@@ -76,7 +76,9 @@ function data_schema_smoke_set_json_body(object $controller, array $body): void
         $ref = $ref->getParentClass();
     }
     $property = $ref->getProperty('jsonBodyCache');
-    $property->setAccessible(true);
+    if (PHP_VERSION_ID < 80100) {
+        $property->setAccessible(true);
+    }
     $property->setValue($controller, $body);
 }
 
@@ -124,6 +126,9 @@ smoke_assert(array_key_exists('db_structural_drift_table_count', (array)($worksp
 smoke_assert(array_key_exists('db_probe_applicable', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether live DB probing is actually applicable.');
 smoke_assert(array_key_exists('db_probe_reachable', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether the DB probe actually reached PostgreSQL.');
 smoke_assert(array_key_exists('db_probe_resolved', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether DB presence truth has actually been resolved.');
+smoke_assert(array_key_exists('db_target_status', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose the classified DB target status.');
+smoke_assert(array_key_exists('db_target_healthy', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether the DB target is healthy enough to trust as authority.');
+smoke_assert(array_key_exists('db_authority_coverage_ratio', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose DB-to-authority coverage ratio.');
 smoke_assert(array_key_exists('migration_tracking_present', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether schema_migrations tracking exists.');
 smoke_assert(array_key_exists('applied_migration_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose how many migrations are recorded as applied.');
 smoke_assert(array_key_exists('migration_backlog_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose the migration backlog count.');
@@ -136,6 +141,14 @@ smoke_assert(array_key_exists('operational_blind_spot_critical_count', (array)($
 smoke_assert(array_key_exists('operational_stress_critical_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include critical operational stress counts.');
 smoke_assert(array_key_exists('global_capability_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM capability counts.');
 smoke_assert(array_key_exists('global_capability_blocking_gap_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should include global ERP+MOM blocking gap counts.');
+smoke_assert(array_key_exists('runtime_ready_endpoint_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose endpoint implementation linkage counts.');
+smoke_assert(array_key_exists('api_implementation_linked_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose API implementation linkage counts.');
+smoke_assert(array_key_exists('unlinked_endpoint_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose unlinked endpoint counts.');
+smoke_assert(array_key_exists('api_backed_table_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose API-backed table counts.');
+smoke_assert(array_key_exists('schema_authority_linked_table_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose migration authority-linked table counts.');
+smoke_assert(array_key_exists('runtime_contract_linked_table_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose runtime contract-linked table counts.');
+smoke_assert(array_key_exists('unlinked_table_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose unlinked table counts.');
+smoke_assert(array_key_exists('governance_direct_gap_count', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose classified direct governance posture counts.');
 smoke_assert(array_key_exists('workspace_design_available', (array)($workspace['metrics'] ?? [])), 'Workspace metrics should expose whether the editable workspace design source exists.');
 smoke_assert(($workspace['metrics']['workspace_design_available'] ?? false) === true, 'Normal Data Schema workspace should find the editable workspace design source.');
 smoke_assert(($workspace['metrics']['workspace_design_artifact_orphaned'] ?? true) === false, 'Normal Data Schema workspace should not mark Schema Studio artifacts orphaned.');
@@ -143,6 +156,9 @@ smoke_assert(array_key_exists('present_lookup', (array)($workspace['connection']
 smoke_assert(array_key_exists('db_probe_applicable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe is active or intentionally not applicable.');
 smoke_assert(array_key_exists('db_probe_reachable', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the DB probe reached PostgreSQL.');
 smoke_assert(array_key_exists('db_probe_resolved', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether DB presence truth has actually been resolved.');
+smoke_assert(array_key_exists('db_target_status', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose the DB target root-cause status.');
+smoke_assert(array_key_exists('db_target_reason', (array)($workspace['connection'] ?? [])), 'Workspace connection should explain why the DB target is or is not authoritative.');
+smoke_assert(array_key_exists('db_target_next_action', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose the next safe action for DB target gaps.');
 smoke_assert(array_key_exists('migration_table_present', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the schema_migrations ledger table exists.');
 smoke_assert(array_key_exists('applied_migration_count', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose the applied migration count.');
 smoke_assert(array_key_exists('pending_migration_count', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose pending migration backlog count.');
@@ -168,6 +184,14 @@ smoke_assert(
 );
 smoke_assert((int)($workspace['metrics']['operational_blind_spot_critical_count'] ?? -1) === 0, 'Workspace metrics should show zero critical blind spots after hardening.');
 smoke_assert((int)($workspace['metrics']['operational_stress_critical_count'] ?? -1) === 0, 'Workspace metrics should show zero critical stress paths after hardening.');
+smoke_assert((int)($workspace['metrics']['runtime_ready_endpoint_count'] ?? -1) === (int)($workspace['metrics']['endpoint_count'] ?? -2), 'Every endpoint in Data Schema should link to a real backend path/controller/handler.');
+smoke_assert((int)($workspace['metrics']['unlinked_endpoint_count'] ?? -1) === 0, 'Data Schema should not expose unlinked endpoint labels as runtime contracts.');
+smoke_assert((int)($workspace['metrics']['api_backed_table_count'] ?? -1) === (int)($workspace['metrics']['table_count'] ?? -2), 'Every active system table should be API-backed before frontend build-out.');
+smoke_assert((int)($workspace['metrics']['runtime_contract_linked_table_count'] ?? -1) === (int)($workspace['metrics']['table_count'] ?? -2), 'Every active system table should link to migration, registry, relation map and API controller truth.');
+smoke_assert((int)($workspace['metrics']['unlinked_table_count'] ?? -1) === 0, 'Data Schema should not expose unlinked table labels as active system tables.');
+smoke_assert((int)($workspace['metrics']['governance_gap_count'] ?? -1) === 0, 'Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately.');
+smoke_assert(count((array)($workspace['highlights']['governance_gaps'] ?? [])) === 0, 'Workspace highlights should not report classified inherited/root-scope governance posture as actionable gaps.');
+smoke_assert(count((array)($workspace['highlights']['unlinked_components'] ?? [])) === 0, 'Workspace highlights should not expose unlinked active components.');
 
 $firstApi = (array)($workspace['lists']['apis'][0] ?? []);
 $firstTable = (array)($workspace['lists']['tables'][0] ?? []);
@@ -175,12 +199,28 @@ $firstSchema = (array)($workspace['lists']['schemas'][0] ?? []);
 $firstVariable = (array)($workspace['lists']['variables'][0] ?? []);
 
 smoke_assert(isset($firstApi['key']), 'At least one API summary should expose a key.');
+smoke_assert(array_key_exists('implementation_linked', $firstApi), 'API summaries should expose real controller/handler linkage.');
+smoke_assert(array_key_exists('truth_status', $firstApi), 'API summaries should expose truth status.');
+smoke_assert(array_key_exists('truthBinding', $firstApi), 'API summaries should expose truth binding details.');
 smoke_assert(array_key_exists('registry_present', $firstTable), 'Table summaries should expose registry presence.');
 smoke_assert(array_key_exists('db_present', $firstTable), 'Table summaries should expose DB presence.');
 smoke_assert(array_key_exists('column_drift_count', $firstTable), 'Table summaries should expose structural drift counts.');
 smoke_assert(array_key_exists('pk_drift', $firstTable), 'Table summaries should expose primary-key drift posture.');
+smoke_assert(array_key_exists('truth_status', $firstTable), 'Table summaries should expose truth status.');
+smoke_assert(array_key_exists('truthBinding', $firstTable), 'Table summaries should expose truth binding details.');
+smoke_assert(array_key_exists('db_status', $firstTable), 'Table summaries should expose classified DB status instead of only a generic missing label.');
+smoke_assert(array_key_exists('runtime_contract_linked', $firstTable), 'Table summaries should expose runtime contract linkage.');
+smoke_assert(array_key_exists('endpoint_count', $firstTable), 'Table summaries should expose endpoint linkage counts.');
+smoke_assert(array_key_exists('linked_endpoint_count', $firstTable), 'Table summaries should expose linked endpoint counts.');
+smoke_assert(array_key_exists('migration_source_present', $firstTable), 'Table summaries should expose migration source proof.');
+smoke_assert(array_key_exists('operationalRole', $firstTable), 'Table summaries should expose operational role classification.');
+smoke_assert(array_key_exists('governance_mode', $firstTable), 'Table summaries should expose governance classification mode.');
 smoke_assert(isset($firstSchema['key']), 'At least one schema blueprint should expose a key.');
+smoke_assert((string)($firstSchema['truth_status'] ?? '') === 'reference_blueprint', 'Schema blueprints should be explicitly marked as non-runtime reference metadata.');
+smoke_assert(($firstSchema['runtimeLinked'] ?? true) === false, 'Schema blueprints should not be reported as runtime-linked authority.');
 smoke_assert(isset($firstVariable['key']), 'At least one variable category should expose a key.');
+smoke_assert((string)($firstVariable['truth_status'] ?? '') === 'config_library', 'Variable libraries should be explicitly marked as config metadata.');
+smoke_assert(($firstVariable['runtimeLinked'] ?? false) === true, 'Variable libraries should be reported as runtime-used config metadata.');
 $schemaDesigns = array_values(array_filter((array)($workspace['lists']['designs'] ?? []), 'is_array'));
 $schemaDesignIds = array_map(static fn(array $design): string => (string)($design['id'] ?? ''), $schemaDesigns);
 smoke_assert(in_array('workspace', $schemaDesignIds, true), 'Data Schema workspace should expose workspace as the editable design layer.');
@@ -199,9 +239,13 @@ smoke_assert(is_array($workspaceDesignSummary), 'Data Schema workspace design su
 smoke_assert(!empty($workspaceDesignSummary['blankDraft']), 'Workspace design summary should explicitly declare the active draft as blank.');
 smoke_assert((int)($workspaceDesignSummary['tableCount'] ?? -1) === 0, 'Workspace design summary should stay empty so it cannot be confused with system schema authority.');
 smoke_assert((string)($workspaceDesignSummary['runtimeAuthority'] ?? '') === 'system_contract_registry', 'Workspace design summary should point runtime authority to the system contract registry.');
+smoke_assert((string)($workspaceDesignSummary['truth_status'] ?? '') === 'non_runtime_design_draft', 'Workspace design summary should declare itself as a non-runtime design draft.');
+smoke_assert(($workspaceDesignSummary['runtimeLinked'] ?? true) === false, 'Workspace design summary should not be runtime-linked authority.');
 smoke_assert(is_array($registryDesignSummary), 'Data Schema registry design summary should be present.');
 smoke_assert(!empty($registryDesignSummary['readOnly']), 'Data Schema registry design summary should be read-only.');
 smoke_assert((int)($registryDesignSummary['tableCount'] ?? 0) >= 600, 'Data Schema registry design summary should expose full platform table coverage.');
+smoke_assert((string)($registryDesignSummary['truth_status'] ?? '') === 'runtime_contract_authority', 'System contract registry should declare itself as runtime contract authority.');
+smoke_assert(($registryDesignSummary['runtimeLinked'] ?? false) === true, 'System contract registry should be runtime-linked authority.');
 smoke_assert((int)($workspace['metrics']['system_contract_table_count'] ?? 0) >= 600, 'Data Schema metrics should expose full system contract table coverage.');
 smoke_assert((int)($workspace['metrics']['system_contract_endpoint_count'] ?? 0) >= 3000, 'Data Schema metrics should expose full system contract endpoint coverage.');
 smoke_assert((int)($workspace['metrics']['system_contract_workflow_count'] ?? 0) >= 250, 'Data Schema metrics should expose full system contract workflow coverage.');
@@ -234,7 +278,9 @@ smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary'
 smoke_assert((int)($workspace['artifacts']['business_contract_bundle']['summary']['stateModelCount'] ?? 0) > 0, 'Business contract bundle summary should expose state model coverage.');
 
 $buildTableSummaries = new ReflectionMethod(DataSchemaService::class, 'buildTableSummaries');
-$buildTableSummaries->setAccessible(true);
+if (PHP_VERSION_ID < 80100) {
+    $buildTableSummaries->setAccessible(true);
+}
 $tableSummaryRows = $buildTableSummaries->invoke(
     $service,
     [
@@ -300,6 +346,69 @@ foreach ($tableSummaryRows as $row) {
 }
 smoke_assert(($tableSummaryLookup['inventory_transactions']['pk_drift'] ?? true) === false, 'Composite partitioned keys should not be flagged as drift when PostgreSQL reports the expected PK order.');
 smoke_assert(($tableSummaryLookup['risk_register']['pk_drift'] ?? true) === false, 'Risk register should be treated as a scalar-key runtime table after the authority reconciliation.');
+smoke_assert(($tableSummaryLookup['inventory_transactions']['db_status'] ?? '') === 'verified', 'Present tables should be classified as DB verified.');
+
+$partialTargetRows = $buildTableSummaries->invoke(
+    $service,
+    [
+        'tables' => [
+            'inventory_transactions' => [
+                'label' => 'Inventory Transactions',
+                'primaryKey' => ['txn_id', 'recorded_at'],
+                'columns' => [
+                    'txn_id' => ['pk' => true],
+                    'recorded_at' => ['pk' => true],
+                ],
+            ],
+            'risk_register' => [
+                'label' => 'Risk Register',
+                'primaryKey' => 'risk_id',
+                'columns' => [
+                    'risk_id' => ['pk' => true],
+                ],
+            ],
+        ],
+    ],
+    [
+        'entities' => [
+            'inventory_transactions' => [
+                'label' => 'Inventory Transactions',
+                'primaryKeyFields' => ['txn_id', 'recorded_at'],
+                'fields' => ['txn_id', 'recorded_at'],
+            ],
+            'risk_register' => [
+                'label' => 'Risk Register',
+                'primaryKeyFields' => ['risk_id'],
+                'fields' => ['risk_id'],
+            ],
+        ],
+    ],
+    [
+        'db_probe_applicable' => true,
+        'db_probe_resolved' => true,
+        'db_table_count' => 1,
+        'present_table_count' => 1,
+        'migration_table_present' => true,
+        'applied_migration_count' => 0,
+        'present_lookup' => [
+            'inventory_transactions' => true,
+        ],
+        'column_lookup' => [
+            'inventory_transactions' => ['txn_id' => true, 'recorded_at' => true],
+        ],
+        'pk_lookup' => [
+            'inventory_transactions' => ['txn_id', 'recorded_at'],
+        ],
+    ],
+);
+$partialTargetLookup = [];
+foreach ($partialTargetRows as $row) {
+    if (is_array($row) && isset($row['key'])) {
+        $partialTargetLookup[(string)$row['key']] = $row;
+    }
+}
+smoke_assert(($partialTargetLookup['risk_register']['db_status'] ?? '') === 'missing_from_untracked_target', 'Missing table status should point to the untracked DB target root cause when the migration ledger is empty.');
+smoke_assert(($partialTargetLookup['risk_register']['truthBinding']['dbProbe'] ?? '') === 'missing_from_untracked_target', 'Truth binding should preserve DB target root-cause classification for missing tables.');
 
 $store = [
     'settings' => ['require_mfa' => false],

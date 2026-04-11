@@ -1,0 +1,32 @@
+    <div class="grid-2" style="margin-top:18px;margin-bottom:18px">
+      <div class="info-box info-box-blue">
+        <strong>CROSS-REFERENCE V4.3</strong>
+        Xem section <code>a11y-i18n-precision</code> để áp dụng landmark mapping theo zone, roving tabindex, contrast verification, typography tiếng Việt, reading order và i18n formatting. Section 7 giữ pattern nền; section mới là checklist triển khai chi tiết trước khi release.
+      </div>
+      <div class="info-box info-box-amber">
+        <strong>ALT TEXT AUTHORING</strong>
+        Ảnh inspection/defect phải mô tả defect type + vị trí + mã part/lot nếu có: “Vết xước dài 12mm ở cạnh trái part AERO-BRK-2024, lot MAT-AL6061-T6-0426”. Ảnh decorative dùng <code>aria-hidden="true"</code> hoặc alt rỗng. Ảnh machine phải mô tả machine type + trạng thái: “Haas VF-2SS đang dừng vì alarm spindle load”.
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Alt text authoring guideline</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Loại hình ảnh</th>
+              <th>Alt text nên viết</th>
+              <th>Không nên viết</th>
+              <th>ARIA rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ảnh inspection / defect</td><td>Mô tả loại lỗi, vị trí, kích thước nếu biết, part number và lot/serial liên quan.</td><td>“Ảnh lỗi”, “Defect image”, hoặc chỉ ghi tên file.</td><td><code>alt</code> cụ thể; nếu có caption dài thì dùng <code>aria-describedby</code>.</td></tr>
+            <tr><td>Ảnh machine / workstation</td><td>Mô tả loại máy, trạng thái, alarm hoặc hoạt động đang diễn ra.</td><td>“Máy CNC”, nếu trạng thái trong ảnh quan trọng.</td><td><code>alt</code> cụ thể; không dựa vào màu đèn machine.</td></tr>
+            <tr><td>Ảnh bằng chứng setup</td><td>Nêu setup reference, fixture/tool và điều kiện đúng/sai cần nhìn.</td><td>“Setup photo” chung chung.</td><td>Liên kết với checklist item bằng <code>aria-describedby</code> nếu ảnh giải thích tiêu chí.</td></tr>
+            <tr><td>Ảnh decorative / wireframe</td><td>Không cần đọc nếu chỉ trang trí hoặc thumbnail minh họa không chứa thông tin mới.</td><td>Alt dài lặp lại text ngay cạnh ảnh.</td><td>Dùng <code>aria-hidden="true"</code> cho SVG decorative hoặc <code>alt=""</code> cho image decorative.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

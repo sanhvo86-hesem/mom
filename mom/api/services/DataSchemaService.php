@@ -17,6 +17,17 @@ final class DataSchemaService
     private const ARTIFACT_DEPENDENCY_GRACE_SECONDS = 60;
     private const LARGE_ARTIFACT_WARN_BYTES = 10485760;
     private const VERY_LARGE_ARTIFACT_WARN_BYTES = 20971520;
+    private const WORKSPACE_MEMORY_BUDGET = '256M';
+    private const GOVERNANCE_FIELDS = [
+        'org_company_code',
+        'org_legal_entity_code',
+        'org_plant_id',
+        'org_site_id',
+        'source_system',
+        'source_record_id',
+        'row_version',
+        'payload_schema_version',
+    ];
 
     private DataLayer $data;
     private string $dataDir;
@@ -41,17 +52,17 @@ final class DataSchemaService
 
     public function getWorkspace(): array
     {
-        $this->ensureMemoryBudget('512M');
+        $this->ensureMemoryBudget(self::WORKSPACE_MEMORY_BUDGET);
 
         $endpointCatalogWorkspace = $this->readEndpointCatalogWorkspace();
-        $endpointCatalogArtifact = $this->readJson($this->registryPath('endpoint-catalog'));
+        $endpointCatalogArtifact = $this->readArtifactEnvelope($this->registryPath('endpoint-catalog'), ['_meta']);
         $tableRegistry = $this->readJson($this->registryPath('table-registry'));
         $relationMap = $this->readRelationMapLight();
         $schemaLibrary = $this->readJson($this->registryPath('schema-library'));
         $variableLibrary = $this->readJson($this->configDir . '/variable_library.json');
         $systemContractManifest = $this->readJson($this->registryPath('system-contract-manifest'));
         $systemContractDiagnostics = $this->readJson($this->registryPath('system-contract-diagnostics'));
-        $systemContractRuntimeProjections = $this->readJson($this->registryPath('system-contract-runtime-projections'));
+        $systemContractRuntimeProjections = $this->readArtifactEnvelope($this->registryPath('system-contract-runtime-projections'), ['_meta', 'summary']);
         $systemContractRegistryContracts = $this->readJson($this->registryPath('system-contract-registry-contracts'));
         $schemaStudioManifest = $this->readJson($this->registryPath('schema-studio-enterprise-manifest'));
         $schemaStudioDiagnostics = $this->readJson($this->registryPath('schema-studio-diagnostics'));
@@ -84,7 +95,7 @@ final class DataSchemaService
         $apis = $this->buildApiSummaries($endpointCatalogWorkspace);
         $tableKeys = $this->allTableKeys($tableRegistry, $relationMap);
         $dbProbe = $this->probeDatabase($tableKeys);
-        $tables = $this->buildTableSummaries($tableRegistry, $relationMap, $dbProbe);
+        $tables = $this->buildTableSummaries($tableRegistry, $relationMap, $dbProbe, $apis);
         $connection = $this->buildConnectionSummary($dbProbe, $tables);
         $blueprints = $this->buildBlueprintSummaries($schemaLibrary);
         $variables = $this->buildVariableSummaries($variableLibrary);
@@ -130,6 +141,8 @@ final class DataSchemaService
 
         $dbProbeApplicable = !empty($connection['db_probe_applicable']);
         $dbProbeResolved = !empty($connection['db_probe_resolved']);
+        $dbTargetStatus = (string)($connection['db_target_status'] ?? 'not_configured');
+        $dbTargetHealthy = (bool)($connection['db_target_healthy'] ?? false);
         $workflowTableCount = 0;
         $supportTableCount = 0;
         $governanceGapCount = 0;
@@ -138,6 +151,14 @@ final class DataSchemaService
         $dbMissingCount = 0;
         $adminOnlyEndpointCount = 0;
         $csrfEndpointCount = 0;
+        $runtimeReadyEndpointCount = 0;
+        $unlinkedEndpointCount = 0;
+        $apiBackedTableCount = 0;
+        $schemaAuthorityLinkedTableCount = 0;
+        $runtimeContractLinkedTableCount = 0;
+        $dbVerifiedTableCount = 0;
+        $unlinkedTableCount = 0;
+        $directGovernanceGapCount = 0;
         $variableCount = 0;
 
         foreach ($tables as $table) {
@@ -148,7 +169,13 @@ final class DataSchemaService
                 $supportTableCount += 1;
             }
             $governanceGapCount += (int)($table['governance_gap_count'] ?? 0) > 0 ? 1 : 0;
+            $directGovernanceGapCount += (int)($table['governance_direct_missing_count'] ?? 0) > 0 ? 1 : 0;
             $registryGapCount += (($table['registry_present'] ?? false) === false) ? 1 : 0;
+            $apiBackedTableCount += (int)($table['endpoint_count'] ?? 0) > 0 ? 1 : 0;
+            $schemaAuthorityLinkedTableCount += !empty($table['migration_source_present']) ? 1 : 0;
+            $runtimeContractLinkedTableCount += !empty($table['runtime_contract_linked']) ? 1 : 0;
+            $dbVerifiedTableCount += (string)($table['truth_status'] ?? '') === 'db_verified' ? 1 : 0;
+            $unlinkedTableCount += !empty($table['unlinked']) ? 1 : 0;
             if ($dbProbeResolved) {
                 $dbPresentCount += (($table['db_present'] ?? false) === true) ? 1 : 0;
                 $dbMissingCount += (($table['db_present'] ?? false) === false) ? 1 : 0;
@@ -158,6 +185,8 @@ final class DataSchemaService
         foreach ($apis as $api) {
             $adminOnlyEndpointCount += (($api['admin_only'] ?? false) === true) ? 1 : 0;
             $csrfEndpointCount += (($api['csrf_required'] ?? false) === true) ? 1 : 0;
+            $runtimeReadyEndpointCount += !empty($api['implementation_linked']) ? 1 : 0;
+            $unlinkedEndpointCount += empty($api['implementation_linked']) ? 1 : 0;
         }
 
         foreach ($variables as $category) {
@@ -180,23 +209,34 @@ final class DataSchemaService
             'connection' => $connection,
             'metrics' => [
                 'endpoint_count' => count($apis),
-                'runtime_ready_endpoint_count' => (int)($endpointCatalogWorkspace['_meta']['activeEndpoints'] ?? 0),
+                'runtime_ready_endpoint_count' => $runtimeReadyEndpointCount,
+                'api_implementation_linked_count' => $runtimeReadyEndpointCount,
+                'unlinked_endpoint_count' => $unlinkedEndpointCount,
                 'endpoint_field_library_count' => (int)($dataFieldsIndex['_meta']['generatedEndpointCount'] ?? 0),
                 'admin_only_endpoint_count' => $adminOnlyEndpointCount,
                 'csrf_endpoint_count' => $csrfEndpointCount,
                 'table_count' => count($tables),
+                'api_backed_table_count' => $apiBackedTableCount,
+                'schema_authority_linked_table_count' => $schemaAuthorityLinkedTableCount,
+                'runtime_contract_linked_table_count' => $runtimeContractLinkedTableCount,
+                'db_verified_table_count' => $dbVerifiedTableCount,
+                'unlinked_table_count' => $unlinkedTableCount,
                 'registry_table_count' => count((array)($tableRegistry['tables'] ?? [])),
                 'relation_entity_count' => count((array)($relationMap['entities'] ?? [])),
                 'registry_gap_count' => $registryGapCount,
                 'db_probe_applicable' => $dbProbeApplicable,
                 'db_probe_reachable' => !empty($connection['db_probe_reachable']),
                 'db_probe_resolved' => $dbProbeResolved,
+                'db_target_status' => $dbTargetStatus,
+                'db_target_healthy' => $dbTargetHealthy,
+                'db_authority_coverage_ratio' => (float)($connection['authority_coverage_ratio'] ?? 0.0),
                 'runtime_postgres_path_active' => !empty($connection['runtime_path_active']),
                 'db_present_table_count' => $dbPresentCount,
                 'db_missing_table_count' => $dbMissingCount,
                 'workflow_table_count' => $workflowTableCount,
                 'support_table_count' => $supportTableCount,
                 'governance_gap_count' => $governanceGapCount,
+                'governance_direct_gap_count' => $directGovernanceGapCount,
                 'domain_count' => count($domains),
                 'business_contract_domain_count' => count((array)($contractDomainMap['domains'] ?? [])),
                 'business_contract_package_count' => count((array)($contractPackageIndex['packages'] ?? [])),
@@ -435,6 +475,20 @@ final class DataSchemaService
         return $this->schemaStudioDir . '/' . ltrim($segment, '/');
     }
 
+    private function relativePath(string $path): string
+    {
+        $normalizedPath = rtrim(str_replace('\\', '/', $path), '/');
+        $root = rtrim(str_replace('\\', '/', $this->rootDir), '/');
+        if ($root !== '' && $root !== '.' && $normalizedPath === $root) {
+            return '';
+        }
+        if ($root !== '' && $root !== '.' && str_starts_with($normalizedPath, $root . '/')) {
+            return substr($normalizedPath, strlen($root) + 1);
+        }
+
+        return ltrim($normalizedPath, '/');
+    }
+
     private function readJson(string $path): array
     {
         if (function_exists('read_json_file')) {
@@ -475,6 +529,33 @@ final class DataSchemaService
         }
 
         return $this->readJson($this->registryPath('endpoint-catalog'));
+    }
+
+    /**
+     * Read only top-level metadata sections from large registry artifacts.
+     *
+     * Data Schema summary needs artifact freshness and release posture, not the
+     * full endpoint/table projection payload. Decoding multi-megabyte registry
+     * bodies in every admin request can exceed the PHP-FPM 256MB memory budget.
+     *
+     * @param list<string> $sections
+     * @return array<string, mixed>
+     */
+    private function readArtifactEnvelope(string $path, array $sections): array
+    {
+        $payload = [];
+        foreach ($sections as $section) {
+            $key = trim((string)$section);
+            if ($key === '') {
+                continue;
+            }
+            $value = $this->extractTopLevelJsonSection($path, $key);
+            if ($value !== []) {
+                $payload[$key] = $value;
+            }
+        }
+
+        return $payload;
     }
 
     private function extractTopLevelJsonSection(string $path, string $section): array
@@ -1117,7 +1198,7 @@ final class DataSchemaService
         $missingDependencyPaths = [];
         foreach ($dependencyPaths as $dependencyPath) {
             if (!is_file($dependencyPath)) {
-                $missingDependencyPaths[] = ltrim(str_replace($this->rootDir, '', $dependencyPath), '/');
+                $missingDependencyPaths[] = $this->relativePath($dependencyPath);
                 continue;
             }
             $dependencyTimestamp = array_key_exists($dependencyPath, $knownDependencyTimestamps)
@@ -1150,7 +1231,7 @@ final class DataSchemaService
             'id' => $id,
             'label' => $label,
             'category' => $category,
-            'path' => ltrim(str_replace($this->rootDir, '', $path), '/'),
+            'path' => $this->relativePath($path),
             'exists' => $exists,
             'status' => $status,
             'requiredForRelease' => $requiredForRelease,
@@ -1167,7 +1248,7 @@ final class DataSchemaService
             'sourceDriftSeconds' => $sourceDriftSeconds,
             'sourceDriftLabel' => $sourceDriftSeconds > 0 ? $this->humanDuration($sourceDriftSeconds) : '0s',
             'latestDependencyAt' => $latestDependencyTimestamp !== null ? gmdate('c', $latestDependencyTimestamp) : '',
-            'latestDependencyPath' => $latestDependencyPath !== '' ? ltrim(str_replace($this->rootDir, '', $latestDependencyPath), '/') : '',
+            'latestDependencyPath' => $latestDependencyPath !== '' ? $this->relativePath($latestDependencyPath) : '',
         ];
     }
 
@@ -1282,6 +1363,7 @@ final class DataSchemaService
         $missingColumnCount = 0;
         $unexpectedColumnCount = 0;
         $pkDriftCount = 0;
+        $authorityTableCount = count($tables);
 
         foreach ($tables as $table) {
             if (!is_array($table) || empty($table['db_present'])) {
@@ -1314,11 +1396,19 @@ final class DataSchemaService
             return $bScore <=> $aScore;
         });
 
+        $dbTarget = $this->classifyDbTarget($dbProbe, $authorityTableCount, count($structuralDrift));
+
         return [
             'data_layer' => (array)($dbProbe['data_layer'] ?? []),
             'db_probe_applicable' => !empty($dbProbe['db_probe_applicable']),
             'db_probe_reachable' => !empty($dbProbe['db_probe_reachable']),
             'db_probe_resolved' => !empty($dbProbe['db_probe_resolved']),
+            'db_target_status' => (string)($dbTarget['status'] ?? 'not_configured'),
+            'db_target_healthy' => (bool)($dbTarget['healthy'] ?? false),
+            'db_target_reason' => (string)($dbTarget['reason'] ?? ''),
+            'db_target_next_action' => (string)($dbTarget['nextAction'] ?? ''),
+            'db_target_authority_table_count' => $authorityTableCount,
+            'authority_coverage_ratio' => (float)($dbTarget['coverageRatio'] ?? 0.0),
             'configured' => !empty($dbProbe['configured']),
             'reachable' => (bool)($dbProbe['reachable'] ?? false),
             'host' => (string)($dbProbe['host'] ?? ''),
@@ -1346,6 +1436,111 @@ final class DataSchemaService
             'pk_drift_table_count' => $pkDriftCount,
             'structural_drift' => array_slice($structuralDrift, 0, 20),
             'error' => (string)($dbProbe['error'] ?? ''),
+        ];
+    }
+
+    /**
+     * @return array{status:string, healthy:bool, reason:string, nextAction:string, coverageRatio:float}
+     */
+    private function classifyDbTarget(array $dbProbe, int $authorityTableCount, int $structuralDriftCount): array
+    {
+        $applicable = !empty($dbProbe['db_probe_applicable']);
+        $reachable = !empty($dbProbe['db_probe_reachable']);
+        $resolved = !empty($dbProbe['db_probe_resolved']);
+        $dbTableCount = (int)($dbProbe['db_table_count'] ?? 0);
+        $presentTableCount = (int)($dbProbe['present_table_count'] ?? 0);
+        $missingTableCount = (int)($dbProbe['missing_table_count'] ?? 0);
+        $unexpectedTableCount = count((array)($dbProbe['unexpected_tables'] ?? []));
+        $migrationTablePresent = !empty($dbProbe['migration_table_present']);
+        $appliedMigrationCount = (int)($dbProbe['applied_migration_count'] ?? 0);
+        $migrationFileCount = (int)($dbProbe['migration_file_count'] ?? 0);
+        $coverageRatio = $authorityTableCount > 0 ? round($presentTableCount / max(1, $authorityTableCount), 4) : 0.0;
+
+        if (!$applicable) {
+            return [
+                'status' => 'not_configured',
+                'healthy' => false,
+                'reason' => 'No live PostgreSQL profile is configured for direct schema probing.',
+                'nextAction' => 'Configure a governed DB profile before using live DB coverage as release evidence.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if (!$reachable || !$resolved) {
+            return [
+                'status' => 'unreachable',
+                'healthy' => false,
+                'reason' => 'The configured PostgreSQL target cannot be reached or resolved.',
+                'nextAction' => 'Restore DB connectivity, credentials and schema search_path before trusting DB coverage.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if ($dbTableCount > 0 && !$migrationTablePresent) {
+            return [
+                'status' => 'untracked_live_database',
+                'healthy' => false,
+                'reason' => 'The target DB contains tables but has no schema_migrations authority ledger.',
+                'nextAction' => 'Create a controlled migration baseline before applying schema changes.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if ($dbTableCount > 0 && $migrationTablePresent && $appliedMigrationCount === 0) {
+            return [
+                'status' => 'untracked_live_database',
+                'healthy' => false,
+                'reason' => 'The target DB contains tables but schema_migrations records zero applied migrations.',
+                'nextAction' => 'Backfill or rebuild the migration baseline before treating this DB as authority.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if ($missingTableCount > 0 || ($authorityTableCount > 0 && $coverageRatio < 0.95)) {
+            return [
+                'status' => 'incomplete_runtime_database',
+                'healthy' => false,
+                'reason' => sprintf(
+                    'The configured DB has %d/%d authority tables; %d are missing from the probed schema.',
+                    $presentTableCount,
+                    $authorityTableCount,
+                    $missingTableCount
+                ),
+                'nextAction' => 'Run a no-data-loss schema promotion plan against the production DB or point the runtime to the governed full-schema DB after backfill.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if ($unexpectedTableCount > 0 || $structuralDriftCount > 0) {
+            return [
+                'status' => 'schema_drift',
+                'healthy' => false,
+                'reason' => sprintf(
+                    'The target DB has %d unmanaged tables and %d tables with column or PK drift.',
+                    $unexpectedTableCount,
+                    $structuralDriftCount
+                ),
+                'nextAction' => 'Reconcile live DB columns, keys and unmanaged tables against migrations before release.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        if ($migrationFileCount > 0 && $appliedMigrationCount > 0 && $appliedMigrationCount < $migrationFileCount) {
+            return [
+                'status' => 'migration_backlog',
+                'healthy' => false,
+                'reason' => sprintf('%d/%d migrations are recorded as applied.', $appliedMigrationCount, $migrationFileCount),
+                'nextAction' => 'Apply pending migrations through the governed migration runner.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
+        return [
+            'status' => 'aligned',
+            'healthy' => true,
+            'reason' => 'The configured DB matches the runtime authority coverage checked by Data Schema.',
+            'nextAction' => 'Keep migration ledger and registry artifacts refreshed on every schema change.',
+            'coverageRatio' => $coverageRatio,
         ];
     }
 
@@ -1440,11 +1635,13 @@ final class DataSchemaService
         }
 
         $registryGapCount = 0;
+        $unlinkedTableCount = 0;
         foreach ($tables as $table) {
             if (!is_array($table)) {
                 continue;
             }
             $registryGapCount += (($table['registry_present'] ?? false) === false) ? 1 : 0;
+            $unlinkedTableCount += !empty($table['unlinked']) ? 1 : 0;
         }
 
         $risks = [];
@@ -1586,6 +1783,17 @@ final class DataSchemaService
             ];
         }
 
+        if ($unlinkedTableCount > 0) {
+            $risks[] = [
+                'id' => 'unlinked_schema_components',
+                'severity' => 'high',
+                'blocking' => true,
+                'title' => 'Schema components without runtime proof remain visible',
+                'detail' => $unlinkedTableCount . ' table components are not linked to registry, relation map, migration, API, or DB proof.',
+                'nextAction' => 'Archive non-runtime components or bind them to the authority chain before exposing them to AI/frontend tooling.',
+            ];
+        }
+
         if (!empty($connection['reachable']) && (int)($connection['structural_drift_table_count'] ?? 0) > 0) {
             $topDrift = array_slice(array_values(array_filter((array)($connection['structural_drift'] ?? []), 'is_array')), 0, 4);
             $labels = array_map(static function (array $item): string {
@@ -1717,6 +1925,159 @@ final class DataSchemaService
         ];
     }
 
+    private function endpointImplementationExists(string $controller, string $handler): bool
+    {
+        $controller = trim($controller);
+        $handler = trim($handler);
+        if ($controller === '' || $handler === '') {
+            return false;
+        }
+
+        $fqcn = 'MOM\\Api\\Controllers\\' . $controller;
+        return class_exists($fqcn) && method_exists($fqcn, $handler);
+    }
+
+    /**
+     * @param list<array<string, mixed>> $apis
+     * @return array<string, array{total:int, linked:int}>
+     */
+    private function endpointCountsByEntity(array $apis): array
+    {
+        $counts = [];
+        foreach ($apis as $api) {
+            if (!is_array($api)) {
+                continue;
+            }
+            $entity = trim((string)($api['entity'] ?? ''));
+            if ($entity === '') {
+                continue;
+            }
+            if (!isset($counts[$entity])) {
+                $counts[$entity] = ['total' => 0, 'linked' => 0];
+            }
+            $counts[$entity]['total'] += 1;
+            if (!empty($api['implementation_linked'])) {
+                $counts[$entity]['linked'] += 1;
+            }
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param array<string, mixed> $tables
+     * @return array<string, bool>
+     */
+    private function governanceCarrierTables(array $tables): array
+    {
+        $carriers = [];
+        foreach ($tables as $tableName => $table) {
+            if (!is_array($table)) {
+                continue;
+            }
+            $columns = is_array($table['columns'] ?? null) ? $table['columns'] : [];
+            if (
+                isset($columns['org_company_code'])
+                || isset($columns['org_plant_id'])
+                || isset($columns['org_site_id'])
+                || str_starts_with((string)$tableName, 'org_')
+            ) {
+                $carriers[(string)$tableName] = true;
+            }
+        }
+
+        return $carriers;
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, bool> $governanceCarriers
+     * @return list<string>
+     */
+    private function governanceInheritanceSources(array $table, array $governanceCarriers): array
+    {
+        $sources = [];
+        foreach ((array)($table['foreignKeys'] ?? []) as $fk) {
+            if (!is_array($fk)) {
+                continue;
+            }
+            $references = trim((string)($fk['references'] ?? ''));
+            if ($references === '') {
+                continue;
+            }
+            $targetParts = explode('.', $references, 2);
+            $targetTable = trim((string)($targetParts[0] ?? ''));
+            if ($targetTable !== '' && isset($governanceCarriers[$targetTable])) {
+                $sources[] = $targetTable;
+            }
+        }
+        $sources = array_values(array_unique($sources));
+        sort($sources);
+
+        return $sources;
+    }
+
+    private function isGovernanceRootScope(string $key, array $table): bool
+    {
+        $domain = (string)($table['domain'] ?? '');
+        if ($domain === 'bi_datawarehouse') {
+            return true;
+        }
+        if ($domain === 'foundation_governance' && str_starts_with($key, 'org_')) {
+            return true;
+        }
+        if ($domain === 'master_data_governance' && (str_contains($key, 'registry') || str_contains($key, 'retention'))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param list<string> $directMissing
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $entity
+     * @param array<string, bool> $governanceCarriers
+     * @return array<string, mixed>
+     */
+    private function governancePosture(string $key, array $table, array $entity, array $directMissing, array $governanceCarriers): array
+    {
+        if ($directMissing === []) {
+            return [
+                'status' => 'direct_complete',
+                'mode' => 'direct',
+                'actionableMissing' => [],
+                'inheritedVia' => [],
+            ];
+        }
+
+        if ($this->isGovernanceRootScope($key, $table !== [] ? $table : $entity)) {
+            return [
+                'status' => 'root_scope_exception',
+                'mode' => 'root_scope',
+                'actionableMissing' => [],
+                'inheritedVia' => [],
+            ];
+        }
+
+        $inheritedVia = $this->governanceInheritanceSources($table, $governanceCarriers);
+        if ($inheritedVia !== []) {
+            return [
+                'status' => 'inherited_scope',
+                'mode' => 'inherited',
+                'actionableMissing' => [],
+                'inheritedVia' => $inheritedVia,
+            ];
+        }
+
+        return [
+            'status' => 'missing_direct_scope',
+            'mode' => 'missing',
+            'actionableMissing' => $directMissing,
+            'inheritedVia' => [],
+        ];
+    }
+
     /**
      * @return list<array<string, mixed>>
      */
@@ -1729,6 +2090,10 @@ final class DataSchemaService
                 if (!is_array($item)) {
                     continue;
                 }
+                $path = (string)($item['path'] ?? '');
+                $controller = (string)($item['controller'] ?? '');
+                $handler = (string)($item['handler'] ?? '');
+                $implementationExists = $this->endpointImplementationExists($controller, $handler);
 
                 $rows[] = [
                     'key' => (string)($item['key'] ?? ''),
@@ -1740,9 +2105,9 @@ final class DataSchemaService
                     'kind' => (string)($item['kind'] ?? ''),
                     'domain' => (string)($item['domain'] ?? ''),
                     'entity' => (string)($item['entity'] ?? ''),
-                    'path' => (string)($item['path'] ?? ''),
-                    'controller' => (string)($item['controller'] ?? ''),
-                    'handler' => (string)($item['handler'] ?? ''),
+                    'path' => $path,
+                    'controller' => $controller,
+                    'handler' => $handler,
                     'field_count' => (int)($item['field_count'] ?? 0),
                     'auth_required' => (bool)($item['auth_required'] ?? false),
                     'csrf_required' => (bool)($item['csrf_required'] ?? false),
@@ -1752,6 +2117,16 @@ final class DataSchemaService
                     'runtime_safe' => (bool)($item['runtime_safe'] ?? false),
                     'deletion_mode' => (string)($item['deletion_mode'] ?? ''),
                     'source' => (string)($item['source'] ?? ''),
+                    'implementation_exists' => $implementationExists,
+                    'implementation_linked' => $path !== '' && $implementationExists,
+                    'truth_status' => $path !== '' && $implementationExists ? 'controller_linked' : 'unlinked',
+                    'truthBinding' => [
+                        'layer' => 'api_controller',
+                        'status' => $path !== '' && $implementationExists ? 'linked' : 'unlinked',
+                        'path' => $path,
+                        'controller' => $controller,
+                        'handler' => $handler,
+                    ],
                 ];
             }
 
@@ -1771,6 +2146,10 @@ final class DataSchemaService
             $deletion = is_array($item['capabilities']['deletion'] ?? null)
                 ? $item['capabilities']['deletion']
                 : (is_array($item['response']['deletion'] ?? null) ? $item['response']['deletion'] : []);
+            $path = (string)($item['path'] ?? '');
+            $controller = (string)($item['controller'] ?? '');
+            $handler = (string)($item['handler'] ?? '');
+            $implementationExists = $this->endpointImplementationExists($controller, $handler);
 
             $rows[] = [
                 'key' => (string)$key,
@@ -1782,9 +2161,9 @@ final class DataSchemaService
                 'kind' => (string)($item['kind'] ?? ''),
                 'domain' => (string)($item['domain'] ?? ''),
                 'entity' => (string)($item['entity'] ?? ''),
-                'path' => (string)($item['path'] ?? ''),
-                'controller' => (string)($item['controller'] ?? ''),
-                'handler' => (string)($item['handler'] ?? ''),
+                'path' => $path,
+                'controller' => $controller,
+                'handler' => $handler,
                 'field_count' => (int)($item['field_count'] ?? 0),
                 'auth_required' => (bool)($security['auth_required'] ?? false),
                 'csrf_required' => (bool)($security['csrf_required'] ?? false),
@@ -1794,6 +2173,16 @@ final class DataSchemaService
                 'runtime_safe' => (bool)($workflow['generic_runtime_safe'] ?? false),
                 'deletion_mode' => (string)($deletion['mode'] ?? ''),
                 'source' => (string)($item['source'] ?? ''),
+                'implementation_exists' => $implementationExists,
+                'implementation_linked' => $path !== '' && $implementationExists,
+                'truth_status' => $path !== '' && $implementationExists ? 'controller_linked' : 'unlinked',
+                'truthBinding' => [
+                    'layer' => 'api_controller',
+                    'status' => $path !== '' && $implementationExists ? 'linked' : 'unlinked',
+                    'path' => $path,
+                    'controller' => $controller,
+                    'handler' => $handler,
+                ],
             ];
         }
 
@@ -2093,27 +2482,74 @@ final class DataSchemaService
         return $pdo;
     }
 
+    private function tableDbStatus(
+        bool $dbProbeApplicable,
+        bool $dbProbeResolved,
+        ?bool $dbPresent,
+        bool $migrationLedgerEmpty,
+        bool $dbTargetIncomplete
+    ): string {
+        if (!$dbProbeApplicable) {
+            return 'not_configured';
+        }
+        if (!$dbProbeResolved) {
+            return 'unresolved';
+        }
+        if ($dbPresent === true) {
+            return 'verified';
+        }
+        if ($migrationLedgerEmpty) {
+            return 'missing_from_untracked_target';
+        }
+        if ($dbTargetIncomplete) {
+            return 'missing_from_incomplete_target';
+        }
+        return 'missing';
+    }
+
     /**
      * @param array<string, mixed> $dbProbe
      * @return list<array<string, mixed>>
      */
-    private function buildTableSummaries(array $tableRegistry, array $relationMap, array $dbProbe): array
+    private function buildTableSummaries(array $tableRegistry, array $relationMap, array $dbProbe, array $apis = []): array
     {
         $rows = [];
         $tables = is_array($tableRegistry['tables'] ?? null) ? $tableRegistry['tables'] : [];
         $entities = is_array($relationMap['entities'] ?? null) ? $relationMap['entities'] : [];
+        $endpointCounts = $this->endpointCountsByEntity($apis);
+        $governanceCarriers = $this->governanceCarrierTables($tables);
         $dbLookup = is_array($dbProbe['present_lookup'] ?? null) ? $dbProbe['present_lookup'] : [];
         $dbColumnLookup = is_array($dbProbe['column_lookup'] ?? null) ? $dbProbe['column_lookup'] : [];
         $dbPkLookup = is_array($dbProbe['pk_lookup'] ?? null) ? $dbProbe['pk_lookup'] : [];
         $dbProbeApplicable = !empty($dbProbe['db_probe_applicable']);
         $dbProbeResolved = !empty($dbProbe['db_probe_resolved']);
+        $tableKeys = $this->allTableKeys($tableRegistry, $relationMap);
+        $authorityTableCount = count($tableKeys);
+        $dbPresentTableCount = (int)($dbProbe['present_table_count'] ?? 0);
+        $dbTableCount = (int)($dbProbe['db_table_count'] ?? 0);
+        $migrationLedgerEmpty = $dbProbeResolved
+            && $dbTableCount > 0
+            && !empty($dbProbe['migration_table_present'])
+            && (int)($dbProbe['applied_migration_count'] ?? 0) === 0;
+        $dbTargetIncomplete = $dbProbeResolved
+            && $authorityTableCount > 0
+            && $dbPresentTableCount < $authorityTableCount;
 
-        foreach ($this->allTableKeys($tableRegistry, $relationMap) as $key) {
+        foreach ($tableKeys as $key) {
             $table = is_array($tables[$key] ?? null) ? $tables[$key] : [];
             $entity = is_array($entities[$key] ?? null) ? $entities[$key] : [];
             $columns = is_array($table['columns'] ?? null) ? array_keys($table['columns']) : [];
             $fieldNames = $columns !== [] ? $columns : $this->scalarStringList($entity['fields'] ?? []);
             $governanceMissing = $this->scalarStringList($entity['governanceMissing'] ?? []);
+            if ($governanceMissing === [] && $fieldNames !== []) {
+                $fieldLookup = array_fill_keys($fieldNames, true);
+                $governanceMissing = array_values(array_filter(self::GOVERNANCE_FIELDS, static fn(string $field): bool => !isset($fieldLookup[$field])));
+            }
+            $governancePosture = $this->governancePosture($key, $table, $entity, $governanceMissing, $governanceCarriers);
+            $actionableGovernanceMissing = $this->scalarStringList($governancePosture['actionableMissing'] ?? []);
+            $endpointStats = $endpointCounts[$key] ?? ['total' => 0, 'linked' => 0];
+            $endpointCount = (int)($endpointStats['total'] ?? 0);
+            $linkedEndpointCount = (int)($endpointStats['linked'] ?? 0);
             $dbColumns = array_keys(is_array($dbColumnLookup[$key] ?? null) ? $dbColumnLookup[$key] : []);
             $expectedPkFields = $this->scalarStringList($table['primaryKeys'] ?? ($entity['primaryKeyFields'] ?? []));
             if ($expectedPkFields === []) {
@@ -2124,9 +2560,34 @@ final class DataSchemaService
             }
             $dbPkFields = array_values(array_filter((array)($dbPkLookup[$key] ?? []), 'is_string'));
             $dbPresent = $dbProbeResolved ? isset($dbLookup[$key]) : null;
+            $dbStatus = $this->tableDbStatus($dbProbeApplicable, $dbProbeResolved, $dbPresent, $migrationLedgerEmpty, $dbTargetIncomplete);
             $missingColumns = $dbPresent === true ? array_values(array_diff($fieldNames, $dbColumns)) : [];
             $unexpectedColumns = $dbPresent === true ? array_values(array_diff($dbColumns, $fieldNames)) : [];
             $pkDrift = $dbPresent === true && $expectedPkFields !== [] && $dbPkFields !== $expectedPkFields;
+            $migration = trim((string)($table['migration'] ?? ''));
+            $migrationPath = $migration !== '' ? $this->rootDir . '/mom/database/migrations/' . $migration : '';
+            $migrationSourcePresent = $migrationPath !== '' && is_file($migrationPath);
+            $registryPresent = $table !== [];
+            $relationPresent = $entity !== [];
+            $runtimeContractLinked = $registryPresent && $relationPresent && $linkedEndpointCount > 0 && $migrationSourcePresent;
+            if ($dbProbeResolved && $dbPresent === true) {
+                $truthStatus = 'db_verified';
+            } elseif ($runtimeContractLinked) {
+                $truthStatus = 'contract_runtime_linked';
+            } elseif ($registryPresent && $linkedEndpointCount > 0) {
+                $truthStatus = 'registry_api_linked';
+            } elseif ($registryPresent && $migrationSourcePresent) {
+                $truthStatus = 'schema_authority_linked';
+            } elseif ($registryPresent || $relationPresent || $endpointCount > 0) {
+                $truthStatus = 'partial_link';
+            } else {
+                $truthStatus = 'unlinked';
+            }
+            $operationalRole = ($table['workflowId'] ?? $entity['workflowId'] ?? '') !== ''
+                ? 'workflow_owner'
+                : (!empty($table['supportTable'] ?? $entity['supportTable'] ?? false)
+                    ? 'support_table'
+                    : ($linkedEndpointCount > 0 ? 'api_backed_runtime_table' : 'registry_reference'));
 
             $rows[] = [
                 'key' => $key,
@@ -2140,16 +2601,38 @@ final class DataSchemaService
                 'supportTable' => (bool)($table['supportTable'] ?? $entity['supportTable'] ?? false),
                 'canonical' => (bool)($table['canonical'] ?? false),
                 'source' => (string)($table['source'] ?? ''),
-                'registry_present' => $table !== [],
-                'relation_present' => $entity !== [],
-                'governance_complete' => $entity === [] ? true : (bool)($entity['governanceComplete'] ?? false),
-                'governance_gap_count' => count($governanceMissing),
-                'governance_missing' => array_slice($governanceMissing, 0, 6),
+                'migration' => $migration,
+                'migration_path' => $migrationSourcePresent ? $this->relativePath($migrationPath) : '',
+                'migration_source_present' => $migrationSourcePresent,
+                'endpoint_count' => $endpointCount,
+                'linked_endpoint_count' => $linkedEndpointCount,
+                'registry_present' => $registryPresent,
+                'relation_present' => $relationPresent,
+                'runtime_contract_linked' => $runtimeContractLinked,
+                'truth_status' => $truthStatus,
+                'truthBinding' => [
+                    'schemaAuthority' => $migrationSourcePresent ? 'linked' : 'missing_migration_source',
+                    'registry' => $registryPresent ? 'linked' : 'missing',
+                    'relationMap' => $relationPresent ? 'linked' : 'missing',
+                    'apiController' => $linkedEndpointCount > 0 ? 'linked' : 'missing',
+                    'dbProbe' => $dbStatus,
+                ],
+                'operationalRole' => $operationalRole,
+                'unlinked' => $truthStatus === 'unlinked',
+                'governance_complete' => $actionableGovernanceMissing === [],
+                'governance_status' => (string)($governancePosture['status'] ?? 'missing_direct_scope'),
+                'governance_mode' => (string)($governancePosture['mode'] ?? 'missing'),
+                'governance_inherited_via' => array_slice($this->scalarStringList($governancePosture['inheritedVia'] ?? []), 0, 6),
+                'governance_gap_count' => count($actionableGovernanceMissing),
+                'governance_missing' => array_slice($actionableGovernanceMissing, 0, 6),
+                'governance_direct_missing_count' => count($governanceMissing),
+                'governance_direct_missing' => array_slice($governanceMissing, 0, 6),
                 'jsonb_field_count' => (int)($entity['jsonbFieldCount'] ?? 0),
                 'digital_thread' => (bool)($entity['digitalThread'] ?? false),
                 'db_probe_applicable' => $dbProbeApplicable,
                 'db_probe_resolved' => $dbProbeResolved,
                 'db_present' => $dbPresent,
+                'db_status' => $dbStatus,
                 'db_column_count' => count($dbColumns),
                 'missing_column_count' => count($missingColumns),
                 'unexpected_column_count' => count($unexpectedColumns),
@@ -2182,9 +2665,16 @@ final class DataSchemaService
             }
             $rows[] = [
                 'key' => (string)$key,
+                'label' => (string)($item['label'] ?? $this->humanize((string)$key)),
                 'description' => (string)($item['description'] ?? ''),
                 'tableCount' => count(array_filter((array)($item['tables'] ?? []), 'is_scalar')),
                 'migrationCount' => count(array_filter((array)($item['migrations'] ?? []), 'is_scalar')),
+                'authorityLayer' => 'metadata_library',
+                'truth_status' => 'reference_blueprint',
+                'runtimeLinked' => false,
+                'activeInRuntime' => false,
+                'source' => 'data/registry/schema-library.json',
+                'purpose' => 'Reusable reference blueprint for schema/module planning. It is not a runtime DB contract.',
             ];
         }
         usort($rows, static fn(array $a, array $b): int => $a['key'] <=> $b['key']);
@@ -2208,6 +2698,12 @@ final class DataSchemaService
                 'label_vi' => (string)($item['label_vi'] ?? $item['label'] ?? $key),
                 'description' => (string)($item['description'] ?? ''),
                 'variableCount' => count((array)($item['variables'] ?? [])),
+                'authorityLayer' => 'metadata_library',
+                'truth_status' => 'config_library',
+                'runtimeLinked' => true,
+                'activeInRuntime' => true,
+                'source' => 'data/config/variable_library.json',
+                'purpose' => 'Shared variable/type definitions consumed by forms, validation and module builders.',
             ];
         }
         usort($rows, static fn(array $a, array $b): int => $a['key'] <=> $b['key']);
@@ -2257,6 +2753,9 @@ final class DataSchemaService
                 'deletePolicy' => (string)($meta['deletePolicy'] ?? 'archive_or_replace_do_not_hard_delete'),
                 'dataLossImpact' => (string)($meta['dataLossImpact'] ?? 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.'),
                 'blankDraft' => !empty($meta['blankDraft']),
+                'truth_status' => 'non_runtime_design_draft',
+                'runtimeLinked' => false,
+                'activeInRuntime' => false,
                 'canDelete' => false,
                 'readOnly' => false,
                 'editable' => true,
@@ -2299,6 +2798,9 @@ final class DataSchemaService
                 'writePolicy' => 'read_only_generated_artifact',
                 'deletePolicy' => 'do_not_delete_regenerate_from_authority',
                 'dataLossImpact' => 'Deleting this artifact does not delete DB rows, but removes full contract visibility until registry publication is regenerated.',
+                'truth_status' => 'runtime_contract_authority',
+                'runtimeLinked' => true,
+                'activeInRuntime' => true,
                 'canDelete' => false,
                 'readOnly' => true,
                 'editable' => false,
@@ -2380,8 +2882,12 @@ final class DataSchemaService
             $workflowTableCount = 0;
             $supportTableCount = 0;
             $governanceGapCount = 0;
+            $directGovernanceGapCount = 0;
             $registryGapCount = 0;
             $structuralDriftTableCount = 0;
+            $apiBackedTableCount = 0;
+            $runtimeLinkedTableCount = 0;
+            $unlinkedTableCount = 0;
 
             foreach ($apis as $api) {
                 if ((string)($api['domain'] ?? '') === $domainId) {
@@ -2399,8 +2905,12 @@ final class DataSchemaService
                 $workflowTableCount += (($table['workflowId'] ?? '') !== '') ? 1 : 0;
                 $supportTableCount += (($table['supportTable'] ?? false) === true) ? 1 : 0;
                 $governanceGapCount += ((int)($table['governance_gap_count'] ?? 0) > 0) ? 1 : 0;
+                $directGovernanceGapCount += ((int)($table['governance_direct_missing_count'] ?? 0) > 0) ? 1 : 0;
                 $registryGapCount += (($table['registry_present'] ?? false) === false) ? 1 : 0;
                 $structuralDriftTableCount += ((int)($table['column_drift_count'] ?? 0) > 0 || !empty($table['pk_drift'])) ? 1 : 0;
+                $apiBackedTableCount += ((int)($table['endpoint_count'] ?? 0) > 0) ? 1 : 0;
+                $runtimeLinkedTableCount += !empty($table['runtime_contract_linked']) ? 1 : 0;
+                $unlinkedTableCount += !empty($table['unlinked']) ? 1 : 0;
             }
 
             $rows[] = [
@@ -2417,8 +2927,12 @@ final class DataSchemaService
                 'workflow_table_count' => $workflowTableCount,
                 'support_table_count' => $supportTableCount,
                 'governance_gap_count' => $governanceGapCount,
+                'governance_direct_gap_count' => $directGovernanceGapCount,
                 'registry_gap_count' => $registryGapCount,
                 'structural_drift_table_count' => $structuralDriftTableCount,
+                'api_backed_table_count' => $apiBackedTableCount,
+                'runtime_linked_table_count' => $runtimeLinkedTableCount,
+                'unlinked_table_count' => $unlinkedTableCount,
             ];
         }
 
@@ -2462,24 +2976,49 @@ final class DataSchemaService
         }
 
         $governanceGaps = [];
-        foreach ($relationEntities as $key => $entity) {
-            if (!is_array($entity)) {
+        $governanceDirectMissing = [];
+        $unlinkedComponents = [];
+        foreach ($tables as $table) {
+            if (!is_array($table)) {
                 continue;
             }
-            $missing = $this->scalarStringList($entity['governanceMissing'] ?? []);
+            $missing = $this->scalarStringList($table['governance_missing'] ?? []);
             if ($missing === []) {
-                continue;
+                $directMissing = $this->scalarStringList($table['governance_direct_missing'] ?? []);
+                if ($directMissing !== []) {
+                    $governanceDirectMissing[] = [
+                        'table' => (string)($table['key'] ?? ''),
+                        'label' => (string)($table['label'] ?? $table['key'] ?? ''),
+                        'domain' => (string)($table['domain'] ?? ''),
+                        'missing' => array_slice($directMissing, 0, 6),
+                        'missing_count' => count($directMissing),
+                        'status' => (string)($table['governance_status'] ?? ''),
+                        'inherited_via' => array_slice($this->scalarStringList($table['governance_inherited_via'] ?? []), 0, 4),
+                    ];
+                }
+            } else {
+                $governanceGaps[] = [
+                    'table' => (string)($table['key'] ?? ''),
+                    'label' => (string)($table['label'] ?? $table['key'] ?? ''),
+                    'domain' => (string)($table['domain'] ?? ''),
+                    'missing' => array_slice($missing, 0, 6),
+                    'missing_count' => count($missing),
+                    'status' => (string)($table['governance_status'] ?? 'missing_direct_scope'),
+                ];
             }
-            $governanceGaps[] = [
-                'table' => (string)$key,
-                'label' => (string)($entity['label'] ?? $this->humanize((string)$key)),
-                'domain' => (string)($entity['domain'] ?? ''),
-                'missing' => array_slice($missing, 0, 6),
-                'missing_count' => count($missing),
-            ];
+
+            if (!empty($table['unlinked'])) {
+                $unlinkedComponents[] = [
+                    'type' => 'table',
+                    'key' => (string)($table['key'] ?? ''),
+                    'label' => (string)($table['label'] ?? $table['key'] ?? ''),
+                    'reason' => 'No registry, relation-map, migration, API, or DB proof resolved for this component.',
+                ];
+            }
         }
 
         usort($governanceGaps, static fn(array $a, array $b): int => $b['missing_count'] <=> $a['missing_count']);
+        usort($governanceDirectMissing, static fn(array $a, array $b): int => $b['missing_count'] <=> $a['missing_count']);
         usort($registryGaps, static fn(array $a, array $b): int => [$a['domain'], $a['table']] <=> [$b['domain'], $b['table']]);
 
         $qualityBlockers = [];
@@ -2555,6 +3094,8 @@ final class DataSchemaService
             'recommendations' => array_slice(array_values(array_filter((array)($qualityReport['publishability']['recommended_next_actions'] ?? []), 'is_scalar')), 0, 8),
             'registry_gaps' => array_slice($registryGaps, 0, 12),
             'governance_gaps' => array_slice($governanceGaps, 0, 12),
+            'governance_direct_missing' => array_slice($governanceDirectMissing, 0, 12),
+            'unlinked_components' => array_slice($unlinkedComponents, 0, 12),
             'db_missing_tables' => !empty($connection['db_probe_reachable']) ? array_slice(array_values(array_filter((array)($connection['missing_tables'] ?? []), 'is_scalar')), 0, 12) : [],
             'db_unexpected_tables' => !empty($connection['db_probe_reachable']) ? array_slice(array_values(array_filter((array)($connection['unexpected_tables'] ?? []), 'is_scalar')), 0, 12) : [],
             'structural_drift' => array_slice($structuralDrift, 0, 12),

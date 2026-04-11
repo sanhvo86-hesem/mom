@@ -1,0 +1,377 @@
+<section class="section" id="a11y-i18n-precision">
+    <h2 class="section-title"><span class="section-number">??</span>Accessibility &amp; Internationalization Precision</h2>
+    <p class="section-subtitle">Bổ sung chuẩn WCAG, ARIA và i18n chính xác cho HESEM MOM. Section này nối trực tiếp với section <code>3 standards</code>, section <code>7 accessibility</code>, section <code>20 token-reference</code> và section <code>33 zone-system</code>; mọi pattern ở đây phải được dùng như checklist trước khi phát hành module hoặc block runtime.</p>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="info-box info-box-blue">
+        <strong>CROSS-REFERENCE</strong>
+        Section <code>7 accessibility</code> định nghĩa pattern cơ bản cho dialog, tabs, table, live region, loading và form errors. Section này khóa thêm landmark, roving tabindex, typography tiếng Việt, contrast thực tế và i18n formatting để không còn khoảng trống triển khai.
+      </div>
+      <div class="info-box info-box-amber">
+        <strong>QUALITY GATE</strong>
+        Một màn hình chỉ được xem là đạt nếu có đúng <code>1 main</code>, tab order theo DOM order, focus ring nhìn thấy, text thường đạt <code>4.5:1</code>, non-text contrast đạt <code>3:1</code>, label có đủ <code>{vi,en}</code>, và mọi format ngày/số/tiền dùng <code>Intl</code>.
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-blue">5.1</span>ARIA Landmark Mapping - Zone to ARIA</div>
+      <div class="card-body">
+        <div class="info-box info-box-green" style="margin-bottom:14px">
+          <strong>LANDMARK RULE</strong>
+          Mỗi page shell có chính xác <code>1 &lt;main&gt;</code>. Breadcrumb dùng landmark <code>&lt;nav aria-label="Breadcrumb"&gt;</code> riêng, không gộp vào sidebar navigation. Zone không có content hiển thị thì không tạo landmark rỗng.
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>HTML element</th>
+              <th>ARIA role</th>
+              <th>aria-label / naming</th>
+              <th>Landmark count</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Shell header / app bar</td><td><code>&lt;header&gt;</code></td><td><code>banner</code></td><td><code>{vi:"Thanh đầu trang ứng dụng HESEM MOM", en:"HESEM MOM application header"}</code></td><td>1 per page</td><td>Chứa logo, page actions cấp shell, user menu; không đặt table filter ở đây nếu filter thuộc module.</td></tr>
+            <tr><td>Sidebar navigation</td><td><code>&lt;nav&gt;</code></td><td><code>navigation</code></td><td><code>{vi:"Điều hướng module", en:"Module navigation"}</code></td><td>0-1</td><td>Áp dụng cho module sidebar hoặc tree menu; nếu có nhiều nav, mỗi nav phải có label khác nhau.</td></tr>
+            <tr><td>Breadcrumb</td><td><code>&lt;nav&gt;</code></td><td><code>navigation</code></td><td><code>{vi:"Đường dẫn", en:"Breadcrumb"}</code></td><td>0-1</td><td>Luôn là landmark riêng: <code>&lt;nav aria-label="Breadcrumb"&gt;</code>.</td></tr>
+            <tr><td>KPI bar</td><td><code>&lt;section&gt;</code></td><td><code>region</code></td><td><code>{vi:"Chỉ số hiệu suất chính", en:"Key performance indicators"}</code></td><td>0-1</td><td>Dùng khi KPI giúp ra quyết định; không dùng region cho KPI trang trí hoặc trùng nội dung main.</td></tr>
+            <tr><td>Filter bar</td><td><code>&lt;section&gt;</code></td><td><code>region</code></td><td><code>{vi:"Bộ lọc dữ liệu", en:"Data filters"}</code></td><td>0-1</td><td>Filter submit hoặc auto-filter phải announce số kết quả thay đổi qua live region riêng.</td></tr>
+            <tr><td>Tabs zone</td><td><code>&lt;section&gt;</code></td><td><code>region</code></td><td><code>{vi:"Nhóm tab nội dung", en:"Content tabs"}</code></td><td>0-1</td><td>Bản thân tab list vẫn dùng <code>role="tablist"</code> theo section 7.</td></tr>
+            <tr><td>Main content</td><td><code>&lt;main&gt;</code></td><td><code>main</code></td><td>Thừa kế từ <code>h1</code> hoặc <code>aria-labelledby</code> trỏ tới page title</td><td>Exactly 1</td><td>Không bọc main trong nhiều landmark main khác; skip link phải trỏ về <code>#main-content</code>.</td></tr>
+            <tr><td>Sidebar detail</td><td><code>&lt;aside&gt;</code></td><td><code>complementary</code></td><td><code>{vi:"Panel chi tiết", en:"Detail panel"}</code></td><td>0-1 visible</td><td>Khi collapse thành drawer, giữ name cũ và thêm state expanded/collapsed cho trigger.</td></tr>
+            <tr><td>Chart area</td><td><code>&lt;section&gt;</code></td><td><code>region</code></td><td><code>{vi:"Khu vực biểu đồ", en:"Chart area"}</code></td><td>0-1</td><td>Chỉ dùng khi chart là nội dung chính; chart phải có summary text/table fallback.</td></tr>
+            <tr><td>Footer actions</td><td><code>&lt;footer&gt;</code></td><td><code>contentinfo</code></td><td><code>{vi:"Thao tác trang", en:"Page actions"}</code></td><td>0-1</td><td>Nếu footer chỉ là action bar sticky, vẫn cần label rõ để screen reader phân biệt với site footer.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">&lt;a class="skip-link" href="#main-content"&gt;Chuyển đến nội dung chính&lt;/a&gt;
+&lt;header role="banner" aria-label="HESEM MOM application header"&gt;...&lt;/header&gt;
+&lt;nav aria-label="Breadcrumb"&gt;...&lt;/nav&gt;
+&lt;nav aria-label="Module navigation"&gt;...&lt;/nav&gt;
+&lt;main id="main-content" aria-labelledby="page-title"&gt;
+  &lt;h1 id="page-title"&gt;Bảng điều khiển sản xuất&lt;/h1&gt;
+  ...
+&lt;/main&gt;
+&lt;aside aria-label="Panel chi tiết"&gt;...&lt;/aside&gt;
+&lt;footer aria-label="Thao tác trang"&gt;...&lt;/footer&gt;</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-purple">5.2</span>Roving Tabindex Patterns</div>
+      <div class="card-body">
+        <div class="info-box info-box-purple" style="margin-bottom:14px">
+          <strong>ROVING TABINDEX RULE</strong>
+          Mỗi composite widget chỉ có <code>1</code> tab stop. Item active dùng <code>tabindex="0"</code>, item còn lại dùng <code>tabindex="-1"</code>. Arrow keys di chuyển focus nội bộ; <code>Tab</code> thoát khỏi widget.
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">Toolbar pattern</div>
+          <div class="card-body">
+            <table class="spec-table">
+              <thead><tr><th>Widget</th><th>Roles</th><th>Keyboard model</th><th>Focus return</th></tr></thead>
+              <tbody><tr><td>Action toolbar</td><td><code>role="toolbar"</code>, child buttons</td><td>Tab vào active button; Left/Right chuyển item; Home/End nhảy đầu/cuối; Enter/Space kích hoạt.</td><td>Sau modal/action đóng, focus quay về button đã kích hoạt.</td></tr></tbody>
+            </table>
+            <pre class="code-block" style="margin-top:12px">&lt;div role="toolbar" aria-label="Thao tác phiếu CAPA"&gt;
+  &lt;button tabindex="0"&gt;Lưu&lt;/button&gt;
+  &lt;button tabindex="-1"&gt;Gửi duyệt&lt;/button&gt;
+  &lt;button tabindex="-1"&gt;Xuất PDF&lt;/button&gt;
+&lt;/div&gt;
+
+function onToolbarKeydown(event, items, index) {
+  if (event.key === 'ArrowRight') moveFocus(items, index + 1);
+  if (event.key === 'ArrowLeft') moveFocus(items, index - 1);
+  if (event.key === 'Home') moveFocus(items, 0);
+  if (event.key === 'End') moveFocus(items, items.length - 1);
+}</pre>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">Tree view pattern</div>
+          <div class="card-body">
+            <table class="spec-table">
+              <thead><tr><th>Widget</th><th>Roles</th><th>Keyboard model</th><th>Required state</th></tr></thead>
+              <tbody><tr><td>Module tree / document tree</td><td><code>tree</code>, <code>treeitem</code>, <code>group</code></td><td>Up/Down chuyển node; Right mở node; Left đóng node hoặc về parent; Enter chọn.</td><td><code>aria-expanded</code>, <code>aria-selected</code>, level/setsize/posinset nếu tree ảo hóa.</td></tr></tbody>
+            </table>
+            <pre class="code-block" style="margin-top:12px">&lt;div role="tree" aria-label="Cây tài liệu"&gt;
+  &lt;div role="treeitem" tabindex="0" aria-expanded="true"&gt;01-QMS-Portal&lt;/div&gt;
+  &lt;div role="group"&gt;
+    &lt;div role="treeitem" tabindex="-1" aria-selected="false"&gt;API Reference&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+function onTreeKeydown(event, node) {
+  if (event.key === 'ArrowDown') focusNextVisibleNode();
+  if (event.key === 'ArrowUp') focusPreviousVisibleNode();
+  if (event.key === 'ArrowRight') expandOrFocusFirstChild(node);
+  if (event.key === 'ArrowLeft') collapseOrFocusParent(node);
+}</pre>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">Menu pattern</div>
+          <div class="card-body">
+            <table class="spec-table">
+              <thead><tr><th>Widget</th><th>Roles</th><th>Keyboard model</th><th>Dismiss rule</th></tr></thead>
+              <tbody><tr><td>Context menu / overflow menu</td><td><code>menu</code>, <code>menuitem</code></td><td>Up/Down chuyển item; Enter chọn; Escape đóng; typeahead optional.</td><td>Escape và click ngoài trả focus về trigger; menu không tự giữ focus sau khi đóng.</td></tr></tbody>
+            </table>
+            <pre class="code-block" style="margin-top:12px">&lt;button id="row-menu-trigger" aria-haspopup="menu" aria-expanded="false"&gt;Thao tác&lt;/button&gt;
+&lt;div role="menu" aria-labelledby="row-menu-trigger"&gt;
+  &lt;button role="menuitem" tabindex="0"&gt;Mở chi tiết&lt;/button&gt;
+  &lt;button role="menuitem" tabindex="-1"&gt;Gán owner&lt;/button&gt;
+  &lt;button role="menuitem" tabindex="-1"&gt;Lưu hồ sơ&lt;/button&gt;
+&lt;/div&gt;
+
+function closeMenu(trigger) {
+  setExpanded(trigger, false);
+  trigger.focus();
+}</pre>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">Grid / table pattern</div>
+          <div class="card-body">
+            <table class="spec-table">
+              <thead><tr><th>Widget</th><th>Roles</th><th>Keyboard model</th><th>Edit mode</th></tr></thead>
+              <tbody><tr><td>Editable grid / dispatch table</td><td><code>grid</code>, <code>row</code>, <code>gridcell</code></td><td>Arrow keys chuyển cell; PageUp/PageDown chuyển viewport; Home/End trong row; Ctrl+Home/Ctrl+End tới đầu/cuối grid.</td><td>Enter bật edit; Escape hủy edit; Tab trong edit đi qua field nội bộ rồi quay lại grid policy.</td></tr></tbody>
+            </table>
+            <pre class="code-block" style="margin-top:12px">&lt;div role="grid" aria-label="Bảng điều độ WO" aria-rowcount="342"&gt;
+  &lt;div role="row"&gt;
+    &lt;div role="columnheader"&gt;WO&lt;/div&gt;
+    &lt;div role="columnheader"&gt;Máy&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div role="row"&gt;
+    &lt;div role="gridcell" tabindex="0"&gt;WO-2026-0891&lt;/div&gt;
+    &lt;div role="gridcell" tabindex="-1"&gt;Haas VF-2SS&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+function onGridKeydown(event, cell) {
+  if (event.key.startsWith('Arrow')) focusAdjacentCell(event.key, cell);
+  if (event.key === 'Enter') enterEditMode(cell);
+  if (event.key === 'Escape') cancelEditMode(cell);
+}</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Tabs pattern</div>
+          <div class="card-body">
+            <table class="spec-table">
+              <thead><tr><th>Widget</th><th>Roles</th><th>Keyboard model</th><th>Activation mode</th></tr></thead>
+              <tbody><tr><td>Module tabs / detail tabs</td><td><code>tablist</code>, <code>tab</code>, <code>tabpanel</code></td><td>Left/Right chuyển tab; Home/End nhảy đầu/cuối; Enter/Space activate nếu manual activation.</td><td>Auto activation chỉ dùng khi panel tải tức thì; data-heavy tab dùng manual activation.</td></tr></tbody>
+            </table>
+            <pre class="code-block" style="margin-top:12px">&lt;div role="tablist" aria-label="Chi tiết lệnh sản xuất"&gt;
+  &lt;button role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview" tabindex="0"&gt;Tổng quan&lt;/button&gt;
+  &lt;button role="tab" id="tab-quality" aria-selected="false" aria-controls="panel-quality" tabindex="-1"&gt;Chất lượng&lt;/button&gt;
+&lt;/div&gt;
+&lt;section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview"&gt;...&lt;/section&gt;
+
+function onTabKeydown(event, tabs, index) {
+  if (event.key === 'ArrowRight') focusTab(tabs, index + 1);
+  if (event.key === 'ArrowLeft') focusTab(tabs, index - 1);
+  if (event.key === 'Home') focusTab(tabs, 0);
+  if (event.key === 'End') focusTab(tabs, tabs.length - 1);
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-green">5.3</span>Vietnamese Typography Requirements</div>
+      <div class="card-body">
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="info-box info-box-green">
+            <strong>FONT STACK ĐÃ VALIDATE</strong>
+            Dùng <code>-apple-system, 'Segoe UI', 'Noto Sans', 'Roboto', Arial, Helvetica, sans-serif</code>. Stack này tương thích tiếng Việt có dấu trên macOS, Windows, Android, iOS và browser kiosk phổ biến.
+          </div>
+          <div class="info-box info-box-red">
+            <strong>OVERLINE WARNING</strong>
+            Không dùng overline <code>10px</code> cho tiếng Việt có dấu. Minimum cho Vietnamese label có dấu là <code>11px</code>, line-height <code>1.4</code>, letter-spacing <code>0</code> đến <code>0.04em</code> tùy uppercase ngắn.
+          </div>
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Required value</th>
+              <th>Reason</th>
+              <th>Test case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Font family</td><td><code>-apple-system, 'Segoe UI', 'Noto Sans', 'Roboto', Arial, Helvetica, sans-serif</code></td><td>Đủ glyph Vietnamese, fallback ổn định trên kiosk.</td><td>Không mất dấu trong “Nguyễn Văn Thành”.</td></tr>
+            <tr><td>Text rendering</td><td><code>text-rendering: optimizeLegibility</code></td><td>Cải thiện kerning và shaping cho đoạn dài.</td><td>Đọc paragraph 2 dòng không dính dấu.</td></tr>
+            <tr><td>Body line-height</td><td><code>≥ 1.5</code>, minimum allowed <code>1.4</code></td><td>Dấu sắc/huyền/hỏi/ngã/nặng cần khoảng thở dọc.</td><td>Không cắt dấu trên card/table row.</td></tr>
+            <tr><td>Table cell line-height</td><td><code>1.5-1.65</code></td><td>Bảng dense vẫn phải đọc được tên Việt và mã chứng từ.</td><td>Cell “Trần Thị Mai - Kiểm tra đầu ca”.</td></tr>
+            <tr><td>Uppercase Vietnamese</td><td>Chỉ dùng cho badge ngắn; font <code>11px+</code>, weight <code>800</code>, letter-spacing <code>0.04em max</code></td><td>Uppercase dài làm dấu khó đọc.</td><td>Badge “QUÁ HẠN” pass; “ĐÃ PHÊ DUYỆT BỞI QUẢN LÝ” fail.</td></tr>
+            <tr><td>Pangram test</td><td><code>Bắc kim thạp khắc ngọc quyển chưa để Yến</code></td><td>Kiểm tra đủ dấu tiếng Việt trong screenshot review.</td><td>Render ở 11px, 13px, 14px, 16px, 18px.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">.mom-ui {
+  font-family: -apple-system, 'Segoe UI', 'Noto Sans', 'Roboto', Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+.mom-ui :lang(vi) {
+  line-height: 1.5;
+}
+
+.mom-ui .overline:lang(vi) {
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-amber">5.4</span>Contrast Verification Table</div>
+      <div class="card-body">
+        <div class="info-box info-box-amber" style="margin-bottom:14px">
+          <strong>CALCULATION NOTE</strong>
+          Tỷ lệ dưới đây được tính lại từ token hiện tại trong file chính bằng công thức WCAG relative luminance. Một vài tỷ lệ khác số gợi ý trong prompt; bảng này ưu tiên giá trị thực tế để tránh spec sai.
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Token pair</th>
+              <th>Foreground</th>
+              <th>Background</th>
+              <th>Ratio</th>
+              <th>Pass/fail</th>
+              <th>Rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Light primary text</td><td><code>--text-primary #1e293b</code></td><td><code>--bg-surface #ffffff</code></td><td><code>14.63:1</code></td><td>Pass AAA</td><td>Body, heading, table content.</td></tr>
+            <tr><td>Light secondary text</td><td><code>--text-secondary #64748b</code></td><td><code>--bg-surface #ffffff</code></td><td><code>4.76:1</code></td><td>Pass AA</td><td>Helper text và metadata thường.</td></tr>
+            <tr><td>Light tertiary text</td><td><code>--text-tertiary #94a3b8</code></td><td><code>--bg-surface #ffffff</code></td><td><code>2.56:1</code></td><td>Fail normal; large/decorative only</td><td>Không dùng cho body, table cell, form hint quan trọng.</td></tr>
+            <tr><td>Light brand link/focus</td><td><code>--brand-2 #1565c0</code></td><td><code>--bg-surface #ffffff</code></td><td><code>5.75:1</code></td><td>Pass AA</td><td>Link, selected text, focus ring.</td></tr>
+            <tr><td>Light error text</td><td><code>--red #dc2626</code></td><td><code>--bg-surface #ffffff</code></td><td><code>4.83:1</code></td><td>Pass AA</td><td>Error label, destructive action text.</td></tr>
+            <tr><td>Light warning direct text</td><td><code>--amber #d97706</code></td><td><code>--bg-surface #ffffff</code></td><td><code>3.19:1</code></td><td>Fail normal; large only</td><td>Dùng <code>#b45309</code> cho warning text nhỏ hoặc đặt trên warning surface.</td></tr>
+            <tr><td>Dark primary text</td><td><code>--text-primary #f1f5f9</code></td><td><code>--bg-surface #1e293b</code></td><td><code>13.35:1</code></td><td>Pass AAA</td><td>Body, heading, table content trong dark mode.</td></tr>
+            <tr><td>Dark secondary text</td><td><code>--text-secondary #94a3b8</code></td><td><code>--bg-surface #1e293b</code></td><td><code>5.71:1</code></td><td>Pass AA</td><td>Helper text và metadata.</td></tr>
+            <tr><td>Dark tertiary text</td><td><code>--text-tertiary #64748b</code></td><td><code>--bg-surface #1e293b</code></td><td><code>3.07:1</code></td><td>Large/non-critical only</td><td>Không dùng cho form instruction bắt buộc.</td></tr>
+            <tr><td>Dark brand link/focus</td><td><code>--brand-2 #60a5fa</code></td><td><code>--bg-surface #1e293b</code></td><td><code>5.75:1</code></td><td>Pass AA</td><td>Focus ring, link, selected tab.</td></tr>
+            <tr><td>Dark error text</td><td><code>--red #f87171</code></td><td><code>--bg-surface #1e293b</code></td><td><code>5.29:1</code></td><td>Pass AA</td><td>Error label and alert text.</td></tr>
+            <tr><td>Dark warning text</td><td><code>--amber #fbbf24</code></td><td><code>--bg-surface #1e293b</code></td><td><code>8.76:1</code></td><td>Pass AAA</td><td>Warning label in dark mode.</td></tr>
+            <tr><td>Non-text focus ring</td><td><code>--brand-2 #1565c0</code></td><td><code>--bg-surface #ffffff</code></td><td><code>5.75:1</code></td><td>Pass 3:1 non-text</td><td>Outline <code>2px</code>, offset <code>2px</code> theo section 3.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-red">5.5</span>Reading Order &amp; CSS Reordering Rule</div>
+      <div class="card-body">
+        <div class="info-box info-box-red" style="margin-bottom:14px">
+          <strong>ABSOLUTE RULE</strong>
+          KHÔNG BAO GIỜ dùng <code>order</code>, <code>flex-direction: row-reverse</code>, <code>grid-auto-flow:dense</code> hoặc grid placement để tạo visual order khác DOM order. Screen readers đọc DOM order. Ngoại lệ duy nhất là RTL layout transforms, hiện chưa áp dụng cho HESEM MOM.
+        </div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Allowed</th>
+              <th>Forbidden</th>
+              <th>Why</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Responsive sidebar</td><td>DOM: header → filter → main → sidebar → footer; CSS stack cùng thứ tự.</td><td>Đặt sidebar trước main bằng CSS order trên mobile.</td><td>Screen reader sẽ đọc detail trước nội dung chính.</td><td>Đổi DOM hoặc dùng drawer có trigger rõ.</td></tr>
+            <tr><td>Action footer</td><td>Footer actions đứng sau form trong DOM.</td><td>Đưa footer lên trên bằng <code>order:-1</code>.</td><td>Keyboard user gặp action trước khi đọc form.</td><td>Dùng sticky position nhưng giữ DOM sau form.</td></tr>
+            <tr><td>Chart and table</td><td>Summary text → chart → fallback table.</td><td>Đặt table trước DOM nhưng visually hide dưới chart bằng CSS.</td><td>Reader nghe data dài trước insight.</td><td>DOM theo narrative order, table có heading riêng.</td></tr>
+            <tr><td>Kanban columns</td><td>DOM columns theo workflow thực tế: TODO → WIP → QA → DONE.</td><td>Dùng CSS grid dense làm card đổi thứ tự theo height.</td><td>Mất logic workflow khi dùng keyboard.</td><td>Giữ explicit column containers.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">/* BAD: visual order khác DOM order */
+.detail-panel { order: -1; }
+.kanban-board { grid-auto-flow: dense; }
+
+/* GOOD: DOM order đúng, sticky chỉ đổi vị trí viewport chứ không đổi đọc */
+.footer-actions {
+  position: sticky;
+  bottom: 0;
+}</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><span class="chip chip-cyan">5.6</span>i18n Date, Number, Currency &amp; Timezone Rules</div>
+      <div class="card-body">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Format type</th>
+              <th>Implementation</th>
+              <th>vi-VN output</th>
+              <th>en-US output</th>
+              <th>Required rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Date</td><td><code>Intl.DateTimeFormat(locale)</code></td><td><code>11/04/2026</code></td><td><code>04/11/2026</code></td><td>Không hard-code <code>dd/MM/yyyy</code> trong JS; chỉ ghi là default display cho <code>vi-VN</code>.</td></tr>
+            <tr><td>Date time</td><td><code>Intl.DateTimeFormat(locale, { dateStyle:"short", timeStyle:"medium", timeZone })</code></td><td><code>11/04/2026, 14:30:05</code></td><td><code>4/11/26, 2:30:05 PM</code></td><td>Luôn hiển thị timezone hoặc UTC offset gần timestamp quan trọng.</td></tr>
+            <tr><td>Number</td><td><code>Intl.NumberFormat(locale)</code></td><td><code>1.234,56</code></td><td><code>1,234.56</code></td><td>Không tự replace dấu phẩy/chấm bằng regex.</td></tr>
+            <tr><td>Percent</td><td><code>Intl.NumberFormat(locale, { style:"percent", maximumFractionDigits:1 })</code></td><td><code>93,4%</code></td><td><code>93.4%</code></td><td>Giữ số gốc dạng decimal <code>0.934</code> trong data model.</td></tr>
+            <tr><td>Currency VND</td><td><code>Intl.NumberFormat("vi-VN", { style:"currency", currency:"VND" })</code></td><td><code>1.234.567 ₫</code></td><td><code>₫1,234,567</code></td><td>VND không có decimal trong UI quản trị mặc định.</td></tr>
+            <tr><td>Currency USD</td><td><code>Intl.NumberFormat(locale, { style:"currency", currency:"USD" })</code></td><td><code>1.234.567,00 US$</code></td><td><code>$1,234,567.00</code></td><td>Symbol trước/sau theo locale, không hard-code vị trí.</td></tr>
+            <tr><td>Timezone</td><td><code>Asia/Ho_Chi_Minh</code> default, display offset</td><td><code>UTC+7</code></td><td><code>UTC+7</code></td><td>Audit/e-signature timestamp phải server-side và immutable.</td></tr>
+            <tr><td>Relative time</td><td><code>Intl.RelativeTimeFormat(locale, { numeric:"auto" })</code></td><td><code>2 giờ trước</code></td><td><code>2 hours ago</code></td><td>Chỉ dùng cho convenience; record chính vẫn có absolute timestamp.</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block" style="margin-top:14px">const locale = user.locale || 'vi-VN';
+const timeZone = user.timeZone || 'Asia/Ho_Chi_Minh';
+
+const dateText = new Intl.DateTimeFormat(locale, {
+  dateStyle: 'short',
+  timeZone
+}).format(new Date('2026-04-11T07:30:00Z'));
+
+const amountText = new Intl.NumberFormat(locale, {
+  style: 'currency',
+  currency: 'VND',
+  maximumFractionDigits: 0
+}).format(1234567);</pre>
+        <table class="spec-table" style="margin-top:14px">
+          <thead><tr><th>Translation rule</th><th>Exact requirement</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Labels</td><td>Mọi label hiển thị có object <code>{vi,en}</code>; không lưu string đơn nếu block có thể render đa ngôn ngữ.</td><td><code>{vi:"Lưu thay đổi", en:"Save changes"}</code></td></tr>
+            <tr><td>Buttons</td><td>Min-width tính thêm <code>30%</code> so với text English baseline cho German/French và ngôn ngữ dài.</td><td><code>minInlineSize = ceil(enTextWidth * 1.3)</code></td></tr>
+            <tr><td>Pluralization</td><td>Dùng <code>Intl.PluralRules</code> hoặc ICU message; không nối chuỗi thủ công.</td><td><code>{count} phiếu quá hạn</code>, <code>{count} overdue records</code></td></tr>
+            <tr><td>Fallback</td><td>Nếu thiếu bản dịch, show English + log missing key; không show key thô như <code>form.save</code>.</td><td><code>Save changes</code> + telemetry <code>missing_i18n_key</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="chip chip-green">Audit Checklist</span>Release gate cho accessibility và i18n</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th>Pass condition</th>
+              <th>Evidence</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Landmarks</td><td>Exactly 1 main, named nav/aside/footer landmarks, skip link works.</td><td>Keyboard walkthrough + accessibility tree screenshot.</td><td>Frontend owner</td></tr>
+            <tr><td>Keyboard</td><td>Roving tabindex widgets have one tab stop and arrow key behavior documented.</td><td>Manual keyboard test log.</td><td>Frontend owner</td></tr>
+            <tr><td>Contrast</td><td>Text normal ≥4.5:1, large/non-text ≥3:1, warning amber not used as small text on white.</td><td>Token contrast report.</td><td>Design system owner</td></tr>
+            <tr><td>Vietnamese typography</td><td>Pangram renders without clipped accents at 11px, 13px, 14px, 16px and 18px.</td><td>Browser screenshot set.</td><td>QA reviewer</td></tr>
+            <tr><td>i18n</td><td>Date/number/currency use <code>Intl</code>; all labels carry <code>{vi,en}</code>.</td><td>Locale toggle test: vi-VN and en-US.</td><td>Module owner</td></tr>
+            <tr><td>Reading order</td><td>DOM order equals visual order at desktop, tablet and mobile breakpoints.</td><td>DOM order inspection + screen reader pass.</td><td>Frontend owner</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>

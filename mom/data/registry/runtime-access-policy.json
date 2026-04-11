@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T02:14:49.088Z",
+    "generatedAt": "2026-04-11T06:15:20.245Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
     "tableOverrideCount": 130

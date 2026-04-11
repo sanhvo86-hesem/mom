@@ -4137,7 +4137,11 @@ var Validator = {
           Validator.addResult(results, { level:'error', code:'E06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Tên cột không hợp lệ: ' + tbl.name + '.' + col.name, 'Invalid column name: ' + tbl.name + '.' + col.name) });
         }
         if(isReservedWord(col.name)){
-          Validator.addResult(results, { level:'error', code:'E07', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cột dùng từ khóa SQL: ' + tbl.name + '.' + col.name, 'Column uses SQL keyword: ' + tbl.name + '.' + col.name) });
+          if(isRegistrySchema){
+            Validator.addResult(results, { level:'info', code:'I07', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Registry có định danh trùng từ khóa SQL nhưng đây là contract DB-derived chỉ đọc: ' + tbl.name + '.' + col.name, 'Registry has a SQL-keyword identifier, but this is a read-only DB-derived contract: ' + tbl.name + '.' + col.name) });
+          } else {
+            Validator.addResult(results, { level:'error', code:'E07', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cột dùng từ khóa SQL: ' + tbl.name + '.' + col.name, 'Column uses SQL keyword: ' + tbl.name + '.' + col.name) });
+          }
         }
         if(col.type === 'varchar' && !col.length){
           Validator.addResult(results, { level:'warning', code:'W02', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('varchar chưa có length: ' + tbl.name + '.' + col.name, 'varchar has no length: ' + tbl.name + '.' + col.name) }, function(){

@@ -13259,7 +13259,9 @@ function session_init(): void {
 
   if ($headerlessSessionMode) {
     @ini_set('session.use_cookies', '0');
-    @ini_set('session.use_only_cookies', '0');
+    if (PHP_VERSION_ID < 80500) {
+      @ini_set('session.use_only_cookies', '0');
+    }
     @ini_set('session.cache_limiter', '');
   } else {
     @ini_set('session.use_only_cookies', '1');
@@ -13353,7 +13355,9 @@ function session_start_with_fresh_id(): bool {
   }
 
   @ini_set('session.use_cookies', '0');
-  @ini_set('session.use_only_cookies', '0');
+  if (PHP_VERSION_ID < 80500) {
+    @ini_set('session.use_only_cookies', '0');
+  }
   @ini_set('session.cache_limiter', '');
   @session_id(bin2hex(random_bytes(16)));
 

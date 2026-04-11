@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T02:14:54.096Z",
+    "generatedAt": "2026-04-11T06:15:27.204Z",
     "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
@@ -12,8 +12,8 @@
     "implemented_canonical_resources": 64,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 69,
-    "governed_support_entities": 589,
-    "conditional_extension_entities": 6,
+    "governed_support_entities": 594,
+    "conditional_extension_entities": 1,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
     "generic_status_only_core_entities": 0,
@@ -1112,7 +1112,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1189,7 +1189,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -1222,7 +1222,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1244,7 +1244,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -1657,6 +1657,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "commercial_contracts.material_cost_templates",
+        "entity": "material_cost_templates",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "core_system.audit_events",
         "entity": "audit_events",
         "profile": "business_record",
@@ -1893,7 +1904,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1904,7 +1915,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -1937,7 +1948,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -1959,7 +1970,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -1970,7 +1981,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1981,7 +1992,7 @@
         "profile": "planning_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2124,7 +2135,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2157,7 +2168,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2279,6 +2290,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "ehs_sustainability.ehs_ppe_requirements",
+        "entity": "ehs_ppe_requirements",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2416,6 +2438,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "finance.cost_ledger",
+        "entity": "cost_ledger",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "finance.gl_transactions",
         "entity": "gl_transactions",
         "profile": "transactional_record",
@@ -2443,7 +2476,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2597,7 +2630,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2641,7 +2674,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2806,7 +2839,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2839,7 +2872,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
@@ -2861,7 +2894,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 25,
+        "relation_count": 29,
         "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
@@ -2872,7 +2905,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2883,7 +2916,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2894,7 +2927,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2905,7 +2938,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2916,7 +2949,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 419,
+        "relation_count": 522,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2949,7 +2982,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 420,
+        "relation_count": 523,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2971,7 +3004,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 420,
+        "relation_count": 523,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3026,7 +3059,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 25,
+        "relation_count": 29,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3037,7 +3070,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3048,7 +3081,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3059,8 +3092,19 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation_governance.reason_code",
+        "entity": "reason_code",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3070,7 +3114,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3081,7 +3125,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3092,7 +3136,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3114,7 +3158,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": null,
         "readiness": "ready",
         "canonical_resources": []
@@ -3433,7 +3477,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 8,
+        "relation_count": 12,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3444,7 +3488,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3455,7 +3499,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3466,7 +3510,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 22,
+        "relation_count": 26,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3499,7 +3543,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3510,7 +3554,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3521,7 +3565,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3554,7 +3598,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3565,7 +3609,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3587,7 +3631,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3598,7 +3642,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3664,7 +3708,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3686,7 +3730,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3719,7 +3763,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3730,7 +3774,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3763,7 +3807,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3851,7 +3895,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3862,7 +3906,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3884,7 +3928,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3961,7 +4005,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3972,7 +4016,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -3994,7 +4038,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4060,7 +4104,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4126,7 +4170,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4181,7 +4225,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4269,7 +4313,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4302,7 +4346,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 423,
+        "relation_count": 526,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4357,7 +4401,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4401,7 +4445,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4412,7 +4456,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4423,7 +4467,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4434,7 +4478,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4445,7 +4489,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4478,7 +4522,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4489,7 +4533,7 @@
         "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4500,7 +4544,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4511,7 +4555,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4522,7 +4566,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4533,7 +4577,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4698,7 +4742,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
+        "relation_count": 11,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4709,7 +4753,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4720,7 +4764,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -4753,7 +4797,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4764,7 +4808,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5105,7 +5149,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5490,7 +5534,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5501,7 +5545,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5589,7 +5633,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5754,7 +5798,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5831,7 +5875,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5842,7 +5886,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5853,7 +5897,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5875,7 +5919,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5941,7 +5985,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5952,7 +5996,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5963,7 +6007,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -5976,6 +6020,17 @@
         "archive_candidate": false,
         "relation_count": 4,
         "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.electronic_signatures",
+        "entity": "electronic_signatures",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6040,7 +6095,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6139,7 +6194,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6150,7 +6205,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6557,7 +6612,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6623,7 +6678,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6865,7 +6920,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -6876,7 +6931,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 8,
+        "relation_count": 12,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6887,7 +6942,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
+        "relation_count": 11,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6975,7 +7030,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -7162,7 +7217,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -7195,7 +7250,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 7,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -7206,7 +7261,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -7465,61 +7520,6 @@
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
-      },
-      {
-        "entity_key": "commercial_contracts.material_cost_templates",
-        "entity": "material_cost_templates",
-        "profile": "transactional_record",
-        "zone": "conditional_extension",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "ehs_sustainability.ehs_ppe_requirements",
-        "entity": "ehs_ppe_requirements",
-        "profile": "transactional_record",
-        "zone": "conditional_extension",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "finance.cost_ledger",
-        "entity": "cost_ledger",
-        "profile": "transactional_record",
-        "zone": "conditional_extension",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "foundation_governance.reason_code",
-        "entity": "reason_code",
-        "profile": "business_record",
-        "zone": "conditional_extension",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "record_system.electronic_signatures",
-        "entity": "electronic_signatures",
-        "profile": "document_record",
-        "zone": "conditional_extension",
-        "archive_candidate": false,
-        "relation_count": 0,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
       }
     ],
     "unused_candidate": [],
@@ -7530,7 +7530,7 @@
         "profile": "transactional_record",
         "zone": "archive_isolation",
         "archive_candidate": false,
-        "relation_count": 2,
+        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": [
@@ -7556,7 +7556,7 @@
         "profile": "governed_case",
         "zone": "archive_isolation",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -7569,7 +7569,7 @@
         "profile": "governed_case",
         "zone": "archive_isolation",
         "archive_candidate": false,
-        "relation_count": 0,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -7582,7 +7582,7 @@
         "profile": "governed_case",
         "zone": "archive_isolation",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [

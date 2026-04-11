@@ -11,9 +11,11 @@ function _js(v){
   return JSON.stringify(String(v == null ? '' : v));
 }
 function _api(action, payload, method, timeoutMs){
-  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', timeoutMs || 30000);
-  var url = 'api.php?action=' + encodeURIComponent(action);
-  if((method || 'GET') === 'GET' && payload){
+  var requestMethod = String(method || 'GET').toUpperCase();
+  var useMvcEndpoint = String(action || '').indexOf('admin_metadata_studio_') === 0;
+  if(typeof apiCall === 'function' && !useMvcEndpoint) return apiCall(action, payload || {}, requestMethod, timeoutMs || 30000);
+  var url = (useMvcEndpoint ? 'api/index.php' : 'api.php') + '?action=' + encodeURIComponent(action);
+  if(requestMethod === 'GET' && payload){
     var params = new URLSearchParams();
     Object.keys(payload || {}).forEach(function(key){
       if(payload[key] == null || payload[key] === '') return;
@@ -23,15 +25,32 @@ function _api(action, payload, method, timeoutMs){
     if(query) url += '&' + query;
   }
   return fetch(url, {
-    method: method || 'GET',
+    method: requestMethod,
     credentials: 'include',
     headers: Object.assign(
       {},
-      (method || 'GET') === 'GET' ? {} : {'Content-Type':'application/json'},
+      requestMethod === 'GET' ? {} : {'Content-Type':'application/json'},
       (typeof csrfToken !== 'undefined' && csrfToken ? {'X-CSRF-Token': csrfToken} : {})
     ),
-    body: (method || 'GET') === 'GET' ? undefined : JSON.stringify(payload || {})
-  }).then(function(r){ return r.json(); });
+    body: requestMethod === 'GET' ? undefined : JSON.stringify(payload || {})
+  }).then(function(r){
+    return r.text().then(function(text){
+      var data = null;
+      try{
+        data = text ? JSON.parse(text) : null;
+      }catch(err){
+        throw new Error('invalid_json_response http_' + String(r.status));
+      }
+      if(!data){
+        throw new Error('empty_response http_' + String(r.status));
+      }
+      if(!r.ok && data && data.ok !== false){
+        data.ok = false;
+        data.error = data.error || ('http_' + String(r.status));
+      }
+      return data;
+    });
+  });
 }
 function _toast(message, type){
   if(typeof showToast === 'function') return showToast(message, type);
@@ -64,6 +83,14 @@ function _tone(status){
 }
 function _boolTone(flag){
   return flag ? 'good' : 'bad';
+}
+function _truthTone(status){
+  var key = String(status || '').toLowerCase();
+  if(key === 'db_verified' || key === 'contract_runtime_linked' || key === 'controller_linked' || key === 'runtime_contract_authority' || key === 'config_library') return 'good';
+  if(key === 'registry_api_linked' || key === 'schema_authority_linked' || key === 'reference_blueprint' || key === 'non_runtime_design_draft') return 'neutral';
+  if(key === 'partial_link' || key === 'missing_direct_scope') return 'warn';
+  if(key === 'unlinked') return 'bad';
+  return _tone(key);
 }
 function _jsonPretty(value){
   return JSON.stringify(value == null ? {} : value, null, 2);
@@ -129,6 +156,38 @@ function _dbStatusLabel(applicable, resolved, present){
 function _dbStatusTone(applicable, resolved, present){
   if(!applicable || !resolved) return 'neutral';
   return present ? 'good' : 'bad';
+}
+function _dbStatusLabelFor(item){
+  var status = String((item && item.db_status) || '').toLowerCase();
+  if(status === 'verified') return _t('DB OK', 'DB OK');
+  if(status === 'not_configured') return _t('DB N/A', 'DB N/A');
+  if(status === 'unresolved') return _t('DB unknown', 'DB unknown');
+  if(status === 'missing_from_untracked_target') return _t('DB ledger gap', 'DB ledger gap');
+  if(status === 'missing_from_incomplete_target') return _t('DB target gap', 'DB target gap');
+  return _dbStatusLabel(!!(item && item.db_probe_applicable), !!(item && item.db_probe_resolved), !!(item && item.db_present === true));
+}
+function _dbStatusToneFor(item){
+  var status = String((item && item.db_status) || '').toLowerCase();
+  if(status === 'verified') return 'good';
+  if(status === 'missing_from_untracked_target' || status === 'missing_from_incomplete_target') return 'warn';
+  if(status === 'missing') return 'bad';
+  return _dbStatusTone(!!(item && item.db_probe_applicable), !!(item && item.db_probe_resolved), !!(item && item.db_present === true));
+}
+function _dbTargetAlert(connection){
+  var status = String((connection && connection.db_target_status) || '').toLowerCase();
+  if(!status || status === 'aligned') return '';
+  var tone = (status === 'not_configured') ? 'neutral' : 'warn';
+  var reason = connection && connection.db_target_reason ? String(connection.db_target_reason) : '';
+  var nextAction = connection && connection.db_target_next_action ? String(connection.db_target_next_action) : '';
+  var label = status.replace(/_/g, ' ');
+  return '<div class="ds-inline-alert tone-' + _esc(tone) + '"><strong>' + _esc(_t('DB target', 'DB target')) + ': ' + _esc(label) + '.</strong> ' + _esc(reason) + (nextAction ? ' ' + _esc(_t('Hành động', 'Action')) + ': ' + _esc(nextAction) : '') + '</div>';
+}
+function _dbProbeTone(status){
+  var key = String(status || '').toLowerCase();
+  if(key === 'verified') return 'good';
+  if(key === 'missing') return 'bad';
+  if(key === 'missing_from_untracked_target' || key === 'missing_from_incomplete_target') return 'warn';
+  return 'neutral';
 }
 
 var state = {
@@ -763,9 +822,14 @@ function _renderMetricCards(){
   var connection = ws.connection || {};
   var dbProbeApplicable = _dbProbeApplicable(connection) || _dbProbeApplicable(m);
   var dbProbeResolved = _dbProbeResolved(connection) || _dbProbeResolved(m);
+  var unlinkedComponentCount = Number(m.unlinked_endpoint_count || 0) + Number(m.unlinked_table_count || 0);
   var cards = [
     { label:_t('Endpoint catalog', 'Endpoint catalog'), value:m.endpoint_count, note:_t('Tổng endpoint có contract.', 'Total endpoints under contract.') },
+    { label:_t('Runtime-linked APIs', 'Runtime-linked APIs'), value:_fmtInt(m.runtime_ready_endpoint_count) + ' / ' + _fmtInt(m.endpoint_count), note:_t('Endpoint có path, controller và handler thật trong backend.', 'Endpoints with a real backend path, controller and handler.') },
     { label:_t('Tables covered', 'Tables covered'), value:m.table_count, note:_t('Union từ registry + relation map.', 'Union from registry + relation map.') },
+    { label:_t('Runtime-linked tables', 'Runtime-linked tables'), value:_fmtInt(m.runtime_contract_linked_table_count) + ' / ' + _fmtInt(m.table_count), note:_t('Bảng có migration, registry, relation map và API controller link.', 'Tables linked to migration, registry, relation map and API controllers.') },
+    { label:_t('Unlinked components', 'Unlinked components'), value:unlinkedComponentCount, note:_t('Component không có bằng chứng runtime thật sẽ phải cách ly hoặc xóa.', 'Components without real runtime proof must be quarantined or removed.') },
+    { label:_t('DB target status', 'DB target status'), value:(m.db_target_status || connection.db_target_status || 'not_configured'), note:(connection.db_target_reason || _t('Trạng thái DB đang được web runtime probe.', 'Status of the DB target probed by the web runtime.')) },
     { label:_t('Present in DB', 'Present in DB'), value:!dbProbeApplicable ? _t('N/A', 'N/A') : (dbProbeResolved ? m.db_present_table_count : '—'), note:!dbProbeApplicable ? _t('Chưa có hồ sơ DB thật để probe trực tiếp.', 'No live DB profile is configured for direct probing.') : (dbProbeResolved ? _t('Bảng thật tìm thấy trong PostgreSQL.', 'Tables found in live PostgreSQL.') : _t('Đã có hồ sơ DB nhưng probe hiện chưa resolve được truth từ PostgreSQL.', 'A DB profile exists, but the probe has not resolved live PostgreSQL truth yet.')) },
     { label:_t('Structural drift', 'Structural drift'), value:!dbProbeApplicable ? _t('N/A', 'N/A') : (dbProbeResolved ? m.db_structural_drift_table_count : '—'), note:!dbProbeApplicable ? _t('Chưa cấu hình DB probe nên không thể so drift.', 'No DB probe is configured, so structural drift cannot be compared.') : (dbProbeResolved ? _t('Bảng live lệch cột/PK so với authority.', 'Live tables drifting in columns or PK from authority.') : _t('Probe DB đang lỗi hoặc chưa tới được PostgreSQL nên drift chưa thể kết luận.', 'The DB probe is currently failing or cannot reach PostgreSQL, so structural drift is still unknown.')) },
     { label:_t('Operational risks', 'Operational risks'), value:m.operational_risk_count, note:_t('Rủi ro vận hành và logic chưa an toàn.', 'Operational and logic risks that still need treatment.') },
@@ -799,6 +863,8 @@ function _renderOverview(){
 
   var blockers = Array.isArray(highlights.blockers) ? highlights.blockers : [];
   var governanceGaps = Array.isArray(highlights.governance_gaps) ? highlights.governance_gaps : [];
+  var governanceDirectMissing = Array.isArray(highlights.governance_direct_missing) ? highlights.governance_direct_missing : [];
+  var unlinkedComponents = Array.isArray(highlights.unlinked_components) ? highlights.unlinked_components : [];
   var registryGaps = Array.isArray(highlights.registry_gaps) ? highlights.registry_gaps : [];
   var dbMissing = Array.isArray(highlights.db_missing_tables) ? highlights.db_missing_tables : [];
   var dbUnexpected = Array.isArray(highlights.db_unexpected_tables) ? highlights.db_unexpected_tables : [];
@@ -869,7 +935,10 @@ function _renderOverview(){
       '<section class="ds-panel">',
         '<div class="ds-panel-head"><div><small>' + _esc(_t('Connection reality', 'Connection reality')) + '</small><h3>' + _esc(_t('Registry vs PostgreSQL', 'Registry vs PostgreSQL')) + '</h3></div></div>',
         '<div class="ds-panel-body">',
+          _dbTargetAlert(connection),
           '<div class="ds-facts">',
+            '<div><span>' + _esc(_t('DB target status', 'DB target status')) + '</span><strong class="tone-' + _esc(connection.db_target_healthy ? 'good' : (dbProbeApplicable ? 'warn' : 'neutral')) + '">' + _esc(connection.db_target_status || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Authority coverage', 'Authority coverage')) + '</span><strong class="tone-' + _esc(connection.db_target_healthy ? 'good' : 'warn') + '">' + _esc(_fmtInt(connection.present_table_count || 0) + ' / ' + _fmtInt(connection.db_target_authority_table_count || metrics.table_count || 0)) + '</strong></div>',
             '<div><span>' + _esc(_t('Probe configured', 'Probe configured')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? 'good' : 'neutral') + '">' + _esc(dbProbeApplicable ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
             '<div><span>' + _esc(_t('Reachable', 'Reachable')) + '</span><strong class="tone-' + _esc(dbProbeApplicable ? (dbProbeReachable ? 'good' : 'bad') : 'neutral') + '">' + _esc(dbProbeApplicable ? (dbProbeReachable ? _t('Yes', 'Yes') : _t('No', 'No')) : _t('N/A', 'N/A')) + '</strong></div>',
             '<div><span>' + _esc(_t('Present tables', 'Present tables')) + '</span><strong>' + _esc(dbProbeResolved ? _fmtInt(connection.present_table_count) : _t('N/A', 'N/A')) + '</strong></div>',
@@ -899,6 +968,9 @@ function _renderOverview(){
             '<div><span>' + _esc(_t('Contract issues', 'Contract issues')) + '</span><strong class="tone-' + _esc((artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.contractIssues) ? 'warn' : 'good') + '">' + _esc(_fmtInt(artifacts.registry_quality && artifacts.registry_quality.summary && artifacts.registry_quality.summary.contractIssues)) + '</strong></div>',
             '<div><span>' + _esc(_t('Publishability', 'Publishability')) + '</span><strong class="tone-' + _esc(_tone(artifacts.registry_quality && artifacts.registry_quality.publishability && artifacts.registry_quality.publishability.status)) + '">' + _esc((artifacts.registry_quality && artifacts.registry_quality.publishability && artifacts.registry_quality.publishability.status) || '—') + '</strong></div>',
             '<div><span>' + _esc(_t('Schema authority', 'Schema authority')) + '</span><strong>' + _esc(_fmtInt(metrics.authoritative_table_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('API implementation linked', 'API implementation linked')) + '</span><strong class="tone-' + _esc(metrics.unlinked_endpoint_count ? 'bad' : 'good') + '">' + _esc(_fmtInt(metrics.runtime_ready_endpoint_count) + ' / ' + _fmtInt(metrics.endpoint_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Runtime contract tables', 'Runtime contract tables')) + '</span><strong class="tone-' + _esc(metrics.unlinked_table_count ? 'bad' : 'good') + '">' + _esc(_fmtInt(metrics.runtime_contract_linked_table_count) + ' / ' + _fmtInt(metrics.table_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Unlinked components', 'Unlinked components')) + '</span><strong class="tone-' + _esc((Number(metrics.unlinked_endpoint_count || 0) + Number(metrics.unlinked_table_count || 0)) ? 'bad' : 'good') + '">' + _esc(_fmtInt(Number(metrics.unlinked_endpoint_count || 0) + Number(metrics.unlinked_table_count || 0))) + '</strong></div>',
             '<div><span>' + _esc(_t('Artifact drift', 'Artifact drift')) + '</span><strong class="tone-' + _esc(_tone(freshness.driftStatus || 'neutral')) + '">' + _esc(freshness.driftLabel || '—') + '</strong></div>',
             '<div><span>' + _esc(_t('Dependency drift', 'Dependency drift')) + '</span><strong class="tone-' + _esc((metrics.dependency_outdated_artifact_count ? 'warn' : 'good')) + '">' + _esc(_fmtInt(metrics.dependency_outdated_artifact_count)) + '</strong></div>',
             '<div><span>' + _esc(_t('Blind spots critical', 'Blind spots critical')) + '</span><strong class="tone-' + _esc((blindSpotSummary.critical ? 'bad' : 'good')) + '">' + _esc(_fmtInt(blindSpotSummary.critical)) + '</strong></div>',
@@ -914,6 +986,10 @@ function _renderOverview(){
       '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Blockers', 'Blockers')) + '</small><h3>' + _esc(_t('Điểm nghẽn thật', 'Real blockers')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(blockers, 'blocker') + '</div></section>',
       '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Governance gaps', 'Governance gaps')) + '</small><h3>' + _esc(_t('Thiếu metadata governance', 'Missing governance metadata')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(governanceGaps, 'governance') + '</div></section>',
       '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Migration hotspots', 'Migration hotspots')) + '</small><h3>' + _esc(_t('Khoảng trống schema authority', 'Schema authority gaps')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(migrationHotspots, 'migration') + '</div></section>',
+    '</div>',
+    '<div class="ds-grid ds-grid-2">',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Runtime linkage', 'Runtime linkage')) + '</small><h3>' + _esc(_t('Thành phần không link hệ thống thật', 'Components not linked to real system truth')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(unlinkedComponents, 'unlinked') + '</div></section>',
+      '<section class="ds-panel"><div class="ds-panel-head"><div><small>' + _esc(_t('Governance posture', 'Governance posture')) + '</small><h3>' + _esc(_t('Direct metadata được kế thừa / root-scope', 'Direct metadata inherited / root-scoped')) + '</h3></div></div><div class="ds-panel-body">' + _renderIssueList(governanceDirectMissing, 'direct_governance') + '</div></section>',
     '</div>',
     '<div class="ds-grid ds-grid-2">',
       '<section class="ds-panel">',
@@ -967,6 +1043,13 @@ function _renderIssueList(items, mode){
     if(mode === 'governance'){
       return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.domain || 'domain', 'warn') + '<strong>' + _esc(item.table || item.label || 'table') + '</strong></div><p>' + _esc((item.missing || []).join(', ')) + '</p></article>';
     }
+    if(mode === 'direct_governance'){
+      var inheritedVia = Array.isArray(item.inherited_via) && item.inherited_via.length ? ' · ' + _t('inherited via', 'inherited via') + ': ' + item.inherited_via.join(', ') : '';
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.status || 'classified', 'neutral') + _badge(item.domain || 'domain', 'neutral') + '<strong>' + _esc(item.table || item.label || 'table') + '</strong></div><p>' + _esc(((item.missing || []).join(', ') || _t('Không có field trực tiếp bị thiếu.', 'No direct fields missing.')) + inheritedVia) + '</p><div class="ds-helper-text">' + _esc(_t('Đây là posture đã phân loại, không phải blocker nếu bảng là root-scope hoặc kế thừa governance qua quan hệ thật.', 'This is classified posture, not a blocker when the table is root-scoped or inherits governance through real relationships.')) + '</div></article>';
+    }
+    if(mode === 'unlinked'){
+      return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.type || 'component', 'bad') + '<strong>' + _esc(item.key || item.label || 'component') + '</strong></div><p>' + _esc(item.reason || _t('Không có bằng chứng link runtime.', 'No runtime link proof found.')) + '</p></article>';
+    }
     if(mode === 'migration'){
       return '<article class="ds-issue-card"><div class="ds-issue-head">' + _badge(item.priority || 'medium', _tone(item.priority || 'warn')) + '<strong>' + _esc(item.table || 'table') + '</strong></div><p>' + _esc(item.reason || '') + '</p>' + (item.suggestedMigration ? '<div class="ds-helper-text">' + _esc(item.suggestedMigration) + '</div>' : '') + '</article>';
     }
@@ -1008,8 +1091,8 @@ function _renderDomainTable(rows){
   if(!rows.length){
     return _emptyState(_t('Chưa có domain', 'No domains'), _t('Không có dữ liệu domain để hiển thị.', 'No domain data is available.'));
   }
-  return '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Domain', 'Domain')) + '</th><th>' + _esc(_t('API', 'API')) + '</th><th>' + _esc(_t('Tables', 'Tables')) + '</th><th>' + _esc(_t('Present', 'Present')) + '</th><th>' + _esc(_t('Workflow', 'Workflow')) + '</th><th>' + _esc(_t('Gov gaps', 'Gov gaps')) + '</th><th>' + _esc(_t('Registry gaps', 'Registry gaps')) + '</th><th>' + _esc(_t('Structural drift', 'Structural drift')) + '</th></tr></thead><tbody>' + rows.map(function(row){
-    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div></td><td>' + _esc(_fmtInt(row.api_count)) + '</td><td>' + _esc(_fmtInt(row.table_count)) + '</td><td>' + _esc(_fmtInt(row.present_table_count)) + '</td><td>' + _esc(_fmtInt(row.workflow_table_count)) + '</td><td class="tone-' + _esc(row.governance_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.governance_gap_count)) + '</td><td class="tone-' + _esc(row.registry_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.registry_gap_count)) + '</td><td class="tone-' + _esc(row.structural_drift_table_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.structural_drift_table_count)) + '</td></tr>';
+  return '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Domain', 'Domain')) + '</th><th>' + _esc(_t('API', 'API')) + '</th><th>' + _esc(_t('Tables', 'Tables')) + '</th><th>' + _esc(_t('Runtime linked', 'Runtime linked')) + '</th><th>' + _esc(_t('API-backed', 'API-backed')) + '</th><th>' + _esc(_t('Workflow', 'Workflow')) + '</th><th>' + _esc(_t('Gov gaps', 'Gov gaps')) + '</th><th>' + _esc(_t('Direct gov', 'Direct gov')) + '</th><th>' + _esc(_t('Unlinked', 'Unlinked')) + '</th><th>' + _esc(_t('Structural drift', 'Structural drift')) + '</th></tr></thead><tbody>' + rows.map(function(row){
+    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div></td><td>' + _esc(_fmtInt(row.api_count)) + '</td><td>' + _esc(_fmtInt(row.table_count)) + '</td><td class="tone-' + _esc(row.unlinked_table_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.runtime_linked_table_count)) + '</td><td>' + _esc(_fmtInt(row.api_backed_table_count)) + '</td><td>' + _esc(_fmtInt(row.workflow_table_count)) + '</td><td class="tone-' + _esc(row.governance_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.governance_gap_count)) + '</td><td class="tone-neutral">' + _esc(_fmtInt(row.governance_direct_gap_count)) + '</td><td class="tone-' + _esc(row.unlinked_table_count ? 'bad' : 'good') + '">' + _esc(_fmtInt(row.unlinked_table_count)) + '</td><td class="tone-' + _esc(row.structural_drift_table_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(row.structural_drift_table_count)) + '</td></tr>';
   }).join('') + '</tbody></table></div>';
 }
 
@@ -1031,26 +1114,39 @@ function _renderApiTab(){
 
   var listHtml = rows.length ? rows.map(function(item){
     var active = String(item.key) === String(state.selectedApiKey);
-    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectApi(' + _js(item.key) + ')\'><div class="ds-list-head">' + _methodBadge(item.method) + '<strong>' + _esc(item.label || item.key) + '</strong></div><div class="ds-list-meta">' + _esc(item.key) + '</div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge(item.kind || 'kind', 'neutral') + ((item.csrf_required) ? _badge('CSRF', 'warn') : '') + ((item.admin_only) ? _badge('ADMIN', 'bad') : '') + '</div></button>';
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectApi(' + _js(item.key) + ')\'><div class="ds-list-head">' + _methodBadge(item.method) + '<strong>' + _esc(item.label || item.key) + '</strong></div><div class="ds-list-meta">' + _esc(item.key) + '</div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge(item.kind || 'kind', 'neutral') + _badge(item.implementation_linked ? 'CTRL LINKED' : 'UNLINKED', item.implementation_linked ? 'good' : 'bad') + _badge(item.truth_status || 'truth', _truthTone(item.truth_status)) + ((item.csrf_required) ? _badge('CSRF', 'warn') : '') + ((item.admin_only) ? _badge('ADMIN', 'bad') : '') + '</div></button>';
   }).join('') : _emptyState(_t('Không có API', 'No APIs'), _t('Không còn API phù hợp bộ lọc hiện tại.', 'No APIs match the current filters.'));
 
+  var authRequired = !!(current && ((current.security && current.security.auth_required) || current.auth_required));
+  var csrfRequired = !!(current && ((current.security && current.security.csrf_required) || current.csrf_required));
+  var adminOnly = !!(current && ((current.security && current.security.admin_only) || current.admin_only));
+  var implementationLinked = !!(current && current.implementation_linked);
+  var truthBinding = current && current.truthBinding ? current.truthBinding : {};
   var detailHtml = current ? [
     '<div class="ds-detail-scroll">',
       '<div class="ds-detail-head">',
         '<div><small>' + _esc(_t('Endpoint detail', 'Endpoint detail')) + '</small><h3>' + _esc(current.label || state.selectedApiKey) + '</h3><p>' + _esc(current.action || state.selectedApiKey) + '</p></div>',
-        '<div class="ds-chip-row">' + _methodBadge(current.method || 'GET') + _badge(current.domain || 'domain', 'neutral') + _badge(current.kind || 'kind', 'neutral') + '</div>',
+        '<div class="ds-chip-row">' + _methodBadge(current.method || 'GET') + _badge(current.domain || 'domain', 'neutral') + _badge(current.kind || 'kind', 'neutral') + _badge(implementationLinked ? 'CTRL LINKED' : 'UNLINKED', implementationLinked ? 'good' : 'bad') + _badge(current.truth_status || 'truth', _truthTone(current.truth_status)) + '</div>',
       '</div>',
       '<div class="ds-facts">',
         '<div><span>Path</span><strong>' + _esc(current.path || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Controller', 'Controller')) + '</span><strong>' + _esc((current.controller || '—') + '::' + (current.handler || '—')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Truth link', 'Truth link')) + '</span><strong class="tone-' + _esc(_truthTone(current.truth_status)) + '">' + _esc(current.truth_status || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Implementation', 'Implementation')) + '</span><strong class="tone-' + _esc(implementationLinked ? 'good' : 'bad') + '">' + _esc(implementationLinked ? _t('Linked', 'Linked') : _t('Unlinked', 'Unlinked')) + '</strong></div>',
         '<div><span>' + _esc(_t('Field count', 'Field count')) + '</span><strong>' + _esc(_fmtInt(current.field_count)) + '</strong></div>',
         '<div><span>' + _esc(_t('Workflow mode', 'Workflow mode')) + '</span><strong>' + _esc(current.workflow_mode || '—') + '</strong></div>',
-        '<div><span>' + _esc(_t('Security', 'Security')) + '</span><strong>' + _esc((current.security && current.security.auth_required ? 'auth' : 'public')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Security', 'Security')) + '</span><strong>' + _esc(authRequired ? 'auth' : 'public') + '</strong></div>',
       '</div>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Runtime binding', 'Runtime binding')) + '</h4><div class="ds-facts">' +
+        '<div><span>' + _esc(_t('Layer', 'Layer')) + '</span><strong>' + _esc(truthBinding.layer || 'api_controller') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Status', 'Status')) + '</span><strong class="tone-' + _esc(_truthTone(current.truth_status)) + '">' + _esc(truthBinding.status || current.truth_status || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Route', 'Route')) + '</span><strong>' + _esc(truthBinding.path || current.path || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Handler', 'Handler')) + '</span><strong>' + _esc((truthBinding.controller || current.controller || '—') + '::' + (truthBinding.handler || current.handler || '—')) + '</strong></div>' +
+      '</div>' + (!implementationLinked ? '<div class="ds-inline-alert tone-bad">' + _esc(_t('Endpoint này chưa có bằng chứng controller/handler thật nên không được coi là contract vận hành.', 'This endpoint has no real controller/handler proof and must not be treated as an operational contract.')) + '</div>' : '') + '</section>',
       '<section class="ds-detail-section"><h4>' + _esc(_t('Security and contract', 'Security and contract')) + '</h4><div class="ds-chip-row">' +
-        _badge((current.security && current.security.auth_required) ? 'AUTH' : 'PUBLIC', _boolTone(current.security && current.security.auth_required)) +
-        _badge((current.security && current.security.csrf_required) ? 'CSRF' : 'NO CSRF', (current.security && current.security.csrf_required) ? 'warn' : 'neutral') +
-        _badge((current.security && current.security.admin_only) ? 'ADMIN ONLY' : 'SHARED', (current.security && current.security.admin_only) ? 'bad' : 'good') +
+        _badge(authRequired ? 'AUTH' : 'PUBLIC', _boolTone(authRequired)) +
+        _badge(csrfRequired ? 'CSRF' : 'NO CSRF', csrfRequired ? 'warn' : 'neutral') +
+        _badge(adminOnly ? 'ADMIN ONLY' : 'SHARED', adminOnly ? 'bad' : 'good') +
         '</div><div class="ds-helper-text">' + _esc(_t('Dùng editor JSON bên dưới để chỉnh metadata endpoint, request/response và field packs.', 'Use the JSON editor below to update endpoint metadata, request/response and field packs.')) + '</div>' + _renderSaveGuard(detail, 'api') + '</section>',
       '<section class="ds-detail-section"><h4>' + _esc(_t('Request / response summary', 'Request / response summary')) + '</h4>' +
         '<div class="ds-inline-grid"><article class="ds-mini-card"><small>Request</small><strong>' + _esc(_fmtInt((detail.api_params && detail.api_params.params && detail.api_params.params.length) || (current.request && current.request.body_fields && current.request.body_fields.length) || 0)) + '</strong><p>' + _esc(_t('tham số / field được khai báo', 'declared params / fields')) + '</p></article>' +
@@ -1126,39 +1222,63 @@ function _renderPreviewTable(preview){
 
 function _renderTableTab(){
   var rows = _filteredTables();
+  var connection = _workspace().connection || {};
+  var targetAlert = _dbTargetAlert(connection);
   var detail = state.tableDetail;
   var summary = _selectedTableSummary();
   var item = detail && detail.item ? Object.assign({}, summary || {}, detail.item || {}) : (summary || null);
   var preview = state.tablePreview;
   var columns = _tableColumnRows(item, preview);
+  var tableTruthBinding = item && item.truthBinding ? item.truthBinding : {};
+  var tableTruthStatus = item && item.truth_status ? item.truth_status : '';
+  var governanceInheritedVia = item && Array.isArray(item.governance_inherited_via) ? item.governance_inherited_via : [];
 
   var listHtml = rows.length ? rows.map(function(row){
     var active = String(row.key) === String(state.selectedTableKey);
-    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectTable(' + _js(row.key) + ')\'><div class="ds-list-head"><strong>' + _esc(row.label || row.key) + '</strong>' + _badge(_dbStatusLabel(!!row.db_probe_applicable, !!row.db_probe_resolved, row.db_present === true), _dbStatusTone(!!row.db_probe_applicable, !!row.db_probe_resolved, row.db_present === true)) + '</div><div class="ds-list-meta">' + _esc(row.key) + '</div><div class="ds-chip-row">' + _badge(row.domain || 'domain', 'neutral') + (row.workflowId ? _badge('WF', 'good') : '') + (row.governance_gap_count ? _badge('GAP ' + row.governance_gap_count, 'warn') : '') + (row.column_drift_count ? _badge('DRIFT ' + row.column_drift_count, 'warn') : '') + (row.pk_drift ? _badge('PK', 'bad') : '') + ((!row.registry_present) ? _badge('NOT IN REGISTRY', 'bad') : '') + '</div></button>';
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectTable(' + _js(row.key) + ')\'><div class="ds-list-head"><strong>' + _esc(row.label || row.key) + '</strong>' + _badge(_dbStatusLabelFor(row), _dbStatusToneFor(row)) + '</div><div class="ds-list-meta">' + _esc(row.key) + '</div><div class="ds-chip-row">' + _badge(row.domain || 'domain', 'neutral') + _badge(row.truth_status || 'truth', _truthTone(row.truth_status)) + _badge(row.runtime_contract_linked ? 'RUNTIME LINKED' : 'PARTIAL', row.runtime_contract_linked ? 'good' : _truthTone(row.truth_status)) + _badge(_fmtInt(row.linked_endpoint_count) + '/' + _fmtInt(row.endpoint_count) + ' API', row.linked_endpoint_count ? 'good' : 'neutral') + _badge(row.operationalRole || 'role', 'neutral') + (row.workflowId ? _badge('WF', 'good') : '') + (row.governance_gap_count ? _badge('GAP ' + row.governance_gap_count, 'warn') : '') + (row.column_drift_count ? _badge('DRIFT ' + row.column_drift_count, 'warn') : '') + (row.pk_drift ? _badge('PK', 'bad') : '') + (row.unlinked ? _badge('UNLINKED', 'bad') : '') + ((!row.registry_present) ? _badge('NOT IN REGISTRY', 'bad') : '') + '</div></button>';
   }).join('') : _emptyState(_t('Không có bảng', 'No tables'), _t('Không còn bảng phù hợp bộ lọc hiện tại.', 'No tables match the current filters.'));
 
   var detailHtml = item ? [
     '<div class="ds-detail-scroll">',
-      '<div class="ds-detail-head"><div><small>' + _esc(_t('Table detail', 'Table detail')) + '</small><h3>' + _esc(item.label || state.selectedTableKey) + '</h3><p>' + _esc(state.selectedTableKey) + '</p></div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge((item.primaryKey || 'no_pk'), item.primaryKey ? 'good' : 'warn') + _badge(!item.db_probe_applicable ? _t('DB N/A', 'DB N/A') : (!item.db_probe_resolved ? _t('DB unknown', 'DB unknown') : (item.db_present ? 'DB OK' : 'DB MISSING')), !item.db_probe_applicable || !item.db_probe_resolved ? 'neutral' : (item.db_present ? 'good' : 'bad')) + _badge(item.registry_present === false ? 'RELATION ONLY' : 'REGISTRY', item.registry_present === false ? 'warn' : 'good') + '</div></div>',
+      targetAlert,
+      '<div class="ds-detail-head"><div><small>' + _esc(_t('Table detail', 'Table detail')) + '</small><h3>' + _esc(item.label || state.selectedTableKey) + '</h3><p>' + _esc(state.selectedTableKey) + '</p></div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge(tableTruthStatus || 'truth', _truthTone(tableTruthStatus)) + _badge(item.runtime_contract_linked ? 'RUNTIME LINKED' : 'PARTIAL', item.runtime_contract_linked ? 'good' : _truthTone(tableTruthStatus)) + _badge((item.primaryKey || 'no_pk'), item.primaryKey ? 'good' : 'warn') + _badge(_dbStatusLabelFor(item), _dbStatusToneFor(item)) + _badge(item.registry_present === false ? 'RELATION ONLY' : 'REGISTRY', item.registry_present === false ? 'warn' : 'good') + '</div></div>',
       '<div class="ds-facts">',
         '<div><span>' + _esc(_t('Columns', 'Columns')) + '</span><strong>' + _esc(_fmtInt(item.columnCount || columns.length)) + '</strong></div>',
         '<div><span>' + _esc(_t('DB columns', 'DB columns')) + '</span><strong class="tone-' + _esc(item.db_probe_applicable && item.db_probe_resolved ? (item.db_present ? 'good' : 'neutral') : 'neutral') + '">' + _esc(item.db_probe_applicable && item.db_probe_resolved ? _fmtInt(item.db_column_count || 0) : _t('N/A', 'N/A')) + '</strong></div>',
         '<div><span>' + _esc(_t('Primary key', 'Primary key')) + '</span><strong>' + _esc(item.primaryKey || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Status column', 'Status column')) + '</span><strong>' + _esc(item.statusColumn || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Workflow', 'Workflow')) + '</span><strong>' + _esc(item.workflowId || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Operational role', 'Operational role')) + '</span><strong>' + _esc(item.operationalRole || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('API links', 'API links')) + '</span><strong class="tone-' + _esc(item.linked_endpoint_count ? 'good' : 'neutral') + '">' + _esc(_fmtInt(item.linked_endpoint_count) + ' / ' + _fmtInt(item.endpoint_count)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Migration source', 'Migration source')) + '</span><strong class="tone-' + _esc(item.migration_source_present ? 'good' : 'warn') + '">' + _esc(item.migration || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Support table', 'Support table')) + '</span><strong>' + _esc(item.supportTable ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
         '<div><span>' + _esc(_t('Registry source', 'Registry source')) + '</span><strong>' + _esc(item.source || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Truth status', 'Truth status')) + '</span><strong class="tone-' + _esc(_truthTone(tableTruthStatus)) + '">' + _esc(tableTruthStatus || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Governance gaps', 'Governance gaps')) + '</span><strong class="tone-' + _esc(item.governance_gap_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.governance_gap_count)) + '</strong></div>',
+        '<div><span>' + _esc(_t('Governance mode', 'Governance mode')) + '</span><strong class="tone-' + _esc(item.governance_gap_count ? 'warn' : 'neutral') + '">' + _esc(item.governance_mode || item.governance_status || '—') + '</strong></div>',
         '<div><span>' + _esc(_t('Missing columns', 'Missing columns')) + '</span><strong class="tone-' + _esc(item.missing_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.missing_column_count || 0)) + '</strong></div>',
         '<div><span>' + _esc(_t('Unexpected columns', 'Unexpected columns')) + '</span><strong class="tone-' + _esc(item.unexpected_column_count ? 'warn' : 'good') + '">' + _esc(_fmtInt(item.unexpected_column_count || 0)) + '</strong></div>',
         '<div><span>' + _esc(_t('Primary key drift', 'Primary key drift')) + '</span><strong class="tone-' + _esc(item.pk_drift ? 'bad' : 'good') + '">' + _esc(item.pk_drift ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
         '<div><span>' + _esc(_t('Digital thread', 'Digital thread')) + '</span><strong>' + _esc(item.digital_thread ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
       '</div>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Runtime truth binding', 'Runtime truth binding')) + '</h4><div class="ds-facts">' +
+        '<div><span>' + _esc(_t('Schema authority', 'Schema authority')) + '</span><strong class="tone-' + _esc(tableTruthBinding.schemaAuthority === 'linked' ? 'good' : 'warn') + '">' + _esc(tableTruthBinding.schemaAuthority || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Registry', 'Registry')) + '</span><strong class="tone-' + _esc(tableTruthBinding.registry === 'linked' ? 'good' : 'bad') + '">' + _esc(tableTruthBinding.registry || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Relation map', 'Relation map')) + '</span><strong class="tone-' + _esc(tableTruthBinding.relationMap === 'linked' ? 'good' : 'warn') + '">' + _esc(tableTruthBinding.relationMap || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('API controller', 'API controller')) + '</span><strong class="tone-' + _esc(tableTruthBinding.apiController === 'linked' ? 'good' : 'neutral') + '">' + _esc(tableTruthBinding.apiController || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('DB probe', 'DB probe')) + '</span><strong class="tone-' + _esc(_dbProbeTone(tableTruthBinding.dbProbe)) + '">' + _esc(tableTruthBinding.dbProbe || '—') + '</strong></div>' +
+        '<div><span>' + _esc(_t('Migration path', 'Migration path')) + '</span><strong>' + _esc(item.migration_path || '—') + '</strong></div>' +
+      '</div>' + (item.unlinked ? '<div class="ds-inline-alert tone-bad">' + _esc(_t('Bảng này không có bằng chứng link hệ thống thật và phải được cách ly khỏi contract vận hành.', 'This table has no proof linking it to the real system and must be quarantined from operational contracts.')) + '</div>' : '') + '</section>',
+      '<section class="ds-detail-section"><h4>' + _esc(_t('Governance posture', 'Governance posture')) + '</h4>' + (item.governance_gap_count ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này còn thiếu governance metadata bắt buộc ở scope trực tiếp.', 'This table still misses required governance metadata in its direct scope.')) + ' ' + _esc((item.governance_missing || []).join(', ')) + '</div>' : '<div class="ds-inline-alert tone-good">' + _esc(_t('Không còn governance gap có thể hành động cho bảng này.', 'No actionable governance gap remains for this table.')) + '</div>') + (item.governance_direct_missing_count ? '<div class="ds-helper-text">' + _esc(_t('Direct missing đã được phân loại', 'Classified direct missing') + ': ' + (item.governance_direct_missing || []).join(', ') + (governanceInheritedVia.length ? ' · ' + _t('inherited via', 'inherited via') + ': ' + governanceInheritedVia.join(', ') : '')) + '</div>' : '') + '</section>',
       '<section class="ds-detail-section"><h4>' + _esc(_t('Structural drift', 'Structural drift')) + '</h4>' + (
         (!item.db_probe_applicable)
           ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Chưa có hồ sơ DB thật cho bảng này, nên module chưa thể đối chiếu drift với PostgreSQL.', 'No live DB profile is configured for this table yet, so the module cannot compare drift against PostgreSQL.')) + '</div>'
           : (!item.db_probe_resolved)
           ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('DB probe đã được cấu hình nhưng hiện chưa resolve được truth từ PostgreSQL, nên chưa thể kết luận drift cột/PK.', 'The DB probe is configured but has not resolved PostgreSQL truth yet, so column/PK drift cannot be concluded.')) + '</div>'
+          : (item.db_status === 'missing_from_untracked_target')
+          ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này không có trong DB đang probe vì target DB có dữ liệu nhưng migration ledger rỗng. Đây là vấn đề cấu hình/baseline DB, không phải lỗi registry riêng của bảng.', 'This table is absent from the probed DB because the target DB has data but an empty migration ledger. This is a DB target/baseline issue, not an isolated registry defect.')) + '</div>'
+          : (item.db_status === 'missing_from_incomplete_target')
+          ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này không có trong DB đang probe vì target DB chưa được nâng đủ theo authority schema. Cần promotion schema không mất dữ liệu trước khi dùng DB làm runtime authority.', 'This table is absent from the probed DB because the target DB has not been promoted to the full authority schema. A no-data-loss schema promotion is required before using DB as runtime authority.')) + '</div>'
           : (!item.db_present)
           ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('Bảng này chưa hiện diện trong PostgreSQL đang probe, nên chưa thể so drift cột/PK.', 'This table is not present in the probed PostgreSQL database yet, so column/PK drift cannot be compared.')) + '</div>'
           : (
@@ -1180,7 +1300,7 @@ function _renderTableTab(){
     '</div>'
   ].join('') : _emptyState(_t('Chọn một bảng', 'Select a table'), _t('Chọn một bảng bên trái để xem runtime posture, preview dữ liệu và chỉnh metadata.', 'Select a table on the left to inspect runtime posture, preview data and edit metadata.'));
 
-  return '<div class="ds-shell"><aside class="ds-shell-list"><div class="ds-toolbar"><div class="ds-search"><input value="' + _esc(state.tableSearch) + '" placeholder="' + _esc(_t('Tìm bảng, khóa chính, workflow...', 'Search table, primary key, workflow...')) + '" oninput=\'DataSchemaAdmin.setTableSearch(this.value)\'></div><div class="ds-select-row"><select onchange=\'DataSchemaAdmin.setTableDomain(this.value)\'><option value="ALL">All domains</option>' + _tableDomains().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.tableDomain===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select></div></div><div class="ds-list-scroll">' + listHtml + '</div></aside><section class="ds-shell-detail">' + detailHtml + '</section></div>';
+  return '<div class="ds-shell"><aside class="ds-shell-list"><div class="ds-toolbar">' + targetAlert + '<div class="ds-search"><input value="' + _esc(state.tableSearch) + '" placeholder="' + _esc(_t('Tìm bảng, khóa chính, workflow...', 'Search table, primary key, workflow...')) + '" oninput=\'DataSchemaAdmin.setTableSearch(this.value)\'></div><div class="ds-select-row"><select onchange=\'DataSchemaAdmin.setTableDomain(this.value)\'><option value="ALL">All domains</option>' + _tableDomains().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.tableDomain===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select></div></div><div class="ds-list-scroll">' + listHtml + '</div></aside><section class="ds-shell-detail">' + detailHtml + '</section></div>';
 }
 
 function _renderDesignResult(){
@@ -1195,10 +1315,15 @@ function _renderDesignTab(){
   var releases = Array.isArray(state.releases) ? state.releases : [];
   var operational = _workspace().operational || {};
   var releaseGate = operational.releaseGate || {};
+  var selectedDesignSummary = null;
+  designs.forEach(function(item){
+    if(String(item.id) === String(state.selectedDesignId)) selectedDesignSummary = item;
+  });
+  var designAuthority = selectedDesignSummary || designSummary || {};
 
   var listHtml = designs.length ? designs.map(function(item){
     var active = String(item.id) === String(state.selectedDesignId);
-    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectDesign(' + _js(item.id) + ')\'><div class="ds-list-head"><strong>' + _esc(item.name || item.id) + '</strong>' + _badge(item.baselineAvailable ? 'BASELINE' : 'NO BASELINE', item.baselineAvailable ? 'good' : 'warn') + '</div><div class="ds-list-meta">' + _esc(item.id) + '</div><div class="ds-chip-row">' + _badge(item.profile || 'profile', 'neutral') + _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + (item.lastReleaseId ? _badge('RELEASED', 'good') : '') + '</div></button>';
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectDesign(' + _js(item.id) + ')\'><div class="ds-list-head"><strong>' + _esc(item.name || item.id) + '</strong>' + _badge(item.baselineAvailable ? 'BASELINE' : 'NO BASELINE', item.baselineAvailable ? 'good' : 'warn') + '</div><div class="ds-list-meta">' + _esc(item.id) + '</div><div class="ds-chip-row">' + _badge(item.profile || 'profile', 'neutral') + _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + _badge(item.readOnly ? 'READ ONLY' : 'EDITABLE', item.readOnly ? 'neutral' : 'good') + _badge(item.runtimeLinked ? 'RUNTIME AUTHORITY' : 'NON-RUNTIME', item.runtimeLinked ? 'good' : 'neutral') + _badge(item.truth_status || item.authorityLayer || 'truth', _truthTone(item.truth_status || item.authorityLayer)) + (item.lastReleaseId ? _badge('RELEASED', 'good') : '') + '</div></button>';
   }).join('') : _emptyState(_t('Chưa có design', 'No designs'), _t('Hãy load từ registry hoặc reverse engineer để tạo working design đầu tiên.', 'Load from the registry or reverse engineer the database to create the first working design.'));
 
   return [
@@ -1209,20 +1334,27 @@ function _renderDesignTab(){
       '</aside>',
       '<section class="ds-shell-detail">',
         '<div class="ds-detail-scroll">',
-          '<div class="ds-detail-head"><div><small>' + _esc(_t('Working design', 'Working design')) + '</small><h3>' + _esc((designSummary && (designSummary.name || designSummary.id)) || _t('Chưa có working design', 'No working design loaded')) + '</h3><p>' + _esc(_currentDesignId() || '—') + '</p></div><div class="ds-chip-row">' + (state.designBaseline ? _badge('BASELINE', 'good') : _badge('NO BASELINE', 'warn')) + (designSummary && designSummary.enterprise && designSummary.enterprise.profile ? _badge(designSummary.enterprise.profile, 'neutral') : '') + '</div></div>',
+          '<div class="ds-detail-head"><div><small>' + _esc(_t('Schema layer', 'Schema layer')) + '</small><h3>' + _esc((designAuthority && (designAuthority.name || designAuthority.displayName || designAuthority.id)) || _t('Chưa có schema layer', 'No schema layer loaded')) + '</h3><p>' + _esc(_currentDesignId() || state.selectedDesignId || '—') + '</p></div><div class="ds-chip-row">' + (state.designBaseline ? _badge('BASELINE', 'good') : _badge('NO BASELINE', 'warn')) + _badge(designAuthority.readOnly ? 'READ ONLY' : 'EDITABLE', designAuthority.readOnly ? 'neutral' : 'good') + _badge(designAuthority.runtimeLinked ? 'RUNTIME AUTHORITY' : 'NON-RUNTIME', designAuthority.runtimeLinked ? 'good' : 'neutral') + _badge(designAuthority.truth_status || designAuthority.authorityLayer || 'truth', _truthTone(designAuthority.truth_status || designAuthority.authorityLayer)) + (designSummary && designSummary.enterprise && designSummary.enterprise.profile ? _badge(designSummary.enterprise.profile, 'neutral') : '') + '</div></div>',
           (releaseGate.blocking ? '<div class="ds-inline-alert tone-warn"><strong>' + _esc(_t('Release gate is blocked.', 'Release gate is blocked.')) + '</strong> ' + _esc((releaseGate.reasons || []).join(' · ')) + '</div>' : ''),
+          (designAuthority && designAuthority.truth_status === 'non_runtime_design_draft' ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Workspace Design Draft là vùng thiết kế có revision guard. Nó không phải DB schema thật và không được dùng làm runtime authority.', 'Workspace Design Draft is a revision-guarded design surface. It is not the physical DB schema and must not be used as runtime authority.')) + '</div>' : ''),
+          (designAuthority && designAuthority.readOnly ? '<div class="ds-inline-alert tone-good">' + _esc(_t('System Contract Registry là lớp authority chỉ đọc sinh từ migrations/schema.sql/registry. Muốn thay đổi runtime phải đi qua migration và pipeline publish, không sửa trực tiếp tại đây.', 'System Contract Registry is a read-only authority layer generated from migrations/schema.sql/registry. Runtime changes must go through migrations and the publish pipeline, not direct editing here.')) + '</div>' : ''),
           '<div class="ds-facts">',
             '<div><span>' + _esc(_t('Tables', 'Tables')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.tables && state.designSchema.tables.length)) + '</strong></div>',
             '<div><span>' + _esc(_t('Relations', 'Relations')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.relations && state.designSchema.relations.length)) + '</strong></div>',
             '<div><span>' + _esc(_t('Groups', 'Groups')) + '</span><strong>' + _esc(_fmtInt(state.designSchema && state.designSchema.groups && state.designSchema.groups.length)) + '</strong></div>',
             '<div><span>' + _esc(_t('Updated', 'Updated')) + '</span><strong>' + _esc(_fmtTime(designSummary && (designSummary.updatedAt || designSummary.generated_at))) + '</strong></div>',
+            '<div><span>' + _esc(_t('Authority layer', 'Authority layer')) + '</span><strong>' + _esc(designAuthority.authorityLayer || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Authority source', 'Authority source')) + '</span><strong>' + _esc(designAuthority.authoritySource || designAuthority.source || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Write policy', 'Write policy')) + '</span><strong>' + _esc(designAuthority.writePolicy || '—') + '</strong></div>',
+            '<div><span>' + _esc(_t('Data loss impact', 'Data loss impact')) + '</span><strong>' + _esc(designAuthority.dataLossImpact || '—') + '</strong></div>',
           '</div>',
           '<section class="ds-detail-section"><h4>' + _esc(_t('Action runner', 'Action runner')) + '</h4><div class="ds-action-grid">' + actions.map(function(action){
             var requiresDesign = ['validate','set_baseline','diagnose','compile','release'].indexOf(action.id) !== -1;
-            var disabled = (requiresDesign && !state.designSchema) || (action.id === 'release' && releaseGate.blocking);
+            var writesDesign = ['set_baseline','compile','release'].indexOf(action.id) !== -1;
+            var disabled = (requiresDesign && !state.designSchema) || (action.id === 'release' && releaseGate.blocking) || (!!designAuthority.readOnly && writesDesign);
             return '<button class="ds-action-card' + (disabled ? ' disabled' : '') + '" type="button" onclick=\'DataSchemaAdmin.runDesignAction(' + _js(action.id) + ')\' ' + (disabled ? 'disabled' : '') + '><strong>' + _esc(action.label_vi || action.label) + '</strong><span>' + _esc(action.description || '') + '</span></button>';
-          }).join('') + '<button class="ds-action-card" type="button" onclick=\'DataSchemaAdmin.runDesignAction("save_design")\' ' + (!state.designSchema ? 'disabled' : '') + '><strong>' + _esc(_t('Lưu working design', 'Save working design')) + '</strong><span>' + _esc(_t('Ghi working schema hiện tại xuống thư mục design.', 'Persist the current working schema into the design store.')) + '</span></button><button class="ds-action-card" type="button" onclick=\'DataSchemaAdmin.runDesignAction("refresh_releases")\'><strong>' + _esc(_t('Tải release bundle', 'Refresh release bundles')) + '</strong><span>' + _esc(_t('Lấy danh sách release bundle mới nhất.', 'Fetch the latest release bundle list.')) + '</span></button></div></section>',
-          '<section class="ds-detail-section"><h4>' + _esc(_t('Working schema JSON', 'Working schema JSON')) + '</h4>' + _renderDesignSaveGuard() + '<textarea class="ds-editor ds-editor-xl" oninput=\'DataSchemaAdmin.setDesignEditor(this.value)\'>' + _esc(state.designEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.prettifyDesignEditor()\'>' + _esc(_t('Format JSON', 'Format JSON')) + '</button></div></section>',
+          }).join('') + '<button class="ds-action-card' + ((!state.designSchema || designAuthority.readOnly) ? ' disabled' : '') + '" type="button" onclick=\'DataSchemaAdmin.runDesignAction("save_design")\' ' + ((!state.designSchema || designAuthority.readOnly) ? 'disabled' : '') + '><strong>' + _esc(_t('Lưu working design', 'Save working design')) + '</strong><span>' + _esc(_t('Ghi working schema hiện tại xuống thư mục design.', 'Persist the current working schema into the design store.')) + '</span></button><button class="ds-action-card" type="button" onclick=\'DataSchemaAdmin.runDesignAction("refresh_releases")\'><strong>' + _esc(_t('Tải release bundle', 'Refresh release bundles')) + '</strong><span>' + _esc(_t('Lấy danh sách release bundle mới nhất.', 'Fetch the latest release bundle list.')) + '</span></button></div></section>',
+          '<section class="ds-detail-section"><h4>' + _esc(_t('Schema layer JSON', 'Schema layer JSON')) + '</h4>' + _renderDesignSaveGuard() + '<textarea class="ds-editor ds-editor-xl" ' + (designAuthority.readOnly ? 'readonly ' : '') + 'oninput=\'DataSchemaAdmin.setDesignEditor(this.value)\'>' + _esc(state.designEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.prettifyDesignEditor()\'>' + _esc(_t('Format JSON', 'Format JSON')) + '</button></div></section>',
           '<section class="ds-detail-section"><h4>' + _esc(_t('Action result', 'Action result')) + '</h4>' + _renderDesignResult() + '</section>',
           '<section class="ds-detail-section"><h4>' + _esc(_t('Recent releases', 'Recent releases')) + '</h4>' + (releases.length ? '<div class="ds-release-list">' + releases.slice(0, 12).map(function(item){
             return '<article class="ds-release-card"><div><strong>' + _esc(item.name || item.id) + '</strong><p>' + _esc(item.designId || '') + '</p></div><div class="ds-chip-row">' + _badge(item.approvalClass || 'standard', 'neutral') + _badge('risk ' + _fmtInt(item.riskScore), item.riskScore ? 'warn' : 'good') + '</div></article>';
@@ -1237,19 +1369,31 @@ function _renderLibraryTab(){
   var leftRows = state.libraryTab === 'schemas' ? _list('schemas') : _list('variables');
   var current = state.libraryTab === 'schemas' ? state.schemaDetail : state.variableDetail;
   var editor = state.libraryTab === 'schemas' ? state.schemaEditor : state.variableEditor;
+  var selectedLibraryKey = state.libraryTab === 'schemas' ? state.selectedSchemaKey : state.selectedVariableKey;
+  var currentSummary = null;
+  leftRows.forEach(function(row){
+    if(String(row.key) === String(selectedLibraryKey)) currentSummary = row;
+  });
+  var currentItem = current && current.item ? Object.assign({}, currentSummary || {}, current.item || {}) : currentSummary;
 
   var listHtml = leftRows.length ? leftRows.map(function(item){
     var key = String(item.key || '');
     var active = state.libraryTab === 'schemas'
       ? key === String(state.selectedSchemaKey)
       : key === String(state.selectedVariableKey);
-    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectLibraryItem(' + _js(state.libraryTab) + ',' + _js(key) + ')\'><div class="ds-list-head"><strong>' + _esc(item.label || item.label_vi || key) + '</strong></div><div class="ds-list-meta">' + _esc(key) + '</div><div class="ds-chip-row">' + (state.libraryTab === 'schemas' ? _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + _badge(_fmtInt(item.migrationCount) + ' mig', 'neutral') : _badge(_fmtInt(item.variableCount) + ' vars', 'neutral')) + '</div></button>';
+    return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectLibraryItem(' + _js(state.libraryTab) + ',' + _js(key) + ')\'><div class="ds-list-head"><strong>' + _esc(item.label || item.label_vi || key) + '</strong></div><div class="ds-list-meta">' + _esc(key) + '</div><div class="ds-chip-row">' + (state.libraryTab === 'schemas' ? _badge(_fmtInt(item.tableCount) + ' tbl', 'neutral') + _badge(_fmtInt(item.migrationCount) + ' mig', 'neutral') : _badge(_fmtInt(item.variableCount) + ' vars', 'neutral')) + _badge(item.authorityLayer || 'metadata', 'neutral') + _badge(item.truth_status || 'truth', _truthTone(item.truth_status)) + _badge(item.runtimeLinked ? 'RUNTIME USED' : 'REFERENCE ONLY', item.runtimeLinked ? 'good' : 'neutral') + '</div></button>';
   }).join('') : _emptyState(_t('Không có thư viện', 'No libraries'), _t('Không có dữ liệu cho nhóm thư viện hiện tại.', 'There is no data for the current library group.'));
 
-  var detailHtml = current && current.item ? [
+  var detailHtml = currentItem ? [
     '<div class="ds-detail-scroll">',
-      '<div class="ds-detail-head"><div><small>' + _esc(state.libraryTab === 'schemas' ? _t('Schema blueprint', 'Schema blueprint') : _t('Variable category', 'Variable category')) + '</small><h3>' + _esc((current.item.label || current.item.label_vi || (current.item.key || (state.libraryTab === 'schemas' ? state.selectedSchemaKey : state.selectedVariableKey)))) + '</h3><p>' + _esc(state.libraryTab === 'schemas' ? state.selectedSchemaKey : state.selectedVariableKey) + '</p></div></div>',
-      '<section class="ds-detail-section">' + _renderSaveGuard(current, state.libraryTab === 'schemas' ? 'schema' : 'variable') + '<textarea class="ds-editor ds-editor-xl" oninput=\'DataSchemaAdmin.setLibraryEditor(this.value)\'>' + _esc(editor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveLibrary()\'>' + _esc(_t('Lưu thư viện', 'Save library')) + '</button></div></section>',
+      '<div class="ds-detail-head"><div><small>' + _esc(state.libraryTab === 'schemas' ? _t('Schema blueprint', 'Schema blueprint') : _t('Variable category', 'Variable category')) + '</small><h3>' + _esc((currentItem.label || currentItem.label_vi || currentItem.key || selectedLibraryKey)) + '</h3><p>' + _esc(selectedLibraryKey) + '</p></div><div class="ds-chip-row">' + _badge(currentItem.authorityLayer || 'metadata', 'neutral') + _badge(currentItem.truth_status || 'truth', _truthTone(currentItem.truth_status)) + _badge(currentItem.runtimeLinked ? 'RUNTIME USED' : 'REFERENCE ONLY', currentItem.runtimeLinked ? 'good' : 'neutral') + '</div></div>',
+      '<div class="ds-facts">',
+        '<div><span>' + _esc(_t('Authority layer', 'Authority layer')) + '</span><strong>' + _esc(currentItem.authorityLayer || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Runtime linked', 'Runtime linked')) + '</span><strong class="tone-' + _esc(currentItem.runtimeLinked ? 'good' : 'neutral') + '">' + _esc(currentItem.runtimeLinked ? _t('Yes', 'Yes') : _t('No', 'No')) + '</strong></div>',
+        '<div><span>' + _esc(_t('Source', 'Source')) + '</span><strong>' + _esc(currentItem.source || '—') + '</strong></div>',
+        '<div><span>' + _esc(_t('Purpose', 'Purpose')) + '</span><strong>' + _esc(currentItem.purpose || currentItem.description || '—') + '</strong></div>',
+      '</div>',
+      '<section class="ds-detail-section">' + _renderSaveGuard(current || {}, state.libraryTab === 'schemas' ? 'schema' : 'variable') + '<textarea class="ds-editor ds-editor-xl" oninput=\'DataSchemaAdmin.setLibraryEditor(this.value)\'>' + _esc(editor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveLibrary()\'>' + _esc(_t('Lưu thư viện', 'Save library')) + '</button></div></section>',
     '</div>'
   ].join('') : _emptyState(_t('Chọn một mục', 'Select an item'), _t('Chọn một blueprint hoặc variable category để chỉnh metadata.', 'Select a blueprint or variable category to edit metadata.'));
 

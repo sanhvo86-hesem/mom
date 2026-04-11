@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Onboard canonical entity keys and public endpoint keys into registry JSON assets.
-- Adds 29 endpoint entries to endpoint-catalog.json
+- Adds canonical endpoint entries to endpoint-catalog.json
+- Keeps endpoint-catalog-index.json in sync for memory-safe admin Data Schema reads
 - Adds 11 entity entries to frontend-foundation-catalog.json
 """
 
@@ -26,6 +27,7 @@ def resolve_registry_dir() -> str:
 
 REGISTRY_DIR = resolve_registry_dir()
 ENDPOINT_CATALOG = os.path.join(REGISTRY_DIR, "endpoint-catalog.json")
+ENDPOINT_CATALOG_INDEX = os.path.join(REGISTRY_DIR, "endpoint-catalog-index.json")
 FRONTEND_CATALOG = os.path.join(REGISTRY_DIR, "frontend-foundation-catalog.json")
 
 
@@ -125,7 +127,85 @@ def ensure_entity_contract(entity):
     if "score" not in readiness:
         readiness["score"] = 90 if readiness.get("verdict") == "ready" else (70 if readiness.get("verdict") == "partial" else 40)
 
-# ── 29 canonical endpoint definitions ──────────────────────────────────────
+
+def endpoint_index_row(key, item):
+    security = item.get("security") if isinstance(item.get("security"), dict) else {}
+    workflow = {}
+    capabilities = item.get("capabilities") if isinstance(item.get("capabilities"), dict) else {}
+    if isinstance(capabilities.get("workflow_runtime"), dict):
+        workflow = capabilities["workflow_runtime"]
+    elif isinstance(item.get("workflow"), dict):
+        runtime = item["workflow"].get("runtime")
+        workflow = runtime if isinstance(runtime, dict) else item["workflow"]
+    deletion = capabilities.get("deletion") if isinstance(capabilities.get("deletion"), dict) else {}
+    if not deletion and isinstance(item.get("response"), dict) and isinstance(item["response"].get("deletion"), dict):
+        deletion = item["response"]["deletion"]
+
+    permission_keys = security.get("permission_keys") if isinstance(security.get("permission_keys"), list) else []
+    return {
+        "key": key,
+        "label": item.get("label") or key,
+        "labelEn": item.get("labelEn") or item.get("label") or key,
+        "module": item.get("module") or "",
+        "moduleEn": item.get("moduleEn") or item.get("module") or "",
+        "method": str(item.get("method") or "GET").upper(),
+        "kind": item.get("kind") or "",
+        "domain": item.get("domain") or "",
+        "entity": item.get("entity") or "",
+        "path": item.get("path") or "",
+        "controller": item.get("controller") or "",
+        "handler": item.get("handler") or "",
+        "field_count": int(item.get("field_count") or 0),
+        "auth_required": bool(security.get("auth_required")),
+        "csrf_required": bool(security.get("csrf_required")),
+        "admin_only": bool(security.get("admin_only")),
+        "permission_count": len(permission_keys),
+        "workflow_mode": workflow.get("execution_mode") or workflow.get("lifecycle_mode") or "",
+        "runtime_safe": bool(workflow.get("generic_runtime_safe")),
+        "deletion_mode": deletion.get("mode") or "",
+        "source": item.get("source") or "",
+    }
+
+
+def rebuild_endpoint_catalog_index(catalog):
+    endpoints = catalog.get("endpoints") if isinstance(catalog.get("endpoints"), dict) else {}
+    rows = [endpoint_index_row(key, item) for key, item in endpoints.items() if isinstance(item, dict)]
+    rows.sort(key=lambda row: (row["domain"], row["entity"], row["method"], row["key"]))
+    linked_rows = [
+        row for row in rows
+        if row["path"] and row["controller"] and row["handler"]
+    ]
+    index = {
+        "_meta": {
+            "version": "1.1",
+            "description": "Compact endpoint index for admin/runtime workspace lists and metrics. Rebuilt from endpoint-catalog.json after canonical onboarding.",
+            "generatedAt": datetime.now(timezone.utc).isoformat(),
+            "endpointCount": len(rows),
+            "activeEndpoints": len(linked_rows),
+            "blockedEndpoints": len(rows) - len(linked_rows),
+            "implementationLinkedCount": len(linked_rows),
+            "sourceArtifact": "endpoint-catalog.json",
+        },
+        "rows": rows,
+    }
+
+    current = None
+    if os.path.isfile(ENDPOINT_CATALOG_INDEX):
+        with open(ENDPOINT_CATALOG_INDEX, "r", encoding="utf-8") as f:
+            current = json.load(f)
+    current_rows = current.get("rows") if isinstance(current, dict) else None
+    current_meta = current.get("_meta") if isinstance(current, dict) else {}
+    current_count = current_meta.get("endpointCount") if isinstance(current_meta, dict) else None
+    if current_rows == rows and current_count == len(rows):
+        print("  endpoint-catalog-index.json already aligned.")
+        return
+
+    print(f"Writing {ENDPOINT_CATALOG_INDEX} ...")
+    with open(ENDPOINT_CATALOG_INDEX, "w", encoding="utf-8") as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+    print(f"  Rebuilt compact endpoint index: {len(rows)} rows, {len(linked_rows)} implementation-linked.")
+
+# ── Canonical endpoint definitions ─────────────────────────────────────────
 NEW_ENDPOINTS = [
     {
         "action": "foundation.organization.list",
@@ -1557,6 +1637,8 @@ def onboard_endpoints():
 
     if skipped:
         print(f"  Skipped (already exist): {', '.join(skipped)}")
+
+    rebuild_endpoint_catalog_index(catalog)
 
 
 def onboard_entities():

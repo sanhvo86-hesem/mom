@@ -2,20 +2,20 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-11T02:14:52.602Z",
+    "generatedAt": "2026-04-11T06:15:25.107Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f"
+    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2"
   },
   "coverage": {
     "router_actions": 3578,
     "field_registry_actions": 3603,
-    "field_definitions": 45534,
+    "field_definitions": 48601,
     "unique_field_keys": 4572,
     "status_sets": 733,
     "workflow_count": 277,
-    "relation_edges": 2715,
-    "validation_rules": 42478,
+    "relation_edges": 3127,
+    "validation_rules": 43701,
     "formula_count": 1177,
     "domain_pack_count": 3948,
     "scalar_record_endpoints": 3472,
@@ -42,7 +42,7 @@
       "partial_entities": 0,
       "blocked_entities": 0,
       "workflow_ready_entities": 314,
-      "related_ready_entities": 633,
+      "related_ready_entities": 656,
       "analytics_ready_entities": 355,
       "planning_console_entities": 34,
       "operator_console_entities": 62
@@ -53,8 +53,8 @@
       "implemented_canonical_resources": 64,
       "planned_canonical_resources": 0,
       "core_value_stream_entities": 69,
-      "governed_support_entities": 589,
-      "conditional_extension_entities": 6,
+      "governed_support_entities": 594,
+      "conditional_extension_entities": 1,
       "unused_candidate_entities": 0,
       "archive_isolation_entities": 5,
       "generic_status_only_core_entities": 0,
@@ -213,7 +213,7 @@
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 2715
+      "records": 3127
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
@@ -233,7 +233,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 42478
+      "records": 43701
     },
     "computed-formulas.json": {
       "kind": "formula-library",

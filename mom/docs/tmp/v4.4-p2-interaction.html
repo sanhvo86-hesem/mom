@@ -1,0 +1,131 @@
+<div class="section" id="inline-edit-interaction-pattern">
+  <h2 class="section-title"><span class="section-number">??</span>Pattern 12 — Inline Edit Interaction Pattern</h2>
+  <p class="section-subtitle">Bổ sung quy chuẩn inline edit cho bảng dữ liệu, form rút gọn và các field có thể chỉnh nhanh. Pattern này mở rộng <a href="#interaction-patterns">Section 31</a>, phải khớp state matrix của <a href="#component-states">Section 4</a>, form validation ở <a href="#form-rules">Section 21</a>, table behavior ở <a href="#table-rules">Section 22</a>, modal conflict ở <a href="#modal-rules">Section 23</a>, keyboard model ở <a href="#keyboard-rules">Section 26</a> và toast feedback ở <a href="#toast-precise">Section 30</a>.</p>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="info-box info-box-green"><strong>DO</strong>Inline edit PHẢI có keyboard trigger. KHÔNG chỉ dựa vào double-click. Cell focus được bằng Tab, Enter mở edit mode, Escape hủy và Tab di chuyển sang cell editable tiếp theo.</div>
+    <div class="info-box info-box-amber"><strong>WARNING</strong>Inline edit KHÔNG áp dụng cho trường regulated, trường e-signature, trường đã khóa hoặc field cần reason code theo <a href="#compliance-forms">Section 15</a>.</div>
+    <div class="info-box info-box-purple"><strong>CROSS-REF</strong>Liên kết <a href="#component-states">Section 4</a> state matrix, <a href="#table-rules">Section 22</a> table rules, <a href="#interaction-patterns">Section 31 Pattern 4</a> auto-save và <a href="#interaction-patterns">Section 31 Pattern 5</a> optimistic update.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-blue">Pattern 12</span>Inline Edit State Matrix</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Behavior</th>
+            <th>Token/CSS</th>
+            <th>ARIA</th>
+            <th>Ví dụ MOM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Idle</strong></td><td>Cell hiển thị text bình thường, cursor default, không hiện input chrome. Field read-only vẫn copy được nếu user có quyền xem.</td><td><code>color:var(--text-primary)</code>, background kế thừa row, border trong suốt để không gây layout shift.</td><td>Cell giữ <code>role="gridcell"</code>; nếu editable thì có <code>aria-label</code> nêu tên field và giá trị hiện tại.</td><td>Planner xem quantity của <code>WO-2026-044</code> trong bảng dispatch.</td></tr>
+          <tr><td><strong>Hover</strong></td><td>Cursor pointer, hiện pencil icon mờ ở góc phải cell; không đổi giá trị và không mở edit mode.</td><td>Pencil dùng <code>var(--icon-xs)</code>, opacity <code>var(--opacity-disabled)</code>, hover surface dùng <code>var(--state-hover-bg)</code>.</td><td>Không announce hover riêng; tooltip chỉ hiện nếu icon có giải thích bổ sung theo <a href="#interaction-patterns">Section 31 Pattern 3</a>.</td><td>Hover field "Owner" của <code>NCR-2026-041</code> để thấy khả năng chỉnh nhanh.</td></tr>
+          <tr><td><strong>Trigger</strong></td><td>Double-click bằng mouse hoặc Enter khi cell đang focused. Keyboard trigger là bắt buộc; F2 có thể hỗ trợ như shortcut phụ.</td><td>Focus ring dùng <code>var(--focus-ring)</code>; transition dùng <code>var(--duration-fast)</code> và <code>var(--ease-out)</code>.</td><td><code>tabindex="0"</code> trên cell editable; Enter chuyển sang control nội bộ.</td><td>QA focus vào result cell rồi nhấn Enter để sửa kết quả inspection.</td></tr>
+          <tr><td><strong>Editing</strong></td><td>Cell chuyển thành input, textarea hoặc select phù hợp column type. Focus tự động vào control, giá trị cũ được pre-filled và text được select nếu là input ngắn.</td><td><code>border:2px solid var(--brand-2)</code>, <code>background:var(--bg-input)</code>, <code>border-radius:var(--radius-md)</code>, padding theo density.</td><td>Control có accessible name từ header column + row identifier; <code>aria-describedby</code> trỏ tới helper/error nếu có.</td><td>Sửa due date của <code>CAPA-2026-014</code> ngay trong table.</td></tr>
+          <tr><td><strong>Validating</strong></td><td>On blur hoặc Enter chạy validation. Nếu fail, cell vẫn ở editing mode và lỗi inline hiển thị dưới control.</td><td>Error text dùng <code>var(--text-error)</code>; border dùng <code>var(--border-error)</code>; spacing lỗi dùng <code>var(--space-1)</code>.</td><td><code>aria-invalid="true"</code> và <code>aria-errormessage</code> trỏ tới error id duy nhất.</td><td>End date phải sau start date trong lịch sản xuất.</td></tr>
+          <tr><td><strong>Saving</strong></td><td>Spinner hiển thị trong cell, UI có thể optimistic update ngay nếu field reversible. Action edit tạm disabled để tránh submit trùng.</td><td>Spinner dùng <code>var(--icon-md)</code>; pending badge dùng <code>var(--amber)</code>; duration theo <code>var(--duration-normal)</code>.</td><td><code>aria-busy="true"</code> trên cell; live region đọc <code>{ vi: "Đang lưu thay đổi", en: "Saving changes" }</code>.</td><td>Đổi priority của <code>NCR-2026-041</code> sang Critical.</td></tr>
+          <tr><td><strong>Success</strong></td><td>Flash border success trong <code>500ms</code>, sau đó cell quay về Idle với giá trị mới. Không show toast nếu thay đổi nhỏ và có indicator inline rõ.</td><td><code>border-color:var(--border-success)</code>, <code>transition:var(--transition-default)</code>.</td><td>Live region đọc <code>{ vi: "Đã lưu", en: "Saved" }</code> nếu save không có toast.</td><td>Owner đổi sang <code>Trần Thị Mai</code> và cell trở về text mode.</td></tr>
+          <tr><td><strong>Error (server)</strong></td><td>Cell giữ editing mode, không mất input user đã nhập. Toast error theo <a href="#toast-precise">Section 30</a> và inline retry button trong cell.</td><td>Retry button dùng <code>var(--radius-md)</code>, error border dùng <code>var(--border-error)</code>, text dùng <code>var(--text-error)</code>.</td><td>Toast dùng <code>role="alert"</code>; retry button có label rõ <code>{ vi: "Thử lưu lại", en: "Retry save" }</code>.</td><td>Server từ chối đổi status vì work order đã bị khóa.</td></tr>
+          <tr><td><strong>Cancel</strong></td><td>Escape hoặc click ngoài cell khôi phục giá trị cũ. Nếu value chưa đổi, không mở dirty warning; nếu đã đổi nhưng chưa save, hủy chỉ tác động cell hiện tại.</td><td>Restore animation dùng <code>var(--duration-fast)</code>; focus trả về cell bằng <code>var(--focus-ring)</code>.</td><td>Live region đọc <code>{ vi: "Đã hủy chỉnh sửa", en: "Edit canceled" }</code>.</td><td>Operator nhấn Escape để bỏ sửa quantity khi phát hiện scan nhầm WO.</td></tr>
+          <tr><td><strong>Conflict</strong></td><td>Server trả <code>409</code>: mở modal diff split-pane theo <a href="#interaction-patterns">Section 31 Pattern 6</a>. Không ghi đè silent và không retry mù.</td><td>Conflict cell dùng <code>var(--border-warning)</code>; modal dùng <code>var(--z-modal)</code> và <code>var(--shadow-lg)</code>.</td><td>Focus trap theo <a href="#modal-rules">Section 23</a>; modal title nêu rõ record và field conflict.</td><td>QA và Engineering cùng sửa disposition của <code>NCR-2026-041</code>.</td></tr>
+          <tr><td><strong>Cell-to-cell navigation</strong></td><td>Tab lưu cell hiện tại rồi chuyển sang cell editable tiếp theo trong cùng row. Shift+Tab đi ngược. Enter lưu và xuống row dưới cùng column nếu column đó editable.</td><td>Focus outline ổn định, không làm thay đổi row height; gap dùng <code>var(--gap-sm)</code>.</td><td>Grid dùng <code>aria-rowindex</code>, <code>aria-colindex</code>; active cell cập nhật bằng roving tabindex.</td><td>Planner nhập liên tiếp planned quantity cho nhiều work orders.</td></tr>
+          <tr><td><strong>Concurrent lock</strong></td><td>Nếu user khác đang edit cùng cell, hiển thị lock icon + tooltip "Đang được chỉnh sửa bởi [tên]" và không cho mở edit mode.</td><td>Lock icon dùng <code>var(--icon-sm)</code>, color <code>var(--text-tertiary)</code>, tooltip theo <a href="#interaction-patterns">Section 31 Pattern 3</a>.</td><td>Cell có <code>aria-disabled="true"</code> và mô tả người đang giữ lock trong <code>aria-describedby</code>.</td><td><code>{ vi: "Đang được chỉnh sửa bởi Nguyễn Văn Thành", en: "Being edited by Nguyen Van Thanh" }</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-header">Inline Edit Runtime Contract</div>
+    <div class="card-body">
+      <div class="code-block">{
+  "pattern": "inline-edit",
+  "version": "v4.4-p2",
+  "requiredKeyboard": ["Enter", "Escape", "Tab", "Shift+Tab"],
+  "blockedFor": ["regulated-field", "e-signature", "locked-record", "reason-code-required"],
+  "events": ["cell:edit:start", "cell:edit:validate", "cell:edit:save", "cell:edit:cancel", "cell:edit:conflict"],
+  "tokenDependencies": [
+    "--focus-ring",
+    "--bg-input",
+    "--border-error",
+    "--border-success",
+    "--border-warning",
+    "--text-error",
+    "--state-hover-bg",
+    "--transition-default"
+  ]
+}</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="command-palette-pattern">
+  <h2 class="section-title"><span class="section-number">??</span>Pattern 13 — Command Palette Pattern</h2>
+  <p class="section-subtitle">Bổ sung command palette cho thao tác nhanh toàn hệ thống. Pattern này là shortcut layer, không thay thế navigation chính; mọi command phải có đường đi tương đương qua <a href="#nav-rules">Section 24</a>, shortcut phải khớp <a href="#keyboard-rules">Section 26</a>, search overlay phải phối hợp với <a href="#interaction-patterns">Section 31 Pattern 9</a>, feedback phải dùng <a href="#toast-precise">Section 30</a>.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-green"><strong>DO</strong>Command palette là SHORTCUT, không thay thế menu chính. Mỗi lệnh trong palette PHẢI có đường đi tương đương qua menu hoặc navigation để user mới vẫn học được hệ thống.</div>
+    <div class="info-box info-box-purple"><strong>CROSS-REF</strong>Liên kết <a href="#keyboard-rules">Section 26</a> keyboard matrix, <a href="#interaction-patterns">Section 31 Pattern 9</a> search results UX và <a href="#nav-rules">Section 24</a> navigation thích ứng.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-purple">Pattern 13</span>Command Palette Specification</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Spec</th>
+            <th>Token/CSS</th>
+            <th>ARIA</th>
+            <th>Ví dụ MOM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Trigger</strong></td><td><code>Ctrl+/</code> trên Windows/Linux, <code>Cmd+/</code> trên Mac. KHÔNG mở đồng thời với Ctrl+K search; nếu search đang mở thì đóng search rồi mở palette.</td><td>Shortcut hint dùng <code>var(--text-caption)</code>, badge radius <code>var(--radius-full)</code>.</td><td>Trigger button có <code>aria-keyshortcuts="Control+/"</code>; sau khi mở, focus vào input.</td><td>Planner nhấn <code>Ctrl+/</code> để tạo nhanh Work Order.</td></tr>
+          <tr><td><strong>Overlay</strong></td><td>Modal <code>size=sm</code>, width <code>480px</code>, backdrop dùng shared modal layer, focus trap đầy đủ, không scroll body nền.</td><td><code>z-index:var(--z-modal)</code>, <code>background:var(--bg-overlay)</code>, <code>box-shadow:var(--shadow-lg)</code>, <code>border-radius:var(--radius-2xl)</code>.</td><td><code>role="dialog"</code>, <code>aria-modal="true"</code>, title <code>{ vi: "Bảng lệnh", en: "Command palette" }</code>.</td><td>Overlay mở trên dashboard sản xuất mà không làm mất filter đang chọn.</td></tr>
+          <tr><td><strong>Input</strong></td><td>Auto-focus. Placeholder <code>{ vi: "Nhập lệnh...", en: "Type a command..." }</code>. Debounce <code>100ms</code> trước khi filter command list.</td><td><code>background:var(--bg-input)</code>, <code>outline:var(--focus-ring)</code>, padding <code>var(--pad-sm)</code>.</td><td>Input có <code>role="combobox"</code>, <code>aria-expanded="true"</code>, <code>aria-controls</code> trỏ tới result list.</td><td>Gõ "work" hiển thị lệnh "Tạo Work Order".</td></tr>
+          <tr><td><strong>Command categories</strong></td><td>Nhóm lệnh bắt buộc: Navigation, Action, Settings, Recent. Recent chỉ hiển thị tối đa 5 lệnh gần nhất.</td><td>Category heading dùng <code>var(--text-overline)</code>, color <code>var(--text-secondary)</code>, gap <code>var(--gap-sm)</code>.</td><td>Group heading có id riêng; result item dùng <code>aria-describedby</code> trỏ category nếu cần.</td><td>Navigation: "Mở Quality Dashboard"; Action: "Tạo NCR"; Settings: "Đổi density".</td></tr>
+          <tr><td><strong>Result list</strong></td><td>Tối đa 10 items visible; phần còn lại scroll nội bộ. ArrowUp/ArrowDown di chuyển, Enter chọn, Escape đóng.</td><td>List max height theo viewport; active item dùng <code>var(--state-selected-bg)</code>; hover dùng <code>var(--state-hover-bg)</code>.</td><td><code>role="listbox"</code>; active option cập nhật bằng <code>aria-activedescendant</code>.</td><td>Danh sách hiển thị 10 command phù hợp nhất khi gõ "print".</td></tr>
+          <tr><td><strong>Command item</strong></td><td>Mỗi item có icon Lucide, label, shortcut hint, category badge và matched text highlight. Label user-facing luôn có tiếng Việt có dấu.</td><td>Icon size <code>var(--icon-md)</code>; label color <code>var(--text-primary)</code>; highlight color <code>var(--brand-2)</code>.</td><td>Mỗi item có <code>role="option"</code>; accessible name gồm label + category + shortcut nếu có.</td><td><code>printer</code> + "In Certificate of Conformance" + shortcut hint.</td></tr>
+          <tr><td><strong>Permission filter</strong></td><td>Chỉ hiển thị lệnh user có quyền. Không render rồi disable nếu command reveal tên module/record nhạy cảm.</td><td>Restricted state không có visual item; audit log dùng event riêng nếu cần.</td><td>Không announce command bị ẩn; count chỉ tính command user được phép dùng.</td><td>"Tạo Work Order" chỉ hiện nếu user có role <code>production_planner</code>.</td></tr>
+          <tr><td><strong>Execution feedback</strong></td><td>Khi chọn command, đóng palette ngay. Navigation commands dùng deep link theo <a href="#interaction-patterns">Section 31 Pattern 7</a>; action commands hiển thị toast success/error theo <a href="#toast-precise">Section 30</a>.</td><td>Toast dùng tokens hiện có; pending command có spinner <code>var(--icon-md)</code> nếu action cần API.</td><td>Focus trả về route mới hoặc trigger element cũ nếu command fail trước navigation.</td><td>Chọn "Mở NCR-2026-041" điều hướng tới record bằng URL shareable.</td></tr>
+          <tr><td><strong>Empty state</strong></td><td>Hiển thị "Không tìm thấy lệnh phù hợp" với icon search-x, giữ query trong input và gợi ý kiểm tra chính tả.</td><td>Icon <code>var(--icon-xl)</code>, text <code>var(--text-secondary)</code>, surface <code>var(--bg-surface)</code>.</td><td>Empty message có <code>role="status"</code> và <code>aria-live="polite"</code>.</td><td>Gõ "xuat hangg" không có lệnh, palette gợi ý thử "Xuất hàng".</td></tr>
+          <tr><td><strong>Recent/Pinned</strong></td><td>Lưu 5 lệnh gần nhất vào localStorage key <code>hesem_command_recent</code>. Cho phép pin lệnh thường dùng; pinned đứng trên recent nhưng dưới kết quả exact match.</td><td>Pin icon dùng <code>var(--icon-sm)</code>, selected pin dùng <code>var(--accent)</code>.</td><td>Pin button có <code>aria-pressed</code> và label <code>{ vi: "Ghim lệnh", en: "Pin command" }</code>.</td><td>QA pin "Tạo NCR" và "Mở Audit Trail" để dùng trong ca kiểm tra.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-header">Command Registry Contract</div>
+    <div class="card-body">
+      <div class="code-block">{
+  "pattern": "command-palette",
+  "version": "v4.4-p2",
+  "storageKey": "hesem_command_recent",
+  "maxVisibleItems": 10,
+  "recentLimit": 5,
+  "shortcuts": {
+    "windowsLinux": "Ctrl+/",
+    "mac": "Cmd+/"
+  },
+  "categories": ["navigation", "action", "settings", "recent"],
+  "commandShape": {
+    "id": "stable-command-id",
+    "label": { "vi": "Tạo Work Order", "en": "Create Work Order" },
+    "category": "action",
+    "icon": "lucide-icon-name",
+    "permission": "production_planner",
+    "menuEquivalent": "/production/work-orders/new",
+    "execute": "navigation|api|settings"
+  },
+  "blockedWhen": ["global-search-open", "modal-critical-action-open", "e-signature-session-active"]
+}</div>
+    </div>
+  </div>
+</div>

@@ -5107,7 +5107,7 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   activity:{search:'',actor:'',eventType:'',aggregateType:''}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
-const ADMIN_RUNTIME_ASSET_VERSION = '20260410e';
+const ADMIN_RUNTIME_ASSET_VERSION = '20260411e';
 
 function adminFilterState(tab){
   if(!ADMIN_TAB_FILTERS[tab]){

@@ -1,0 +1,247 @@
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">🧩 kanban-board — Bảng Kanban</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "kanban-board",
+  "props": {
+    "lanes": [{
+      "key": "string",         <span class="c">// stable lane key, VD: todo, in_progress, waiting_qa, done</span>
+      "title": { "vi": "string", "en": "string" },
+      "description": { "vi": "string", "en": "string" },
+      "wipLimit": "number|null",
+      "tone": "neutral|info|success|warning|error",
+      "collapsed": "boolean"
+    }],
+    "cards": [{
+      "id": "string",          <span class="c">// unique card id</span>
+      "laneKey": "string",
+      "swimlaneKey": "string|null",
+      "title": { "vi": "string", "en": "string" },
+      "subtitle": { "vi": "string", "en": "string" },
+      "priority": "low|medium|high|critical",
+      "owner": "string|null",
+      "dueDate": "ISO date|null",
+      "badges": "Array&lt;{label,tone}&gt;",
+      "meta": "Object"
+    }],
+    "cardFields": ["string"],  <span class="c">// visible fields in order</span>
+    "wipLimit": "number|null", <span class="c">// global fallback if lane limit missing</span>
+    "swimlanes": [{
+      "key": "string",
+      "title": { "vi": "string", "en": "string" },
+      "collapsed": "boolean"
+    }],
+    "dragEnabled": "boolean",  <span class="c">// default: true</span>
+    "cardTemplate": "compact|default|quality-capa|production-dispatch",
+    "keyboardDnd": "boolean",  <span class="c">// required for accessibility</span>
+    "emptyLaneText": { "vi": "string", "en": "string" },
+    "loading": "boolean"
+  },
+  "events": {
+    "onCardMove": "(cardId, fromLane, toLane, position, reason) => Promise",
+    "onLaneChange": "(laneKey, changes) => void",
+    "onWipExceed": "(laneKey, limit, attemptedCount) => void",
+    "onCardOpen": "(cardId) => void",
+    "onKeyboardMove": "(cardId, direction) => void"
+  },
+  "allowedZones": ["main"],
+  "accessibility": {
+    "role": "region",
+    "aria-label": { "vi": "Bảng Kanban", "en": "Kanban board" },
+    "keyboardModel": "Tab vào board, arrow keys chọn card/lane, Space nhấc card, Enter thả card, Escape hủy kéo thả",
+    "liveRegion": "Announce card moved and WIP limit violations",
+    "dragAndDropAlternative": "Required keyboard DnD, no mouse-only move"
+  }
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">🕘 data-timeline — Dòng thời gian dữ liệu</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "data-timeline",
+  "props": {
+    "entries": [{
+      "id": "string",
+      "timestamp": "ISO datetime",
+      "timezone": "string",    <span class="c">// default: Asia/Ho_Chi_Minh</span>
+      "title": { "vi": "string", "en": "string" },
+      "body": { "vi": "string", "en": "string" },
+      "actor": {
+        "id": "string",
+        "name": "string",
+        "role": "string|null"
+      },
+      "type": "create|update|approve|reject|comment|system|alarm|scan",
+      "severity": "info|success|warning|error|critical",
+      "evidenceLinks": "Array&lt;{label,url,type}&gt;",
+      "metadata": "Object"
+    }],
+    "orientation": "vertical|horizontal",
+    "groupBy": "none|day|week|user|type|severity",
+    "showConnectors": "boolean",
+    "filterByUser": "boolean",
+    "density": "compact|default|comfortable",
+    "highlightEntryId": "string|null",
+    "emptyText": { "vi": "string", "en": "string" },
+    "loading": "boolean"
+  },
+  "events": {
+    "onEntryClick": "(entry) => void",
+    "onFilter": "(filters) => void",
+    "onEvidenceOpen": "(entryId, evidence) => void"
+  },
+  "allowedZones": ["main", "sidebar"],
+  "accessibility": {
+    "role": "feed",
+    "aria-label": { "vi": "Dòng thời gian", "en": "Timeline" },
+    "entryRole": "article",
+    "entryLabel": "{timestamp} - {actor.name} - {title}",
+    "keyboardModel": "Tab through actionable entries; Enter opens entry detail",
+    "liveRegion": "polite when new realtime entry is appended"
+  }
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">✍️ signature-pad — Chữ ký điện tử</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "signature-pad",
+  "props": {
+    "signerRole": "string",    <span class="c">// VD: QA Manager, Production Lead</span>
+    "signerName": "string|null",
+    "reasonCode": {
+      "required": "boolean",
+      "options": "Array&lt;{value,label:{vi,en}}&gt;"
+    },
+    "meaning": {
+      "required": "boolean",
+      "options": "approve|review|confirm|release|reject"
+    },
+    "timestampMode": "server|client-preview",
+    "timezone": "string",      <span class="c">// display UTC offset, default UTC+7</span>
+    "inkColor": "string",      <span class="c">// default: #0f172a, dark mode: #f8fafc</span>
+    "canvasWidth": "number",   <span class="c">// px, default 480</span>
+    "canvasHeight": "number",  <span class="c">// px, default 180</span>
+    "textAlternative": {
+      "enabled": "boolean",
+      "label": { "vi": "string", "en": "string" },
+      "requiredForScreenReader": "boolean"
+    },
+    "requiresPasswordReentry": "boolean",
+    "lockedAfterSubmit": "boolean",
+    "auditTrail": "boolean"
+  },
+  "events": {
+    "onSign": "(signatureData, metadata) => void",
+    "onClear": "() => void",
+    "onSubmit": "(payload) => Promise",
+    "onPasswordChallenge": "() => Promise"
+  },
+  "allowedZones": ["main", "footer"],
+  "accessibility": {
+    "role": "img on completion",
+    "aria-label": { "vi": "Chữ ký điện tử", "en": "Electronic signature" },
+    "fallbackTextInput": "Required for screen readers and no-pointer devices",
+    "completionText": "{signerName} signed as {signerRole} at {timestamp}",
+    "keyboardModel": "Tab to text alternative, clear, cancel, submit; drawing canvas is not the only input path"
+  }
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">📅 gantt-chart — Biểu đồ Gantt</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "gantt-chart",
+  "props": {
+    "tasks": [{
+      "id": "string",
+      "label": { "vi": "string", "en": "string" },
+      "start": "ISO datetime",
+      "end": "ISO datetime",
+      "resourceId": "string",
+      "progress": "number",    <span class="c">// 0-100</span>
+      "status": "planned|ready|running|blocked|complete|late",
+      "dependencies": ["taskId"],
+      "milestone": "boolean",
+      "critical": "boolean",
+      "metadata": "Object"
+    }],
+    "resources": [{
+      "id": "string",
+      "label": { "vi": "string", "en": "string" },
+      "type": "machine|operator|line|workcenter|supplier",
+      "capacityHours": "number|null"
+    }],
+    "timeScale": "hour|day|week|month",
+    "dependencies": "Array&lt;{from,to,type}&gt;",
+    "milestones": "Array&lt;{id,label,date}&gt;",
+    "criticalPath": "boolean",
+    "dragEnabled": "boolean",
+    "zoom": "fit|day|week|month|custom",
+    "timezone": "string",
+    "loading": "boolean"
+  },
+  "events": {
+    "onTaskDrag": "(taskId, newStart, newEnd, reason) => Promise",
+    "onDependencyChange": "(fromTask, toTask, type) => void",
+    "onZoom": "(scale, range) => void",
+    "onResourceAssign": "(taskId, resourceId) => Promise",
+    "onTaskOpen": "(taskId) => void"
+  },
+  "allowedZones": ["main", "chart-area"],
+  "accessibility": {
+    "role": "img",
+    "aria-label": { "vi": "Biểu đồ Gantt", "en": "Gantt chart" },
+    "textualTaskList": "Required screen-reader alternative sorted by start date",
+    "tableFallback": "Task, resource, start, end, duration, status, dependency",
+    "keyboardModel": "Arrow keys navigate tasks; Enter opens task detail; drag changes require alternative form"
+  }
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">🔎 barcode-input — Ô quét Barcode/QR</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "barcode-input",
+  "props": {
+    "format": "Code128|QR|DataMatrix|auto",
+    "scanMode": "single|continuous",
+    "autoSubmit": "boolean",
+    "validationRegex": "string|null",
+    "placeholder": { "vi": "string", "en": "string" },
+    "manualEntry": "boolean",
+    "cameraScan": "boolean",
+    "autoFocus": "boolean",
+    "debounceMs": "number",    <span class="c">// default: 150</span>
+    "successFeedback": {
+      "flashMs": 300,
+      "toneHz": 1000,
+      "toneMs": 100,
+      "haptic": "light"
+    },
+    "errorFeedback": {
+      "flashMs": 300,
+      "toneHz": 300,
+      "toneMs": 200,
+      "haptic": "heavy"
+    },
+    "multiScanList": "boolean",
+    "duplicatePolicy": "reject|warn|allow",
+    "emptyText": { "vi": "string", "en": "string" }
+  },
+  "events": {
+    "onScan": "(value, parsed, source) => Promise",
+    "onError": "(value, errorCode, message) => void",
+    "onManualInput": "(value) => void",
+    "onDuplicate": "(value, firstSeenAt) => void"
+  },
+  "allowedZones": ["main", "filter", "header"],
+  "accessibility": {
+    "role": "searchbox",
+    "aria-label": { "vi": "Ô quét mã vạch", "en": "Barcode scanner input" },
+    "aria-describedby": "Helper text must explain accepted format",
+    "manualFallback": "Required",
+    "liveRegion": "Announce success, duplicate, and validation failure",
+    "keyboardModel": "Typing and paste must behave like scan input; Enter submits when autoSubmit is false"
+  }
+}</div></div>
+    </div>

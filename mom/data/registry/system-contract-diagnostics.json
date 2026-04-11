@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-11T04:25:41.489Z",
+    "generatedAt": "2026-04-11T06:15:38.735Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f",
+    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,7 +24,7 @@
   },
   "summary": {
     "tableCount": 658,
-    "relationCount": 2715,
+    "relationCount": 3127,
     "relationEntityCount": 658,
     "endpointCount": 3610,
     "endpointBoundTableCount": 658,

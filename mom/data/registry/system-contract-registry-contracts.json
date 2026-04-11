@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-11T04:25:41.489Z",
+    "generatedAt": "2026-04-11T06:15:38.735Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "4d3f16f3-705e-42e6-9ce3-34f689aefa5f",
+    "publication_run_id": "8074b143-180a-4fdc-b838-a3bd4e63a2d2",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,7 +24,7 @@
   },
   "summary": {
     "tableCount": 658,
-    "relationCount": 2715,
+    "relationCount": 3127,
     "relationEntityCount": 658,
     "endpointCount": 3610,
     "endpointBoundTableCount": 658,
@@ -89,7 +89,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -107,7 +107,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.allocation_events",
@@ -122,7 +122,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -140,7 +140,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.allocations",
@@ -291,7 +291,7 @@
       "workflowId": "wf_approval",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 15,
+      "columnCount": 22,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -310,7 +310,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.approved_supplier_list",
@@ -826,7 +826,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 14,
+      "columnCount": 21,
       "endpointCount": 7,
       "runtimeExposure": {
         "list": true,
@@ -844,7 +844,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.audit",
@@ -859,7 +859,7 @@
       "workflowId": "wf_audit",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -878,7 +878,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.audit_actions",
@@ -996,7 +996,7 @@
       "workflowId": "wf_audit_program",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -1014,7 +1014,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.audit_trail",
@@ -1029,7 +1029,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -1047,7 +1047,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.audits",
@@ -1132,7 +1132,7 @@
       "workflowId": "wf_bom",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -1151,7 +1151,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.bom_components",
@@ -1199,7 +1199,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -1217,7 +1217,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.bom_substitute",
@@ -1232,7 +1232,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -1250,7 +1250,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.bom_version",
@@ -1265,7 +1265,7 @@
       "workflowId": "wf_bom_version",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -1284,7 +1284,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.calendar",
@@ -1299,7 +1299,7 @@
       "workflowId": "wf_calendar",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 15,
       "endpointCount": 7,
       "runtimeExposure": {
         "list": true,
@@ -1318,7 +1318,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.calibration_grr_studies",
@@ -1434,7 +1434,7 @@
       "workflowId": "wf_capa",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -1453,7 +1453,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.capa_8d_steps",
@@ -1569,7 +1569,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 15,
+      "columnCount": 23,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -1587,7 +1587,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.certificates",
@@ -1636,7 +1636,7 @@
       "workflowId": "wf_change_control",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -1655,7 +1655,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.cnc_program_approvals",
@@ -2236,7 +2236,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 5,
+      "columnCount": 13,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -2254,7 +2254,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.complaint",
@@ -2269,7 +2269,7 @@
       "workflowId": "wf_complaint",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -2288,7 +2288,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.compliance_records",
@@ -2604,7 +2604,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -2622,7 +2622,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.crm_accounts",
@@ -3076,7 +3076,7 @@
       "workflowId": "wf_data_archival_run",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 14,
+      "columnCount": 22,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3095,7 +3095,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.demand",
@@ -3110,7 +3110,7 @@
       "workflowId": "wf_demand",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3129,7 +3129,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.demand_classifications",
@@ -3243,7 +3243,7 @@
       "workflowId": "wf_deviation",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3262,7 +3262,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.deviations",
@@ -3344,7 +3344,7 @@
       "workflowId": "wf_document",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3363,7 +3363,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.document_distribution",
@@ -3444,7 +3444,7 @@
       "workflowId": "wf_document_revision",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3463,7 +3463,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.document_versions",
@@ -4344,7 +4344,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -4362,7 +4362,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.ehs_regulatory_submissions",
@@ -4544,7 +4544,7 @@
       "workflowId": "wf_electronic_signature",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -4563,7 +4563,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.electronic_signatures",
@@ -4578,7 +4578,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 14,
+      "columnCount": 22,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -4596,7 +4596,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.employee_certifications",
@@ -5641,7 +5641,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -5659,7 +5659,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.fin_budget_versions",
@@ -5775,7 +5775,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -5793,7 +5793,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.fin_country_tax_profiles",
@@ -6343,7 +6343,7 @@
       "workflowId": "wf_finding",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6362,7 +6362,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.fixture_maintenance_logs",
@@ -6578,7 +6578,7 @@
       "workflowId": "wf_forecast",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6597,7 +6597,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.form_attachments",
@@ -6645,7 +6645,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -6663,7 +6663,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.form_entries",
@@ -6816,7 +6816,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -6834,7 +6834,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.gl_transactions",
@@ -7455,7 +7455,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -7473,7 +7473,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.inspection_lot",
@@ -7488,7 +7488,7 @@
       "workflowId": "wf_inspection_lot",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7507,7 +7507,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.inspection_plan",
@@ -7522,7 +7522,7 @@
       "workflowId": "wf_inspection_plan",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7541,7 +7541,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.inspection_plans",
@@ -7589,7 +7589,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -7607,7 +7607,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.inspection_results",
@@ -7655,7 +7655,7 @@
       "workflowId": "wf_integration_monitor",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 16,
+      "columnCount": 23,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7674,7 +7674,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.inventory_balance_snapshot",
@@ -7952,7 +7952,7 @@
       "workflowId": "wf_item",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 12,
+      "columnCount": 20,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7971,7 +7971,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.item_attr",
@@ -7986,7 +7986,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8004,7 +8004,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.item_class",
@@ -8019,7 +8019,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8037,7 +8037,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.item_revision",
@@ -8052,7 +8052,7 @@
       "workflowId": "wf_item_revision",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8071,7 +8071,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.item_revisions",
@@ -8153,7 +8153,7 @@
       "workflowId": "wf_item_spec",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8172,7 +8172,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.item_variant",
@@ -8187,7 +8187,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8205,7 +8205,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.items",
@@ -8321,7 +8321,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8339,7 +8339,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.job_operations",
@@ -8523,7 +8523,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8541,7 +8541,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.labor_transactions",
@@ -8898,7 +8898,7 @@
       "workflowId": "wf_lot",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8917,7 +8917,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.lot_master",
@@ -8966,7 +8966,7 @@
       "workflowId": "wf_lot_policy",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8985,7 +8985,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.machine_event",
@@ -9133,7 +9133,7 @@
       "workflowId": "wf_master_data_store",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -9152,7 +9152,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.material_consumption",
@@ -9167,7 +9167,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9185,7 +9185,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.material_cost_templates",
@@ -9200,7 +9200,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9218,7 +9218,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.material_review_board",
@@ -9432,7 +9432,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9450,7 +9450,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mdm_governance_issues",
@@ -9499,7 +9499,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9517,7 +9517,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mdm_item_classes",
@@ -9598,7 +9598,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9616,7 +9616,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mdm_promise_policies",
@@ -9631,7 +9631,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9649,7 +9649,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mdm_reference_code_values",
@@ -9730,7 +9730,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -9748,7 +9748,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mdm_site_parameters",
@@ -10035,7 +10035,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 20,
+      "columnCount": 28,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10053,7 +10053,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_dispatch_queue",
@@ -10105,7 +10105,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 24,
+      "columnCount": 32,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10123,7 +10123,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_dpp_passports",
@@ -10172,7 +10172,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 16,
+      "columnCount": 24,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10190,7 +10190,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_equipment_extended",
@@ -10407,7 +10407,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 17,
+      "columnCount": 25,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10425,7 +10425,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_genealogy_operations",
@@ -10615,7 +10615,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 17,
+      "columnCount": 25,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10633,7 +10633,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_machine_telemetry",
@@ -10788,7 +10788,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 14,
+      "columnCount": 22,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -10806,7 +10806,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_oee_snapshots",
@@ -11090,7 +11090,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11108,7 +11108,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_shift_handover",
@@ -11362,7 +11362,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 17,
+      "columnCount": 25,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11380,7 +11380,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.mes_tool_preset_offsets",
@@ -11635,7 +11635,7 @@
       "workflowId": "wf_mrp_signal",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -11654,7 +11654,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.naming_patterns",
@@ -11802,7 +11802,7 @@
       "workflowId": "wf_ncr",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -11821,7 +11821,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.notifications",
@@ -11903,7 +11903,7 @@
       "workflowId": "wf_operation",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -11922,7 +11922,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.operation_material",
@@ -11937,7 +11937,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11955,7 +11955,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.operation_output",
@@ -11970,7 +11970,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 5,
+      "columnCount": 13,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11988,7 +11988,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.operation_resource",
@@ -12070,7 +12070,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 12,
+      "columnCount": 19,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -12089,7 +12089,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.order_document_requirements",
@@ -13148,7 +13148,7 @@
       "workflowId": "wf_party",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 17,
       "endpointCount": 7,
       "runtimeExposure": {
         "list": true,
@@ -13167,7 +13167,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.party_contact",
@@ -13182,7 +13182,7 @@
       "workflowId": "wf_party_contact",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 12,
+      "columnCount": 19,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -13201,7 +13201,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.party_role",
@@ -13216,7 +13216,7 @@
       "workflowId": "wf_party_role",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 11,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -13235,7 +13235,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.party_site",
@@ -13250,7 +13250,7 @@
       "workflowId": "wf_party_site",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 15,
+      "columnCount": 22,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -13269,7 +13269,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.passport_access_log",
@@ -13350,7 +13350,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -13368,7 +13368,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.pegging",
@@ -13383,7 +13383,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -13401,7 +13401,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.planned_supply",
@@ -13416,7 +13416,7 @@
       "workflowId": "wf_planned_supply",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -13435,7 +13435,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.plant_performance_snapshots",
@@ -14989,7 +14989,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -15007,7 +15007,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.product_passports",
@@ -15056,7 +15056,7 @@
       "workflowId": "wf_production_completion",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -15075,7 +15075,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.production_order",
@@ -15352,7 +15352,7 @@
       "workflowId": "wf_purchase_order",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -15371,7 +15371,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.purchase_order_line",
@@ -15386,7 +15386,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -15405,7 +15405,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.purchase_order_lines",
@@ -15757,7 +15757,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -15775,7 +15775,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.qual_compliance_evidence",
@@ -16225,7 +16225,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -16243,7 +16243,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.quality_order",
@@ -16258,7 +16258,7 @@
       "workflowId": "wf_quality_order",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16277,7 +16277,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.quality_predictions",
@@ -16426,7 +16426,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -16444,7 +16444,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.record_counters",
@@ -16596,7 +16596,7 @@
       "workflowId": "wf_rework",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16615,7 +16615,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.risk_register",
@@ -16868,7 +16868,7 @@
       "workflowId": "wf_sales_order",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16887,7 +16887,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.sales_order_line",
@@ -16902,7 +16902,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16921,7 +16921,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.sales_order_lines",
@@ -17070,7 +17070,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -17088,7 +17088,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.serial",
@@ -17103,7 +17103,7 @@
       "workflowId": "wf_serial",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17122,7 +17122,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.serial_master",
@@ -17171,7 +17171,7 @@
       "workflowId": "wf_serial_policy",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17190,7 +17190,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.sessions",
@@ -17305,7 +17305,7 @@
       "workflowId": "wf_shelf_life_policy",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17324,7 +17324,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.shift",
@@ -17339,7 +17339,7 @@
       "workflowId": "wf_shift",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 11,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17358,7 +17358,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.shift_assignments",
@@ -18544,7 +18544,7 @@
       "workflowId": "wf_status_code",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 17,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -18563,7 +18563,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.stock_balances",
@@ -18775,7 +18775,7 @@
       "workflowId": "wf_supplier_quality_case",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -18794,7 +18794,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.supplier_scorecards",
@@ -20377,7 +20377,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -20395,7 +20395,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.trace_lot_attributes",
@@ -20576,7 +20576,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -20594,7 +20594,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.trade_broker_profiles",
@@ -21007,7 +21007,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -21025,7 +21025,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.training_record",
@@ -21040,7 +21040,7 @@
       "workflowId": "wf_training_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -21059,7 +21059,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.training_records",
@@ -21107,7 +21107,7 @@
       "workflowId": "wf_uom",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -21126,7 +21126,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.user_roles",
@@ -21345,7 +21345,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -21363,7 +21363,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.wms_bin_contents",
@@ -21883,7 +21883,7 @@
       "workflowId": "wf_work_definition_version",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -21902,7 +21902,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.work_instruction",
@@ -21917,7 +21917,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -21935,7 +21935,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.work_order",
@@ -21950,7 +21950,7 @@
       "workflowId": "wf_work_order",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -21969,7 +21969,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.work_orders",

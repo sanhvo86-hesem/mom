@@ -1,0 +1,205 @@
+<section class="section" id="regulatory-precision">
+  <h2 class="section-title"><span class="section-number">??</span>Quy chuẩn Tuân thủ và Bảo mật Dữ liệu</h2>
+  <p class="section-subtitle">Section tạm cho Prompt 4/8. Prompt 8 sẽ chèn và đánh số lại. Các quy chuẩn dưới đây mở rộng <a href="#compliance-forms">Section 15</a> cho 21 CFR Part 11, audit trail bất biến, ITAR/export control, ECO/ECN, deviation report, retention và Electronic Batch Record.</p>
+
+  <div class="grid-3">
+    <div class="info-box info-box-purple"><strong>NGUYÊN TẮC PART 11</strong>Mọi electronic record có tác động chất lượng phải ghi rõ ai thao tác, thời điểm server, ý nghĩa thao tác, record version và trạng thái khóa sau khi ký. Không có đường tắt bỏ qua xác thực.</div>
+    <div class="info-box info-box-red"><strong>SECURITY FIRST</strong>ITAR/export-controlled data phải bị chặn từ API, bị mask ở UI và bị watermark khi in. UI không được chỉ ẩn bằng CSS nếu user không có quyền.</div>
+    <div class="info-box info-box-green"><strong>TRACEABILITY</strong>Form ECO, deviation, EBR, retention và audit trail phải liên kết bằng <code>recordId</code>, <code>recordVersion</code>, <code>auditEventId</code> và reason code chuẩn hóa.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-purple">4.1</span>E-Signature 3-Step UI Flow — 21 CFR Part 11</div>
+    <div class="card-body">
+      <div class="info-box info-box-purple"><strong>CROSS-REFERENCE SECTION 15</strong>Quy trình này mở rộng pattern Electronic Signature Capture trong <a href="#compliance-forms">Section 15</a>: signer identity, meaning, password re-entry, timestamp server-side và record locking sau khi ký.</div>
+      <div class="flow-row">
+        <div class="flow-node">Step 1<br>Identify</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Step 2<br>Authenticate</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Step 3<br>Meaning</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Signed<br>Record locked</div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Bước</th><th>UI bắt buộc</th><th>Validation / Security</th><th>Dữ liệu ghi vào audit trail</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Modal shell</strong></td><td>Modal <code>size=md</code>, width <code>560px</code>, persistent, không có close icon khi đang ký, footer có Secondary "Hủy" và Primary/Danger "Ký điện tử".</td><td><code>persistent:true</code>; Escape và backdrop bị chặn theo <a href="#modal-rules">Section 23</a>; focus trap không thoát modal.</td><td><code>signatureSessionId</code>, <code>recordId</code>, <code>recordVersion</code>, <code>startedAt</code>.</td></tr>
+          <tr><td><strong>Step 1 Identify</strong></td><td>Signer card read-only: avatar, họ tên, user ID, role, org, timezone, session age. Không cho đổi user trong modal.</td><td>Profile phải khớp authenticated session; nếu session gần hết hạn, yêu cầu re-login trước khi vào Step 2.</td><td><code>signerUserId</code>, <code>signerFullName</code>, <code>role</code>, <code>organization</code>.</td></tr>
+          <tr><td><strong>Step 2 Authenticate</strong></td><td>Password field masked, có toggle visibility, optional biometric button nếu device và policy hỗ trợ.</td><td>Ba lần sai liên tiếp khóa ký <code>15min</code>; server rate limit; không lưu password trong client state; biometric không thay thế audit identity.</td><td><code>authMethod</code>, <code>authResult</code>, <code>failedAttemptCount</code>, <code>lockedUntil</code>.</td></tr>
+          <tr><td><strong>Step 3 Meaning</strong></td><td>Required dropdown: Approval, Review, Verification, Authorship, Responsibility; comments textarea; summary panel nêu record, version, meaning và hậu quả khóa.</td><td>Không cho ký nếu thiếu meaning hoặc comments bắt buộc theo workflow. Nút Sign chuyển danger khi hành động khóa hoặc release regulated record.</td><td><code>meaning</code>, <code>comments</code>, <code>signedAtServer</code>, <code>serverTimezone</code>.</td></tr>
+          <tr><td><strong>Completion</strong></td><td>Sau ký, vùng record chuyển read-only, hiển thị lock badge và signer summary ở header.</td><td>Timestamp lấy server; record version tăng; mọi sửa sau ký phải qua change control hoặc admin override có reason.</td><td><code>newRecordVersion</code>, <code>lockState</code>, <code>signatureHash</code>, <code>auditEventId</code>.</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block">Wireframe:
+[Modal md 560px | persistent:true]
+Header: Ký điện tử CAPA-2026-014 · Record version v7
+Stepper: Identify → Authenticate → Meaning
+Body Step 1: Signer card read-only
+Body Step 2: Password + visibility toggle + biometric option
+Body Step 3: Meaning dropdown + comments + summary panel
+Footer: Hủy | Ký điện tử</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-blue">4.2</span>Audit Trail Exact Column Layout</div>
+    <div class="card-body">
+      <div class="info-box info-box-blue"><strong>CROSS-REFERENCE SECTION 15</strong>Bảng này chi tiết hóa nguyên tắc Audit Trail Visualization trong <a href="#compliance-forms">Section 15</a>: old value → new value, reason, user, timestamp, action type và record version phải đọc được, lọc được, xuất được.</div>
+      <table class="spec-table">
+        <thead><tr><th>Cột</th><th>Width</th><th>Data type / Format</th><th>Alignment</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Timestamp</strong></td><td><code>160px</code></td><td>Mono, <code>yyyy-MM-dd HH:mm:ss.SSS UTC+7</code>, server time.</td><td>Left</td><td>Default sort desc; sticky filter date range.</td></tr>
+          <tr><td><strong>User</strong></td><td><code>140px</code></td><td>Name + ID, ví dụ <code>Trần Thị Mai / QA-018</code>.</td><td>Left</td><td>Filter by user; hover mở user card read-only.</td></tr>
+          <tr><td><strong>Action</strong></td><td><code>100px</code></td><td>Badge enum: Create green, Update blue, Delete red, Approve purple, Print gray.</td><td>Center</td><td>Filter multi-select; Delete/Approve luôn nổi bật.</td></tr>
+          <tr><td><strong>Field</strong></td><td><code>140px</code></td><td>Field key hoặc label ổn định, ví dụ <code>severity</code>, <code>disposition</code>.</td><td>Left</td><td>Filter by field; link tới field nếu record còn tồn tại.</td></tr>
+          <tr><td><strong>Old Value</strong></td><td><code>auto</code></td><td>Mono, red strikethrough cho giá trị bị thay hoặc xóa.</td><td>Left</td><td>Wrap tối đa ba dòng; mở diff modal nếu dài.</td></tr>
+          <tr><td><strong>New Value</strong></td><td><code>auto</code></td><td>Mono, green highlight cho giá trị mới.</td><td>Left</td><td>Không truncate dữ liệu regulatory khi export.</td></tr>
+          <tr><td><strong>Reason</strong></td><td><code>180px</code></td><td>Reason code + note ngắn, bắt buộc cho post-approval edit.</td><td>Left</td><td>Empty chỉ được phép cho Create tự động có policy miễn reason.</td></tr>
+          <tr><td><strong>Record Version</strong></td><td><code>80px</code></td><td>Integer hoặc semantic version, ví dụ <code>v12</code>.</td><td>Center</td><td>Click mở version comparison theo <a href="#compliance-forms">Section 15</a>.</td></tr>
+        </tbody>
+      </table>
+      <div class="grid-2">
+        <div class="info-box info-box-blue"><strong>TABLE CONTROLS</strong>Filters bắt buộc: date range, user, action, field. Export CSV/PDF giữ đầy đủ 8 cột, timestamp UTC+7 và reason. Pagination mặc định <code>50/page</code>; page size không thấp hơn 50 cho audit view.</div>
+        <div class="info-box info-box-red"><strong>IMMUTABLE</strong>Audit trail chỉ append-only. Không inline edit, không delete row, không sửa bằng admin UI. Correction phải tạo event mới loại <code>Correction</code> trỏ tới event gốc.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-red">4.3</span>ITAR / Export Control Data Masking UI</div>
+    <div class="card-body">
+      <div class="info-box info-box-red"><strong>CROSS-REFERENCE SECTION 15</strong>ITAR masking kế thừa yêu cầu record locking và audit evidence của <a href="#compliance-forms">Section 15</a>: mọi view, unmask, print, export và temporary access đều tạo audit event bất biến.</div>
+      <table class="spec-table">
+        <thead><tr><th>Vùng</th><th>Spec bắt buộc</th><th>Security rule</th><th>Ví dụ MOM</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Banner</strong></td><td>Persistent banner ở đầu record, background <code>#fef2f2</code>, border <code>2px solid #dc2626</code>, shield-alert icon <code>24px</code> red, text <code>ITAR CONTROLLED</code>, không dismissible.</td><td>Banner render khi record có <code>exportControl=ITAR</code>, kể cả user có quyền đầy đủ.</td><td>Bản vẽ <code>DWG-AERO-BRK-2024</code> thuộc đơn hàng hàng không.</td></tr>
+          <tr><td><strong>Masking</strong></td><td>User không đủ quyền thấy <code>[RESTRICTED]</code> gray mono, lock icon và tooltip giải thích cần quyền export-control.</td><td>API phải trả masked payload; client không nhận giá trị gốc rồi tự che.</td><td>Material spec, customer drawing number, process note bị mask.</td></tr>
+          <tr><td><strong>Access verification</strong></td><td>Profile hiển thị export-control clearance, citizenship/work location nếu policy yêu cầu, expiry date và approver.</td><td>Verify trước khi mở preview, download, print, export và copy link.</td><td>Engineer ở plant không được clearance không mở được drawing.</td></tr>
+          <tr><td><strong>Print watermark</strong></td><td>Watermark chéo lặp lại: <code>ITAR CONTROLLED — DO NOT DISTRIBUTE</code>, <code>48pt</code>, opacity <code>0.15</code>, color <code>#dc2626</code>, rotate <code>-45deg</code>.</td><td>Print/export luôn có watermark và audit event loại Print/Export.</td><td>PDF inspection plan in ra có watermark và user ID ở footer.</td></tr>
+          <tr><td><strong>Audit event</strong></td><td>View restricted, unmask, print, export, download đều ghi audit trail riêng.</td><td>Event lưu reason nếu user dùng temporary access hoặc emergency break-glass.</td><td>QA Manager mở temporary unmask cho NCR customer complaint.</td></tr>
+        </tbody>
+      </table>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">Banner HTML structure</div>
+          <div class="card-body">
+            <div class="code-block">&lt;div class="info-box info-box-red" role="alert" aria-live="polite" data-export-control="ITAR"&gt;
+  &lt;strong&gt;ITAR CONTROLLED&lt;/strong&gt;
+  &lt;span&gt;Dữ liệu bị kiểm soát xuất khẩu. Không sao chép, in hoặc chia sẻ nếu chưa được cấp quyền.&lt;/span&gt;
+  &lt;span aria-hidden="true"&gt;🛡&lt;/span&gt;
+&lt;/div&gt;</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Print watermark CSS sample</div>
+          <div class="card-body">
+            <div class="code-block">@media print {
+  [data-export-control="ITAR"]::before {
+    content: "ITAR CONTROLLED — DO NOT DISTRIBUTE";
+    position: fixed;
+    inset: 0;
+    color: #dc2626;
+    opacity: 0.15;
+    font-size: 48pt;
+    transform: rotate(-45deg);
+    pointer-events: none;
+  }
+}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-green">4.4</span>Change Control Form Layout — ECO / ECN</div>
+    <div class="card-body">
+      <div class="info-box info-box-green"><strong>CROSS-REFERENCE SECTION 15</strong>ECO/ECN dùng e-signature, reason code entry và record locking từ <a href="#compliance-forms">Section 15</a>; mọi transition sau approval phải tạo audit trail thay vì silent-save.</div>
+      <div class="flow-row">
+        <div class="flow-node">Draft</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Review</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Approved</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Implemented</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Closed</div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Section</th><th>Fields / Layout</th><th>Validation</th><th>Audit linkage</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Description of Change</strong></td><td>Textarea dài, before/after summary, affected part/process/document chips.</td><td>Bắt buộc trước khi chuyển Review; text phải nêu phạm vi thay đổi.</td><td>Snapshot vào audit event khi submit Review.</td></tr>
+          <tr><td><strong>Reason for Change</strong></td><td>Reason code dropdown + free-text rationale; link CAPA/NCR/customer request nếu có.</td><td>Reason code bắt buộc; free-text bắt buộc khi chọn Other.</td><td>Liên kết <code>sourceRecordId</code> và <code>reasonCode</code>.</td></tr>
+          <tr><td><strong>Impact Assessment</strong></td><td>Checkbox matrix: Production, Quality, Cost, Schedule; mỗi checked item mở detail row.</td><td>Ít nhất một impact hoặc chọn explicit "No impact" kèm justification.</td><td>Ghi old/new impact flags theo audit table 4.2.</td></tr>
+          <tr><td><strong>Affected Documents</strong></td><td>Linked table gồm document ID, title, current revision, target revision, owner, required action.</td><td>Không approve nếu document target revision bị trùng hoặc thiếu owner.</td><td>Revision bump tạo event riêng cho từng document.</td></tr>
+          <tr><td><strong>Required Approvals</strong></td><td>Workflow stepper theo chức năng: Engineering, Quality, Production, Regulatory, Customer nếu cần.</td><td>Mỗi approval dùng e-signature 4.1; parallel hoặc sequential theo workflow config.</td><td>Lưu <code>approvalStepId</code>, signer và meaning.</td></tr>
+          <tr><td><strong>Implementation Plan</strong></td><td>Date range, responsible owner, training task, inventory disposition, effective date.</td><td>Implemented chỉ được chọn khi tất cả task required done và evidence attached.</td><td>Task completion liên kết audit trail và attachments.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-amber">4.5</span>Deviation Report Form Structure</div>
+    <div class="card-body">
+      <div class="info-box info-box-amber"><strong>CROSS-REFERENCE SECTION 15</strong>Deviation report liên kết trực tiếp với Reason Code Entry và Version Comparison trong <a href="#compliance-forms">Section 15</a>; close hoặc reclassify deviation sau review phải có reason và audit snapshot.</div>
+      <table class="spec-table">
+        <thead><tr><th>Section</th><th>UI / Field</th><th>Rule bắt buộc</th><th>Ví dụ</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Event Description</strong></td><td>Textarea mô tả sự kiện, detected date/time, detected by, work order, lot, machine.</td><td>Không cho submit nếu thiếu thời điểm phát hiện hoặc affected lot.</td><td>Độ nhám vượt giới hạn trên <code>WO-2026-044</code>.</td></tr>
+          <tr><td><strong>Classification</strong></td><td>Dropdown Major / Minor / Critical, helper text nêu định nghĩa từng mức.</td><td>Critical bắt buộc containment action trước khi lưu Review.</td><td>Critical nếu ảnh hưởng safety hoặc regulatory release.</td></tr>
+          <tr><td><strong>Risk Assessment</strong></td><td>Severity × Probability matrix; tự tính risk level và escalation path.</td><td>Risk High yêu cầu Quality Manager e-signature.</td><td>Severity 4 × Probability 3 tạo high risk.</td></tr>
+          <tr><td><strong>Containment Actions</strong></td><td>Inline table: action, owner, due date, status, evidence link.</td><td>Mỗi action có owner và due date; overdue hiện warning.</td><td>Cách ly lot <code>LOT-AL6061-22A</code>.</td></tr>
+          <tr><td><strong>Root Cause</strong></td><td>Selector 5-Why hoặc Fishbone; template thay đổi theo phương pháp.</td><td>Không close nếu root cause còn blank hoặc chỉ ghi "operator error" không bằng chứng.</td><td>Fishbone cho tool wear + coolant concentration.</td></tr>
+          <tr><td><strong>CAPA Link</strong></td><td>Search + link existing CAPA hoặc create new CAPA từ deviation.</td><td>Critical/Major repeat phải có CAPA link hoặc documented justification.</td><td>Liên kết <code>CAPA-2026-014</code>.</td></tr>
+          <tr><td><strong>Resolution &amp; Follow-up</strong></td><td>Resolution textarea, follow-up verification date, verifier, effectiveness criteria.</td><td>Follow-up date bắt buộc nếu CAPA được tạo; close cần e-signature nếu regulated.</td><td>Verify scrap rate về mức baseline sau 30 ngày.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-dark">4.6</span>Record Retention &amp; Archival UI</div>
+    <div class="card-body">
+      <div class="info-box info-box-purple"><strong>CROSS-REFERENCE SECTION 15</strong>Retention và archival áp dụng Record Locking trong <a href="#compliance-forms">Section 15</a>: archive không xóa record, legal hold không dismissible, restore/disposition cần reason và e-signature khi policy yêu cầu.</div>
+      <table class="spec-table">
+        <thead><tr><th>Control</th><th>Spec UI</th><th>Policy rule</th><th>Audit requirement</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Retention period</strong></td><td>Badge trong record header: <code>Retain until 2036-12-31</code>, tooltip nêu policy source.</td><td>Period tính theo record type, customer, regulatory class và contract.</td><td>Policy version lưu cùng record snapshot.</td></tr>
+          <tr><td><strong>Archive status</strong></td><td>Status chip: Active, Pending archive, Archived, Restored. Archived record read-only mặc định.</td><td>Archive không xóa data; chỉ chuyển storage tier và khóa edit.</td><td>Archive/restore tạo audit event immutable.</td></tr>
+          <tr><td><strong>Legal hold</strong></td><td>Banner amber persistent khi có hold; hiển thị case ID, owner, start date.</td><td>Legal hold override mọi schedule purge/archive; không dismissible.</td><td>Hold add/remove cần e-signature Responsibility.</td></tr>
+          <tr><td><strong>Disposition review</strong></td><td>Queue table cho records sắp hết hạn, columns: record, type, retain-until, hold, owner, action.</td><td>Không cho dispose nếu còn open CAPA, ECO, customer complaint hoặc audit hold.</td><td>Disposition decision lưu approver và reason.</td></tr>
+          <tr><td><strong>Restore request</strong></td><td>Modal request restore gồm reason, needed-until date, approver route.</td><td>Temporary restore tự hết hạn và quay lại archive state.</td><td>Restore view/download in archive vẫn ghi audit.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-teal">4.7</span>Electronic Batch Record Review Flow</div>
+    <div class="card-body">
+      <div class="info-box info-box-blue"><strong>CROSS-REFERENCE SECTION 15</strong>EBR review dùng đủ bộ controls của <a href="#compliance-forms">Section 15</a>: exception review tạo audit evidence, QA release dùng e-signature, batch record bị khóa sau khi ký.</div>
+      <div class="flow-row">
+        <div class="flow-node">Batch complete</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Exception review</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">QA review</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">E-sign release</div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Area</th><th>Review UI</th><th>Exception rule</th><th>Release gate</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Batch summary</strong></td><td>KPI strip: batch ID, product, lot, equipment, start/end, yield, deviations, open holds.</td><td>Open hold hoặc unresolved deviation chặn release.</td><td>Summary snapshot được ký cùng release.</td></tr>
+          <tr><td><strong>Step checklist</strong></td><td>Table grouped by process step, status, operator, timestamp, equipment, measured values.</td><td>Missing timestamp/operator hiển thị exception đỏ và yêu cầu correction event.</td><td>Tất cả required steps phải pass hoặc có approved deviation.</td></tr>
+          <tr><td><strong>Exception panel</strong></td><td>Side panel list deviations, alarms, out-of-spec readings, manual overrides.</td><td>Mỗi exception cần disposition: accept, reject, rework, link CAPA.</td><td>QA không ký nếu còn exception chưa disposition.</td></tr>
+          <tr><td><strong>Review annotations</strong></td><td>QA comment thread theo từng step, @mention owner, attachment evidence.</td><td>Comment không thay thế deviation/CAPA chính thức.</td><td>Resolved thread vẫn giữ audit metadata.</td></tr>
+          <tr><td><strong>Release signature</strong></td><td>E-signature meaning mặc định Verification hoặc Approval tùy workflow.</td><td>Release tạo lock toàn batch record và generated certificate nếu cần.</td><td>Áp dụng 4.1 và audit layout 4.2.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

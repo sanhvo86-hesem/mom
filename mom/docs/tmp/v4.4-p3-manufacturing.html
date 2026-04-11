@@ -1,0 +1,667 @@
+<div class="section" id="work-order-lifecycle">
+  <h2 class="section-title"><span class="section-number">??</span>Work Order Lifecycle State Machine</h2>
+  <p class="section-subtitle">Quy chuẩn vòng đời Work Order cho MES CNC precision machining. Section này mở rộng <a href="#shop-floor-mode">Section 14</a>, <a href="#operator-interface">Section 18</a>, <a href="#realtime-dashboard">Section 19</a>, <a href="#manufacturing-precision">Section 32</a> và <a href="#block-engine">Section 37</a> để khóa state, token, transition, e-signature và audit evidence của lệnh sản xuất.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-blue"><strong>STATE MACHINE LÀ CONTRACT</strong>WO status không phải chỉ là badge hiển thị. Mỗi transition phải có điều kiện, validation, audit event và quyền thao tác rõ ràng để planner, operator, supervisor và QA dùng cùng một logic.</div>
+    <div class="info-box info-box-purple"><strong>CROSS-REFERENCE</strong>Dùng <a href="#compliance-forms">Section 15</a> cho e-signature, <a href="#table-rules">Section 22</a> cho dispatch table, <a href="#toast-precise">Section 30</a> cho feedback khi transition fail, và <a href="#zone-system">Section 38</a> cho zone placement.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Flow</span>Luồng trạng thái chính</div>
+    <div class="card-body">
+      <div class="flow-row" style="margin-bottom:14px">
+        <div class="flow-node">Created<br><span style="font-size:10px;color:var(--text-tertiary)">Có thể chỉnh</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Released<br><span style="font-size:10px;color:var(--text-tertiary)">Đã phát hành</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">In-Progress<br><span style="font-size:10px;color:var(--text-tertiary)">Đang chạy</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Completed<br><span style="font-size:10px;color:var(--text-tertiary)">Hoàn tất sản xuất</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Closed<br><span style="font-size:10px;color:var(--text-tertiary)">Đã khóa</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node">Created</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">On-Hold<br><span style="font-size:10px;color:var(--text-tertiary)">Chờ xử lý</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Released</div>
+        <div class="flow-arrow">·</div>
+        <div class="flow-node">In-Progress</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">On-Hold</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">In-Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-green">Tokens</span>State token table</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Token</th>
+            <th>Hex Light</th>
+            <th>Hex Dark</th>
+            <th>Icon (Lucide)</th>
+            <th>Cho phép edit?</th>
+            <th>E-signature?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="chip chip-dark">Created</span></td><td><code>--wo-created</code></td><td><code>#64748b</code></td><td><code>#94a3b8</code></td><td><code>file-plus</code></td><td>Có</td><td>Không</td></tr>
+          <tr><td><span class="chip chip-blue">Released</span></td><td><code>--wo-released</code></td><td><code>#2563eb</code></td><td><code>#60a5fa</code></td><td><code>send</code></td><td>Chỉ quantity</td><td>Release sign</td></tr>
+          <tr><td><span class="chip chip-amber">In-Progress</span></td><td><code>--wo-in-progress</code></td><td><code>#d97706</code></td><td><code>#fbbf24</code></td><td><code>loader</code></td><td>Không</td><td>Không</td></tr>
+          <tr><td><span class="chip chip-green">Completed</span></td><td><code>--wo-completed</code></td><td><code>#16a34a</code></td><td><code>#4ade80</code></td><td><code>check-circle</code></td><td>Không</td><td>Completion sign</td></tr>
+          <tr><td><span class="chip chip-dark">Closed</span></td><td><code>--wo-closed</code></td><td><code>#334155</code></td><td><code>#475569</code></td><td><code>lock</code></td><td>Không</td><td>Không</td></tr>
+          <tr><td><span class="chip chip-purple">On-Hold</span></td><td><code>--wo-on-hold</code></td><td><code>#7c3aed</code></td><td><code>#a78bfa</code></td><td><code>pause-circle</code></td><td>Chỉ notes</td><td>Không</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-purple">Rules</span>Transition rules table</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Condition</th>
+            <th>Validation</th>
+            <th>Audit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Created</td><td>Released</td><td>BOM confirmed, routing confirmed</td><td>Material availability check</td><td>Reason required</td></tr>
+          <tr><td>Released</td><td>In-Progress</td><td>Operator scans WO barcode</td><td>Machine status != Down</td><td>Auto-logged</td></tr>
+          <tr><td>In-Progress</td><td>Completed</td><td>All operations done, qty reported</td><td>QC check nếu required</td><td>Auto-logged</td></tr>
+          <tr><td>Completed</td><td>Closed</td><td>QA review done</td><td>All inspections passed</td><td>E-signature</td></tr>
+          <tr><td>Any</td><td>On-Hold</td><td>Manager action</td><td>Reason code required</td><td>Reason + user + timestamp</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Schema</span>WO lifecycle block JSON Schema</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "type": "work-order-lifecycle",
+  "version": "4.4",
+  "labels": {
+    "vi": "Vòng đời lệnh sản xuất",
+    "en": "Work Order lifecycle"
+  },
+  "allowedZones": ["header", "main", "sidebar", "footer"],
+  "usesBlocks": ["page-header", "nav-stepper", "data-timeline", "approval-buttons", "barcode-input", "signature-pad"],
+  "props": {
+    "workOrderId": { "type": "string", "pattern": "^WO-[0-9]{4}-[0-9]{4}$", "example": "WO-2026-0891" },
+    "partNumber": { "type": "string", "required": true },
+    "revision": { "type": "string", "required": true },
+    "quantityPlanned": { "type": "integer", "min": 1 },
+    "quantityCompleted": { "type": "integer", "min": 0 },
+    "state": { "type": "enum", "values": ["created", "released", "in-progress", "completed", "closed", "on-hold"] },
+    "machineId": { "type": ["string", "null"], "example": "VF2SS-01" },
+    "routingId": { "type": "string", "required": true },
+    "bomRevision": { "type": "string", "required": true },
+    "holdReasonCode": { "type": ["string", "null"] },
+    "requiresReleaseSignature": { "type": "boolean", "default": true },
+    "requiresCompletionSignature": { "type": "boolean", "default": true },
+    "auditTrail": {
+      "type": "array",
+      "items": {
+        "eventId": { "type": "string" },
+        "fromState": { "type": ["string", "null"] },
+        "toState": { "type": "string" },
+        "actorUserId": { "type": "string" },
+        "actorRole": { "type": "string" },
+        "reasonCode": { "type": ["string", "null"] },
+        "timestampServer": { "type": "datetime", "timezone": "Asia/Ho_Chi_Minh" },
+        "signatureId": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "events": {
+    "onRelease": "wo.lifecycle.release",
+    "onStart": "wo.lifecycle.start",
+    "onComplete": "wo.lifecycle.complete",
+    "onClose": "wo.lifecycle.close",
+    "onHold": "wo.lifecycle.hold",
+    "onResume": "wo.lifecycle.resume"
+  },
+  "accessibility": {
+    "role": "group",
+    "stateCurrent": "aria-current=\"step\"",
+    "statusLiveRegion": "polite",
+    "labels": {
+      "vi": "Lệnh {workOrderId} đang ở trạng thái {state}",
+      "en": "Work order {workOrderId} is in {state} state"
+    },
+    "keyboard": ["Tab", "Shift+Tab", "Enter", "Space", "ArrowLeft", "ArrowRight"]
+  }
+}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-amber">Runtime</span>Guardrail triển khai</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Ngữ cảnh</th><th>Quy tắc bắt buộc</th><th>Không được làm</th></tr></thead>
+        <tbody>
+          <tr><td>Dispatch queue</td><td>Released và On-Hold phải sort riêng, có reason và machine readiness rõ.</td><td>Không cho operator start WO nếu material hoặc routing chưa được xác nhận.</td></tr>
+          <tr><td>Operator panel</td><td>Scan barcode WO là trigger chính cho Released → In-Progress theo <a href="#operator-interface">Section 18</a>.</td><td>Không để nút Start nhỏ hoặc nằm cạnh Stop khi glove mode bật.</td></tr>
+          <tr><td>Audit</td><td>Mọi transition ghi event append-only, timestamp server và actor role.</td><td>Không sửa status bằng update SQL trực tiếp không có audit trail.</td></tr>
+          <tr><td>E-signature</td><td>Release sign và Completion sign dùng flow của <a href="#compliance-forms">Section 15</a>.</td><td>Không thay thế chữ ký bằng checkbox xác nhận.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="tool-management-life">
+  <h2 class="section-title"><span class="section-number">??</span>Tool Management &amp; Tool Life</h2>
+  <p class="section-subtitle">Quy chuẩn quản lý dao, tool crib, tool preset, offset và tuổi thọ dao cho xưởng CNC. Section này mở rộng <a href="#cat-production">Section 44</a>, <a href="#manufacturing-precision">Section 32</a>, <a href="#block-engine">Section 37</a> và <a href="#realtime-dashboard">Section 19</a> để đưa trạng thái tool vào dashboard sản xuất mà không phụ thuộc vào màu đơn lẻ.</p>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="info-box info-box-green"><strong>TOOL CRIB</strong>Inventory phải searchable, filterable theo loại dao, máy được phép dùng, trạng thái, vendor, coating, diameter và vị trí lưu trữ.</div>
+    <div class="info-box info-box-amber"><strong>TOOL LIFE</strong>Tool life phải hiển thị remaining life %, cảnh báo dưới 20%, số lần regrind, số phút cắt và số part đã chạy.</div>
+    <div class="info-box info-box-red"><strong>QUALITY GATE</strong>Tool expired hoặc out-of-preset không được gán vào WO mới. Override phải có reason, supervisor approval và audit event.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-teal">Layout</span>Tool crib dashboard layout</div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="info-box info-box-blue"><strong>Tool inventory list</strong>Danh sách dao có search, filter theo type/machine/status, frozen column <code>toolId</code>, row height <code>56px</code> và action quick view.</div>
+        <div class="info-box info-box-green"><strong>Tool life counter</strong>Bar chart remaining life % theo tool, sort ascending theo life còn lại, threshold <code>20%</code> hiển thị warning text.</div>
+        <div class="info-box info-box-amber"><strong>Alert panel</strong>Panel cảnh báo tool approaching limit, expired, missing preset, offset drift và regrind due.</div>
+      </div>
+      <table class="spec-table" style="margin-top:14px">
+        <thead><tr><th>Zone</th><th>Block đề xuất</th><th>Dữ liệu chính</th><th>Refresh</th><th>Responsive</th></tr></thead>
+        <tbody>
+          <tr><td>header</td><td><code>page-header</code>, <code>kpi-row</code></td><td>Total tools, expired, due soon, in use.</td><td><code>30s</code></td><td>KPIs xuống 2x2 khi mobile.</td></tr>
+          <tr><td>filter</td><td><code>date-range-picker</code>, <code>nav-pills</code></td><td>Machine, tool type, status, vendor.</td><td>User action</td><td>Collapse thành drawer dưới <code>768px</code>.</td></tr>
+          <tr><td>main</td><td><code>data-table</code>, <code>chart-bar</code></td><td>Tool inventory + remaining life.</td><td><code>10s</code> nếu đang chạy WO.</td><td>Table giữ sticky first column.</td></tr>
+          <tr><td>sidebar</td><td><code>anomaly-alert</code>, <code>data-list</code></td><td>Tools dưới threshold, expired, offset drift.</td><td><code>5s</code> với critical.</td><td>Đẩy xuống dưới main trên mobile.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-green">Tokens</span>Tool status tokens</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Token</th>
+            <th>Color</th>
+            <th>Icon</th>
+            <th>UI rule</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="chip chip-green">Available</span></td><td><code>--tool-available</code></td><td><code>var(--green)</code></td><td><code>wrench</code></td><td>Có thể gán vào WO nếu machine compatibility khớp.</td></tr>
+          <tr><td><span class="chip chip-blue">In-Use</span></td><td><code>--tool-in-use</code></td><td><code>var(--brand-2)</code></td><td><code>settings</code></td><td>Hiển thị machine, spindle time và WO đang dùng.</td></tr>
+          <tr><td><span class="chip chip-amber">Worn (&gt;80% life)</span></td><td><code>--tool-worn</code></td><td><code>var(--amber)</code></td><td><code>alert-triangle</code></td><td>Warning khi remaining life dưới <code>20%</code>.</td></tr>
+          <tr><td><span class="chip chip-red">Expired</span></td><td><code>--tool-expired</code></td><td><code>var(--red)</code></td><td><code>x-circle</code></td><td>Disable chọn cho WO và mở replacement workflow.</td></tr>
+          <tr><td><span class="chip chip-purple">Regrind</span></td><td><code>--tool-regrind</code></td><td><code>var(--purple)</code></td><td><code>refresh-cw</code></td><td>Chuyển sang queue regrind, giữ lịch sử số lần mài lại.</td></tr>
+          <tr><td><span class="chip chip-dark">Scrapped</span></td><td><code>--tool-scrapped</code></td><td><code>var(--slate)</code></td><td><code>trash-2</code></td><td>Read-only, không được xuất hiện trong danh sách tool khả dụng.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Offsets</span>Tool preset/offset tracking</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Tool ID</th>
+            <th>Offset X</th>
+            <th>Offset Y</th>
+            <th>Offset Z</th>
+            <th>Wear Compensation</th>
+            <th>Last Measured</th>
+            <th>Measured By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>TL-EM10-CARB-02</code></td><td><code>+0.004mm</code></td><td><code>0.000mm</code></td><td><code>-0.018mm</code></td><td><code>0.012mm</code></td><td><code>2026-04-11 09:15 UTC+7</code></td><td>Presetter / Nguyễn V.T</td></tr>
+          <tr><td><code>TL-DR05-COAT-14</code></td><td><code>0.000mm</code></td><td><code>0.000mm</code></td><td><code>-0.006mm</code></td><td><code>0.004mm</code></td><td><code>2026-04-11 10:02 UTC+7</code></td><td>Operator / Trần M.K</td></tr>
+          <tr><td><code>TL-TAP-M6-03</code></td><td><code>+0.002mm</code></td><td><code>-0.001mm</code></td><td><code>-0.021mm</code></td><td><code>0.018mm</code></td><td><code>2026-04-10 16:44 UTC+7</code></td><td>Tool Crib / Lê H.A</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-purple">Workflow</span>Tool replacement workflow</div>
+    <div class="card-body">
+      <div class="flow-row" style="margin-bottom:14px">
+        <div class="flow-node">Alert<br><span style="font-size:10px;color:var(--text-tertiary)">Life &lt; 20%</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Select replacement<br><span style="font-size:10px;color:var(--text-tertiary)">Compatible tool</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Verify offset<br><span style="font-size:10px;color:var(--text-tertiary)">Preset locked</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Confirm<br><span style="font-size:10px;color:var(--text-tertiary)">Supervisor if override</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Log change<br><span style="font-size:10px;color:var(--text-tertiary)">Audit event</span></div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Bước</th><th>Validation</th><th>Evidence bắt buộc</th><th>Feedback UI</th></tr></thead>
+        <tbody>
+          <tr><td>Alert</td><td>Remaining life dưới threshold hoặc tool expired.</td><td>Tool ID, machine ID, WO, life counter snapshot.</td><td>Alert panel sticky, không auto-dismiss.</td></tr>
+          <tr><td>Select replacement</td><td>Cùng tool family, diameter, coating và machine compatibility.</td><td>Candidate tool list + reason chọn.</td><td>Disable candidate không tương thích, giải thích bằng text.</td></tr>
+          <tr><td>Verify offset</td><td>Offset trong tolerance preset và measured time còn hiệu lực.</td><td>Preset certificate hoặc measurement record.</td><td>Inline pass/fail; fail mở reason hoặc đo lại.</td></tr>
+          <tr><td>Confirm</td><td>Operator xác nhận, supervisor ký nếu vượt policy.</td><td>E-signature nếu tool expired override.</td><td>Modal persistent theo <a href="#modal-rules">Section 23</a>.</td></tr>
+          <tr><td>Log change</td><td>Audit append-only và cập nhật tool life history.</td><td>Old tool, new tool, offset, user, timestamp.</td><td>Toast success + timeline event.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-teal">Schema</span>Tool life runtime contract</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "type": "tool-life-dashboard",
+  "version": "4.4",
+  "allowedZones": ["header", "filter", "main", "sidebar", "footer"],
+  "usesBlocks": ["data-table", "chart-bar", "anomaly-alert", "data-list", "action-toolbar"],
+  "props": {
+    "toolId": { "type": "string", "pattern": "^TL-[A-Z0-9-]{4,20}$" },
+    "toolFamily": { "type": "string" },
+    "status": { "type": "enum", "values": ["available", "in-use", "worn", "expired", "regrind", "scrapped"] },
+    "machineCompatibility": { "type": "array", "items": { "type": "string" } },
+    "lifeLimitMinutes": { "type": "number", "min": 0 },
+    "lifeUsedMinutes": { "type": "number", "min": 0 },
+    "remainingLifePct": { "type": "number", "min": 0, "max": 100 },
+    "lifeWarningPct": { "type": "number", "default": 20 },
+    "offsets": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number", "unit": "mm" },
+        "y": { "type": "number", "unit": "mm" },
+        "z": { "type": "number", "unit": "mm" },
+        "wearCompensation": { "type": "number", "unit": "mm" }
+      }
+    },
+    "lastMeasuredAt": { "type": "datetime", "timezone": "Asia/Ho_Chi_Minh" },
+    "measuredBy": { "type": "string" }
+  },
+  "events": {
+    "onToolSelect": "tool.select",
+    "onToolReplace": "tool.replace",
+    "onOffsetVerify": "tool.offset.verify",
+    "onToolScrap": "tool.scrap",
+    "onToolRegrind": "tool.regrind"
+  },
+  "accessibility": {
+    "statusTextRequired": true,
+    "lifeBarAriaLabel": {
+      "vi": "Dao {toolId} còn {remainingLifePct}% tuổi thọ",
+      "en": "Tool {toolId} has {remainingLifePct}% remaining life"
+    }
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="document-control-lifecycle">
+  <h2 class="section-title"><span class="section-number">??</span>Document Control Lifecycle</h2>
+  <p class="section-subtitle">Quy chuẩn vòng đời tài liệu kiểm soát cho SOP, Work Instruction, Process Spec, Drawing, Form/Template và Policy. Section này mở rộng <a href="#compliance-forms">Section 15</a>, <a href="#regulatory-precision">Section 33</a>, <a href="#cat-documents">Section 50</a> và <a href="#block-engine">Section 37</a> để thống nhất trạng thái, revision, approval routing và audit trail.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-blue"><strong>DOCUMENT STATUS KHÓA THEO TOKEN</strong>Trạng thái tài liệu dùng bộ <code>--doc-*</code> từ CSS foundation v4.4. Không map trạng thái document sang theme preset hoặc màu brand tùy ý.</div>
+    <div class="info-box info-box-red"><strong>CONTROLLED RECORD</strong>Tài liệu Effective hoặc Obsolete không được sửa trực tiếp. Mọi thay đổi phải mở revision mới hoặc change control theo <a href="#regulatory-precision">Section 33</a>.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Flow</span>Document state machine</div>
+    <div class="card-body">
+      <div class="flow-row" style="margin-bottom:14px">
+        <div class="flow-node">Draft<br><span style="font-size:10px;color:var(--text-tertiary)">Editable</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">In Review<br><span style="font-size:10px;color:var(--text-tertiary)">Review locked</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Approved<br><span style="font-size:10px;color:var(--text-tertiary)">Signed</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Effective<br><span style="font-size:10px;color:var(--text-tertiary)">Released</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Obsolete<br><span style="font-size:10px;color:var(--text-tertiary)">Archived</span></div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-node">In Review</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Rejected</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Draft</div>
+        <div class="flow-arrow">·</div>
+        <div class="flow-node">Effective</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Superseded</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-green">Tokens</span>Document status token table</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Status</th><th>Token</th><th>Light</th><th>Dark</th><th>Icon</th><th>Record behavior</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip chip-dark">Draft</span></td><td><code>--doc-draft</code></td><td><code>#64748b</code></td><td><code>#94a3b8</code></td><td><code>file-edit</code></td><td>Editable bởi owner và document controller.</td></tr>
+          <tr><td><span class="chip chip-amber">In Review</span></td><td><code>--doc-review</code></td><td><code>#d97706</code></td><td><code>#fbbf24</code></td><td><code>eye</code></td><td>Content locked; reviewer comment allowed.</td></tr>
+          <tr><td><span class="chip chip-blue">Approved</span></td><td><code>--doc-approved</code></td><td><code>#2563eb</code></td><td><code>#60a5fa</code></td><td><code>badge-check</code></td><td>Pending effective date; approval signatures locked.</td></tr>
+          <tr><td><span class="chip chip-green">Effective</span></td><td><code>--doc-effective</code></td><td><code>#16a34a</code></td><td><code>#4ade80</code></td><td><code>shield-check</code></td><td>Official use; print/export watermark and QR required.</td></tr>
+          <tr><td><span class="chip chip-red">Obsolete</span></td><td><code>--doc-obsolete</code></td><td><code>#dc2626</code></td><td><code>#f87171</code></td><td><code>archive-x</code></td><td>Read-only; hidden from normal work instruction lookup.</td></tr>
+          <tr><td><span class="chip chip-dark">Superseded</span></td><td><code>--doc-superseded</code></td><td><code>#94a3b8</code></td><td><code>#cbd5e1</code></td><td><code>copy-check</code></td><td>Linked to new effective revision.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><span class="chip chip-purple">Revision</span>Revision control rules</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Loại revision</th><th>Rule</th><th>Approval</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td>Minor revision</td><td><code>1.0 → 1.1</code> cho editorial, typo, format, link update.</td><td>Không cần full approval lại nếu policy cho phép.</td><td><code>REV-3.1</code></td></tr>
+            <tr><td>Major revision</td><td><code>1.x → 2.0</code> cho thay đổi nội dung, process, tolerance, owner.</td><td>Cần full approval cycle.</td><td><code>REV-4.0</code></td></tr>
+            <tr><td>Format chuẩn</td><td><code>REV-{major}.{minor}</code>, major/minor là integer.</td><td>Validation trước khi submit.</td><td><code>REV-3.2</code></td></tr>
+            <tr><td>Effective date</td><td>Không được trước ngày approval cuối cùng.</td><td>QA hoặc document control xác nhận.</td><td><code>2026-04-18</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="chip chip-blue">Routing</span>Approval routing</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Routing</th><th>UI pattern</th><th>Rule</th><th>Escalation</th></tr></thead>
+          <tbody>
+            <tr><td>Sequential</td><td><code>A → B → C</code></td><td>Reviewer B chỉ nhận task sau khi A approve.</td><td>Timeout <code>48h</code> → manager.</td></tr>
+            <tr><td>Parallel</td><td><code>A + B + C</code> đồng thời</td><td>Mọi reviewer cùng có task; document chỉ approved khi đủ chữ ký.</td><td>Timeout từng reviewer riêng.</td></tr>
+            <tr><td>Return for correction</td><td>Reject route về owner kèm comment bắt buộc.</td><td>Record về Draft, giữ history review.</td><td>Owner overdue sau <code>72h</code>.</td></tr>
+            <tr><td>Emergency release</td><td>Danger path có reason và QA manager sign.</td><td>Chỉ role được ủy quyền.</td><td>Audit event priority high.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-dark">Types</span>Controlled document types</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead><tr><th>Type</th><th>Ví dụ</th><th>Owner mặc định</th><th>Review bắt buộc</th><th>Effective behavior</th></tr></thead>
+        <tbody>
+          <tr><td>SOP</td><td><code>SOP-QA-017</code></td><td>Quality</td><td>QA Manager + Process Owner</td><td>Hiện trong Document Browser và training matrix.</td></tr>
+          <tr><td>Work Instruction</td><td><code>WI-CNC-VF2SS-004</code></td><td>Production Engineering</td><td>Supervisor + QA</td><td>Hiển thị tại operator panel theo machine/part.</td></tr>
+          <tr><td>Process Spec</td><td><code>PS-AERO-AL6061-02</code></td><td>Engineering</td><td>Engineering + QA</td><td>Liên kết routing và inspection checklist.</td></tr>
+          <tr><td>Drawing</td><td><code>DWG-AERO-BRK-2024</code></td><td>Engineering</td><td>Engineering + Document Control</td><td>Có watermark nếu export controlled.</td></tr>
+          <tr><td>Form/Template</td><td><code>FRM-FAI-AS9102-01</code></td><td>Document Control</td><td>QA</td><td>Dùng làm nguồn form mới, không sửa instance đã ký.</td></tr>
+          <tr><td>Policy</td><td><code>POL-QMS-001</code></td><td>Management</td><td>Management + Compliance</td><td>Require acknowledgement hoặc training.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-purple">Schema</span>Controlled document block JSON Schema</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "type": "controlled-document-lifecycle",
+  "version": "4.4",
+  "allowedZones": ["header", "main", "sidebar", "footer"],
+  "usesBlocks": ["document-preview", "data-timeline", "workflow-diagram", "signature-pad", "nav-sidebar-tree"],
+  "props": {
+    "documentId": { "type": "string", "pattern": "^[A-Z]{2,5}-[A-Z0-9-]{3,40}$" },
+    "documentType": { "type": "enum", "values": ["sop", "work-instruction", "process-spec", "drawing", "form-template", "policy"] },
+    "title": { "type": "i18n", "required": ["vi", "en"] },
+    "revision": { "type": "string", "pattern": "^REV-[0-9]+\\.[0-9]+$" },
+    "state": { "type": "enum", "values": ["draft", "in-review", "rejected", "approved", "effective", "obsolete", "superseded"] },
+    "effectiveDate": { "type": ["date", "null"] },
+    "ownerUserId": { "type": "string" },
+    "approvalRouting": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "enum", "values": ["sequential", "parallel"] },
+        "timeoutHours": { "type": "number", "default": 48 },
+        "reviewers": {
+          "type": "array",
+          "items": {
+            "role": { "type": "string" },
+            "userId": { "type": "string" },
+            "required": { "type": "boolean", "default": true },
+            "signatureId": { "type": ["string", "null"] }
+          }
+        }
+      }
+    }
+  },
+  "events": {
+    "onSubmitReview": "document.review.submit",
+    "onApprove": "document.approve",
+    "onReject": "document.reject",
+    "onReleaseEffective": "document.release",
+    "onSupersede": "document.supersede",
+    "onObsolete": "document.obsolete"
+  },
+  "accessibility": {
+    "statusTextRequired": true,
+    "ariaCurrentForActiveStep": "step",
+    "reviewQueueLabel": {
+      "vi": "Tài liệu {documentId} revision {revision} đang chờ {reviewerRole}",
+      "en": "Document {documentId} revision {revision} is waiting for {reviewerRole}"
+    }
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="fai-as9102">
+  <h2 class="section-title"><span class="section-number">??</span>First Article Inspection (FAI) — AS9102</h2>
+  <p class="section-subtitle">Quy chuẩn FAI theo AS9102 cho Form 1, Form 2, Form 3, liên kết balloon-to-characteristic và phê duyệt có e-signature. Section này mở rộng <a href="#compliance-forms">Section 15</a>, <a href="#manufacturing-precision">Section 32</a>, <a href="#cat-quality">Section 45</a>, <a href="#print-layouts">Section 17</a> và <a href="#block-engine">Section 37</a>.</p>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="info-box info-box-blue"><strong>AS9102 FORM SET</strong>FAI không phải một form đơn. Runtime phải giữ Form 1 Part Number Accountability, Form 2 Product Accountability và Form 3 Characteristic Accountability như một hồ sơ có revision, evidence và approval chain chung.</div>
+    <div class="info-box info-box-red"><strong>REGULATED APPROVAL</strong>Mỗi bước Inspector, QA Engineer và QA Manager dùng e-signature theo <a href="#compliance-forms">Section 15</a>. Sau khi ký, Form 3 actual result và disposition bị khóa.</div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><span class="chip chip-blue">Form 1</span>Part Number Accountability</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Part number, part name, serial number, FAI report number.</li>
+          <li>FAI reason: new part, revision change, lapse in production, process change.</li>
+          <li>Drawing revision, purchase order, supplier, organization name.</li>
+          <li>Sign-off của preparer và reviewer với timestamp server.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="chip chip-purple">Form 2</span>Product Accountability</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Sub-assembly list và detail part references.</li>
+          <li>Material certs, special process certs, supplier CoC.</li>
+          <li>Functional test procedure và report link nếu có.</li>
+          <li>Evidence attachment phải được versioned và audit-linked.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="chip chip-green">Form 3</span>Characteristic Accountability</div>
+      <div class="card-body">
+        <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text-secondary);line-height:1.9">
+          <li>Balloon#, characteristic, nominal, tolerance, actual.</li>
+          <li>Measurement tool, calibration status, result pass/fail.</li>
+          <li>Nonconforming characteristic liên kết NCR/CAPA.</li>
+          <li>Rows có evidence ảnh hoặc CMM report khi required.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-teal">Linking</span>Balloon-to-characteristic linking</div>
+    <div class="card-body">
+      <div class="flow-row" style="margin-bottom:14px">
+        <div class="flow-node">Click balloon#<br><span style="font-size:10px;color:var(--text-tertiary)">Drawing preview</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Highlight row<br><span style="font-size:10px;color:var(--text-tertiary)">Form 3</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Show characteristic<br><span style="font-size:10px;color:var(--text-tertiary)">Nominal/tolerance</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Record actual<br><span style="font-size:10px;color:var(--text-tertiary)">Tool + result</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Persist evidence<br><span style="font-size:10px;color:var(--text-tertiary)">Audit-linked</span></div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Interaction</th><th>Drawing behavior</th><th>Form 3 behavior</th><th>Accessibility</th><th>Failure state</th></tr></thead>
+        <tbody>
+          <tr><td>Click balloon trên drawing</td><td>Balloon selected giữ ring bằng <code>var(--focus-ring)</code>, không chỉ đổi màu.</td><td>Scroll row tương ứng vào view, highlight nhẹ bằng state selected token.</td><td>Balloon là button có label <code>Balloon 12, diameter tolerance</code>.</td><td>Nếu row chưa tồn tại, mở action "Tạo characteristic".</td></tr>
+          <tr><td>Click row Form 3</td><td>Drawing pan/zoom tới balloon tương ứng.</td><td>Row active có <code>aria-selected="true"</code>.</td><td>Keyboard Enter trên row kích hoạt cùng hành vi.</td><td>Nếu drawing chưa load, giữ row active và báo data stale.</td></tr>
+          <tr><td>Pass/fail update</td><td>Balloon status text cập nhật theo result.</td><td>Actual + result locked sau approval.</td><td>Live region polite đọc "Balloon 12 passed".</td><td>Fail bắt buộc reason và linked NCR.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-purple">Approval</span>FAI approval workflow</div>
+    <div class="card-body">
+      <div class="flow-row" style="margin-bottom:14px">
+        <div class="flow-node">Inspector<br><span style="font-size:10px;color:var(--text-tertiary)">Prepare + measure</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">QA Engineer<br><span style="font-size:10px;color:var(--text-tertiary)">Review evidence</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">QA Manager<br><span style="font-size:10px;color:var(--text-tertiary)">Final approval</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Released FAI<br><span style="font-size:10px;color:var(--text-tertiary)">Read-only</span></div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>Bước</th><th>Điều kiện vào bước</th><th>Validation trước khi ký</th><th>E-signature meaning</th><th>Audit event</th></tr></thead>
+        <tbody>
+          <tr><td>Inspector</td><td>WO hoặc NPI lot được chọn, drawing revision có hiệu lực.</td><td>Form 1, 2, 3 có đủ required fields; tool calibration valid.</td><td>Authorship / Measurement responsibility</td><td><code>fai.inspector.sign</code></td></tr>
+          <tr><td>QA Engineer</td><td>Inspector signed.</td><td>All failed characteristics linked to NCR or accepted deviation.</td><td>Technical review</td><td><code>fai.qa_engineer.sign</code></td></tr>
+          <tr><td>QA Manager</td><td>QA Engineer signed.</td><td>Customer requirements, AS9102 completeness, attachments and disposition verified.</td><td>Final approval</td><td><code>fai.qa_manager.sign</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header"><span class="chip chip-blue">Layout</span>Pixel-level form layout rules</div>
+    <div class="card-body" style="padding:0">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Vùng</th>
+            <th>Desktop width</th>
+            <th>Mobile rule</th>
+            <th>Label width</th>
+            <th>Input width</th>
+            <th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Form shell</td><td><code>minmax(960px, 1280px)</code></td><td>Stack one column</td><td><code>160px</code></td><td><code>minmax(220px, 1fr)</code></td><td>Giữ Form 1/2/3 trong tabs hoặc stepper, không render thành một trang dài mù.</td></tr>
+          <tr><td>Form 1 header</td><td>2 columns</td><td>1 column dưới <code>768px</code></td><td><code>150px</code></td><td><code>280px</code></td><td>Part number, revision và FAI reason luôn trên fold đầu.</td></tr>
+          <tr><td>Form 2 cert list</td><td>Table full width</td><td>Cards theo cert</td><td><code>140px</code></td><td><code>auto</code></td><td>Attachment filename wrap tối đa 2 dòng, có document status chip.</td></tr>
+          <tr><td>Form 3 grid</td><td>Horizontal scroll allowed</td><td>Frozen balloon + result</td><td>N/A</td><td>N/A</td><td>Không giảm font dưới <code>12px</code>; dùng sticky header.</td></tr>
+        </tbody>
+      </table>
+      <table class="spec-table" style="margin-top:14px">
+        <thead><tr><th>Form 3 column</th><th>Width</th><th>Alignment</th><th>Validation</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td>Balloon#</td><td><code>72px</code></td><td>Center</td><td>Unique integer hoặc drawing balloon ID.</td><td>Sticky left; click link tới drawing.</td></tr>
+          <tr><td>Characteristic</td><td><code>220px</code></td><td>Left</td><td>Required text, no empty placeholder.</td><td>Wrap tối đa 3 dòng; long text mở detail.</td></tr>
+          <tr><td>Nominal</td><td><code>96px</code></td><td>Right</td><td>Number hoặc text spec.</td><td>Mono font cho số đo.</td></tr>
+          <tr><td>Tolerance</td><td><code>120px</code></td><td>Right</td><td>Required nếu characteristic measurable.</td><td>Hiển thị plus/minus rõ, không dùng màu đơn lẻ.</td></tr>
+          <tr><td>Actual</td><td><code>112px</code></td><td>Right</td><td>Required trước inspector sign.</td><td>Inline validation theo tolerance.</td></tr>
+          <tr><td>Tool</td><td><code>140px</code></td><td>Left</td><td>Calibration valid theo <a href="#manufacturing-precision">Section 32</a>.</td><td>Link tới certificate.</td></tr>
+          <tr><td>Result</td><td><code>96px</code></td><td>Center</td><td>Pass/Fail enum.</td><td>Chip text + icon; fail yêu cầu reason.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="chip chip-green">Schema</span>FAI AS9102 block JSON Schema</div>
+    <div class="card-body">
+      <pre class="code-block">{
+  "type": "fai-as9102-record",
+  "version": "4.4",
+  "allowedZones": ["header", "tabs", "main", "sidebar", "footer"],
+  "usesBlocks": ["page-header", "nav-tabs", "data-table", "inspection-checklist", "document-preview", "signature-pad", "data-timeline"],
+  "props": {
+    "faiReportId": { "type": "string", "pattern": "^FAI-[0-9]{4}-[0-9]{3,6}$", "example": "FAI-2026-009" },
+    "standard": { "type": "enum", "values": ["AS9102"] },
+    "partNumber": { "type": "string", "required": true },
+    "partRevision": { "type": "string", "required": true },
+    "drawingRevision": { "type": "string", "required": true },
+    "faiReason": { "type": "enum", "values": ["new-part", "revision-change", "lapse-in-production", "process-change", "partial-fai"] },
+    "forms": {
+      "form1": { "type": "object", "required": ["partNumber", "faiReason", "signOff"] },
+      "form2": { "type": "object", "required": ["subAssemblies", "materialCerts"] },
+      "form3": {
+        "type": "array",
+        "items": {
+          "balloonId": { "type": "string" },
+          "characteristic": { "type": "string" },
+          "nominal": { "type": "string" },
+          "tolerance": { "type": "string" },
+          "actual": { "type": ["string", "number", "null"] },
+          "toolId": { "type": "string" },
+          "calibrationStatus": { "type": "enum", "values": ["current", "due-soon", "overdue", "out-of-tolerance"] },
+          "result": { "type": "enum", "values": ["pass", "fail", "not-evaluated"] },
+          "ncrId": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "requiredSteps": ["inspector", "qa-engineer", "qa-manager"],
+      "signatureRequiredEachStep": true
+    }
+  },
+  "events": {
+    "onBalloonSelect": "fai.balloon.select",
+    "onCharacteristicUpdate": "fai.characteristic.update",
+    "onInspectorSign": "fai.inspector.sign",
+    "onQaEngineerSign": "fai.qa_engineer.sign",
+    "onQaManagerSign": "fai.qa_manager.sign",
+    "onExportPdf": "fai.export.pdf"
+  },
+  "accessibility": {
+    "drawingBalloonRole": "button",
+    "form3GridRole": "grid",
+    "activeRowSelection": "aria-selected",
+    "liveRegion": "polite",
+    "labels": {
+      "vi": "Balloon {balloonId}: {characteristic}, kết quả {result}",
+      "en": "Balloon {balloonId}: {characteristic}, result {result}"
+    }
+  }
+}</pre>
+    </div>
+  </div>
+</div>

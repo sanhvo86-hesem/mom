@@ -1,0 +1,148 @@
+<!--
+  v4.4 Prompt 5 - Architecture & Runtime Alignment
+  Output type: HTML patches for existing sections.
+  Merge rule: Prompt 9 chèn các patch dưới đây vào section đích, không tạo section mới.
+-->
+
+<!-- PATCH P5-B1: INSERT AFTER <p class="section-subtitle"> OR <p class="section-lead"> IN <section id="runtime-api-spec"> (Section 35) -->
+<div class="info-box info-box-amber" data-v44-patch="p5-runtime-implementation-status">
+  <strong>IMPLEMENTATION STATUS</strong>
+  Các lifecycle hooks <code>onMount</code> → <code>onError</code> và event bus <code>context.events</code> là SPEC TARGET cho v4.5. Code hiện tại trong <code>00-block-engine.js</code> dùng template-based HTML generation qua <code>renderModuleFromSchema()</code>, <code>_renderBlockWrapper()</code> và <code>_renderBlockInner()</code>, chưa dùng component mounting model. Developer PHẢI kiểm tra <code>mom/scripts/portal/00-block-engine.js</code> trước khi dùng bất kỳ API nào từ <a href="#runtime-api-spec">Section 35</a>. Các whitelist zone ở <a href="#zone-system">Section 38</a>, block catalog ở <a href="#block-engine">Section 37</a> và localStorage cascade ở <a href="#token-cascade">Section 55</a> phải được xem cùng nhau.
+</div>
+
+<!-- PATCH P5-B2: INSERT AFTER PATCH P5-B1 IN <section id="runtime-api-spec"> (Section 35) -->
+<div class="card" data-v44-patch="p5-runtime-status-table">
+  <div class="card-header"><span class="chip chip-amber">v4.4</span>Ma trận trạng thái triển khai</div>
+  <div class="card-body" style="padding:0">
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Tính năng</th>
+          <th>Trạng thái</th>
+          <th>File</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Block registration</strong></td><td>Triển khai một phần</td><td><code>00-block-engine.js</code></td><td>Có block catalog, renderer exports và legacy <code>registerModule()</code>; chưa có <code>BlockEngine.register()</code> facade và chưa validate schema khi đăng ký block.</td></tr>
+        <tr><td><strong>9 lifecycle hooks</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5. Hiện block render bằng HTML string, không có instance lifecycle <code>onMount</code>, <code>onUpdate</code>, <code>onTokenChange</code>, <code>onResize</code>, <code>onData</code>, <code>onSuspend</code>, <code>onResume</code>, <code>onDestroy</code>, <code>onError</code>.</td></tr>
+        <tr><td><strong>Event bus</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5 cho <code>context.events</code>. Event system hiện tại là action trigger qua <code>block.events</code> và <code>executeEvent()</code>, không phải scoped inter-block event bus.</td></tr>
+        <tr><td><strong>ResizeObserver</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5 cho responsive block lifecycle và chart resize. Hiện chưa thấy observer lifecycle trong render path.</td></tr>
+        <tr><td><strong>IntersectionObserver</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5 cho lazy/suspend/resume. Hiện chưa có viewport lifecycle cho block.</td></tr>
+        <tr><td><strong>ErrorBoundary</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5. Hiện render lỗi trong block có thể ảnh hưởng vùng render nếu không được handler cục bộ bắt lại.</td></tr>
+        <tr><td><strong>WebSocket realtime</strong></td><td>Chỉ là spec</td><td>—</td><td>Mục tiêu v4.5. Runtime hiện có polling/API data source và event action, chưa có realtime channel chuẩn.</td></tr>
+        <tr><td><strong>Undo/Redo</strong></td><td>Triển khai một phần</td><td><code>00-block-engine.js</code></td><td><code>_undoStack</code> và <code>_redoStack</code> tồn tại cho schema edits; command shape, conflict handling và audit metadata chưa được validate như runtime contract.</td></tr>
+        <tr><td><strong>JSON Schema validation</strong></td><td>Chỉ là spec</td><td>—</td><td>Cần Ajv hoặc equivalent trước khi coi <a href="#block-schema">Section 29</a> là runtime-enforced contract.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH P5-C1: INSERT AFTER <p class="section-subtitle"> OR <p class="section-lead"> IN <section id="visual-themes"> (Section 36) -->
+<div class="info-box info-box-red" data-v44-patch="p5-theme-mismatch">
+  <strong>DOC-VS-CODE MISMATCH</strong>
+  File <code>00b-theme-manager.js</code> có <code>8</code> <code>VISUAL_THEME_PRESETS</code>. File <code>00c-admin-appearance.js</code> có <code>20</code> <code>VISUAL_THEMES</code>. Chỉ <code>5</code> ID trùng: <code>professional-light</code>, <code>professional-dark</code>, <code>midnight-navy</code>, <code>ocean-breeze</code>, <code>forest-calm</code>. <code>15</code> theme có thể chọn trong admin UI nhưng KHÔNG có runtime preset trong theme manager; <code>applyVisualTheme()</code> có nguy cơ bỏ qua hoặc fallback không rõ ràng. PHẢI đồng bộ <code>00b-theme-manager.js</code> trước khi deploy. Xem thêm runtime contract tại <a href="#runtime-api-spec">Section 35</a> và cascade tại <a href="#token-cascade">Section 55</a>.
+</div>
+
+<!-- PATCH P5-C2: INSERT AFTER PATCH P5-C1 IN <section id="visual-themes"> (Section 36) -->
+<div class="card" data-v44-patch="p5-theme-runtime-mapping">
+  <div class="card-header"><span class="chip chip-red">v4.4</span>Ánh xạ theme runtime: Admin UI so với Theme Manager</div>
+  <div class="card-body" style="padding:0">
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Theme trong 00c</th>
+          <th>Có trong 00b?</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>professional-light</code></td><td>Có</td><td>OK. Giữ làm default light.</td></tr>
+        <tr><td><code>professional-dark</code></td><td>Có</td><td>OK. Giữ làm default dark.</td></tr>
+        <tr><td><code>midnight-navy</code></td><td>Có</td><td>OK. Verify contrast tokens khi dark mode.</td></tr>
+        <tr><td><code>ocean-breeze</code></td><td>Có</td><td>OK. Verify tên hiển thị đồng nhất với Section 36.</td></tr>
+        <tr><td><code>forest-calm</code></td><td>Có</td><td>OK. Verify semantic success không bị lẫn brand green.</td></tr>
+        <tr><td><code>sunrise-warm</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc khai báo alias rõ với <code>ember-industrial</code>; không rename âm thầm.</td></tr>
+        <tr><td><code>sunset-ember</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+        <tr><td><code>arctic-snow</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc map có kiểm soát với <code>slate-ice</code>.</td></tr>
+        <tr><td><code>cherry-blossom</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+        <tr><td><code>lavender-dream</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+        <tr><td><code>industrial-steel</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc loại khỏi admin UI nếu chưa runtime-ready.</td></tr>
+        <tr><td><code>shopfloor-signal</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra contrast kiosk/shop-floor.</td></tr>
+        <tr><td><code>executive-glass</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>; nếu dùng glass effect, phải có fallback không blur.</td></tr>
+        <tr><td><code>compliance-paper</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra print/readability với <a href="#print-layouts">Section 17</a>.</td></tr>
+        <tr><td><code>focus-mode</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+        <tr><td><code>vibrant-energy</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>; không để gradient phá token-first rule.</td></tr>
+        <tr><td><code>soft-pastel</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+        <tr><td><code>earth-tone</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc loại khỏi runtime nếu contrast fail.</td></tr>
+        <tr><td><code>neon-pulse</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra motion/reduced motion.</td></tr>
+        <tr><td><code>zen-minimal</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH P5-C3: INSERT AFTER PATCH P5-C2 IN <section id="visual-themes"> (Section 36) -->
+<div class="card" data-v44-patch="p5-theme-token-shape">
+  <div class="card-header"><span class="chip chip-purple">v4.4</span>So sánh cấu trúc token theme</div>
+  <div class="card-body" style="padding:0">
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Dạng trong tài liệu</th>
+          <th>Dạng trong code 00b</th>
+          <th>Cần căn chỉnh</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--brand</code></td><td><code>brandPrimary</code></td><td>Có. Map sang CSS variable khi apply theme.</td></tr>
+        <tr><td><code>--brand-2</code></td><td><code>brandLight</code></td><td>Có. Cần quyết định semantic: primary action hay light shade.</td></tr>
+        <tr><td><code>--accent</code></td><td><code>accent</code></td><td>OK.</td></tr>
+        <tr><td><code>--bg-page</code></td><td><code>colorsLight.bgPage</code>, <code>colorsDark.bgPage</code></td><td>Có. Apply theo <code>colorMode</code>.</td></tr>
+        <tr><td><code>--bg-surface</code></td><td><code>colorsLight.bgSurface</code>, <code>colorsDark.bgSurface</code></td><td>Có. Apply theo <code>colorMode</code>.</td></tr>
+        <tr><td><code>--text-primary</code></td><td>Thiếu</td><td>THÊM vào 00b để theme không chỉ đổi surface/color mà bỏ qua readability.</td></tr>
+        <tr><td><code>--text-secondary</code></td><td>Thiếu</td><td>THÊM vào 00b; required cho helper text, table meta và disabled-ish labels.</td></tr>
+        <tr><td><code>--border</code></td><td>Thiếu</td><td>THÊM vào 00b để card/table/input border đồng nhất với theme.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PATCH P5-D: INSERT AFTER THE EXISTING "ALLOWED BLOCKS" INFO BOX IN <section id="zone-system"> (Section 38) -->
+<div class="info-box info-box-amber" data-v44-patch="p5-zone-allowed-blocks-enforcement">
+  <strong>IMPLEMENTATION STATUS: ALLOWED BLOCKS</strong>
+  Zone <code>allowedBlocks</code> là SPEC ONLY trong runtime hiện tại. Code <code>00-block-engine.js</code> đang render block theo schema/tab và chưa enforce whitelist zone ở <code>renderBlock()</code>, <code>renderModuleFromSchema()</code> hoặc drop path. Vì vậy bất kỳ block nào vẫn có thể được đặt vào bất kỳ zone nào nếu schema/UI cho phép. Runtime validation cần được implement trong <code>00-block-engine.js</code> trước khi mount/render block, đối chiếu <a href="#block-engine">Section 37</a>, <a href="#block-schema">Section 29</a> và <a href="#runtime-api-spec">Section 35</a>.
+</div>
+
+<!-- PATCH P5-E1: INSERT AFTER <p class="section-subtitle"> OR <p class="section-lead"> IN <section id="token-cascade"> (Section 55) -->
+<div class="info-box info-box-blue" data-v44-patch="p5-token-cascade-authority">
+  <strong>AUTHORITY NOTE</strong>
+  <a href="#runtime-api-spec">Section 35</a> là nguồn chính thức cho Block Engine Runtime và localStorage contract. <a href="#token-cascade">Section 55</a> mô tả cascade LOGIC: System → Admin → Template → Zone → User. Khi có mâu thuẫn về keys hoặc API, ưu tiên <a href="#runtime-api-spec">Section 35</a>, sau đó cập nhật Section 55 để phản ánh đúng implementation.
+</div>
+
+<!-- PATCH P5-E2: INSERT AFTER PATCH P5-E1 IN <section id="token-cascade"> (Section 55) -->
+<div class="info-box info-box-red" data-v44-patch="p5-storage-authoritative-keys">
+  <strong>CÁC KEY ĐÚNG TRONG CODE</strong>
+  Code hiện dùng <code>hesem_user_appearance</code>, <code>hesem_admin_appearance_cache</code>, <code>hesem_layout_templates</code>, <code>hesem_module_template_binding</code>. Các key khác trong section này là TARGET KEYS cho v4.5 migration, không được ghi mới trong v4.4 nếu chưa có migration/reader tương ứng.
+</div>
+
+<!-- PATCH P5-A: REPLACE THE CURRENT "localStorage Keys" TABLE IN <section id="token-cascade"> (Section 55) WITH THIS TABLE -->
+<table class="spec-table" data-v44-patch="p5-token-cascade-storage-table">
+  <thead><tr><th>Key</th><th>Mục đích</th><th>Dữ liệu ví dụ</th></tr></thead>
+  <tbody>
+    <tr><td><code>hesem_user_appearance</code></td><td>Key code-authoritative cho lựa chọn cá nhân: theme/color mode, font size, radius, motion và density. <code>density</code> là property bên trong object này, KHÔNG phải key riêng.</td><td><code>{ "theme": "professional-light", "density": "compact", "motion": "normal" }</code></td></tr>
+    <tr><td><code>hesem_admin_appearance_cache</code></td><td>Cache cấu hình appearance cấp admin/org. Đây là Layer 2 trong cascade và phải refresh từ server khi cache hết hạn hoặc thiếu metadata.</td><td><code>{ "cachedAt": "2026-04-11T00:00:00Z", "config": {} }</code></td></tr>
+    <tr><td><code>hesem_layout_templates</code></td><td>Lưu template configs/custom clones cho Template Studio. Đây là nguồn template local hiện tại trước khi có server-persisted template endpoint.</td><td><code>{ "sales-list-default": { "zones": [], "tokens": {} } }</code></td></tr>
+    <tr><td><code>hesem_module_template_binding</code></td><td>Lưu binding module → template trong admin appearance. Giữ làm compatibility key cho target <code>hesem_active_template_{moduleId}</code>.</td><td><code>{ "sales-orders": "sales-list-default" }</code></td></tr>
+    <tr><td><code>hesem_active_template_{moduleId}</code></td><td>Target key v4.5 để runtime đọc nhanh template active theo module. Không ghi mới trong v4.4 nếu chưa có migration từ <code>hesem_module_template_binding</code>.</td><td><code>{ "templateId": "sales-list-default", "version": "1.0.0" }</code></td></tr>
+    <tr><td><code>hesem_template_preview_device</code></td><td>Target key v4.5 cho preview UI trong Template Editor. Hiện chưa thấy reader/writer authoritative trong <code>00b</code>/<code>00c</code>.</td><td><code>{ "device": "tablet" }</code></td></tr>
+    <tr><td><code>hesem_template_preview_theme</code></td><td>Target key v4.5 cho preview theme tạm thời. Runtime deploy không được phụ thuộc key này.</td><td><code>{ "themeId": "professional-light" }</code></td></tr>
+    <tr><td><code>hesem_zone_scroll_debug</code></td><td>Target key v4.5 cho debug zone/scroll/sticky anchors. Không bật trong production nếu chưa có permission/debug guard.</td><td><code>{ "enabled": true }</code></td></tr>
+  </tbody>
+</table>
+
+<!-- PATCH P5-A2: INSERT AFTER THE "localStorage Keys" CARD IN <section id="token-cascade"> (Section 55) IF TABLE ROW REPLACEMENT IS NOT APPLIED -->
+<div class="info-box info-box-amber" data-v44-patch="p5-storage-deprecated-keys">
+  <strong>DEPRECATED STORAGE NOTE</strong>
+  Thay mọi tham chiếu <code>hesem_theme_prefs</code> bằng <code>hesem_user_appearance</code>. Không tạo key <code>hesem_layout_density</code>; <code>density</code> phải là property trong object <code>hesem_user_appearance</code>. Nếu gặp dữ liệu legacy từ các key cũ, chỉ migrate một lần sang key code-authoritative và ghi log migration.
+</div>
