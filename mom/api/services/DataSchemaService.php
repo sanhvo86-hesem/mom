@@ -2105,6 +2105,7 @@ final class DataSchemaService
             $rows[] = [
                 'id' => 'workspace',
                 'name' => (string)($meta['name'] ?? 'HESEM Workspace Design'),
+                'displayName' => 'Workspace Design Draft',
                 'version' => (string)($meta['version'] ?? '1.0.0'),
                 'updatedAt' => (string)($meta['updatedAt'] ?? $meta['generated_at'] ?? ''),
                 'author' => (string)($meta['author'] ?? $enterprise['generated_by'] ?? ''),
@@ -2119,11 +2120,74 @@ final class DataSchemaService
                 'lastReleaseAt' => (string)($enterprise['last_release_at'] ?? ''),
                 'designType' => 'workspace_design',
                 'authorityLayer' => 'design_workspace',
+                'authorityViewKind' => 'design_draft',
+                'source' => 'data/schema-studio/designs/workspace.json',
+                'schemaName' => 'public',
+                'databaseName' => 'mom',
+                'physicalDbSchema' => 'public',
+                'authoritySource' => 'data/schema-studio/designs/workspace.json',
+                'purpose' => 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.',
+                'writePolicy' => 'editable_with_revision_guard',
+                'deletePolicy' => 'archive_or_replace_do_not_hard_delete',
+                'dataLossImpact' => 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.',
+                'canDelete' => false,
+                'readOnly' => false,
+                'editable' => true,
                 'isSystem' => true,
             ];
         }
 
-        usort($rows, static fn(array $a, array $b): int => strcmp((string)$b['updatedAt'], (string)$a['updatedAt']));
+        $tableRegistry = $this->readJson($this->registryPath('table-registry'));
+        if (is_array($tableRegistry['tables'] ?? null) && count((array)$tableRegistry['tables']) > 0) {
+            $relationMap = $this->readJson($this->registryPath('relation-map'));
+            $relationCount = is_array($relationMap['edges'] ?? null)
+                ? count((array)$relationMap['edges'])
+                : (is_array($relationMap['relations'] ?? null) ? count((array)$relationMap['relations']) : 0);
+            $meta = is_array($tableRegistry['_meta'] ?? null) ? $tableRegistry['_meta'] : [];
+            $rows[] = [
+                'id' => 'system_contract_registry',
+                'name' => 'HESEM System Contract Registry',
+                'displayName' => 'System Contract Registry',
+                'version' => (string)($meta['version'] ?? '1.0.0'),
+                'updatedAt' => (string)($meta['generatedAt'] ?? $meta['generated_at'] ?? ''),
+                'author' => (string)($meta['generatedBy'] ?? $meta['generated_by'] ?? 'registry'),
+                'profile' => 'logical_registry',
+                'environment' => 'system_contract',
+                'tableCount' => count((array)$tableRegistry['tables']),
+                'relationCount' => $relationCount,
+                'groupCount' => count((array)($tableRegistry['domains'] ?? [])),
+                'baselineAvailable' => is_file($this->registryPath('schema-authority-summary')),
+                'lastCompiledAt' => '',
+                'lastReleaseId' => '',
+                'lastReleaseAt' => '',
+                'designType' => 'system_contract_registry',
+                'authorityLayer' => 'system_contract_registry',
+                'authorityViewKind' => 'db_derived_contract',
+                'source' => 'data/registry/table-registry.json',
+                'schemaName' => 'public',
+                'databaseName' => 'mom',
+                'physicalDbSchema' => 'public',
+                'authoritySource' => 'database/migrations/*.sql -> database/schema.sql -> table-registry.json',
+                'purpose' => 'Full backend contract visibility for AI, frontend, API governance, workflow mapping, and audit without editing the database.',
+                'writePolicy' => 'read_only_generated_artifact',
+                'deletePolicy' => 'do_not_delete_regenerate_from_authority',
+                'dataLossImpact' => 'Deleting this artifact does not delete DB rows, but removes full contract visibility until registry publication is regenerated.',
+                'canDelete' => false,
+                'readOnly' => true,
+                'editable' => false,
+                'isSystem' => true,
+            ];
+        }
+
+        usort($rows, static function (array $a, array $b): int {
+            $order = ['workspace' => 0, 'system_contract_registry' => 1];
+            $aOrder = $order[(string)($a['id'] ?? '')] ?? 99;
+            $bOrder = $order[(string)($b['id'] ?? '')] ?? 99;
+            if ($aOrder !== $bOrder) {
+                return $aOrder <=> $bOrder;
+            }
+            return strcmp((string)$b['updatedAt'], (string)$a['updatedAt']);
+        });
         return $rows;
     }
 

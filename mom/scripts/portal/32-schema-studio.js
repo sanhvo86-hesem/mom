@@ -160,6 +160,34 @@ function _t(vi, en){
   return currentLang === 'en' ? en : vi;
 }
 
+function schemaStudioIsReadOnlyDesignId(id){
+  return String(id || '') === 'system_contract_registry';
+}
+
+function schemaStudioFindDesign(id){
+  var target = String(id || '');
+  var designs = STORE.designs || [];
+  var i;
+  for(i = 0; i < designs.length; i += 1){
+    if(String(designs[i].id || '') === target) return designs[i];
+  }
+  return null;
+}
+
+function schemaStudioIsReadOnlyDesign(item){
+  return !!(item && (item.readOnly || item.editable === false || item.authorityLayer === 'system_contract_registry' || schemaStudioIsReadOnlyDesignId(item.id)));
+}
+
+function schemaStudioIsCurrentReadOnly(){
+  var meta = STORE.schema && STORE.schema._meta ? STORE.schema._meta : {};
+  var design = schemaStudioFindDesign(STORE.currentDesignId || meta.id || '');
+  return schemaStudioIsReadOnlyDesign(design) || !!meta.readOnly || meta.editable === false || meta.authorityLayer === 'system_contract_registry' || schemaStudioIsReadOnlyDesignId(STORE.currentDesignId || meta.id || '');
+}
+
+function schemaStudioReadOnlyToast(){
+  toast(_t('Lớp System Contract Registry là chỉ đọc. Hãy sửa Workspace Design hoặc cập nhật bằng migration/registry generator.', 'System Contract Registry is read-only. Edit Workspace Design or update through migrations/registry generators.'), 'info');
+}
+
 var Diagnostics = {
   entries: [],
   api: {},
@@ -445,6 +473,9 @@ function ensureSchema(){
 }
 
 function markDirty(){
+  if(schemaStudioIsCurrentReadOnly()){
+    return;
+  }
   STORE.dirty = true;
   if(STORE.schema && STORE.schema._meta){
     STORE.schema._meta.updatedAt = new Date().toISOString();
@@ -635,7 +666,7 @@ function confirm2(msg, dangerous){
 }
 
 function pushUndo(){
-  if(!STORE.schema) return;
+  if(!STORE.schema || schemaStudioIsCurrentReadOnly()) return;
   var snapshot = JSON.stringify(STORE.schema);
   if(STORE.undo.length && STORE.undo[STORE.undo.length - 1] === snapshot) return;
   STORE.undo.push(snapshot);
@@ -710,12 +741,14 @@ function findRelation(id){
 function saveDraft(){
   if(!STORE.schema) return;
   var id = STORE.currentDesignId || (STORE.schema._meta && STORE.schema._meta.id) || 'workspace';
+  if(schemaStudioIsReadOnlyDesignId(id) || schemaStudioIsCurrentReadOnly()) return;
   try{
     localStorage.setItem(LS_PREFIX + id, JSON.stringify(STORE.schema));
   }catch(err){}
 }
 
 function loadDraft(id){
+  if(schemaStudioIsReadOnlyDesignId(id)) return null;
   try{
     return localStorage.getItem(LS_PREFIX + id);
   }catch(err){
@@ -724,6 +757,7 @@ function loadDraft(id){
 }
 
 function clearDraft(id){
+  if(schemaStudioIsReadOnlyDesignId(id)) return;
   try{
     localStorage.removeItem(LS_PREFIX + id);
   }catch(err){}
@@ -1673,6 +1707,10 @@ var Connector = {
 
 var TableCard = {
   createNew: function(x, y){
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return null;
+    }
     ensureSchema();
     pushUndo();
     var tbl = createDefaultTable(x, y);
@@ -3939,6 +3977,10 @@ var MigGen = {
 
   setBaseline: function(){
     if(!STORE.schema) return Promise.resolve();
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return Promise.resolve();
+    }
     return _api('schema_studio_set_baseline', {
       design_id: STORE.currentDesignId || (STORE.schema._meta && STORE.schema._meta.id) || 'workspace',
       schema: STORE.schema
@@ -3955,6 +3997,10 @@ var MigGen = {
     var sql;
     var overlay;
     if(!STORE.schema) return;
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return;
+    }
     if(!STORE.baseline){
       toast(_t('Chưa có baseline. Hãy đặt baseline trước.', 'No baseline set yet. Save a baseline first.'), 'error');
       return;
@@ -4007,6 +4053,10 @@ var MigGen = {
   },
 
   applyMigration: function(){
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return;
+    }
     var diff = STORE.migration.diff || { destructive:[] };
     var destructiveToken = 'CONFIRMED_DESTRUCTIVE_' + ((window.currentUser && (window.currentUser.user_id || window.currentUser.username)) || 'system');
     confirm2(_t('Áp dụng migration lên database?', 'Apply migration to the database?'), diff.destructive.length > 0).then(function(ok){
@@ -4760,8 +4810,12 @@ var SchemaLib = {
   _autoLoadedSystem: false,
 
   withSystemEntries: function(designs){
+    var seen = {};
     var items = Array.isArray(designs) ? designs.filter(function(item){
-      return item && String(item.id || '') === 'workspace';
+      var id = item && String(item.id || '');
+      if(!id || seen[id]) return false;
+      seen[id] = true;
+      return true;
     }) : [];
     if(!items.length){
       items.push({
@@ -4771,6 +4825,8 @@ var SchemaLib = {
         updatedAt: '',
         author: 'system',
         tableCount: 0,
+        readOnly: false,
+        editable: true,
         isSystem: true
       });
     }
@@ -4800,17 +4856,19 @@ var SchemaLib = {
     var select = document.getElementById('ss-schema-select');
     var currentValue = STORE.currentDesignId || '';
     if(!select) return;
-    select.setAttribute('aria-label', _t('Chọn workspace design đang dùng', 'Select active workspace design'));
-    select.setAttribute('title', _t('Chọn workspace design đang dùng', 'Select active workspace design'));
+    select.setAttribute('aria-label', _t('Chọn lớp schema/contract thật', 'Select a real schema/contract layer'));
+    select.setAttribute('title', _t('Workspace là lớp sửa được; System Contract Registry là lớp contract đầy đủ chỉ đọc.', 'Workspace is editable; System Contract Registry is the full read-only contract layer.'));
     select.innerHTML = (STORE.designs || []).map(function(item){
-      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('Thiết kế', 'Workspace Design')) + ']' : '') + '</option>';
+      var label = item && (item.displayName || item.name) ? (item.displayName || item.name) : _t('Workspace Design Draft', 'Workspace Design Draft');
+      var readOnly = schemaStudioIsReadOnlyDesign(item);
+      var badge = readOnly ? _t('Contract DB-derived chỉ đọc', 'DB-derived read-only contract') : _t('Draft thiết kế sửa được', 'Editable design draft');
+      var count = item.tableCount != null ? ' - ' + String(item.tableCount) + ' ' + _t('bảng', 'tables') : '';
+      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(label) + ' [' + _esc(badge) + ']' + _esc(count) + '</option>';
     }).join('');
   },
 
   onSelectChange: function(value){
-    if(value === 'workspace'){
-      SchemaLib.load(value);
-    }
+    return SchemaLib.load(value || 'workspace');
   },
 
   createNew: function(){
@@ -4857,6 +4915,10 @@ var SchemaLib = {
 
   save: function(){
     if(!STORE.schema) return Promise.resolve();
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return Promise.resolve();
+    }
     STORE.schema._meta = STORE.schema._meta || {};
     STORE.schema._meta.updatedAt = new Date().toISOString();
     STORE.schema._meta.author = currentUsername();
@@ -9973,8 +10035,8 @@ window._renderSchemaStudio = function(page){
             '</div>',
             '<div class="ss-lite-option-card">',
               '<div class="ss-lite-option-title">' + _esc(_t('Phạm vi schema hiện hành', 'Current schema scope')) + '</div>',
-              '<div class="ss-lite-system-chip"><span class="ss-lite-toolbar-dot"></span><strong>' + _esc(_t('Một workspace design duy nhất', 'Single workspace design')) + '</strong></div>',
-              '<div class="ss-lite-lock-note">' + _esc(_t('Studio này chỉ cho chỉnh sửa đúng `workspace` design. Full System Contract Registry vẫn là lớp read-only riêng cho toàn nền tảng.', 'This studio allows editing only the `workspace` design. The full System Contract Registry remains a separate read-only layer for the whole platform.')) + '</div>',
+              '<div class="ss-lite-system-chip"><span class="ss-lite-toolbar-dot"></span><strong>' + _esc(_t('Workspace editable + registry chỉ đọc', 'Editable workspace + read-only registry')) + '</strong></div>',
+              '<div class="ss-lite-lock-note">' + _esc(_t('Dropdown hiển thị các lớp schema thật: `workspace` để thiết kế và `system_contract_registry` để xem đầy đủ contract backend. Registry không được save/baseline/migration trực tiếp.', 'The dropdown shows real schema layers: `workspace` for design and `system_contract_registry` for the full backend contract view. Registry cannot be saved, baselined, or migrated directly.')) + '</div>',
             '</div>',
           '</div>',
         '</div>',
@@ -10196,9 +10258,14 @@ window._renderSchemaStudio = function(page){
     });
   };
 
-  SchemaLib.withSystemEntries = function(){
-    var filtered = (STORE.designs || []).filter(function(item){
-      return item && String(item.id || '') === LITE_SYSTEM_ONLY_ID;
+  SchemaLib.withSystemEntries = function(designs){
+    var seen = {};
+    var source = Array.isArray(designs) ? designs : (STORE.designs || []);
+    var filtered = source.filter(function(item){
+      var id = item && String(item.id || '');
+      if(!id || seen[id]) return false;
+      seen[id] = true;
+      return true;
     });
     return filtered.length ? filtered : [liteSystemEntry()];
   };
@@ -10209,13 +10276,17 @@ window._renderSchemaStudio = function(page){
     if(!select){
       return originalRenderSelector ? originalRenderSelector.apply(this, arguments) : undefined;
     }
-    select.setAttribute('aria-label', _t('Workspace design đang dùng', 'Active workspace design'));
-    select.setAttribute('title', _t('Workspace design duy nhất có thể chỉnh sửa trong studio này', 'The only editable workspace design in this studio'));
-    select.innerHTML = SchemaLib.withSystemEntries().map(function(item){
-      var label = item && item.name ? item.name : _t('HESEM Workspace Design', 'HESEM Workspace Design');
-      return '<option value="' + LITE_SYSTEM_ONLY_ID + '">' + _esc(label) + ' [' + _esc(_t('Thiết kế', 'Workspace Design')) + ']</option>';
+    select.setAttribute('aria-label', _t('Chọn lớp schema/contract thật', 'Select a real schema/contract layer'));
+    select.setAttribute('title', _t('Workspace sửa được; System Contract Registry đầy đủ chỉ đọc.', 'Workspace is editable; System Contract Registry is full and read-only.'));
+    select.innerHTML = SchemaLib.withSystemEntries(STORE.designs).map(function(item){
+      var label = item && (item.displayName || item.name) ? (item.displayName || item.name) : _t('Workspace Design Draft', 'Workspace Design Draft');
+      var readOnly = schemaStudioIsReadOnlyDesign(item);
+      var badge = readOnly ? _t('Contract DB-derived chỉ đọc', 'DB-derived read-only contract') : _t('Draft thiết kế sửa được', 'Editable design draft');
+      var count = item && item.tableCount != null ? ' - ' + String(item.tableCount) + ' ' + _t('bảng', 'tables') : '';
+      var id = item && item.id ? item.id : LITE_SYSTEM_ONLY_ID;
+      return '<option value="' + _esc(id) + '"' + (id === (STORE.currentDesignId || LITE_SYSTEM_ONLY_ID) ? ' selected' : '') + '>' + _esc(label) + ' [' + _esc(badge) + ']' + _esc(count) + '</option>';
     }).join('');
-    select.value = LITE_SYSTEM_ONLY_ID;
+    select.value = STORE.currentDesignId || LITE_SYSTEM_ONLY_ID;
     select.disabled = false;
   };
 
@@ -10223,14 +10294,9 @@ window._renderSchemaStudio = function(page){
   SchemaLib.loadList = function(){
     liteEnsureState();
     return Promise.resolve(originalLoadList ? originalLoadList.apply(this, arguments) : undefined).then(function(result){
-      STORE.designs = (STORE.designs || []).filter(function(item){
-        return item && String(item.id || '') === LITE_SYSTEM_ONLY_ID;
-      });
-      if(!STORE.designs.length){
-        STORE.designs = [liteSystemEntry()];
-      }
+      STORE.designs = SchemaLib.withSystemEntries(STORE.designs);
       SchemaLib.renderSelector();
-      if(STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
+      if(!STORE.currentDesignId || !STORE.schema || !((STORE.schema.tables || []).length)){
         return SchemaLib.load(LITE_SYSTEM_ONLY_ID).then(function(){ return result; });
       }
       liteRefreshRelationLabels();
@@ -10246,10 +10312,7 @@ window._renderSchemaStudio = function(page){
   };
 
   SchemaLib.onSelectChange = function(value){
-    if(String(value || '') !== LITE_SYSTEM_ONLY_ID){
-      return Promise.resolve();
-    }
-    return SchemaLib.load(LITE_SYSTEM_ONLY_ID);
+    return SchemaLib.load(value || LITE_SYSTEM_ONLY_ID);
   };
 
   SchemaLib.createNew = function(){
@@ -10265,21 +10328,29 @@ window._renderSchemaStudio = function(page){
   var originalLoad = SchemaLib.load;
   var originalLoadSystemRegistry = SchemaLib.loadSystemRegistry;
   SchemaLib.loadSystemRegistry = function(silent){
-    return Promise.resolve(SchemaLib.load(LITE_SYSTEM_ONLY_ID)).then(function(result){
+    return Promise.resolve(SchemaLib.load('system_contract_registry')).then(function(result){
       liteRefreshRelationLabels();
       if(!silent){
-        toast(_t('Đã nạp workspace design đang dùng', 'Loaded the active workspace design'), 'success');
+        toast(_t('Đã nạp System Contract Registry chỉ đọc', 'Loaded the read-only System Contract Registry'), 'success');
       }
       return result;
     });
   };
 
   SchemaLib.load = function(){
-    return originalLoad.apply(this, [LITE_SYSTEM_ONLY_ID]);
+    var requestedId = arguments.length ? arguments[0] : LITE_SYSTEM_ONLY_ID;
+    return originalLoad.apply(this, [requestedId || LITE_SYSTEM_ONLY_ID]).then(function(result){
+      liteRefreshRelationLabels();
+      return result;
+    });
   };
 
   var originalSave = SchemaLib.save;
   SchemaLib.save = function(){
+    if(schemaStudioIsCurrentReadOnly()){
+      schemaStudioReadOnlyToast();
+      return Promise.resolve();
+    }
     if(STORE.schema){
       STORE.schema._meta = STORE.schema._meta || {};
       STORE.schema._meta.id = LITE_SYSTEM_ONLY_ID;
@@ -10300,7 +10371,7 @@ window._renderSchemaStudio = function(page){
     if(!container) return;
     selector = container.querySelector('#ss-schema-select');
     if(selector){
-      selector.value = LITE_SYSTEM_ONLY_ID;
+      selector.value = STORE.currentDesignId || LITE_SYSTEM_ONLY_ID;
     }
     right = container.querySelector('.ss-toolbar-right');
     if(!right) return;
@@ -10308,9 +10379,19 @@ window._renderSchemaStudio = function(page){
     if(!note){
       note = document.createElement('span');
       note.className = 'ss-lite-toolbar-note';
-      note.textContent = _t('Editable layer • Workspace Design', 'Editable layer • Workspace Design');
       right.insertBefore(note, right.firstChild || null);
     }
+    note.textContent = schemaStudioIsCurrentReadOnly()
+      ? _t('Authority View • System Contract Registry • DB public • read-only', 'Authority View • System Contract Registry • DB public • read-only')
+      : _t('Authority View • Workspace Design Draft • DB public • editable draft', 'Authority View • Workspace Design Draft • DB public • editable draft');
+    Array.prototype.forEach.call(container.querySelectorAll('button'), function(node){
+      var onclick = node.getAttribute('onclick') || '';
+      var locked = schemaStudioIsCurrentReadOnly() && /(SchemaLib\.save|MigGen\.setBaseline|MigGen\.renderPreview|Importer\.openModal)/.test(onclick);
+      node.disabled = !!locked;
+      if(locked){
+        node.setAttribute('title', _t('Registry là chỉ đọc; không cho ghi từ màn hình này', 'Registry is read-only; writes are blocked from this screen'));
+      }
+    });
     button = right.querySelector('.ss-lite-toolbar-btn');
     if(!button){
       button = document.createElement('button');
@@ -10333,13 +10414,27 @@ window._renderSchemaStudio = function(page){
     action:function(){ liteOpenOptions(); }
   });
 
+  if(window.SchemaStudioEnterprise){
+    ['compileRegistryBundle', 'createReleaseBundle', 'saveCurrentView'].forEach(function(method){
+      var originalEnterpriseMethod = window.SchemaStudioEnterprise[method];
+      if(typeof originalEnterpriseMethod !== 'function') return;
+      window.SchemaStudioEnterprise[method] = function(){
+        if(schemaStudioIsCurrentReadOnly()){
+          schemaStudioReadOnlyToast();
+          return Promise.resolve();
+        }
+        return originalEnterpriseMethod.apply(window.SchemaStudioEnterprise, arguments);
+      };
+    });
+  }
+
   var originalInit = init;
   init = function(page){
     var result;
     liteEnsureState();
     liteEnsureStyles();
     result = originalInit(page);
-    if(!STORE.currentDesignId || STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
+    if(!STORE.currentDesignId || !STORE.schema || !((STORE.schema.tables || []).length)){
       SchemaLib.load(LITE_SYSTEM_ONLY_ID);
     }
     if(window.SchemaStudio){

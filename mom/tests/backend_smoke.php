@@ -619,8 +619,40 @@ try {
     smoke_assert($e->getStatusCode() === 200, 'Schema Studio read returned wrong status for builder role.');
     $designs = $e->getPayload()['designs'] ?? null;
     smoke_assert(is_array($designs), 'Schema Studio read payload missing designs array.');
-    smoke_assert(count((array)$designs) === 1, 'Schema Studio should expose exactly one active system design.');
-    smoke_assert((string)(($designs[0]['id'] ?? '')) === 'workspace', 'Schema Studio should expose workspace as the single active design.');
+    $designIds = array_map(static fn(array $design): string => (string)($design['id'] ?? ''), array_values(array_filter((array)$designs, 'is_array')));
+    smoke_assert(in_array('workspace', $designIds, true), 'Schema Studio should expose workspace as the editable design layer.');
+    smoke_assert(in_array('system_contract_registry', $designIds, true), 'Schema Studio should expose the full system contract registry as a real read-only schema layer.');
+    $registryDesign = null;
+    foreach ((array)$designs as $design) {
+        if (is_array($design) && (string)($design['id'] ?? '') === 'system_contract_registry') {
+            $registryDesign = $design;
+            break;
+        }
+    }
+    smoke_assert(is_array($registryDesign), 'Schema Studio registry design summary should be available.');
+    smoke_assert(!empty($registryDesign['readOnly']), 'System contract registry design should be read-only.');
+    smoke_assert((int)($registryDesign['tableCount'] ?? 0) >= 600, 'System contract registry design should expose full platform table coverage.');
+}
+
+smoke_reset_request_state();
+session_init();
+$_SESSION['user'] = 'builder-user';
+$_SESSION['mfa_ok'] = true;
+$_SESSION['csrf'] = 'schema-smoke-token';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SERVER['HTTP_X_CSRF_TOKEN'] = 'schema-smoke-token';
+$_GET['id'] = 'system_contract_registry';
+$registrySchemaStudioController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
+try {
+    $registrySchemaStudioController->getDesign();
+    throw new RuntimeException('Schema Studio registry design did not terminate through the response pipeline.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 200, 'Schema Studio registry getDesign returned wrong status.');
+    $schema = $e->getPayload()['schema'] ?? null;
+    smoke_assert(is_array($schema), 'Schema Studio registry getDesign should return a schema document.');
+    smoke_assert((string)(($schema['_meta'] ?? [])['id'] ?? '') === 'system_contract_registry', 'Schema Studio registry getDesign should preserve the registry design id.');
+    smoke_assert(!empty(($schema['_meta'] ?? [])['readOnly']), 'Schema Studio registry getDesign should mark the schema read-only.');
+    smoke_assert(count((array)($schema['tables'] ?? [])) >= 600, 'Schema Studio registry getDesign should expose full platform table coverage.');
 }
 
 smoke_reset_request_state();

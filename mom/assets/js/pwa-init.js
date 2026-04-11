@@ -23,7 +23,7 @@
   // ── Configuration ───────────────────────────────────────────────────────
 
   const SW_PATH      = '/mom/sw.js';
-  const SW_VERSION   = '1.3.7';
+  const SW_VERSION   = '1.3.9';
   const SW_SCOPE     = '/mom/';
   const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
   const SW_RELOAD_MARKER = `mom_sw_reloaded_${SW_VERSION}`;

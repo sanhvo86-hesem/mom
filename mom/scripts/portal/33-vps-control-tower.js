@@ -81,6 +81,17 @@ function _fmtSizeFromMb(value){
   }
   return Math.round(num) + ' MB';
 }
+function _fmtBytes(value){
+  var num = Number(value || 0);
+  if(!isFinite(num) || num <= 0) return '0 B';
+  var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  var unit = 0;
+  while(num >= 1024 && unit < units.length - 1){
+    num /= 1024;
+    unit += 1;
+  }
+  return (num >= 10 || unit === 0 ? Math.round(num) : num.toFixed(1)) + ' ' + units[unit];
+}
 function _progressWidth(text){
   var raw = parseFloat(String(text || '').replace('%', '').trim());
   if(!isFinite(raw) || raw < 0) return '0%';
@@ -122,6 +133,15 @@ var state = {
   selectedHostId: '',
   selectedTerminalId: '',
   selectedObservabilityId: '',
+  selectedFileRootId: '',
+  filePath: '',
+  fileQuery: '',
+  fileShowHidden: false,
+  fileLoading: false,
+  fileExplorer: null,
+  filePreview: null,
+  fileHistory: [''],
+  fileHistoryIndex: 0,
   host: null,
   actionBusy: '',
   actionResult: null
@@ -155,10 +175,47 @@ function _syncObservabilitySelection(host){
   }
 }
 
+function _syncFileRootSelection(host){
+  var roots = Array.isArray(host && host.file_roots) ? host.file_roots : [];
+  if(!roots.length){
+    state.selectedFileRootId = '';
+    state.filePath = '';
+    state.fileExplorer = null;
+    state.filePreview = null;
+    _resetFileHistory('');
+    return;
+  }
+  var exists = roots.some(function(item){
+    return String(item && item.id || '') === String(state.selectedFileRootId || '');
+  });
+  if(!exists){
+    state.selectedFileRootId = String(roots[0].id || '');
+    state.filePath = '';
+    state.fileExplorer = null;
+    state.filePreview = null;
+    _resetFileHistory('');
+  }
+}
+
+function _resetFileHistory(path){
+  state.fileHistory = [String(path || '')];
+  state.fileHistoryIndex = 0;
+}
+
 function _selectedTerminal(host){
   var items = Array.isArray(host && host.terminals) ? host.terminals : [];
   for(var i = 0; i < items.length; i += 1){
     if(String(items[i] && items[i].id || '') === String(state.selectedTerminalId || '')){
+      return items[i];
+    }
+  }
+  return items[0] || null;
+}
+
+function _selectedFileRoot(host){
+  var items = Array.isArray(host && host.file_roots) ? host.file_roots : [];
+  for(var i = 0; i < items.length; i += 1){
+    if(String(items[i] && items[i].id || '') === String(state.selectedFileRootId || '')){
       return items[i];
     }
   }
@@ -226,10 +283,19 @@ async function _loadHost(showSpinner){
     state.host = res.host || null;
     _syncTerminalSelection(state.host);
     _syncObservabilitySelection(state.host);
+    _syncFileRootSelection(state.host);
+    if(state.tab === 'files' && state.selectedFileRootId){
+      await _loadFiles(state.filePath || '', false);
+      return;
+    }
   }catch(err){
     state.host = null;
     state.selectedTerminalId = '';
     state.selectedObservabilityId = '';
+    state.selectedFileRootId = '';
+    state.fileExplorer = null;
+    state.filePreview = null;
+    _resetFileHistory('');
     _toast(_t('Không thể tải chi tiết host.', 'Could not load the host detail.'), 'error');
   }finally{
     state.loading = false;
@@ -257,6 +323,7 @@ async function _runAction(actionId){
       state.host = state.actionResult.host_after;
       _syncTerminalSelection(state.host);
       _syncObservabilitySelection(state.host);
+      _syncFileRootSelection(state.host);
     }else{
       await _loadHost(false);
       return;
@@ -280,6 +347,10 @@ async function _runAction(actionId){
 function _setTab(tabId){
   if(!tabId || tabId === state.tab) return;
   state.tab = tabId;
+  if(tabId === 'files' && !state.fileExplorer && state.selectedFileRootId){
+    _loadFiles(state.filePath || '', false);
+    return;
+  }
   _paint();
 }
 
@@ -288,6 +359,12 @@ function _setHost(hostId){
   state.selectedHostId = hostId;
   state.selectedTerminalId = '';
   state.selectedObservabilityId = '';
+  state.selectedFileRootId = '';
+  state.filePath = '';
+  state.fileQuery = '';
+  state.fileExplorer = null;
+  state.filePreview = null;
+  _resetFileHistory('');
   state.actionResult = null;
   _loadHost(true);
 }
@@ -302,6 +379,118 @@ function _setObservability(panelId){
   if(!panelId || panelId === state.selectedObservabilityId) return;
   state.selectedObservabilityId = panelId;
   _paint();
+}
+
+function _setFileRoot(rootId){
+  if(!rootId || rootId === state.selectedFileRootId) return;
+  state.selectedFileRootId = rootId;
+  state.filePath = '';
+  state.fileQuery = '';
+  state.fileExplorer = null;
+  state.filePreview = null;
+  _resetFileHistory('');
+  _loadFiles('', true);
+}
+
+function _fileParams(extra){
+  return Object.assign({
+    host_id: state.selectedHostId,
+    root_id: state.selectedFileRootId,
+    path: state.filePath || '',
+    hidden: state.fileShowHidden ? '1' : ''
+  }, extra || {});
+}
+
+async function _loadFiles(path, showToastOnSuccess, fromHistory){
+  if(!state.selectedHostId || !state.selectedFileRootId || state.fileLoading) return;
+  state.fileLoading = true;
+  state.filePath = String(path || '');
+  state.fileQuery = '';
+  state.filePreview = null;
+  _paint();
+  try{
+    var res = await _api('vps_file_list', _fileParams({path: state.filePath}), 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_list_failed');
+    state.fileExplorer = res.explorer || null;
+    state.filePath = String(state.fileExplorer && state.fileExplorer.path || '');
+    if(!fromHistory){
+      var currentHistoryPath = String(state.fileHistory[state.fileHistoryIndex] || '');
+      if(state.filePath !== currentHistoryPath){
+        state.fileHistory = state.fileHistory.slice(0, state.fileHistoryIndex + 1);
+        state.fileHistory.push(state.filePath);
+        if(state.fileHistory.length > 60){
+          state.fileHistory.shift();
+        }
+        state.fileHistoryIndex = state.fileHistory.length - 1;
+      }
+    }
+    if(showToastOnSuccess) _toast(_t('Đã tải thư mục.', 'Folder loaded.'), 'success');
+  }catch(err){
+    state.fileExplorer = {error: (err && err.message) || 'file_list_failed', entries: []};
+    _toast(_t('Không thể tải file explorer.', 'Could not load the file explorer.'), 'error');
+  }finally{
+    state.fileLoading = false;
+    _paint();
+  }
+}
+
+function _goFileHistory(delta){
+  var nextIndex = state.fileHistoryIndex + Number(delta || 0);
+  if(nextIndex < 0 || nextIndex >= state.fileHistory.length) return;
+  state.fileHistoryIndex = nextIndex;
+  _loadFiles(state.fileHistory[nextIndex] || '', false, true);
+}
+
+async function _searchFiles(query){
+  query = String(query || '').trim();
+  if(!query){
+    _loadFiles(state.filePath || '', false);
+    return;
+  }
+  if(!state.selectedHostId || !state.selectedFileRootId || state.fileLoading) return;
+  state.fileLoading = true;
+  state.fileQuery = query;
+  state.filePreview = null;
+  _paint();
+  try{
+    var res = await _api('vps_file_search', _fileParams({q: query}), 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_search_failed');
+    state.fileExplorer = res.explorer || null;
+  }catch(err){
+    state.fileExplorer = {error: (err && err.message) || 'file_search_failed', entries: []};
+    _toast(_t('Không thể tìm file.', 'Could not search files.'), 'error');
+  }finally{
+    state.fileLoading = false;
+    _paint();
+  }
+}
+
+async function _readFile(path){
+  if(!path || !state.selectedHostId || !state.selectedFileRootId || state.fileLoading) return;
+  state.fileLoading = true;
+  state.filePreview = null;
+  _paint();
+  try{
+    var res = await _api('vps_file_read', _fileParams({path: path}), 'GET', 30000);
+    if(!res || !res.ok) throw new Error((res && (res.detail || res.error)) || 'file_read_failed');
+    state.filePreview = res.explorer || null;
+  }catch(err){
+    state.filePreview = {error: (err && err.message) || 'file_read_failed'};
+    _toast(_t('Không thể đọc file.', 'Could not read the file.'), 'error');
+  }finally{
+    state.fileLoading = false;
+    _paint();
+  }
+}
+
+function _fileDownloadHref(path){
+  var params = new URLSearchParams();
+  params.set('action', 'vps_file_read');
+  params.set('host_id', state.selectedHostId || '');
+  params.set('root_id', state.selectedFileRootId || '');
+  params.set('path', path || '');
+  params.set('download', '1');
+  return 'api.php?' + params.toString();
 }
 
 function _summaryCards(metrics){
@@ -342,6 +531,12 @@ function _summaryCards(metrics){
       value: _fmtInt(metrics.healthy_observability_panels || 0) + '/' + _fmtInt(metrics.observability_panels || 0),
       tone: (metrics.healthy_observability_panels || 0) === (metrics.observability_panels || 0) ? 'good' : 'warn',
       detail: _t('Netdata/Grafana panel đang probe được thật.', 'Netdata and Grafana panels whose probes currently succeed.')
+    },
+    {
+      title: _t('File roots', 'File roots'),
+      value: _fmtInt(metrics.file_roots_count || 0),
+      tone: (metrics.file_roots_count || 0) > 0 ? 'good' : 'warn',
+      detail: _t('Root filesystem được allowlist cho file explorer.', 'Allowlisted filesystem roots available to the file explorer.')
     },
     {
       title: _t('Cảnh báo', 'Alerts'),
@@ -412,6 +607,7 @@ function _tabs(){
     {id:'overview', label:_t('Tổng quan live', 'Live overview')},
     {id:'services', label:_t('Service', 'Services')},
     {id:'network', label:_t('Site & DNS', 'Sites & DNS')},
+    {id:'files', label:'File Explorer'},
     {id:'terminal', label:'Terminal'},
     {id:'observability', label:'Observability'},
     {id:'actions', label:_t('Actions', 'Actions')}
@@ -431,12 +627,14 @@ function _healthCards(host){
   var dns = Array.isArray(host && host.dns_records) ? host.dns_records : [];
   var terminals = Array.isArray(host && host.terminals) ? host.terminals : [];
   var panels = Array.isArray(host && host.observability) ? host.observability : [];
+  var fileRoots = Array.isArray(host && host.file_roots) ? host.file_roots : [];
   var items = [
     {label:_t('Service active', 'Active services'), good:_countStatus(services, 'active'), total:services.length},
     {label:_t('Site HTTP OK', 'Healthy sites'), good:_countStatus(sites, 'ok'), total:sites.length},
     {label:'DNS', good:_countStatus(dns, 'ok'), total:dns.length},
     {label:'Terminal', good:_countStatus(terminals, 'ok'), total:terminals.length},
-    {label:'Observability', good:_countStatus(panels, 'ok'), total:panels.length}
+    {label:'Observability', good:_countStatus(panels, 'ok'), total:panels.length},
+    {label:_t('File roots', 'File roots'), good:fileRoots.length, total:fileRoots.length}
   ];
   return '<div class="vps-health-grid">' + items.map(function(item){
     var tone = item.total > 0 && item.good === item.total ? 'good' : (item.good > 0 ? 'warn' : 'bad');
@@ -738,6 +936,223 @@ function _networkTab(host){
     '</div>';
 }
 
+function _fileRootName(root){
+  return root && (root.label || root.id) ? String(root.label || root.id) : 'This VPS';
+}
+
+function _fileDisplayPath(path){
+  path = String(path || '').replace(/^\/+/, '');
+  return path ? '/' + path : '/';
+}
+
+function _filePathInputValue(path){
+  return String(path || '').replace(/^\/+/, '');
+}
+
+function _fileBaseName(path){
+  var parts = String(path || '').split('/').filter(Boolean);
+  return parts.length ? parts[parts.length - 1] : '/';
+}
+
+function _fileTypeLabel(item){
+  item = item || {};
+  if(item.type === 'directory') return _t('File folder', 'File folder');
+  if(item.type === 'symlink') return _t('Symbolic link', 'Symbolic link');
+  var ext = String(item.extension || '').replace(/^\./, '').toUpperCase();
+  if(ext) return ext + ' File';
+  return item.mime || _t('File', 'File');
+}
+
+function _fileIcon(item, large){
+  var type = item && item.type === 'directory' ? 'folder' : 'file';
+  return '<span class="vps-win-icon ' + _esc(type) + (large ? ' large' : '') + '" aria-hidden="true"></span>';
+}
+
+function _fileNavigationPane(host){
+  var roots = Array.isArray(host && host.file_roots) ? host.file_roots : [];
+  if(!roots.length){
+    return '<nav class="vps-win-nav"><div class="vps-win-nav-empty">' + _esc(_t('Host này chưa khai báo root cho File Explorer.', 'No file explorer root is declared for this host.')) + '</div></nav>';
+  }
+  var hostLabel = host && (host.label || host.id) ? String(host.label || host.id) : _t('VPS hiện tại', 'Current VPS');
+  return '' +
+    '<nav class="vps-win-nav" aria-label="File Explorer navigation">' +
+      '<div class="vps-win-nav-section">' +
+        '<div class="vps-win-nav-title">' + _esc(_t('Quick access', 'Quick access')) + '</div>' +
+        '<button class="vps-win-nav-item static" data-file-open="">' +
+          '<span class="vps-win-nav-glyph">PC</span><span>' + _esc(hostLabel) + '</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="vps-win-nav-section">' +
+        '<div class="vps-win-nav-title">' + _esc(_t('This VPS', 'This VPS')) + '</div>' +
+        roots.map(function(root){
+          var active = String(root.id || '') === String(state.selectedFileRootId || '');
+          return '<button class="vps-win-nav-item' + (active ? ' active' : '') + '" data-file-root="' + _esc(root.id || '') + '">' +
+            '<span class="vps-win-nav-glyph">D</span>' +
+            '<span><strong>' + _esc(root.label || root.id || '') + '</strong><small>' + _esc(root.path || '') + '</small></span>' +
+          '</button>';
+        }).join('') +
+      '</div>' +
+    '</nav>';
+}
+
+function _fileBreadcrumbs(path){
+  var root = _selectedFileRoot(state.host);
+  var parts = String(path || '').split('/').filter(Boolean);
+  var acc = '';
+  var nodes = [
+    '<button data-file-open="" class="vps-win-crumb">' + _esc(_t('This PC', 'This PC')) + '</button>',
+    '<button data-file-open="" class="vps-win-crumb">' + _esc(_fileRootName(root)) + '</button>'
+  ];
+  parts.forEach(function(part){
+    acc = acc ? acc + '/' + part : part;
+    nodes.push('<button data-file-open="' + _esc(acc) + '" class="vps-win-crumb">' + _esc(part) + '</button>');
+  });
+  return '<div class="vps-win-breadcrumbs">' + nodes.join('<span>›</span>') + '</div>';
+}
+
+function _fileToolbar(explorer){
+  explorer = explorer || {};
+  var path = String(explorer.path || state.filePath || '');
+  var parent = path ? String(explorer.parent_path || '') : '';
+  var backDisabled = state.fileHistoryIndex <= 0;
+  var forwardDisabled = state.fileHistoryIndex >= state.fileHistory.length - 1;
+  var searching = explorer.mode === 'search' || !!state.fileQuery;
+  return '' +
+    '<div class="vps-win-commandbar">' +
+      '<button class="vps-win-cmd" data-file-history="-1"' + (backDisabled ? ' disabled' : '') + ' aria-label="' + _esc(_t('Quay lại', 'Back')) + '">←</button>' +
+      '<button class="vps-win-cmd" data-file-history="1"' + (forwardDisabled ? ' disabled' : '') + ' aria-label="' + _esc(_t('Tiến tới', 'Forward')) + '">→</button>' +
+      '<button class="vps-win-cmd" data-file-parent="' + _esc(parent) + '"' + (!path ? ' disabled' : '') + ' aria-label="' + _esc(_t('Lên một cấp', 'Up')) + '">↑</button>' +
+      '<span class="vps-win-separator"></span>' +
+      '<button class="vps-win-cmd text" data-file-refresh="1">' + _esc(_t('Refresh', 'Refresh')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-hidden="1">' + _esc(state.fileShowHidden ? _t('Hide dotfiles', 'Hide dotfiles') : _t('Show dotfiles', 'Show dotfiles')) + '</button>' +
+      '<button class="vps-win-cmd text" data-file-clear-search="1"' + (!state.fileQuery ? ' disabled' : '') + '>' + _esc(_t('Clear search', 'Clear search')) + '</button>' +
+      '<span class="vps-win-mode">' + _esc(searching ? _t('Search results', 'Search results') : _t('Read-only', 'Read-only')) + '</span>' +
+    '</div>' +
+    '<div class="vps-win-address-row">' +
+      '<div class="vps-win-address">' +
+        _fileBreadcrumbs(path) +
+        '<div class="vps-win-path-entry">' +
+          '<span>' + _esc(_t('Path', 'Path')) + '</span>' +
+          '<input type="text" data-file-path-input value="' + _esc(_filePathInputValue(path)) + '" placeholder="/">' +
+          '<button class="vps-win-go" data-file-path-go="1">' + _esc(_t('Go', 'Go')) + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="vps-win-searchbox">' +
+        '<input type="search" data-file-search-input value="' + _esc(state.fileQuery || '') + '" placeholder="' + _esc(_t('Search files', 'Search files')) + '">' +
+        '<button data-file-search-submit="1">' + _esc(_t('Search', 'Search')) + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function _fileTable(explorer){
+  explorer = explorer || {};
+  if(explorer.error){
+    return '<div class="vps-win-empty danger">' + _esc(explorer.error) + '</div>';
+  }
+  var entries = Array.isArray(explorer.entries) ? explorer.entries : [];
+  if(state.fileLoading && !entries.length){
+    return '<div class="vps-win-empty">' + _esc(_t('Đang tải File Explorer...', 'Loading File Explorer...')) + '</div>';
+  }
+  if(!entries.length){
+    return '<div class="vps-win-empty">' + _esc(_t('Không có file phù hợp trong phạm vi này.', 'No matching files in this scope.')) + '</div>';
+  }
+  var selectedPath = state.filePreview && state.filePreview.file
+    ? String(state.filePreview.file.relative_path || state.filePreview.path || '')
+    : '';
+  return '<div class="vps-win-table-wrap"><table class="vps-win-table"><thead><tr>' +
+    '<th>' + _esc(_t('Name', 'Name')) + '</th>' +
+    '<th>' + _esc(_t('Date modified', 'Date modified')) + '</th>' +
+    '<th>' + _esc(_t('Type', 'Type')) + '</th>' +
+    '<th>' + _esc(_t('Size', 'Size')) + '</th>' +
+  '</tr></thead><tbody>' + entries.map(function(item){
+    var isDir = item.type === 'directory';
+    var isFile = item.type === 'file' || item.type === 'symlink';
+    var path = item.relative_path || '';
+    var nameButton = isDir
+      ? '<button class="vps-win-name dir" data-file-open="' + _esc(path) + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '') + '</span></button>'
+      : '<button class="vps-win-name" data-file-read="' + _esc(path) + '">' + _fileIcon(item) + '<span><strong>' + _esc(item.name || path || '/') + '</strong>' + (item.denied ? '<small>' + _esc(_t('Guarded by policy', 'Guarded by policy')) + '</small>' : (path ? '<small>' + _esc(_fileDisplayPath(path)) + '</small>' : '')) + '</span></button>';
+    return '<tr' + (selectedPath && selectedPath === String(path) ? ' class="selected"' : '') + '>' +
+      '<td>' + nameButton + '</td>' +
+      '<td>' + _esc(_fmtTime(item.modified_at)) + '</td>' +
+      '<td>' + _esc(_fileTypeLabel(item)) + (isDir && item.child_count != null ? '<small>' + _esc(_fmtInt(item.child_count) + ' items') + '</small>' : '') + '</td>' +
+      '<td>' + _esc(isFile ? _fmtBytes(item.size_bytes || 0) : '') + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody></table></div>';
+}
+
+function _fileDetailsPane(){
+  var preview = state.filePreview || null;
+  var root = _selectedFileRoot(state.host);
+  if(!preview){
+    return '' +
+      '<div class="vps-win-details-head">' +
+        _fileIcon({type:'directory'}, true) +
+        '<strong>' + _esc(_fileRootName(root)) + '</strong>' +
+        '<span>' + _esc(root && root.path ? root.path : _t('Chọn file để xem thông tin.', 'Select a file to view details.')) + '</span>' +
+      '</div>' +
+      '<div class="vps-win-detail-list">' +
+        '<div><span>' + _esc(_t('Mode', 'Mode')) + '</span><strong>' + _esc(_t('Read-only', 'Read-only')) + '</strong></div>' +
+        '<div><span>' + _esc(_t('Root', 'Root')) + '</span><strong>' + _esc(root && root.path ? root.path : '—') + '</strong></div>' +
+      '</div>' +
+      '<div class="vps-win-note">' + _esc(_t('Chọn file text để xem nhanh. File nhạy cảm chỉ hiện metadata và bị chặn preview/download.', 'Select a text file for preview. Sensitive files expose metadata only and block preview/download.')) + '</div>';
+  }
+  if(preview.error){
+    return '<div class="vps-win-empty danger">' + _esc(preview.error) + '</div>';
+  }
+  var file = preview.file || {};
+  var content = String(preview.content || '');
+  var filePath = file.relative_path || preview.path || '';
+  return '' +
+    '<div class="vps-win-details-head">' +
+      _fileIcon(file, true) +
+      '<strong>' + _esc(_fileBaseName(filePath)) + '</strong>' +
+      '<span>' + _esc(_fileDisplayPath(filePath)) + '</span>' +
+    '</div>' +
+    '<div class="vps-win-detail-actions">' +
+      (file.downloadable ? '<a class="vps-win-btn primary" href="' + _esc(_fileDownloadHref(filePath)) + '">' + _esc(_t('Download', 'Download')) + '</a>' : '') +
+    '</div>' +
+    '<div class="vps-win-detail-list">' +
+      '<div><span>' + _esc(_t('Type', 'Type')) + '</span><strong>' + _esc(_fileTypeLabel(file)) + '</strong></div>' +
+      '<div><span>' + _esc(_t('Size', 'Size')) + '</span><strong>' + _esc(_fmtBytes(file.size_bytes || 0)) + '</strong></div>' +
+      '<div><span>' + _esc(_t('Date modified', 'Date modified')) + '</span><strong>' + _esc(_fmtTime(file.modified_at)) + '</strong></div>' +
+      '<div><span>MIME</span><strong>' + _esc(file.mime || '—') + '</strong></div>' +
+      '<div><span>' + _esc(_t('Mode', 'Mode')) + '</span><strong>' + _esc(file.mode || '—') + '</strong></div>' +
+    '</div>' +
+    (content
+      ? '<div class="vps-win-preview"><pre>' + _esc(content) + '</pre></div>'
+      : '<div class="vps-win-note warn">' + _esc(file.denied ? _t('File này khớp guardrail bảo mật nên không được preview.', 'This file matches a security guardrail and cannot be previewed.') : _t('File này không phải text hoặc vượt giới hạn preview.', 'This file is not text or exceeds the preview limit.')) + '</div>');
+}
+
+function _filesTab(host){
+  if(!host){
+    return '<section class="vps-win-explorer"><div class="vps-win-titlebar"><div class="vps-win-title-left"><span class="vps-win-appicon"></span><strong>File Explorer</strong></div></div><div class="vps-win-empty">' + _esc(_t('Chưa có host live để hiển thị File Explorer.', 'No live host is available to display File Explorer.')) + '</div></section>';
+  }
+  _syncFileRootSelection(host);
+  var explorer = state.fileExplorer || null;
+  var summary = explorer && explorer.summary ? explorer.summary : {};
+  var root = _selectedFileRoot(host);
+  var entriesCount = summary.count != null ? Number(summary.count || 0) : (explorer && Array.isArray(explorer.entries) ? explorer.entries.length : 0);
+  var selectedName = state.filePreview && state.filePreview.file ? _fileBaseName(state.filePreview.file.relative_path || state.filePreview.path || '') : '';
+  return '' +
+    '<section class="vps-win-explorer" aria-label="File Explorer">' +
+      '<div class="vps-win-titlebar">' +
+        '<div class="vps-win-title-left"><span class="vps-win-appicon"></span><strong>File Explorer</strong><span>' + _esc(root ? _fileRootName(root) : _t('No root', 'No root')) + '</span></div>' +
+        '<div class="vps-win-window-controls" aria-hidden="true"><span></span><span></span><span></span></div>' +
+      '</div>' +
+      _fileToolbar(explorer || {path: state.filePath || ''}) +
+      '<div class="vps-win-body">' +
+        _fileNavigationPane(host) +
+        '<main class="vps-win-main">' + _fileTable(explorer || {entries: []}) + '</main>' +
+        '<aside class="vps-win-details" aria-label="Details pane">' + _fileDetailsPane() + '</aside>' +
+      '</div>' +
+      '<div class="vps-win-statusbar">' +
+        '<span>' + _esc(_fmtInt(entriesCount) + ' items') + '</span>' +
+        '<span>' + _esc(selectedName ? (_t('Selected', 'Selected') + ': ' + selectedName) : _t('No item selected', 'No item selected')) + '</span>' +
+        '<span>' + _esc(root && root.path ? root.path : '') + '</span>' +
+      '</div>' +
+    '</section>';
+}
+
 function _terminalTab(host, overview){
   if(!host){
     return _empty(_t('Chưa có host live để hiển thị terminal.', 'No live host is available to display terminals.'));
@@ -820,6 +1235,9 @@ function _body(){
     return _empty(overview.error);
   }
   var hosts = Array.isArray(overview.hosts) ? overview.hosts : [];
+  if(state.tab === 'files'){
+    return _filesTab(state.host);
+  }
   var body = _header(overview, state.host || {}) + _summaryCards(overview.metrics || {});
   body += _tabs();
   body += _hostPicker(hosts);
@@ -839,7 +1257,7 @@ function _paint(){
     state.container.innerHTML = '<div class="vps-ct"><div class="vps-panel"><div class="vps-panel-body"><div class="vps-empty">' + _esc(_t('Đang tải trạng thái VPS live...', 'Loading the live VPS state...')) + '</div></div></div></div>';
     return;
   }
-  state.container.innerHTML = '<div class="vps-ct">' + _body() + '</div>';
+  state.container.innerHTML = '<div class="vps-ct' + (state.tab === 'files' ? ' vps-ct-file-mode' : '') + '">' + _body() + '</div>';
   _bind();
 }
 
@@ -859,6 +1277,69 @@ function _bind(){
   });
   state.container.querySelectorAll('[data-observability-id]').forEach(function(btn){
     btn.onclick = function(){ _setObservability(btn.getAttribute('data-observability-id')); };
+  });
+  state.container.querySelectorAll('[data-file-root]').forEach(function(btn){
+    btn.onclick = function(){ _setFileRoot(btn.getAttribute('data-file-root')); };
+  });
+  state.container.querySelectorAll('[data-file-open]').forEach(function(btn){
+    btn.onclick = function(){ _loadFiles(btn.getAttribute('data-file-open') || '', true); };
+  });
+  state.container.querySelectorAll('[data-file-parent]').forEach(function(btn){
+    btn.onclick = function(){ _loadFiles(btn.getAttribute('data-file-parent') || '', true); };
+  });
+  state.container.querySelectorAll('[data-file-history]').forEach(function(btn){
+    btn.onclick = function(){ _goFileHistory(Number(btn.getAttribute('data-file-history') || 0)); };
+  });
+  state.container.querySelectorAll('[data-file-refresh]').forEach(function(btn){
+    btn.onclick = function(){
+      if(state.fileQuery) _searchFiles(state.fileQuery);
+      else _loadFiles(state.filePath || '', false, true);
+    };
+  });
+  state.container.querySelectorAll('[data-file-read]').forEach(function(btn){
+    btn.onclick = function(){ _readFile(btn.getAttribute('data-file-read') || ''); };
+  });
+  state.container.querySelectorAll('[data-file-hidden]').forEach(function(btn){
+    btn.onclick = function(){
+      state.fileShowHidden = !state.fileShowHidden;
+      if(state.fileQuery) _searchFiles(state.fileQuery);
+      else _loadFiles(state.filePath || '', false, true);
+    };
+  });
+  state.container.querySelectorAll('[data-file-path-go]').forEach(function(btn){
+    btn.onclick = function(){
+      var input = state.container.querySelector('[data-file-path-input]');
+      var value = input ? String(input.value || '').trim().replace(/^\/+/, '') : '';
+      _loadFiles(value, true);
+    };
+  });
+  state.container.querySelectorAll('[data-file-path-input]').forEach(function(input){
+    input.onkeydown = function(event){
+      if(event.key === 'Enter'){
+        event.preventDefault();
+        _loadFiles(String(input.value || '').trim().replace(/^\/+/, ''), true);
+      }
+    };
+  });
+  state.container.querySelectorAll('[data-file-search-submit]').forEach(function(btn){
+    btn.onclick = function(){
+      var input = state.container.querySelector('[data-file-search-input]');
+      _searchFiles(input ? input.value : '');
+    };
+  });
+  state.container.querySelectorAll('[data-file-search-input]').forEach(function(input){
+    input.onkeydown = function(event){
+      if(event.key === 'Enter'){
+        event.preventDefault();
+        _searchFiles(input.value);
+      }
+    };
+  });
+  state.container.querySelectorAll('[data-file-clear-search]').forEach(function(btn){
+    btn.onclick = function(){
+      state.fileQuery = '';
+      _loadFiles(state.filePath || '', false, true);
+    };
   });
   state.container.querySelectorAll('[data-refresh-live]').forEach(function(btn){
     btn.onclick = function(){ _refresh(); };

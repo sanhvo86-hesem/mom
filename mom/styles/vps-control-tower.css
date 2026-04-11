@@ -1034,10 +1034,907 @@
   margin-top:12px;
 }
 
+.vps-file-shell{
+  grid-template-columns:minmax(0,1.45fr) minmax(360px,.75fr);
+}
+
+.vps-file-root-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:10px;
+}
+
+.vps-file-root{
+  text-align:left;
+  padding:14px 15px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid rgba(148,163,184,0.18);
+  cursor:pointer;
+}
+
+.vps-file-root.active{
+  border-color:rgba(15,118,110,0.42);
+  box-shadow:0 12px 26px rgba(15,23,42,0.08);
+}
+
+.vps-file-root strong,
+.vps-file-root code,
+.vps-file-root span{
+  display:block;
+}
+
+.vps-file-root code{
+  margin-top:8px;
+  color:#0f766e;
+  font-size:12px;
+  word-break:break-word;
+}
+
+.vps-file-root span{
+  margin-top:8px;
+  color:var(--vps-ink-soft);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.vps-file-toolbar{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:14px;
+  border-radius:8px;
+  background:#f8fafc;
+  border:1px solid rgba(148,163,184,0.16);
+}
+
+.vps-file-toolbar small{
+  display:block;
+  color:var(--vps-ink-soft);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:11px;
+  margin-bottom:8px;
+}
+
+.vps-file-actions,
+.vps-file-row-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+
+.vps-file-crumbs{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  color:var(--vps-ink-soft);
+}
+
+.vps-file-crumb{
+  border:0;
+  padding:4px 6px;
+  border-radius:6px;
+  background:#eaf3f2;
+  color:#0f766e;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.vps-file-search{
+  display:grid;
+  grid-template-columns:minmax(180px,1fr) auto auto;
+  gap:10px;
+  margin-top:12px;
+}
+
+.vps-file-search input{
+  min-width:0;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid rgba(148,163,184,0.24);
+  background:#fff;
+  color:var(--vps-ink);
+  font:inherit;
+}
+
+.vps-file-table td{
+  vertical-align:middle;
+}
+
+.vps-file-name{
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#0f172a;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+}
+
+.vps-file-name.dir{
+  color:#0f766e;
+}
+
+.vps-file-path{
+  margin-top:5px;
+  color:var(--vps-ink-soft);
+  font-size:12px;
+  word-break:break-word;
+}
+
+.vps-file-preview-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+
+.vps-file-preview-head small{
+  display:block;
+  color:var(--vps-ink-soft);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:11px;
+  margin-bottom:6px;
+}
+
+.vps-file-preview-head strong{
+  display:block;
+  word-break:break-word;
+}
+
+.vps-keyval.compact{
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+}
+
+.vps-file-preview{
+  max-height:560px;
+  overflow:auto;
+  border-radius:8px;
+  background:#06111c;
+  border:1px solid rgba(94,234,212,0.12);
+}
+
+.vps-file-preview pre{
+  margin:0;
+  padding:14px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  color:#d6f5df;
+  font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:12px;
+  line-height:1.7;
+}
+
+.vps-ct.vps-ct-file-mode{
+  max-width:none;
+  padding:10px 12px 18px;
+}
+
+.vps-win-explorer{
+  min-height:calc(100vh - 122px);
+  height:calc(100vh - 122px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid #cfd6df;
+  border-radius:8px;
+  background:#f3f3f3;
+  color:#1f2937;
+  box-shadow:0 16px 38px rgba(15,23,42,0.12);
+  font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+
+.vps-win-titlebar{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 10px 0 12px;
+  background:#f7f7f7;
+  border-bottom:1px solid #d9dde3;
+  user-select:none;
+}
+
+.vps-win-title-left{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#1f2937;
+  font-size:12px;
+}
+
+.vps-win-title-left strong{
+  font-size:13px;
+  font-weight:650;
+}
+
+.vps-win-title-left span:last-child{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#64748b;
+}
+
+.vps-win-appicon{
+  width:18px;
+  height:14px;
+  position:relative;
+  flex:0 0 18px;
+  border-radius:2px;
+  background:#f6c344;
+  border:1px solid #d69d00;
+}
+
+.vps-win-appicon:before{
+  content:"";
+  position:absolute;
+  left:1px;
+  top:-4px;
+  width:8px;
+  height:5px;
+  border-radius:2px 2px 0 0;
+  background:#ffd766;
+  border:1px solid #d69d00;
+  border-bottom:0;
+}
+
+.vps-win-window-controls{
+  display:flex;
+  align-items:center;
+  gap:2px;
+}
+
+.vps-win-window-controls span{
+  width:38px;
+  height:28px;
+  display:block;
+  border-radius:4px;
+  position:relative;
+}
+
+.vps-win-window-controls span:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:12px;
+  height:1px;
+  background:#475569;
+}
+
+.vps-win-window-controls span:nth-child(2):before{
+  width:10px;
+  height:10px;
+  border:1px solid #475569;
+  background:transparent;
+}
+
+.vps-win-window-controls span:nth-child(3):before,
+.vps-win-window-controls span:nth-child(3):after{
+  width:13px;
+  height:1px;
+  background:#475569;
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+
+.vps-win-window-controls span:nth-child(3):after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+
+.vps-win-commandbar{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  background:#fbfbfb;
+  border-bottom:1px solid #e0e4ea;
+}
+
+.vps-win-cmd,
+.vps-win-go,
+.vps-win-searchbox button,
+.vps-win-btn{
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border:1px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  color:#1f2937;
+  font:inherit;
+  font-size:12px;
+  font-weight:600;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.vps-win-cmd{
+  min-width:34px;
+  padding:0 9px;
+}
+
+.vps-win-cmd.text{
+  min-width:0;
+}
+
+.vps-win-cmd:hover,
+.vps-win-go:hover,
+.vps-win-searchbox button:hover,
+.vps-win-btn:hover{
+  background:#eef2f7;
+  border-color:#d8dee8;
+}
+
+.vps-win-cmd:disabled,
+.vps-win-go:disabled,
+.vps-win-searchbox button:disabled,
+.vps-win-btn:disabled{
+  color:#9ca3af;
+  cursor:not-allowed;
+  background:transparent;
+}
+
+.vps-win-separator{
+  width:1px;
+  height:24px;
+  margin:0 3px;
+  background:#d9dde3;
+}
+
+.vps-win-mode{
+  margin-left:auto;
+  padding:5px 9px;
+  border-radius:4px;
+  background:#eef6ff;
+  color:#1d4f91;
+  font-size:12px;
+  font-weight:650;
+}
+
+.vps-win-address-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(260px,360px);
+  gap:8px;
+  padding:8px 10px;
+  background:#fff;
+  border-bottom:1px solid #e0e4ea;
+}
+
+.vps-win-address,
+.vps-win-searchbox,
+.vps-win-path-entry{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.vps-win-address{
+  border:1px solid #cfd6df;
+  border-radius:4px;
+  padding:4px 6px;
+  background:#fff;
+}
+
+.vps-win-breadcrumbs{
+  min-width:180px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  overflow:hidden;
+  color:#6b7280;
+  white-space:nowrap;
+}
+
+.vps-win-crumb{
+  border:0;
+  border-radius:4px;
+  padding:4px 5px;
+  background:transparent;
+  color:#1f2937;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.vps-win-crumb:hover{
+  background:#eef2f7;
+}
+
+.vps-win-path-entry{
+  flex:1 1 240px;
+  border-left:1px solid #e5e7eb;
+  padding-left:8px;
+}
+
+.vps-win-path-entry span{
+  color:#6b7280;
+  font-size:11px;
+  font-weight:650;
+}
+
+.vps-win-path-entry input,
+.vps-win-searchbox input{
+  min-width:0;
+  width:100%;
+  height:28px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#1f2937;
+  font:inherit;
+  font-size:12px;
+}
+
+.vps-win-go,
+.vps-win-searchbox button{
+  flex:0 0 auto;
+  padding:0 10px;
+  background:#f6f8fb;
+  border-color:#d8dee8;
+}
+
+.vps-win-searchbox{
+  border:1px solid #cfd6df;
+  border-radius:4px;
+  padding:4px 4px 4px 10px;
+  background:#fff;
+}
+
+.vps-win-body{
+  min-height:0;
+  flex:1 1 auto;
+  display:grid;
+  grid-template-columns:250px minmax(0,1fr) 330px;
+  background:#fff;
+}
+
+.vps-win-nav{
+  min-height:0;
+  overflow:auto;
+  padding:10px 8px;
+  background:#f7f7f7;
+  border-right:1px solid #e0e4ea;
+}
+
+.vps-win-nav-section + .vps-win-nav-section{
+  margin-top:14px;
+}
+
+.vps-win-nav-title{
+  padding:5px 8px 6px;
+  color:#6b7280;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+}
+
+.vps-win-nav-item{
+  width:100%;
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:6px 8px;
+  border:1px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  color:#1f2937;
+  text-align:left;
+  cursor:pointer;
+}
+
+.vps-win-nav-item:hover{
+  background:#eef2f7;
+}
+
+.vps-win-nav-item.active{
+  background:#dbeafe;
+  border-color:#bfdbfe;
+}
+
+.vps-win-nav-item span:last-child{
+  min-width:0;
+}
+
+.vps-win-nav-item strong,
+.vps-win-nav-item small{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.vps-win-nav-item strong{
+  font-size:12px;
+  font-weight:650;
+}
+
+.vps-win-nav-item small{
+  margin-top:2px;
+  color:#64748b;
+  font-size:11px;
+}
+
+.vps-win-nav-glyph{
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  background:#e5e7eb;
+  color:#475569;
+  font-size:10px;
+  font-weight:800;
+}
+
+.vps-win-nav-item.active .vps-win-nav-glyph{
+  background:#2563eb;
+  color:#fff;
+}
+
+.vps-win-nav-empty,
+.vps-win-empty{
+  margin:14px;
+  padding:18px;
+  border:1px solid #d8dee8;
+  border-radius:6px;
+  background:#fff;
+  color:#64748b;
+  font-size:13px;
+}
+
+.vps-win-empty.danger{
+  border-color:#fecaca;
+  background:#fef2f2;
+  color:#991b1b;
+}
+
+.vps-win-main{
+  min-width:0;
+  min-height:0;
+  overflow:auto;
+  background:#fff;
+}
+
+.vps-win-table-wrap{
+  min-width:720px;
+}
+
+.vps-win-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:12px;
+}
+
+.vps-win-table th{
+  position:sticky;
+  top:0;
+  z-index:1;
+  height:32px;
+  padding:0 11px;
+  border-bottom:1px solid #e0e4ea;
+  background:#fff;
+  color:#475569;
+  font-weight:650;
+  text-align:left;
+}
+
+.vps-win-table th:not(:last-child),
+.vps-win-table td:not(:last-child){
+  border-right:1px solid #f0f2f5;
+}
+
+.vps-win-table td{
+  height:42px;
+  padding:4px 11px;
+  border-bottom:1px solid #f2f4f7;
+  color:#374151;
+  vertical-align:middle;
+}
+
+.vps-win-table tr:hover td{
+  background:#f3f7ff;
+}
+
+.vps-win-table tr.selected td{
+  background:#dbeafe;
+}
+
+.vps-win-table th:nth-child(1),
+.vps-win-table td:nth-child(1){ width:44%; }
+.vps-win-table th:nth-child(2),
+.vps-win-table td:nth-child(2){ width:22%; }
+.vps-win-table th:nth-child(3),
+.vps-win-table td:nth-child(3){ width:22%; }
+.vps-win-table th:nth-child(4),
+.vps-win-table td:nth-child(4){ width:12%; text-align:right; }
+
+.vps-win-table small{
+  display:block;
+  margin-top:2px;
+  color:#64748b;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.vps-win-name{
+  min-width:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#1f2937;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+
+.vps-win-name span{
+  min-width:0;
+}
+
+.vps-win-name strong{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:500;
+}
+
+.vps-win-name.dir strong{
+  font-weight:600;
+}
+
+.vps-win-icon{
+  width:19px;
+  height:16px;
+  position:relative;
+  flex:0 0 19px;
+  display:inline-block;
+}
+
+.vps-win-icon.folder{
+  border:1px solid #d49b00;
+  border-radius:2px;
+  background:#f7c948;
+}
+
+.vps-win-icon.folder:before{
+  content:"";
+  position:absolute;
+  left:1px;
+  top:-5px;
+  width:9px;
+  height:5px;
+  border:1px solid #d49b00;
+  border-bottom:0;
+  border-radius:2px 2px 0 0;
+  background:#ffd766;
+}
+
+.vps-win-icon.file{
+  width:15px;
+  height:19px;
+  border:1px solid #94a3b8;
+  border-radius:2px;
+  background:#fff;
+}
+
+.vps-win-icon.file:before{
+  content:"";
+  position:absolute;
+  right:-1px;
+  top:-1px;
+  width:6px;
+  height:6px;
+  border-left:1px solid #94a3b8;
+  border-bottom:1px solid #94a3b8;
+  background:#e8eef6;
+}
+
+.vps-win-icon.large{
+  width:56px;
+  height:44px;
+  flex:0 0 auto;
+  margin:2px auto 12px;
+}
+
+.vps-win-icon.folder.large:before{
+  top:-10px;
+  width:24px;
+  height:10px;
+}
+
+.vps-win-icon.file.large{
+  width:42px;
+  height:56px;
+}
+
+.vps-win-icon.file.large:before{
+  width:15px;
+  height:15px;
+}
+
+.vps-win-details{
+  min-width:0;
+  min-height:0;
+  overflow:auto;
+  padding:18px 16px;
+  background:#fbfbfb;
+  border-left:1px solid #e0e4ea;
+}
+
+.vps-win-details-head{
+  text-align:center;
+  border-bottom:1px solid #e5e7eb;
+  padding-bottom:16px;
+  margin-bottom:14px;
+}
+
+.vps-win-details-head strong{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#111827;
+  font-size:15px;
+}
+
+.vps-win-details-head span{
+  display:block;
+  margin-top:6px;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+
+.vps-win-detail-actions{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.vps-win-btn{
+  width:100%;
+  padding:0 12px;
+  background:#f6f8fb;
+  border-color:#d8dee8;
+}
+
+.vps-win-btn.primary{
+  background:#2563eb;
+  border-color:#1d4ed8;
+  color:#fff;
+}
+
+.vps-win-detail-list{
+  display:grid;
+  gap:1px;
+  margin-bottom:14px;
+  border:1px solid #e5e7eb;
+  border-radius:6px;
+  overflow:hidden;
+}
+
+.vps-win-detail-list div{
+  display:grid;
+  grid-template-columns:104px minmax(0,1fr);
+  gap:8px;
+  padding:9px 10px;
+  background:#fff;
+}
+
+.vps-win-detail-list span{
+  color:#64748b;
+  font-size:12px;
+}
+
+.vps-win-detail-list strong{
+  min-width:0;
+  color:#1f2937;
+  font-size:12px;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+
+.vps-win-preview{
+  max-height:46vh;
+  overflow:auto;
+  border:1px solid #d8dee8;
+  border-radius:6px;
+  background:#0b1220;
+}
+
+.vps-win-preview pre{
+  margin:0;
+  padding:12px;
+  color:#d1fae5;
+  font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:12px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.vps-win-note{
+  padding:12px;
+  border:1px solid #d8dee8;
+  border-radius:6px;
+  background:#fff;
+  color:#475569;
+  font-size:12px;
+  line-height:1.6;
+}
+
+.vps-win-note.warn{
+  border-color:#fde68a;
+  background:#fffbeb;
+  color:#92400e;
+}
+
+.vps-win-statusbar{
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:0 12px;
+  border-top:1px solid #d9dde3;
+  background:#f7f7f7;
+  color:#475569;
+  font-size:12px;
+}
+
+.vps-win-statusbar span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.vps-win-statusbar span:last-child{
+  margin-left:auto;
+  max-width:48%;
+}
+
 @media (max-width: 1180px){
   .vps-ops-header,
   .vps-shell-grid{
     grid-template-columns:1fr;
+  }
+  .vps-win-address-row{
+    grid-template-columns:1fr;
+  }
+  .vps-win-body{
+    grid-template-columns:220px minmax(0,1fr);
+  }
+  .vps-win-details{
+    display:none;
   }
 }
 
@@ -1051,6 +1948,57 @@
   .vps-ops-header-actions{
     justify-content:flex-start;
   }
+  .vps-file-toolbar,
+  .vps-file-preview-head{
+    flex-direction:column;
+  }
+  .vps-file-search{
+    grid-template-columns:1fr;
+  }
+  .vps-ct.vps-ct-file-mode{
+    padding:6px;
+  }
+  .vps-win-explorer{
+    min-height:620px;
+    height:calc(100vh - 86px);
+  }
+  .vps-win-commandbar{
+    overflow-x:auto;
+    align-items:center;
+  }
+  .vps-win-mode{
+    margin-left:0;
+    flex:0 0 auto;
+  }
+  .vps-win-address{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .vps-win-breadcrumbs{
+    min-width:0;
+    overflow-x:auto;
+    padding-bottom:2px;
+  }
+  .vps-win-path-entry{
+    border-left:0;
+    border-top:1px solid #e5e7eb;
+    padding:5px 0 0;
+  }
+  .vps-win-body{
+    grid-template-columns:1fr;
+  }
+  .vps-win-nav{
+    display:none;
+  }
+  .vps-win-table-wrap{
+    min-width:640px;
+  }
+  .vps-win-window-controls{
+    display:none;
+  }
+  .vps-win-statusbar span:last-child{
+    display:none;
+  }
 }
 
 [data-color-mode="dark"] .vps-ops-header,
@@ -1058,6 +2006,9 @@
 [data-color-mode="dark"] .vps-health-card,
 [data-color-mode="dark"] .vps-meter-card,
 [data-color-mode="dark"] .vps-endpoint-card,
+[data-color-mode="dark"] .vps-file-root,
+[data-color-mode="dark"] .vps-file-toolbar,
+[data-color-mode="dark"] .vps-file-search input,
 [data-color-mode="dark"] .vps-chip{
   background:#111c2e;
   border-color:rgba(148,163,184,0.22);
@@ -1065,6 +2016,7 @@
 }
 
 [data-color-mode="dark"] .vps-section-kicker,
+[data-color-mode="dark"] .vps-file-crumb,
 [data-color-mode="dark"] .vps-endpoint-meta span{
   background:#1e293b;
   color:#cbd5e1;
@@ -1079,6 +2031,15 @@
 [data-color-mode="dark"] .vps-link-btn.primary{
   background:#f8fafc;
   color:#0f172a;
+}
+
+[data-color-mode="dark"] .vps-file-name{
+  color:#e2e8f0;
+}
+
+[data-color-mode="dark"] .vps-file-name.dir,
+[data-color-mode="dark"] .vps-file-root code{
+  color:#5eead4;
 }
 
 [data-color-mode="dark"] .vps-alert-item{

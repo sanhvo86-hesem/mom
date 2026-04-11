@@ -14,6 +14,7 @@ class SchemaStudioController extends BaseController
 {
     private const DESIGN_SAVE_MAX_BYTES = 6291456;
     private const SYSTEM_DESIGN_ID = 'workspace';
+    private const SYSTEM_REGISTRY_DESIGN_ID = 'system_contract_registry';
 
     private string $studioDir;
     private string $designDir;
@@ -88,7 +89,29 @@ class SchemaStudioController extends BaseController
 
     private function normalizeDesignId(string $designId): string
     {
+        $id = $this->safeId($designId, self::SYSTEM_DESIGN_ID);
+        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            return self::SYSTEM_REGISTRY_DESIGN_ID;
+        }
         return self::SYSTEM_DESIGN_ID;
+    }
+
+    private function isReadOnlyDesignId(string $designId): bool
+    {
+        return $this->normalizeDesignId($designId) === self::SYSTEM_REGISTRY_DESIGN_ID;
+    }
+
+    private function requireEditableDesign(string $designId): string
+    {
+        $id = $this->normalizeDesignId($designId);
+        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            $this->error(
+                'read_only_schema_layer',
+                409,
+                'System Contract Registry is a read-only authority view. Edit the workspace design or promote changes through migrations/registry generation.'
+            );
+        }
+        return $id;
     }
 
     private function endsWith(string $value, string $suffix): bool
@@ -207,6 +230,21 @@ class SchemaStudioController extends BaseController
      */
     private function currentDesignRevisions(string $designId): array
     {
+        $designId = $this->normalizeDesignId($designId);
+        if ($designId === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            return [
+                'designId' => $designId,
+                'capturedAt' => $this->nowIso(),
+                'readOnly' => true,
+                'files' => [
+                    'design' => $this->fileRevision($this->registryDirPath() . '/table-registry.json'),
+                    'baseline' => $this->fileRevision($this->registryDirPath() . '/schema-authority-summary.json'),
+                    'relation_map' => $this->fileRevision($this->registryDirPath() . '/relation-map.json'),
+                    'domain_architecture' => $this->fileRevision($this->registryDirPath() . '/domain-architecture.json'),
+                ],
+            ];
+        }
+
         return [
             'designId' => $designId,
             'capturedAt' => $this->nowIso(),
@@ -1620,11 +1658,28 @@ class SchemaStudioController extends BaseController
     private function designCandidatePaths(string $designId): array
     {
         $id = $this->normalizeDesignId($designId);
+        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            return [];
+        }
         return [$this->designPath($id)];
     }
 
     private function loadDesignDocument(string $designId): ?array
     {
+        $id = $this->normalizeDesignId($designId);
+        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            return $this->buildRegistryDesignDocument(self::SYSTEM_REGISTRY_DESIGN_ID, [
+                'name' => 'HESEM System Contract Registry',
+                'description' => 'Read-only full backend contract registry generated from migrations, workflow contracts, and registry publication artifacts.',
+                'source' => 'data/registry/table-registry.json',
+                'designType' => 'system_contract_registry',
+                'authorityLayer' => 'system_contract_registry',
+                'readOnly' => true,
+                'editable' => false,
+                'validation_profile' => 'logical_registry',
+            ]);
+        }
+
         foreach ($this->designCandidatePaths($designId) as $path) {
             $doc = $this->readJsonFile($path);
             if (is_array($doc)) {
@@ -1637,6 +1692,19 @@ class SchemaStudioController extends BaseController
     private function loadBaselineDocument(string $designId, ?array $design = null): array
     {
         $id = $this->normalizeDesignId($designId);
+        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
+            return is_array($design) ? $design : [
+                '_meta' => [
+                    'id' => self::SYSTEM_REGISTRY_DESIGN_ID . '_baseline',
+                    'readOnly' => true,
+                    'authorityLayer' => 'system_contract_registry',
+                ],
+                'tables' => [],
+                'relations' => [],
+                'groups' => [],
+                'notes' => [],
+            ];
+        }
         $paths = [$this->baselinePath($id)];
         foreach ($paths as $path) {
             $doc = $this->readJsonFile($path);
@@ -4880,6 +4948,288 @@ class SchemaStudioController extends BaseController
         }
     }
 
+    /**
+     * Build a Schema Studio document directly from the published registry
+     * contract without creating or mutating a design file.
+     *
+     * @param array<string, mixed> $meta
+     * @return array<string, mixed>
+     */
+    private function buildRegistryDesignDocument(string $id, array $meta): array
+    {
+        $registryPath = $this->dataDir . '/registry/table-registry.json';
+        $relationPath = $this->dataDir . '/registry/relation-map.json';
+        $domainPath = $this->dataDir . '/registry/domain-architecture.json';
+        $tableRegistry = $this->readJsonFile($registryPath) ?? [];
+        $relationMap = $this->readJsonFile($relationPath) ?? [];
+        $domainArch = $this->readJsonFile($domainPath) ?? [];
+        $registryUpdatedAt = is_file($registryPath) ? gmdate('c', (int)(filemtime($registryPath) ?: time())) : $this->nowIso();
+
+        $domainMap = [];
+        foreach (($domainArch['domains'] ?? []) as $domainKey => $domainDef) {
+            $tables = is_array($domainDef['tables'] ?? null) ? $domainDef['tables'] : [];
+            foreach ($tables as $tableName) {
+                $domainMap[(string)$tableName] = (string)$domainKey;
+            }
+        }
+
+        $schema = [
+            '_meta' => array_merge([
+                'id' => $id,
+                'name' => 'HESEM System Contract Registry',
+                'displayName' => 'System Contract Registry',
+                'version' => '1.0.0',
+                'description' => 'Read-only full backend contract registry.',
+                'purpose' => 'Full backend contract visibility for AI, frontend, API governance, workflow mapping, and audit without editing the database.',
+                'source' => 'data/registry/table-registry.json',
+                'designType' => 'system_contract_registry',
+                'authorityLayer' => 'system_contract_registry',
+                'authorityViewKind' => 'db_derived_contract',
+                'writePolicy' => 'read_only_generated_artifact',
+                'deletePolicy' => 'do_not_delete_regenerate_from_authority',
+                'dataLossImpact' => 'Deleting this artifact does not delete DB rows, but removes full contract visibility until registry publication is regenerated.',
+                'validation_profile' => 'logical_registry',
+                'schemaName' => 'public',
+                'databaseName' => 'mom',
+                'storageAuthority' => 'database/migrations/*.sql -> database/schema.sql',
+                'registryAuthority' => 'data/registry/table-registry.json',
+                'createdAt' => (string)(($tableRegistry['_meta']['generatedAt'] ?? null) ?: $registryUpdatedAt),
+                'updatedAt' => (string)(($tableRegistry['_meta']['generatedAt'] ?? null) ?: $registryUpdatedAt),
+                'author' => 'registry',
+                'readOnly' => true,
+                'editable' => false,
+            ], $meta),
+            'enums' => [],
+            'tables' => [],
+            'relations' => [],
+            'groups' => [],
+            'notes' => [],
+        ];
+
+        $tableMap = [];
+        $colMap = [];
+        $columnIndexMap = [];
+        $tables = is_array($tableRegistry['tables'] ?? null) ? $tableRegistry['tables'] : [];
+        $tableIndex = 0;
+        foreach ($tables as $tableName => $tableDef) {
+            if (!is_string($tableName) || !is_array($tableDef)) {
+                continue;
+            }
+
+            $tableId = 'tbl_' . substr(md5($id . '.' . $tableName), 0, 10);
+            $tableMap[$tableName] = $tableId;
+            $columns = [];
+            $rawColumns = is_array($tableDef['columns'] ?? null) ? $tableDef['columns'] : [];
+            $pkFields = $this->normalizeFieldList($tableDef['primaryKey'] ?? ($tableDef['primaryKeys'] ?? []));
+            foreach ($rawColumns as $columnName => $columnDef) {
+                $name = is_string($columnName)
+                    ? $columnName
+                    : (is_array($columnDef) ? (string)($columnDef['name'] ?? '') : (string)$columnDef);
+                if ($name === '') {
+                    continue;
+                }
+
+                $colId = 'col_' . substr(md5($id . '.' . $tableName . '.' . $name), 0, 10);
+                $colMap[$tableName . '.' . $name] = $colId;
+                $isIdentifier = $this->endsWith($name, '_id') || $name === 'id';
+                $type = is_array($columnDef)
+                    ? (string)($columnDef['type'] ?? ($isIdentifier ? 'uuid' : 'varchar'))
+                    : ($isIdentifier ? 'uuid' : 'varchar');
+                $isPk = !empty($pkFields) ? in_array($name, $pkFields, true) : $name === 'id';
+                $pkOrder = $isPk ? array_search($name, $pkFields, true) : false;
+                $required = is_array($columnDef) && array_key_exists('required', $columnDef) ? (bool)$columnDef['required'] : null;
+                $defaultVal = is_array($columnDef) && array_key_exists('default', $columnDef) ? $columnDef['default'] : null;
+                $columns[] = [
+                    'id' => $colId,
+                    'name' => $name,
+                    'type' => $type,
+                    'length' => null,
+                    'scale' => null,
+                    'is_array' => false,
+                    'nullable' => $required === null ? !in_array($name, ['id', 'created_at'], true) : !$required,
+                    'unique' => is_array($columnDef) ? (bool)($columnDef['unique'] ?? false) : false,
+                    'primary_key' => $isPk,
+                    'pk_order' => $isPk ? (($pkOrder === false ? 0 : (int)$pkOrder) + 1) : null,
+                    'default_val' => $defaultVal !== null
+                        ? (string)$defaultVal
+                        : ($isPk && strtoupper($type) === 'UUID' ? 'gen_random_uuid()' : (($name === 'created_at' || $name === 'updated_at') ? 'now()' : null)),
+                    'check_expr' => null,
+                    'generated_expr' => null,
+                    'generated_stored' => false,
+                    'comment' => is_array($columnDef) ? (string)($columnDef['description'] ?? $columnDef['label'] ?? $columnDef['comment'] ?? '') : '',
+                    'foreign_key' => null,
+                ];
+                $columnIndexMap[$colId] = ['table' => $tableIndex, 'column' => count($columns) - 1];
+            }
+
+            $schema['tables'][] = [
+                'id' => $tableId,
+                'name' => $tableName,
+                'schema' => 'public',
+                'comment' => (string)($tableDef['description'] ?? $tableDef['comment'] ?? ''),
+                'domain' => (string)($domainMap[$tableName] ?? $tableDef['domain'] ?? 'default'),
+                'color' => null,
+                'tags' => ['registry_contract'],
+                'rls_enabled' => false,
+                'readOnly' => true,
+                'canvas' => [
+                    'x' => 80 + (($tableIndex % 5) * 300),
+                    'y' => 80 + ((int)floor($tableIndex / 5) * 240),
+                    'width' => 260,
+                    'collapsed' => true,
+                ],
+                'columns' => $columns,
+                'indexes' => [],
+                'check_constraints' => [],
+                'triggers' => [],
+            ];
+            $tableIndex++;
+        }
+
+        $edges = [];
+        if (is_array($relationMap['edges'] ?? null)) {
+            $edges = $relationMap['edges'];
+        } elseif (is_array($relationMap['relations'] ?? null)) {
+            $edges = $relationMap['relations'];
+        } elseif (is_array($relationMap)) {
+            $edges = $relationMap;
+        }
+
+        foreach ($edges as $edge) {
+            if (!is_array($edge)) {
+                continue;
+            }
+            $fromDef = is_array($edge['from'] ?? null) ? $edge['from'] : [];
+            $toDef = is_array($edge['to'] ?? null) ? $edge['to'] : [];
+            $fromTable = is_scalar($fromDef['entity'] ?? null) ? trim((string)$fromDef['entity']) : '';
+            $toTable = is_scalar($toDef['entity'] ?? null) ? trim((string)$toDef['entity']) : '';
+            $fromFields = $this->normalizeFieldList($fromDef['field'] ?? ($edge['sourceColumn'] ?? ''));
+            $toFields = $this->normalizeFieldList($toDef['field'] ?? ($edge['targetColumn'] ?? 'id'));
+            $fromTableId = $tableMap[$fromTable] ?? null;
+            $toTableId = $tableMap[$toTable] ?? null;
+            if (!$fromTableId || !$toTableId || empty($fromFields) || empty($toFields)) {
+                continue;
+            }
+
+            $pairCount = min(count($fromFields), count($toFields));
+            $cascadeActions = is_array($edge['cascadeActions'] ?? null) ? $edge['cascadeActions'] : [];
+            $onDelete = is_scalar($cascadeActions['delete'] ?? null) ? trim((string)$cascadeActions['delete']) : 'RESTRICT';
+            $onUpdate = is_scalar($cascadeActions['update'] ?? null) ? trim((string)$cascadeActions['update']) : 'CASCADE';
+            if ($onDelete === '') {
+                $onDelete = 'RESTRICT';
+            }
+            if ($onUpdate === '') {
+                $onUpdate = 'CASCADE';
+            }
+
+            for ($pairIndex = 0; $pairIndex < $pairCount; $pairIndex++) {
+                $fromCol = $fromFields[$pairIndex] ?? '';
+                $toCol = $toFields[$pairIndex] ?? 'id';
+                if ($fromCol === '' || $toCol === '') {
+                    continue;
+                }
+
+                $fromColId = $colMap[$fromTable . '.' . $fromCol] ?? null;
+                $toColId = $colMap[$toTable . '.' . $toCol] ?? null;
+                if (!$fromColId || !$toColId) {
+                    continue;
+                }
+
+                $sourceColumnRef = $columnIndexMap[$fromColId] ?? null;
+                $sourceNullable = true;
+                if ($sourceColumnRef) {
+                    $sourceNullable = (bool)($schema['tables'][$sourceColumnRef['table']]['columns'][$sourceColumnRef['column']]['nullable'] ?? true);
+                }
+
+                $suffix = $pairCount > 1 ? '_' . ($pairIndex + 1) : '';
+                $relationName = is_scalar($edge['constraintName'] ?? null)
+                    ? trim((string)$edge['constraintName'])
+                    : 'fk_' . $fromTable . '_' . $fromCol . $suffix;
+                if ($relationName === '') {
+                    $relationName = 'fk_' . $fromTable . '_' . $fromCol . $suffix;
+                }
+
+                $schema['relations'][] = [
+                    'id' => 'rel_' . substr(md5($id . '.' . $fromTable . '.' . $fromCol . '>' . $toTable . '.' . $toCol), 0, 10),
+                    'from_table_id' => $fromTableId,
+                    'from_col_id' => $fromColId,
+                    'to_table_id' => $toTableId,
+                    'to_col_id' => $toColId,
+                    'name' => $relationName,
+                    'on_delete' => $onDelete,
+                    'on_update' => $onUpdate,
+                    'nullable' => $sourceNullable,
+                    'edge' => ['type' => 'orthogonal', 'waypoints' => []],
+                ];
+            }
+        }
+
+        foreach ($schema['tables'] as &$table) {
+            foreach ($table['columns'] as &$column) {
+                foreach ($schema['relations'] as $relation) {
+                    if ($relation['from_table_id'] === $table['id'] && $relation['from_col_id'] === $column['id']) {
+                        $column['foreign_key'] = [
+                            'ref_table_id' => $relation['to_table_id'],
+                            'ref_col_id' => $relation['to_col_id'],
+                            'on_delete' => $relation['on_delete'],
+                            'on_update' => $relation['on_update'],
+                            'constraint_name' => $relation['name'],
+                            'deferrable' => false,
+                        ];
+                        break;
+                    }
+                }
+            }
+        }
+        unset($table, $column);
+
+        $schema['_meta']['tableCount'] = count($schema['tables']);
+        $schema['_meta']['relationCount'] = count($schema['relations']);
+
+        return $schema;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildDesignSummary(array $schema, array $overrides = []): array
+    {
+        $meta = is_array($schema['_meta'] ?? null) ? $schema['_meta'] : [];
+        $readOnly = !empty($meta['readOnly']) || (($meta['editable'] ?? true) === false);
+        $id = (string)($meta['id'] ?? self::SYSTEM_DESIGN_ID);
+        $defaultDisplayName = $id === self::SYSTEM_REGISTRY_DESIGN_ID
+            ? 'System Contract Registry'
+            : 'Workspace Design Draft';
+        $summary = [
+            'id' => $id,
+            'name' => (string)($meta['name'] ?? 'HESEM Workspace Design'),
+            'displayName' => (string)($meta['displayName'] ?? $defaultDisplayName),
+            'version' => (string)($meta['version'] ?? '1.0.0'),
+            'updatedAt' => (string)($meta['updatedAt'] ?? $meta['generated_at'] ?? ''),
+            'author' => (string)($meta['author'] ?? ''),
+            'tableCount' => count((array)($schema['tables'] ?? [])),
+            'relationCount' => count((array)($schema['relations'] ?? [])),
+            'designType' => (string)($meta['designType'] ?? 'workspace_design'),
+            'authorityLayer' => (string)($meta['authorityLayer'] ?? 'design_workspace'),
+            'authorityViewKind' => (string)($meta['authorityViewKind'] ?? ($readOnly ? 'db_derived_contract' : 'design_draft')),
+            'source' => (string)($meta['source'] ?? ''),
+            'schemaName' => (string)($meta['schemaName'] ?? 'public'),
+            'databaseName' => (string)($meta['databaseName'] ?? 'mom'),
+            'physicalDbSchema' => (string)($meta['physicalDbSchema'] ?? 'public'),
+            'authoritySource' => (string)($meta['authoritySource'] ?? ($readOnly ? 'database/migrations/*.sql -> database/schema.sql -> table-registry.json' : 'data/schema-studio/designs/workspace.json')),
+            'purpose' => (string)($meta['purpose'] ?? ($readOnly ? 'Full read-only backend contract view.' : 'Editable design draft for controlled schema design before promotion.')),
+            'writePolicy' => (string)($meta['writePolicy'] ?? ($readOnly ? 'read_only_generated_artifact' : 'editable_with_revision_guard')),
+            'deletePolicy' => (string)($meta['deletePolicy'] ?? ($readOnly ? 'do_not_delete_regenerate_from_authority' : 'archive_or_replace_do_not_hard_delete')),
+            'dataLossImpact' => (string)($meta['dataLossImpact'] ?? ($readOnly ? 'No DB data loss, but contract visibility is lost until regenerated.' : 'No DB data loss, but editable design, baseline, diff, compiler, and release workflows lose their working surface.')),
+            'canDelete' => false,
+            'readOnly' => $readOnly,
+            'editable' => !$readOnly,
+            'isSystem' => true,
+        ];
+
+        return array_merge($summary, $overrides);
+    }
+
     public function listDesigns(): never
     {
         $user = $this->requireAuth();
@@ -4888,18 +5238,27 @@ class SchemaStudioController extends BaseController
         $workspace = $this->loadDesignDocument(self::SYSTEM_DESIGN_ID);
         $designs = [];
         if (is_array($workspace)) {
-            $meta = is_array($workspace['_meta'] ?? null) ? $workspace['_meta'] : [];
-            $designs[] = [
+            $designs[] = $this->buildDesignSummary($workspace, [
                 'id' => self::SYSTEM_DESIGN_ID,
-                'name' => (string)($meta['name'] ?? 'HESEM Workspace Design'),
-                'version' => (string)($meta['version'] ?? '1.0.0'),
-                'updatedAt' => (string)($meta['updatedAt'] ?? $meta['generated_at'] ?? ''),
-                'author' => (string)($meta['author'] ?? ''),
-                'tableCount' => count($workspace['tables'] ?? []),
+                'displayName' => 'Workspace Design Draft',
                 'designType' => 'workspace_design',
                 'authorityLayer' => 'design_workspace',
-                'isSystem' => true,
-            ];
+                'authorityViewKind' => 'design_draft',
+                'purpose' => 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.',
+                'writePolicy' => 'editable_with_revision_guard',
+                'deletePolicy' => 'archive_or_replace_do_not_hard_delete',
+                'dataLossImpact' => 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.',
+                'readOnly' => false,
+                'editable' => true,
+            ]);
+        }
+        $registry = $this->loadDesignDocument(self::SYSTEM_REGISTRY_DESIGN_ID);
+        if (is_array($registry) && count((array)($registry['tables'] ?? [])) > 0) {
+            $designs[] = $this->buildDesignSummary($registry, [
+                'id' => self::SYSTEM_REGISTRY_DESIGN_ID,
+                'readOnly' => true,
+                'editable' => false,
+            ]);
         }
         $this->success(['designs' => $designs]);
     }
@@ -4942,6 +5301,8 @@ class SchemaStudioController extends BaseController
         if (!is_array($schema) || !isset($schema['_meta'])) {
             $this->error('invalid_schema', 400);
         }
+        $incomingId = (string)($schema['_meta']['id'] ?? self::SYSTEM_DESIGN_ID);
+        $this->requireEditableDesign($incomingId);
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
         $schema['_meta']['id'] = self::SYSTEM_DESIGN_ID;
         $this->assertRevisionToken((string)$schema['_meta']['id'], $body['revisions'] ?? null, ['design']);
@@ -4976,6 +5337,7 @@ class SchemaStudioController extends BaseController
             $this->error('missing_id', 400);
         }
         $id = $this->normalizeDesignId($id);
+        $this->requireEditableDesign($id);
         if ($id === self::SYSTEM_DESIGN_ID) {
             $this->error('system_design_locked', 409, 'The active system schema cannot be deleted.');
         }
@@ -4999,6 +5361,7 @@ class SchemaStudioController extends BaseController
         $this->ensureSavePayloadLimit();
         $body = $this->jsonBody();
         $designId = $this->normalizeDesignId((string)($body['design_id'] ?? self::SYSTEM_DESIGN_ID));
+        $this->requireEditableDesign($designId);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : null;
         if ($designId === '' || !$schema) {
             $this->error('missing_payload', 400);
@@ -5426,6 +5789,9 @@ class SchemaStudioController extends BaseController
         $this->requireMigrationAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
+        if (isset($body['design_id'])) {
+            $this->requireEditableDesign((string)$body['design_id']);
+        }
         $sql = trim((string)($body['sql'] ?? ''));
         if ($sql === '') {
             $this->error('missing_sql', 400);
@@ -5770,12 +6136,13 @@ class SchemaStudioController extends BaseController
         $this->ensureSavePayloadLimit();
 
         $body = $this->jsonBody();
-        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $designId = $this->requireEditableDesign((string)($body['design_id'] ?? 'workspace'));
         $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
         }
+        $this->requireEditableDesign((string)($schema['_meta']['id'] ?? $designId));
 
         $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
         $bundle = $this->buildCompilerBundle($schema, $designId, (string)($user['username'] ?? 'system'));
@@ -5831,12 +6198,13 @@ class SchemaStudioController extends BaseController
         $this->enforceReleaseGate();
 
         $body = $this->jsonBody();
-        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $designId = $this->requireEditableDesign((string)($body['design_id'] ?? 'workspace'));
         $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design', 'baseline']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {
             $this->error('invalid_schema', 400);
         }
+        $this->requireEditableDesign((string)($schema['_meta']['id'] ?? $designId));
 
         $baseline = is_array($body['baseline'] ?? null) ? $body['baseline'] : $this->loadBaselineDocument($designId, $schema);
         if (!is_array($baseline)) {
@@ -5937,7 +6305,14 @@ class SchemaStudioController extends BaseController
         $this->ensureSavePayloadLimit();
 
         $body = $this->jsonBody();
-        $designId = $this->safeId((string)($body['design_id'] ?? 'workspace'), 'workspace');
+        $designId = $this->normalizeDesignId((string)($body['design_id'] ?? 'workspace'));
+        if ($this->isReadOnlyDesignId($designId) && (($body['persist_artifacts'] ?? true) !== false)) {
+            $this->error(
+                'read_only_schema_layer',
+                409,
+                'Diagnostics for System Contract Registry must be run without persisting workspace artifacts.'
+            );
+        }
         $this->assertRevisionToken($designId, $body['revisions'] ?? null, ['design', 'baseline']);
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $this->loadDesignDocument($designId);
         if (!is_array($schema)) {

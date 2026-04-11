@@ -178,8 +178,20 @@ smoke_assert(array_key_exists('column_drift_count', $firstTable), 'Table summari
 smoke_assert(array_key_exists('pk_drift', $firstTable), 'Table summaries should expose primary-key drift posture.');
 smoke_assert(isset($firstSchema['key']), 'At least one schema blueprint should expose a key.');
 smoke_assert(isset($firstVariable['key']), 'At least one variable category should expose a key.');
-smoke_assert(count((array)($workspace['lists']['designs'] ?? [])) === 1, 'Data Schema workspace should expose exactly one active design.');
-smoke_assert((string)((($workspace['lists']['designs'] ?? [])[0]['id'] ?? '')) === 'workspace', 'Data Schema workspace should expose workspace as the single active design.');
+$schemaDesigns = array_values(array_filter((array)($workspace['lists']['designs'] ?? []), 'is_array'));
+$schemaDesignIds = array_map(static fn(array $design): string => (string)($design['id'] ?? ''), $schemaDesigns);
+smoke_assert(in_array('workspace', $schemaDesignIds, true), 'Data Schema workspace should expose workspace as the editable design layer.');
+smoke_assert(in_array('system_contract_registry', $schemaDesignIds, true), 'Data Schema workspace should expose the full system contract registry as a read-only schema layer.');
+$registryDesignSummary = null;
+foreach ($schemaDesigns as $schemaDesign) {
+    if ((string)($schemaDesign['id'] ?? '') === 'system_contract_registry') {
+        $registryDesignSummary = $schemaDesign;
+        break;
+    }
+}
+smoke_assert(is_array($registryDesignSummary), 'Data Schema registry design summary should be present.');
+smoke_assert(!empty($registryDesignSummary['readOnly']), 'Data Schema registry design summary should be read-only.');
+smoke_assert((int)($registryDesignSummary['tableCount'] ?? 0) >= 600, 'Data Schema registry design summary should expose full platform table coverage.');
 smoke_assert(is_array(($workspace['artifacts']['business_contract_bundle'] ?? null)), 'Data Schema workspace should expose the business contract bundle summary.');
 smoke_assert(is_array(($workspace['artifacts']['global_capability_audit'] ?? null)), 'Data Schema workspace should expose the global ERP+MOM capability audit summary.');
 smoke_assert((int)($workspace['artifacts']['global_capability_audit']['summary']['capabilityCount'] ?? 0) >= 15, 'Global capability audit should cover the broad ERP+MOM process map.');
@@ -429,7 +441,13 @@ smoke_assert(is_array(($saveResponse['payload']['current_revision'] ?? null)), '
 data_schema_smoke_remove_dir($tempDataDir);
 
 $schemaStudioController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($schemaStudioStore);
-$designId = (string)(($workspace['lists']['designs'][0] ?? [])['id'] ?? 'workspace');
+$designId = 'workspace';
+foreach ((array)($workspace['lists']['designs'] ?? []) as $schemaDesign) {
+    if (is_array($schemaDesign) && (string)($schemaDesign['id'] ?? '') === 'workspace') {
+        $designId = 'workspace';
+        break;
+    }
+}
 
 data_schema_smoke_reset_request_state();
 data_schema_smoke_trace('design-get');

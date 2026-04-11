@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.3.27';
+const CACHE_VERSION = 'v1.3.30';
 const CACHE_PREFIX  = 'hesem-mom';
 
 /** Named caches with version stamps. */
@@ -47,6 +47,7 @@ const PRECACHE_URLS = [
   '/mom/index.html',
   '/mom/styles/portal.main.css',
   '/mom/styles/deploy-dashboard.css',
+  '/mom/styles/vps-control-tower.css',
   '/mom/styles/online-forms.css',
   '/mom/styles/form-runtime-frm-403.css',
   '/mom/styles/gateway-landing.css',
@@ -63,6 +64,7 @@ const PRECACHE_URLS = [
   '/mom/scripts/portal/08-deploy-dashboard.js',
   '/mom/scripts/portal/09-online-forms.js',
   '/mom/scripts/portal/09b-form-fill-download.js',
+  '/mom/scripts/portal/33-vps-control-tower.js',
   '/mom/scripts/portal/10-eqms-form-runtime.js',
   '/mom/scripts/form-runtimes/frm-403-scar.js',
   '/mom/scripts/portal/10-upload-validator.js',

@@ -236,7 +236,8 @@
         "portal",
         "postgres",
         "terminal-gateway",
-        "observability"
+        "observability",
+        "file-explorer"
       ],
       "services": [
         {
@@ -388,6 +389,38 @@
           "service_name": "grafana-server",
           "internal_url": "http://127.0.0.1:3000/api/health",
           "expected_http_codes": [200]
+        }
+      ],
+      "file_roots": [
+        {
+          "id": "portal_app",
+          "label": "Portal app",
+          "path": "/var/www/eqms.hesemeng.com/mom",
+          "note": "Application code, docs, styles, scripts and API sources."
+        },
+        {
+          "id": "portal_data",
+          "label": "Portal data",
+          "path": "/var/www/eqms.hesemeng.com/mom/data",
+          "note": "Runtime data and logs with secret preview/download guardrails."
+        },
+        {
+          "id": "nginx",
+          "label": "Nginx config",
+          "path": "/etc/nginx",
+          "note": "Ingress, TLS and reverse proxy configuration."
+        },
+        {
+          "id": "nginx_logs",
+          "label": "Nginx logs",
+          "path": "/var/log/nginx",
+          "note": "Access and error logs for live request triage."
+        },
+        {
+          "id": "systemd",
+          "label": "Systemd units",
+          "path": "/etc/systemd/system",
+          "note": "Service units for terminal, observability and app runtime."
         }
       ]
     }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HESEM MOM — Module Layout Template Design System v4.1 Enterprise</title>
+<title>HESEM MOM — Module Layout Template Design System v4.2 Enterprise</title>
 <style>
 :root{
   --brand:#0c2d48;
@@ -206,11 +206,11 @@ body{background:var(--bg-page)}
 <body>
 <div class="shell">
   <header class="doc-header">
-    <h1>Module Layout Template Design System v4.1</h1>
-    <p class="subtitle">Tài liệu thiết kế toàn diện — 123 preset templates bao phủ 34 modules, 90 block types, 20 visual themes, 30 component presets. Template là trung tâm quyết định đồ họa toàn bộ phần mềm. Zone-based architecture. Smart scroll. Token cascade 5 lớp. Quy chuẩn đồ họa chuyên sâu.</p>
+    <h1>Module Layout Template Design System v4.2</h1>
+    <p class="subtitle">Tài liệu thiết kế toàn diện — 123 preset templates bao phủ 34 modules, 90 block types, 20 visual themes, 30 component presets. Template là trung tâm quyết định đồ họa toàn bộ phần mềm. Zone-based architecture. Smart scroll. Token cascade 5 lớp. 51 sections quy chuẩn đồ họa chính xác — kim chỉ nam cho mọi hoạt động frontend.</p>
     <div class="meta">
       <span class="meta-item">HESEM MOM Platform</span>
-      <span class="meta-item">v4.1 Enterprise</span>
+      <span class="meta-item">v4.2 Enterprise</span>
       <span class="meta-item">2026-04-11</span>
       <span class="meta-item">123 Templates</span>
       <span class="meta-item">12 Nhóm module</span>
@@ -246,6 +246,18 @@ body{background:var(--bg-page)}
       <a href="#print-layouts">In ấn</a>
       <a href="#operator-interface">Operator</a>
       <a href="#realtime-dashboard">Realtime</a>
+      <!-- Quy chuẩn chính xác -->
+      <a href="#token-reference">Tokens</a>
+      <a href="#form-rules">Forms</a>
+      <a href="#table-rules">Tables</a>
+      <a href="#modal-rules">Modals</a>
+      <a href="#nav-rules">Navigation</a>
+      <a href="#dataviz-rules">DataViz</a>
+      <a href="#keyboard-rules">Phím tắt</a>
+      <a href="#icon-rules">Icons</a>
+      <a href="#responsive-rules">Responsive</a>
+      <a href="#block-schema">Block Schema</a>
+      <a href="#toast-precise">Toast</a>
       <!-- Themes + Templates -->
       <a href="#visual-themes">Themes</a>
       <a href="#block-engine">Blocks</a>
@@ -262,7 +274,7 @@ body{background:var(--bg-page)}
 
 <section class="section" id="summary">
     <h2 class="section-title"><span class="section-number">1</span>Tóm Tắt Thực Thi</h2>
-    <p class="section-lead">Tài liệu thiết kế toàn diện v4.1 — 123 template preset bao phủ 34 module, 20 visual theme, 90 block types, 30 component presets, 181 CSS token, 8 zone types. Template là trung tâm quyết định toàn bộ đồ họa phần mềm. Mọi module phải có <code>templateId</code>. Khi cập nhật template, tất cả module sử dụng template đó thay đổi theo.</p>
+    <p class="section-lead">Tài liệu thiết kế toàn diện v4.2 — 123 template preset bao phủ 34 module, 20 visual theme, 90 block types, 30 component presets, 181 CSS token, 8 zone types. Template là trung tâm quyết định toàn bộ đồ họa phần mềm. Mọi module phải có <code>templateId</code>. Khi cập nhật template, tất cả module sử dụng template đó thay đổi theo.</p>
     <div class="grid-4 stats">
       <div class="stat-card"><div class="stat-value">123</div><div class="stat-label">Template Cards</div></div>
       <div class="stat-card"><div class="stat-value">13</div><div class="stat-label">Catalog Sections</div></div>
@@ -1838,8 +1850,807 @@ body{background:var(--bg-page)}
     </div>
   </section>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     PHẦN II-B — QUY CHUẨN CHÍNH XÁC (Precise Specifications)
+     Từ đây trở xuống: mọi giá trị pixel, mọi token, mọi quy tắc
+     tương tác đều CHÍNH XÁC — developer KHÔNG PHẢI ĐOÁN.
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- ═══ SECTION 20: TOKEN REFERENCE ═══ -->
+<section class="section" id="token-reference">
+    <h2 class="section-title"><span class="section-number">20</span>Hệ thống Design Token chính xác</h2>
+    <p class="section-subtitle">Mọi giá trị dưới đây là BẮT BUỘC. Không hardcode giá trị — luôn dùng token. Khi cần giá trị mới, thêm token trước.</p>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-header">📐 Spacing Scale (base-4, 13 bậc)</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Token</th><th>Giá trị</th><th>Dùng cho</th></tr></thead>
+            <tbody>
+              <tr><td><code>--space-0</code></td><td>0</td><td>Reset margin/padding</td></tr>
+              <tr><td><code>--space-1</code></td><td>4px</td><td>Icon gap, chip padding-y</td></tr>
+              <tr><td><code>--space-2</code></td><td>8px</td><td>Inline gap, badge padding-x</td></tr>
+              <tr><td><code>--space-3</code></td><td>12px</td><td>Card padding nhỏ, field gap</td></tr>
+              <tr><td><code>--space-4</code></td><td>16px</td><td>Section padding, form group gap</td></tr>
+              <tr><td><code>--space-5</code></td><td>20px</td><td>Card padding lớn</td></tr>
+              <tr><td><code>--space-6</code></td><td>24px</td><td>Section gap, page gutter tablet</td></tr>
+              <tr><td><code>--space-7</code></td><td>32px</td><td>Page gutter desktop, section margin</td></tr>
+              <tr><td><code>--space-8</code></td><td>40px</td><td>Section margin lớn</td></tr>
+              <tr><td><code>--space-9</code></td><td>48px</td><td>Page padding XL, hero gap</td></tr>
+              <tr><td><code>--space-10</code></td><td>56px</td><td>Page top margin</td></tr>
+              <tr><td><code>--space-11</code></td><td>64px</td><td>Feature section gap</td></tr>
+              <tr><td><code>--space-12</code></td><td>80px</td><td>Hero section padding</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">🎯 Semantic Spacing Aliases</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Token</th><th>Map to</th><th>Ngữ cảnh</th></tr></thead>
+            <tbody>
+              <tr><td><code>--gap-xs</code></td><td><code>--space-1</code> (4px)</td><td>Inline elements, icon-text gap</td></tr>
+              <tr><td><code>--gap-sm</code></td><td><code>--space-2</code> (8px)</td><td>Form field internal, chip gap</td></tr>
+              <tr><td><code>--gap-md</code></td><td><code>--space-3</code> (12px)</td><td>Card grid gap, field gap</td></tr>
+              <tr><td><code>--gap-lg</code></td><td><code>--space-4</code> (16px)</td><td>Section internal, grid gap</td></tr>
+              <tr><td><code>--gap-xl</code></td><td><code>--space-6</code> (24px)</td><td>Page section spacing</td></tr>
+              <tr><td><code>--pad-xs</code></td><td><code>--space-2</code> (8px)</td><td>Badge, tooltip padding</td></tr>
+              <tr><td><code>--pad-sm</code></td><td><code>--space-3</code> (12px)</td><td>Button, input padding</td></tr>
+              <tr><td><code>--pad-md</code></td><td><code>--space-4</code> (16px)</td><td>Card padding, dropdown</td></tr>
+              <tr><td><code>--pad-lg</code></td><td><code>--space-5</code> (20px)</td><td>Modal body, section</td></tr>
+              <tr><td><code>--pad-xl</code></td><td><code>--space-6</code> (24px)</td><td>Page container</td></tr>
+              <tr><td><code>--page-pad-mobile</code></td><td>16px</td><td>Shell padding &lt;768px</td></tr>
+              <tr><td><code>--page-pad-tablet</code></td><td>24px</td><td>Shell padding 768–1279px</td></tr>
+              <tr><td><code>--page-pad-desktop</code></td><td>32px</td><td>Shell padding ≥1280px</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-header">🔲 Shadow / Elevation (5 cấp)</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Token</th><th>Giá trị CSS</th><th>Dùng cho</th><th>Z-index</th></tr></thead>
+            <tbody>
+              <tr><td><code>--shadow-xs</code></td><td>0 1px 2px rgba(12,45,72,.04)</td><td>Input, badge, chip</td><td>auto</td></tr>
+              <tr><td><code>--shadow-sm</code></td><td>0 4px 14px rgba(12,45,72,.06)</td><td>Card, table header, stat</td><td>1</td></tr>
+              <tr><td><code>--shadow-md</code></td><td>0 8px 24px rgba(12,45,72,.10)</td><td>Dropdown, popover, hover card</td><td>100</td></tr>
+              <tr><td><code>--shadow-lg</code></td><td>0 18px 40px rgba(15,23,42,.14), 0 8px 20px rgba(15,23,42,.09)</td><td>Modal, drawer, sidebar overlay</td><td>1000</td></tr>
+              <tr><td><code>--shadow-xl</code></td><td>0 32px 64px rgba(15,23,42,.18), 0 16px 32px rgba(15,23,42,.12)</td><td>Full-screen dialog, notification stack</td><td>2000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">⭕ Border Radius Roles</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Token</th><th>Giá trị</th><th>Áp dụng cho</th></tr></thead>
+            <tbody>
+              <tr><td><code>--radius-xs</code></td><td>2px</td><td>Inline code, progress bar inner</td></tr>
+              <tr><td><code>--radius-sm</code></td><td>4px</td><td>Badge nhỏ, tooltip</td></tr>
+              <tr><td><code>--radius-md</code></td><td>6px</td><td>Button, input, select, table cell</td></tr>
+              <tr><td><code>--radius-lg</code></td><td>8px</td><td>Card nhỏ, dropdown menu, toast</td></tr>
+              <tr><td><code>--radius-xl</code></td><td>12px</td><td>Card lớn, section panel</td></tr>
+              <tr><td><code>--radius-2xl</code></td><td>16px</td><td>Modal, dialog, template editor</td></tr>
+              <tr><td><code>--radius-3xl</code></td><td>20px</td><td>Page section, hero card</td></tr>
+              <tr><td><code>--radius-full</code></td><td>999px</td><td>Chip, badge tròn, avatar, pill button</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-header">⚡ Motion / Easing Scale</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Token</th><th>Giá trị</th><th>Dùng cho</th></tr></thead>
+            <tbody>
+              <tr><td><code>--duration-instant</code></td><td>75ms</td><td>Button press scale, active state</td></tr>
+              <tr><td><code>--duration-fast</code></td><td>150ms</td><td>Hover transition, focus ring, toggle</td></tr>
+              <tr><td><code>--duration-normal</code></td><td>200ms</td><td>Panel expand, tab switch, dropdown open</td></tr>
+              <tr><td><code>--duration-slow</code></td><td>300ms</td><td>Modal enter, sidebar slide, page transition</td></tr>
+              <tr><td><code>--duration-slower</code></td><td>500ms</td><td>Skeleton shimmer, complex animation</td></tr>
+              <tr><td colspan="3" style="border:none;padding-top:12px;font-weight:800;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)">Easing Functions</td></tr>
+              <tr><td><code>--ease-out</code></td><td>cubic-bezier(0,0,0.2,1)</td><td>Mở, hiện, xuất hiện (enter)</td></tr>
+              <tr><td><code>--ease-in</code></td><td>cubic-bezier(0.4,0,1,1)</td><td>Đóng, ẩn, thoát (exit)</td></tr>
+              <tr><td><code>--ease-in-out</code></td><td>cubic-bezier(0.4,0,0.2,1)</td><td>Di chuyển, resize, sort</td></tr>
+              <tr><td><code>--ease-spring</code></td><td>cubic-bezier(0.16,1,0.3,1)</td><td>Card hover, FAB, tooltip snap</td></tr>
+              <tr><td><code>--ease-sharp</code></td><td>cubic-bezier(0.2,0,0,1)</td><td>Button press, dropdown close</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">🎨 Color Semantic Roles</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Role</th><th>50 (bg)</th><th>100 (hover)</th><th>600 (text/icon)</th><th>700 (active)</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:800;color:#16a34a">Success</td><td>#f0fdf4</td><td>#dcfce7</td><td>#16a34a</td><td>#15803d</td></tr>
+              <tr><td style="font-weight:800;color:#d97706">Warning</td><td>#fffbeb</td><td>#fef3c7</td><td>#d97706</td><td>#b45309</td></tr>
+              <tr><td style="font-weight:800;color:#dc2626">Error</td><td>#fef2f2</td><td>#fee2e2</td><td>#dc2626</td><td>#b91c1c</td></tr>
+              <tr><td style="font-weight:800;color:#2563eb">Info</td><td>#eff6ff</td><td>#dbeafe</td><td>#2563eb</td><td>#1d4ed8</td></tr>
+              <tr><td style="font-weight:800;color:#7c3aed">Accent</td><td>#f5f3ff</td><td>#ede9fe</td><td>#7c3aed</td><td>#6d28d9</td></tr>
+              <tr><td style="font-weight:800;color:#0891b2">Teal</td><td>#f0fdfa</td><td>#ccfbf1</td><td>#0d9488</td><td>#0f766e</td></tr>
+              <tr><td colspan="5" style="border:none;padding-top:12px;font-weight:800;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)">Surface Hierarchy</td></tr>
+              <tr><td><code>--bg-page</code></td><td colspan="4">#f3f7fb — Nền trang chính</td></tr>
+              <tr><td><code>--bg-surface</code></td><td colspan="4">#ffffff — Card, panel, table</td></tr>
+              <tr><td><code>--bg-surface-alt</code></td><td colspan="4">#f7fbff — Table header, section alt</td></tr>
+              <tr><td><code>--bg-elevated</code></td><td colspan="4">#fafbfc — Dropdown, popover, tooltip</td></tr>
+              <tr><td><code>--bg-overlay</code></td><td colspan="4">rgba(15,23,42,0.5) — Modal backdrop</td></tr>
+              <tr><td><code>--bg-input</code></td><td colspan="4">#ffffff — Input field background</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">📝 Typography Roles (Semantic Type Scale)</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:140px">Role</th><th>Font Size</th><th>Weight</th><th>Line Height</th><th>Letter Spacing</th><th>Dùng cho</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:900">Display</td><td>32px (<code>--text-3xl</code>)</td><td>900</td><td>1.1</td><td>-0.03em</td><td>Hero heading, dashboard title</td></tr>
+            <tr><td style="font-weight:900">Headline</td><td>24px (<code>--text-2xl</code>)</td><td>800</td><td>1.2</td><td>-0.02em</td><td>Section title, page heading</td></tr>
+            <tr><td style="font-weight:900">Title</td><td>18px (<code>--text-lg</code>)</td><td>700</td><td>1.3</td><td>-0.01em</td><td>Card header, panel title</td></tr>
+            <tr><td style="font-weight:900">Subtitle</td><td>14px (<code>--text-base</code>)</td><td>700</td><td>1.4</td><td>0em</td><td>Field label, table column header</td></tr>
+            <tr><td style="font-weight:900">Body</td><td>14px (<code>--text-base</code>)</td><td>400</td><td>1.6</td><td>0em</td><td>Paragraph, description, form value</td></tr>
+            <tr><td style="font-weight:900">Body Small</td><td>13px (<code>--text-sm</code>)</td><td>400</td><td>1.5</td><td>0em</td><td>Secondary text, helper text, meta</td></tr>
+            <tr><td style="font-weight:900">Caption</td><td>11px (<code>--text-xs</code>)</td><td>600</td><td>1.4</td><td>0.04em</td><td>Badge, chip, timestamp, footnote</td></tr>
+            <tr><td style="font-weight:900">Overline</td><td>10px</td><td>800</td><td>1.3</td><td>0.06em</td><td>Section label, KPI label, UPPERCASE</td></tr>
+            <tr><td style="font-weight:900">Code</td><td>12px (<code>--text-sm</code>)</td><td>400</td><td>1.5</td><td>0em</td><td>Inline code, ID, mono values (JetBrains Mono)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">🔢 Z-Index Stacking Order (bắt buộc)</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Token</th><th>Giá trị</th><th>Thành phần</th></tr></thead>
+          <tbody>
+            <tr><td><code>--z-base</code></td><td>1</td><td>Card, table, nội dung chính</td></tr>
+            <tr><td><code>--z-sticky</code></td><td>10</td><td>Sticky header, sticky filter bar, TOC</td></tr>
+            <tr><td><code>--z-dropdown</code></td><td>100</td><td>Dropdown menu, select options, popover</td></tr>
+            <tr><td><code>--z-sidebar</code></td><td>200</td><td>Sidebar overlay (mobile drawer mode)</td></tr>
+            <tr><td><code>--z-modal-backdrop</code></td><td>900</td><td>Modal backdrop (scrim layer)</td></tr>
+            <tr><td><code>--z-modal</code></td><td>1000</td><td>Modal dialog, full-screen dialog</td></tr>
+            <tr><td><code>--z-toast</code></td><td>2000</td><td>Toast notification stack</td></tr>
+            <tr><td><code>--z-tooltip</code></td><td>3000</td><td>Tooltip, title hint</td></tr>
+            <tr><td><code>--z-loading</code></td><td>9000</td><td>Full-page loading overlay</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 21: FORM LAYOUT RULES ═══ -->
+<section class="section" id="form-rules">
+    <h2 class="section-title"><span class="section-number">21</span>Quy chuẩn Form Layout</h2>
+    <p class="section-subtitle">Mọi form trong hệ thống PHẢI tuân theo quy tắc bên dưới. Không ngoại lệ.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Cấu trúc Form chuẩn</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:200px">Quy tắc</th><th>Giá trị chính xác</th><th>Giải thích</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Vị trí label</td><td><code>top</code> (mặc định). Label phía trên input.</td><td>Label bên trái (inline) chỉ dùng khi form width &gt;900px VÀ ít hơn 6 fields. Label-left width cố định 160px.</td></tr>
+            <tr><td style="font-weight:800">Label font</td><td>13px, weight 600, color <code>--text-1</code></td><td>Label KHÔNG uppercase trừ overline. Kết thúc bằng dấu hai chấm khi inline.</td></tr>
+            <tr><td style="font-weight:800">Required indicator</td><td>Dấu <code>*</code> màu <code>--red</code> (#dc2626), sau label text, gap 2px</td><td>Nếu phần lớn fields bắt buộc → đánh dấu fields KHÔNG bắt buộc bằng "(Tùy chọn)" thay vì dấu *.</td></tr>
+            <tr><td style="font-weight:800">Field height</td><td>Compact: 32px · Default: 40px · Comfortable: 48px</td><td>Áp dụng cho input, select, textarea first-line, date picker.</td></tr>
+            <tr><td style="font-weight:800">Field gap (vertical)</td><td><code>--space-4</code> (16px) giữa các field groups</td><td>Giữa label và input: <code>--space-1</code> (4px). Giữa input và helper/error text: <code>--space-1</code> (4px).</td></tr>
+            <tr><td style="font-weight:800">Multi-column form</td><td><code>grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))</code></td><td>≥1280px: tối đa 3 cột. 768–1279px: 2 cột. &lt;768px: 1 cột. Full-width fields (textarea, rich-text): <code>grid-column: 1 / -1</code>.</td></tr>
+            <tr><td style="font-weight:800">Form section spacing</td><td><code>--space-7</code> (32px) giữa các fieldset/section</td><td>Dùng <code>&lt;fieldset&gt;</code> với <code>&lt;legend&gt;</code> (Title role: 18px bold) hoặc divider 1px <code>--border</code>.</td></tr>
+            <tr><td style="font-weight:800">Helper text</td><td>12px, color <code>--text-2</code>, dưới input</td><td>Max 1 dòng. Nếu dài hơn → dùng tooltip (i) icon cạnh label.</td></tr>
+            <tr><td style="font-weight:800">Error text</td><td>12px, color <code>--red</code>, dưới input, icon ⚠ trước text</td><td>Thay thế helper text khi có lỗi (không hiện cả hai). Input border chuyển sang <code>--red</code>.</td></tr>
+            <tr><td style="font-weight:800">Validation timing</td><td><strong>onBlur</strong> cho validate đơn. <strong>onSubmit</strong> cho validate tổng form.</td><td>KHÔNG validate onChange (gây khó chịu khi đang gõ). Ngoại lệ: email/phone format check sau 500ms debounce.</td></tr>
+            <tr><td style="font-weight:800">Disabled field</td><td>opacity: 0.5, cursor: not-allowed, background: <code>--bg-surface-alt</code></td><td>Disabled khác read-only: disabled = không submit, read-only = submit nhưng không edit.</td></tr>
+            <tr><td style="font-weight:800">Read-only field</td><td>border: none, background: transparent, padding-left: 0</td><td>Hiển thị giá trị như text thường, không khung input. Font weight 500.</td></tr>
+            <tr><td style="font-weight:800">Dependent fields</td><td>Ẩn/hiện bằng <code>display:none</code> + <code>aria-hidden="true"</code></td><td>Khi field A thay đổi, field B hiện/ẩn. Animation: fadeInUp 200ms. Không dùng visibility:hidden (vẫn chiếm layout).</td></tr>
+            <tr><td style="font-weight:800">Form footer</td><td>Sticky bottom, padding <code>--space-4</code>, border-top 1px, gap <code>--space-3</code></td><td>Nút chính (Submit/Save) bên phải, nút phụ (Cancel/Reset) bên trái. Primary button luôn ở cuối cùng bên phải.</td></tr>
+            <tr><td style="font-weight:800">Success after submit</td><td>Toast success 3s + redirect hoặc inline success banner</td><td>Nếu form modal → đóng modal + toast. Nếu form page → redirect về list + toast. Nếu inline edit → flash green border 1s.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box info-box-green"><strong>PLACEHOLDER RULES</strong>Placeholder KHÔNG thay thế label. Placeholder chỉ dùng cho ví dụ format (VD: "DD/MM/YYYY", "VD: 0901234567"). Color: <code>--text-3</code>. Font style: italic. Biến mất khi focus — label vẫn hiện.</div>
+      <div class="info-box info-box-amber"><strong>TEXTAREA RULES</strong>Min height: 80px. Max height: 300px. Resize: vertical only (<code>resize: vertical</code>). Character counter hiện ở bottom-right khi có maxLength. Counter color: <code>--text-3</code>, chuyển <code>--red</code> khi &gt;90%.</div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 22: TABLE INTERACTIVE SPEC ═══ -->
+<section class="section" id="table-rules">
+    <h2 class="section-title"><span class="section-number">22</span>Quy chuẩn Table tương tác</h2>
+    <p class="section-subtitle">Bảng dữ liệu là thành phần phổ biến nhất. Mọi bảng PHẢI tuân theo quy chuẩn chính xác bên dưới.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Cấu trúc Table chuẩn</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:180px">Thuộc tính</th><th>Giá trị chính xác</th><th>Chi tiết</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Header font</td><td>10px, weight 800, uppercase, letter-spacing 0.05em, color <code>--text-2</code></td><td>Header bg: <code>--bg-surface-alt</code>. Sticky: top:0, z-index: <code>--z-sticky</code>.</td></tr>
+            <tr><td style="font-weight:800">Row height</td><td>Compact: 32px · Default: 40px · Comfortable: 48px · Shop floor: 56px</td><td>Áp dụng bằng density token. Nội dung vượt → text-overflow: ellipsis.</td></tr>
+            <tr><td style="font-weight:800">Cell padding</td><td>Horizontal: 12px. Vertical: auto (căn giữa dọc bằng row height).</td><td>Cột đầu tiên padding-left: 16px. Cột cuối padding-right: 16px.</td></tr>
+            <tr><td style="font-weight:800">Hover row</td><td>background: rgba(21,101,192, 0.03)</td><td>Transition: background <code>--duration-fast</code>. Cursor: pointer (nếu row clickable).</td></tr>
+            <tr><td style="font-weight:800">Selected row</td><td>background: rgba(21,101,192, 0.08). Border-left: 3px solid <code>--brand-2</code>.</td><td>Multi-select: checkbox column width 48px, padding 12px. Checkbox size 18px.</td></tr>
+            <tr><td style="font-weight:800">Zebra striping</td><td>KHÔNG dùng zebra mặc định. Chỉ bật khi table &gt;20 rows VÀ không có vertical borders.</td><td>Nếu bật: odd rows <code>--bg-surface-alt</code>. Even rows <code>--bg-surface</code>.</td></tr>
+            <tr><td style="font-weight:800">Column alignment</td><td>Text: left. Number/currency: right. Status/action: center. Date: left. ID/code: left, mono font.</td><td>Header alignment phải khớp data alignment.</td></tr>
+            <tr><td style="font-weight:800">Sort indicator</td><td>Icon ▲▼ (8px, color <code>--text-3</code>). Active sort: icon đổi <code>--brand-2</code>, header text bold.</td><td>Chỉ 1 column active sort cùng lúc. Click header → ASC. Click lại → DESC. Click lần 3 → unsort. Cursor: pointer trên sortable header.</td></tr>
+            <tr><td style="font-weight:800">Filter per column</td><td>Icon funnel 14px trong header. Click → dropdown filter panel.</td><td>Filter panel: max-height 240px, overflow-y auto. Search input ở đầu. Checkbox list cho enum values. Range slider cho numbers.</td></tr>
+            <tr><td style="font-weight:800">Frozen columns</td><td>Cột đầu (checkbox + ID) freeze bằng <code>position:sticky; left:0; z-index:2</code>.</td><td>Cột freeze có shadow-right: 4px 0 8px rgba(0,0,0,.04). Tối đa freeze 2 cột trái.</td></tr>
+            <tr><td style="font-weight:800">Pagination</td><td>Dưới table. Height: 48px. Format: "1–20 / 1,234" + Previous/Next buttons + page size selector.</td><td>Page sizes: [20, 50, 100]. Default: 20. Buttons: icon-only (← →), disabled khi đầu/cuối. Jump-to-page input khi &gt;10 pages.</td></tr>
+            <tr><td style="font-weight:800">Inline editing</td><td>Double-click cell → input field in-place. Save on Enter/blur. Cancel on Escape.</td><td>Editable cell có icon ✏ nhỏ (10px) ở top-right khi hover. Chỉ áp dụng cho columns được đánh dấu <code>editable:true</code>.</td></tr>
+            <tr><td style="font-weight:800">Row expansion</td><td>Click expand icon (chevron ›) → detail row mở bên dưới, colspan full width.</td><td>Expansion row bg: <code>--bg-surface-alt</code>. Padding: 16px 16px 16px 48px (indent bằng checkbox col). Animation: slideDown 200ms.</td></tr>
+            <tr><td style="font-weight:800">Bulk action bar</td><td>Khi ≥1 rows selected → bar xuất hiện TRÊN table, height 48px, bg <code>--brand</code> color white.</td><td>Nội dung: "X mục đã chọn" + action buttons (Delete, Export, Assign, Print). Nút Close (×) để bỏ chọn tất cả.</td></tr>
+            <tr><td style="font-weight:800">Empty table</td><td>Hiện header row. Body chứa empty state: icon 32px + text "Không có dữ liệu" + CTA nếu phù hợp.</td><td>Min-height body: 200px. Căn giữa (flex center). Không hiện pagination khi trống.</td></tr>
+            <tr><td style="font-weight:800">Loading state</td><td>Skeleton rows: 5 rows × full columns. Shimmer animation 1.5s infinite.</td><td>Header giữ nguyên (không skeleton). aria-busy="true" trên &lt;table&gt;.</td></tr>
+            <tr><td style="font-weight:800">Column resize</td><td>Drag handle ở right edge header cell. Width 4px, cursor: col-resize.</td><td>Min column width: 60px. Max: không giới hạn. Resize line: 1px dashed <code>--brand-2</code> khi dragging.</td></tr>
+            <tr><td style="font-weight:800">Responsive (&lt;768px)</td><td>Table chuyển sang dạng card list: mỗi row = 1 card với label-value pairs.</td><td>Card padding: 12px. Label font: caption (11px, 600). Value font: body (14px). Max 6 fields hiện, còn lại collapse "Xem thêm".</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 23: MODAL & DIALOG SPEC ═══ -->
+<section class="section" id="modal-rules">
+    <h2 class="section-title"><span class="section-number">23</span>Quy chuẩn Modal &amp; Dialog</h2>
+    <p class="section-subtitle">Tất cả modal, dialog, drawer, confirm popup PHẢI tuân theo quy chuẩn chính xác bên dưới.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Size Variants</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Size</th><th>Width</th><th>Max Height</th><th>Dùng cho</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">sm</td><td>400px</td><td>60vh</td><td>Confirm, alert, quick input (1-2 fields)</td></tr>
+            <tr><td style="font-weight:800">md</td><td>560px</td><td>75vh</td><td>Form ngắn (3-6 fields), detail preview</td></tr>
+            <tr><td style="font-weight:800">lg</td><td>720px</td><td>85vh</td><td>Form phức tạp, wizard step, comparison</td></tr>
+            <tr><td style="font-weight:800">xl</td><td>960px</td><td>90vh</td><td>Editor, builder, multi-panel view</td></tr>
+            <tr><td style="font-weight:800">full</td><td>calc(100vw - 48px)</td><td>calc(100vh - 48px)</td><td>Drawing viewer, Gantt, report preview</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Cấu trúc chi tiết</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:180px">Phần</th><th>Spec chính xác</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Backdrop</td><td>Background: <code>--bg-overlay</code> rgba(15,23,42,0.5). Z-index: <code>--z-modal-backdrop</code> (900). Click backdrop → close (trừ khi <code>persistent:true</code>). Blur: <code>backdrop-filter: blur(4px)</code>.</td></tr>
+            <tr><td style="font-weight:800">Container</td><td>Z-index: <code>--z-modal</code> (1000). Border-radius: <code>--radius-2xl</code> (16px). Shadow: <code>--shadow-lg</code>. Background: <code>--bg-surface</code>. Centered: margin auto + flex center.</td></tr>
+            <tr><td style="font-weight:800">Header</td><td>Height: 56px. Padding: 0 24px. Border-bottom: 1px <code>--border</code>. Title: Title role (18px, 700). Close button: 32×32px, top-right, icon × 16px, hover bg rgba(0,0,0,.06), border-radius 8px.</td></tr>
+            <tr><td style="font-weight:800">Body</td><td>Padding: 24px. Overflow-y: auto (body scrolls, header/footer stay fixed). Max-height: modal max-height - header - footer.</td></tr>
+            <tr><td style="font-weight:800">Footer</td><td>Height: 64px. Padding: 0 24px. Border-top: 1px <code>--border</code>. Buttons align right. Gap: 12px. Primary button cuối cùng (bên phải nhất).</td></tr>
+            <tr><td style="font-weight:800">Animation enter</td><td>Backdrop: opacity 0→1, <code>--duration-slow</code>. Container: opacity 0→1 + translateY(16px)→0 + scale(0.97)→1, <code>--duration-slow</code>, <code>--ease-spring</code>.</td></tr>
+            <tr><td style="font-weight:800">Animation exit</td><td>Ngược lại enter. Duration: <code>--duration-normal</code>. Easing: <code>--ease-in</code>. Backdrop mờ dần cuối cùng.</td></tr>
+            <tr><td style="font-weight:800">Focus trap</td><td>Tab chỉ cycle trong modal (Tab ở element cuối → quay về element đầu). Focus mặc định vào element tương tác đầu tiên hoặc close button.</td></tr>
+            <tr><td style="font-weight:800">Escape key</td><td>Đóng modal (trừ khi <code>persistent:true</code> — form có unsaved changes). Nếu persistent → flash border đỏ 200ms cảnh báo.</td></tr>
+            <tr><td style="font-weight:800">Nested modal</td><td>CHO PHÉP tối đa 2 cấp. Modal con z-index +10 so với cha. Backdrop mới phủ lên modal cha. Khi close con → focus trả về cha.</td></tr>
+            <tr><td style="font-weight:800">Responsive (&lt;768px)</td><td>Modal sm/md → full width, border-radius: 16px 16px 0 0, position: fixed bottom, slide-up animation. Modal lg/xl/full → fullscreen.</td></tr>
+            <tr><td style="font-weight:800">Scroll body lock</td><td><code>body { overflow: hidden; padding-right: scrollbar-width }</code> khi modal mở. Giải phóng khi đóng. Tránh layout shift.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box info-box-blue"><strong>CONFIRM DIALOG (size sm)</strong>Title: hỏi rõ hành động ("Xóa đơn hàng SO-2024-001?"). Body: giải thích hậu quả ngắn gọn. Cancel button (secondary) bên trái. Confirm button (danger hoặc primary) bên phải. Icon: ⚠ warning 24px nếu destructive.</div>
+      <div class="info-box info-box-purple"><strong>DRAWER (biến thể modal)</strong>Width: 360px (sm), 480px (md), 640px (lg). Position: right edge. Animation: translateX(100%)→0. Backdrop: giống modal. Không nested drawer. Close: icon × hoặc swipe-right trên mobile.</div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 24: NAVIGATION ADAPTIVE ═══ -->
+<section class="section" id="nav-rules">
+    <h2 class="section-title"><span class="section-number">24</span>Navigation thích ứng</h2>
+    <p class="section-subtitle">Sidebar, breadcrumb, tab bar, mobile nav — hành vi chính xác theo từng breakpoint.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Sidebar Navigation</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Breakpoint</th><th>Sidebar Mode</th><th>Width</th><th>Hành vi</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">≥1280px (xl)</td><td>Expanded (icon + text)</td><td>240px (fixed)</td><td>Luôn hiện. Scrollable nếu menu dài. Active item: bg <code>--brand-2</code> opacity 10%, text <code>--brand-2</code>, border-left 3px solid <code>--brand-2</code>.</td></tr>
+            <tr><td style="font-weight:800">768–1279px (md–lg)</td><td>Collapsed (icon only)</td><td>64px (fixed)</td><td>Hover icon → tooltip tên module (delay 300ms). Click icon → navigate. Expand button ở bottom sidebar: click → slide ra expanded 240px (overlay, z-index <code>--z-sidebar</code>).</td></tr>
+            <tr><td style="font-weight:800">&lt;768px (sm)</td><td>Hidden (hamburger menu)</td><td>0px (ẩn)</td><td>Hamburger icon (☰) ở header top-left. Click → drawer slide-in từ trái, width 280px, z-index <code>--z-sidebar</code> + backdrop. Swipe-left to close.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:18px">
+      <div class="card">
+        <div class="card-header">Breadcrumb Rules</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Quy tắc</th><th>Giá trị</th></tr></thead>
+            <tbody>
+              <tr><td>Separator</td><td>Chevron › (10px, color <code>--text-3</code>), gap 8px mỗi bên</td></tr>
+              <tr><td>Current page</td><td>font-weight 700, color <code>--text-1</code>, không click được</td></tr>
+              <tr><td>Parent pages</td><td>font-weight 400, color <code>--brand-2</code>, hover: underline</td></tr>
+              <tr><td>Max items</td><td>5 items. Nếu &gt;5 → collapse giữa thành "…" dropdown</td></tr>
+              <tr><td>Mobile (&lt;768px)</td><td>Chỉ hiện: ← icon + parent gần nhất. Tap → back.</td></tr>
+              <tr><td>Font</td><td>13px, role Body Small</td></tr>
+              <tr><td>Placement</td><td>Header zone, dưới page title, trên filter bar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">Tab Bar Rules</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Quy tắc</th><th>Giá trị</th></tr></thead>
+            <tbody>
+              <tr><td>Height</td><td>44px (includes 3px active indicator)</td></tr>
+              <tr><td>Active indicator</td><td>Border-bottom 3px solid <code>--brand-2</code>, border-radius 3px 3px 0 0</td></tr>
+              <tr><td>Active text</td><td>font-weight 700, color <code>--brand-2</code></td></tr>
+              <tr><td>Inactive text</td><td>font-weight 500, color <code>--text-2</code></td></tr>
+              <tr><td>Hover</td><td>bg rgba(21,101,192,.04), transition <code>--duration-fast</code></td></tr>
+              <tr><td>Gap giữa tabs</td><td>0 (tabs liền nhau, padding-x 16px mỗi tab)</td></tr>
+              <tr><td>Overflow</td><td>Scroll horizontal, scrollbar hidden. Arrow buttons ← → ở hai đầu khi overflow.</td></tr>
+              <tr><td>Mobile</td><td>Swipe horizontal. Hoặc chuyển sang dropdown select nếu &gt;5 tabs.</td></tr>
+              <tr><td>Disabled tab</td><td>opacity 0.4, cursor not-allowed, không navigate khi click</td></tr>
+              <tr><td>Badge trên tab</td><td>Dot 8px hoặc count badge (min 16px diameter) ở top-right tab text</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 25: DATA VISUALIZATION SPEC ═══ -->
+<section class="section" id="dataviz-rules">
+    <h2 class="section-title"><span class="section-number">25</span>Quy chuẩn Data Visualization chính xác</h2>
+    <p class="section-subtitle">Biểu đồ, gauge, sparkline — mọi quy tắc màu sắc, tooltip, legend, responsive đều xác định ở đây.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">🎨 Chart Color Palette (10 màu tuần tự + semantic)</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Thứ tự</th><th>Hex</th><th>Tên</th><th>Dùng cho</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td style="font-weight:800;color:#2563eb">#2563eb</td><td>Blue</td><td>Series chính, primary metric</td></tr>
+            <tr><td>2</td><td style="font-weight:800;color:#0891b2">#0891b2</td><td>Cyan</td><td>Series phụ, comparison</td></tr>
+            <tr><td>3</td><td style="font-weight:800;color:#7c3aed">#7c3aed</td><td>Purple</td><td>Series 3, category C</td></tr>
+            <tr><td>4</td><td style="font-weight:800;color:#db2777">#db2777</td><td>Pink</td><td>Series 4</td></tr>
+            <tr><td>5</td><td style="font-weight:800;color:#d97706">#d97706</td><td>Amber</td><td>Series 5, warning threshold</td></tr>
+            <tr><td>6</td><td style="font-weight:800;color:#0d9488">#0d9488</td><td>Teal</td><td>Series 6</td></tr>
+            <tr><td>7</td><td style="font-weight:800;color:#4f46e5">#4f46e5</td><td>Indigo</td><td>Series 7</td></tr>
+            <tr><td>8</td><td style="font-weight:800;color:#e11d48">#e11d48</td><td>Rose</td><td>Series 8</td></tr>
+            <tr><td>9</td><td style="font-weight:800;color:#0369a1">#0369a1</td><td>Sky</td><td>Series 9</td></tr>
+            <tr><td>10</td><td style="font-weight:800;color:#65a30d">#65a30d</td><td>Lime</td><td>Series 10</td></tr>
+            <tr><td colspan="4" style="border:none;padding-top:8px;font-weight:800;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)">Semantic Chart Colors</td></tr>
+            <tr><td>✓</td><td style="color:#16a34a">#16a34a</td><td>Good / Pass</td><td>OEE &gt;85%, yield &gt;95%, on-time</td></tr>
+            <tr><td>⚠</td><td style="color:#d97706">#d97706</td><td>Warning</td><td>OEE 65-85%, approaching limit</td></tr>
+            <tr><td>✗</td><td style="color:#dc2626">#dc2626</td><td>Bad / Fail</td><td>OEE &lt;65%, over spec limit, late</td></tr>
+            <tr><td>—</td><td style="color:#94a3b8">#94a3b8</td><td>Neutral</td><td>No data, baseline, placeholder</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Tooltip, Legend, Axis, Responsive</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:160px">Thuộc tính</th><th>Spec chính xác</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Tooltip delay</td><td>Hiện sau 200ms hover. Ẩn sau 100ms leave. Background: <code>--bg-elevated</code>. Border: 1px <code>--border</code>. Shadow: <code>--shadow-md</code>. Border-radius: <code>--radius-lg</code>. Max-width: 280px. Font: 12px. Line-height: 1.5.</td></tr>
+            <tr><td style="font-weight:800">Tooltip content</td><td>Dòng 1: Label/tên series (bold). Dòng 2: Giá trị + đơn vị. Dòng 3 (nếu cần): % thay đổi hoặc target comparison. Color dot tròn 8px trước tên series.</td></tr>
+            <tr><td style="font-weight:800">Legend position</td><td>Mặc định: bottom-center. Nếu &gt;6 series: right column. Mobile: bottom wrapped. Font: 12px, weight 500. Gap giữa items: 16px. Color dot 10px tròn trước tên.</td></tr>
+            <tr><td style="font-weight:800">Legend interaction</td><td>Click legend item → toggle show/hide series. Hidden series: text opacity 0.4 + strikethrough. Double-click → solo (ẩn tất cả trừ series đó).</td></tr>
+            <tr><td style="font-weight:800">X-axis labels</td><td>Font: 11px, color <code>--text-3</code>. Time axis: auto-format (giờ/ngày/tháng tùy range). Rotation: 0° mặc định, -45° nếu overlap (&gt;8 chars), -90° nếu nhiều.</td></tr>
+            <tr><td style="font-weight:800">Y-axis labels</td><td>Font: 11px, color <code>--text-3</code>. Right-aligned. Auto-scale (0–max×1.1). Số thập phân: tự động. Viết tắt: K(nghìn), M(triệu). Gridlines: 1px dashed rgba(0,0,0,.06).</td></tr>
+            <tr><td style="font-weight:800">Reference lines</td><td>Spec limit: 2px dashed <code>--red</code> + label bên phải. Target: 2px dashed <code>--green</code>. Average: 1px solid <code>--text-3</code> + label "TB".</td></tr>
+            <tr><td style="font-weight:800">Chart min height</td><td>Compact: 200px. Default: 280px. Full: 400px. Nếu container &lt;200px → thay chart bằng bảng số liệu.</td></tr>
+            <tr><td style="font-weight:800">Responsive</td><td>≥1280px: full chart. 768–1279px: ẩn legend, show on hover. &lt;768px: chart height giảm 30%, legend dưới wrapped, scroll horizontal nếu cần.</td></tr>
+            <tr><td style="font-weight:800">Loading chart</td><td>Skeleton rectangle (rounded corners) với shimmer animation. Cùng kích thước chart. Không hiện axis/label.</td></tr>
+            <tr><td style="font-weight:800">Empty chart</td><td>Hiện khung chart trống + text centered "Không có dữ liệu trong khoảng thời gian này" + icon 📊 32px. CTA: "Thay đổi bộ lọc".</td></tr>
+            <tr><td style="font-weight:800">Animation on load</td><td>Bar: grow from 0, stagger 30ms/bar, <code>--duration-slow</code>, <code>--ease-out</code>. Line: draw left→right, <code>--duration-slower</code>. Pie: rotate 0→360°. Disabled nếu <code>prefers-reduced-motion: reduce</code>.</td></tr>
+            <tr><td style="font-weight:800">Colorblind safe</td><td>Kết hợp color + pattern (stripes, dots, dashes) cho series &gt;3. Hoặc dùng shape markers trên line chart (●, ■, ▲, ◆).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 26: KEYBOARD SHORTCUT MATRIX ═══ -->
+<section class="section" id="keyboard-rules">
+    <h2 class="section-title"><span class="section-number">26</span>Ma trận phím tắt</h2>
+    <p class="section-subtitle">Mọi thao tác quan trọng đều CÓ THỂ thực hiện bằng bàn phím. Đây là danh sách bắt buộc.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">⌨️ Global Shortcuts</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Phím</th><th>Hành động</th></tr></thead>
+            <tbody>
+              <tr><td><code>Ctrl+S</code></td><td>Lưu form/record hiện tại</td></tr>
+              <tr><td><code>Ctrl+/</code></td><td>Mở command palette (tìm kiếm module/action)</td></tr>
+              <tr><td><code>Ctrl+K</code></td><td>Quick search (tìm record, part, SO, WO)</td></tr>
+              <tr><td><code>Ctrl+N</code></td><td>Tạo mới (context-aware: SO/WO/PO tùy module)</td></tr>
+              <tr><td><code>Escape</code></td><td>Đóng modal/drawer/dropdown đang mở</td></tr>
+              <tr><td><code>?</code></td><td>Hiện shortcut help overlay (khi không focus input)</td></tr>
+              <tr><td><code>Alt+1..9</code></td><td>Switch tab 1–9 trong admin panel</td></tr>
+              <tr><td><code>Ctrl+Shift+D</code></td><td>Toggle dark mode</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">📋 Table / List Shortcuts</div>
+        <div class="card-body" style="padding:0">
+          <table class="spec-table">
+            <thead><tr><th>Phím</th><th>Hành động</th></tr></thead>
+            <tbody>
+              <tr><td><code>↑ / ↓</code></td><td>Di chuyển giữa rows</td></tr>
+              <tr><td><code>Enter</code></td><td>Mở detail/edit row đang focus</td></tr>
+              <tr><td><code>Space</code></td><td>Toggle select row (checkbox)</td></tr>
+              <tr><td><code>Ctrl+A</code></td><td>Select all rows (trang hiện tại)</td></tr>
+              <tr><td><code>Delete</code></td><td>Xóa selected rows (hiện confirm dialog)</td></tr>
+              <tr><td><code>Ctrl+E</code></td><td>Export selected/all rows</td></tr>
+              <tr><td><code>Home / End</code></td><td>Jump to first/last row</td></tr>
+              <tr><td><code>Page Up/Down</code></td><td>Chuyển trang pagination</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:18px">
+      <div class="info-box info-box-blue"><strong>FOCUS MANAGEMENT</strong>Tab order: theo DOM order từ trên xuống, trái sang phải. Skip link "Chuyển đến nội dung chính" ẩn cho đến khi Tab — hiện ở top-left, z-index 9999. Mọi interactive element PHẢI có <code>:focus-visible</code> ring: 2px solid <code>--brand-2</code>, offset 2px.</div>
+      <div class="info-box info-box-amber"><strong>SHORTCUT DISCOVERY</strong>Nhấn <code>?</code> → modal hiện grid tất cả shortcuts hiện tại. Mỗi action button có tooltip showing shortcut (VD: "Lưu (Ctrl+S)"). Không conflict với browser shortcuts (tránh Ctrl+L, Ctrl+T, F5, F12).</div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 27: ICON SYSTEM ═══ -->
+<section class="section" id="icon-rules">
+    <h2 class="section-title"><span class="section-number">27</span>Hệ thống Icon</h2>
+    <p class="section-subtitle">Thư viện icon, kích thước, màu sắc, spacing — quy tắc bắt buộc cho mọi icon trong hệ thống.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Icon Library &amp; Standards</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:180px">Quy tắc</th><th>Giá trị chính xác</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Thư viện chính</td><td><strong>Lucide Icons</strong> (lucide.dev) — outline style, stroke-width 2px. Dự phòng: Heroicons Outline. KHÔNG trộn thư viện.</td></tr>
+            <tr><td style="font-weight:800">Size Scale</td><td><code>--icon-xs</code>: 12px (inline badge) · <code>--icon-sm</code>: 14px (button icon, table cell) · <code>--icon-md</code>: 16px (nav item, default) · <code>--icon-lg</code>: 20px (card header, section) · <code>--icon-xl</code>: 24px (empty state, hero) · <code>--icon-2xl</code>: 32px (empty state large, onboarding)</td></tr>
+            <tr><td style="font-weight:800">Color inheritance</td><td>Icon color mặc định = <code>currentColor</code> (kế thừa từ parent text color). Override chỉ cho semantic: success icon = <code>--green</code>, error = <code>--red</code>.</td></tr>
+            <tr><td style="font-weight:800">Gap icon-text</td><td><code>--gap-xs</code> (4px) cho sm icon. <code>--space-2</code> (8px) cho md/lg icon. Icon LUÔN trước text (leading icon), trừ action "Xem thêm →".</td></tr>
+            <tr><td style="font-weight:800">Icon-only button</td><td>Min touch target: 32×32px (desktop), 44×44px (mobile/shop floor). Padding: (target - icon) / 2. PHẢI có <code>aria-label</code>. Tooltip hiện sau 500ms hover.</td></tr>
+            <tr><td style="font-weight:800">Disabled icon</td><td>opacity: 0.35. Không thay đổi color.</td></tr>
+            <tr><td style="font-weight:800">Animated icons</td><td>Loading spinner: rotate 360° / <code>--duration-slower</code> linear infinite. Check mark: stroke-dasharray animation <code>--duration-normal</code>. Chevron rotate: <code>--duration-fast</code> <code>--ease-out</code>.</td></tr>
+            <tr><td style="font-weight:800">Custom icon</td><td>24×24 viewBox. Stroke-width 2px. Stroke-linecap round. Stroke-linejoin round. Đăng ký trong icon registry trước khi dùng.</td></tr>
+            <tr><td style="font-weight:800">Status icon kết hợp</td><td>KHÔNG dùng color alone. Kết hợp icon + color: ✓ (green) = pass, ✗ (red) = fail, ⚠ (amber) = warning, ℹ (blue) = info, ○ (gray) = pending.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 28: RESPONSIVE LAYOUT RULES ═══ -->
+<section class="section" id="responsive-rules">
+    <h2 class="section-title"><span class="section-number">28</span>Quy chuẩn Responsive Layout</h2>
+    <p class="section-subtitle">Breakpoint chính xác. Grid columns. Component size adjustments. Touch targets. Font scaling.</p>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Breakpoint System (5 mức)</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Token</th><th>Width</th><th>Device</th><th>Grid Cols</th><th>Sidebar</th><th>Page Padding</th></tr></thead>
+          <tbody>
+            <tr><td><code>--bp-sm</code></td><td>&lt;640px</td><td>Mobile portrait</td><td>1 cột</td><td>Hidden (hamburger)</td><td>16px</td></tr>
+            <tr><td><code>--bp-md</code></td><td>640–767px</td><td>Mobile landscape</td><td>2 cột</td><td>Hidden (hamburger)</td><td>16px</td></tr>
+            <tr><td><code>--bp-lg</code></td><td>768–1023px</td><td>Tablet</td><td>2–3 cột</td><td>Collapsed (64px icon-only)</td><td>24px</td></tr>
+            <tr><td><code>--bp-xl</code></td><td>1024–1279px</td><td>Laptop / small desktop</td><td>3–4 cột</td><td>Collapsed (64px icon-only)</td><td>24px</td></tr>
+            <tr><td><code>--bp-2xl</code></td><td>≥1280px</td><td>Desktop / monitor</td><td>4–6 cột</td><td>Expanded (240px)</td><td>32px</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">Component Size Scaling</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th>Component</th><th>Desktop (≥1280)</th><th>Tablet (768–1279)</th><th>Mobile (&lt;768)</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Button height</td><td>36px</td><td>40px</td><td>44px (touch target)</td></tr>
+            <tr><td style="font-weight:800">Input height</td><td>40px</td><td>44px</td><td>48px</td></tr>
+            <tr><td style="font-weight:800">Table row height</td><td>40px (default density)</td><td>44px</td><td>Card mode (auto height)</td></tr>
+            <tr><td style="font-weight:800">Icon button</td><td>32×32px</td><td>36×36px</td><td>44×44px</td></tr>
+            <tr><td style="font-weight:800">Touch target min</td><td>32×32px</td><td>44×44px</td><td>44×44px (WCAG)</td></tr>
+            <tr><td style="font-weight:800">KPI card</td><td>Value 32px, label 11px</td><td>Value 28px, label 10px</td><td>Value 24px, label 10px</td></tr>
+            <tr><td style="font-weight:800">Chart height</td><td>280–400px</td><td>240–320px</td><td>200–240px</td></tr>
+            <tr><td style="font-weight:800">Heading sizes</td><td>Display 32px, Headline 24px</td><td>Display 28px, Headline 22px</td><td>Display 24px, Headline 20px</td></tr>
+            <tr><td style="font-weight:800">Body text</td><td>14px</td><td>14px</td><td>15px (legibility boost)</td></tr>
+            <tr><td style="font-weight:800">Modal</td><td>Centered overlay</td><td>Centered overlay</td><td>Full-width bottom sheet</td></tr>
+            <tr><td style="font-weight:800">Toast</td><td>Top-right, width 360px</td><td>Top-right, width 320px</td><td>Top-center, width 100% - 32px</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box info-box-green"><strong>ZONE COLLAPSE ORDER (Mobile)</strong>Khi viewport thu nhỏ, zones collapse theo thứ tự: 1. Sidebar → drawer/hidden. 2. KPI-bar → horizontal scroll hoặc 2×2 grid. 3. Chart-area → thu nhỏ 30%. 4. Footer → sticky bottom, buttons stack vertical. 5. Filter → collapse thành 1 nút "Bộ lọc" mở drawer.</div>
+      <div class="info-box info-box-purple"><strong>PRINT vs RESPONSIVE</strong>Print layout (Ctrl+P): luôn dùng breakpoint ≥1280px (full desktop). Ẩn sidebar, navigation, action buttons. Hiện tất cả data (không pagination, không collapse). Background-color: in bằng <code>print-color-adjust: exact</code>. Page-break: avoid inside card/row.</div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 29: BLOCK JSON SCHEMA ═══ -->
+<section class="section" id="block-schema">
+    <h2 class="section-title"><span class="section-number">29</span>Block JSON Schema — 10 blocks quan trọng nhất</h2>
+    <p class="section-subtitle">Mỗi block type có JSON Schema chính xác. Developer dùng schema này để render block — không cần tìm nguồn khác.</p>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">📊 data-table — Block phổ biến nhất</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "data-table",
+  "props": {
+    "columns": [{
+      "key": "string",         <span class="c">// field name from data source</span>
+      "title": "string",       <span class="c">// column header text</span>
+      "width": "number|string",<span class="c">// px or 'auto', min 60px</span>
+      "dataType": "string|number|date|currency|percent|boolean|status",
+      "align": "left|center|right",  <span class="c">// default: auto by dataType</span>
+      "sortable": "boolean",   <span class="c">// default: true</span>
+      "filterable": "boolean", <span class="c">// default: false</span>
+      "frozen": "boolean",     <span class="c">// default: false, max 2 cols</span>
+      "editable": "boolean",   <span class="c">// default: false</span>
+      "hidden": "boolean",     <span class="c">// default: false</span>
+      "render": "text|badge|link|icon|progress|custom"
+    }],
+    "data": "Array&lt;Object&gt;",     <span class="c">// row objects matching column keys</span>
+    "rowKey": "string",        <span class="c">// unique ID field, default 'id'</span>
+    "stickyHeader": "boolean", <span class="c">// default: true</span>
+    "selectable": "none|single|multi", <span class="c">// default: 'none'</span>
+    "pagination": {
+      "enabled": "boolean",    <span class="c">// default: true</span>
+      "pageSize": "20|50|100", <span class="c">// default: 20</span>
+      "serverSide": "boolean"  <span class="c">// default: false</span>
+    },
+    "expandable": "boolean",   <span class="c">// row expansion, default: false</span>
+    "density": "compact|default|comfortable|shopfloor",
+    "emptyText": "string",     <span class="c">// default: 'Không có dữ liệu'</span>
+    "loading": "boolean"
+  },
+  "events": {
+    "onRowClick": "(row, index) => void",
+    "onSelectionChange": "(selectedRows) => void",
+    "onSort": "(column, direction) => void",
+    "onFilter": "(column, value) => void",
+    "onPageChange": "(page, pageSize) => void",
+    "onCellEdit": "(row, column, oldValue, newValue) => void"
+  },
+  "allowedZones": ["main", "sidebar"],
+  "accessibility": {
+    "role": "table",
+    "aria-label": "string (bắt buộc)",
+    "aria-rowcount": "auto from data.length",
+    "th scope": "col"
+  }
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">📈 chart-line — Biểu đồ đường</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "chart-line",
+  "props": {
+    "series": [{
+      "name": "string",        <span class="c">// legend label</span>
+      "data": "Array&lt;{x, y}&gt;", <span class="c">// data points</span>
+      "color": "string",       <span class="c">// override chart palette</span>
+      "dashStyle": "solid|dashed|dotted",
+      "marker": "none|circle|square|triangle"
+    }],
+    "xAxis": {
+      "type": "category|time|numeric",
+      "label": "string",       <span class="c">// axis title</span>
+      "format": "string"       <span class="c">// date format or number format</span>
+    },
+    "yAxis": {
+      "label": "string",
+      "min": "number|auto",
+      "max": "number|auto",
+      "format": "number|percent|currency"
+    },
+    "referenceLines": [{
+      "value": "number",
+      "label": "string",
+      "color": "string",       <span class="c">// default: --red</span>
+      "style": "solid|dashed"  <span class="c">// default: dashed</span>
+    }],
+    "tooltip": { "enabled": true, "format": "string" },
+    "legend": { "position": "bottom|right|none" },
+    "height": "number",        <span class="c">// px, default 280</span>
+    "smoothing": "boolean",    <span class="c">// curved lines, default true</span>
+    "loading": "boolean"
+  },
+  "events": {
+    "onPointClick": "(series, point) => void",
+    "onLegendToggle": "(seriesName, visible) => void",
+    "onBrushSelect": "(range) => void"
+  },
+  "allowedZones": ["main", "chart-area", "sidebar"]
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">📝 form-standard — Form chuẩn</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "form-standard",
+  "props": {
+    "fields": [{
+      "key": "string",         <span class="c">// data field name</span>
+      "label": "string",       <span class="c">// display label (Vietnamese)</span>
+      "type": "text|number|email|phone|date|select|multiselect|checkbox|radio|textarea|file|signature",
+      "required": "boolean",
+      "placeholder": "string",
+      "helperText": "string",
+      "defaultValue": "any",
+      "validation": {
+        "pattern": "regex string",
+        "min": "number", "max": "number",
+        "minLength": "number", "maxLength": "number",
+        "custom": "(value, allValues) => string|null"
+      },
+      "options": "Array&lt;{value,label}&gt;", <span class="c">// for select/radio/checkbox</span>
+      "dependsOn": {           <span class="c">// conditional visibility</span>
+        "field": "string",
+        "operator": "eq|neq|gt|lt|in|notIn",
+        "value": "any"
+      },
+      "colSpan": "1|2|3|full", <span class="c">// grid column span</span>
+      "readOnly": "boolean",
+      "disabled": "boolean"
+    }],
+    "layout": "vertical|horizontal",  <span class="c">// label position</span>
+    "columns": "1|2|3|auto",   <span class="c">// grid columns, default auto</span>
+    "sections": [{             <span class="c">// fieldset grouping</span>
+      "title": "string",
+      "fields": ["field_key_1", "field_key_2"]
+    }],
+    "submitLabel": "string",   <span class="c">// default: 'Lưu'</span>
+    "cancelLabel": "string",   <span class="c">// default: 'Hủy'</span>
+    "loading": "boolean"
+  },
+  "events": {
+    "onSubmit": "(values) => Promise",
+    "onCancel": "() => void",
+    "onChange": "(field, value, allValues) => void",
+    "onValidationError": "(errors) => void"
+  },
+  "allowedZones": ["main", "sidebar"]
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">📊 kpi-row — Dãy thẻ KPI</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "kpi-row",
+  "props": {
+    "items": [{
+      "label": "string",       <span class="c">// KPI name (VD: 'OEE', 'Yield')</span>
+      "value": "number|string",<span class="c">// display value</span>
+      "unit": "string",        <span class="c">// '%', 'pcs', 'giờ'</span>
+      "trend": "number|null",  <span class="c">// +2.1 or -0.5</span>
+      "trendDirection": "up-good|up-bad", <span class="c">// green or red for positive</span>
+      "tone": "success|warning|error|info|neutral",
+      "sparkline": "Array&lt;number&gt;|null", <span class="c">// mini 30-point trend</span>
+      "target": "number|null", <span class="c">// target value for comparison</span>
+      "icon": "string|null"    <span class="c">// Lucide icon name</span>
+    }],
+    "columns": "auto|2|3|4|5|6", <span class="c">// responsive auto-fit</span>
+    "size": "compact|default|large", <span class="c">// value font size</span>
+    "clickable": "boolean"     <span class="c">// click to drill-down</span>
+  },
+  "events": {
+    "onItemClick": "(item, index) => void"
+  },
+  "allowedZones": ["kpi-bar", "header", "main"]
+}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header">✅ approval-buttons — Nút phê duyệt</div>
+      <div class="card-body"><div class="code-block">{
+  "type": "approval-buttons",
+  "props": {
+    "currentState": "string",  <span class="c">// VD: 'pending_review'</span>
+    "transitions": [{
+      "action": "approve|reject|escalate|return|sign",
+      "label": "string",      <span class="c">// VD: 'Phê duyệt', 'Từ chối'</span>
+      "nextState": "string",   <span class="c">// VD: 'approved'</span>
+      "variant": "primary|danger|secondary",
+      "requiresReason": "boolean",  <span class="c">// bắt buộc nhập lý do</span>
+      "requiresSignature": "boolean",<span class="c">// e-signature 21 CFR Part 11</span>
+      "confirmMessage": "string|null",
+      "permissions": ["string"] <span class="c">// roles allowed</span>
+    }],
+    "approvalFlow": [{         <span class="c">// visual workflow path</span>
+      "step": "number",
+      "role": "string",        <span class="c">// VD: 'QA Manager'</span>
+      "status": "pending|completed|current|skipped",
+      "assignee": "string|null",
+      "completedAt": "ISO date|null",
+      "slaHours": "number|null"
+    }],
+    "showTimeline": "boolean", <span class="c">// default: true</span>
+    "showSlaTimer": "boolean"  <span class="c">// countdown timer</span>
+  },
+  "events": {
+    "onAction": "(action, reason, signature) => Promise",
+    "onEscalate": "(reason) => void"
+  },
+  "allowedZones": ["footer", "header"],
+  "accessibility": {
+    "role": "toolbar",
+    "aria-label": "Approval actions"
+  }
+}</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box info-box-blue"><strong>5 BLOCKS NỮA CẦN SCHEMA</strong>kanban-board (drag-drop columns, swimlanes, WIP limits), data-timeline (vertical/horizontal, milestones, dependencies), signature-pad (21 CFR Part 11, signer role, intent, timestamp lock), gantt-chart (multi-resource, constraints, drag-reschedule), barcode-input (camera scan, manual entry, validation format).</div>
+      <div class="info-box info-box-amber"><strong>QUY TẮC MỞ RỘNG BLOCK</strong>Khi tạo block mới: (1) Viết JSON Schema trước, (2) Xác định allowedZones, (3) Liệt kê events, (4) Ghi accessibility requirements, (5) Thêm vào Block Engine registry (Section 33). Block KHÔNG có schema → không được deploy.</div>
+    </div>
+  </section>
+
+<!-- ═══ SECTION 30: TOAST & NOTIFICATION PRECISE ═══ -->
+<section class="section" id="toast-precise">
+    <h2 class="section-title"><span class="section-number">30</span>Quy chuẩn Toast &amp; Notification chính xác</h2>
+    <p class="section-subtitle">Vị trí pixel, kích thước, thời gian, animation — tất cả quy tắc chính xác cho toast system.</p>
+
+    <div class="card">
+      <div class="card-header">Toast Specifications</div>
+      <div class="card-body" style="padding:0">
+        <table class="spec-table">
+          <thead><tr><th style="width:160px">Thuộc tính</th><th>Giá trị chính xác</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:800">Position</td><td>Desktop: top-right, offset 24px from viewport edges. Mobile: top-center, offset 16px top, width calc(100vw - 32px).</td></tr>
+            <tr><td style="font-weight:800">Width</td><td>Desktop: 360px (fixed). Mobile: 100% - 32px. Min-height: 48px.</td></tr>
+            <tr><td style="font-weight:800">Padding</td><td>12px 16px. Icon-text gap: 12px. Close button: 8px from right edge.</td></tr>
+            <tr><td style="font-weight:800">Border-radius</td><td><code>--radius-lg</code> (8px)</td></tr>
+            <tr><td style="font-weight:800">Shadow</td><td><code>--shadow-md</code></td></tr>
+            <tr><td style="font-weight:800">Z-index</td><td><code>--z-toast</code> (2000)</td></tr>
+            <tr><td style="font-weight:800">Stack direction</td><td>Mới nhất ở trên. Gap giữa toasts: 8px. Max stack: 4. Toast thứ 5+ xếp hàng ẩn.</td></tr>
+            <tr><td style="font-weight:800">Duration</td><td>Success: 3s. Info: 4s. Warning: 6s (manual close). Error: ∞ (manual close only).</td></tr>
+            <tr><td style="font-weight:800">Animation enter</td><td>translateX(100%) → 0, opacity 0 → 1. Duration: <code>--duration-slow</code>. Easing: <code>--ease-spring</code>.</td></tr>
+            <tr><td style="font-weight:800">Animation exit</td><td>translateX(0) → 100%, opacity 1 → 0. Duration: <code>--duration-normal</code>. Easing: <code>--ease-in</code>.</td></tr>
+            <tr><td style="font-weight:800">Progress bar</td><td>Auto-dismiss toasts có thin progress bar (2px) ở bottom, color matching toast type. Shrinks left → right.</td></tr>
+            <tr><td style="font-weight:800">Duplicate prevention</td><td>Nếu toast cùng message đang hiện → KHÔNG tạo mới. Counter badge: "×3" ở góc.</td></tr>
+            <tr><td style="font-weight:800">Action button</td><td>Text-only, color inherit, font-weight 700, padding 4px 8px. Max 1 action per toast. VD: "Hoàn tác", "Xem chi tiết".</td></tr>
+            <tr><td style="font-weight:800">Icon per type</td><td>Success: ✓ circle (16px, <code>--green</code>). Error: ✗ circle (<code>--red</code>). Warning: ⚠ triangle (<code>--amber</code>). Info: ℹ circle (<code>--brand-2</code>).</td></tr>
+            <tr><td style="font-weight:800">ARIA</td><td>Success/Info: <code>role="status"</code>, <code>aria-live="polite"</code>. Warning/Error: <code>role="alert"</code>, <code>aria-live="assertive"</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
 <section class="section" id="visual-themes">
-    <h2 class="section-title"><span class="section-number">20</span>20 Visual Theme Presets</h2>
+    <h2 class="section-title"><span class="section-number">31</span>20 Visual Theme Presets</h2>
     <p class="section-subtitle">Bộ giao diện sẵn có. Admin chọn theme → tự động áp dụng toàn hệ thống. User có thể override bằng preference cá nhân.</p>
 
     <div class="grid-4" style="margin-bottom:18px">
@@ -1966,7 +2777,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="block-engine">
-    <h2 class="section-title"><span class="section-number">21</span>Block Engine</h2>
+    <h2 class="section-title"><span class="section-number">32</span>Block Engine</h2>
     <p class="section-lead">Block Engine là lớp render chuẩn hóa cho toàn bộ template catalog. Mỗi block type có contract rõ về zone được phép, data shape và config keys để Module Builder, runtime router và preview engine dùng cùng một ngôn ngữ.</p>
     <div class="note">Ba sample data bắt buộc đã được khóa trong catalog này: <code>data-table</code> dùng header “Mã SO | Khách hàng | Part Number | Số lượng | Ngày giao | Trạng thái”, <code>kpi-row</code> dùng “OTD: 98.7% ▲2.1% | Backlog: $1.2M | Active JOs: 342 | Scrap Rate: 0.8%”, và <code>chart-bar</code> dùng “Doanh thu theo tháng T1-T6 2026”.</div>
 
@@ -2194,7 +3005,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="zone-system">
-    <h2 class="section-title"><span class="section-number">22</span>Zone System</h2>
+    <h2 class="section-title"><span class="section-number">33</span>Zone System</h2>
     <p class="section-lead">Zone là contract cứng giữa template và block engine. Mỗi zone quyết định vị trí, độ cao, hành vi scroll, loại block được phép và cách responsive co giãn theo breakpoint.</p>
 
     <div class="grid-2" style="margin-top:18px;margin-bottom:18px">
@@ -2248,7 +3059,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="scroll-ux">
-    <h2 class="section-title"><span class="section-number">23</span>Smart Scroll UX</h2>
+    <h2 class="section-title"><span class="section-number">34</span>Smart Scroll UX</h2>
     <p class="section-lead">Scroll contract của HESEM MOM đi theo nguyên tắc “chỉ data di chuyển”. Layout shell phải ổn định để người dùng luôn còn header, KPI, filter và action trong tầm nhìn.</p>
 
     <div class="grid-2" style="margin-top:18px">
@@ -2317,7 +3128,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-overview">
-    <h2 class="section-title"><span class="section-number">24</span>TỔNG QUAN</h2>
+    <h2 class="section-title"><span class="section-number">35</span>TỔNG QUAN</h2>
     <div class="cat-header">
       <span class="chip chip-blue cat-chip">TỔNG QUAN</span>
       <span class="cat-desc">Màn hình tổng quan, điều hành, giám sát, dashboard</span>
@@ -2484,7 +3295,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-sales">
-    <h2 class="section-title"><span class="section-number">25</span>BÁN HÀNG & CRM</h2>
+    <h2 class="section-title"><span class="section-number">36</span>BÁN HÀNG & CRM</h2>
     <div class="cat-header">
       <span class="chip chip-cyan cat-chip">BÁN HÀNG & CRM</span>
       <span class="cat-desc">Báo giá, đơn hàng, hợp đồng, lịch giao hàng và cổng khách hàng</span>
@@ -2599,7 +3410,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-engineering">
-    <h2 class="section-title"><span class="section-number">26</span>KỸ THUẬT & NPI</h2>
+    <h2 class="section-title"><span class="section-number">37</span>KỸ THUẬT & NPI</h2>
     <div class="cat-header">
       <span class="chip chip-indigo cat-chip">KỸ THUẬT & NPI</span>
       <span class="cat-desc">Part master, BOM, routing, CAM, ECR/ECN và NPI</span>
@@ -2714,7 +3525,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-purchasing">
-    <h2 class="section-title"><span class="section-number">27</span>MUA HÀNG & CUNG ỨNG</h2>
+    <h2 class="section-title"><span class="section-number">38</span>MUA HÀNG & CUNG ỨNG</h2>
     <div class="cat-header">
       <span class="chip chip-amber cat-chip">MUA HÀNG & CUNG ỨNG</span>
       <span class="cat-desc">PO, RFQ, supplier scorecard, procurement analytics và receiving</span>
@@ -2829,7 +3640,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-production">
-    <h2 class="section-title"><span class="section-number">28</span>SẢN XUẤT & MES</h2>
+    <h2 class="section-title"><span class="section-number">39</span>SẢN XUẤT & MES</h2>
     <div class="cat-header">
       <span class="chip chip-green cat-chip">SẢN XUẤT & MES</span>
       <span class="cat-desc">Điều độ, MES, OEE, máy CNC, labor tracking và batch record</span>
@@ -3035,7 +3846,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-quality">
-    <h2 class="section-title"><span class="section-number">29</span>CHẤT LƯỢNG & eQMS</h2>
+    <h2 class="section-title"><span class="section-number">40</span>CHẤT LƯỢNG & eQMS</h2>
     <div class="cat-header">
       <span class="chip chip-red cat-chip">CHẤT LƯỢNG & eQMS</span>
       <span class="cat-desc">NCR, CAPA, SPC, FMEA, audit, calibration, IQC và MSA</span>
@@ -3228,7 +4039,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-warehouse">
-    <h2 class="section-title"><span class="section-number">30</span>KHO VẬN</h2>
+    <h2 class="section-title"><span class="section-number">41</span>KHO VẬN</h2>
     <div class="cat-header">
       <span class="chip chip-teal cat-chip">KHO VẬN &amp; LOGISTICS</span>
       <span class="cat-desc">Tồn kho, truy xuất lô, min-max, dụng cụ, giao dịch kho</span>
@@ -3249,7 +4060,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-shipping">
-    <h2 class="section-title"><span class="section-number">31</span>GIAO HÀNG</h2>
+    <h2 class="section-title"><span class="section-number">42</span>GIAO HÀNG</h2>
     <div class="cat-header"><span class="chip chip-teal cat-chip">GIAO HÀNG</span><span class="cat-desc">Shipment, packing, tracking, lịch giao, xác nhận chứng từ</span><span class="cat-count">4 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,date-range-picker,data-table,action-toolbar,gantt-row,data-timeline" data-zones="header,filter,main,footer"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="118" rx="4" class="wb"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="10" rx="1" class="wh" opacity=".5"/><rect x="4" y="52" width="192" height="8" rx="2" class="wt"/><rect x="4" y="64" width="192" height="8" rx="2" class="wta"/><rect x="4" y="76" width="192" height="8" rx="2" class="wt"/><rect x="4" y="88" width="192" height="8" rx="2" class="wta"/><rect x="4" y="100" width="192" height="14" rx="2" class="wft"/><rect x="152" y="52" width="26" height="6" rx="2" class="wg"/><rect x="152" y="64" width="26" height="6" rx="2" class="wa"/></svg></div><div class="tpl-info"><div class="tpl-name">T76 Danh sách giao hàng</div><div class="tpl-subname">Shipment List</div><div class="tpl-desc">Danh sách giao hàng quản lý shipment, trạng thái xử lý và bộ chứng từ liên quan theo từng đợt xuất. Dành cho logistics, kho thành phẩm và customer service khi chuẩn bị xuất hàng, kiểm tra chứng từ còn thiếu hoặc theo dõi lô đang chờ xe nhận.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + filter + main(table) + footer</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span><span class="chip chip-amber">dense</span></div></div></div></div>
@@ -3260,7 +4071,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-finance">
-    <h2 class="section-title"><span class="section-number">32</span>TÀI CHÍNH</h2>
+    <h2 class="section-title"><span class="section-number">43</span>TÀI CHÍNH</h2>
     <div class="cat-header"><span class="chip chip-amber cat-chip">TÀI CHÍNH &amp; KẾ TOÁN</span><span class="cat-desc">Doanh thu, job costing, hóa đơn, bằng chứng hồ sơ công việc, COPQ, payroll</span><span class="cat-count">6 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,kpi-row,data-table,data-list,pivot-table,stat-callout" data-zones="header,kpi-bar,main,sidebar"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="118" rx="4" class="wb"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="45" height="18" rx="2" class="wk"/><rect x="52" y="22" width="45" height="18" rx="2" class="wk"/><rect x="100" y="22" width="45" height="18" rx="2" class="wk"/><rect x="148" y="22" width="48" height="18" rx="2" class="wk"/><rect x="4" y="44" width="126" height="70" rx="3" class="wm"/><rect x="134" y="44" width="62" height="70" rx="3" class="ws"/><rect x="14" y="92" width="106" height="10" rx="2" class="wta"/><rect x="16" y="58" width="14" height="32" rx="2" class="wg"/><rect x="36" y="50" width="14" height="40" rx="2" class="wbl"/><rect x="56" y="66" width="14" height="24" rx="2" class="wa"/></svg></div><div class="tpl-info"><div class="tpl-name">T80 Dashboard tài chính</div><div class="tpl-subname">Finance Dashboard</div><div class="tpl-desc">Dashboard tài chính tổng hợp doanh thu, chi phí, lợi nhuận và công nợ phải thu hoặc phải trả trên cùng một khung nhìn. Dành cho kế toán trưởng, CFO và ban giám đốc khi xem sức khỏe tài chính, so sánh kỳ báo cáo hoặc phát hiện khoản mục biến động bất thường.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + kpi-bar(4) + main(bar + pie charts) + sidebar(recent txns)</div><div class="tpl-chips"><span class="chip chip-blue">5 zones</span><span class="chip chip-green">comfortable</span></div></div></div></div>
@@ -3273,7 +4084,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-hr">
-    <h2 class="section-title"><span class="section-number">33</span>NHÂN SỰ</h2>
+    <h2 class="section-title"><span class="section-number">44</span>NHÂN SỰ</h2>
     <div class="cat-header"><span class="chip chip-pink cat-chip">NHÂN SỰ &amp; ĐÀO TẠO</span><span class="cat-desc">Nhân sự, phép, KPI, năng lực, đào tạo, chấm công, cổng nội bộ</span><span class="cat-count">10 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,date-range-picker,data-table,data-list,form-standard,chart-donut" data-zones="header,filter,main,sidebar"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="118" rx="4" class="wb"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="128" height="76" rx="3" class="wm"/><rect x="136" y="38" width="60" height="76" rx="3" class="ws"/><rect x="12" y="46" width="112" height="8" rx="2" class="wt"/><rect x="12" y="58" width="112" height="8" rx="2" class="wta"/><rect x="12" y="70" width="112" height="8" rx="2" class="wt"/><rect x="146" y="48" width="40" height="18" rx="9" class="wbl"/><rect x="150" y="78" width="32" height="20" rx="3" class="wg"/></svg></div><div class="tpl-info"><div class="tpl-name">T86 Danh bạ nhân viên</div><div class="tpl-subname">Employee Directory</div><div class="tpl-desc">Danh bạ nhân viên hiển thị bảng nhân sự kèm panel chi tiết về hồ sơ, KPI và phép năm của từng người. Dành cho HR, trưởng bộ phận và admin khi tra cứu thông tin nhân viên, kiểm tra trạng thái làm việc hoặc chuẩn bị đánh giá định kỳ.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + filter + main(table) + sidebar(employee detail card)</div><div class="tpl-chips"><span class="chip chip-blue">5 zones</span><span class="chip chip-amber">dense</span></div></div></div></div>
@@ -3290,7 +4101,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-documents">
-    <h2 class="section-title"><span class="section-number">34</span>TÀI LIỆU</h2>
+    <h2 class="section-title"><span class="section-number">45</span>TÀI LIỆU</h2>
     <div class="cat-header"><span class="chip chip-purple cat-chip">TÀI LIỆU &amp; TUÂN THỦ</span><span class="cat-desc">Browser 3-pane, report viewer, audit trail, change control, risk, SOP, compliance</span><span class="cat-count">10 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,data-table,data-list,document-preview,nav-sidebar-tree,data-timeline" data-zones="header,main,sidebar"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="118" rx="4" class="wb"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="58" height="92" rx="3" class="ws"/><rect x="66" y="22" width="62" height="92" rx="3" class="wm"/><rect x="132" y="22" width="64" height="92" rx="3" class="wbl"/><rect x="12" y="30" width="42" height="8" rx="2" class="wt"/><rect x="12" y="44" width="42" height="8" rx="2" class="wta"/><rect x="74" y="30" width="46" height="8" rx="2" class="wt"/><rect x="74" y="44" width="46" height="8" rx="2" class="wta"/><rect x="140" y="32" width="48" height="48" rx="3" fill="#fff" stroke="rgba(37,99,235,.16)" stroke-width="1"/></svg></div><div class="tpl-info"><div class="tpl-name">T96 Duyệt tài liệu</div><div class="tpl-subname">Document Browser</div><div class="tpl-desc">Màn hình duyệt tài liệu kết hợp cây thư mục, danh sách file và khung preview để truy cập hồ sơ nhanh chóng. Dành cho QA, document control và auditor khi tìm SOP, xem phiên bản hiện hành hoặc xác minh tài liệu nào đang có hiệu lực.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + sidebar(tree) + main(list) + sidebar-right(preview)</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span><span class="chip chip-dark">default</span></div></div></div></div>
@@ -3307,7 +4118,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-admin">
-    <h2 class="section-title"><span class="section-number">35</span>QUẢN TRỊ</h2>
+    <h2 class="section-title"><span class="section-number">46</span>QUẢN TRỊ</h2>
     <div class="cat-header"><span class="chip chip-dark cat-chip">QUẢN TRỊ HỆ THỐNG</span><span class="cat-desc">Cấu hình, người dùng, phân quyền, org chart, schema, security, observability</span><span class="cat-count">8 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,data-table,action-toolbar,form-standard,nav-tabs,rule-builder" data-zones="header,main,footer"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0" y="0" width="200" height="118" class="wb" rx="4"/><rect x="4" y="4" width="192" height="14" class="wh" rx="3"/><rect x="164" y="6" width="28" height="6" opacity=".25" class="wbl" rx="2"/><rect x="4" y="22" width="44" height="90" class="ws" rx="3"/><rect x="52" y="22" width="144" height="90" class="wm" rx="3"/><rect x="12" y="30" width="28" height="8" class="wbl" rx="2"/><rect x="12" y="44" width="24" height="8" class="wk" rx="2"/><rect x="12" y="58" width="26" height="8" class="wp" rx="2"/><rect x="60" y="30" width="128" height="12" class="wfl" rx="2"/><rect x="60" y="48" width="128" height="12" class="wft" rx="2"/><rect x="60" y="66" width="128" height="12" class="wft" rx="2"/><rect x="60" y="84" width="128" height="12" class="wft" rx="2"/><rect x="70" y="34" width="18" height="4" class="wt" rx="1"/><rect x="166" y="33" width="14" height="6" class="wg" rx="3"/><rect x="166" y="51" width="14" height="6" class="wa" rx="3"/><rect x="70" y="52" width="28" height="4" class="wt" rx="1"/><rect x="70" y="70" width="34" height="4" class="wt" rx="1"/><line x1="150" y1="72" x2="178" y2="72" stroke="rgba(15,23,42,.16)" stroke-width="2" stroke-linecap="round"/><circle cx="160" cy="72" r="5" fill="rgba(37,99,235,.36)"/><rect x="70" y="88" width="30" height="4" class="wt" rx="1"/><rect x="150" y="87" width="28" height="6" class="wbl" rx="2"/></svg></div><div class="tpl-info"><div class="tpl-name">T106 Bảng cấu hình</div><div class="tpl-subname">Config Panel</div><div class="tpl-desc">Bảng cấu hình gom các nhóm cài đặt theo accordion kèm thao tác lưu và đặt lại tham số nhanh chóng. Dành cho admin hệ thống và chủ quy trình khi bật tắt cấu hình, chuẩn hóa tham số mặc định hoặc rà soát khác biệt trước khi áp dụng toàn tổ chức.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + main(settings accordion sections) + footer</div><div class="tpl-chips"><span class="chip chip-blue">3 zones</span><span class="chip chip-dark">default</span></div></div></div></div>
@@ -3322,7 +4133,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="cat-cross">
-    <h2 class="section-title"><span class="section-number">36</span>CROSS-MODULE</h2>
+    <h2 class="section-title"><span class="section-number">47</span>CROSS-MODULE</h2>
     <div class="cat-header"><span class="chip chip-dark cat-chip">MẪU CHUNG ĐA MODULE</span><span class="cat-desc">Shell tái sử dụng cho CRUD, wizard, kanban, Gantt, detail, empty, print</span><span class="cat-count">10 templates</span></div>
     <div class="grid-4">
       <div class="tpl-card" data-blocks="page-header,date-range-picker,data-table,action-toolbar,data-cards,kanban-board" data-zones="header,filter,main,footer"><div class="tpl-thumb"><svg viewBox="0 0 200 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="118" rx="4" class="wb"/><rect x="4" y="4" width="192" height="14" rx="3" class="wh"/><rect x="4" y="22" width="192" height="12" rx="2" class="wfl"/><rect x="4" y="38" width="192" height="10" rx="1" class="wh" opacity=".5"/><rect x="4" y="52" width="192" height="8" rx="2" class="wt"/><rect x="4" y="64" width="192" height="8" rx="2" class="wta"/><rect x="4" y="76" width="192" height="8" rx="2" class="wt"/><rect x="4" y="88" width="192" height="8" rx="2" class="wta"/><rect x="4" y="100" width="192" height="14" rx="2" class="wft"/></svg></div><div class="tpl-info"><div class="tpl-name">T114 Bảng danh sách</div><div class="tpl-subname">Generic List Report</div><div class="tpl-desc">Bảng danh sách tổng quát cung cấp bộ lọc, bảng sắp xếp được và phân trang để dùng cho nhiều module dữ liệu. Dành cho BA, developer và owner khi cần khởi tạo nhanh màn hình list, kiểm thử luồng CRUD hoặc trình diễn cấu trúc dữ liệu chuẩn.</div><div class="tpl-meta"><strong>Bố cục:</strong> header + filter + main(table) + footer</div><div class="tpl-chips"><span class="chip chip-blue">4 zones</span><span class="chip chip-amber">dense</span></div></div></div></div>
@@ -3339,7 +4150,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="component-presets">
-    <h2 class="section-title"><span class="section-number">37</span>Component Preset Library</h2>
+    <h2 class="section-title"><span class="section-number">48</span>Component Preset Library</h2>
     <p class="section-lead">30 preset sets dưới đây là lớp cấu hình sẵn mà Template Editor áp lên component tokens. Mỗi preset mô tả đúng use case, component chịu ảnh hưởng và key visual contract cần giữ ổn định trong runtime.</p>
     <div class="grid-3" style="margin-top:18px">
       <div class="card"><div class="card-header">1. Nút bấm gọn / Compact Buttons</div><div class="card-body"><div style="font-size:12px;color:var(--text-secondary)">Padding nhỏ, font 11px, border-width 1px cho toolbar dày đặc.</div><div class="tpl-meta"><strong>Components:</strong> Button</div><div class="tpl-chips"><span class="chip chip-blue">11px</span><span class="chip chip-dark">4x8</span></div></div></div>
@@ -3376,7 +4187,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="module-editor">
-    <h2 class="section-title"><span class="section-number">38</span>Module Editor Tools</h2>
+    <h2 class="section-title"><span class="section-number">49</span>Module Editor Tools</h2>
     <p class="section-lead">Template Studio trong admin không chỉ là gallery preset. Nó là môi trường authoring đầy đủ: tìm kiếm, chỉnh zone, preview theme/device, drag-drop block, rồi buộc builder đi qua Step 0 trước khi cấu hình module schema.</p>
 
     <div class="grid-2" style="margin-top:18px;margin-bottom:18px">
@@ -3453,7 +4264,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="token-cascade">
-    <h2 class="section-title"><span class="section-number">39</span>Token Cascade</h2>
+    <h2 class="section-title"><span class="section-number">50</span>Token Cascade</h2>
     <p class="section-lead">Token cascade đi qua 5 lớp rõ ràng. Luật ưu tiên phải deterministic để preview, save và runtime render luôn cho cùng kết quả dù token được nhập từ system, admin, template, zone hay người dùng cuối.</p>
 
     <div class="grid-5" style="margin-top:18px;margin-bottom:18px">
@@ -3514,7 +4325,7 @@ body{background:var(--bg-page)}
   </section>
 
 <section class="section" id="governance">
-    <h2 class="section-title"><span class="section-number">40</span>Governance &amp; Roadmap</h2>
+    <h2 class="section-title"><span class="section-number">51</span>Governance &amp; Roadmap</h2>
     <p class="section-lead">Hệ thống thiết kế chỉ có giá trị khi được vận hành với owner rõ ràng, release gate, audit trail và rollout plan. Governance dưới đây là contract để Template Studio không trở thành nơi chỉnh UI ad-hoc.</p>
 
     <div class="grid-2" style="margin-top:18px;margin-bottom:18px">
@@ -3566,7 +4377,7 @@ body{background:var(--bg-page)}
     </div>
   </section>
 
-  <div class="footer-note">HESEM MOM — Module Layout Template Design System v4.1 Enterprise — 123 templates · 90 block types · 20 visual themes · 30 component presets · 34 modules · 181 CSS tokens — 2026-04-11</div>
+  <div class="footer-note">HESEM MOM — Module Layout Template Design System v4.2 Enterprise — 123 templates · 90 block types · 20 visual themes · 30 component presets · 34 modules · 181 CSS tokens · 51 sections — 2026-04-11</div>
 </div>
 </body>
 </html>

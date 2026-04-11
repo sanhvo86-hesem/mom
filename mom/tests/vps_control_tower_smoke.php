@@ -40,6 +40,12 @@ function vps_smoke_exit_payload(callable $callback): array
 
 $tmpDataDir = sys_get_temp_dir() . '/mom-vps-control-' . bin2hex(random_bytes(6));
 @mkdir($tmpDataDir . '/config', 0775, true);
+$explorerRoot = $tmpDataDir . '/explorer-root';
+@mkdir($explorerRoot . '/subdir', 0775, true);
+file_put_contents($explorerRoot . '/readme.txt', "hello file explorer\nline two\n");
+file_put_contents($explorerRoot . '/subdir/app.log', "probe ok\n");
+file_put_contents($explorerRoot . '/secret.key', "do-not-stream\n");
+file_put_contents($explorerRoot . '/.hidden-note', "hidden\n");
 
 $config = [
     'product' => 'Test VPS Control Tower',
@@ -60,6 +66,14 @@ $config = [
         'provider' => 'Local',
         'mode' => 'local',
         'safe_actions' => ['health', 'nginx_test'],
+        'file_roots' => [
+            [
+                'id' => 'test_root',
+                'label' => 'Test root',
+                'path' => $explorerRoot,
+                'note' => 'Smoke-test file explorer root.',
+            ],
+        ],
         'services' => [
             ['name' => 'nginx', 'label' => 'Nginx', 'kind' => 'systemd'],
         ],
@@ -87,6 +101,7 @@ try {
     smoke_assert(($overview['metrics']['sites_count'] ?? null) === 0, 'VPS overview should expose the declared site count.');
     smoke_assert(($overview['metrics']['terminals_count'] ?? null) === 2, 'VPS overview should expose the declared terminal count.');
     smoke_assert(($overview['metrics']['observability_panels'] ?? null) === 2, 'VPS overview should expose the declared observability panel count.');
+    smoke_assert(($overview['metrics']['file_roots_count'] ?? null) === 1, 'VPS overview should expose the declared file root count.');
     smoke_assert(($overview['metrics']['terminal_ready_hosts'] ?? null) === 1, 'VPS overview should count one terminal-ready host.');
     smoke_assert(($overview['metrics']['observability_ready_hosts'] ?? null) === 1, 'VPS overview should count one observability-ready host.');
     smoke_assert(count((array)($overview['control_assets'] ?? [])) >= 6, 'VPS overview should expose the whitelisted control assets.');
@@ -96,6 +111,7 @@ try {
     smoke_assert(($snapshot['mode'] ?? null) === 'local', 'Host snapshot should preserve the declared execution mode.');
     smoke_assert(count((array)($snapshot['terminals'] ?? [])) === 2, 'Host snapshot should expose both terminal entries.');
     smoke_assert(count((array)($snapshot['observability'] ?? [])) === 2, 'Host snapshot should expose both observability panels.');
+    smoke_assert(count((array)($snapshot['file_roots'] ?? [])) === 1, 'Host snapshot should expose the configured file explorer root.');
     smoke_assert(is_array($snapshot['capabilities'] ?? null), 'Host snapshot should expose probe capabilities.');
     smoke_assert($service->terminalRequiresWrite('local-vps', 'primary') === true, 'Primary terminal should require write access.');
     smoke_assert($service->terminalRequiresWrite('local-vps', 'readonly') === false, 'Readonly terminal should not require write access.');
@@ -106,6 +122,44 @@ try {
     smoke_assert(is_file((string)($setupAsset['absolute_path'] ?? '')), 'Resolved asset should point to a real file.');
     $scriptAsset = $service->resolveAsset('./ops/vps/install-terminal-gateway.sh');
     smoke_assert(($scriptAsset['kind'] ?? null) === 'code', 'Install script should resolve as a code asset.');
+
+    $fileList = $service->listFiles('local-vps', 'test_root');
+    smoke_assert(($fileList['mode'] ?? null) === 'list', 'File explorer list should return list mode.');
+    smoke_assert(count((array)($fileList['entries'] ?? [])) >= 3, 'File explorer list should return root entries.');
+    smoke_assert(
+        count(array_filter((array)($fileList['entries'] ?? []), static fn(array $entry): bool => ($entry['relative_path'] ?? '') === 'readme.txt')) === 1,
+        'File explorer list should include the smoke text file.'
+    );
+    smoke_assert(
+        count(array_filter((array)($fileList['entries'] ?? []), static fn(array $entry): bool => ($entry['relative_path'] ?? '') === '.hidden-note')) === 0,
+        'File explorer list should hide dotfiles by default.'
+    );
+    $fileListHidden = $service->listFiles('local-vps', 'test_root', '', true);
+    smoke_assert(
+        count(array_filter((array)($fileListHidden['entries'] ?? []), static fn(array $entry): bool => ($entry['relative_path'] ?? '') === '.hidden-note')) === 1,
+        'File explorer list should show dotfiles when requested.'
+    );
+    $fileRead = $service->readFile('local-vps', 'test_root', 'readme.txt');
+    smoke_assert(str_contains((string)($fileRead['content'] ?? ''), 'hello file explorer'), 'File explorer should preview text files.');
+    $fileDownload = $service->readFile('local-vps', 'test_root', 'readme.txt', true);
+    smoke_assert(base64_decode((string)($fileDownload['content_base64'] ?? ''), true) === "hello file explorer\nline two\n", 'File explorer download should return base64 raw content.');
+    $fileSearch = $service->searchFiles('local-vps', 'test_root', '', 'app.log');
+    smoke_assert(
+        count(array_filter((array)($fileSearch['entries'] ?? []), static fn(array $entry): bool => ($entry['relative_path'] ?? '') === 'subdir/app.log')) === 1,
+        'File explorer search should find nested matching files.'
+    );
+    try {
+        $service->readFile('local-vps', 'test_root', '../outside.txt');
+        throw new RuntimeException('Unexpected path traversal read.');
+    } catch (RuntimeException $e) {
+        smoke_assert(str_starts_with($e->getMessage(), 'invalid_file_path'), 'File explorer should reject path traversal.');
+    }
+    try {
+        $service->readFile('local-vps', 'test_root', 'secret.key');
+        throw new RuntimeException('Unexpected secret key read.');
+    } catch (RuntimeException $e) {
+        smoke_assert(str_starts_with($e->getMessage(), 'file_access_denied'), 'File explorer should block guarded secret files.');
+    }
 
     try {
         $service->resolveAsset('../not-allowed.txt');
@@ -210,6 +264,71 @@ try {
     });
     smoke_assert($resp['status'] === 404, 'Unknown observability panel should return 404.');
     smoke_assert(($resp['payload']['error'] ?? null) === 'vps_observability_auth_failed', 'Observability auth should surface the dedicated error code.');
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_GET['host_id'] = 'local-vps';
+    $_GET['root_id'] = 'test_root';
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileList();
+    });
+    smoke_assert($resp['status'] === 200, 'Authorized file list request should succeed.');
+    smoke_assert(
+        (($resp['payload']['explorer'] ?? [])['root']['id'] ?? null) === 'test_root',
+        'File list response should include the selected root.'
+    );
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_GET['host_id'] = 'local-vps';
+    $_GET['root_id'] = 'test_root';
+    $_GET['q'] = 'app.log';
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileSearch();
+    });
+    smoke_assert($resp['status'] === 200, 'Authorized file search request should succeed.');
+    smoke_assert((($resp['payload']['explorer'] ?? [])['mode'] ?? null) === 'search', 'File search response should be in search mode.');
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_GET['host_id'] = 'local-vps';
+    $_GET['root_id'] = 'test_root';
+    $_GET['path'] = 'readme.txt';
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileRead();
+    });
+    smoke_assert($resp['status'] === 200, 'Authorized file read request should succeed.');
+    smoke_assert(
+        str_contains((string)((($resp['payload']['explorer'] ?? [])['content'] ?? '')), 'hello file explorer'),
+        'File read response should include preview content.'
+    );
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_GET['host_id'] = 'local-vps';
+    $_GET['root_id'] = 'test_root';
+    $_GET['path'] = 'readme.txt';
+    $_GET['download'] = '1';
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileRead();
+    });
+    smoke_assert($resp['status'] === 200, 'Authorized file download request should succeed.');
+    smoke_assert(
+        str_contains((string)($resp['headers']['Content-Disposition'] ?? ''), 'attachment'),
+        'File download should force attachment disposition.'
+    );
+    smoke_assert((string)($resp['body'] ?? '') === "hello file explorer\nline two\n", 'File download body should stream raw content.');
+
+    vps_smoke_reset_request_state();
+    set_authenticated_session('admin-user', ['role' => 'admin']);
+    $_GET['host_id'] = 'local-vps';
+    $_GET['root_id'] = 'test_root';
+    $_GET['path'] = 'secret.key';
+    $resp = vps_smoke_exit_payload(static function () use ($controller): void {
+        $controller->fileRead();
+    });
+    smoke_assert($resp['status'] === 403, 'Guarded file read should be forbidden.');
+    smoke_assert(($resp['payload']['error'] ?? null) === 'vps_file_read_failed', 'Guarded file read should map to the dedicated file read error.');
 
     vps_smoke_reset_request_state();
     set_authenticated_session('admin-user', ['role' => 'admin']);
