@@ -2,25 +2,25 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-13T08:03:28.617Z",
+    "generatedAt": "2026-04-13T09:36:30.848Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "7c3137ba-7c5a-40af-a929-21affde304f5"
+    "publication_run_id": "4cf09b68-e8c3-4106-accb-7da755ddc7ee"
   },
   "summary": {
-    "endpoint_count": 3616,
-    "pack_count": 3954,
+    "endpoint_count": 3621,
+    "pack_count": 3960,
     "relation_edge_count": 3128,
     "workflow_count": 278,
     "status_set_count": 734,
-    "validation_rule_count": 43774,
-    "formula_count": 1179,
-    "formula_reference_count": 1179,
-    "field_context_count": 48697,
-    "row_version_tables": 542,
-    "org_scoped_tables": 527,
+    "validation_rule_count": 43911,
+    "formula_count": 1180,
+    "formula_reference_count": 1180,
+    "field_context_count": 48862,
+    "row_version_tables": 543,
+    "org_scoped_tables": 528,
     "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -29,29 +29,29 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 260,
-    "workflow_engine_bridge_ready": 261,
+    "transition_runtime_warnings": 261,
+    "workflow_engine_bridge_ready": 262,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 659,
+    "archive_only_tables": 660,
     "soft_delete_tables": 0,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 336,
-      "generic_status_only": 32,
+      "stateless": 337,
+      "generic_status_only": 31,
       "guarded_transition_runtime": 31,
-      "persisted": 260,
+      "persisted": 261,
       "unknown": 0
     },
-    "frontend_foundation_entities": 670,
-    "frontend_ready_entities": 670,
+    "frontend_foundation_entities": 671,
+    "frontend_ready_entities": 671,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 5,
-    "frontend_publishable_entities": 654,
+    "frontend_publishable_entities": 655,
     "frontend_unpublishable_entities": 0,
-    "attachment_contract_entities": 658,
-    "comment_contract_entities": 658,
-    "activity_contract_entities": 531,
+    "attachment_contract_entities": 659,
+    "comment_contract_entities": 659,
+    "activity_contract_entities": 532,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -74,20 +74,20 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 659,
-      "target": 659
+      "actual": 660,
+      "target": 660
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 659,
-      "target": 659
+      "actual": 660,
+      "target": 660
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 659,
-      "target": 659
+      "actual": 660,
+      "target": 660
     },
     {
       "id": "fk_edges_covered",
@@ -110,8 +110,8 @@
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 639,
-      "target": 627
+      "actual": 640,
+      "target": 628
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -140,8 +140,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 659,
-      "target": 659
+      "actual": 660,
+      "target": 660
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -182,20 +182,20 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 43774,
+      "actual": 43911,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1179,
+      "actual": 1180,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1179,
-      "target": 1179
+      "actual": 1180,
+      "target": 1180
     }
   ],
   "warnings": {

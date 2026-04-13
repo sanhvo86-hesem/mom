@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-13T08:03:24.055Z",
+    "generatedAt": "2026-04-13T09:36:26.083Z",
     "enumCount": 734
   },
   "so_status": {
@@ -35909,7 +35909,6 @@
     "standard": "internal",
     "sourceTable": "idempotency_replay_ledger",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",

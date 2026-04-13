@@ -243,6 +243,14 @@ return static function (Router $router, string $dataDir): void {
         'product_passport_trace'     => [ProductPassportController::class, 'trace'],
         'product_passport_qr'        => [ProductPassportController::class, 'getQrData'],
     ]);
+
+    // Canonical Manufacturing Event Backbone
+    $router->actions([
+        'manufacturing_event_timeline' => [ManufacturingEventController::class, 'timeline'],
+        'manufacturing_event_probe'    => [ManufacturingEventController::class, 'probe'],
+    ]);
+    $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
+    $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
     
     // AI Quality Scheduling
     $router->actions([

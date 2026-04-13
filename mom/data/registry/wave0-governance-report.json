@@ -1,18 +1,18 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T08:03:30.243Z",
+    "generatedAt": "2026-04-13T09:36:32.514Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 670,
+    "total_frontend_entities": 671,
     "canonical_resources": 67,
     "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 73,
-    "governed_support_entities": 591,
+    "governed_support_entities": 592,
     "conditional_extension_entities": 1,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
@@ -4278,6 +4278,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "mes_execution.mes_operational_event_ledger",
+        "entity": "mes_operational_event_ledger",
+        "profile": "operator_console",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T08:05:23.070039+00:00",
+    "generatedAt": "2026-04-13T09:36:47.863676+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 659
+    "tableCount": 660
   },
   "summary": {
     "domains": {
@@ -40,7 +40,7 @@
       "lean_manufacturing": 8,
       "master_data": 17,
       "master_data_governance": 21,
-      "mes_execution": 66,
+      "mes_execution": 67,
       "mfg_engineering": 25,
       "mobile_operations": 3,
       "outsource_execution": 15,
@@ -69,12 +69,12 @@
       "asset_lifecycle": 18,
       "domain_runtime": 84,
       "governed_support": 24,
-      "machine_runtime": 87,
+      "machine_runtime": 88,
       "platform_governance": 15,
       "process_runtime": 407
     },
     "targetDeletionMode": {
-      "archive_only": 659
+      "archive_only": 660
     },
     "hardDeleteWaiverRequired": 0
   },
@@ -10396,7 +10396,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:idempotency_replay_ledger_status",
         "wf_idempotency_replay_ledger"
       ],
       "businessObjectRefs": [],
@@ -15406,6 +15406,50 @@
         "mes_execution.mes_operation_execution.detail",
         "mes_execution.mes_operation_execution.list",
         "mes_execution.mes_operation_execution.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "manual_machine_runtime",
+        "operator_mes_console",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "mes_operational_event_ledger": {
+      "systemOfRecord": "postgres_migration:098_canonical_manufacturing_event_backbone.sql",
+      "authorityMode": "machine_runtime",
+      "ownerRole": "production_manager",
+      "stewardRole": "mes_data_steward",
+      "dataClassification": "confidential_financial",
+      "retentionClass": "financial_record_10y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "mes_execution.mes_operational_event_ledger.create",
+        "mes_execution.mes_operational_event_ledger.delete",
+        "mes_execution.mes_operational_event_ledger.detail",
+        "mes_execution.mes_operational_event_ledger.list",
+        "mes_execution.mes_operational_event_ledger.update"
       ],
       "eventContractRefs": [],
       "workflowRefs": [],

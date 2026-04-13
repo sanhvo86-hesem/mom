@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T08:03:38.175Z",
+    "generatedAt": "2026-04-13T09:37:15.738Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "7c3137ba-7c5a-40af-a929-21affde304f5",
+    "publication_run_id": "4cf09b68-e8c3-4106-accb-7da755ddc7ee",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -23,11 +23,11 @@
     "purpose": "Full DB-derived table contract index. Read-only; regenerate from registry authority."
   },
   "summary": {
-    "tableCount": 659,
+    "tableCount": 660,
     "relationCount": 3128,
-    "relationEntityCount": 659,
-    "endpointCount": 3616,
-    "endpointBoundTableCount": 659,
+    "relationEntityCount": 660,
+    "endpointCount": 3621,
+    "endpointBoundTableCount": 660,
     "workflowCount": 278,
     "workflowEligibleTableCount": 329,
     "workflowBoundTableCount": 298,
@@ -35,7 +35,7 @@
     "statusManagedTableCount": 310,
     "supportTableCount": 113,
     "domainCount": 49,
-    "contractCount": 659,
+    "contractCount": 660,
     "criticalGapCount": 0,
     "warningCount": 2,
     "capabilityCount": 18,
@@ -7350,7 +7350,7 @@
       "labelEn": "Idempotency Replay Ledger",
       "primaryKey": "ledger_id",
       "statusColumn": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "idempotency_replay_ledger_status",
       "workflowId": "wf_idempotency_replay_ledger",
       "workflowPresent": true,
       "supportTable": false,
@@ -10919,6 +10919,39 @@
       "workflowPresent": false,
       "supportTable": false,
       "columnCount": 48,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.mes_operational_event_ledger",
+      "table": "mes_operational_event_ledger",
+      "schema": "public",
+      "domain": "mes_execution",
+      "label": "Operational sự kiện sổ cái MES",
+      "labelEn": "MES Operational Event Ledger",
+      "primaryKey": "event_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 53,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,

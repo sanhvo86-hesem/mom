@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-13T08:03:24.055Z",
-    "formulaCount": 1179
+    "generatedAt": "2026-04-13T09:36:26.083Z",
+    "formulaCount": 1180
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -26061,6 +26061,27 @@
       {
         "type": "endpoint",
         "id": "system_infrastructure.idempotency_replay_ledger.transition"
+      }
+    ]
+  },
+  "f_mes_operational_event_ledger_record_count": {
+    "formulaId": "f_mes_operational_event_ledger_record_count",
+    "name": "Operational sự kiện sổ cái MES - Số bản ghi",
+    "nameEn": "MES Operational Event Ledger Record Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM mes_operational_event_ledger",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mes_operational_event_ledger_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.mes_operational_event_ledger.list"
       }
     ]
   }

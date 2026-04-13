@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T08:05:23.070039+00:00",
+    "generatedAt": "2026-04-13T09:36:47.863676+00:00",
     "sourceArtifacts": [
       "mom/contracts/command-index.json",
       "mom/contracts/object-index.json",
@@ -214,7 +214,7 @@
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "acknowledge",
         "command_key": "commercial_customer.customer-purchase-orders:acknowledge",
@@ -242,7 +242,7 @@
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "cancel",
         "command_key": "commercial_customer.customer-purchase-orders:cancel",
@@ -270,7 +270,7 @@
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "close",
         "command_key": "commercial_customer.customer-purchase-orders:close",
@@ -298,7 +298,7 @@
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "confirm",
         "command_key": "commercial_customer.customer-purchase-orders:confirm",
@@ -1002,7 +1002,7 @@
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "close",
         "command_key": "finance.backdate-exceptions:close",
@@ -1028,7 +1028,7 @@
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "expire",
         "command_key": "finance.backdate-exceptions:expire",
@@ -1054,7 +1054,7 @@
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "revoke",
         "command_key": "finance.backdate-exceptions:revoke",
@@ -1082,7 +1082,7 @@
       "endpointKey": "finance.credit_memos.create",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "create",
         "command_key": "finance.credit-memos:create",
@@ -1110,7 +1110,7 @@
       "endpointKey": "finance.debit_memos.create",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "create",
         "command_key": "finance.debit-memos:create",
@@ -1248,7 +1248,7 @@
       "endpointKey": "finance.period_close_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "close",
         "command_key": "finance.period-closes:close",
@@ -1274,7 +1274,7 @@
       "endpointKey": "finance.period_close_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "reopen",
         "command_key": "finance.period-closes:reopen",
@@ -7511,7 +7511,7 @@
       "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "close",
         "command_key": "quality_improvement.override-controls:close",
@@ -7537,7 +7537,7 @@
       "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "expire",
         "command_key": "quality_improvement.override-controls:expire",
@@ -7563,7 +7563,7 @@
       "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
       "executableInEndpointCatalog": true,
-      "executableInRouter": true,
+      "executableInRouter": false,
       "requestBodyTemplate": {
         "command": "revoke",
         "command_key": "quality_improvement.override-controls:revoke",

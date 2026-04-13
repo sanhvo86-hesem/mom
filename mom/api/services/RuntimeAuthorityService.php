@@ -20,6 +20,7 @@ final class RuntimeAuthorityService
         private readonly ?OrderWorkflowService $orderWorkflow = null,
         private readonly ?MasterDataService $masterData = null,
         private readonly ?array $modeSummaryOverride = null,
+        private readonly ?ManufacturingEventBackboneService $manufacturingEvents = null,
     ) {
     }
 
@@ -32,11 +33,13 @@ final class RuntimeAuthorityService
         $idempotency = ($this->idempotency ?? new IdempotencyService($this->dataDir))->backendProbe();
         $orderWorkflow = ($this->orderWorkflow ?? new OrderWorkflowService($this->dataDir))->authorityProbe($modeSummary);
         $masterData = ($this->masterData ?? new MasterDataService($this->dataDir))->authorityProbe($modeSummary);
+        $manufacturingEvents = ($this->manufacturingEvents ?? new ManufacturingEventBackboneService($this->dataDir, $this->data))->authorityProbe();
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),
             'order_workflow' => $this->normalizeOperationalSlice($orderWorkflow),
             'master_data' => $this->normalizeOperationalSlice($masterData),
+            'manufacturing_events' => $this->normalizeOperationalSlice($manufacturingEvents),
         ];
 
         $states = [];
@@ -133,4 +136,3 @@ final class RuntimeAuthorityService
         ]);
     }
 }
-

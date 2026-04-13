@@ -42,8 +42,10 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('compatibility_only', $report['slices']['idempotency']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['order_workflow']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['master_data']['readiness_state']);
+        $this->assertSame('compatibility_only', $report['slices']['manufacturing_events']['readiness_state']);
         $this->assertSame('json_fallback', $report['slices']['order_workflow']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['master_data']['authority_mode']);
+        $this->assertSame('json_fallback', $report['slices']['manufacturing_events']['authority_mode']);
     }
 
     public function testReportMarksExpectedPostgresIdempotencyFallbackAsDegraded(): void
@@ -125,4 +127,3 @@ final class RuntimeAuthorityServiceTest extends TestCase
 final class RuntimeAuthorityFakeDb
 {
 }
-

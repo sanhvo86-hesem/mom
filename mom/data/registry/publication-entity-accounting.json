@@ -1,22 +1,22 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-13T08:03:37.276Z",
-    "publication_run_id": "7c3137ba-7c5a-40af-a929-21affde304f5",
+    "generated_at": "2026-04-13T09:37:11.376Z",
+    "publication_run_id": "4cf09b68-e8c3-4106-accb-7da755ddc7ee",
     "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {
-      "count": 659,
+      "count": 660,
       "source": "table-registry.json",
       "description": "Physical tables currently governed by the canonical table registry."
     },
     "frontend_entities": {
-      "count": 670,
+      "count": 671,
       "source": "frontend-foundation-catalog.json",
       "description": "Frontend entity registrations, including non-table views and additional aliases over the same physical table where business presentation differs.",
       "breakdown": {
-        "table_backed": 662,
+        "table_backed": 663,
         "virtual_composite": 8,
         "duplicate_table_views": 3,
-        "total": 670
+        "total": 671
       },
       "non_table_entities": [
         {
@@ -54,16 +54,16 @@
       ]
     },
     "readiness": {
-      "ready": 670,
+      "ready": 671,
       "partial": 0,
       "blocked": 0,
-      "total": 670,
+      "total": 671,
       "description": "Current readiness counts are taken directly from frontend-foundation-catalog.json and reflect the live publication state, not historical onboarding assumptions."
     },
     "field_coverage": {
-      "tables_with_fields": 664,
+      "tables_with_fields": 665,
       "tables_without_fields": 0,
-      "derivation": "659 registry tables -> 664 tables referenced by data-fields artifacts -> 0 tables without field definitions.",
+      "derivation": "660 registry tables -> 665 tables referenced by data-fields artifacts -> 0 tables without field definitions.",
       "affected_artifacts": [
         "data-fields.json + split parts",
         "endpoint-catalog.json",
@@ -71,8 +71,8 @@
       ]
     },
     "why_counts_differ": {
-      "670_vs_659": "8 non-table entities and 3 additional table-view aliases explain why frontend entity registrations exceed physical tables.",
-      "664_vs_659": "Field coverage is now full across the canonical table registry.",
+      "671_vs_660": "8 non-table entities and 3 additional table-view aliases explain why frontend entity registrations exceed physical tables.",
+      "665_vs_660": "Field coverage is now full across the canonical table registry.",
       "conclusion": "Count differences are governed and explainable. Any remaining delta must map either to a non-table entity or a deliberate alias over an existing physical table."
     }
   }

@@ -44,6 +44,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertSame('compatibility_only', $payload['authority']['slices']['idempotency']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['order_workflow']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['master_data']['readiness_state'] ?? null);
+        $this->assertSame('compatibility_only', $payload['authority']['slices']['manufacturing_events']['readiness_state'] ?? null);
     }
 
     private function removeDir(string $dir): void
@@ -61,4 +62,3 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         rmdir($dir);
     }
 }
-
