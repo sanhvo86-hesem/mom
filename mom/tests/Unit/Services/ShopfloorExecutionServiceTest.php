@@ -30,8 +30,14 @@ final class ShopfloorExecutionServiceTest extends TestCase
                     ['resolution_code' => 'tool_replaced', 'resolution_name' => 'Tool replaced', 'status' => 'active'],
                 ],
                 'defect_catalog' => [
-                    ['defect_code' => 'DEF-DIM', 'defect_name' => 'Dimensional', 'status' => 'active'],
-                    ['defect_code' => 'DEF-SURF', 'defect_name' => 'Surface', 'status' => 'active'],
+                    ['defect_code' => 'DEF-DIM', 'defect_name' => 'Dimensional', 'defect_group' => 'dimensional', 'status' => 'active'],
+                    ['defect_code' => 'DEF-SURF', 'defect_name' => 'Surface', 'defect_group' => 'surface', 'status' => 'active'],
+                    ['defect_code' => 'DEF-MAT', 'defect_name' => 'Material', 'defect_group' => 'material', 'status' => 'active'],
+                    ['defect_code' => 'DEF-VIS', 'defect_name' => 'Visual', 'defect_group' => 'visual', 'status' => 'active'],
+                    ['defect_code' => 'DEF-BURR', 'defect_name' => 'Burr', 'defect_group' => 'burr', 'status' => 'active'],
+                    ['defect_code' => 'DEF-THREAD', 'defect_name' => 'Thread', 'defect_group' => 'thread', 'status' => 'active'],
+                    ['defect_code' => 'DEF-FOD', 'defect_name' => 'FOD', 'defect_group' => 'fod', 'status' => 'active'],
+                    ['defect_code' => 'DEF-OTHER', 'defect_name' => 'Other', 'defect_group' => 'other', 'status' => 'active'],
                 ],
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
@@ -127,6 +133,16 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame(100, $response['target_qty']);
     }
 
+    public function testTargetUpdateRejectsZeroCycleTime(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('invalid_cycle_time_minutes');
+
+        $this->service()->applyTargetUpdates($this->target(), [
+            'cycle_time_minutes' => 0,
+        ], '2026-04-13T01:00:00Z');
+    }
+
     public function testReportValidationRejectsMissingReasonCodesForBadOutputAndDowntime(): void
     {
         $target = $this->target();
@@ -196,14 +212,16 @@ final class ShopfloorExecutionServiceTest extends TestCase
 
         $log = $service->buildProductionLog([
             'quantity_good' => 8,
-            'quantity_ng' => 2,
+            'quantity_ng' => 3,
             'ng_details' => [
                 ['type' => 'dimensional', 'qty' => 2],
+                ['type' => 'burr', 'qty' => 1],
             ],
         ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
 
-        $this->assertSame(['DEF-DIM'], $log['reason_codes']['ng']);
+        $this->assertSame(['DEF-DIM', 'DEF-BURR'], $log['reason_codes']['ng']);
         $this->assertSame(2, $log['ng_details'][0]['quantity']);
+        $this->assertSame('DEF-BURR', $log['ng_details'][1]['defect_code']);
 
         try {
             $service->buildProductionLog([
@@ -295,6 +313,46 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('order.work_execution', $event['event_type']);
         $this->assertSame('manual_shift_report', $event['payload']['phase']);
         $this->assertSame('manual_capture_no_machine_control', $event['metadata']['ot_boundary']);
+    }
+
+    public function testProductionReportIdempotencyReplaysSameFingerprint(): void
+    {
+        $service = $this->service();
+        $body = [
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'tablet-7:TGT-1001:2026-04-13:morning',
+            'client_report_id' => 'tablet-7-shift-001',
+        ];
+
+        $existing = $service->buildProductionLog($body, $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+        $candidate = $service->buildProductionLog($body, $this->target(), $existing, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $replayed = $service->replayProductionLogForIdempotency($candidate, [$existing]);
+
+        $this->assertIsArray($replayed);
+        $this->assertSame($existing['log_id'], $replayed['log_id']);
+        $this->assertSame($existing['report_fingerprint'], $replayed['report_fingerprint']);
+    }
+
+    public function testProductionReportIdempotencyRejectsPayloadConflict(): void
+    {
+        $service = $this->service();
+        $existing = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'tablet-7:TGT-1001:2026-04-13:morning',
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+        $candidate = $service->buildProductionLog([
+            'quantity_good' => 9,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'tablet-7:TGT-1001:2026-04-13:morning',
+        ], $this->target(), $existing, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('idempotency_conflict');
+
+        $service->replayProductionLogForIdempotency($candidate, [$existing]);
     }
 
     /**

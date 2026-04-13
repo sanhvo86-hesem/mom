@@ -1,0 +1,38 @@
+<?php
+declare(strict_types=1);
+
+namespace MOM\Api\Services;
+
+use RuntimeException;
+
+final class ConnectedGovernanceException extends RuntimeException
+{
+    /**
+     * @param array<string, mixed> $details
+     */
+    public function __construct(
+        private readonly string $reasonCode,
+        private readonly array $details,
+        string $message = 'Connected governance entitlement blocked execution.',
+    ) {
+        parent::__construct($message);
+    }
+
+    public function reasonCode(): string
+    {
+        return $this->reasonCode;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function details(): array
+    {
+        return $this->details;
+    }
+}
+
+if (!class_exists('MOM\\Services\\ConnectedGovernanceException', false)) {
+    class_alias(ConnectedGovernanceException::class, 'MOM\\Services\\ConnectedGovernanceException');
+}
+

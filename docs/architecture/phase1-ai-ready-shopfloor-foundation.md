@@ -182,9 +182,9 @@ Validation:
 - Downtime reason codes are rejected unless downtime/idle minutes are also supplied or derived from a downtime event.
 - Blank downtime rows are ignored; non-empty downtime rows require a known reason code.
 
-Legacy `ng_details` rows using `{ "type": "dimensional", "qty": 2 }` are accepted when `type` resolves to an active `defect_catalog.defect_group`, `defect_name`, or `defect_code`; the stored log still uses canonical `defect_code` and `quantity`.
+Legacy `ng_details` rows using `{ "type": "dimensional", "qty": 2 }` are accepted when `type` resolves to an active `defect_catalog.defect_group`, `defect_name`, or `defect_code`; the stored log still uses canonical `defect_code` and `quantity`. The seeded CNC defect catalog covers the existing dispatch UI groups: `dimensional`, `surface`, `material`, `visual`, `burr`, `thread`, `fod`, and `other`.
 
-`client_report_id` and `idempotency_key` are captured for replay diagnostics and later DB-backed conflict checks. The current file-backed dispatch store still preserves the existing one-log-per-target overwrite behavior.
+`idempotency_key` is enforced for file-backed production reporting. A replay with the same key and same normalized report fingerprint returns the existing production log with `"replayed": true`; the same key with different target or execution facts returns `409 idempotency_conflict`. The current file-backed dispatch store still preserves the existing one-log-per-target overwrite behavior for reports without an idempotency key.
 
 ## Advisory Projection
 
@@ -199,4 +199,4 @@ This field is not execution authority and must not drive autonomous schedule cha
 
 ## Storage Notes
 
-The schema already has DB-backed equivalents in migrations such as `043_production_dispatch_shift_targets.sql`, `076_canonical_mes_execution_spine.sql`, and `098_canonical_manufacturing_event_backbone.sql`. This Phase 1 implementation keeps file-backed dispatch as the compatibility authority and uses the existing manufacturing event backbone as a read-model bridge only. A later migration can shadow-write dispatch files into `shift_targets` and `shift_production_log` without changing operator contracts.
+The schema already has DB-backed equivalents in migrations such as `043_production_dispatch_shift_targets.sql`, `076_canonical_mes_execution_spine.sql`, and `098_canonical_manufacturing_event_backbone.sql`. This Phase 1 implementation keeps file-backed dispatch as the compatibility authority and uses the existing manufacturing event backbone as a read-model bridge only. Production report writes update `production_logs.json` and `targets.json` together with best-effort rollback if either atomic file write fails; this is not a replacement for a future database transaction boundary. A later migration can shadow-write dispatch files into `shift_targets` and `shift_production_log` without changing operator contracts.

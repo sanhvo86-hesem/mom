@@ -1058,6 +1058,46 @@
             "status": "active"
         },
         {
+            "defect_code": "DEF-VIS",
+            "defect_name": "Visual",
+            "defect_name_vi": "Lỗi ngoại quan",
+            "defect_group": "visual",
+            "severity_default": "minor",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-BURR",
+            "defect_name": "Burr",
+            "defect_name_vi": "Ba via",
+            "defect_group": "burr",
+            "severity_default": "minor",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-THREAD",
+            "defect_name": "Thread",
+            "defect_name_vi": "Lỗi ren",
+            "defect_group": "thread",
+            "severity_default": "major",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-FOD",
+            "defect_name": "FOD",
+            "defect_name_vi": "Dị vật/FOD",
+            "defect_group": "fod",
+            "severity_default": "major",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-OTHER",
+            "defect_name": "Other",
+            "defect_name_vi": "Khác",
+            "defect_group": "other",
+            "severity_default": "minor",
+            "status": "active"
+        },
+        {
             "defect_code": "DEF-TRACE",
             "defect_name": "Traceability",
             "defect_name_vi": "Lỗi truy xuất",

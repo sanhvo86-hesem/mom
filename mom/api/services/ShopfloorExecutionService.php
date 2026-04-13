@@ -177,7 +177,7 @@ final class ShopfloorExecutionService
         $target['shift_date'] = $this->normalizeDate($target['shift_date'] ?? null, 'shift_date');
         $target['shift_code'] = $this->normalizeShiftCode($target['shift_code'] ?? 'morning');
         $target['operation_seq'] = $this->nullablePositiveInt($target['operation_seq'] ?? null, 'operation_seq');
-        $target['cycle_time_minutes'] = $this->nonNegativeFloat($target['cycle_time_minutes'] ?? 0, 'cycle_time_minutes');
+        $target['cycle_time_minutes'] = $this->positiveFloat($target['cycle_time_minutes'] ?? 0, 'cycle_time_minutes');
         $target['setup_time_minutes'] = $this->nonNegativeFloat($target['setup_time_minutes'] ?? 0, 'setup_time_minutes');
         $defaultSetupMinutes = $target['setup_time_minutes'];
         $target['standard_setup_minutes'] = $this->nonNegativeFloat($target['standard_setup_minutes'] ?? $defaultSetupMinutes, 'standard_setup_minutes');
@@ -310,9 +310,55 @@ final class ShopfloorExecutionService
             $log['log_id'] = 'LOG-' . bin2hex(random_bytes(8));
         }
         $log['created_at'] = is_array($existingLog) ? (string)($existingLog['created_at'] ?? $now) : $now;
+        $log['report_fingerprint'] = $this->productionReportFingerprint($log);
         $log['advisory_projection'] = $this->buildAdvisoryProjection($log, $target);
 
         return $log;
+    }
+
+    /**
+     * @param array<string, mixed> $candidateLog
+     * @param array<int|string, mixed> $logs
+     * @return array<string, mixed>|null
+     */
+    public function replayProductionLogForIdempotency(array $candidateLog, array $logs): ?array
+    {
+        $idempotencyKey = $this->stringValue($candidateLog['idempotency_key'] ?? '');
+        if ($idempotencyKey === '') {
+            return null;
+        }
+
+        foreach ($logs as $existingLog) {
+            if (!is_array($existingLog)) {
+                continue;
+            }
+            /** @var array<string, mixed> $existingLog */
+            if ($this->stringValue($existingLog['idempotency_key'] ?? '') !== $idempotencyKey) {
+                continue;
+            }
+
+            if ($this->stringValue($existingLog['target_id'] ?? '') !== $this->stringValue($candidateLog['target_id'] ?? '')) {
+                throw new RuntimeException('idempotency_conflict');
+            }
+
+            $existingFingerprint = $this->stringValue($existingLog['report_fingerprint'] ?? '');
+            $candidateFingerprint = $this->stringValue($candidateLog['report_fingerprint'] ?? '');
+            if (
+                $existingFingerprint !== ''
+                && $candidateFingerprint !== ''
+                && !hash_equals($existingFingerprint, $candidateFingerprint)
+            ) {
+                throw new RuntimeException('idempotency_conflict');
+            }
+
+            if ($existingFingerprint === '' && !$this->legacyProductionLogMatches($existingLog, $candidateLog)) {
+                throw new RuntimeException('idempotency_conflict');
+            }
+
+            return $existingLog;
+        }
+
+        return null;
     }
 
     /**
@@ -761,6 +807,106 @@ final class ShopfloorExecutionService
                 'actual_idle_minutes' => $idle,
             ],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     */
+    private function productionReportFingerprint(array $log): string
+    {
+        $fingerprint = [];
+        foreach ($this->productionFingerprintFields() as $field) {
+            $fingerprint[$field] = $log[$field] ?? null;
+        }
+
+        return hash('sha256', $this->canonicalJson($fingerprint));
+    }
+
+    /**
+     * @param array<string, mixed> $existingLog
+     * @param array<string, mixed> $candidateLog
+     */
+    private function legacyProductionLogMatches(array $existingLog, array $candidateLog): bool
+    {
+        foreach ($this->productionFingerprintFields() as $field) {
+            if (($existingLog[$field] ?? null) != ($candidateLog[$field] ?? null)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function productionFingerprintFields(): array
+    {
+        return [
+            'target_id',
+            'wo_number',
+            'jo_number',
+            'item_id',
+            'part_number',
+            'part_revision',
+            'operation_seq',
+            'operation_id',
+            'machine_id',
+            'equipment_id',
+            'work_center_id',
+            'operator_id',
+            'shift_date',
+            'shift_code',
+            'cnc_program_id',
+            'cnc_program_revision',
+            'setup_sheet_id',
+            'quantity_good',
+            'quantity_ng',
+            'quantity_rework',
+            'actual_start',
+            'actual_end',
+            'actual_setup_minutes',
+            'actual_run_minutes',
+            'actual_idle_minutes',
+            'reason_codes',
+            'downtime_events',
+            'ng_details',
+            'rework_details',
+            'blocking_issues',
+            'notes',
+            'issues_encountered',
+            'offline_created',
+            'device_id',
+            'client_report_id',
+        ];
+    }
+
+    private function canonicalJson(mixed $value): string
+    {
+        $normalized = $this->sortForHash($value);
+        $json = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('unable_to_encode_report_fingerprint');
+        }
+
+        return $json;
+    }
+
+    private function sortForHash(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        if (!array_is_list($value)) {
+            ksort($value);
+        }
+
+        foreach ($value as $key => $child) {
+            $value[$key] = $this->sortForHash($child);
+        }
+
+        return $value;
     }
 
     /**

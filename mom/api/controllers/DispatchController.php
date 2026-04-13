@@ -35,6 +35,34 @@ class DispatchController extends BaseController
         return $this->shopfloorSvc;
     }
 
+    /**
+     * @param array<int|string, mixed> $logs
+     * @param array<int|string, mixed> $targets
+     * @param array<int|string, mixed> $originalLogs
+     * @param array<int|string, mixed> $originalTargets
+     */
+    private function writeExecutionState(
+        string $logFile,
+        array $logs,
+        string $targetFile,
+        array $targets,
+        array $originalLogs,
+        array $originalTargets,
+    ): void {
+        try {
+            $this->writeJsonFile($logFile, $logs);
+            $this->writeJsonFile($targetFile, $targets);
+        } catch (Throwable $e) {
+            try {
+                $this->writeJsonFile($logFile, $originalLogs);
+                $this->writeJsonFile($targetFile, $originalTargets);
+            } catch (Throwable $rollback) {
+                @error_log('[DispatchController] dispatch state rollback failed: ' . $rollback->getMessage());
+            }
+            throw $e;
+        }
+    }
+
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
@@ -345,6 +373,7 @@ class DispatchController extends BaseController
             // Update target status
             $tFile   = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($tFile) ?? [];
+            $originalTargets = $targets;
             $target  = null;
 
             foreach ($targets as &$t) {
@@ -367,6 +396,7 @@ class DispatchController extends BaseController
             // Create or update production log
             $logFile = $this->dispatchDir() . '/production_logs.json';
             $logs    = $this->readJsonFile($logFile) ?? [];
+            $originalLogs = $logs;
 
             $existingIdx = -1;
             foreach ($logs as $idx => $l) {
@@ -383,6 +413,15 @@ class DispatchController extends BaseController
                 $uid,
                 $now,
             );
+
+            $replayedLog = $this->shopfloor()->replayProductionLogForIdempotency($log, $logs);
+            if ($replayedLog !== null) {
+                $this->auditLog('dispatch_report_production_replay', [
+                    'target_id' => (string)($replayedLog['target_id'] ?? ''),
+                    'idempotency_key' => (string)($log['idempotency_key'] ?? ''),
+                ], $uid);
+                $this->success(['production_log' => $replayedLog, 'replayed' => true]);
+            }
 
             if ($existingIdx >= 0) {
                 $logs[$existingIdx]     = $log;
@@ -403,8 +442,7 @@ class DispatchController extends BaseController
                 unset($t2);
             }
 
-            $this->writeJsonFile($logFile, $logs);
-            $this->writeJsonFile($tFile, $targets);
+            $this->writeExecutionState($logFile, $logs, $tFile, $targets, $originalLogs, $originalTargets);
             $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             $this->auditLog('dispatch_report_production', [
@@ -420,6 +458,9 @@ class DispatchController extends BaseController
         } catch (RuntimeException $e) {
             if ($e->getMessage() === 'forbidden_operator_assignment') {
                 $this->error('forbidden', 403);
+            }
+            if ($e->getMessage() === 'idempotency_conflict') {
+                $this->error('idempotency_conflict', 409);
             }
             $this->error('report_production_failed', 500, $e->getMessage());
         } catch (Throwable $e) {
