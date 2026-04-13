@@ -1,0 +1,16 @@
+[Unit]
+Description=HESEM MOM AI Worker
+After=rabbitmq-server.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/mom
+ExecStart=/usr/bin/php scripts/ai_worker.php
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

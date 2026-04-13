@@ -73,4 +73,12 @@ return [
         'ttl_seconds' => max(300, (int)(getenv('QMS_API_IDEMPOTENCY_TTL_SECONDS') ?: 86400)),
         'retry_window_seconds' => max(15, (int)(getenv('QMS_API_IDEMPOTENCY_RETRY_WINDOW_SECONDS') ?: 120)),
     ],
+    'ai' => [
+        'anthropic_api_key'    => getenv('ANTHROPIC_API_KEY') ?: '',
+        'anthropic_model'      => getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-20250514',
+        'anthropic_max_tokens' => (int)(getenv('ANTHROPIC_MAX_TOKENS') ?: 4096),
+        'anthropic_timeout'    => (int)(getenv('ANTHROPIC_TIMEOUT') ?: 30),
+        'cache_ttl'            => (int)(getenv('AI_CACHE_TTL') ?: 300),
+        'enabled'              => $envBool('AI_ENABLED', false),
+    ],
 ];

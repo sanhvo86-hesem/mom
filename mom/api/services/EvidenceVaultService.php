@@ -134,6 +134,7 @@ final class EvidenceVaultService
         $record = array_merge($evidence, [
             'evidence_id'    => $this->generateUuidV4(),
             'file_hash'      => $fileHash,
+            'previous_hash'  => $prevChainHash,
             'chain_hash'     => $chainHash,
             'chain_sequence' => $chainSequence,
             'stored_by'      => $actorId,
@@ -153,7 +154,7 @@ final class EvidenceVaultService
         $this->pgInsertEvidence($record);
 
         // Record initial custody event
-        $this->recordCustody($record['evidence_id'], 'stored', $actorId, 'Initial storage in vault');
+        $this->recordCustody($record['evidence_id'], 'uploaded', $actorId, 'Initial storage in vault');
 
         return $record;
     }
@@ -173,6 +174,13 @@ final class EvidenceVaultService
      */
     public function getAll(array $filters = []): array
     {
+        if (!isset($filters['entity_id']) && isset($filters['record'])) {
+            $filters['entity_id'] = (string)$filters['record'];
+        }
+        if (!isset($filters['entity_type']) && isset($filters['record_type'])) {
+            $filters['entity_type'] = (string)$filters['record_type'];
+        }
+
         $vault  = $this->loadVault();
         $result = [];
 
@@ -341,10 +349,12 @@ final class EvidenceVaultService
         if ($this->pgWriteEnabled()) {
             try {
                 $db = $this->dataLayer->getConnection();
-                $db->execute(
-                    'DELETE FROM evidence_links WHERE evidence_id = :eid::uuid AND entity_type = :etype AND entity_id = :entityid',
-                    [':eid' => $evidenceId, ':etype' => $entityType, ':entityid' => $entityId]
-                );
+                if ($db !== null) {
+                    $db->execute(
+                    'DELETE FROM evidence_links WHERE evidence_id = CAST(:eid AS uuid) AND linked_entity_type = :etype AND linked_entity_id = :entityid',
+                        [':eid' => $evidenceId, ':etype' => $entityType, ':entityid' => $entityId]
+                    );
+                }
             } catch (\Throwable $e) {
                 error_log('[EvidenceVaultService] PG unlink failed: ' . $e->getMessage());
             }
@@ -397,7 +407,7 @@ final class EvidenceVaultService
      * Record a custody event for an evidence record.
      *
      * @param string      $evidenceId Evidence UUID.
-     * @param string      $action     Action (e.g., 'stored', 'accessed', 'exported', 'uploaded').
+     * @param string      $action     Action (e.g., 'uploaded', 'viewed', 'downloaded').
      * @param string      $userId     Acting user.
      * @param string|null $reason     Optional reason.
      */
@@ -568,7 +578,7 @@ final class EvidenceVaultService
      *
      * @return array{valid: bool, broken_at: ?int, total: int}
      */
-    public function verifyChain(): array
+    public function verifyChain(?string $evidenceId = null): array
     {
         $vault = $this->loadVault();
 
@@ -579,6 +589,7 @@ final class EvidenceVaultService
         $total         = count($vault);
         $prevChainHash = 'GENESIS';
 
+        $found = $evidenceId === null;
         foreach ($vault as $idx => $rec) {
             if (!is_array($rec)) {
                 continue;
@@ -596,7 +607,21 @@ final class EvidenceVaultService
                 ];
             }
 
+            if ($evidenceId !== null && (string)($rec['evidence_id'] ?? '') === $evidenceId) {
+                $found = true;
+                break;
+            }
+
             $prevChainHash = $storedHash;
+        }
+
+        if (!$found) {
+            return [
+                'valid'     => false,
+                'broken_at' => null,
+                'total'     => $total,
+                'error'     => 'evidence_not_found',
+            ];
         }
 
         return [
@@ -765,17 +790,19 @@ final class EvidenceVaultService
         if (!$this->pgWriteEnabled()) return;
         try {
             $db = $this->dataLayer->getConnection();
+            if ($db === null) return;
             $meta = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $actorUuid = $this->resolveUserUuid($db, (string)($record['stored_by'] ?? ''));
 
             $db->execute(
                 'INSERT INTO evidence_vault
                     (evidence_id, evidence_type, title, description, file_name, file_path,
-                     file_hash, mime_type, file_size, chain_hash, chain_sequence,
-                     stored_by, metadata)
+                     file_hash_sha256, previous_hash, mime_type, file_size_bytes, chain_hash,
+                     chain_sequence, uploaded_by, uploaded_at, metadata)
                  VALUES
-                    (:eid::uuid, :etype::evidence_type_enum, :title, :desc, :fname, :fpath,
-                     :fhash, :mime, :fsize, :chash, :cseq,
-                     :user, :meta::jsonb)
+                    (CAST(:eid AS uuid), CAST(:etype AS evidence_type_enum), :title, :desc, :fname, :fpath,
+                     :fhash, :prevhash, :mime, :fsize, :chash,
+                     :cseq, CAST(:user AS uuid), CAST(:uploaded_at AS timestamptz), CAST(:meta AS jsonb))
                  ON CONFLICT (evidence_id) DO NOTHING',
                 [
                     ':eid'   => $record['evidence_id'],
@@ -785,11 +812,13 @@ final class EvidenceVaultService
                     ':fname' => $record['filename'] ?? $record['original_name'] ?? '',
                     ':fpath' => $record['stored_path'] ?? '',
                     ':fhash' => $record['file_hash'] ?? '',
+                    ':prevhash' => $record['previous_hash'] ?? null,
                     ':mime'  => $record['mime_type'] ?? 'application/octet-stream',
                     ':fsize' => (int)($record['file_size'] ?? 0),
                     ':chash' => $record['chain_hash'] ?? '',
                     ':cseq'  => (int)($record['chain_sequence'] ?? 0),
-                    ':user'  => $record['stored_by'] ?? 'unknown',
+                    ':user'  => $actorUuid,
+                    ':uploaded_at' => $record['stored_at'] ?? $this->nowIso(),
                     ':meta'  => $meta,
                 ]
             );
@@ -806,20 +835,30 @@ final class EvidenceVaultService
         if (!$this->pgWriteEnabled()) return;
         try {
             $db = $this->dataLayer->getConnection();
+            if ($db === null) return;
             $custodyAction = $this->mapCustodyAction($event['action'] ?? 'accessed');
+            $actorName = (string)($event['user'] ?? 'unknown');
+            $actorUuid = $this->resolveUserUuid($db, $actorName);
+            $details = json_encode([
+                'source' => 'EvidenceVaultService',
+                'raw_action' => (string)($event['action'] ?? ''),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             $db->execute(
                 'INSERT INTO evidence_chain_custody
-                    (custody_id, evidence_id, action, actor, reason)
+                    (custody_id, evidence_id, action, actor_id, actor_name, reason, details, recorded_at)
                  VALUES
-                    (:cid::uuid, :eid::uuid, :action::custody_action_enum, :actor, :reason)
+                    (CAST(:cid AS uuid), CAST(:eid AS uuid), CAST(:action AS custody_action_enum), CAST(:actor_id AS uuid), :actor_name, :reason, CAST(:details AS jsonb), CAST(:recorded_at AS timestamptz))
                  ON CONFLICT DO NOTHING',
                 [
-                    ':cid'    => $event['event_id'],
-                    ':eid'    => $event['evidence_id'],
-                    ':action' => $custodyAction,
-                    ':actor'  => $event['user'] ?? 'unknown',
-                    ':reason' => $event['reason'] ?? null,
+                    ':cid'         => $event['event_id'],
+                    ':eid'         => $event['evidence_id'],
+                    ':action'      => $custodyAction,
+                    ':actor_id'    => $actorUuid,
+                    ':actor_name'  => $actorName,
+                    ':reason'      => $event['reason'] ?? null,
+                    ':details'     => $details,
+                    ':recorded_at' => $event['timestamp'] ?? $this->nowIso(),
                 ]
             );
         } catch (\Throwable $e) {
@@ -835,20 +874,28 @@ final class EvidenceVaultService
         if (!$this->pgWriteEnabled()) return;
         try {
             $db = $this->dataLayer->getConnection();
+            if ($db === null) return;
+            $linkedBy = (string)($linkRecord['linked_by'] ?? '');
+            $linkedByUuid = $this->resolveUserUuid($db, $linkedBy);
+            $metadata = json_encode([
+                'note' => $linkRecord['note'] ?? null,
+                'linked_by_name' => $linkedBy,
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             $db->execute(
                 'INSERT INTO evidence_links
-                    (link_id, evidence_id, entity_type, entity_id, linked_by, note)
+                    (link_id, evidence_id, linked_entity_type, linked_entity_id, linked_by, linked_at, metadata)
                  VALUES
-                    (:lid::uuid, :eid::uuid, :etype, :entityid, :user, :note)
+                    (CAST(:lid AS uuid), CAST(:eid AS uuid), :etype, :entityid, CAST(:user AS uuid), CAST(:linked_at AS timestamptz), CAST(:metadata AS jsonb))
                  ON CONFLICT DO NOTHING',
                 [
-                    ':lid'      => $linkRecord['link_id'],
-                    ':eid'      => $linkRecord['evidence_id'],
-                    ':etype'    => $linkRecord['entity_type'] ?? '',
-                    ':entityid' => $linkRecord['entity_id'] ?? '',
-                    ':user'     => $linkRecord['linked_by'] ?? '',
-                    ':note'     => $linkRecord['note'] ?? null,
+                    ':lid'       => $linkRecord['link_id'],
+                    ':eid'       => $linkRecord['evidence_id'],
+                    ':etype'     => $linkRecord['entity_type'] ?? '',
+                    ':entityid'  => $linkRecord['entity_id'] ?? '',
+                    ':user'      => $linkedByUuid,
+                    ':linked_at' => $linkRecord['linked_at'] ?? $this->nowIso(),
+                    ':metadata'  => $metadata,
                 ]
             );
         } catch (\Throwable $e) {
@@ -861,8 +908,23 @@ final class EvidenceVaultService
      */
     private function mapEvidenceType(string $type): string
     {
-        $valid = ['photo', 'document', 'certificate', 'measurement', 'video', 'audio', 'log', 'report', 'other'];
         $type = strtolower(trim($type));
+        $aliases = [
+            'certificate' => 'material_cert',
+            'cert' => 'material_cert',
+            'measurement' => 'measurement_data',
+            'measurement_data' => 'measurement_data',
+            'machine' => 'machine_log',
+            'machine_log' => 'machine_log',
+            'log' => 'machine_log',
+            'report' => 'test_report',
+            'test_report' => 'test_report',
+        ];
+        $type = $aliases[$type] ?? $type;
+        $valid = [
+            'photo', 'video', 'document', 'measurement_data', 'machine_log',
+            'material_cert', 'test_report', 'coc', 'coa', 'scan', 'email', 'other',
+        ];
         return in_array($type, $valid, true) ? $type : 'document';
     }
 
@@ -871,8 +933,50 @@ final class EvidenceVaultService
      */
     private function mapCustodyAction(string $action): string
     {
-        $valid = ['stored', 'accessed', 'exported', 'transferred', 'sealed', 'released', 'archived'];
         $action = strtolower(trim($action));
-        return in_array($action, $valid, true) ? $action : 'accessed';
+        $aliases = [
+            'stored' => 'uploaded',
+            'store' => 'uploaded',
+            'upload' => 'uploaded',
+            'accessed' => 'viewed',
+            'access' => 'viewed',
+            'read' => 'viewed',
+            'exported' => 'downloaded',
+            'export' => 'downloaded',
+            'download' => 'downloaded',
+            'sealed' => 'verified',
+            'released' => 'verified',
+            'archived' => 'verified',
+        ];
+        $action = $aliases[$action] ?? $action;
+        $valid = ['uploaded', 'viewed', 'downloaded', 'transferred', 'linked', 'unlinked', 'verified', 'flagged'];
+        return in_array($action, $valid, true) ? $action : 'viewed';
+    }
+
+    private function resolveUserUuid(object $db, string $actor): ?string
+    {
+        $actor = trim($actor);
+        if ($actor === '') {
+            return null;
+        }
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $actor) === 1) {
+            return strtolower($actor);
+        }
+
+        try {
+            if (method_exists($db, 'queryOne')) {
+                $row = $db->queryOne(
+                    'SELECT user_id FROM users WHERE username = :actor OR employee_id = :actor OR email = :actor LIMIT 1',
+                    [':actor' => $actor],
+                );
+                if (is_array($row) && !empty($row['user_id'])) {
+                    return (string)$row['user_id'];
+                }
+            }
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return null;
     }
 }

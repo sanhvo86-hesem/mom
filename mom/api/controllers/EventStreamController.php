@@ -24,7 +24,7 @@ class EventStreamController extends BaseController
     public function stream(): void
     {
         // Parse requested channels from query parameter
-        $channelsParam = trim($_GET['channels'] ?? 'workflow,notifications,mes,dashboard,dispatch');
+        $channelsParam = trim($_GET['channels'] ?? 'workflow,notifications,mes,dashboard,dispatch,ai');
         $requestedChannels = array_filter(
             array_map('trim', explode(',', $channelsParam))
         );
@@ -36,6 +36,7 @@ class EventStreamController extends BaseController
             'mes'           => 'mom:realtime:mes',
             'dashboard'     => 'mom:realtime:dashboard',
             'dispatch'      => 'mom:realtime:dispatch',
+            'ai'            => \MOM\Api\Services\EventBroadcaster::CHANNEL_AI,
         ];
 
         $channels = [];

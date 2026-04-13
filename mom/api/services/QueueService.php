@@ -30,6 +30,7 @@ final class QueueService
     public const EXCHANGE_EVENTS        = 'mom.events';
     public const EXCHANGE_COMMANDS       = 'mom.commands';
     public const EXCHANGE_NOTIFICATIONS  = 'mom.notifications';
+    public const EXCHANGE_AI             = 'mom.ai';
 
     // Queue names
     public const QUEUE_EPICOR_OUTBOX     = 'epicor.outbox';
@@ -38,6 +39,12 @@ final class QueueService
     public const QUEUE_JOBS_SCHEDULED    = 'jobs.scheduled';
     public const QUEUE_EVENTS_AUDIT      = 'events.audit';
     public const QUEUE_EVENTS_ANALYTICS  = 'events.analytics';
+
+    // AI queues / Hàng đợi AI
+    public const QUEUE_AI_INFERENCE  = 'ai.inference';
+    public const QUEUE_AI_ANALYSIS   = 'ai.analysis';
+    public const QUEUE_AI_FEEDBACK   = 'ai.feedback';
+    public const QUEUE_AI_TRAINING   = 'ai.training';
 
     /**
      * @param string $dataDir    Base data directory
@@ -125,6 +132,21 @@ final class QueueService
         // Notifications exchange -> email + in-app queues (fanout = all)
         $this->channel->queue_bind(self::QUEUE_NOTIFICATIONS_EMAIL, self::EXCHANGE_NOTIFICATIONS);
         $this->channel->queue_bind(self::QUEUE_NOTIFICATIONS_INAPP, self::EXCHANGE_NOTIFICATIONS);
+
+        // AI exchange (topic) / Sàn giao dịch AI
+        $this->channel->exchange_declare(self::EXCHANGE_AI, 'topic', false, true, false);
+
+        // AI queues (durable) / Hàng đợi AI (bền vững)
+        $this->channel->queue_declare(self::QUEUE_AI_INFERENCE, false, true, false, false);
+        $this->channel->queue_declare(self::QUEUE_AI_ANALYSIS, false, true, false, false);
+        $this->channel->queue_declare(self::QUEUE_AI_FEEDBACK, false, true, false, false);
+        $this->channel->queue_declare(self::QUEUE_AI_TRAINING, false, true, false, false);
+
+        // AI exchange bindings / Liên kết sàn AI
+        $this->channel->queue_bind(self::QUEUE_AI_INFERENCE, self::EXCHANGE_AI, 'ai.predict.#');
+        $this->channel->queue_bind(self::QUEUE_AI_ANALYSIS, self::EXCHANGE_AI, 'ai.analyze.#');
+        $this->channel->queue_bind(self::QUEUE_AI_FEEDBACK, self::EXCHANGE_AI, 'ai.feedback.#');
+        $this->channel->queue_bind(self::QUEUE_AI_TRAINING, self::EXCHANGE_AI, 'ai.train.#');
     }
 
     /**
@@ -331,6 +353,14 @@ final class QueueService
         }
         if (str_starts_with($routingKey, 'epicor.')) {
             return self::QUEUE_EPICOR_OUTBOX;
+        }
+        // AI routing keys → AI queues / Routing key AI → hàng đợi AI
+        if ($exchange === self::EXCHANGE_AI) {
+            if (str_starts_with($routingKey, 'ai.predict')) return self::QUEUE_AI_INFERENCE;
+            if (str_starts_with($routingKey, 'ai.analyze')) return self::QUEUE_AI_ANALYSIS;
+            if (str_starts_with($routingKey, 'ai.feedback')) return self::QUEUE_AI_FEEDBACK;
+            if (str_starts_with($routingKey, 'ai.train')) return self::QUEUE_AI_TRAINING;
+            return self::QUEUE_AI_INFERENCE; // Default AI queue
         }
         return self::QUEUE_EVENTS_AUDIT;
     }

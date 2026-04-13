@@ -24,6 +24,7 @@ final class EventBroadcaster
     public const CHANNEL_MES           = 'realtime:mes';
     public const CHANNEL_DASHBOARD     = 'realtime:dashboard';
     public const CHANNEL_DISPATCH      = 'realtime:dispatch';
+    public const CHANNEL_AI            = 'mom:realtime:ai';
 
     public function __construct(CacheService $cache)
     {
@@ -103,6 +104,19 @@ final class EventBroadcaster
             'type'      => 'dispatch.updated',
             'timestamp' => gmdate('c'),
         ], $data));
+    }
+
+    /**
+     * Broadcast AI prediction update.
+     * Phát cập nhật dự đoán AI.
+     */
+    public function aiPredictionUpdated(string $type, array $data = []): void
+    {
+        $this->broadcast(self::CHANNEL_AI, [
+            'type'      => 'ai.prediction.' . $type,
+            'data'      => $data,
+            'timestamp' => gmdate('c'),
+        ]);
     }
 
     /**

@@ -255,7 +255,12 @@ class EvidenceController extends BaseController
 
         $record = $this->query('record');
         if ($record !== null && $record !== '') {
-            $filters['record'] = $record;
+            $filters['entity_id'] = $record;
+        }
+
+        $recordType = $this->query('record_type');
+        if ($recordType !== null && $recordType !== '') {
+            $filters['entity_type'] = strtolower($recordType);
         }
 
         $tags = $this->query('tags');
@@ -383,9 +388,9 @@ class EvidenceController extends BaseController
             );
 
             $this->auditLog('evidence_upload', [
-                'evidence_id'   => $evidence['id'],
+                'evidence_id'   => $evidence['evidence_id'] ?? '',
                 'original_name' => $originalName,
-                'sha256'        => $evidence['sha256'] ?? '',
+                'sha256'        => $evidence['file_hash'] ?? '',
             ], $userId);
 
             $this->success(['evidence' => $evidence], 201);

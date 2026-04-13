@@ -60,6 +60,13 @@ final class DomainEvent
     // Finance events
     public const PERIOD_CLOSED   = 'finance.period.closed';
 
+    // AI events / Sự kiện AI
+    public const AI_PREDICTION_CREATED   = 'ai.prediction.created';
+    public const AI_PREDICTION_ACTIONED  = 'ai.prediction.actioned';
+    public const AI_FEEDBACK_RECORDED    = 'ai.feedback.recorded';
+    public const AI_ANALYSIS_COMPLETED   = 'ai.analysis.completed';
+    public const AI_SCHEDULE_OPTIMIZED   = 'ai.schedule.optimized';
+
     public function __construct(
         string $eventType,
         string $aggregateType,
