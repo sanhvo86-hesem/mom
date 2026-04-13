@@ -1,0 +1,10 @@
+# ══════════════════════════════════════════════════════
+# DOMAIN: Backend — API, Services & Database
+# Nguồn: GPT Pro chat "4. Backend"
+# Thời gian ước tính: 10h
+# ══════════════════════════════════════════════════════
+# HƯỚNG DẪN: Paste kết quả prompt từ GPT Pro chat "4. Backend" vào đây.
+# ══════════════════════════════════════════════════════
+
+# PASTE PROMPTS TỪ GPT PRO "Backend" VÀO ĐÂY:
+

@@ -53,10 +53,12 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
         }
 
         $limit = min(500, max(1, (int)($filters['limit'] ?? 100)));
+        $offset = max(0, (int)($filters['offset'] ?? 0));
         $params[':limit'] = $limit;
+        $params[':offset'] = $offset;
         $sql = 'SELECT * FROM ' . self::TABLE
             . ($where !== [] ? ' WHERE ' . implode(' AND ', $where) : '')
-            . ' ORDER BY occurred_at ASC, recorded_at ASC, event_id ASC LIMIT :limit';
+            . ' ORDER BY occurred_at ASC, recorded_at ASC, event_id ASC LIMIT :limit OFFSET :offset';
 
         $rows = $this->db->query($sql, $params);
         return array_map([ManufacturingEventCodec::class, 'normalizeRow'], $rows);

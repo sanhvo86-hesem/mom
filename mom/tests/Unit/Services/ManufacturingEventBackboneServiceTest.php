@@ -148,6 +148,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'correlation_id' => 'corr-taxonomy',
             'wo_number' => 'WO-TAX',
             'source_aggregate_id' => 'WO-TAX',
+            'occurred_at' => '2026-04-13T00:00:01+00:00',
             'payload' => ['state' => 'started'],
         ]);
         $service->recordInspectionEvent([
@@ -155,6 +156,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'inspection_id' => 'INSP-TAX',
             'source_aggregate_id' => 'INSP-TAX',
             'wo_number' => 'WO-TAX',
+            'occurred_at' => '2026-04-13T00:00:02+00:00',
             'payload' => ['result' => 'pass'],
         ]);
         $service->recordNcrCapaLinkageEvent([
@@ -162,6 +164,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'ncr_id' => 'NCR-TAX',
             'capa_id' => 'CAPA-TAX',
             'wo_number' => 'WO-TAX',
+            'occurred_at' => '2026-04-13T00:00:03+00:00',
             'payload' => ['linkage' => 'capa_required'],
         ]);
         $service->recordEvidenceAttachmentEvent([
@@ -169,6 +172,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'evidence_id' => 'EVID-TAX',
             'source_aggregate_id' => 'EVID-TAX',
             'wo_number' => 'WO-TAX',
+            'occurred_at' => '2026-04-13T00:00:04+00:00',
             'payload' => ['attachment' => 'measurement-photo'],
         ]);
         $service->recordGenealogyRelationEvent([
@@ -176,6 +180,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'lot_number' => 'LOT-PARENT',
             'child_lot_number' => 'LOT-CHILD',
             'wo_number' => 'WO-TAX',
+            'occurred_at' => '2026-04-13T00:00:05+00:00',
             'payload' => ['relation' => 'consumed_into'],
         ]);
 

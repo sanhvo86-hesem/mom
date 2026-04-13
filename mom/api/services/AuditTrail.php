@@ -141,6 +141,15 @@ final class AuditTrail
     /** Directory for JSON-based event storage. */
     private readonly string $eventDir;
 
+    /** @var array<string, mixed> Last audit read source/provenance metadata. */
+    private array $lastReadProbe = [
+        'source_backend' => 'none',
+        'fallback_used' => false,
+        'authoritative_required' => false,
+        'error' => '',
+        'queried_at' => '',
+    ];
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -228,16 +237,45 @@ final class AuditTrail
     {
         $limit = min((int) ($filters['limit'] ?? 100), self::MAX_QUERY_LIMIT);
         $offset = max(0, (int) ($filters['offset'] ?? 0));
+        $requiresAuthoritativeRead = $this->requiresAuthoritativeRead($filters);
 
         if ($this->db !== null) {
             try {
-                return $this->queryPostgres($filters, $limit, $offset);
-            } catch (\Throwable) {
-                // Fall through to JSON
+                $events = $this->queryPostgres($filters, $limit, $offset);
+                $this->setLastReadProbe('postgres', false, $requiresAuthoritativeRead);
+                return $this->annotateReadSource($events, 'postgres', false);
+            } catch (\Throwable $e) {
+                if ($requiresAuthoritativeRead) {
+                    $this->setLastReadProbe('postgres_unavailable', false, true, $e->getMessage());
+                    throw new RuntimeException(
+                        'Authoritative audit read failed for controlled event: ' . $e->getMessage(),
+                        0,
+                        $e,
+                    );
+                }
+                error_log('[AuditTrail] PG read failed, falling back to JSON: ' . $e->getMessage());
+                $events = $this->queryJson($filters, $limit, $offset);
+                $this->setLastReadProbe('json', true, false, $e->getMessage());
+                return $this->annotateReadSource($events, 'json', true, $e->getMessage());
             }
         }
 
-        return $this->queryJson($filters, $limit, $offset);
+        if ($requiresAuthoritativeRead) {
+            $this->setLastReadProbe('unavailable', false, true, 'postgres_not_configured');
+            throw new RuntimeException('Authoritative audit read requires PostgreSQL for controlled event.');
+        }
+
+        $events = $this->queryJson($filters, $limit, $offset);
+        $this->setLastReadProbe('json', false, false);
+        return $this->annotateReadSource($events, 'json', false);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function readProbe(): array
+    {
+        return $this->lastReadProbe;
     }
 
     /**
@@ -681,6 +719,52 @@ final class AuditTrail
 
         $aggregateType = strtolower(trim($event->aggregateType));
         return in_array($aggregateType, self::AUTHORITATIVE_AGGREGATE_TYPES, true);
+    }
+
+    /**
+     * @param array<string, mixed> $filters
+     */
+    private function requiresAuthoritativeRead(array $filters): bool
+    {
+        foreach (['audit_fail_closed', 'authoritative_audit_required', 'controlled_record'] as $flag) {
+            if ($this->boolValue($filters[$flag] ?? false)) {
+                return true;
+            }
+        }
+
+        $aggregateType = strtolower(trim((string)($filters['aggregate_type'] ?? '')));
+        return $aggregateType !== '' && in_array($aggregateType, self::AUTHORITATIVE_AGGREGATE_TYPES, true);
+    }
+
+    private function setLastReadProbe(
+        string $sourceBackend,
+        bool $fallbackUsed,
+        bool $authoritativeRequired,
+        string $error = '',
+    ): void {
+        $this->lastReadProbe = [
+            'source_backend' => $sourceBackend,
+            'fallback_used' => $fallbackUsed,
+            'authoritative_required' => $authoritativeRequired,
+            'error' => $error,
+            'queried_at' => gmdate('c'),
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $events
+     * @return list<array<string, mixed>>
+     */
+    private function annotateReadSource(array $events, string $sourceBackend, bool $fallbackUsed, string $error = ''): array
+    {
+        return array_map(static function (array $event) use ($sourceBackend, $fallbackUsed, $error): array {
+            $event['_audit_source_backend'] = $sourceBackend;
+            $event['_audit_fallback_used'] = $fallbackUsed;
+            if ($error !== '') {
+                $event['_audit_fallback_error'] = $error;
+            }
+            return $event;
+        }, $events);
     }
 
     private function boolValue(mixed $value): bool

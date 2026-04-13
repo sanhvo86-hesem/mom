@@ -2,7 +2,7 @@
 
 **Declared**: 2026-04-13
 **Scope**: Platform-global (750 tables)
-**Migration range**: 001–108 (108 migrations)
+**Migration range**: 001–108 (109 migrations)
 
 ## Authority Chain
 

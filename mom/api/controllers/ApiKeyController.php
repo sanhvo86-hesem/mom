@@ -19,10 +19,18 @@ class ApiKeyController extends BaseController
 {
     private string $keyFile;
 
-    public function __construct()
+    /**
+     * Constructor must receive DataLayer, rootDir, and dataDir from the factory.
+     * Parent constructor handles initialization.
+     *
+     * @param \MOM\Database\DataLayer $data    Shared data layer instance.
+     * @param string                  $rootDir Absolute path to project root.
+     * @param string                  $dataDir Absolute path to data directory.
+     */
+    public function __construct(\MOM\Database\DataLayer $data, string $rootDir, string $dataDir)
     {
-        parent::__construct();
-        $this->keyFile = ($GLOBALS['DATA_DIR'] ?? dirname(__DIR__, 2) . '/data') . '/config/api_keys.json';
+        parent::__construct($data, $rootDir, $dataDir);
+        $this->keyFile = $dataDir . '/config/api_keys.json';
     }
 
     /**
@@ -35,7 +43,9 @@ class ApiKeyController extends BaseController
      */
     public function create(): void
     {
-        $this->requireAdmin();
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $name = trim($body['name'] ?? '');
@@ -44,7 +54,6 @@ class ApiKeyController extends BaseController
 
         if ($name === '') {
             $this->json(['ok' => false, 'error' => 'name_required'], 400);
-            return;
         }
 
         // Generate API key
@@ -63,7 +72,7 @@ class ApiKeyController extends BaseController
             'user_id'    => $body['user_id'] ?? 'api-service',
             'active'     => true,
             'created_at' => gmdate('c'),
-            'created_by' => $_SESSION['user'] ?? 'system',
+            'created_by' => $user['username'] ?? 'system',
             'expires_at' => $expiresAt,
             'last_used'  => null,
         ];
@@ -91,7 +100,8 @@ class ApiKeyController extends BaseController
      */
     public function list(): void
     {
-        $this->requireAdmin();
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
 
         $store = $this->loadStore();
         $keys = array_map(function (array $key): array {
@@ -111,12 +121,13 @@ class ApiKeyController extends BaseController
      */
     public function revoke(): void
     {
-        $this->requireAdmin();
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
 
-        $keyId = $_GET['key_id'] ?? '';
+        $keyId = $_GET['key_id'] ?? $_GET['keyId'] ?? '';
         if ($keyId === '') {
             $this->json(['ok' => false, 'error' => 'key_id_required'], 400);
-            return;
         }
 
         $store = $this->loadStore();
@@ -125,7 +136,7 @@ class ApiKeyController extends BaseController
             if (($key['key_id'] ?? '') === $keyId) {
                 $key['active'] = false;
                 $key['revoked_at'] = gmdate('c');
-                $key['revoked_by'] = $_SESSION['user'] ?? 'system';
+                $key['revoked_by'] = $user['username'] ?? 'system';
                 $found = true;
                 break;
             }
@@ -134,7 +145,6 @@ class ApiKeyController extends BaseController
 
         if (!$found) {
             $this->json(['ok' => false, 'error' => 'key_not_found'], 404);
-            return;
         }
 
         $this->saveStore($store);
@@ -150,18 +160,19 @@ class ApiKeyController extends BaseController
      */
     public function generateJwt(): void
     {
-        $this->requireAdmin();
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
 
         $jwtSecret = getenv('JWT_SECRET') ?: '';
         if ($jwtSecret === '') {
             $this->json(['ok' => false, 'error' => 'jwt_secret_not_configured'], 500);
-            return;
         }
 
         $body = $this->jsonBody();
         $scopes = $body['scopes'] ?? ['read:*'];
         $expiresInMinutes = max(1, min(1440, (int)($body['expires_in_minutes'] ?? 60)));
-        $subject = $body['subject'] ?? ($_SESSION['user'] ?? 'system');
+        $subject = $body['subject'] ?? ($user['username'] ?? 'system');
 
         try {
             $config = \Lcobucci\JWT\Configuration::forSymmetricSigner(
@@ -224,23 +235,5 @@ class ApiKeyController extends BaseController
     {
         // If CacheService is available globally, invalidate
         // For now, rely on TTL-based cache expiry (5 min)
-    }
-
-    private function requireAdmin(): void
-    {
-        $user = $_SESSION['user'] ?? '';
-        if ($user === '') {
-            throw ExitException::json(['ok' => false, 'error' => 'unauthorized'], 401);
-        }
-
-        // Check admin role via store
-        $store = $GLOBALS['store'] ?? null;
-        if ($store) {
-            $userRecord = find_user_by_username($store, $user);
-            $role = $userRecord['role'] ?? '';
-            if ($role !== 'admin') {
-                throw ExitException::json(['ok' => false, 'error' => 'admin_required'], 403);
-            }
-        }
     }
 }

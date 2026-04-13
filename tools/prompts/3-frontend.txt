@@ -1,0 +1,10 @@
+# ══════════════════════════════════════════════════════
+# DOMAIN: Frontend — UI/UX & API Contracts
+# Nguồn: GPT Pro chat "3. Frontend"
+# Thời gian ước tính: 6h
+# ══════════════════════════════════════════════════════
+# HƯỚNG DẪN: Paste kết quả prompt từ GPT Pro chat "3. Frontend" vào đây.
+# ══════════════════════════════════════════════════════
+
+# PASTE PROMPTS TỪ GPT PRO "Frontend" VÀO ĐÂY:
+

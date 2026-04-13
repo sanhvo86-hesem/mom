@@ -10,12 +10,12 @@ use MOM\Database\Connection;
  * AiPredictionPipeline - Full prediction lifecycle orchestrator.
  * Đường ống dự đoán AI — điều phối toàn bộ vòng đời dự đoán.
  *
- * Lifecycle: creation → storage → action-triggering → feedback → expiry.
- * Vòng đời: tạo → lưu trữ → kích hoạt hành động → phản hồi → hết hạn.
+ * Lifecycle: creation -> storage -> advisory recommendation -> feedback -> expiry.
+ * Vòng đời: tạo -> lưu trữ -> khuyến nghị tư vấn -> phản hồi -> hết hạn.
  *
  * Integrations:
  *   - quality_predictions      : Core prediction storage / Lưu trữ dự đoán
- *   - ai_recommendation_actions: Automated action tracking / Theo dõi hành động tự động
+ *   - ai_recommendation_actions: Advisory action tracking / Theo dõi khuyến nghị tư vấn
  *   - ai_feedback_loops        : Operator feedback collection / Thu thập phản hồi vận hành viên
  *   - EventBus                 : Domain event publishing / Phát sự kiện miền
  *   - EventBroadcaster         : Real-time SSE broadcasting / Phát SSE thời gian thực
@@ -64,8 +64,8 @@ final class AiPredictionPipeline
     ];
 
     /**
-     * Action mapping: prediction_type + severity → action_type.
-     * Bảng ánh xạ hành động: loại dự đoán + mức độ nghiêm trọng → loại hành động.
+     * Advisory action mapping: prediction_type + severity -> action_type.
+     * Bảng ánh xạ khuyến nghị: loại dự đoán + mức độ nghiêm trọng -> loại hành động.
      *
      * Format: 'prediction_type:severity' => action_type
      * Fallback entries use 'prediction_type:*' for any severity.
@@ -73,22 +73,20 @@ final class AiPredictionPipeline
      * @var array<string, string>
      */
     private const ACTION_MAP = [
-        // quality anomaly types (defect_probability, process_drift) + critical → auto NCR
-        // Bất thường chất lượng + nghiêm trọng → tự động tạo NCR
+        // quality anomaly types (defect_probability, process_drift) + critical -> NCR review recommendation
         'defect_probability:critical' => 'auto_ncr',
         'process_drift:critical'      => 'auto_ncr',
 
-        // equipment_failure + critical or warning → maintenance request
-        // Lỗi thiết bị + nghiêm trọng hoặc cảnh báo → yêu cầu bảo trì
+        // equipment_failure + critical or warning -> maintenance review recommendation
         'equipment_failure:critical' => 'maintenance_request',
         'equipment_failure:warning'  => 'maintenance_request',
 
-        // SPC anomaly → alert sent / Bất thường SPC → gửi cảnh báo
+        // SPC anomaly -> alert recommendation
         'spc_anomaly:critical' => 'alert_sent',
         'spc_anomaly:warning'  => 'alert_sent',
         'spc_anomaly:watch'    => 'alert_sent',
 
-        // Tool wear + critical → tool change order / Mòn dao + nghiêm trọng → lệnh thay dao
+        // Tool wear + critical -> tool-change review recommendation
         'tool_wear:critical' => 'tool_change_order',
         'tool_wear:warning'  => 'tool_change_order',
     ];
@@ -107,6 +105,11 @@ final class AiPredictionPipeline
         $this->broadcaster = $broadcaster;
     }
 
+    public function dataDirectory(): string
+    {
+        return $this->dataDir;
+    }
+
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
@@ -114,7 +117,7 @@ final class AiPredictionPipeline
      * Tạo bản ghi dự đoán AI mới.
      *
      * Stores the prediction in quality_predictions, emits domain events,
-     * and auto-triggers actions for critical severity.
+     * and creates pending advisory recommendation records for critical severity.
      *
      * @param array $data Prediction data with required keys:
      *   - prediction_type (string): One of prediction_type_enum values
@@ -234,12 +237,13 @@ final class AiPredictionPipeline
             @error_log('[AiPredictionPipeline] EventBroadcaster error: ' . $e->getMessage());
         }
 
-        // ── Auto-trigger actions for critical severity / Tự động kích hoạt hành động cho mức nghiêm trọng ──
+        // Critical predictions create advisory action records only. They do not execute NCR,
+        // maintenance, scheduling, tooling, or machine-control side effects.
         if (($record['severity'] ?? '') === 'critical') {
             try {
                 $record['_triggered_actions'] = $this->triggerActions($record['prediction_id']);
             } catch (\Throwable $e) {
-                @error_log('[AiPredictionPipeline] Auto-trigger actions error: ' . $e->getMessage());
+                @error_log('[AiPredictionPipeline] Advisory action tracking error: ' . $e->getMessage());
                 $record['_triggered_actions'] = [];
             }
         }
@@ -248,11 +252,12 @@ final class AiPredictionPipeline
     }
 
     /**
-     * Trigger automated actions based on prediction type and severity.
-     * Kích hoạt hành động tự động dựa trên loại dự đoán và mức độ nghiêm trọng.
+     * Create advisory action records based on prediction type and severity.
+     * Tạo bản ghi khuyến nghị dựa trên loại dự đoán và mức độ nghiêm trọng.
      *
-     * Determines the appropriate action from the ACTION_MAP, stores it in
-     * ai_recommendation_actions, and emits events + broadcasts.
+     * Determines the appropriate recommendation from ACTION_MAP, stores it in
+     * ai_recommendation_actions, and emits events + broadcasts. This method does
+     * not execute operational side effects; status remains pending for human review.
      *
      * @param string $predictionId UUID of the prediction / UUID của dự đoán
      * @return array List of triggered action records / Danh sách bản ghi hành động đã kích hoạt
@@ -292,17 +297,30 @@ final class AiPredictionPipeline
             return [];
         }
 
-        // ── Build action payload / Xây dựng dữ liệu hành động ──
+        // ── Build advisory payload / Xây dựng dữ liệu khuyến nghị ──
         $actionPayload = [
-            'prediction_type'  => $predictionType,
-            'severity'         => $severity,
-            'machine_id'       => $prediction['machine_id'] ?? null,
-            'item_id'          => $prediction['item_id'] ?? null,
-            'job_number'       => $prediction['job_number'] ?? null,
-            'wo_number'        => $prediction['wo_number'] ?? null,
-            'confidence_score' => $prediction['confidence_score'] ?? null,
-            'recommendation'   => $prediction['recommendation'] ?? null,
-            'triggered_at'     => gmdate('c'),
+            'advisory_only'       => true,
+            'execution_authority' => false,
+            'requires_human_approval' => true,
+            'advisory_boundary'  => 'ai_advisory_projection',
+            'ot_safe_boundary'   => 'no_machine_control_no_execution_write',
+            'side_effect_policy' => 'pending_human_review_only',
+            'allowed_next_step'  => $this->advisoryNextStep($actionType),
+            'next_step'          => $this->advisoryNextStep($actionType),
+            'prediction_type'    => $predictionType,
+            'severity'           => $severity,
+            'machine_id'         => $prediction['machine_id'] ?? null,
+            'item_id'            => $prediction['item_id'] ?? null,
+            'job_number'         => $prediction['job_number'] ?? null,
+            'wo_number'          => $prediction['wo_number'] ?? null,
+            'confidence_score'   => $prediction['confidence_score'] ?? null,
+            'recommendation'     => $prediction['recommendation'] ?? null,
+            'triggered_at'       => gmdate('c'),
+            'source_truth'       => [
+                'prediction_table' => 'quality_predictions',
+                'execution_write_authority' => 'MOM/MES dispatch, quality, maintenance, and tooling workflows',
+                'projection_only' => true,
+            ],
         ];
 
         // ── Insert action record / Chèn bản ghi hành động ──
@@ -370,6 +388,18 @@ final class AiPredictionPipeline
         }
 
         return $triggeredActions;
+    }
+
+    private function advisoryNextStep(string $actionType): string
+    {
+        return match ($actionType) {
+            'auto_ncr' => 'quality_review_required',
+            'maintenance_request' => 'maintenance_planner_review_required',
+            'schedule_adjustment' => 'planner_review_required',
+            'tool_change_order' => 'tooling_supervisor_review_required',
+            'alert_sent' => 'operator_or_supervisor_acknowledgement_required',
+            default => 'human_review_required',
+        };
     }
 
     /**

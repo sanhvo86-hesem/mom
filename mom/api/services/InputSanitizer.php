@@ -108,7 +108,7 @@ final class InputSanitizer
             'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
             'org_plant_id'         => (string)($user['org_plant_id'] ?? ''),
             'org_site_id'          => (string)($user['org_site_id'] ?? ''),
-            'mfa'                  => ['enabled' => (bool)(($user['mfa']['enabled'] ?? false))],
+            'mfa'                  => ['enabled' => is_array($user['mfa'] ?? null) && (bool)($user['mfa']['enabled'] ?? false)],
             'updated_at'           => (string)($user['updated_at'] ?? ''),
             'created_at'           => (string)($user['created_at'] ?? ''),
         ];

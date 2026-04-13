@@ -1,0 +1,12 @@
+# ══════════════════════════════════════════════════════
+# DOMAIN: EQMS — Quality Management System
+# Nguồn: GPT Pro chat "1. eqms"
+# Thời gian ước tính: 5h
+# ══════════════════════════════════════════════════════
+# HƯỚNG DẪN: Paste kết quả prompt từ GPT Pro chat "1. eqms" vào đây.
+# Mỗi prompt = 1 dòng (hoặc nhiều dòng, cách nhau bằng dòng trống).
+# Dòng bắt đầu # là comment, bị bỏ qua.
+# ══════════════════════════════════════════════════════
+
+# PASTE PROMPTS TỪ GPT PRO "eqms" VÀO ĐÂY:
+

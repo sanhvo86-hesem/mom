@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T15:11:34.599Z",
+    "generatedAt": "2026-04-13T17:01:47.820Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 15,
-    "idempotency_mentions": 21707,
+    "idempotency_mentions": 21714,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -199,7 +199,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21707,
+        "idempotency_mentions": 21714,
         "optimistic_concurrency_mentions": 8200,
         "mutating_endpoint_count": 2612,
         "idempotent_endpoint_count": 2612,
@@ -392,7 +392,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21707
+        "idempotency_mentions": 21714
       },
       "required_controls": [
         "offline_conflict_model",

@@ -7,6 +7,7 @@ namespace MOM\Services;
 use InvalidArgumentException;
 use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Api\Services\ManufacturingEventBackboneService;
+use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 use RuntimeException;
 use Throwable;
@@ -1016,15 +1017,15 @@ final class ShopfloorExecutionService
     {
         $master = $this->masterData();
 
+        $downtime = $this->activeRows((array)($master['downtime_reason_codes'] ?? []), 'reason_code');
+        $blocking = $this->activeRows((array)($master['blocking_reason_codes'] ?? []), 'reason_code');
+
         return [
-            'downtime' => $this->activeRows((array)($master['downtime_reason_codes'] ?? []), 'reason_code'),
+            'downtime' => $downtime,
             'downtime_resolution' => $this->activeRows((array)($master['downtime_resolution_codes'] ?? []), 'resolution_code'),
             'ng' => $this->activeRows((array)($master['defect_catalog'] ?? []), 'defect_code'),
             'rework' => $this->activeRows((array)($master['defect_catalog'] ?? []), 'defect_code'),
-            'blocking' => $this->activeRows(
-                (array)($master['blocking_reason_codes'] ?? $master['downtime_reason_codes'] ?? []),
-                'reason_code',
-            ),
+            'blocking' => $blocking,
         ];
     }
 
@@ -1637,6 +1638,11 @@ final class ShopfloorExecutionService
      */
     private function passingFirstPieceInspection(array $target): ?array
     {
+        $dbInspection = $this->passingFirstPieceInspectionFromDb($target);
+        if ($dbInspection !== null) {
+            return $dbInspection;
+        }
+
         $file = $this->dataDir . '/mobile/inspections.json';
         if (!is_file($file)) {
             return null;
@@ -1686,6 +1692,80 @@ final class ShopfloorExecutionService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>|null
+     */
+    private function passingFirstPieceInspectionFromDb(array $target): ?array
+    {
+        if ($this->dataLayer === null || $this->dataLayer->getMode() === DataLayer::MODE_JSON_ONLY) {
+            return null;
+        }
+
+        $db = $this->dataLayer->getConnection();
+        if ($db === null || !$this->tableAvailable($db, 'mobile_inspection_captures')) {
+            return null;
+        }
+
+        $targetWo = $this->stringValue($target['wo_number'] ?? '');
+        if ($targetWo === '') {
+            return null;
+        }
+        $targetOperation = $this->stringValue($target['operation_seq'] ?? '');
+        $targetPlan = $this->stringValue($target['inspection_plan_id'] ?? '');
+
+        try {
+            $where = [
+                "capture_type = 'first_piece'",
+                "lower(COALESCE(overall_result, '')) IN ('pass', 'passed', 'ok', 'accepted', 'approved')",
+                'wo_number = :wo_number',
+            ];
+            $params = [':wo_number' => $targetWo];
+            if ($targetOperation !== '') {
+                $where[] = 'operation_seq::text = :operation_seq';
+                $params[':operation_seq'] = $targetOperation;
+            }
+            if ($targetPlan !== '') {
+                $where[] = "(inspection_plan_id::text = :inspection_plan_id OR metadata->>'inspection_plan_external_id' = :inspection_plan_id)";
+                $params[':inspection_plan_id'] = $targetPlan;
+            }
+
+            $row = $db->queryOne(
+                'SELECT capture_id::text AS capture_id,
+                        operator_id,
+                        wo_number,
+                        jo_number,
+                        operation_seq,
+                        capture_type,
+                        inspection_plan_id::text AS inspection_plan_id,
+                        overall_result,
+                        metadata,
+                        created_at::text AS created_at
+                   FROM mobile_inspection_captures
+                  WHERE ' . implode(' AND ', $where) . '
+                  ORDER BY created_at DESC
+                  LIMIT 1',
+                $params,
+            );
+            if (!is_array($row)) {
+                return null;
+            }
+            if (isset($row['metadata']) && is_string($row['metadata'])) {
+                $decoded = json_decode($row['metadata'], true);
+                $row['metadata'] = is_array($decoded) ? $decoded : [];
+            }
+            if ($targetPlan !== '' && $this->stringValue($row['inspection_plan_id'] ?? '') === '') {
+                $metadata = is_array($row['metadata'] ?? null) ? $row['metadata'] : [];
+                $row['inspection_plan_id'] = $this->stringValue($metadata['inspection_plan_external_id'] ?? '');
+            }
+
+            return $row;
+        } catch (Throwable $e) {
+            @error_log('[ShopfloorExecutionService] mobile inspection DB lookup failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -1890,6 +1970,16 @@ final class ShopfloorExecutionService
 
         $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function tableAvailable(Connection $db, string $table): bool
+    {
+        try {
+            $row = $db->queryOne('SELECT to_regclass(:table_name) AS table_name', [':table_name' => $table]);
+            return is_array($row) && $this->stringValue($row['table_name'] ?? '') !== '';
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /**

@@ -134,6 +134,68 @@ final class TraceabilityGenealogyServiceTest extends TestCase
         $this->assertTrue($eligible['eligible']);
     }
 
+    public function testSerialOnlySupplierQualityIssueBlocksSerialConsumptionAndShipment(): void
+    {
+        $this->seedSupplierSerialToShipmentChain('SUP-SN-Q', 'REC-SN-Q', 'PROD-SN-Q', 'SHIP-SN-Q', 'SITE-A');
+        $this->traceability->recordSupplierQualityIssue([
+            'supplier_issue_id' => 'SQI-SN',
+            'scar_id' => 'SCAR-SN',
+            'affected_serial_number' => 'SUP-SN-Q',
+            'vendor_id' => 'VEND-SN',
+            'issue_status' => 'issued',
+            'org_site_id' => 'SITE-A',
+            'occurred_at' => '2026-04-13T10:00:00Z',
+        ]);
+
+        $impact = $this->traceability->supplierIssueImpactSummary(['scar_id' => 'SCAR-SN', 'org_site_id' => 'SITE-A']);
+        $shipment = $this->traceability->shipmentEligibility(['shipment_id' => 'SHIP-SN-Q', 'org_site_id' => 'SITE-A']);
+        $consumption = $this->traceability->consumptionEligibility(['serial_number' => 'SUP-SN-Q', 'org_site_id' => 'SITE-A']);
+
+        $this->assertSame(1, $impact['issue_count']);
+        $this->assertSame('SUP-SN-Q', $impact['issues'][0]['affected_serial_number']);
+        $this->assertSame(3, $impact['issues'][0]['impacted_output_count']);
+        $this->assertFalse($shipment['eligible']);
+        $this->assertFalse($consumption['eligible']);
+        $this->assertSame('supplier_quality_consumption_block', $consumption['blockers'][0]['reason_code']);
+
+        $this->traceability->recordSupplierQualityIssue([
+            'supplier_issue_id' => 'SQI-SN',
+            'scar_id' => 'SCAR-SN',
+            'affected_serial_number' => 'SUP-SN-Q',
+            'vendor_id' => 'VEND-SN',
+            'issue_status' => 'closed',
+            'org_site_id' => 'SITE-A',
+            'occurred_at' => '2026-04-13T11:00:00Z',
+        ]);
+
+        $eligible = $this->traceability->consumptionEligibility(['serial_number' => 'SUP-SN-Q', 'org_site_id' => 'SITE-A']);
+        $this->assertTrue($eligible['eligible']);
+    }
+
+    public function testTraceQueriesPageBeyondFirstFiveHundredEvents(): void
+    {
+        $base = strtotime('2026-04-13T07:00:00Z');
+        for ($i = 0; $i < 510; $i++) {
+            $this->traceability->recordGenealogyLink([
+                'link_type' => 'supplier_receipt',
+                'parent_lot_number' => 'NOISE-PARENT-' . $i,
+                'child_lot_number' => 'NOISE-CHILD-' . $i,
+                'org_site_id' => 'SITE-PAGE',
+                'occurred_at' => gmdate(DATE_ATOM, $base + $i),
+            ]);
+        }
+        $this->seedSupplierToShipmentChain('SUP-PAGE', 'REC-PAGE', 'PROD-PAGE', 'SHIP-PAGE', 'SITE-PAGE');
+
+        $trace = $this->traceability->downstreamTrace(['lot_number' => 'SUP-PAGE', 'org_site_id' => 'SITE-PAGE']);
+
+        $this->assertSame(4, $trace['node_count']);
+        $this->assertSame(3, $trace['edge_count']);
+        $this->assertContains('SHIP-PAGE', array_values(array_filter(array_map(
+            static fn(array $node): string => (string)($node['shipment_id'] ?? ''),
+            $trace['nodes'],
+        ))));
+    }
+
     public function testContainmentPacketBlocksClosureUntilImpactEvidenceAndApprovalArePresent(): void
     {
         $this->seedSupplierToShipmentChain('SUP-LOT-C', 'REC-LOT-C', 'PROD-LOT-C', 'SHIP-C', 'SITE-A');
@@ -232,6 +294,37 @@ final class TraceabilityGenealogyServiceTest extends TestCase
         $this->traceability->recordGenealogyLink([
             'link_type' => 'shipment_pack',
             'lot_number' => $productionLot,
+            'shipment_id' => $shipmentId,
+            'packing_id' => 'PK-' . $shipmentId,
+            'package_number' => 'PKG-' . $shipmentId,
+            'org_site_id' => $siteId,
+            'occurred_at' => '2026-04-13T09:00:00Z',
+        ]);
+    }
+
+    private function seedSupplierSerialToShipmentChain(string $supplierSerial, string $receiptSerial, string $productionSerial, string $shipmentId, string $siteId): void
+    {
+        $this->traceability->recordGenealogyLink([
+            'link_type' => 'supplier_receipt',
+            'parent_serial_number' => $supplierSerial,
+            'child_serial_number' => $receiptSerial,
+            'vendor_id' => 'VEND-SN',
+            'inspection_id' => 'INC-' . $receiptSerial,
+            'org_site_id' => $siteId,
+            'occurred_at' => '2026-04-13T08:00:00Z',
+        ]);
+        $this->traceability->recordGenealogyLink([
+            'link_type' => 'production_consumption',
+            'parent_serial_number' => $receiptSerial,
+            'child_serial_number' => $productionSerial,
+            'wo_number' => 'WO-' . $productionSerial,
+            'operation_seq' => '20',
+            'org_site_id' => $siteId,
+            'occurred_at' => '2026-04-13T08:30:00Z',
+        ]);
+        $this->traceability->recordGenealogyLink([
+            'link_type' => 'shipment_pack',
+            'serial_number' => $productionSerial,
             'shipment_id' => $shipmentId,
             'packing_id' => 'PK-' . $shipmentId,
             'package_number' => 'PKG-' . $shipmentId,

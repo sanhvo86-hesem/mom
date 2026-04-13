@@ -6,7 +6,19 @@ namespace MOM\Api\Services;
 
 class GraphicsGovernanceService
 {
-    private const VALID_TEMPLATE_STATUSES = ['approved', 'draft', 'deprecated', 'retired'];
+    private const VALID_TEMPLATE_STATUSES = [
+        'draft-only',
+        'controlled-draft',
+        'validated',
+        'publish-blocked',
+        'published',
+        'deprecated',
+        'legacy-bridged',
+        // Backward-compatible registry imports are normalized before API output.
+        'approved',
+        'draft',
+        'retired',
+    ];
     private const VALID_DENSITIES = ['compact', 'default', 'comfortable', 'shopfloor'];
     private const IMPACT_TTL_SECONDS = 86400;
     private const VALID_ROLLOUT_SCOPE_MODES = [
@@ -169,9 +181,9 @@ class GraphicsGovernanceService
         }
 
         $draft = $template;
-        $draft['status'] = (string)($draft['status'] ?? 'draft');
-        if ($draft['status'] === 'approved') {
-            $draft['status'] = 'draft';
+        $draft['status'] = $this->canonicalTemplateGovernanceStatus((string)($draft['status'] ?? 'controlled-draft'));
+        if ($draft['status'] === 'published') {
+            $draft['status'] = 'controlled-draft';
         }
         $draft['_draft'] = [
             'savedAt' => gmdate('c'),
@@ -223,7 +235,7 @@ class GraphicsGovernanceService
             static fn($value): string => trim((string)$value),
             (array)($input['aliases'] ?? [$newTemplateId])
         ))));
-        $draft['status'] = 'draft';
+        $draft['status'] = 'controlled-draft';
         $draft['version'] = (string)($input['version'] ?? '0.1.0');
         $draft['owner'] = (string)($input['owner'] ?? $source['owner'] ?? 'Frontend Architecture Council');
         $draft['_clonedFrom'] = [
@@ -354,7 +366,8 @@ class GraphicsGovernanceService
             throw new GraphicsGovernanceException(404, 'template_draft_not_found', 'Template draft not found: ' . $templateId);
         }
         $draft['templateId'] = (string)($draft['templateId'] ?? $templateId);
-        $draft['status'] = 'approved';
+        $draft['registryStatus'] = (string)($draft['registryStatus'] ?? 'approved');
+        $draft['status'] = 'published';
 
         $validation = $this->validateTemplateDocument($draft, $templateId);
         if (!$validation['valid']) {
@@ -366,7 +379,7 @@ class GraphicsGovernanceService
         if ($existingIndex !== null) {
             $existing = (array)$registry['templates'][$existingIndex];
             if (!$this->isVersionGreater((string)($draft['version'] ?? ''), (string)($existing['version'] ?? ''))) {
-                throw new GraphicsGovernanceException(422, 'version_bump_required', 'Published template version must be greater than the current approved version', [
+                throw new GraphicsGovernanceException(422, 'version_bump_required', 'Published template version must be greater than the current published version', [
                     ['field' => 'version', 'message' => 'Version must be greater than ' . (string)($existing['version'] ?? ''), 'code' => 'version_bump_required'],
                 ]);
             }
@@ -379,10 +392,15 @@ class GraphicsGovernanceService
         $this->snapshotRegistry('before_publish_' . (string)$draft['templateId'], $registry, $username);
 
         $releaseRefs = $this->normalizeReleaseManifestRefs((array)($request['releaseManifestRefs'] ?? $request['releaseEvidence'] ?? []));
+        $waiverIds = $this->assertApprovedWaiverRefsForPublish(
+            array_values(array_filter(array_map('strval', (array)($request['waiverIds'] ?? [])))),
+            (string)$draft['templateId'],
+            $impact
+        );
         $draft['publishedAt'] = gmdate('c');
         $draft['publishedBy'] = $username;
         $draft['releaseManifestRefs'] = $releaseRefs;
-        $draft['waiverIds'] = array_values(array_filter(array_map('strval', (array)($request['waiverIds'] ?? []))));
+        $draft['waiverIds'] = $waiverIds;
         $draft['impactAnalysisId'] = (string)($request['impactAnalysisId'] ?? $impact['impactId']);
 
         if ($existingIndex === null) {
@@ -496,8 +514,11 @@ class GraphicsGovernanceService
             if ($shopfloor && !$gateState['shopfloorReady']) {
                 $findings[] = ['code' => 'shopfloor_accessibility_evidence_missing', 'severity' => 'blocker'];
             }
-            $hasBlocker = count(array_filter($findings, static fn(array $finding): bool => (string)($finding['severity'] ?? '') === 'blocker')) > 0;
             $usesPrivateCssShell = $this->moduleUsesPrivateCssShell($moduleId, $module, $packet);
+            if ($usesPrivateCssShell) {
+                $findings[] = ['code' => 'legacy_private_css_shell', 'severity' => 'blocker'];
+            }
+            $hasBlocker = count(array_filter($findings, static fn(array $finding): bool => (string)($finding['severity'] ?? '') === 'blocker')) > 0;
             $consumesSharedTokens = !$usesPrivateCssShell && $template !== null;
             $consumesHmComponents = $blockFamilies !== [] && $blockFindings === [];
             $linkageStatus = $hasBlocker ? 'blocked' : 'full-admin-controlled';
@@ -751,6 +772,7 @@ class GraphicsGovernanceService
                 'tokenAdoptionCoverage' => $coverage['coverage'],
             ],
             'blockers' => $blockers,
+            'generatedAt' => gmdate('c'),
         ];
     }
 
@@ -1419,6 +1441,9 @@ class GraphicsGovernanceService
         if (!in_array((string)($rollout['status'] ?? ''), ['staged', 'canary_applied'], true)) {
             throw new GraphicsGovernanceException(409, 'rollout_not_staged_or_canary', 'Only staged or canary-applied rollouts can be applied globally');
         }
+        if ((string)($rollout['status'] ?? '') === 'canary_applied') {
+            $this->assertPostCanaryVerification($rollout, $input);
+        }
         if ($this->normalizeReleaseManifestRefs((array)($rollout['releaseManifestRefs'] ?? [])) === []) {
             throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Apply requires releaseManifestRefs captured at rollout stage');
         }
@@ -1508,7 +1533,7 @@ class GraphicsGovernanceService
     {
         $doc = $this->repo->readWaiversDocument();
         $this->requireExpectedVersion($expectedVersion, $doc);
-        foreach (['scope', 'targetId', 'reason', 'expiresAt'] as $field) {
+        foreach (['scope', 'targetId', 'reason', 'riskClass', 'compensatingControl', 'owner', 'approver', 'expiresAt'] as $field) {
             if (trim((string)($input[$field] ?? '')) === '') {
                 throw new GraphicsGovernanceException(422, 'waiver_field_required', 'Waiver requires ' . $field, [
                     ['field' => $field, 'message' => $field . ' is required', 'code' => 'required'],
@@ -1524,7 +1549,7 @@ class GraphicsGovernanceService
                 ['field' => 'scope', 'message' => 'Scope must be template, module, component, token, or release_gate', 'code' => 'invalid_scope'],
             ]);
         }
-        $riskClass = (string)($input['riskClass'] ?? 'medium');
+        $riskClass = (string)$input['riskClass'];
         if (!in_array($riskClass, ['low', 'medium', 'high', 'regulated', 'shopfloor-critical'], true)) {
             throw new GraphicsGovernanceException(422, 'invalid_waiver_risk_class', 'Waiver riskClass is not allowed', [
                 ['field' => 'riskClass', 'message' => 'riskClass must be low, medium, high, regulated, or shopfloor-critical', 'code' => 'invalid_risk_class'],
@@ -1543,9 +1568,9 @@ class GraphicsGovernanceService
             'targetId' => (string)$input['targetId'],
             'reason' => (string)$input['reason'],
             'risk' => (string)($input['risk'] ?? $riskClass),
-            'compensatingControl' => (string)($input['compensatingControl'] ?? ''),
-            'owner' => (string)($input['owner'] ?? $username),
-            'approver' => (string)($input['approver'] ?? ''),
+            'compensatingControl' => (string)$input['compensatingControl'],
+            'owner' => (string)$input['owner'],
+            'approver' => (string)$input['approver'],
             'riskClass' => $riskClass,
             'status' => 'draft',
             'documentControlRefs' => array_values(array_map('strval', (array)($input['documentControlRefs'] ?? []))),
@@ -1656,6 +1681,7 @@ class GraphicsGovernanceService
         $blockers = $this->releaseBlockers();
         $runtimeBeacon = $this->runtimeComplianceBeacon();
         $observatory = $this->visualDebtObservatory();
+        $drift = $this->driftReport();
         return [
             'releaseLink' => [
                 'graphicsAuthorityRefs' => [
@@ -1679,6 +1705,7 @@ class GraphicsGovernanceService
                 'blockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
                 'runtimeBeaconSummary' => (array)($runtimeBeacon['runtimeBeacon']['summary'] ?? []),
                 'debtSummary' => (array)($observatory['observatory']['summary'] ?? []),
+                'driftReportGeneratedAt' => (string)($drift['generatedAt'] ?? ''),
                 'evidenceBundleRequirements' => [
                     'affectedModulesSnapshot',
                     'complianceMatrixSnapshot',
@@ -1729,6 +1756,12 @@ class GraphicsGovernanceService
     private function normalizeTemplateAuthorityFields(array $template, array $registryMeta = []): array
     {
         $templateId = (string)($template['templateId'] ?? '');
+        $sourceStatus = (string)($template['status'] ?? '');
+        $canonicalStatus = $this->canonicalTemplateGovernanceStatus($sourceStatus);
+        if ($sourceStatus !== '' && $canonicalStatus !== $sourceStatus && !isset($template['registryStatus'])) {
+            $template['registryStatus'] = $sourceStatus;
+        }
+        $template['status'] = $canonicalStatus;
         $allowedZones = array_values(array_filter(array_map(
             static fn($zone): string => is_array($zone) ? (string)($zone['zoneId'] ?? $zone['name'] ?? '') : (string)$zone,
             (array)($template['zones'] ?? $template['allowedZones'] ?? [])
@@ -1787,6 +1820,26 @@ class GraphicsGovernanceService
         }
 
         return $template;
+    }
+
+    private function canonicalTemplateGovernanceStatus(string $status): string
+    {
+        $normalized = strtolower(trim(str_replace('_', '-', $status)));
+        return match ($normalized) {
+            'approved', 'live' => 'published',
+            'draft' => 'controlled-draft',
+            'blocked' => 'publish-blocked',
+            'legacy' => 'legacy-bridged',
+            'retired' => 'deprecated',
+            'draft-only',
+            'controlled-draft',
+            'validated',
+            'publish-blocked',
+            'published',
+            'deprecated',
+            'legacy-bridged' => $normalized,
+            default => 'legacy-bridged',
+        };
     }
 
     /**
@@ -1911,7 +1964,7 @@ class GraphicsGovernanceService
         }
         $existing = (array)$registry['templates'][$index];
         if (!$this->isVersionGreater((string)($template['version'] ?? ''), (string)($existing['version'] ?? ''))) {
-            throw new GraphicsGovernanceException(422, 'version_bump_required', 'Template draft version must be greater than the current approved version', [
+            throw new GraphicsGovernanceException(422, 'version_bump_required', 'Template draft version must be greater than the current published version', [
                 ['field' => 'version', 'message' => 'Version must be greater than ' . (string)($existing['version'] ?? ''), 'code' => 'version_bump_required'],
             ]);
         }
@@ -2604,6 +2657,166 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<int, string> $waiverIds
+     * @param array<string, mixed> $impact
+     * @return array<int, string>
+     */
+    private function assertApprovedWaiverRefsForPublish(array $waiverIds, string $templateId, array $impact): array
+    {
+        $waiverIds = array_values(array_unique(array_filter($waiverIds)));
+        if ($waiverIds === []) {
+            return [];
+        }
+
+        $approved = [];
+        foreach ((array)($this->activeWaivers()['waivers'] ?? []) as $waiver) {
+            if (is_array($waiver)) {
+                $approved[(string)($waiver['waiverId'] ?? '')] = $waiver;
+            }
+        }
+
+        $allowedTargets = [
+            $templateId,
+            (string)($impact['impactId'] ?? ''),
+            'graphics-governance',
+            'G19-graphics-governance',
+        ];
+        foreach ((array)($impact['affectedModules'] ?? []) as $module) {
+            if (is_array($module)) {
+                $allowedTargets[] = (string)($module['moduleId'] ?? '');
+            }
+        }
+        foreach ((array)($impact['blockers'] ?? []) as $blocker) {
+            if (is_array($blocker)) {
+                $allowedTargets[] = (string)($blocker['moduleId'] ?? '');
+                $allowedTargets[] = (string)($blocker['code'] ?? '');
+            }
+        }
+        $releaseBlockers = (array)($this->releaseBlockers()['blockers'] ?? []);
+        foreach ($releaseBlockers as $blocker) {
+            if (is_array($blocker)) {
+                $allowedTargets[] = (string)($blocker['blockerId'] ?? '');
+                $allowedTargets[] = (string)($blocker['targetId'] ?? '');
+                $allowedTargets[] = (string)($blocker['releaseGate'] ?? '');
+            }
+        }
+        $allowedTargets = array_values(array_unique(array_filter($allowedTargets)));
+
+        foreach ($waiverIds as $waiverId) {
+            $waiver = $approved[$waiverId] ?? null;
+            if (!is_array($waiver)) {
+                throw new GraphicsGovernanceException(422, 'waiver_not_approved', 'Publish waiver must exist, be approved, and be unexpired: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Unknown, draft, expired, or unapproved waiver: ' . $waiverId, 'code' => 'waiver_not_approved'],
+                ]);
+            }
+            $riskClass = (string)($waiver['riskClass'] ?? '');
+            if (!in_array($riskClass, ['high', 'regulated', 'shopfloor-critical'], true)) {
+                throw new GraphicsGovernanceException(422, 'waiver_risk_class_insufficient', 'Publish blocker waivers must be high, regulated, or shopfloor-critical risk class: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Waiver riskClass is insufficient for publish/release blocker scope', 'code' => 'waiver_risk_class_insufficient'],
+                ]);
+            }
+            if (trim((string)($waiver['compensatingControl'] ?? '')) === '') {
+                throw new GraphicsGovernanceException(422, 'compensating_control_required', 'Publish waiver requires compensatingControl: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Approved waiver lacks compensatingControl', 'code' => 'compensating_control_required'],
+                ]);
+            }
+            if (trim((string)($waiver['approver'] ?? '')) === '' || trim((string)($waiver['approvedBy'] ?? '')) === '') {
+                throw new GraphicsGovernanceException(422, 'waiver_approval_evidence_required', 'Publish waiver requires named approver and approvedBy evidence: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Approved waiver lacks approver or approvedBy', 'code' => 'waiver_approval_evidence_required'],
+                ]);
+            }
+            if (strcasecmp((string)($waiver['createdBy'] ?? ''), (string)($waiver['approvedBy'] ?? '')) === 0) {
+                throw new GraphicsGovernanceException(422, 'waiver_separation_of_duties_required', 'Publish waiver creator and approver must be different: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Waiver violates creator/approver separation of duties', 'code' => 'waiver_separation_of_duties_required'],
+                ]);
+            }
+            if ((array)($waiver['documentControlRefs'] ?? []) === []) {
+                throw new GraphicsGovernanceException(422, 'document_control_ref_required', 'Publish waiver requires documentControlRefs: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Approved waiver lacks documentControlRefs', 'code' => 'document_control_ref_required'],
+                ]);
+            }
+            if ($this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) === []) {
+                throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Publish waiver requires releaseManifestRefs: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Approved waiver lacks releaseManifestRefs', 'code' => 'release_manifest_required'],
+                ]);
+            }
+            $targetId = (string)($waiver['targetId'] ?? '');
+            if (in_array($targetId, ['graphics-governance', 'G19-graphics-governance'], true) && (string)($waiver['scope'] ?? '') !== 'release_gate') {
+                throw new GraphicsGovernanceException(422, 'waiver_scope_mismatch', 'Graphics release-gate waiver must use release_gate scope: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Graphics release-gate waiver scope mismatch', 'code' => 'waiver_scope_mismatch'],
+                ]);
+            }
+            if (!in_array($targetId, $allowedTargets, true)) {
+                throw new GraphicsGovernanceException(422, 'waiver_scope_mismatch', 'Approved waiver does not cover this template publish scope: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Waiver targetId ' . $targetId . ' does not cover template, impact, module, blocker, or release gate scope', 'code' => 'waiver_scope_mismatch'],
+                ]);
+            }
+        }
+
+        return $waiverIds;
+    }
+
+    /**
+     * @param array<string, mixed> $rollout
+     * @param array<string, mixed> $input
+     */
+    private function assertPostCanaryVerification(array $rollout, array $input): void
+    {
+        $verification = is_array($input['postCanaryVerification'] ?? null)
+            ? (array)$input['postCanaryVerification']
+            : (is_array($input['verification'] ?? null) ? (array)$input['verification'] : []);
+
+        $missing = [];
+        $runtimeBeaconRef = trim((string)($verification['runtimeBeaconRef'] ?? $input['runtimeBeaconRef'] ?? ''));
+        $driftReportRef = trim((string)($verification['driftReportRef'] ?? $input['driftReportRef'] ?? ''));
+        $moduleOwnerSignoffRef = trim((string)($verification['moduleOwnerSignoffRef'] ?? $input['moduleOwnerSignoffRef'] ?? ''));
+        if ($runtimeBeaconRef === '') {
+            $missing[] = 'runtimeBeaconRef';
+        }
+        if ($driftReportRef === '') {
+            $missing[] = 'driftReportRef';
+        }
+        if ($moduleOwnerSignoffRef === '') {
+            $missing[] = 'moduleOwnerSignoffRef';
+        }
+        $manifestRefs = $this->normalizeReleaseManifestRefs((array)($verification['releaseManifestRefs'] ?? $input['releaseManifestRefs'] ?? $rollout['releaseManifestRefs'] ?? []));
+        if ($manifestRefs === []) {
+            $missing[] = 'releaseManifestRefs';
+        }
+        if ($missing !== []) {
+            throw new GraphicsGovernanceException(422, 'post_canary_verification_required', 'Global apply after canary requires post-canary verification evidence', array_map(
+                static fn(string $field): array => ['field' => 'postCanaryVerification.' . $field, 'message' => 'Required before global apply after canary', 'code' => 'post_canary_verification_required'],
+                $missing
+            ), [
+                'rolloutId' => (string)($rollout['rolloutId'] ?? ''),
+                'postCanaryVerification' => (array)($rollout['postCanaryVerification'] ?? []),
+            ]);
+        }
+        $this->assertControlledEvidenceRef('runtimeBeaconRef', $runtimeBeaconRef);
+        $this->assertControlledEvidenceRef('driftReportRef', $driftReportRef);
+        $this->assertControlledEvidenceRef('moduleOwnerSignoffRef', $moduleOwnerSignoffRef);
+    }
+
+    private function assertControlledEvidenceRef(string $field, string $ref): void
+    {
+        $allowed = [
+            'mom/data/graphics-governance/',
+            'mom/data/registry/',
+            'mom/release/',
+            'mom/docs/forms/design-system/',
+            '_reports/',
+        ];
+        foreach ($allowed as $prefix) {
+            if (str_starts_with($ref, $prefix)) {
+                return;
+            }
+        }
+        throw new GraphicsGovernanceException(422, 'controlled_evidence_ref_required', 'Evidence ref must point to a controlled graphics/release artifact', [
+            ['field' => 'postCanaryVerification.' . $field, 'message' => 'Use a controlled evidence ref, not an ad hoc string or boolean', 'code' => 'controlled_evidence_ref_required'],
+        ], ['ref' => $ref]);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function multiSitePlantBrandingGovernance(): array
@@ -2859,11 +3072,42 @@ class GraphicsGovernanceService
             throw new GraphicsGovernanceException(404, 'waiver_not_found', 'Waiver not found: ' . $waiverId);
         }
         $waiver = (array)$doc['waivers'][$waiverId];
+        $currentStatus = (string)($waiver['status'] ?? 'draft');
+        if ($status === 'approved' && $currentStatus === 'approved') {
+            throw new GraphicsGovernanceException(409, 'waiver_already_approved', 'Waiver is already approved: ' . $waiverId);
+        }
+        if ($status === 'approved' && $currentStatus === 'expired') {
+            throw new GraphicsGovernanceException(409, 'waiver_already_expired', 'Expired waivers cannot be approved: ' . $waiverId);
+        }
+        if ($status === 'expired' && $currentStatus === 'expired') {
+            throw new GraphicsGovernanceException(409, 'waiver_already_expired', 'Waiver is already expired: ' . $waiverId);
+        }
         if ($status === 'approved') {
             $expiresAt = $this->parseTime((string)($waiver['expiresAt'] ?? ''));
             if ($expiresAt === null || $expiresAt <= time()) {
                 throw new GraphicsGovernanceException(422, 'waiver_expired', 'Expired waivers cannot be approved', [
                     ['field' => 'expiresAt', 'message' => 'Waiver expiry must be in the future', 'code' => 'waiver_expired'],
+                ]);
+            }
+            if (trim((string)($waiver['compensatingControl'] ?? '')) === '') {
+                throw new GraphicsGovernanceException(422, 'compensating_control_required', 'Waiver approval requires compensatingControl', [
+                    ['field' => 'compensatingControl', 'message' => 'Required for waiver approval', 'code' => 'required'],
+                ]);
+            }
+            if (trim((string)($waiver['approver'] ?? '')) === '') {
+                throw new GraphicsGovernanceException(422, 'approver_required', 'Waiver approval requires a named approver', [
+                    ['field' => 'approver', 'message' => 'Required for waiver approval', 'code' => 'required'],
+                ]);
+            }
+            if (strcasecmp((string)$waiver['approver'], $username) !== 0) {
+                throw new GraphicsGovernanceException(403, 'waiver_approver_mismatch', 'Only the named waiver approver can approve this waiver');
+            }
+            if (strcasecmp((string)($waiver['createdBy'] ?? ''), $username) === 0) {
+                throw new GraphicsGovernanceException(403, 'waiver_separation_of_duties_required', 'Waiver creator cannot approve the same waiver');
+            }
+            if ($this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) === []) {
+                throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Waiver approval requires releaseManifestRefs', [
+                    ['field' => 'releaseManifestRefs', 'message' => 'Required for waiver approval', 'code' => 'required'],
                 ]);
             }
             $riskClass = (string)($waiver['riskClass'] ?? 'medium');

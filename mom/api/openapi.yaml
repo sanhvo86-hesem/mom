@@ -119,6 +119,10 @@ tags:
     description: |
       Commercial demand objects -- customer purchase orders and quote-to-order commitment controls.
       Doi tuong cau thuong mai -- PO khach hang va kiem soat cam ket quote-to-order.
+  - name: Traceability
+    description: |
+      Lot, serial, supplier-quality impact, containment, and genealogy read models.
+      Truy xuat lot/serial, tac dong supplier quality, containment, va genealogy.
   - name: System Contract
     description: |
       Read-only backend contract registry for frontend and AI tooling: table registry,
@@ -3895,7 +3899,7 @@ paths:
     post:
       operationId: graphicsTemplatePublish
       tags: [Graphics Governance]
-      summary: Publish an approved template version
+      summary: Publish a controlled template version
       description: |
         Blocks publish when validation fails, impact blockers are unresolved,
         required gate evidence is missing, release evidence is missing, the
@@ -4786,6 +4790,207 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # TRACEABILITY GENEALOGY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/traceability-genealogy/upstream:
+    get:
+      operationId: traceabilityGenealogyUpstream
+      tags: [Traceability]
+      summary: Trace upstream inputs for a lot, serial, or shipment reference
+      description: |
+        Returns the authoritative genealogy upstream read model from the canonical
+        manufacturing event ledger or its explicit compatibility repository.
+
+        **Legacy action:** `traceability_genealogy_upstream`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityShipmentId'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Upstream trace returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/downstream:
+    get:
+      operationId: traceabilityGenealogyDownstream
+      tags: [Traceability]
+      summary: Trace downstream production and shipment impact for an input lot or serial
+      description: |
+        Returns the downstream read model for supplier/input material genealogy.
+
+        **Legacy action:** `traceability_genealogy_downstream`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Downstream trace returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/impacted-outputs:
+    get:
+      operationId: traceabilityGenealogyImpactedOutputs
+      tags: [Traceability]
+      summary: List impacted outputs for a supplier/input lot or serial
+      description: |
+        Returns affected production and shipment outputs for containment analysis.
+
+        **Legacy action:** `traceability_genealogy_impacted_outputs`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Impacted outputs returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/supplier-issue-impact:
+    get:
+      operationId: traceabilityGenealogySupplierIssueImpact
+      tags: [Traceability]
+      summary: Summarize downstream impact for a supplier quality issue
+      description: |
+        Connects supplier issue references to impacted lots, serials, and shipments.
+
+        **Legacy action:** `traceability_genealogy_supplier_issue_impact`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilitySupplierIssueId'
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Supplier issue impact returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/consumption-eligibility:
+    get:
+      operationId: traceabilityGenealogyConsumptionEligibility
+      tags: [Traceability]
+      summary: Check material consumption eligibility for a lot or serial
+      description: |
+        Returns deterministic blockers when unresolved supplier-quality issues
+        prevent material consumption.
+
+        **Legacy action:** `traceability_genealogy_consumption_eligibility`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Consumption eligibility returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/shipment-eligibility:
+    get:
+      operationId: traceabilityGenealogyShipmentEligibility
+      tags: [Traceability]
+      summary: Check shipment eligibility for lot, serial, or package references
+      description: |
+        Returns deterministic blockers when affected genealogy prevents shipment.
+
+        **Legacy action:** `traceability_genealogy_shipment_eligibility`
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TraceabilityLotNumber'
+        - $ref: '#/components/parameters/TraceabilitySerialNumber'
+        - $ref: '#/components/parameters/TraceabilityShipmentId'
+        - $ref: '#/components/parameters/TraceabilityScopeSiteId'
+      responses:
+        '200':
+          description: Shipment eligibility returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/traceability-genealogy/probe:
+    get:
+      operationId: traceabilityGenealogyProbe
+      tags: [Traceability]
+      summary: Probe traceability genealogy authority backend
+      description: |
+        Admin-only runtime probe for the active genealogy repository/backend.
+
+        **Legacy action:** `traceability_genealogy_probe`
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Traceability genealogy probe returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -4818,6 +5023,41 @@ components:
       schema:
         type: string
       description: Current backend authority ETag. State-changing graphics governance endpoints also accept `expectedVersion` in the JSON body.
+    TraceabilityLotNumber:
+      name: lot_number
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Material, supplier, production, or output lot number.
+    TraceabilitySerialNumber:
+      name: serial_number
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Serial identity for serial-level genealogy where available.
+    TraceabilityShipmentId:
+      name: shipment_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Shipment, packing, or package reference.
+    TraceabilitySupplierIssueId:
+      name: supplier_issue_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Supplier issue, SCAR, NCR, CAPA, or incoming-quality issue reference.
+    TraceabilityScopeSiteId:
+      name: site_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Site or plant scope guard for genealogy queries.
     TemplateIdPath:
       name: templateId
       in: path
@@ -5028,7 +5268,10 @@ components:
           pattern: '^\d+\.\d+\.\d+'
         status:
           type: string
-          enum: [approved, draft, deprecated, retired]
+          enum: [draft-only, controlled-draft, validated, publish-blocked, published, deprecated, legacy-bridged]
+        registryStatus:
+          type: string
+          enum: [approved, draft, deprecated, retired, published, controlled-draft]
         owner:
           type: string
         moduleArchetype:
@@ -6068,6 +6311,24 @@ components:
           type: string
         rolloutId:
           type: string
+        postCanaryVerification:
+          type: object
+          required: [runtimeBeaconRef, driftReportRef, moduleOwnerSignoffRef, releaseManifestRefs]
+          additionalProperties: true
+          properties:
+            runtimeBeaconRef:
+              type: string
+              description: Controlled artifact ref. Booleans are not accepted.
+            driftReportRef:
+              type: string
+              description: Controlled artifact ref. Booleans are not accepted.
+            moduleOwnerSignoffRef:
+              type: string
+              description: Controlled artifact ref. Booleans are not accepted.
+            releaseManifestRefs:
+              type: array
+              items:
+                $ref: '#/components/schemas/GraphicsReleaseManifestRef'
 
     GraphicsRollbackRequest:
       type: object
@@ -6141,7 +6402,7 @@ components:
 
     GraphicsWaiver:
       type: object
-      required: [scope, targetId, reason, expiresAt]
+      required: [scope, targetId, reason, riskClass, compensatingControl, owner, approver, expiresAt]
       additionalProperties: true
       properties:
         expectedVersion:

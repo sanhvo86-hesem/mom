@@ -298,22 +298,27 @@ final class IdempotencyService
 
     /**
      * @param mixed $value
+     * @param int $depth Current recursion depth.
      * @return mixed
      */
-    private function normalizeForHash(mixed $value): mixed
+    private function normalizeForHash(mixed $value, int $depth = 0): mixed
     {
+        if ($depth > 20) {
+            return '[max_depth_exceeded]';
+        }
+
         if (!is_array($value)) {
             return $value;
         }
 
         $isList = array_keys($value) === range(0, count($value) - 1);
         if ($isList) {
-            return array_map(fn($item) => $this->normalizeForHash($item), $value);
+            return array_map(fn($item) => $this->normalizeForHash($item, $depth + 1), $value);
         }
 
         ksort($value);
         foreach ($value as $key => $item) {
-            $value[$key] = $this->normalizeForHash($item);
+            $value[$key] = $this->normalizeForHash($item, $depth + 1);
         }
 
         return $value;

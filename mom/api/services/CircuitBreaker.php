@@ -140,16 +140,20 @@ final class CircuitBreaker
 
         if (!is_file($this->stateFile)) return;
         $lockHandle = @fopen($this->stateFile, 'r');
-        if ($lockHandle && @flock($lockHandle, LOCK_SH)) {
-            try {
-                $data = json_decode(@file_get_contents($this->stateFile) ?: '', true);
-                if (!is_array($data)) return;
-                $this->hydrateState($data);
-            } finally {
-                @flock($lockHandle, LOCK_UN);
-                @fclose($lockHandle);
+        if ($lockHandle) {
+            if (@flock($lockHandle, LOCK_SH)) {
+                try {
+                    $data = json_decode(@file_get_contents($this->stateFile) ?: '', true);
+                    if (!is_array($data)) return;
+                    $this->hydrateState($data);
+                } finally {
+                    @flock($lockHandle, LOCK_UN);
+                    @fclose($lockHandle);
+                }
+                return;
+            } else {
+                @fclose($lockHandle); // Close even when lock fails
             }
-            return;
         }
         // Lock failed - attempt non-locked read
         $data = json_decode(@file_get_contents($this->stateFile) ?: '', true);

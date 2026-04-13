@@ -8,7 +8,11 @@ use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 
 /**
- * Generic domain outbox worker for control-plane side effects.
+ * Legacy domain_outbox_events drain worker.
+ *
+ * New side effects must be dispatched from CanonicalOutboxWorker/outbox_events.
+ * This worker remains only to drain or dead-letter rows created before the
+ * canonical outbox cutover.
  */
 final class DomainOutboxWorker
 {

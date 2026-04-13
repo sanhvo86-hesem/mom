@@ -379,6 +379,7 @@ def main() -> int:
             "controlledEmergencyOverridePathRef",
             "rolloutDecisionRef",
             "rollbackPlanRef",
+            "driftReportGeneratedAt",
         }
         check("graphics_release_link_complete", isinstance(release_link, dict) and link_fields.issubset(release_link.keys()),
               f"keys={sorted(release_link.keys()) if isinstance(release_link, dict) else []}")

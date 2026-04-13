@@ -26,7 +26,8 @@ Provides KPI calculation, trend analysis, SPC capability studies, OEE computatio
 ## Key Tables
 - `mes_oee_snapshots` — Per-machine OEE snapshots (`oee_pct`, `availability_pct`, `performance_pct`, `quality_pct`, `snapshot_date`)
 - `analytics_plant_performance` — Aggregated plant-level KPIs from equipment snapshots
-- `predictions.json` *(file-backed)* — Prediction records (`status`: active/acknowledged/resolved/false_positive/expired, `type`: tool_wear/defect_probability/spc_anomaly/process_drift, `severity`)
+- `quality_predictions` *(DB-backed)* — Prediction records (`status`: active/acknowledged/resolved/false_positive/expired, `prediction_type`: tool_wear/defect_probability/spc_anomaly/process_drift/equipment_failure, `severity`)
+- `data/ai-scheduling/*.json` *(legacy fallback/advisory)* — JSON prediction and scheduling files used when DB-backed AI tables are unavailable
 - SPC measurement data — Indexed by `part_number` + `characteristic` for trend analysis
 
 ## Workflow States
@@ -38,7 +39,7 @@ Provides KPI calculation, trend analysis, SPC capability studies, OEE computatio
 ## Common Tasks & Entry Points
 - **Calculate OEE:** `DashboardController::production()` → `KpiEngine::calculateKpi('OEE', period, filters)` → `OeeService::calculateOee()` → returns `oee_pct`
 - **SPC capability analysis:** `DashboardController::spcCapability()` → `SpcEngine::calculateCapability(measurements, usl, lsl)` → `CapabilityResult` (Cp, Cpk)
-- **Detect SPC anomalies:** `AiSchedulingController::getSpcAnomalies()` → loads `spc-anomalies.json` → filters by severity + date
+- **Detect SPC anomalies:** `AiSchedulingController::getSpcAnomalies()` → reads `quality_predictions` first, then falls back to `spc-anomalies.json` when DB is unavailable
 - **Suggest promise date:** `AiSchedulingController::suggestPromiseDate(part_id, quantity)` → heuristic lead_time + schedule occupancy
 - **Get capacity heatmap:** `AiSchedulingController::getCapacityHeatmap()` → machine utilization per time slot
 
@@ -54,5 +55,5 @@ Provides KPI calculation, trend analysis, SPC capability studies, OEE computatio
 - **KPI trend granularity must be normalized**: daily/weekly/monthly — date boundary normalization required per granularity
 - **SPC chart type must be specified**: Xbar-R, Xbar-S, or I-MR; `subgroup_size` defaults to 5; wrong type produces invalid control limits
 - **OEE components improve independently** — a high Availability alone does not lift OEE if Performance or Quality is low
-- **Predictions are file-backed** (`predictions.json`), not DB-backed in current wave — reading/writing bypasses DataLayer; file must be writable
-- **`AiSchedulingController` reads from multiple JSON files**: `spc-anomalies.json`, `tool-wear-alerts.json`, `quality-predictions.json`; ensure these are populated by MES/SPC writers
+- **Predictions are DB-first with JSON fallback** — `quality_predictions`, `ai_feedback_loops`, and `ai_recommendation_actions` are canonical advisory tables when available; `AiSchedulingController` still supports legacy JSON files for backward compatibility.
+- **AI ETL is projection-only** — `AiDataEtlService` can extract `shopfloor_execution` features from accepted MOM/MES execution facts (`shift_production_log`) so later analytics are grounded in operational truth without becoming execution authority.

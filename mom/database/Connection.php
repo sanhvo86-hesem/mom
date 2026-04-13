@@ -118,9 +118,9 @@ class Connection
             // Set client encoding
             $this->pdo->exec("SET client_encoding TO 'UTF8'");
 
-            // Set statement timeout
-            $timeout = $this->config['statement_timeout'] ?? 30000;
-            $this->pdo->exec("SET statement_timeout = {$timeout}");
+            // Set statement timeout (cast to int and clamp to safe range)
+            $timeout = max(1000, min(3600000, (int)($this->config['statement_timeout'] ?? 30000)));
+            $this->pdo->exec("SET statement_timeout = " . $timeout);
         } catch (PDOException $e) {
             $this->pdo = null;
             throw new RuntimeException(

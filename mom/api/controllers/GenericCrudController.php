@@ -1077,12 +1077,17 @@ class GenericCrudController extends BaseController
     private function governedGenericMutationOverrideEnabled(): bool
     {
         $configured = strtolower(trim((string)(getenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION') ?: '')));
-        if (!in_array($configured, ['1', 'true', 'yes', 'on'], true)) {
+        if ($configured !== 'break_glass_for_migration_only') {
             return false;
         }
 
         $token = trim((string)($this->requestHeader('X-HESEM-Internal-Generic-Override') ?? ''));
-        return hash_equals('domain-command-backfill', $token);
+        $releaseManifest = trim((string)($this->requestHeader('X-HESEM-Release-Manifest') ?? ''));
+        $commandId = trim((string)($this->requestHeader('X-HESEM-Command-Id') ?? ''));
+
+        return hash_equals('domain-command-backfill', $token)
+            && preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
+            && preg_match('/^[a-f0-9-]{36}$/i', $commandId) === 1;
     }
 
     /**

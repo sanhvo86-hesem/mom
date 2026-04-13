@@ -1,0 +1,20 @@
+# =============================================================================
+# tasks.txt — Danh sách prompt để chạy batch qua Codex
+# =============================================================================
+# - Mỗi dòng = 1 prompt (1 task)
+# - Dòng bắt đầu bằng # là comment, bị bỏ qua
+# - Dòng trống bị bỏ qua
+# - Copy prompt từ GPT rồi paste thẳng vào đây
+# =============================================================================
+
+# --- Ví dụ từ audit MOM ERP ---
+
+In the MOM ERP codebase under mom/api/, add input validation to all POST endpoints in the PlanningController that currently accept raw JSON without sanitizing the 'quantity' and 'batch_id' fields. Use the existing Validator service pattern found in other controllers.
+
+Refactor the InventoryService to use the existing Redis cache layer (see CacheService) for the getStockLevel() method. Cache TTL should be 60 seconds. Follow the pattern used in ProductionService::getStatus().
+
+Add missing foreign key index on the production_orders.material_id column. Create a new migration file following the naming convention in mom/database/migrations/. Reference db-map.json for the table structure.
+
+In QualityController, the updateInspectionResult() method does not return a 422 status when validation fails — it returns 200. Fix this to follow the error response contract defined in mom/api/contracts/.
+
+Add PHPDoc blocks to all public methods in FinanceService that are currently missing them. Use the existing format found in MasterDataService as a reference.

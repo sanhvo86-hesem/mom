@@ -21,16 +21,13 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
 
     protected function tearDown(): void
     {
+        $_SESSION = [];
         $this->removeDir($this->tmpDir);
     }
 
     public function testStatusPayloadIncludesRuntimeAuthorityReport(): void
     {
-        $controller = new HealthController(
-            new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, ['use_postgres' => false]),
-            (string)QMS_TEST_ROOT_DIR,
-            $this->tmpDir,
-        );
+        $controller = $this->adminController();
 
         try {
             $controller->status();
@@ -41,6 +38,15 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
 
         $this->assertIsArray($payload);
         $this->assertArrayHasKey('authority', $payload);
+        $this->assertArrayHasKey('health_evaluation', $payload);
+        $this->assertSame(
+            !in_array(false, $payload['health_evaluation']['components_ok'], true),
+            $payload['ok'],
+        );
+        $this->assertSame(
+            (bool)($payload['authority']['ok'] ?? false),
+            $payload['health_evaluation']['components_ok']['runtime_authority'] ?? null,
+        );
         $this->assertSame('compatibility_only', $payload['authority']['slices']['idempotency']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['order_workflow']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['master_data']['readiness_state'] ?? null);
@@ -52,6 +58,87 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertSame('authority_partial', $payload['authority']['slices']['connected_governance']['readiness_state'] ?? null);
         $this->assertSame('authority_partial', $payload['authority']['slices']['planning_scenario']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['traceability_genealogy']['readiness_state'] ?? null);
+    }
+
+    public function testStatusRequiresAdminAuthentication(): void
+    {
+        $controller = new HealthController(
+            new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, ['use_postgres' => false]),
+            (string)QMS_TEST_ROOT_DIR,
+            $this->tmpDir,
+        );
+        $controller->setStore([
+            'users' => [[
+                'username' => 'admin-user',
+                'name' => 'Admin User',
+                'role' => 'admin',
+                'active' => true,
+            ]],
+            'settings' => [],
+        ]);
+
+        try {
+            $controller->status();
+            $this->fail('Health status should throw structured API response.');
+        } catch (ExitException $e) {
+            $payload = $e->getPayload();
+            $status = $e->getStatusCode();
+        }
+
+        $this->assertIsArray($payload);
+        $this->assertSame(401, $status);
+        $this->assertSame('unauthorized', $payload['error'] ?? null);
+    }
+
+    public function testReadyIncludesInfrastructureChecks(): void
+    {
+        $controller = new HealthController(
+            new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, ['use_postgres' => false]),
+            (string)QMS_TEST_ROOT_DIR,
+            $this->tmpDir,
+        );
+        $GLOBALS['DATA_DIR'] = $this->tmpDir;
+        $GLOBALS['store'] = ['users' => []];
+
+        try {
+            $controller->ready();
+            $this->fail('Health ready should throw structured API response.');
+        } catch (ExitException $e) {
+            $payload = $e->getPayload();
+        } finally {
+            unset($GLOBALS['DATA_DIR'], $GLOBALS['store']);
+        }
+
+        $this->assertIsArray($payload);
+        $this->assertArrayHasKey('checks', $payload);
+        $this->assertArrayHasKey('redis', $payload['checks']);
+        $this->assertArrayHasKey('rabbitmq', $payload['checks']);
+        $this->assertArrayHasKey('logging', $payload['checks']);
+        $this->assertArrayHasKey('runtime_authority', $payload['checks']);
+        $this->assertSame(
+            !in_array(false, $payload['checks'], true),
+            $payload['ok'],
+        );
+    }
+
+    private function adminController(): HealthController
+    {
+        $store = [
+            'users' => [[
+                'username' => 'admin-user',
+                'name' => 'Admin User',
+                'role' => 'admin',
+                'active' => true,
+            ]],
+            'settings' => [],
+        ];
+        set_authenticated_session('admin-user', ['role' => 'admin']);
+
+        return (new HealthController(
+            new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, ['use_postgres' => false]),
+            (string)QMS_TEST_ROOT_DIR,
+            $this->tmpDir,
+        ))->setStore($store);
     }
 
     private function removeDir(string $dir): void

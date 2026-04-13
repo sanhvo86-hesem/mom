@@ -67,10 +67,12 @@ final class GenericCrudControllerRuntimeSafetyTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testGovernedGenericMutationOverrideRequiresEnvironmentAndHeader(): void
+    public function testGovernedGenericMutationOverrideRequiresBreakGlassManifestAndCommandHeaders(): void
     {
-        putenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION=1');
+        putenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION=break_glass_for_migration_only');
         $_SERVER['HTTP_X_HESEM_INTERNAL_GENERIC_OVERRIDE'] = 'domain-command-backfill';
+        $_SERVER['HTTP_X_HESEM_RELEASE_MANIFEST'] = 'REL-2026-001';
+        $_SERVER['HTTP_X_HESEM_COMMAND_ID'] = '00000000-0000-0000-0000-000000000001';
 
         $controller = $this->controller();
         $guard = $this->method($controller, 'enforceRuntimePermission');

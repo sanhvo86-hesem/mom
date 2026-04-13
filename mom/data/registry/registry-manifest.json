@@ -2,22 +2,22 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-13T15:11:25.146Z",
+    "generatedAt": "2026-04-13T16:49:10.762Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "5cb008bb-9c26-4b28-ae49-4fb011aec016",
-    "enterpriseAuthorityGeneratedAt": "2026-04-13T15:11:51.252576+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-13T15:11:51.440528+00:00"
+    "publication_run_id": "b01ea549-df67-49ac-a2b1-5f678f4786da",
+    "enterpriseAuthorityGeneratedAt": "2026-04-13T16:59:08.508698+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-13T16:59:13.078523+00:00"
   },
   "coverage": {
     "router_actions": 4100,
     "field_registry_actions": 4125,
-    "field_definitions": 54472,
-    "unique_field_keys": 5096,
+    "field_definitions": 54499,
+    "unique_field_keys": 5098,
     "status_sets": 856,
     "workflow_count": 326,
     "relation_edges": 3257,
-    "validation_rules": 47886,
+    "validation_rules": 47902,
     "formula_count": 1331,
     "domain_pack_count": 4500,
     "scalar_record_endpoints": 3988,
@@ -72,7 +72,7 @@
       "high": 0,
       "medium": 0,
       "watch": 15,
-      "idempotency_mentions": 21707,
+      "idempotency_mentions": 21714,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
@@ -165,11 +165,11 @@
       "high": 0,
       "medium": 0,
       "watch": 12,
-      "idempotency_mentions": 21730,
+      "idempotency_mentions": 21737,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "compensation_markers": 3,
+      "compensation_markers": 4,
       "correction_markers": 2287,
       "period_close_mentions": 36,
       "credit_memo_mentions": 18,
@@ -260,7 +260,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 47886
+      "records": 47902
     },
     "computed-formulas.json": {
       "kind": "formula-library",

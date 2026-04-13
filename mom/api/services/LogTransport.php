@@ -22,6 +22,10 @@ final class LogTransport
     private string $environment;
     private string $fallbackDir;
     private bool $lokiAvailable;
+    private int $fallbackWriteCount = 0;
+    private int $fallbackEntryCount = 0;
+    private string $lastFailureAt = '';
+    private string $lastFailureMessage = '';
 
     /** @var array<int, array> Buffered log entries for batch push */
     private array $buffer = [];
@@ -33,11 +37,22 @@ final class LogTransport
         string $environment = 'production',
         int $bufferLimit = 50
     ) {
-        $this->lokiUrl = $lokiUrl ?? (getenv('LOKI_URL') ?: 'http://localhost:3100');
+        $lokiUrl = $lokiUrl ?? (getenv('LOKI_URL') ?: 'http://localhost:3100');
+
+        // Validate LOKI_URL to prevent SSRF attacks
+        if (!filter_var($lokiUrl, FILTER_VALIDATE_URL)) {
+            $this->lokiAvailable = false;
+            $this->markFailure('Invalid LOKI_URL: ' . $lokiUrl);
+            @error_log('[LogTransport] ' . $this->lastFailureMessage . ', disabling Loki');
+            $this->lokiUrl = '';
+        } else {
+            $this->lokiUrl = $lokiUrl;
+            $this->lokiAvailable = true;
+        }
+
         $this->environment = $environment;
         $this->bufferLimit = $bufferLimit;
         $this->fallbackDir = rtrim($dataDir, '/') . '/log-transport';
-        $this->lokiAvailable = true; // Assume available until proven otherwise
 
         if (!is_dir($this->fallbackDir)) {
             @mkdir($this->fallbackDir, 0775, true);
@@ -168,6 +183,8 @@ final class LogTransport
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => 5,
             CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
         ]);
 
         $response = curl_exec($ch);
@@ -177,7 +194,12 @@ final class LogTransport
 
         if ($httpCode < 200 || $httpCode >= 300) {
             $this->lokiAvailable = false;
-            @error_log("[LogTransport] Loki push failed (HTTP {$httpCode}): {$error}");
+            $message = "Loki push failed (HTTP {$httpCode})";
+            if ($error !== '') {
+                $message .= ': ' . $error;
+            }
+            $this->markFailure($message);
+            @error_log('[LogTransport] ' . $this->lastFailureMessage);
 
             // Fallback: write to file
             $allEntries = [];
@@ -203,7 +225,14 @@ final class LogTransport
             $lines .= json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
         }
 
-        @file_put_contents($file, $lines, FILE_APPEND | LOCK_EX);
+        $written = @file_put_contents($file, $lines, FILE_APPEND | LOCK_EX);
+        if ($written === false) {
+            $this->markFailure('Log fallback file write failed: ' . $file);
+            return;
+        }
+
+        $this->fallbackWriteCount++;
+        $this->fallbackEntryCount += count($entries);
     }
 
     /**
@@ -228,11 +257,47 @@ final class LogTransport
      */
     public function getHealth(): array
     {
+        $fallbackStats = $this->fallbackStats();
         return [
             'loki_url'       => $this->lokiUrl,
             'loki_available' => $this->lokiAvailable,
             'buffer_count'   => count($this->buffer),
             'fallback_dir'   => $this->fallbackDir,
+            'fallback_active' => !$this->lokiAvailable || $this->fallbackWriteCount > 0 || $fallbackStats['file_count'] > 0,
+            'fallback_write_count' => $this->fallbackWriteCount,
+            'fallback_entry_count' => $this->fallbackEntryCount,
+            'fallback_file_count' => $fallbackStats['file_count'],
+            'fallback_bytes' => $fallbackStats['bytes'],
+            'last_failure_at' => $this->lastFailureAt,
+            'last_failure_message' => $this->lastFailureMessage,
         ];
+    }
+
+    private function markFailure(string $message): void
+    {
+        $this->lastFailureAt = gmdate('c');
+        $this->lastFailureMessage = $message;
+    }
+
+    /**
+     * @return array{file_count:int, bytes:int}
+     */
+    private function fallbackStats(): array
+    {
+        $files = is_dir($this->fallbackDir) ? glob($this->fallbackDir . '/logs-*.jsonl') : [];
+        $fileCount = 0;
+        $bytes = 0;
+        foreach ($files ?: [] as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+            $fileCount++;
+            $size = filesize($file);
+            if (is_int($size)) {
+                $bytes += $size;
+            }
+        }
+
+        return ['file_count' => $fileCount, 'bytes' => $bytes];
     }
 }

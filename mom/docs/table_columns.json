@@ -8813,8 +8813,12 @@
     "approved_by",
     "capture_id",
     "capture_type",
+    "client_capture_id",
     "created_at",
     "device_id",
+    "equipment_id",
+    "idempotency_key",
+    "inspection_fingerprint",
     "inspection_plan_id",
     "inspector_id",
     "jo_number",
@@ -8836,7 +8840,8 @@
     "source_record_id",
     "source_system",
     "sync_status",
-    "wo_number"
+    "wo_number",
+    "work_center_id"
   ],
   "mobile_time_entries": [
     "created_at",
@@ -12801,6 +12806,10 @@
     "notes",
     "offline_created",
     "operator_id",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
     "payload_schema_version",
     "quantity_good",
     "quantity_ng",

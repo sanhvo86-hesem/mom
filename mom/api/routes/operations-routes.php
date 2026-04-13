@@ -251,6 +251,13 @@ return static function (Router $router, string $dataDir): void {
         'manufacturing_event_timeline' => [ManufacturingEventController::class, 'timeline'],
         'manufacturing_event_probe'    => [ManufacturingEventController::class, 'probe'],
         'manufacturing_history_packet' => [ManufacturingEventController::class, 'productionHistory'],
+        'traceability_genealogy_upstream' => [TraceabilityGenealogyController::class, 'upstream'],
+        'traceability_genealogy_downstream' => [TraceabilityGenealogyController::class, 'downstream'],
+        'traceability_genealogy_impacted_outputs' => [TraceabilityGenealogyController::class, 'impactedOutputs'],
+        'traceability_genealogy_supplier_issue_impact' => [TraceabilityGenealogyController::class, 'supplierIssueImpact'],
+        'traceability_genealogy_consumption_eligibility' => [TraceabilityGenealogyController::class, 'consumptionEligibility'],
+        'traceability_genealogy_shipment_eligibility' => [TraceabilityGenealogyController::class, 'shipmentEligibility'],
+        'traceability_genealogy_probe' => [TraceabilityGenealogyController::class, 'probe'],
         'manufacturing_spine_model'    => [ManufacturingSpineController::class, 'model'],
         'manufacturing_spine_probe'    => [ManufacturingSpineController::class, 'probe'],
         'trusted_release_record_assemble' => [TrustedReleaseRecordController::class, 'assemble'],
@@ -281,6 +288,13 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
     $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
     $router->get('/api/manufacturing-events/production-history', ManufacturingEventController::class, 'productionHistory');
+    $router->get('/api/traceability-genealogy/upstream', TraceabilityGenealogyController::class, 'upstream');
+    $router->get('/api/traceability-genealogy/downstream', TraceabilityGenealogyController::class, 'downstream');
+    $router->get('/api/traceability-genealogy/impacted-outputs', TraceabilityGenealogyController::class, 'impactedOutputs');
+    $router->get('/api/traceability-genealogy/supplier-issue-impact', TraceabilityGenealogyController::class, 'supplierIssueImpact');
+    $router->get('/api/traceability-genealogy/consumption-eligibility', TraceabilityGenealogyController::class, 'consumptionEligibility');
+    $router->get('/api/traceability-genealogy/shipment-eligibility', TraceabilityGenealogyController::class, 'shipmentEligibility');
+    $router->get('/api/traceability-genealogy/probe', TraceabilityGenealogyController::class, 'probe');
     $router->get('/api/manufacturing-spine/model', ManufacturingSpineController::class, 'model');
     $router->get('/api/manufacturing-spine/probe', ManufacturingSpineController::class, 'probe');
     $router->get('/api/trusted-release-record/readiness', TrustedReleaseRecordController::class, 'readiness');

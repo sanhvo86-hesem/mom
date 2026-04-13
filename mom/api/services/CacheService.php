@@ -240,16 +240,20 @@ final class CacheService
         $filePath = $this->filePath($fullKey);
         $lockPath = $filePath . '.lock';
         $lockHandle = @fopen($lockPath, 'c+');
-        if ($lockHandle && @flock($lockHandle, LOCK_EX)) {
-            try {
-                $current = (int)($this->fileGet($key) ?? 0);
-                $new = $current + $amount;
-                $this->fileSet($key, $new, $ttl > 0 ? $ttl : 3600);
-                $this->l1[$fullKey] = $new;
-                return $new;
-            } finally {
-                @flock($lockHandle, LOCK_UN);
-                @fclose($lockHandle);
+        if ($lockHandle) {
+            if (@flock($lockHandle, LOCK_EX)) {
+                try {
+                    $current = (int)($this->fileGet($key) ?? 0);
+                    $new = $current + $amount;
+                    $this->fileSet($key, $new, $ttl > 0 ? $ttl : 3600);
+                    $this->l1[$fullKey] = $new;
+                    return $new;
+                } finally {
+                    @flock($lockHandle, LOCK_UN);
+                    @fclose($lockHandle);
+                }
+            } else {
+                @fclose($lockHandle); // Close even when lock fails
             }
         }
         // Lock acquisition failed - still attempt non-locked for availability

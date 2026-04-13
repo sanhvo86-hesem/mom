@@ -237,10 +237,11 @@ function normalizeTemplate(tpl){
 
 function backendStatusForTemplate(status, action){
   var s = canonicalState(status);
-  if(action === 'publish' || s === 'published') return 'approved';
+  if(action === 'publish' || s === 'published') return 'published';
   if(s === 'deprecated') return 'deprecated';
   if(s === 'legacy-bridged') return 'deprecated';
-  return 'draft';
+  if(s === 'draft-only') return 'draft-only';
+  return 'controlled-draft';
 }
 
 function toBackendTemplate(template, action){
@@ -1111,6 +1112,7 @@ function buildReleaseLink(){
     controlledEmergencyOverridePathRef:'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
     rolloutDecisionRef:'mom/data/graphics-governance/rollouts.json#/rollouts',
     rollbackPlanRef:'mom/data/graphics-governance/snapshots',
+    driftReportGeneratedAt:_state.backendAvailable ? (_state.lastLoadedAt || nowIso()) : '',
     releaseBlocked:blockers.some(function(row){ return String(row.status || '') === 'active'; }),
     blockerCount:blockers.length,
     evidenceBundleRequirements:[

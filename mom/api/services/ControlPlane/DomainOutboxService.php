@@ -8,15 +8,22 @@ use MOM\Database\Connection;
 use MOM\Database\DataLayer;
 
 /**
- * Minimal DB-backed domain outbox writer.
+ * Compatibility wrapper for the pre-canonical domain outbox API.
+ *
+ * New writes are bridged into outbox_events through CanonicalOutboxService.
+ * The legacy domain_outbox_events table is retained only for migration/backfill
+ * reads; keeping this writer pointed at it would preserve split-brain side
+ * effects.
  */
 final class DomainOutboxService
 {
     private ?object $db;
+    private CanonicalOutboxService $canonical;
 
     public function __construct(?object $db = null)
     {
         $this->db = $this->normalizeDb($db);
+        $this->canonical = new CanonicalOutboxService($this->db);
     }
 
     /**
@@ -30,31 +37,27 @@ final class DomainOutboxService
         array $payload,
         array $options = [],
     ): bool {
-        if ($this->db === null || !method_exists($this->db, 'execute')) {
-            return false;
+        $handlerKey = $this->stringOrNull($options['handler_key'] ?? null);
+        if ($handlerKey === null) {
+            $handlerKey = 'legacy_domain.' . strtolower((string)preg_replace('/[^a-zA-Z0-9]+/', '_', $eventType));
         }
 
-        try {
-            $this->db->execute(
-                'INSERT INTO domain_outbox_events
-                    (aggregate_type, aggregate_id, event_type, payload, idempotency_key, correlation_id)
-                 VALUES
-                    (:aggregate_type, :aggregate_id, :event_type, CAST(:payload AS jsonb), :idempotency_key, :correlation_id)
-                 ON CONFLICT DO NOTHING',
-                [
-                    ':aggregate_type' => $aggregateType,
-                    ':aggregate_id' => $aggregateId,
-                    ':event_type' => $eventType,
-                    ':payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                    ':idempotency_key' => $this->stringOrNull($options['idempotency_key'] ?? null),
-                    ':correlation_id' => $this->stringOrNull($options['correlation_id'] ?? null),
+        return $this->canonical->enqueue(
+            $aggregateType,
+            $aggregateId,
+            $eventType,
+            array_merge($payload, [
+                '_compatibility' => [
+                    'legacy_api' => 'DomainOutboxService',
+                    'legacy_table' => 'domain_outbox_events',
+                    'canonical_table' => 'outbox_events',
                 ],
-            );
-            return true;
-        } catch (\Throwable $e) {
-            error_log('[DomainOutboxService] enqueue failed: ' . $e->getMessage());
-            return false;
-        }
+            ]),
+            array_merge($options, [
+                'handler_key' => $handlerKey,
+                'payload_schema_version' => (string)($options['payload_schema_version'] ?? 'legacy_domain_outbox_bridge.v1'),
+            ]),
+        );
     }
 
     private function normalizeDb(?object $db): ?object

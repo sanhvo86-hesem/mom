@@ -126,7 +126,17 @@ INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
 ON CONFLICT (entity_type, entity_id) DO NOTHING;
 
 -- ================================================================
--- 11. DEFECT CATALOG (6 records → master_data_store)
+-- 11. BLOCKING REASON CODES (4 records -> master_data_store)
+-- ================================================================
+INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
+  ('blocking_reason_codes', 'BLK-MATL-WAIT', 'active', '{"reason_code":"BLK-MATL-WAIT","reason_name":"Material, fixture, or outsource lot not available","reason_name_vi":"Thiếu vật tư, đồ gá hoặc lô outsource","reason_group":"material","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":30}'::jsonb),
+  ('blocking_reason_codes', 'BLK-QUAL-HOLD', 'active', '{"reason_code":"BLK-QUAL-HOLD","reason_name":"Quality disposition, first-piece, or inspection release pending","reason_name_vi":"Chờ quyết định chất lượng, first-piece hoặc release kiểm tra","reason_group":"quality","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-ENG-CLARIFY', 'active', '{"reason_code":"BLK-ENG-CLARIFY","reason_name":"Engineering, drawing, setup, or CNC program clarification required","reason_name_vi":"Cần kỹ thuật làm rõ bản vẽ, setup hoặc chương trình CNC","reason_group":"engineering","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-OPERATOR-AUTH', 'active', '{"reason_code":"BLK-OPERATOR-AUTH","reason_name":"Qualified operator, certification, or supervisor authorization missing","reason_name_vi":"Thiếu thợ đủ năng lực, chứng nhận hoặc phê duyệt trưởng ca","reason_group":"labor","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":15}'::jsonb)
+ON CONFLICT (entity_type, entity_id) DO NOTHING;
+
+-- ================================================================
+-- 12. DEFECT CATALOG (6 records → master_data_store)
 -- ================================================================
 INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
   ('defect_catalog', 'DEF-DIM', 'active', '{"defect_code":"DEF-DIM","defect_name":"Dimensional Out of Tolerance","defect_name_vi":"Kích thước ngoài dung sai","defect_group":"dimensional","severity_default":"major"}'::jsonb),
@@ -138,7 +148,7 @@ INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
 ON CONFLICT (entity_type, entity_id) DO NOTHING;
 
 -- ================================================================
--- 12. MES CONNECTIVITY ADAPTERS (3 records → master_data_store)
+-- 13. MES CONNECTIVITY ADAPTERS (3 records → master_data_store)
 -- ================================================================
 INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
   ('mes_connectivity_adapters', 'ADAPT-5AX-01', 'active', '{"adapter_id":"ADAPT-5AX-01","machine_id":"MC-5AX-01","adapter_name":"Makino MTConnect Adapter","adapter_type":"mtconnect","transport_protocol":"HTTPS","endpoint_url":"https://mes.hesem.local/mtconnect/mc-5ax-01/current","poll_interval_seconds":5,"heartbeat_sla_seconds":90}'::jsonb),

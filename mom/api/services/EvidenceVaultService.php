@@ -31,6 +31,18 @@ final class EvidenceVaultService
     private readonly string $vaultFile;
     private readonly string $custodyFile;
     private readonly string $linksFile;
+    /** @var array<string, mixed> */
+    private array $pgWriteProbe = [
+        'backend' => 'postgres',
+        'enabled' => false,
+        'mode' => DataLayer::MODE_JSON_ONLY,
+        'last_operation' => '',
+        'last_status' => 'not_attempted',
+        'degraded' => false,
+        'failure_count' => 0,
+        'last_error' => '',
+        'last_error_at' => '',
+    ];
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -60,6 +72,34 @@ final class EvidenceVaultService
     {
         if ($this->dataLayer === null) return true;
         return $this->dataLayer->getMode() !== DataLayer::MODE_POSTGRES_ONLY;
+    }
+
+    private function pgAuthoritativeWriteRequired(): bool
+    {
+        if ($this->dataLayer === null) {
+            return false;
+        }
+        return in_array($this->dataLayer->getMode(), [
+            DataLayer::MODE_POSTGRES_PRIMARY,
+            DataLayer::MODE_POSTGRES_ONLY,
+        ], true);
+    }
+
+    private function dataLayerMode(): string
+    {
+        return $this->dataLayer !== null ? $this->dataLayer->getMode() : DataLayer::MODE_JSON_ONLY;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function pgWriteProbe(): array
+    {
+        return array_merge($this->pgWriteProbe, [
+            'enabled' => $this->pgWriteEnabled(),
+            'mode' => $this->dataLayerMode(),
+            'authoritative_required' => $this->pgAuthoritativeWriteRequired(),
+        ]);
     }
 
     private function requiresControlledArtifactHash(array $evidence): bool
@@ -382,19 +422,24 @@ final class EvidenceVaultService
             $this->saveLinks($updated);
         }
 
-        // PostgreSQL: delete the link
+        // PostgreSQL: delete the link.
         if ($this->pgWriteEnabled()) {
             try {
                 $db = $this->dataLayer->getConnection();
                 if ($db !== null) {
                     $db->execute(
-                    'DELETE FROM evidence_links WHERE evidence_id = CAST(:eid AS uuid) AND linked_entity_type = :etype AND linked_entity_id = :entityid',
+                        'DELETE FROM evidence_links WHERE evidence_id = CAST(:eid AS uuid) AND linked_entity_type = :etype AND linked_entity_id = :entityid',
                         [':eid' => $evidenceId, ':etype' => $entityType, ':entityid' => $entityId]
                     );
+                    $this->recordPgWriteProbe('unlink', 'ok');
+                } else {
+                    throw new RuntimeException('evidence_pg_connection_unavailable');
                 }
             } catch (\Throwable $e) {
-                error_log('[EvidenceVaultService] PG unlink failed: ' . $e->getMessage());
+                $this->handlePgWriteFailure('unlink', $e);
             }
+        } else {
+            $this->recordPgWriteProbe('unlink', 'skipped');
         }
 
         // Record custody event for unlink
@@ -831,10 +876,15 @@ final class EvidenceVaultService
      */
     private function pgInsertEvidence(array $record): void
     {
-        if (!$this->pgWriteEnabled()) return;
+        if (!$this->pgWriteEnabled()) {
+            $this->recordPgWriteProbe('evidence', 'skipped');
+            return;
+        }
         try {
             $db = $this->dataLayer->getConnection();
-            if ($db === null) return;
+            if ($db === null) {
+                throw new RuntimeException('evidence_pg_connection_unavailable');
+            }
             $meta = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $actorUuid = $this->resolveUserUuid($db, (string)($record['stored_by'] ?? ''));
 
@@ -866,8 +916,9 @@ final class EvidenceVaultService
                     ':meta'  => $meta,
                 ]
             );
+            $this->recordPgWriteProbe('evidence', 'ok');
         } catch (\Throwable $e) {
-            error_log('[EvidenceVaultService] PG insert evidence failed: ' . $e->getMessage());
+            $this->handlePgWriteFailure('evidence', $e);
         }
     }
 
@@ -876,10 +927,15 @@ final class EvidenceVaultService
      */
     private function pgInsertCustody(array $event): void
     {
-        if (!$this->pgWriteEnabled()) return;
+        if (!$this->pgWriteEnabled()) {
+            $this->recordPgWriteProbe('custody', 'skipped');
+            return;
+        }
         try {
             $db = $this->dataLayer->getConnection();
-            if ($db === null) return;
+            if ($db === null) {
+                throw new RuntimeException('evidence_pg_connection_unavailable');
+            }
             $custodyAction = $this->mapCustodyAction($event['action'] ?? 'accessed');
             $actorName = (string)($event['user'] ?? 'unknown');
             $actorUuid = $this->resolveUserUuid($db, $actorName);
@@ -905,8 +961,9 @@ final class EvidenceVaultService
                     ':recorded_at' => $event['timestamp'] ?? $this->nowIso(),
                 ]
             );
+            $this->recordPgWriteProbe('custody', 'ok');
         } catch (\Throwable $e) {
-            error_log('[EvidenceVaultService] PG insert custody failed: ' . $e->getMessage());
+            $this->handlePgWriteFailure('custody', $e);
         }
     }
 
@@ -915,10 +972,15 @@ final class EvidenceVaultService
      */
     private function pgInsertLink(array $linkRecord): void
     {
-        if (!$this->pgWriteEnabled()) return;
+        if (!$this->pgWriteEnabled()) {
+            $this->recordPgWriteProbe('link', 'skipped');
+            return;
+        }
         try {
             $db = $this->dataLayer->getConnection();
-            if ($db === null) return;
+            if ($db === null) {
+                throw new RuntimeException('evidence_pg_connection_unavailable');
+            }
             $linkedBy = (string)($linkRecord['linked_by'] ?? '');
             $linkedByUuid = $this->resolveUserUuid($db, $linkedBy);
             $metadata = json_encode([
@@ -942,9 +1004,41 @@ final class EvidenceVaultService
                     ':metadata'  => $metadata,
                 ]
             );
+            $this->recordPgWriteProbe('link', 'ok');
         } catch (\Throwable $e) {
-            error_log('[EvidenceVaultService] PG insert link failed: ' . $e->getMessage());
+            $this->handlePgWriteFailure('link', $e);
         }
+    }
+
+    private function recordPgWriteProbe(string $operation, string $status, ?\Throwable $error = null): void
+    {
+        $this->pgWriteProbe['enabled'] = $this->pgWriteEnabled();
+        $this->pgWriteProbe['mode'] = $this->dataLayerMode();
+        $this->pgWriteProbe['last_operation'] = $operation;
+        $this->pgWriteProbe['last_status'] = $status;
+
+        if ($error === null) {
+            if ($status === 'ok') {
+                $this->pgWriteProbe['degraded'] = false;
+                $this->pgWriteProbe['last_error'] = '';
+                $this->pgWriteProbe['last_error_at'] = '';
+            }
+            return;
+        }
+
+        $this->pgWriteProbe['degraded'] = true;
+        $this->pgWriteProbe['failure_count'] = (int)($this->pgWriteProbe['failure_count'] ?? 0) + 1;
+        $this->pgWriteProbe['last_error'] = $error->getMessage();
+        $this->pgWriteProbe['last_error_at'] = $this->nowIso();
+    }
+
+    private function handlePgWriteFailure(string $operation, \Throwable $error): void
+    {
+        $this->recordPgWriteProbe($operation, 'failed', $error);
+        if ($this->pgAuthoritativeWriteRequired()) {
+            throw new RuntimeException('evidence_pg_write_failed:' . $operation, 0, $error);
+        }
+        error_log('[EvidenceVaultService] PG ' . $operation . ' write degraded: ' . $error->getMessage());
     }
 
     /**

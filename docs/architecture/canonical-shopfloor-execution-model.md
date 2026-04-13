@@ -14,7 +14,7 @@ This document defines the Phase 1 canonical execution model for CNC/discrete man
 | Production report snapshot | `data/dispatch/production_logs.json` | `shift_production_log` PostgreSQL mirror | Snapshot is latest derived state per target. |
 | Production report event | `data/dispatch/production_report_events.json` | `shift_production_report_events` PostgreSQL mirror | Primary replay/idempotency source, with compatibility snapshot fallback for pre-event records. |
 | Dispatch lifecycle event | `data/dispatch/execution_events.json` | `shift_dispatch_execution_events` PostgreSQL mirror | Append-only lifecycle history for target created/updated/dispatched/reported/downtime/blocked/paused/resumed/completed. |
-| Inspection capture | Existing mobile inspection capture store | Dispatch report `quality_gate` result | Dispatch reads first-piece status; it does not replace inspection capture. |
+| Inspection capture | `MobileWorkQueueService::captureInspection()` JSON compatibility store with `mobile_inspection_captures` DB bridge | Dispatch report `quality_gate` result | Dispatch reads first-piece status; it does not replace inspection capture. |
 | Machine/equipment | Existing machine/equipment master data references | Connectivity projections/alarms | Dispatch requires stable `machine_id`/`equipment_id` values. |
 | Work center | Existing work center references | Report/task card copies | Dispatch preserves trace reference. |
 | Downtime/alarm | Manual downtime reason events now; connectivity alarms later | Machine alarm stores | Phase 1 manual downtime is not machine telemetry. |

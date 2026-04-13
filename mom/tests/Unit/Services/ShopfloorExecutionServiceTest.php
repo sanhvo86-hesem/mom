@@ -29,6 +29,10 @@ final class ShopfloorExecutionServiceTest extends TestCase
                 'downtime_resolution_codes' => [
                     ['resolution_code' => 'tool_replaced', 'resolution_name' => 'Tool replaced', 'status' => 'active'],
                 ],
+                'blocking_reason_codes' => [
+                    ['reason_code' => 'BLK-MATL-WAIT', 'reason_name' => 'Material wait blocker', 'loss_class' => 'blocked', 'status' => 'active'],
+                    ['reason_code' => 'BLK-QUAL-HOLD', 'reason_name' => 'Quality hold blocker', 'loss_class' => 'blocked', 'status' => 'active'],
+                ],
                 'defect_catalog' => [
                     ['defect_code' => 'DEF-DIM', 'defect_name' => 'Dimensional', 'defect_group' => 'dimensional', 'status' => 'active'],
                     ['defect_code' => 'DEF-SURF', 'defect_name' => 'Surface', 'defect_group' => 'surface', 'status' => 'active'],
@@ -520,13 +524,27 @@ final class ShopfloorExecutionServiceTest extends TestCase
             'quantity_good' => 0,
             'execution_event_type' => 'blocked',
             'blocking_issues' => [
-                ['reason_code' => 'DT-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
+                ['reason_code' => 'BLK-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
             ],
         ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
 
         $this->assertSame('blocked', $log['execution_event_type']);
         $this->assertSame('blocking', $log['blocking_issues'][0]['reason_domain']);
         $this->assertSame('blocked', $log['blocking_issues'][0]['loss_class']);
+    }
+
+    public function testBlockingReasonsDoNotFallBackToDowntimeCatalog(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('unknown_blocking_reason_code');
+
+        $this->service()->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'blocked',
+            'blocking_issues' => [
+                ['reason_code' => 'DT-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
+            ],
+        ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
     }
 
     public function testPauseResumeAndOfflineReportSemanticsAreStructured(): void
@@ -595,7 +613,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
                 ['reason_code' => 'DT-TOOL-LIFE', 'minutes' => 20, 'resolution_code' => 'TOOL_REPLACED'],
             ],
             'blocking_issues' => [
-                ['reason_code' => 'DT-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
+                ['reason_code' => 'BLK-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
             ],
         ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
 
@@ -604,7 +622,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('tool_replaced', $log['downtime_events'][0]['resolution_code']);
         $this->assertSame(['DEF-DIM'], $log['reason_codes']['ng']);
         $this->assertSame(['DEF-SURF'], $log['reason_codes']['rework']);
-        $this->assertSame(['DT-MATL-WAIT'], $log['reason_codes']['blocking']);
+        $this->assertSame(['BLK-MATL-WAIT'], $log['reason_codes']['blocking']);
         $this->assertSame(20.0, $log['actual_idle_minutes']);
         $this->assertTrue($log['advisory_projection']['projection_only']);
         $this->assertSame('elevated', $log['advisory_projection']['delay_risk_hint']);

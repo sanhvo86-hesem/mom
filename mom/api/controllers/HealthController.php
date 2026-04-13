@@ -55,14 +55,17 @@ class HealthController extends BaseController
         // Check promoted runtime authority posture.
         try {
             $authority = (new RuntimeAuthorityService($this->data, $dataDir))->report();
-            $checks['runtime_authority'] = (bool)($authority['summary']['idempotency_expected_authority_met'] ?? true);
-            if (!$checks['runtime_authority']) {
+        } catch (\Throwable $e) {
+            $authority = ['ok' => false, 'error' => $e->getMessage()];
+        }
+
+        $infra = $this->collectInfrastructureHealth($dataDir);
+        $componentOk = $this->evaluateComponents($infra, $authority);
+        foreach ($componentOk as $component => $ok) {
+            $checks[$component] = $ok;
+            if (!$ok) {
                 $allOk = false;
             }
-        } catch (\Throwable $e) {
-            $checks['runtime_authority'] = false;
-            $allOk = false;
-            $authority = ['ok' => false, 'error' => $e->getMessage()];
         }
 
         $this->json([
@@ -70,6 +73,10 @@ class HealthController extends BaseController
             'status'      => $allOk ? 'ready' : 'not_ready',
             'checks'      => $checks,
             'authority'   => $authority,
+            'degraded_components' => array_values(array_keys(array_filter(
+                $componentOk,
+                static fn(bool $ok): bool => !$ok,
+            ))),
             'server_time' => gmdate('c'),
         ], $allOk ? 200 : 503);
     }
@@ -79,35 +86,12 @@ class HealthController extends BaseController
      */
     public function status(): void
     {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
         $dataDir = $GLOBALS['DATA_DIR'] ?? dirname(__DIR__, 2) . '/data';
 
-        // Infrastructure health
-        $infra = [];
-
-        // Redis
-        try {
-            $cache = new CacheService($dataDir);
-            $infra['redis'] = $cache->getHealth();
-        } catch (\Throwable $e) {
-            $infra['redis'] = ['available' => false, 'error' => $e->getMessage()];
-        }
-
-        // RabbitMQ
-        try {
-            $queue = new QueueService($dataDir);
-            $infra['rabbitmq'] = $queue->getHealth();
-            $queue->close();
-        } catch (\Throwable $e) {
-            $infra['rabbitmq'] = ['available' => false, 'error' => $e->getMessage()];
-        }
-
-        // Logging
-        try {
-            $log = new LogTransport($dataDir);
-            $infra['logging'] = $log->getHealth();
-        } catch (\Throwable $e) {
-            $infra['logging'] = ['available' => false, 'error' => $e->getMessage()];
-        }
+        $infra = $this->collectInfrastructureHealth($dataDir);
 
         // Runtime authority
         try {
@@ -115,6 +99,9 @@ class HealthController extends BaseController
         } catch (\Throwable $e) {
             $authority = ['ok' => false, 'error' => $e->getMessage()];
         }
+
+        $componentOk = $this->evaluateComponents($infra, $authority);
+        $allOk = !in_array(false, $componentOk, true);
 
         // PHP info
         $php = [
@@ -132,12 +119,95 @@ class HealthController extends BaseController
         ];
 
         $this->json([
-            'ok'             => true,
+            'ok'             => $allOk,
             'version'        => '2.1.0',
             'infrastructure' => $infra,
             'authority'      => $authority,
+            'health_evaluation' => [
+                'components_ok' => $componentOk,
+                'degraded_components' => array_values(array_keys(array_filter(
+                    $componentOk,
+                    static fn(bool $ok): bool => !$ok,
+                ))),
+            ],
             'php'            => $php,
             'server_time'    => gmdate('c'),
-        ]);
+        ], $allOk ? 200 : 503);
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function collectInfrastructureHealth(string $dataDir): array
+    {
+        $infra = [];
+
+        try {
+            $cache = new CacheService($dataDir);
+            $infra['redis'] = $cache->getHealth();
+        } catch (\Throwable $e) {
+            $infra['redis'] = ['available' => false, 'error' => $e->getMessage()];
+        }
+
+        try {
+            $queue = new QueueService($dataDir);
+            $infra['rabbitmq'] = $queue->getHealth();
+            $queue->close();
+        } catch (\Throwable $e) {
+            $infra['rabbitmq'] = ['available' => false, 'error' => $e->getMessage()];
+        }
+
+        try {
+            $log = new LogTransport($dataDir);
+            $infra['logging'] = $log->getHealth();
+        } catch (\Throwable $e) {
+            $infra['logging'] = ['available' => false, 'error' => $e->getMessage()];
+        }
+
+        return $infra;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $infra
+     * @param array<string, mixed> $authority
+     * @return array<string, bool>
+     */
+    private function evaluateComponents(array $infra, array $authority): array
+    {
+        return [
+            'redis' => $this->componentHealthy($infra['redis'] ?? []),
+            'rabbitmq' => $this->componentHealthy($infra['rabbitmq'] ?? []),
+            'logging' => $this->componentHealthy($infra['logging'] ?? []),
+            'runtime_authority' => (bool)($authority['ok'] ?? false)
+                && (bool)($authority['summary']['idempotency_expected_authority_met'] ?? true),
+        ];
+    }
+
+    /**
+     * @param mixed $payload
+     */
+    private function componentHealthy($payload): bool
+    {
+        if (!is_array($payload)) {
+            return false;
+        }
+        if (isset($payload['error']) && trim((string)$payload['error']) !== '') {
+            return false;
+        }
+
+        foreach (['ok', 'available', 'healthy', 'redis_available', 'amqp_available', 'loki_available'] as $field) {
+            if (array_key_exists($field, $payload) && $payload[$field] === false) {
+                return false;
+            }
+        }
+
+        if (isset($payload['fallback_active']) && $payload['fallback_active'] === true) {
+            return false;
+        }
+        if (isset($payload['fallback_mode']) && !in_array((string)$payload['fallback_mode'], ['', 'none'], true)) {
+            return false;
+        }
+
+        return true;
     }
 }

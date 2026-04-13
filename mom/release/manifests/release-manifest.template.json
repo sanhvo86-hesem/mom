@@ -1,0 +1,17 @@
+{
+  "release_ref": "REL-YYYY-NNN",
+  "promotion_scope": "controlled_source",
+  "source_commit_sha": "",
+  "source_tree_hash_sha256": "",
+  "artifact_manifest_hash_sha256": "",
+  "manifest_state": "draft",
+  "required_checks": [
+    "repo_boundary_scan_clean",
+    "migration_lint_passed",
+    "targeted_tests_passed",
+    "authority_map_reviewed"
+  ],
+  "signature_event_id": null,
+  "approver": null,
+  "notes": ""
+}

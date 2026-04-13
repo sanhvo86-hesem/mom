@@ -195,7 +195,16 @@ Mobile inspection capture must preserve the execution context used by the gate w
   "work_center_id": "WC-5AX",
   "capture_type": "first_piece",
   "overall_result": "pass",
-  "measurements": []
+  "measurements": [
+    {
+      "characteristic": "OD-1",
+      "value": 10.002,
+      "unit": "mm",
+      "lower_spec": 9.99,
+      "upper_spec": 10.01,
+      "pass_fail": "pass"
+    }
+  ]
 }
 ```
 

@@ -10,8 +10,10 @@ use Throwable;
 /**
  * Audit trail middleware for HESEM MOM API.
  *
- * Logs every API call with action, user, IP, timestamp,
- * request summary, and response status to a JSONL audit file.
+ * Legacy request-access audit sink.
+ *
+ * This middleware is disabled by default because governed records must use the
+ * canonical DB-backed audit trail. Enable only for short-lived diagnostics.
  *
  * @package MOM\Api\Middleware
  * @since   2.0.0
@@ -30,7 +32,7 @@ class AuditMiddleware
      * @param string       $logFile     Absolute path to audit log file.
      * @param list<string> $skipActions Actions to skip (e.g. 'status' for health checks).
      */
-    public function __construct(string $logFile, array $skipActions = [])
+    public function __construct(string $logFile, array $skipActions = [], private readonly bool $enabled = false)
     {
         $this->logFile     = $logFile;
         $this->skipActions = $skipActions ?: ['status'];
@@ -121,6 +123,10 @@ class AuditMiddleware
      */
     public function writeEntry(array $entry): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $dir = dirname($this->logFile);
         if (!is_dir($dir)) {
             @mkdir($dir, 0775, true);

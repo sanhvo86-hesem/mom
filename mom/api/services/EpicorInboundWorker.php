@@ -70,32 +70,46 @@ final class EpicorInboundWorker
                 $failed++;
             }
 
-            $syncRun = \epicor_integration_service()->normalizeSyncRun([
-                'sync_domain' => $domain,
-                'sync_direction' => 'inbound',
-                'transport_mode' => 'rest',
-                'sync_status' => $status,
-                'started_at' => $startedAt,
-                'completed_at' => $completedAt,
-                'records_received' => $recordsReceived,
-                'records_processed' => $status === 'success' ? $recordsReceived : 0,
-                'records_failed' => $status === 'failed' ? 1 : 0,
-                'checkpoint_key' => $checkpointKey,
-                'checkpoint_value' => $status === 'success' ? $completedAt : $checkpointValue,
-                'summary' => $this->summaryEn($domain, $status, $recordsReceived),
-                'summary_vi' => $this->summaryVi($domain, $status, $recordsReceived),
-                'summary_en' => $this->summaryEn($domain, $status, $recordsReceived),
-                'metadata' => [
-                    'worker' => 'EpicorInboundWorker',
-                    'status_code' => (int)($transportResult['status_code'] ?? 0),
-                    'message' => (string)($transportResult['message'] ?? ''),
-                    'response_shape' => $this->describeResponseShape($transportResult['response'] ?? []),
-                    'checkpoint_before' => $checkpointValue,
-                    'dry_run' => (bool)($transportResult['skipped'] ?? false),
-                ],
-            ], $userId, $policy);
-
-            $savedRun = \upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $syncRun);
+            $savedRun = null;
+            try {
+                $syncRun = \epicor_integration_service()->normalizeSyncRun([
+                    'sync_domain' => $domain,
+                    'sync_direction' => 'inbound',
+                    'transport_mode' => 'rest',
+                    'sync_status' => $status,
+                    'started_at' => $startedAt,
+                    'completed_at' => $completedAt,
+                    'records_received' => $recordsReceived,
+                    'records_processed' => $status === 'success' ? $recordsReceived : 0,
+                    'records_failed' => $status === 'failed' ? 1 : 0,
+                    'checkpoint_key' => $checkpointKey,
+                    'checkpoint_value' => $status === 'success' ? $completedAt : $checkpointValue,
+                    'summary' => $this->summaryEn($domain, $status, $recordsReceived),
+                    'summary_vi' => $this->summaryVi($domain, $status, $recordsReceived),
+                    'summary_en' => $this->summaryEn($domain, $status, $recordsReceived),
+                    'metadata' => [
+                        'worker' => 'EpicorInboundWorker',
+                        'status_code' => (int)($transportResult['status_code'] ?? 0),
+                        'message' => (string)($transportResult['message'] ?? ''),
+                        'degraded' => $status === 'skipped',
+                        'degradation_reason' => $status === 'skipped'
+                            ? (string)($transportResult['error'] ?? 'unsupported_inbound_domain')
+                            : '',
+                        'response_shape' => $this->describeResponseShape($transportResult['response'] ?? []),
+                        'checkpoint_before' => $checkpointValue,
+                        'dry_run' => (bool)($transportResult['skipped'] ?? false),
+                    ],
+                ], $userId, $policy);
+                $savedRun = \upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $syncRun);
+            } catch (\RuntimeException $e) {
+                if ($e->getMessage() !== 'invalid_epicor_sync_domain') {
+                    throw $e;
+                }
+                $runtime['health']['unsupported_inbound_domains'] = array_values(array_unique(array_merge(
+                    (array)($runtime['health']['unsupported_inbound_domains'] ?? []),
+                    [$domain],
+                )));
+            }
             if ($status === 'success') {
                 \upsert_epicor_runtime_item($runtime['checkpoints'], 'checkpoint_key', [
                     'checkpoint_key' => $checkpointKey,
@@ -124,12 +138,13 @@ final class EpicorInboundWorker
             'succeeded' => $succeeded,
             'skipped' => $skipped,
             'failed' => $failed,
+            'degraded' => $skipped > 0,
         ];
 
         \save_epicor_runtime_store($runtime);
 
         return [
-            'ok' => $failed === 0,
+            'ok' => $failed === 0 && $skipped === 0,
             'processed' => $processed,
             'succeeded' => $succeeded,
             'skipped' => $skipped,
@@ -159,7 +174,7 @@ final class EpicorInboundWorker
         if ($requestedDomains === []) {
             return array_values(array_unique($available));
         }
-        return array_values(array_filter($available, static fn($domain) => in_array($domain, $requestedDomains, true)));
+        return array_values(array_unique($requestedDomains));
     }
 
     /** @param array<string, mixed> $runtime */
@@ -188,6 +203,7 @@ final class EpicorInboundWorker
             default => [
                 'ok' => false,
                 'skipped' => true,
+                'error' => 'unsupported_inbound_domain',
                 'status_code' => 0,
                 'message' => 'No inbound transport route is defined for this Epicor domain.',
                 'response' => [],

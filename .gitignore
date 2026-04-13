@@ -8,6 +8,7 @@ _reports/
 _build/
 _Deleted/
 .tmp/
+.tmp/browser-test/
 .tmp-*.png
 .tmp-*.jpg
 .tmp-*.jpeg
@@ -16,6 +17,18 @@ _Deleted/
 mom/.phpunit.cache/
 mom/_reports/
 mom/docs/tmp/
+mom/docs/system/agent-reports/
+mom/docs/system/*tranche*.md
+mom/release/module-builder-*
+mom/release/*-smoke-*.txt
+mom/release/*-sample-*.json
+
+# Root-level operational/audit documents must be promoted through release lanes,
+# not silently kept beside controlled source. Sanctioned templates under
+# standards/templates remain trackable because this pattern is root-only.
+/*.docx
+/*.pptx
+/*.xlsx
 
 # Composer
 mom/vendor/

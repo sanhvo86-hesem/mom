@@ -23,7 +23,8 @@
         "M2-orders-default"
       ],
       "version": "1.0.0",
-      "status": "approved",
+      "status": "published",
+      "registryStatus": "approved",
       "owner": "Frontend Architecture Council",
       "moduleArchetype": "list-report-workspace",
       "description": {
@@ -200,7 +201,8 @@
         "M4-purchasing-default"
       ],
       "version": "1.0.0",
-      "status": "approved",
+      "status": "published",
+      "registryStatus": "approved",
       "owner": "Frontend Architecture Council",
       "moduleArchetype": "list-report-workspace",
       "description": {

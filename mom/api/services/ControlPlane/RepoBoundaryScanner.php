@@ -16,18 +16,31 @@ final class RepoBoundaryScanner
      * @var list<array{pattern: string, type: string, severity: string}>
      */
     private const RULES = [
-        ['pattern' => '#(^|/)\.codex-playwright($|/)#', 'type' => 'browser_output', 'severity' => 'P1'],
-        ['pattern' => '#(^|/)\.tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
-        ['pattern' => '#(^|/)\.tmp-[^/]+\.(png|jpg|jpeg|webm)$#i', 'type' => 'browser_output', 'severity' => 'P1'],
-        ['pattern' => '#(^|/)_reports($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
-        ['pattern' => '#(^|/)_build($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
-        ['pattern' => '#(^|/)_Deleted($|/)#', 'type' => 'deleted_archive', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)\.codex-playwright($|/)#', 'type' => 'browser_output', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)\.tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)\.tmp-[^/]+\.(png|jpg|jpeg|webm)$#i', 'type' => 'browser_output', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)_reports($|/)#', 'type' => 'generated_report', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)mom/_reports($|/)#', 'type' => 'generated_report', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)_build($|/)#', 'type' => 'generated_report', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)_Deleted($|/)#', 'type' => 'deleted_archive', 'severity' => 'P0'],
+        ['pattern' => '#(^|/)mom/data/registry($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/release/module-builder-[^/]+#', 'type' => 'generated_report', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/docs/system/agent-reports($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/docs/system/[^/]*tranche[^/]*\.md$#i', 'type' => 'generated_report', 'severity' => 'P1'],
         ['pattern' => '#(^|/)prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
         ['pattern' => '#(^|/)standards/prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
-        ['pattern' => '#\.(docx|pptx|xlsx)$#i', 'type' => 'runtime_artifact', 'severity' => 'P2'],
+        ['pattern' => '#^[^/]+\.(docx|pptx|xlsx)$#i', 'type' => 'runtime_artifact', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/docs/tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P2'],
         ['pattern' => '#(^|/)mom/data/php_error\.log$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/\.phpunit\.cache($|/)#', 'type' => 'generated_report', 'severity' => 'P2'],
+    ];
+
+    /**
+     * @var list<string>
+     */
+    private const ALLOWED_CONTROLLED_BINARY_PATTERNS = [
+        '#^standards/templates/[^/]+\.(xlsx|docx|pptx)$#i',
+        '#^standards/reference/[^/]+\.(xlsx|docx|pptx)$#i',
     ];
 
     /**
@@ -40,6 +53,9 @@ final class RepoBoundaryScanner
         foreach ($paths as $path) {
             $normalized = $this->normalizePath($path);
             if ($normalized === '' || str_starts_with($normalized, '.git/')) {
+                continue;
+            }
+            if ($this->isAllowedControlledArtifact($normalized)) {
                 continue;
             }
 
@@ -105,5 +121,15 @@ final class RepoBoundaryScanner
     private function normalizePath(string $path): string
     {
         return trim(str_replace('\\', '/', $path), '/');
+    }
+
+    private function isAllowedControlledArtifact(string $path): bool
+    {
+        foreach (self::ALLOWED_CONTROLLED_BINARY_PATTERNS as $pattern) {
+            if (preg_match($pattern, $path) === 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }

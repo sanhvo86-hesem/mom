@@ -344,14 +344,15 @@ Footer must have page number and document identification.
 | System | Role | Data type |
 |-----------|---------|---------------|
 | **Epicor** | System of Record (SoR) | ERP transactions: orders, production, warehouse, finance |
-| **M365 (SharePoint)** | Single Source of Truth (SSOT) | QMS documents, control records, policies |
-| **Excel (Forms)** | Gate / Evidence / Decision layer | Recording forms, checklists, decision logs |
+| **Portal control plane** | System of Record / Single Source of Truth for QMS and evidence records | QMS documents, controlled records, policies, evidence packages |
+| **M365 (SharePoint)** | Read-only publication and discovery replica | Published copies, discovery metadata, publication receipts |
+| **Excel (Forms)** | Controlled capture carrier | Offline recording forms and checklists issued and validated by the portal |
 
 ### E2. Rules are not duplicated
 
 - **Do not duplicate data between systems.** Each data point has only one official source.
 - Epicor is the source for transactional data — not copied to SharePoint.
-- SharePoint is the source for documents — don't keep copies on personal drives.
+- SharePoint is not the authority for controlled records; do not keep uncontrolled copies on personal drives.
 - The Excel form records only the data required by the SOP/WI — do not add out-of-range fields.
 
 ### E3. System link
@@ -395,11 +396,11 @@ Full details: see `15-evidence-and-records-naming.md`. Summary:
 | 3 | Every file MUST have `{HHMM}-{UserID}` to avoid duplicate names when multiple people upload at the same time | REJECT upload |
 | 4 | Engineering baseline MUST have `V{ver}` and only 1 release person (approval gate FRM-306) | REJECT release |
 | 5 | Formal records (NCR, CAPA, FAI, Audit...) MUST have a Record-ID from the server atomic counter | REJECT submit |
-| 6 | NO files will be saved to SharePoint with names containing spaces or special characters | REJECT upload |
+| 6 | NO portal-controlled artifact or publication copy will use names containing spaces or special characters | REJECT upload/publication |
 
 ### G2. UserID MUST be registered uniquely
 
-Each employee is assigned a 3-4 character UserID (eg: NVA, TBH, LMC), registered in SharePoint List `Employee-Registry`. UserID DOES NOT change when changing department/position, NOT reused after leaving job.
+Each employee is assigned a 3-4 character UserID (eg: NVA, TBH, LMC), registered in the portal identity/governance registry and optionally published to SharePoint for read-only discovery. UserID DOES NOT change when changing department/position, NOT reused after leaving job.
 
 ---
 

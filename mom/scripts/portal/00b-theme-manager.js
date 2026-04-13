@@ -656,10 +656,10 @@ function set(key, value){
   _apply();
 }
 
-/** Set a nested value for local preview/user preference.
-    This does not promote graphics authority; saveAdminConfig must pass backend
-    concurrency and governance review before becoming admin org default. */
-function setDeep(path, value){
+  /** Legacy internal nested user-preference helper.
+      This is intentionally not exported; Admin Appearance uses setPreviewDeep()
+      and backend save/graphics-governance endpoints for controlled authority. */
+  function setDeep(path, value){
   _loadUserPrefs();
   var parts = path.split('.');
   var obj = _userPrefs;
@@ -698,11 +698,11 @@ function clearPreviewOverrides(){
   _apply();
 }
 
-/** Set a CSS variable directly for real-time preview only.
-    Modules must not use this as a bypass around Admin/shared token authority. */
-function setVar(varName, value){
-  ROOT.style.setProperty(varName, value);
-}
+  /** Set a CSS variable directly for real-time preview only.
+      Exported as setPreviewVar to make the non-authority role explicit. */
+  function setPreviewVar(varName, value){
+    ROOT.style.setProperty(varName, value);
+  }
 
 function setAll(prefs){
   _loadUserPrefs();
@@ -1013,11 +1013,10 @@ window.HmTheme = {
   get: get,
   getDeep: getDeep,
   set: set,
-  setDeep: setDeep,
   setPreviewDeep: setPreviewDeep,
   setPreviewAll: setPreviewAll,
+  setPreviewVar: setPreviewVar,
   clearPreviewOverrides: clearPreviewOverrides,
-  setVar: setVar,
   setAll: setAll,
   getAll: getAll,
   getFullConfig: getFullConfig,

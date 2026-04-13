@@ -1,0 +1,11 @@
+{
+  "intake_source": "",
+  "source_uri": "",
+  "source_hash_sha256": "",
+  "intake_class": "external_reference",
+  "disposition_state": "quarantined",
+  "accepted_record_type": null,
+  "accepted_record_id": null,
+  "accepted_by": null,
+  "reason": ""
+}

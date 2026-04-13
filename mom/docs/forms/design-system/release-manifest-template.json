@@ -42,6 +42,7 @@
     "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
     "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
     "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+    "driftReportGeneratedAt": "",
     "evidenceBundleRequirements": [
       "affectedModulesSnapshot",
       "complianceMatrixSnapshot",

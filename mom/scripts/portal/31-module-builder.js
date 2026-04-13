@@ -7283,7 +7283,13 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     });
     var status = row && row.linkageStatus ? row.linkageStatus : (moduleId ? 'pending-graphics-beacon' : 'missing-module-id');
     var acceptable = status === 'full-admin-controlled' || status === 'bridged-to-shared-tokens';
-    var releaseLinkComplete = !!(releaseLink && releaseLink.complianceMatrixRef && releaseLink.runtimeBeaconRef && releaseLink.rollbackPlanRef);
+    var releaseLinkComplete = !!(releaseLink
+      && releaseLink.complianceMatrixRef
+      && releaseLink.runtimeBeaconRef
+      && releaseLink.rollbackPlanRef
+      && releaseLink.multiSitePlantBrandingGovernanceRef
+      && releaseLink.controlledEmergencyOverridePathRef
+      && releaseLink.driftReportGeneratedAt);
     var releaseBlocked = !!(releaseLink && releaseLink.releaseBlocked);
     return {
       status: status,
@@ -7311,8 +7317,11 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
         waiversRef: '',
         runtimeBeaconRef: '',
         debtObservatoryRef: '',
+        multiSitePlantBrandingGovernanceRef: '',
+        controlledEmergencyOverridePathRef: '',
         rolloutDecisionRef: '',
         rollbackPlanRef: '',
+        driftReportGeneratedAt: '',
         releaseBlocked: true,
         evidenceBundleRequirements: [
           'affectedModulesSnapshot',
@@ -7400,6 +7409,8 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
       waiversRef: graphicsReleaseLink.waiversRef || '',
       runtimeBeaconRef: graphicsReleaseLink.runtimeBeaconRef || '',
       debtObservatoryRef: graphicsReleaseLink.debtObservatoryRef || '',
+      multiSitePlantBrandingGovernanceRef: graphicsReleaseLink.multiSitePlantBrandingGovernanceRef || '',
+      controlledEmergencyOverridePathRef: graphicsReleaseLink.controlledEmergencyOverridePathRef || '',
       rolloutDecisionRef: graphicsReleaseLink.rolloutDecisionRef || '',
       rollbackPlanRef: graphicsReleaseLink.rollbackPlanRef || ''
     };

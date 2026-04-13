@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MOM\Tests\Unit\Services;
 
 use MOM\Services\EvidenceVaultService;
+use MOM\Database\Connection;
+use MOM\Database\DataLayer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -15,6 +17,7 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
 
     protected function setUp(): void
     {
+        Connection::resetInstance();
         $this->tmpDir = sys_get_temp_dir() . '/mom_evidence_vault_test_' . bin2hex(random_bytes(4));
         if (!mkdir($this->tmpDir, 0775, true) && !is_dir($this->tmpDir)) {
             throw new RuntimeException('Unable to create temp evidence test directory.');
@@ -23,6 +26,7 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
 
     protected function tearDown(): void
     {
+        Connection::resetInstance();
         $this->removeTree($this->tmpDir);
     }
 
@@ -126,6 +130,56 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
             'type' => 'application/pdf',
             'size' => 456,
         ], 'approval-group-1', 'party-1', new \stdClass());
+    }
+
+    public function testPostgresPrimaryEvidenceWriteFailsClosedWhenDatabaseUnavailable(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir, $this->failingDataLayer(DataLayer::MODE_POSTGRES_PRIMARY));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('evidence_pg_write_failed:evidence');
+
+        $service->store([
+            'title' => 'Controlled DB-primary evidence',
+            'type' => 'document',
+            'content' => 'payload',
+        ], 'qa.user');
+    }
+
+    public function testShadowWriteEvidenceFailureIsObservableButCompatible(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir, $this->failingDataLayer(DataLayer::MODE_SHADOW_WRITE));
+
+        $record = $service->store([
+            'title' => 'Shadow evidence',
+            'type' => 'document',
+            'content' => 'payload',
+        ], 'qa.user');
+
+        $this->assertNotEmpty($record['evidence_id']);
+        $probe = $service->pgWriteProbe();
+        $this->assertTrue($probe['enabled']);
+        $this->assertSame(DataLayer::MODE_SHADOW_WRITE, $probe['mode']);
+        $this->assertTrue($probe['degraded']);
+        $this->assertGreaterThanOrEqual(1, $probe['failure_count']);
+        $this->assertSame('failed', $probe['last_status']);
+        $this->assertNotSame('', $probe['last_error']);
+    }
+
+    private function failingDataLayer(string $mode): DataLayer
+    {
+        return new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, [
+            'use_postgres' => true,
+            'shadow_write' => $mode === DataLayer::MODE_SHADOW_WRITE,
+            'json_fallback' => $mode === DataLayer::MODE_POSTGRES_PRIMARY,
+            'host' => '127.0.0.1',
+            'port' => 1,
+            'database' => 'mom_unavailable',
+            'username' => 'mom',
+            'password' => 'mom',
+            'schema' => 'public',
+            'statement_timeout' => 1000,
+        ]);
     }
 
     private function removeTree(string $path): void

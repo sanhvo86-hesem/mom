@@ -881,7 +881,7 @@ final class ScheduledJobs
             $etl = new \MOM\Api\Services\AiDataEtlService($this->dataDir, $this->db);
             $results = [];
 
-            foreach (['tool_wear', 'quality_prediction', 'scheduling'] as $modelType) {
+            foreach (['tool_wear', 'quality_prediction', 'scheduling', 'shopfloor_execution'] as $modelType) {
                 try {
                     $dataset = $etl->snapshotForModel($modelType);
                     $results[] = [

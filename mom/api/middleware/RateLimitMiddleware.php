@@ -137,6 +137,12 @@ class RateLimitMiddleware
     /**
      * Perform a Redis-backed rate-limit check via CacheService.
      *
+     * Uses atomic Redis operations (INCRBY) for counter updates. The counter
+     * has its own TTL which is set on first increment. While setNx + get has
+     * a small race window, the counter's atomic increment and TTL provide
+     * sufficient protection for rate limiting, with acceptable false negatives
+     * (allowing one extra request in rare race conditions).
+     *
      * @param string $bucketKey     Sanitized subject/action key.
      * @param int    $maxRequests   Max allowed hits per window.
      * @param int    $windowSeconds Window size in seconds.

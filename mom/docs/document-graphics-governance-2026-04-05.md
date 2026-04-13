@@ -45,7 +45,7 @@ This governance document converts that benchmark into local build rules, release
 
 All document-facing UI must follow this exact order:
 
-1. `Admin Appearance` defines approved design tokens and governed patterns.
+1. `Admin Appearance` is the governed control surface for proposed design tokens and governed patterns; backend graphics authority owns the production version/ETag and publish state.
 2. `Theme runtime` maps saved configuration to CSS variables.
 3. `Shared tokens` expose semantic values such as surfaces, text, border, radius, sizing, density, and motion.
 4. `Shared components` consume those tokens through `hm-*` primitives or equivalent shared selectors.

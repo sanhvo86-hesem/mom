@@ -406,32 +406,51 @@ final class NotificationService
             return [];
         }
 
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
+        // Read file with shared lock to prevent concurrent modifications
+        $fp = @fopen($file, 'r');
+        if (!$fp) {
             return [];
         }
 
-        $notifications = [];
-        foreach ($lines as $line) {
-            $item = json_decode($line, true);
-            if (!is_array($item)) {
-                continue;
-            }
-            // Skip expired
-            if (($item['expires_at'] ?? '') < $now) {
-                continue;
-            }
-            // Filter unread only
-            if ($unreadOnly && ($item['read'] ?? false) === true) {
-                continue;
-            }
-            $notifications[] = $item;
+        if (!@flock($fp, LOCK_SH)) {
+            @fclose($fp);
+            return [];
         }
 
-        // Newest first
-        usort($notifications, fn(array $a, array $b) => ($b['created_at'] ?? '') <=> ($a['created_at'] ?? ''));
+        try {
+            $lines = [];
+            while (($line = fgets($fp)) !== false) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $lines[] = $line;
+                }
+            }
 
-        return array_slice($notifications, $offset, $limit);
+            $notifications = [];
+            foreach ($lines as $line) {
+                $item = json_decode($line, true);
+                if (!is_array($item)) {
+                    continue;
+                }
+                // Skip expired
+                if (($item['expires_at'] ?? '') < $now) {
+                    continue;
+                }
+                // Filter unread only
+                if ($unreadOnly && ($item['read'] ?? false) === true) {
+                    continue;
+                }
+                $notifications[] = $item;
+            }
+
+            // Newest first
+            usort($notifications, fn(array $a, array $b) => ($b['created_at'] ?? '') <=> ($a['created_at'] ?? ''));
+
+            return array_slice($notifications, $offset, $limit);
+        } finally {
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        }
     }
 
     /**
@@ -442,25 +461,67 @@ final class NotificationService
         // Scan all user files to find the notification
         $files = glob($this->notifDir . '/*.jsonl') ?: [];
         foreach ($files as $file) {
-            $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            if ($lines === false) {
+            // Check file exists before trying to read (glob can return stale entries)
+            if (!is_file($file)) {
                 continue;
             }
 
-            $modified = false;
-            $newLines = [];
-            foreach ($lines as $line) {
-                $item = json_decode($line, true);
-                if (is_array($item) && ($item['id'] ?? '') === $notificationId) {
-                    $item = array_merge($item, $patch);
-                    $modified = true;
-                }
-                $newLines[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            // Read with shared lock first to find if we need to update
+            $fp = @fopen($file, 'r');
+            if (!$fp) {
+                continue;
             }
 
-            if ($modified) {
-                file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
-                return;
+            if (!@flock($fp, LOCK_SH)) {
+                @fclose($fp);
+                continue;
+            }
+
+            $lines = [];
+            $found = false;
+            try {
+                while (($line = fgets($fp)) !== false) {
+                    $line = trim($line);
+                    if ($line !== '') {
+                        $lines[] = $line;
+                        $item = json_decode($line, true);
+                        if (is_array($item) && ($item['id'] ?? '') === $notificationId) {
+                            $found = true;
+                        }
+                    }
+                }
+            } finally {
+                @flock($fp, LOCK_UN);
+                @fclose($fp);
+            }
+
+            // If found, upgrade to exclusive lock and update
+            if ($found) {
+                $fp = @fopen($file, 'r+');
+                if (!$fp || !@flock($fp, LOCK_EX)) {
+                    continue;
+                }
+
+                try {
+                    $newLines = [];
+                    $modified = false;
+                    foreach ($lines as $line) {
+                        $item = json_decode($line, true);
+                        if (is_array($item) && ($item['id'] ?? '') === $notificationId) {
+                            $item = array_merge($item, $patch);
+                            $modified = true;
+                        }
+                        $newLines[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    }
+
+                    if ($modified) {
+                        file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
+                    }
+                    return;
+                } finally {
+                    @flock($fp, LOCK_UN);
+                    @fclose($fp);
+                }
             }
         }
     }
@@ -475,23 +536,42 @@ final class NotificationService
             return;
         }
 
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
+        // Read file with exclusive lock to modify it
+        $fp = @fopen($file, 'r+');
+        if (!$fp) {
             return;
         }
 
-        $now = gmdate('Y-m-d\TH:i:s\Z');
-        $newLines = [];
-        foreach ($lines as $line) {
-            $item = json_decode($line, true);
-            if (is_array($item) && ($item['read'] ?? false) === false) {
-                $item['read'] = true;
-                $item['read_at'] = $now;
-            }
-            $newLines[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!@flock($fp, LOCK_EX)) {
+            @fclose($fp);
+            return;
         }
 
-        file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
+        try {
+            $lines = [];
+            while (($line = fgets($fp)) !== false) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $lines[] = $line;
+                }
+            }
+
+            $now = gmdate('Y-m-d\TH:i:s\Z');
+            $newLines = [];
+            foreach ($lines as $line) {
+                $item = json_decode($line, true);
+                if (is_array($item) && ($item['read'] ?? false) === false) {
+                    $item['read'] = true;
+                    $item['read_at'] = $now;
+                }
+                $newLines[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+
+            file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
+        } finally {
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        }
     }
 
     /**
@@ -503,25 +583,49 @@ final class NotificationService
         $files = glob($this->notifDir . '/*.jsonl') ?: [];
 
         foreach ($files as $file) {
-            $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            if ($lines === false) {
+            // Check file still exists (glob can return stale entries)
+            if (!is_file($file)) {
                 continue;
             }
 
-            $kept = [];
-            foreach ($lines as $line) {
-                $item = json_decode($line, true);
-                if (!is_array($item)) {
-                    continue;
-                }
-                if (($item['expires_at'] ?? '') < $now) {
-                    $count++;
-                    continue;
-                }
-                $kept[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            // Read file with exclusive lock to safely purge expired items
+            $fp = @fopen($file, 'r+');
+            if (!$fp) {
+                continue;
             }
 
-            file_put_contents($file, implode("\n", $kept) . "\n", LOCK_EX);
+            if (!@flock($fp, LOCK_EX)) {
+                @fclose($fp);
+                continue;
+            }
+
+            try {
+                $lines = [];
+                while (($line = fgets($fp)) !== false) {
+                    $line = trim($line);
+                    if ($line !== '') {
+                        $lines[] = $line;
+                    }
+                }
+
+                $kept = [];
+                foreach ($lines as $line) {
+                    $item = json_decode($line, true);
+                    if (!is_array($item)) {
+                        continue;
+                    }
+                    if (($item['expires_at'] ?? '') < $now) {
+                        $count++;
+                        continue;
+                    }
+                    $kept[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
+
+                file_put_contents($file, implode("\n", $kept) . (count($kept) > 0 ? "\n" : ''), LOCK_EX);
+            } finally {
+                @flock($fp, LOCK_UN);
+                @fclose($fp);
+            }
         }
 
         return $count;

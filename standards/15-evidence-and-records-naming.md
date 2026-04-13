@@ -8,7 +8,8 @@ authority for records. The authoritative object is the portal evidence record /
 evidence version plus immutable package manifest. SharePoint filenames are
 distribution metadata only.
 
-> Naming convention is consistent for EVERY file saved to SharePoint: completed forms, produced evidence,
+> Naming convention is consistent for every portal-controlled artifact and any
+> downstream read-only publication copy: completed forms, produced evidence,
 > engineering baseline, training records, audits, and assets.
 > Complies with AS9100 §8.5.2 (traceability), ISO 9001 §7.5.3 (record control).
 
@@ -313,7 +314,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 | 1 | 3-4 characters abbreviation from first name-first name-middle name |
 | 2 | Priority: first letter of last name + first letter of middle name + first letter of first name (NVA, TBH, LMC) |
 | 3 | If duplicate: add number (NVA → NVA2) |
-| 4 | Register once in SharePoint List `Employee-Registry` or Epicor Employee Master |
+| 4 | Register once in the portal identity/governance registry or Epicor Employee Master; SharePoint may receive a read-only publication copy |
 | 5 | NO changes when employees change rooms/positions |
 | 6 | DO NOT reuse UserID after employee leaves |
 
@@ -397,8 +398,8 @@ When a user loads a blank form from the web portal:
 
 ### 7.2 Form filled upload — version validation
 
-When the user uploads the completed form to SharePoint:
-- SharePoint metadata column `Form-Version` must match the active version in form_control_registry
+When the user uploads the completed form to the portal:
+- Portal issuance metadata must match the active template revision and schema version
 - If old version → FLAG `Version-Valid = OBSOLETE` + notify uploader
 - Monthly audit: query files where Version-Valid = OBSOLETE → action required
 
@@ -465,11 +466,11 @@ PHOTO-NCR_NCR-2026-043_20260327_0831-TBH.jpg           ← Ảnh lỗi #2 (ngư�
 PHOTO-NCR_NCR-2026-043_20260327_0832-NVA.jpg           ← Ảnh lỗi #3
 CMM_NCR-2026-043_20260327_0835-QC1.csv                 ← Dữ liệu đo
 
-SharePoint search: "NCR-2026-043" → tìm thấy TẤT CẢ files ← traceability
+Portal/evidence search: "NCR-2026-043" → tìm thấy TẤT CẢ authoritative records and publication copies ← traceability
 ```
 
 ---
 
 > **Last updated:** 2026-03-27
-> **Applies:** All files saved to SharePoint — HESEM ENGINEERING
+> **Applies:** Portal-controlled artifacts and read-only publication copies — HESEM ENGINEERING
 > **Related documents:** 14-m365-sharepoint-architecture.md, evidence-naming-rule.html (Training Academy), ANNEX-131

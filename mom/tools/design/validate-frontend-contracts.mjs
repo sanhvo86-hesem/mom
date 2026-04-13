@@ -383,6 +383,7 @@ function validateGraphicsGovernance(graphicsGovernance, packets) {
     'controlledEmergencyOverridePathRef',
     'rolloutDecisionRef',
     'rollbackPlanRef',
+    'driftReportGeneratedAt',
   ]) {
     if (!(field in releaseLink)) {
       errors.push(`graphics-governance: graphicsReleaseLink missing ${field}`);

@@ -75,7 +75,7 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
 |----------|---------|
 | Implementer | Document Owner |
 | Act | Prepare document content according to standard structure (see 08-document-types.md) |
-| File | Draft files are saved in the Draft folder on SharePoint |
+| File | Draft files are controlled by the portal draft/revision workflow; SharePoint is not a draft editing store |
 | Exit | Send DCR (Document Change Request) when draft is completed |
 
 #### Step 2: Submit (Send request)
@@ -116,7 +116,7 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
 | Check | Link works, format is correct, version is correct |
 | Update | FRM-101 Master Document Register |
 | Notification | Send notifications to relevant departments |
-| Cancel the old version | Mark old versions as "Superseded" on SharePoint |
+| Cancel the old version | Supersede the old version in the portal control plane; publish read-only supersession status to SharePoint if required |
 
 ### 2.3 Special cases
 
@@ -217,7 +217,7 @@ Every HTML document has a revision history table at the bottom of the page, in `
 | Record type | Storage time | Note |
 |-----------|-------------------|---------|
 | Current QMS documents (SOP, WI, ANNEX) | Permanent (on QMS site) | The current version is always accessible |
-| Effective QMS Document (Superseded) | Minimum 7 men | Stored on SharePoint Archive |
+| Effective QMS Document (Superseded) | Minimum 7 years | Retained by portal retention policy; SharePoint may carry read-only superseded publication copies |
 | DCR (FRM-102) | Minimum 7 years | Attach corresponding documents |
 | Peer Review Log (FRM-105) | Minimum 7 years | Attach corresponding documents |
 | Job records | Minimum 10 years or according to customer requirements | According to the contract |
@@ -230,8 +230,8 @@ Every HTML document has a revision history table at the bottom of the page, in `
 | System | Record type | Format |
 |----------|-----------|-----------|
 | QMS Site (web) | Current documents | HTML |
-| SharePoint — QMS Records | Original documents, DCR, review log | PDF (from HTML) |
-| SharePoint — Archive | Document is expired | PDF |
+| Portal evidence package | Original documents, DCR, review log, signatures, manifests | Canonical payload + readable snapshot + manifest |
+| SharePoint publication | Read-only discovery/publication copies | PDF/metadata replica with receipt |
 | Epicor | Production records, job records | System data |
 | Local backup | Full backup | According to IT regulations |
 

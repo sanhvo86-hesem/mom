@@ -14,8 +14,8 @@ The current authority model is:
 - Final evidence must be accepted, locked, packaged, retained, and audited in
   the portal before any SharePoint publication attempt.
 
-> Design a 4-site SharePoint architecture for record storage, document backup, and synchronization with web portal.
-> Web portal (qms.hesem.com.vn) = the only place to READ. SharePoint = backup + operational record storage.
+> Design a SharePoint publication architecture for read-only distribution,
+> discovery, and receipt tracking after portal acceptance/finalization.
 
 ---
 
@@ -23,13 +23,13 @@ The current authority model is:
 
 | # | Principle | Describe |
 |---|-----------|-------|
-| 1 | **Web portal = read, SharePoint = save** | People read documents on the web. SharePoint only stores operational records (filled forms, evidence) and backup sources. |
+| 1 | **Portal = create/accept/finalize, SharePoint = read-only publication** | People work through the portal. SharePoint receives only controlled publication copies after portal finalization. |
 | 2 | **Site = security boundary** | Each site = 1 sensitivity level, 1 main user group. Separate customer IPs to separate sites. |
-| 3 | **Epicor = SoR, SharePoint = SSOT** | Epicor manages transactions (job, PO, inventory). SharePoint manages documents and evidence. Link, không copy. |
+| 3 | **Epicor = ERP SoR, portal = QMS/evidence SoR, SharePoint = publication replica** | Epicor manages ERP transactions. The portal manages controlled records and evidence. SharePoint links back to the authoritative portal record. |
 | 4 | **Flat folder + metadata** | Maximum 3 levels of folders. Use SharePoint metadata columns instead of deep sub-folders. |
 | 5 | **OneDrive for personal files** | Do not create Employee Workbench in SharePoint. Each user uses OneDrive (1TB/user in Business Basic). |
 | 6 | **Group-based permission** | Delegate permissions according to Entra ID Security Groups, do not assign per-user. |
-| 7 | **Blank form downloaded from the web** | Form template (.xlsx) served from web server. SharePoint only contains completed forms and evidence. |
+| 7 | **Blank/offline forms issued by portal** | Form template (.xlsx) is issued by the portal. Completed forms are uploaded to the portal and may later be published to SharePoint as read-only copies. |
 
 ---
 
@@ -55,7 +55,7 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 ## 3. SITE 1: HESEM-Records — Operational records
 
-**Purpose:** Contains completed forms, evidence, records arising in daily operations (NO job attached).
+**Purpose:** Contains read-only publication copies and discovery metadata for completed forms, evidence, and records arising in daily operations. Authoritative records remain in the portal.
 
 ### 3.1 Document Libraries
 
@@ -80,7 +80,7 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 ### 3.3 Online form sync
 
-Each online form (~25 forms) syncs to a separate SharePoint List + auto PDF to Document Library:
+Each online form may publish a read-only receipt/list row and PDF snapshot to SharePoint after portal finalization:
 
 | Online form | SharePoint List | PDF saved at |
 |------------|----------------|-------------|
@@ -200,13 +200,13 @@ External sharing: OFF
 
 | Library | Content |
 |---------|---------|
-| **QMS-Source-Control** | Backup the entire web portal: `01-Controlled-Source/qms.hesem.com.vn/` + Release Manifests + Deploy Receipts |
+| **QMS-Source-Control-Publication** | Read-only publication copies of approved release manifests and deploy receipts. Git/control-plane records remain authoritative. |
 | **System-Records** | IT governance: Access-Control, M365-Config, Epicor-Control, Backup-Recovery |
 
 ### 6.2 Sync flow (defined in WI-107)
 
 ```
-SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
+Git/control plane source → release manifest → server deploy → promotion receipt → optional SharePoint read-only publication
 ```
 
 ---
@@ -324,17 +324,17 @@ Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind*
 
 ```
 Online form submit → api.php:
-├── Save JSON (server, primary)
+├── Accept/finalize in portal canonical records
 ├── Generate PDF snapshot
-├── Sync to SharePoint List (Graph API) → structured data
-└── Upload PDF to SharePoint Library → evidence
+├── Queue Graph publication asynchronously
+└── Store publication receipt/state; SharePoint is not the evidence authority
 ```
 
 ### 9.4 Excel form version control
 
 ```
 Download: api.php inject version stamp → filename FRM-302_Setup-Sheet_V3.2.xlsx
-Upload:   SharePoint validate version vs registry → reject if obsolete
+Upload:   Portal validates issuance/template/schema version → reject if obsolete
 ```
 
 ---

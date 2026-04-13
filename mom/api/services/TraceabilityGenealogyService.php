@@ -217,14 +217,23 @@ final class TraceabilityGenealogyService
         foreach ($issues as $event) {
             $issue = $this->supplierIssuePayload($event);
             $lot = (string)($issue['affected_lot_number'] ?? $event['lot_number'] ?? '');
-            if ($lot === '') {
+            $serial = (string)($issue['affected_serial_number'] ?? $event['serial_number'] ?? '');
+            if ($lot === '' && $serial === '') {
                 continue;
             }
-            $impact = $this->impactedOutputs(['lot_number' => $lot] + $this->scopeFields($filters));
+            $impactFilters = $this->scopeFields($filters);
+            if ($lot !== '') {
+                $impactFilters['lot_number'] = $lot;
+            }
+            if ($serial !== '') {
+                $impactFilters['serial_number'] = $serial;
+            }
+            $impact = $this->impactedOutputs($impactFilters);
             $summaries[] = [
                 'issue_id' => (string)($issue['issue_id'] ?? $event['source_aggregate_id'] ?? ''),
                 'issue_status' => (string)($issue['issue_status'] ?? ''),
                 'affected_lot_number' => $lot,
+                'affected_serial_number' => $serial,
                 'open' => !$this->isClosedQualityState((string)($issue['issue_status'] ?? '')),
                 'impacted_output_count' => $impact['impacted_output_count'],
                 'shipment_count' => $impact['shipment_count'],
@@ -251,8 +260,7 @@ final class TraceabilityGenealogyService
     {
         $node = $this->targetNode($filters);
         $events = $this->allEvents($filters);
-        $lot = $this->nodeLot($node);
-        $issues = $lot !== '' ? $this->unresolvedSupplierIssuesForLots([$lot], $events) : [];
+        $issues = $this->unresolvedSupplierIssuesForNodes([$node], $events);
         $blockers = $this->issueBlockers($issues, 'supplier_quality_consumption_block');
 
         return [
@@ -273,14 +281,14 @@ final class TraceabilityGenealogyService
     {
         $upstream = $this->upstreamTrace($filters);
         $events = $this->allEvents($filters);
-        $lots = [];
+        $nodes = [];
         foreach ((array)$upstream['nodes'] as $node) {
-            if (is_array($node) && (string)($node['node_type'] ?? '') === 'lot') {
-                $lots[(string)$node['lot_number']] = (string)$node['lot_number'];
+            if (is_array($node) && in_array((string)($node['node_type'] ?? ''), ['lot', 'serial'], true)) {
+                $nodes[(string)$node['node_key']] = $node;
             }
         }
 
-        $issues = $this->unresolvedSupplierIssuesForLots(array_values($lots), $events);
+        $issues = $this->unresolvedSupplierIssuesForNodes(array_values($nodes), $events);
         $blockers = $this->issueBlockers($issues, 'supplier_quality_shipment_block');
         if ($blockers !== []) {
             $this->metrics['shipment_eligibility_block']++;
@@ -549,8 +557,53 @@ final class TraceabilityGenealogyService
                 $query[$field] = $value;
             }
         }
-        $query['limit'] = min(500, max(1, (int)($filters['limit'] ?? 500)));
-        return (array)($this->events->productionTimeline($query)['events'] ?? []);
+        $explicitMax = array_key_exists('max_events', $filters)
+            ? (int)$filters['max_events']
+            : (array_key_exists('limit', $filters) ? (int)$filters['limit'] : 5000);
+        $maxEvents = min(5000, max(1, $explicitMax));
+        $pageSize = min(500, $maxEvents, max(1, (int)($filters['page_size'] ?? 500)));
+        $offset = max(0, (int)($filters['offset'] ?? 0));
+        $events = [];
+        $seen = [];
+
+        while (count($events) < $maxEvents) {
+            $query['limit'] = min($pageSize, $maxEvents - count($events));
+            $query['offset'] = $offset;
+            $page = (array)($this->events->productionTimeline($query)['events'] ?? []);
+            if ($page === []) {
+                break;
+            }
+            foreach ($page as $event) {
+                if (!is_array($event)) {
+                    continue;
+                }
+                $eventId = (string)($event['event_id'] ?? '');
+                $key = $eventId !== '' ? $eventId : hash('sha256', ManufacturingEventCodec::canonicalJson($event));
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
+                $events[] = $event;
+                if (count($events) >= $maxEvents) {
+                    break 2;
+                }
+            }
+            if (count($page) < $query['limit']) {
+                break;
+            }
+            $offset += count($page);
+        }
+
+        usort($events, static function (array $left, array $right): int {
+            $cmp = strcmp((string)($left['occurred_at'] ?? ''), (string)($right['occurred_at'] ?? ''));
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = strcmp((string)($left['recorded_at'] ?? ''), (string)($right['recorded_at'] ?? ''));
+            return $cmp !== 0 ? $cmp : strcmp((string)($left['event_id'] ?? ''), (string)($right['event_id'] ?? ''));
+        });
+
+        return array_values($events);
     }
 
     /**
@@ -685,13 +738,28 @@ final class TraceabilityGenealogyService
     }
 
     /**
-     * @param list<string> $lots
+     * @param list<array<string, mixed>> $nodes
      * @param list<array<string, mixed>> $events
      * @return list<array<string, mixed>>
      */
-    private function unresolvedSupplierIssuesForLots(array $lots, array $events): array
+    private function unresolvedSupplierIssuesForNodes(array $nodes, array $events): array
     {
-        $lots = array_values(array_filter(array_unique($lots), static fn(string $lot): bool => trim($lot) !== ''));
+        $lots = [];
+        $serials = [];
+        foreach ($nodes as $node) {
+            if (!is_array($node)) {
+                continue;
+            }
+            $lot = trim((string)($node['lot_number'] ?? ''));
+            if ($lot !== '') {
+                $lots[$lot] = $lot;
+            }
+            $serial = trim((string)($node['serial_number'] ?? ''));
+            if ($serial !== '') {
+                $serials[$serial] = $serial;
+            }
+        }
+
         $issues = [];
         foreach ($events as $event) {
             $issue = $this->supplierIssuePayload($event);
@@ -699,7 +767,10 @@ final class TraceabilityGenealogyService
                 continue;
             }
             $lot = (string)($issue['affected_lot_number'] ?? $event['lot_number'] ?? '');
-            if (!in_array($lot, $lots, true)) {
+            $serial = (string)($issue['affected_serial_number'] ?? $event['serial_number'] ?? '');
+            $lotMatched = $lot !== '' && isset($lots[$lot]);
+            $serialMatched = $serial !== '' && isset($serials[$serial]);
+            if (!$lotMatched && !$serialMatched) {
                 continue;
             }
             $issues[] = $event;
@@ -720,6 +791,10 @@ final class TraceabilityGenealogyService
     {
         usort($events, static function (array $left, array $right): int {
             $cmp = strcmp((string)($left['occurred_at'] ?? ''), (string)($right['occurred_at'] ?? ''));
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = strcmp((string)($left['recorded_at'] ?? ''), (string)($right['recorded_at'] ?? ''));
             return $cmp !== 0 ? $cmp : strcmp((string)($left['event_id'] ?? ''), (string)($right['event_id'] ?? ''));
         });
 
@@ -763,6 +838,7 @@ final class TraceabilityGenealogyService
                 'issue_id' => (string)($issue['issue_id'] ?? $event['source_aggregate_id'] ?? ''),
                 'issue_status' => (string)($issue['issue_status'] ?? ''),
                 'affected_lot_number' => (string)($issue['affected_lot_number'] ?? $event['lot_number'] ?? ''),
+                'affected_serial_number' => (string)($issue['affected_serial_number'] ?? $event['serial_number'] ?? ''),
                 'scar_id' => (string)($issue['scar_id'] ?? $event['scar_id'] ?? ''),
                 'ncr_id' => (string)($issue['ncr_id'] ?? $event['ncr_id'] ?? ''),
                 'inspection_id' => (string)($issue['inspection_id'] ?? $event['inspection_id'] ?? ''),
@@ -790,12 +866,23 @@ final class TraceabilityGenealogyService
         if ($affectedLot === '' && $issue !== []) {
             $affectedLot = (string)($issue['affected_lot_number'] ?? '');
         }
+        $affectedSerial = $this->firstString($input, ['affected_serial_number', 'serial_number']);
+        if ($affectedSerial === '' && $issue !== []) {
+            $affectedSerial = (string)($issue['affected_serial_number'] ?? '');
+        }
 
-        if ($issueId === '' || $affectedLot === '') {
+        if ($issueId === '' || ($affectedLot === '' && $affectedSerial === '')) {
             throw new RuntimeException('missing_containment_trigger_reference');
         }
 
-        $impact = $this->impactedOutputs(['lot_number' => $affectedLot] + $this->scopeFields($input));
+        $impactFilters = $this->scopeFields($input);
+        if ($affectedLot !== '') {
+            $impactFilters['lot_number'] = $affectedLot;
+        }
+        if ($affectedSerial !== '') {
+            $impactFilters['serial_number'] = $affectedSerial;
+        }
+        $impact = $this->impactedOutputs($impactFilters);
         $evidenceIds = $this->stringList($input['evidence_ids'] ?? $input['evidence_id'] ?? []);
         $approvalIds = $this->stringList($input['approval_ids'] ?? $input['approval_id'] ?? []);
         $requiredEvidence = $this->stringList($input['required_evidence_ids'] ?? []);
@@ -820,7 +907,7 @@ final class TraceabilityGenealogyService
         }
 
         $packet = [
-            'packet_id' => 'containment-' . substr(hash('sha256', $issueId . '|' . $affectedLot), 0, 24),
+            'packet_id' => 'containment-' . substr(hash('sha256', $issueId . '|' . $affectedLot . '|' . $affectedSerial), 0, 24),
             'packet_type' => 'traceability_containment_response',
             'payload_schema_version' => 'containment_response.v1',
             'packet_state' => $blockers === [] ? $targetState : 'blocked',
@@ -831,6 +918,7 @@ final class TraceabilityGenealogyService
                 'ncr_id' => (string)($issue['ncr_id'] ?? $input['ncr_id'] ?? ''),
                 'inspection_id' => (string)($issue['inspection_id'] ?? $input['inspection_id'] ?? ''),
                 'affected_lot_number' => $affectedLot,
+                'affected_serial_number' => $affectedSerial,
                 'event_id' => is_array($issueEvent) ? (string)($issueEvent['event_id'] ?? '') : '',
             ],
             'impact_summary' => [
@@ -905,14 +993,6 @@ final class TraceabilityGenealogyService
             'message' => $message,
             'details' => $details,
         ];
-    }
-
-    /**
-     * @param array<string, mixed> $node
-     */
-    private function nodeLot(array $node): string
-    {
-        return (string)($node['lot_number'] ?? '');
     }
 
     /**

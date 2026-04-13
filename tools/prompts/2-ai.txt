@@ -1,0 +1,10 @@
+# ══════════════════════════════════════════════════════
+# DOMAIN: AI — Intelligence & Analytics Layer
+# Nguồn: GPT Pro chat "2. AI"
+# Thời gian ước tính: 5h
+# ══════════════════════════════════════════════════════
+# HƯỚNG DẪN: Paste kết quả prompt từ GPT Pro chat "2. AI" vào đây.
+# ══════════════════════════════════════════════════════
+
+# PASTE PROMPTS TỪ GPT PRO "AI" VÀO ĐÂY:
+

@@ -169,7 +169,36 @@ final class LocalStorageDriver implements StorageDriver
 
     private function fullPath(string $path): string
     {
-        return $this->basePath . '/' . ltrim($path, '/');
+        $normalizedPath = str_replace('\\', '/', $path);
+        if ($normalizedPath === '' || str_starts_with($normalizedPath, '/')) {
+            throw new \RuntimeException('Invalid storage path: ' . $path);
+        }
+
+        $segments = [];
+        foreach (explode('/', $normalizedPath) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+            if ($segment === '..') {
+                throw new \RuntimeException('Path traversal detected: ' . $path);
+            }
+            $segments[] = $segment;
+        }
+        if ($segments === []) {
+            throw new \RuntimeException('Invalid storage path: ' . $path);
+        }
+
+        $full = rtrim($this->basePath, '/') . '/' . implode('/', $segments);
+        $this->ensureDirectory($full);
+
+        // Prevent path traversal attacks
+        $resolved = realpath(dirname($full));
+        $baseResolved = realpath($this->basePath);
+        if ($resolved === false || $baseResolved === false || strpos($resolved . '/', $baseResolved . '/') !== 0) {
+            throw new \RuntimeException('Path traversal detected: ' . $path);
+        }
+
+        return $full;
     }
 
     private function ensureDirectory(string $filePath): void
@@ -183,7 +212,6 @@ final class LocalStorageDriver implements StorageDriver
     public function put(string $path, string $contents): bool
     {
         $full = $this->fullPath($path);
-        $this->ensureDirectory($full);
         $tmp = $full . '.tmp.' . bin2hex(random_bytes(4));
         if (@file_put_contents($tmp, $contents, LOCK_EX) === false) {
             @unlink($tmp);
@@ -195,7 +223,6 @@ final class LocalStorageDriver implements StorageDriver
     public function putStream(string $path, $stream): bool
     {
         $full = $this->fullPath($path);
-        $this->ensureDirectory($full);
         $fp = @fopen($full, 'wb');
         if (!$fp) return false;
         if (flock($fp, LOCK_EX)) {

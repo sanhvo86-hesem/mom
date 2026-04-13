@@ -272,10 +272,13 @@ final class QueueService
         $count = 0;
         $fp = @fopen($file, 'r');
         if ($fp) {
-            while (fgets($fp) !== false) {
-                $count++;
+            try {
+                while (fgets($fp) !== false) {
+                    $count++;
+                }
+            } finally {
+                fclose($fp);
             }
-            fclose($fp);
         }
         return $count;
     }

@@ -10,8 +10,8 @@ use MOM\Database\DataLayer;
 /**
  * Canonical outbox writer for migration 106/108 outbox_events.
  *
- * DomainOutboxService remains a compatibility writer for the older
- * domain_outbox_events table. New control-plane workers should use this class.
+ * DomainOutboxService is now a compatibility wrapper that forwards into this
+ * canonical table. New control-plane workers should use this class directly.
  */
 final class CanonicalOutboxService
 {

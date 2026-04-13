@@ -185,6 +185,16 @@ final class ControlPlaneCommandGuard
             ]);
         }
 
+        $authoritySource = strtolower($this->text($context['authority_source'] ?? ''));
+        $authorityVerified = $this->bool($context['authority_verified'] ?? false)
+            || $authoritySource === 'canonical_change_authority';
+        if (!$authorityVerified) {
+            return $this->deny('change_authority_not_verified', 'Released change authority must be resolved from the canonical change authority service, not supplied only by the caller.', [
+                'required_authority_source' => 'canonical_change_authority',
+                'change_order_ref' => $changeRef,
+            ]);
+        }
+
         $fieldPath = $this->text($context['field_path'] ?? '');
         $authorizedFields = $this->stringList($context['authorized_fields'] ?? []);
         if ($fieldPath !== '' && $authorizedFields !== [] && !in_array('*', $authorizedFields, true) && !in_array($fieldPath, $authorizedFields, true)) {

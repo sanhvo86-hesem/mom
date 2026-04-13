@@ -75,14 +75,26 @@ final class OutboxWorker
             $domainStats[$domain]['processed']++;
 
             if (($transportResult['skipped'] ?? false) === true) {
+                $runtime['outbox_events'][$idx]['last_attempt_at'] = $attemptedAt;
+                $runtime['outbox_events'][$idx]['updated_at'] = $attemptedAt;
+                $runtime['outbox_events'][$idx]['updated_by'] = $userId;
+                $runtime['outbox_events'][$idx]['publish_status'] = 'dead_letter';
+                $runtime['outbox_events'][$idx]['next_attempt_at'] = '';
+                $runtime['outbox_events'][$idx]['summary'] = 'Epicor outbound delivery skipped because no supported transport route was available.';
+                $runtime['outbox_events'][$idx]['message_en'] = (string)($transportResult['message'] ?? 'No Epicor transport route is defined for this outbox domain.');
+                $runtime['outbox_events'][$idx]['message_vi'] = 'Giao dịch outbound sang Epicor bị chặn vì chưa có tuyến transport được hỗ trợ.';
+                $runtime['outbox_events'][$idx]['erp_response'] = (array)($transportResult['response'] ?? []);
+                $runtime['outbox_events'][$idx]['degradation_reason'] = (string)($transportResult['error'] ?? 'unsupported_outbox_domain');
                 $results[] = [
                     'outbox_event_id' => (string)($row['outbox_event_id'] ?? ''),
                     'sync_domain' => $domain,
-                    'status' => 'skipped',
+                    'status' => 'dead_letter',
                     'message' => (string)($transportResult['message'] ?? 'Transport skipped.'),
+                    'degradation_reason' => (string)($transportResult['error'] ?? 'unsupported_outbox_domain'),
                 ];
-                $domainStats[$domain]['skipped']++;
+                $domainStats[$domain]['failed']++;
                 $skipped++;
+                $deadLetter++;
                 continue;
             }
 
@@ -157,34 +169,44 @@ final class OutboxWorker
             $status = $stats['failed'] > 0
                 ? ($stats['delivered'] > 0 ? 'partial' : 'failed')
                 : ($stats['delivered'] > 0 ? 'success' : 'queued');
-            $normalized = \epicor_integration_service()->normalizeSyncRun([
-                'sync_domain' => $domain,
-                'sync_direction' => 'outbound',
-                'transport_mode' => 'rest',
-                'sync_status' => $status,
-                'started_at' => gmdate(DATE_ATOM),
-                'completed_at' => gmdate(DATE_ATOM),
-                'records_received' => 0,
-                'records_processed' => (int)($stats['delivered'] ?? 0),
-                'records_failed' => (int)($stats['failed'] ?? 0),
-                'summary' => 'Epicor outbox worker cycle completed.',
-                'summary_vi' => 'Chu kỳ Epicor outbox worker đã hoàn tất.',
-                'summary_en' => 'Epicor outbox worker cycle completed.',
-                'metadata' => [
-                    'worker' => 'OutboxWorker',
-                    'processed' => (int)($stats['processed'] ?? 0),
-                    'delivered' => (int)($stats['delivered'] ?? 0),
-                    'failed' => (int)($stats['failed'] ?? 0),
-                    'skipped' => (int)($stats['skipped'] ?? 0),
-                ],
-            ], $userId, $policy);
-            \upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $normalized);
+            try {
+                $normalized = \epicor_integration_service()->normalizeSyncRun([
+                    'sync_domain' => $domain,
+                    'sync_direction' => 'outbound',
+                    'transport_mode' => 'rest',
+                    'sync_status' => $status,
+                    'started_at' => gmdate(DATE_ATOM),
+                    'completed_at' => gmdate(DATE_ATOM),
+                    'records_received' => 0,
+                    'records_processed' => (int)($stats['delivered'] ?? 0),
+                    'records_failed' => (int)($stats['failed'] ?? 0),
+                    'summary' => 'Epicor outbox worker cycle completed.',
+                    'summary_vi' => 'Chu kỳ Epicor outbox worker đã hoàn tất.',
+                    'summary_en' => 'Epicor outbox worker cycle completed.',
+                    'metadata' => [
+                        'worker' => 'OutboxWorker',
+                        'processed' => (int)($stats['processed'] ?? 0),
+                        'delivered' => (int)($stats['delivered'] ?? 0),
+                        'failed' => (int)($stats['failed'] ?? 0),
+                        'skipped' => (int)($stats['skipped'] ?? 0),
+                    ],
+                ], $userId, $policy);
+                \upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $normalized);
+            } catch (\RuntimeException $e) {
+                if ($e->getMessage() !== 'invalid_epicor_sync_domain') {
+                    throw $e;
+                }
+                $runtime['health']['unsupported_outbox_domains'] = array_values(array_unique(array_merge(
+                    (array)($runtime['health']['unsupported_outbox_domains'] ?? []),
+                    [$domain],
+                )));
+            }
         }
 
         \save_epicor_runtime_store($runtime);
 
         return [
-            'ok' => $deadLetter === 0,
+            'ok' => $deadLetter === 0 && $retried === 0 && $skipped === 0,
             'processed' => $processed,
             'delivered' => $delivered,
             'retried' => $retried,
@@ -209,6 +231,7 @@ final class OutboxWorker
             default => [
                 'ok' => false,
                 'skipped' => true,
+                'error' => 'unsupported_outbox_domain',
                 'message' => 'No Epicor transport route is defined for this outbox domain.',
                 'response' => [],
             ],

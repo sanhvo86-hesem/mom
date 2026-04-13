@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Services\ControlPlane\ControlPlaneCommandGuard;
+use MOM\Services\ControlPlane\ControlPlaneCommandService;
 use MOM\Services\ControlPlane\EffectivityGateService;
 use MOM\Services\ControlPlane\EqmsControlPlaneStateMachine;
 use MOM\Services\ControlPlane\EqmsFormExecutionService;
+use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Publication\PublicationStateService;
+use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Traceability\UnifiedEvidenceGraphService;
 
 final class EqmsControlPlaneController extends BaseController
@@ -93,6 +96,48 @@ final class EqmsControlPlaneController extends BaseController
         $this->success(['decision' => $decision->toArray()]);
     }
 
+    public function submitCommand(): never
+    {
+        $user = $this->requireAuth();
+        $body = $this->jsonBody();
+        if (!isset($body['actor_ref']) && !isset($body['actor_id'])) {
+            $body['actor_ref'] = (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user');
+        }
+        if (!isset($body['idempotency_key'])) {
+            $body['idempotency_key'] = $this->requestHeader('Idempotency-Key') ?? '';
+        }
+
+        try {
+            $result = (new ControlPlaneCommandService($this->data))->submit($body);
+            if (!$result['accepted']) {
+                $decision = is_array($result['decision'] ?? null) ? $result['decision'] : [];
+                $this->error((string)($decision['code'] ?? 'command_rejected'), 409, (string)($decision['message'] ?? 'Command rejected.'), $result);
+            }
+            $this->success($result, 202);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function getCommand(): never
+    {
+        $this->requireAuth();
+        $commandId = trim((string)$this->query('command_id', ''));
+        if ($commandId === '') {
+            $this->error('missing_command_id', 400);
+        }
+
+        try {
+            $command = (new ControlPlaneCommandService($this->data))->get($commandId);
+            if ($command === null) {
+                $this->error('command_not_found', 404);
+            }
+            $this->success(['command' => $command]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function validateIssuanceManifest(): never
     {
         $this->requireAuth();
@@ -160,6 +205,41 @@ final class EqmsControlPlaneController extends BaseController
         $this->success(['retry_plan' => (new PublicationStateService())->retryPlan($attempts, $maxAttempts)]);
     }
 
+    public function publicationMonitor(): never
+    {
+        $this->requireAuth();
+        try {
+            $monitor = (new PublicationMonitorService($this->data))->summarize([
+                'state' => (string)$this->query('state', ''),
+                'limit' => (int)$this->query('limit', '100'),
+            ]);
+            $this->success(['publication_monitor' => $monitor]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function requestPublicationAction(): never
+    {
+        $user = $this->requireAuth();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['publication_id', 'action', 'reason']);
+        $idempotencyKey = trim((string)($body['idempotency_key'] ?? $this->requestHeader('Idempotency-Key') ?? ''));
+
+        try {
+            $result = (new PublicationMonitorService($this->data))->queueAction(
+                trim((string)$body['publication_id']),
+                trim((string)$body['action']),
+                (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                trim((string)$body['reason']),
+                $idempotencyKey,
+            );
+            $this->success(['publication_action' => $result], 202);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function buildAuditPackManifest(): never
     {
         $this->requireAuth();
@@ -203,5 +283,30 @@ final class EqmsControlPlaneController extends BaseController
             'finding_count' => count($findings),
             'persisted' => false,
         ]);
+    }
+
+    public function periodicEvaluationDashboard(): never
+    {
+        $this->requireAuth();
+        try {
+            $this->success([
+                'periodic_evaluations' => (new PeriodicEvaluationService($this->data))->dashboard((int)$this->query('limit', '100')),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function schedulePeriodicEvaluation(): never
+    {
+        $this->requireAuth();
+        $body = $this->jsonBody();
+        try {
+            $this->success([
+                'periodic_evaluation' => (new PeriodicEvaluationService($this->data))->schedule($body),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
     }
 }

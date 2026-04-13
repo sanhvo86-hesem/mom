@@ -22,7 +22,8 @@
                     "M2-orders-default"
                 ],
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
+                "registryStatus": "approved",
                 "owner": "Frontend Architecture Council",
                 "moduleArchetype": "list-report-workspace",
                 "description": {
@@ -199,7 +200,8 @@
                     "M4-purchasing-default"
                 ],
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
+                "registryStatus": "approved",
                 "owner": "Frontend Architecture Council",
                 "moduleArchetype": "list-report-workspace",
                 "description": {
@@ -575,7 +577,7 @@
             {
                 "blockType": "action-status-flow",
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
                 "owner": "Frontend Architecture Council",
                 "allowedZones": [
                     "workflow"
@@ -731,7 +733,7 @@
             {
                 "blockType": "action-toolbar",
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
                 "owner": "Frontend Architecture Council",
                 "allowedZones": [
                     "actions"
@@ -873,7 +875,7 @@
             {
                 "blockType": "data-detail",
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
                 "owner": "Frontend Architecture Council",
                 "allowedZones": [
                     "detail"
@@ -1020,7 +1022,7 @@
             {
                 "blockType": "data-table",
                 "version": "1.0.0",
-                "status": "approved",
+                "status": "published",
                 "owner": "Frontend Architecture Council",
                 "allowedZones": [
                     "primary"
@@ -6933,6 +6935,7 @@
             "moduleDebtCount": 2,
             "uncontrolledLegacyShellDebt": 0
         },
+        "driftReportGeneratedAt": "2026-04-13T15:25:40+00:00",
         "evidenceBundleRequirements": [
             "affectedModulesSnapshot",
             "complianceMatrixSnapshot",

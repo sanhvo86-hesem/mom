@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T15:11:13.352Z",
-    "description": "Resolution plan for 0 orphan registry fields and 433 orphan DB column names."
+    "generatedAt": "2026-04-13T16:48:48.478Z",
+    "description": "Resolution plan for 0 orphan registry fields and 435 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 355,
+      "count": 356,
       "columns": [
         {
           "column": "item_class",
@@ -3864,6 +3864,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "inspection_fingerprint",
+          "tables": [
+            "mobile_inspection_captures"
+          ],
+          "suggestedLabel": "Kiểm tra Fingerprint",
+          "suggestedLabelEn": "Inspection Fingerprint",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(128)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "target_quantity",
           "tables": [
             "shift_production_log",
@@ -4682,7 +4695,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 78,
+      "count": 79,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -5124,6 +5137,16 @@
             "UUID"
           ],
           "role": "primary_key"
+        },
+        {
+          "column": "client_capture_id",
+          "tables": [
+            "mobile_inspection_captures"
+          ],
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "role": "foreign_key"
         },
         {
           "column": "spare_inventory_id",

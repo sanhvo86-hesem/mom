@@ -149,7 +149,8 @@ $corsMiddleware      = new CorsMiddleware(
 $apiKeyMiddleware    = new ApiKeyMiddleware($DATA_DIR, $cacheService);
 $authMiddleware      = new AuthMiddleware($store, (array)($apiConfig['auth'] ?? []));
 $rateLimitMiddleware = new RateLimitMiddleware($DATA_DIR . '/ratelimit', 120, 60, [], $cacheService);
-$auditMiddleware     = new AuditMiddleware($DATA_DIR . '/audit.log');
+$legacyAuditLogEnabled = in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true);
+$auditMiddleware     = new AuditMiddleware($DATA_DIR . '/audit.log', [], $legacyAuditLogEnabled);
 
 $router->use($corsMiddleware->handler());
 $router->use($apiKeyMiddleware->handler());  // API key/JWT checked before session auth

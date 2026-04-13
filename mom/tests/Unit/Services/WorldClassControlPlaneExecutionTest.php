@@ -7,10 +7,13 @@ namespace MOM\Tests\Unit\Services;
 use MOM\Services\ControlPlane\CanonicalOutboxService;
 use MOM\Services\ControlPlane\CanonicalOutboxWorker;
 use MOM\Services\ControlPlane\ControlPlaneCommandGuard;
+use MOM\Services\ControlPlane\ControlPlaneCommandService;
 use MOM\Services\ControlPlane\EffectivityGateService;
 use MOM\Services\ControlPlane\EqmsFormExecutionService;
+use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Traceability\UnifiedEvidenceGraphService;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +33,21 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('browser_output', $findings[0]['violation_type']);
         $this->assertSame('generated_report', $findings[1]['violation_type']);
         $this->assertSame('prompt_file', $findings[2]['violation_type']);
+    }
+
+    public function testRepoBoundaryScannerFlagsActualSpillPathsWithoutBlockingControlledTemplates(): void
+    {
+        $findings = (new RepoBoundaryScanner())->scanPaths([
+            'HESEM_Security_Audit_Final.docx',
+            'standards/templates/frm-000-master-template.xlsx',
+            'mom/data/registry/registry-manifest.json',
+            'mom/release/module-builder-ultra-round10-manifest-2026-04-08.json',
+        ]);
+
+        $this->assertCount(3, $findings);
+        $this->assertSame('HESEM_Security_Audit_Final.docx', $findings[0]['path']);
+        $this->assertSame('mom/data/registry/registry-manifest.json', $findings[1]['path']);
+        $this->assertSame('mom/release/module-builder-ultra-round10-manifest-2026-04-08.json', $findings[2]['path']);
     }
 
     public function testCommandGuardBlocksGenericCrudSharePointUploadAndFinalEditWithoutReleasedChange(): void
@@ -72,6 +90,20 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertFalse($finalEdit->allowed);
         $this->assertSame('change_authority_required', $finalEdit->code);
 
+        $callerSuppliedAuthority = $guard->validateEnvelope([
+            'command_name' => 'UpdateEvidenceRecord',
+            'idempotency_key' => 'idem-3b',
+            'actor_ref' => 'qa1',
+            'operation' => 'update',
+            'record_state' => 'finalized',
+            'field_path' => 'canonical_payload.result',
+            'authorized_fields' => ['canonical_payload.result'],
+            'change_order_ref' => 'CO-2026-001',
+            'change_order_state' => 'released',
+        ]);
+        $this->assertFalse($callerSuppliedAuthority->allowed);
+        $this->assertSame('change_authority_not_verified', $callerSuppliedAuthority->code);
+
         $allowed = $guard->validateEnvelope([
             'command_name' => 'UpdateEvidenceRecord',
             'idempotency_key' => 'idem-4',
@@ -82,6 +114,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'authorized_fields' => ['canonical_payload.result'],
             'change_order_ref' => 'CO-2026-001',
             'change_order_state' => 'released',
+            'authority_source' => 'canonical_change_authority',
         ]);
         $this->assertTrue($allowed->allowed);
     }
@@ -102,6 +135,69 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringContainsString('CAST(:payload AS jsonb)', $db->executeCalls[0]['sql']);
         $this->assertSame('publication.sharepoint_graph', $db->executeCalls[0]['params'][':handler_key']);
         $this->assertSame('publication_request.v1', $db->executeCalls[0]['params'][':payload_schema_version']);
+    }
+
+    public function testControlPlaneCommandServiceWritesCommandLedgerAndCanonicalOutbox(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $service = new ControlPlaneCommandService($db);
+
+        $result = $service->submit([
+            'command_name' => 'FinalizeEvidenceRecord',
+            'idempotency_key' => 'cmd-1',
+            'actor_ref' => 'qa.user',
+            'operation' => 'finalize',
+            'scope' => ['object_type' => 'evidence_record', 'object_id' => 'EV-1'],
+            'payload' => ['evidence_record_id' => 'EV-1'],
+        ]);
+
+        $this->assertTrue($result['accepted']);
+        $this->assertSame('FinalizeEvidenceRecord', $result['command']['command_name']);
+        $this->assertCount(1, $db->queryOneCalls);
+        $this->assertNotEmpty($db->executeCalls);
+        $this->assertStringContainsString('INSERT INTO outbox_events', $db->executeCalls[0]['sql']);
+        $this->assertSame('ControlPlaneCommandAccepted', $db->executeCalls[0]['params'][':event_type']);
+    }
+
+    public function testPublicationMonitorQueuesActionsThroughCanonicalOutbox(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'evidence_publication_id' => '00000000-0000-0000-0000-000000000010',
+            'publication_state' => 'failed',
+        ];
+
+        $result = (new PublicationMonitorService($db))->queueAction(
+            '00000000-0000-0000-0000-000000000010',
+            'retry',
+            'qa.user',
+            'Graph transient failure recovered',
+            'retry-1',
+        );
+
+        $this->assertTrue($result['queued']);
+        $this->assertSame('publication.retry', $db->executeCalls[0]['params'][':handler_key']);
+    }
+
+    public function testPeriodicEvaluationServiceSchedulesAuthoritativeReviewRows(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'scheduled',
+            'result_payload' => '{}',
+        ];
+
+        $row = (new PeriodicEvaluationService($db))->schedule([
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'due_at' => '2026-04-14T00:00:00Z',
+        ]);
+
+        $this->assertSame('system_integrity', $row['evaluation_scope']);
+        $this->assertStringContainsString('INSERT INTO periodic_evaluations', $db->queryOneCalls[0]['sql']);
     }
 
     public function testCanonicalOutboxWorkerDispatchesByHandlerKey(): void
@@ -278,6 +374,16 @@ final class CanonicalOutboxFakeDb
     public array $queryRows = [];
 
     /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    public array $queryOneRows = [];
+
+    /**
      * @param array<string, mixed> $params
      */
     public function execute(string $sql, array $params = []): int
@@ -293,5 +399,25 @@ final class CanonicalOutboxFakeDb
     public function query(string $sql, array $params = []): array
     {
         return $this->queryRows;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if ($this->queryOneRows !== []) {
+            return array_shift($this->queryOneRows);
+        }
+
+        return [
+            'eqms_command_id' => '00000000-0000-0000-0000-000000000001',
+            'command_name' => (string)($params[':command_name'] ?? ''),
+            'command_state' => (string)($params[':command_state'] ?? 'accepted'),
+            'idempotency_key' => (string)($params[':idempotency_key'] ?? ''),
+            'scope_key' => (string)($params[':scope_key'] ?? ''),
+        ];
     }
 }

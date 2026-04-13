@@ -17,6 +17,7 @@ use MOM\Database\Connection;
  *   - tool_wear           : Machine telemetry features for tool wear prediction
  *   - quality_prediction   : Quality prediction history with NCR correlation
  *   - scheduling          : Production schedule slot features for optimization
+ *   - shopfloor_execution : Manual execution facts from dispatch/MES for delay/OEE features
  *
  * @package MOM\Api\Services
  * @since   2.2.0
@@ -30,7 +31,7 @@ final class AiDataEtlService
     private string $dataDir;
 
     /** @var list<string> Valid model types / Loại mô hình hợp lệ */
-    private const VALID_MODEL_TYPES = ['tool_wear', 'quality_prediction', 'scheduling'];
+    private const VALID_MODEL_TYPES = ['tool_wear', 'quality_prediction', 'scheduling', 'shopfloor_execution'];
 
     /** Default date range lookback in days / Khoảng thời gian mặc định tính bằng ngày */
     private const DEFAULT_LOOKBACK_DAYS = 90;
@@ -48,6 +49,15 @@ final class AiDataEtlService
             'machine_id', 'wo_number', 'slot_date', 'start_time',
             'end_time', 'status', 'duration_hours',
         ],
+        'shopfloor_execution' => [
+            'machine_id', 'operator_id', 'wo_number', 'jo_number',
+            'shift_date', 'shift_code', 'quantity_good', 'quantity_ng',
+            'quantity_rework', 'target_quantity', 'achievement_pct',
+            'ng_rate_pct', 'actual_setup_minutes', 'actual_run_minutes',
+            'actual_idle_minutes', 'execution_event_type', 'reason_codes',
+            'delay_risk_hint', 'data_quality_flags', 'report_event_count',
+            'correction_event_count', 'last_report_event_at',
+        ],
     ];
 
     // ── Construction ───────────────────────────────────────────────────────
@@ -62,6 +72,11 @@ final class AiDataEtlService
         $this->db = $db ?? Connection::getInstance();
     }
 
+    public function dataDirectory(): string
+    {
+        return $this->dataDir;
+    }
+
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
@@ -71,9 +86,9 @@ final class AiDataEtlService
      * Constructs and executes a JOIN query appropriate for the model type,
      * applies date range filtering, and returns a summary with sample rows.
      *
-     * @param string $modelType One of: tool_wear, quality_prediction, scheduling
+     * @param string $modelType One of: tool_wear, quality_prediction, scheduling, shopfloor_execution
      * @param array  $options   Optional keys: date_from, date_to (Y-m-d strings)
-     * @return array{model_type: string, row_count: int, features: list<string>, date_range: array, sample_rows: list<array>}
+     * @return array{model_type: string, row_count: int, features: list<string>, date_range: array{from: string, to: string}, sample_rows: list<array>, projection_only: bool, source_authority: string}
      * @throws \InvalidArgumentException If modelType is invalid / Nếu loại mô hình không hợp lệ
      */
     public function extractTrainingData(string $modelType, array $options = []): array
@@ -81,22 +96,35 @@ final class AiDataEtlService
         $this->validateModelType($modelType);
 
         // ── Resolve date range / Xác định khoảng thời gian ──
-        $dateTo   = $options['date_to']   ?? date('Y-m-d');
-        $dateFrom = $options['date_from'] ?? date('Y-m-d', strtotime('-' . self::DEFAULT_LOOKBACK_DAYS . ' days'));
+        $dateTo   = $this->normalizeDate($options['date_to'] ?? date('Y-m-d'), 'date_to');
+        $dateFrom = $this->normalizeDate(
+            $options['date_from'] ?? date('Y-m-d', strtotime('-' . self::DEFAULT_LOOKBACK_DAYS . ' days')),
+            'date_from'
+        );
+
+        if ($dateFrom > $dateTo) {
+            throw new \InvalidArgumentException(
+                "date_from must be on or before date_to. / date_from phai nho hon hoac bang date_to."
+            );
+        }
 
         // ── Build and execute query / Xây dựng và thực thi truy vấn ──
         $rows = match ($modelType) {
             'tool_wear'           => $this->extractToolWear($dateFrom, $dateTo),
             'quality_prediction'  => $this->extractQualityPrediction($dateFrom, $dateTo),
             'scheduling'          => $this->extractScheduling($dateFrom, $dateTo),
+            'shopfloor_execution' => $this->extractShopfloorExecution($dateFrom, $dateTo),
+            default               => throw new \InvalidArgumentException("Invalid model_type '{$modelType}'."),
         };
 
         return [
-            'model_type'  => $modelType,
-            'row_count'   => count($rows),
-            'features'    => self::MODEL_FEATURES[$modelType],
-            'date_range'  => ['from' => $dateFrom, 'to' => $dateTo],
-            'sample_rows' => array_slice($rows, 0, 5),
+            'model_type'       => $modelType,
+            'row_count'        => count($rows),
+            'features'         => self::MODEL_FEATURES[$modelType],
+            'date_range'       => ['from' => $dateFrom, 'to' => $dateTo],
+            'sample_rows'      => array_slice($rows, 0, 5),
+            'projection_only'  => true,
+            'source_authority' => 'mom_execution',
         ];
     }
 
@@ -107,7 +135,7 @@ final class AiDataEtlService
      * Extracts data for the last 90 days, stores metadata in the
      * ai_training_datasets table, and returns the dataset record.
      *
-     * @param string $modelType One of: tool_wear, quality_prediction, scheduling
+     * @param string $modelType One of: tool_wear, quality_prediction, scheduling, shopfloor_execution
      * @return array Dataset metadata record / Bản ghi siêu dữ liệu tập dữ liệu
      * @throws \InvalidArgumentException If modelType is invalid / Nếu loại mô hình không hợp lệ
      * @throws \RuntimeException On database failure / Khi lỗi cơ sở dữ liệu
@@ -257,9 +285,19 @@ final class AiDataEtlService
                     qp.prediction_id, qp.machine_id, qp.prediction_type, qp.severity,
                     qp.confidence_score AS confidence, qp.status, qp.created_at,
                     (SELECT COUNT(*) FROM ncr_records nr
-                     WHERE nr.created_at >= qp.created_at - INTERVAL '7 days') AS recent_ncr_count
+                     WHERE nr.created_at BETWEEN qp.created_at - INTERVAL '7 days'
+                                             AND qp.created_at + INTERVAL '7 days'
+                       AND (
+                            (qp.job_number IS NULL AND qp.wo_number IS NULL)
+                            OR (qp.job_number IS NOT NULL AND (
+                                nr.job_number = qp.job_number
+                                OR nr.metadata->>'job_number' = qp.job_number
+                            ))
+                            OR (qp.wo_number IS NOT NULL AND nr.metadata->>'wo_number' = qp.wo_number)
+                       )) AS recent_ncr_count
                  FROM quality_predictions qp
-                 WHERE qp.created_at BETWEEN :date_from AND :date_to
+                 WHERE qp.created_at BETWEEN :date_from::date
+                                         AND (:date_to::date + INTERVAL '1 day')
                  ORDER BY qp.created_at",
                 ['date_from' => $dateFrom, 'date_to' => $dateTo]
             );
@@ -294,6 +332,53 @@ final class AiDataEtlService
         }
     }
 
+    /**
+     * Extract canonical manual shopfloor execution facts for advisory AI features.
+     * These rows are read-only projections from MOM/MES execution truth.
+     *
+     * @return list<array>
+     */
+    private function extractShopfloorExecution(string $dateFrom, string $dateTo): array
+    {
+        try {
+            return $this->db->query(
+                "SELECT
+                    spl.target_id, spl.log_id, spl.machine_id, spl.operator_id,
+                    spl.wo_number, spl.jo_number, spl.shift_date, spl.shift_code,
+                    spl.quantity_good, spl.quantity_ng, spl.quantity_rework,
+                    spl.target_quantity, spl.achievement_pct, spl.ng_rate_pct,
+                    spl.actual_setup_minutes, spl.actual_run_minutes, spl.actual_idle_minutes,
+                    spl.execution_event_type,
+                    spl.metadata->'reason_codes' AS reason_codes,
+                    spl.metadata->'advisory_projection'->>'delay_risk_hint' AS delay_risk_hint,
+                    spl.metadata->'advisory_projection'->'data_quality_flags' AS data_quality_flags,
+                    COALESCE(spe.report_event_count, 0) AS report_event_count,
+                    COALESCE(spe.correction_event_count, 0) AS correction_event_count,
+                    spe.last_report_event_at,
+                    spl.created_at,
+                    TRUE AS projection_only,
+                    'shift_production_log' AS source_table
+                 FROM shift_production_log spl
+                 LEFT JOIN (
+                    SELECT
+                        log_source_record_id,
+                        COUNT(*) AS report_event_count,
+                        COUNT(*) FILTER (WHERE execution_event_type = 'correction') AS correction_event_count,
+                        MAX(occurred_at) AS last_report_event_at
+                    FROM shift_production_report_events
+                    WHERE occurred_at BETWEEN :date_from::date AND (:date_to::date + INTERVAL '1 day')
+                    GROUP BY log_source_record_id
+                 ) spe ON spe.log_source_record_id = spl.source_record_id
+                 WHERE spl.shift_date BETWEEN :date_from::date AND :date_to::date
+                 ORDER BY spl.shift_date, spl.machine_id, spl.wo_number, spl.created_at",
+                ['date_from' => $dateFrom, 'date_to' => $dateTo]
+            );
+        } catch (\Throwable $e) {
+            @error_log('[AiDataEtlService] extractShopfloorExecution error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     // ── Private Helpers ────────────────────────────────────────────────────
     // Hàm trợ giúp nội bộ
 
@@ -311,5 +396,24 @@ final class AiDataEtlService
                 . " / Loại mô hình không hợp lệ '{$modelType}'. Hợp lệ: " . implode(', ', self::VALID_MODEL_TYPES)
             );
         }
+    }
+
+    private function normalizeDate(mixed $value, string $field): string
+    {
+        if (!is_scalar($value)) {
+            throw new \InvalidArgumentException("{$field} must be a Y-m-d date string.");
+        }
+
+        $dateText = trim((string)$value);
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $dateText);
+        $errors = \DateTimeImmutable::getLastErrors();
+        $hasParseErrors = is_array($errors)
+            && (((int)$errors['warning_count']) > 0 || ((int)$errors['error_count']) > 0);
+
+        if ($date === false || $hasParseErrors || $date->format('Y-m-d') !== $dateText) {
+            throw new \InvalidArgumentException("{$field} must be a valid Y-m-d date.");
+        }
+
+        return $dateText;
     }
 }

@@ -94,6 +94,22 @@ final class AuditTrailIntegrityTest extends TestCase
         $events = $audit->getEntityHistory('legacy_record', 'LEG-002');
         $this->assertCount(1, $events);
         $this->assertSame('UPDATED', $events[0]['event_type']);
+        $this->assertSame('json', $events[0]['_audit_source_backend']);
+        $this->assertTrue($events[0]['_audit_fallback_used']);
+        $this->assertTrue($audit->readProbe()['fallback_used']);
+    }
+
+    public function testControlledAuditReadFailsClosedInsteadOfFallingBackToJson(): void
+    {
+        $audit = new AuditTrail($this->tmpDir, new FailingAuditTrailConnection());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Authoritative audit read failed');
+
+        $audit->getEvents([
+            'aggregate_type' => 'evidence_record',
+            'aggregate_id' => 'EV-READ-001',
+        ]);
     }
 
     private function removeTree(string $path): void

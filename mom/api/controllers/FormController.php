@@ -198,12 +198,10 @@ class FormController extends BaseController
 
         $year = (int)date('Y');
         $counterFile = $this->confDir . '/record_counters.json';
-        $counters = $this->readJsonFile($counterFile) ?? [];
-
         $key = "{$type}_{$year}";
-        $num = ((int)($counters[$key] ?? 0)) + 1;
-        $counters[$key] = $num;
-        $this->writeJsonFile($counterFile, $counters);
+
+        // Generate next ID with file locking to prevent race conditions
+        $num = $this->incrementCounter($counterFile, $key);
 
         $digits = (int)($data['digits'] ?? 3);
         if ($digits < 1 || $digits > 6) $digits = 3;
@@ -230,10 +228,9 @@ class FormController extends BaseController
 
         $year = (int)date('Y');
         $counterFile = $this->confDir . '/record_counters.json';
-        $counters = $this->readJsonFile($counterFile) ?? [];
 
-        $key = "{$type}_{$year}";
-        $num = ((int)($counters[$key] ?? 0)) + 1;
+        // Peek at the next counter value without consuming it (safe read with shared lock)
+        $num = $this->peekCounter($counterFile, "{$type}_{$year}") + 1;
 
         $digits = (int)($this->query('digits') ?? '3');
         if ($digits < 1 || $digits > 6) $digits = 3;
@@ -989,5 +986,68 @@ class FormController extends BaseController
         return substr($hash, 0, 8) . '-' . substr($hash, 8, 4) . '-4' . substr($hash, 13, 3)
             . '-' . dechex(8 | (hexdec(substr($hash, 16, 1)) & 3)) . substr($hash, 17, 3)
             . '-' . substr($hash, 20, 12);
+    }
+
+    /**
+     * Atomically increment a counter value with exclusive file locking.
+     * Prevents race conditions when multiple requests try to generate sequential IDs.
+     *
+     * @param string $counterFile Path to the counter file (JSON).
+     * @param string $key Counter key (e.g., "PO_2026").
+     * @return int The incremented value.
+     */
+    private function incrementCounter(string $counterFile, string $key): int
+    {
+        $lockFile = $counterFile . '.lock';
+        $lock = @fopen($lockFile, 'c');
+
+        if (!$lock || !@flock($lock, LOCK_EX)) {
+            // Fallback if locking fails (should not happen in normal operation)
+            error_log("[FormController] Failed to acquire exclusive lock on {$lockFile}");
+            $counters = $this->readJsonFile($counterFile) ?? [];
+            $num = ((int)($counters[$key] ?? 0)) + 1;
+            $counters[$key] = $num;
+            $this->writeJsonFile($counterFile, $counters);
+            return $num;
+        }
+
+        try {
+            $counters = $this->readJsonFile($counterFile) ?? [];
+            $num = ((int)($counters[$key] ?? 0)) + 1;
+            $counters[$key] = $num;
+            $this->writeJsonFile($counterFile, $counters);
+            return $num;
+        } finally {
+            @flock($lock, LOCK_UN);
+            @fclose($lock);
+        }
+    }
+
+    /**
+     * Safely peek at the current counter value without consuming it (shared lock).
+     * Prevents dirty reads while allowing concurrent peeks.
+     *
+     * @param string $counterFile Path to the counter file (JSON).
+     * @param string $key Counter key (e.g., "PO_2026").
+     * @return int The current counter value (0 if not set).
+     */
+    private function peekCounter(string $counterFile, string $key): int
+    {
+        $lockFile = $counterFile . '.lock';
+        $lock = @fopen($lockFile, 'c');
+
+        if (!$lock || !@flock($lock, LOCK_SH)) {
+            // Fallback if locking fails
+            $counters = $this->readJsonFile($counterFile) ?? [];
+            return (int)($counters[$key] ?? 0);
+        }
+
+        try {
+            $counters = $this->readJsonFile($counterFile) ?? [];
+            return (int)($counters[$key] ?? 0);
+        } finally {
+            @flock($lock, LOCK_UN);
+            @fclose($lock);
+        }
     }
 }

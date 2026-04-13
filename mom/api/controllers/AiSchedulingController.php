@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
 use MOM\Api\Services\AiPredictionPipeline;
+use MOM\Api\Services\IdempotencyService;
 use MOM\Api\Services\NaturalLanguageQueryService;
 use MOM\Api\Services\RootCauseAnalysisService;
 use MOM\Api\Services\AnthropicService;
@@ -31,6 +32,7 @@ class AiSchedulingController extends BaseController
 {
     /** @var string Base directory for AI scheduling data (JSON fallback). */
     private string $aiDir = '';
+    private ?IdempotencyService $idempotencyService = null;
 
     // -- Helpers --------------------------------------------------------------
 
@@ -91,6 +93,68 @@ class AiSchedulingController extends BaseController
     private function requireAiWriteAccess(array $user): void
     {
         $this->requireAnyRole($user, $this->aiWriteRoles());
+    }
+
+    private function idempotency(): IdempotencyService
+    {
+        if ($this->idempotencyService === null) {
+            $this->idempotencyService = new IdempotencyService($this->dataDir);
+        }
+
+        return $this->idempotencyService;
+    }
+
+    private function parseIdempotencyKey(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            $this->error('invalid_idempotency_key', 400);
+        }
+
+        $text = trim((string)$value);
+        if ($text === '') {
+            return null;
+        }
+        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+            $this->error('invalid_idempotency_key', 400);
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function aiFeedbackIdempotency(array $body, string $actorId, string $predictionId, string $feedbackType): array
+    {
+        $explicitKey = $this->parseIdempotencyKey($this->requestHeader('Idempotency-Key'))
+            ?? $this->parseIdempotencyKey($this->query('idempotency_key'))
+            ?? $this->parseIdempotencyKey($this->query('request_id'))
+            ?? $this->parseIdempotencyKey($body['idempotency_key'] ?? null)
+            ?? $this->parseIdempotencyKey($body['request_id'] ?? null);
+
+        $fingerprint = [
+            'prediction_id' => $predictionId,
+            'feedback_type' => $feedbackType,
+            'actor_id' => $actorId,
+            'body' => $body,
+        ];
+
+        return [
+            'scope_key' => implode('|', ['ai_feedback', $predictionId, $actorId]),
+            'key' => $explicitKey ?? ('drv-ai-feedback-' . hash('sha256', json_encode($fingerprint, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '')),
+            'key_source' => $explicitKey !== null ? 'header_or_body' : 'derived:payload_retry_window',
+            'mode' => $explicitKey !== null ? 'client_token' : 'derived_payload_window',
+            'kind' => 'ai_feedback',
+            'domain' => 'analytics',
+            'table' => 'ai_feedback_loops',
+            'user_id' => $actorId,
+            'ttl_seconds' => $explicitKey !== null ? null : $this->idempotency()->retryWindowSeconds(),
+            'fingerprint' => $fingerprint,
+        ];
     }
 
     /**
@@ -282,6 +346,7 @@ class AiSchedulingController extends BaseController
             $file  = $this->aiDir() . '/predictions.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = [];
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -390,6 +455,7 @@ class AiSchedulingController extends BaseController
             $file  = $this->aiDir() . '/predictions.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = [];
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -1071,6 +1137,7 @@ class AiSchedulingController extends BaseController
             $file  = $this->aiDir() . '/schedule-slots.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = [];
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -1515,6 +1582,7 @@ class AiSchedulingController extends BaseController
     public function aiFeedbackSubmit(): never
     {
         $user = $this->requireAuth();
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['prediction_id', 'feedback_type']);
@@ -1525,20 +1593,35 @@ class AiSchedulingController extends BaseController
         $userId       = $this->userUuid($user);
 
         try {
-            $pipeline = new AiPredictionPipeline($this->dataDir);
-            $details = [];
-            if ($notes !== '') {
-                $details['notes'] = $notes;
-            }
+            $idempotency = $this->aiFeedbackIdempotency($body, $userId, $predictionId, $feedbackType);
+            $resultEnvelope = $this->idempotency()->execute($idempotency, function () use ($predictionId, $userId, $feedbackType, $notes): array {
+                $pipeline = new AiPredictionPipeline($this->dataDir);
+                $details = [];
+                if ($notes !== '') {
+                    $details['notes'] = $notes;
+                }
 
-            $result = $pipeline->recordFeedback($predictionId, $userId, $feedbackType, $details);
+                return [
+                    'status_code' => 200,
+                    'payload' => [
+                        'feedback' => $pipeline->recordFeedback($predictionId, $userId, $feedbackType, $details),
+                    ],
+                ];
+            });
 
             $this->auditLog('ai_feedback_submit', [
                 'prediction_id' => $predictionId,
                 'feedback_type' => $feedbackType,
+                'idempotency_key' => $idempotency['key'] ?? '',
+                'idempotency_replayed' => (bool)$resultEnvelope['replayed'],
             ], $this->userId($user));
 
-            $this->success(['feedback' => $result]);
+            $payload = $resultEnvelope['payload'];
+            $payload['idempotency'] = [
+                'replayed' => (bool)$resultEnvelope['replayed'],
+                'stored_at' => (string)$resultEnvelope['stored_at'],
+            ];
+            $this->success($payload, (int)$resultEnvelope['status_code']);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('ai_feedback_submit_failed', 500, $e->getMessage());

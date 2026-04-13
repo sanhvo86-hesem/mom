@@ -95,6 +95,20 @@ class EvidenceController extends BaseController
         return $hash;
     }
 
+    private function truthy(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'y'], true);
+        }
+        return false;
+    }
+
     /**
      * @param array<string, mixed> $file
      * @return array<string, mixed>
@@ -355,6 +369,16 @@ class EvidenceController extends BaseController
         $title = trim((string)($_POST['title'] ?? ''));
         if ($title === '') {
             $this->error('missing_title', 400);
+        }
+
+        foreach (['controlled_record', 'final_evidence', 'immutable_package'] as $controlledFlag) {
+            if ($this->truthy($_POST[$controlledFlag] ?? false)) {
+                $this->error(
+                    'canonical_evidence_finalization_required',
+                    409,
+                    'Final controlled evidence must be accepted through the canonical issuance/submission/finalization command path, not the legacy evidence vault upload endpoint.'
+                );
+            }
         }
 
         $userId = $this->userId($user);

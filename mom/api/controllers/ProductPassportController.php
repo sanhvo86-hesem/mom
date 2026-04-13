@@ -49,6 +49,11 @@ class ProductPassportController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    private function legacyPassportWritesEnabled(): bool
+    {
+        return in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_PASSPORT_WRITES')), ['1', 'true', 'yes'], true);
+    }
+
     /**
      * @return array<int, string>
      */
@@ -288,6 +293,14 @@ class ProductPassportController extends BaseController
         $this->requirePassportWriteAccess($user);
         $this->requireCsrf();
 
+        if (!$this->legacyPassportWritesEnabled()) {
+            $this->error(
+                'canonical_genealogy_command_required',
+                410,
+                'Product passport writes are no longer authoritative through JSON files. Use the canonical genealogy/digital-thread command API.'
+            );
+        }
+
         $body = $this->jsonBody();
         if (!isset($body['part_id']) && isset($body['item_id'])) $body['part_id'] = $body['item_id'];
         if (!isset($body['part_id']) && isset($body['part_number'])) $body['part_id'] = $body['part_number'];
@@ -358,6 +371,14 @@ class ProductPassportController extends BaseController
         $user = $this->requireAuth();
         $this->requirePassportWriteAccess($user);
         $this->requireCsrf();
+
+        if (!$this->legacyPassportWritesEnabled()) {
+            $this->error(
+                'canonical_genealogy_command_required',
+                410,
+                'Product passport lifecycle events must be written through the canonical genealogy/digital-thread command API.'
+            );
+        }
 
         $body = $this->jsonBody();
         if (!isset($body['passport_id']) && isset($body['id'])) $body['passport_id'] = $body['id'];

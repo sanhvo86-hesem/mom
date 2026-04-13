@@ -130,9 +130,10 @@ function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? pars
  * never through this local runtime preview path.
  */
 window._hmSet = function(cssVar, path, value){
-  if(cssVar) HmTheme.setVar(cssVar, value);          /* instant CSS update */
+  if(cssVar && HmTheme.setPreviewVar) HmTheme.setPreviewVar(cssVar, value);          /* instant CSS preview */
+  else if(cssVar && typeof showToast === 'function') showToast(L('Theme preview runtime is stale; CSS preview was not applied.', 'Theme preview runtime is stale; CSS preview was not applied.'), 'warning');
   if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep(path, value);
-  else HmTheme.setDeep(path, value);
+  else if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; change was not persisted.', 'Theme preview runtime is stale; change was not persisted.'), 'warning');
   if(typeof window._admGraphicsMarkChange === 'function'){
     window._admGraphicsMarkChange(
       /^components\./.test(String(path || '')) ? 'component-contract' : 'token',
@@ -1380,7 +1381,7 @@ function cloneTemplateData(tpl){
   return JSON.parse(JSON.stringify(tpl));
 }
 
-function saveTemplateRecord(tpl){
+function cacheUnsavedTemplateDraftRecord(tpl){
   if(!tpl || !tpl.id) return;
   var svc = graphicsSvc();
   var payload = cloneTemplateData(tpl);
@@ -1394,7 +1395,7 @@ function saveTemplateRecord(tpl){
   writeDraftCache(store);
 }
 
-function deleteTemplateRecord(id){
+function deleteUnsavedTemplateDraftRecord(id){
   var svc = graphicsSvc();
   if(svc && typeof svc.deleteTemplateDraft === 'function'){
     svc.deleteTemplateDraft(id);
@@ -1442,7 +1443,7 @@ function getTemplateById(id){
   return getAllTemplates().find(function(tpl){ return tpl.id === id || tpl.templateId === id; }) || null;
 }
 
-function getModulesUsingTemplate(tpl){
+function getGovernedModulesForTemplate(tpl){
   var svc = graphicsSvc();
   if(svc && typeof svc.getModulesForTemplate === 'function'){
     return (svc.getModulesForTemplate(tpl.templateId || tpl.id, BASE_TEMPLATE_PRESETS) || []).map(function(m){ return m.moduleId || m.route || ''; }).filter(Boolean);
@@ -1492,7 +1493,7 @@ function templateControlBadge(tpl){
 function templateCompatibility(tpl, key){
   var value = String((tpl && tpl[key]) || '').trim();
   if(value) return value;
-  var modules = getModulesUsingTemplate(tpl || {});
+  var modules = getGovernedModulesForTemplate(tpl || {});
   if(key === 'regulatedCompatibility'){
     return modules.some(function(id){ return /quality|qms|eqms|document|compliance/i.test(String(id)); }) ? 'explicit-required' : 'not-regulated';
   }
@@ -2276,7 +2277,7 @@ window._admTplCreate = function(){
   clone.controlMode = 'draft-cache';
   clone.owner = 'HESEM Platform Architecture';
   clone.version = '0.1.0';
-  saveTemplateRecord(clone);
+  cacheUnsavedTemplateDraftRecord(clone);
   _selectedTemplate = clone.id;
   _templateView = 'editor';
   if(typeof showToast === 'function') showToast(L('Đã tạo template mới','Template created'), 'success');
@@ -2296,7 +2297,7 @@ window._admTplClone = function(id){
   clone.controlMode = 'draft-cache';
   clone.owner = tpl.owner || 'HESEM Platform Architecture';
   clone.version = '0.1.0';
-  saveTemplateRecord(clone);
+  cacheUnsavedTemplateDraftRecord(clone);
   _selectedTemplate = clone.id;
   _templateView = 'detail';
   if(typeof showToast === 'function') showToast(L('Đã nhân bản template','Template cloned'), 'success');
@@ -2305,7 +2306,7 @@ window._admTplClone = function(id){
 
 window._admTplDelete = function(id){
   if(!id) return;
-  deleteTemplateRecord(id);
+  deleteUnsavedTemplateDraftRecord(id);
   if(_selectedTemplate === id){ _selectedTemplate = null; _templateView = 'gallery'; }
   if(typeof showToast === 'function') showToast(L('Đã xóa draft cache của template','Template draft cache removed'), 'success');
   renderAdminAppearance();
@@ -2322,7 +2323,7 @@ window._admTplSaveField = function(id, field, value){
   if(field === 'regulatedCompatibility') tpl.regulatedCompatibility = value;
   if(field === 'shopfloorCompatibility') tpl.shopfloorCompatibility = value;
   if(field === 'themePreset') tpl.themePreset = value;
-  saveTemplateRecord(tpl);
+  cacheUnsavedTemplateDraftRecord(tpl);
   window._admGraphicsMarkChange(/Compatibility|version|owner/.test(field) ? 'template-contract' : 'template-zone', id, field);
 };
 
@@ -2334,7 +2335,7 @@ window._admTplSaveZone = function(id, index, key, value){
     tpl.allowedBlocks = tpl.allowedBlocks || {};
     tpl.allowedBlocks[tpl.zoneSettings[index].name] = value;
   }
-  saveTemplateRecord(tpl);
+  cacheUnsavedTemplateDraftRecord(tpl);
   window._admGraphicsMarkChange(key === 'allowed' ? 'template-allowed-blocks' : 'template-zone', id, tpl.zoneSettings[index].name + '.' + key);
 };
 
@@ -2354,7 +2355,7 @@ window._admTplApplyTheme = function(themeId){
     window._hmSet('--bg-page-light', 'colorsLight.bgPage', theme.colors.bgPage);
     window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
     if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep('appearance.visualThemePreset', themeId);
-    else HmTheme.setDeep('appearance.visualThemePreset', themeId);
+    else if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'), 'warning');
   }
   if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
   window._admGraphicsMarkChange('theme-preset', themeId, themeId);
@@ -2362,7 +2363,7 @@ window._admTplApplyTheme = function(themeId){
 };
 
 function renderTemplateCard(tpl){
-  var modulesUsing = getModulesUsingTemplate(tpl);
+  var modulesUsing = getGovernedModulesForTemplate(tpl);
   return '<div class="tpl-gallery-card"'
     +' role="button" tabindex="0" aria-label="'+esc((tpl.templateId || tpl.id) + ' ' + templateDisplayName(tpl))+'"'
     +' onclick="_admTplPick(\''+tpl.id+'\')"'
@@ -2462,7 +2463,7 @@ function renderTemplateLineagePanel(tpl){
 function renderTemplateDetail(id){
   var tpl = getTemplateById(id);
   if(!tpl) return '<div class="hm-empty">'+esc(T('noTemplate'))+'</div>';
-  var modulesUsing = getModulesUsingTemplate(tpl);
+  var modulesUsing = getGovernedModulesForTemplate(tpl);
   var cat = TEMPLATE_CATEGORIES.find(function(item){ return item.key === tpl.category; });
   var canDelete = /^C/.test(tpl.id) || tpl.source === 'custom';
   if(graphicsSvc() && typeof graphicsSvc().markChange === 'function') graphicsSvc().markChange({ kind:'template-zone', target:tpl.templateId || tpl.id, label:'Template detail selected' }, BASE_TEMPLATE_PRESETS);
@@ -2515,7 +2516,7 @@ function renderTemplateEditor(id){
     + smallMeta('status', templateStatusLabel(tpl.status))
 	    + smallMeta('owner', tpl.owner || '-')
 	    + smallMeta('zone count', tpl.zoneCount || 0)
-	    + smallMeta('governed modules', getModulesUsingTemplate(tpl).length)
+	    + smallMeta('governed modules', getGovernedModulesForTemplate(tpl).length)
 	    + smallMeta('regulated compatibility', templateCompatibility(tpl, 'regulatedCompatibility'))
 	    + smallMeta('shopfloor compatibility', templateCompatibility(tpl, 'shopfloorCompatibility'))
 	    + smallMeta('drift state', templateDriftState(tpl))
@@ -2615,18 +2616,19 @@ function render(el, subTab, currentLang){
   });
   h += '</div>';
 
-  /* Sub-tab content */
-  var body = '';
-  switch(_subTab){
-    case 'templates': body += renderTemplates(); break;
-    case 'tokens': body += renderTokens(); break;
-    case 'components': body += renderComponents(); break;
-    case 'effects': body += renderEffects(); break;
-    case 'governance': body += renderGovernance(); break;
-    case 'advanced': body += renderAdvanced(); break;
-    default: body += renderTemplates();
-  }
-  h += '<div id="adm-appearance-panel-'+esc(_subTab)+'" role="tabpanel" aria-labelledby="adm-appearance-tab-'+esc(_subTab)+'" tabindex="0">'+body+'</div>';
+  /* Sub-tab content: keep stable panels so aria-controls always resolves. */
+  var bodies = {
+    templates: renderTemplates(),
+    tokens: renderTokens(),
+    components: renderComponents(),
+    effects: renderEffects(),
+    governance: renderGovernance(),
+    advanced: renderAdvanced()
+  };
+  tabs.forEach(function(t){
+    var active = _subTab === t.key;
+    h += '<div id="adm-appearance-panel-'+t.key+'" role="tabpanel" aria-labelledby="adm-appearance-tab-'+t.key+'" tabindex="'+(active?'0':'-1')+'"'+(active?'':' hidden aria-hidden="true"')+'>'+bodies[t.key]+'</div>';
+  });
 
   /* Global actions */
   h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">';
@@ -2713,9 +2715,9 @@ function renderOverview(){
       {value:'schedule',icon:'🕐',label:T('schedule')}
     ], cur.colorMode, "HmTheme.set('colorMode',this.value);renderAdminAppearance()")
     + (cur.colorMode==='schedule' ? '<div style="display:flex;gap:8px;align-items:center;margin-top:8px"><span style="font-size:12px">'+T('darkFrom')+'</span>'
-      +'<input type="time" value="'+(cfg('colorSchedule.darkFrom')||'18:00')+'" onchange="if(HmTheme.setPreviewDeep)HmTheme.setPreviewDeep(\'colorSchedule.darkFrom\',this.value);else HmTheme.setDeep(\'colorSchedule.darkFrom\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
+      +'<input type="time" value="'+(cfg('colorSchedule.darkFrom')||'18:00')+'" onchange="_hmSet(null,\'colorSchedule.darkFrom\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
       +'<span style="font-size:12px">'+T('darkTo')+'</span>'
-      +'<input type="time" value="'+(cfg('colorSchedule.darkTo')||'06:00')+'" onchange="if(HmTheme.setPreviewDeep)HmTheme.setPreviewDeep(\'colorSchedule.darkTo\',this.value);else HmTheme.setDeep(\'colorSchedule.darkTo\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
+      +'<input type="time" value="'+(cfg('colorSchedule.darkTo')||'06:00')+'" onchange="_hmSet(null,\'colorSchedule.darkTo\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
       +'</div>' : '')
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('radiusScale')+'</strong></div>'
     + radioRow('adm_radius', [
@@ -3383,7 +3385,7 @@ function renderGovernance(){
 	  h += renderWaiverGovernancePanel();
 
   h += sectionLead(
-    L('Governance theo template đã được kích hoạt', 'Template-centric governance is now active'),
+    L('Graphics governance theo backend authority đã được kích hoạt', 'Backend-authority graphics governance is now active'),
     L('Tab này tổng hợp mức sử dụng template, compliance matrix cho contract mới, WCAG snapshot và bộ theme presets để preview/apply ngay trong studio.', 'This tab now centralizes template usage, compliance checks for the new contract, WCAG snapshots, and the visual themes library for direct preview/apply flows.'),
     statusChip('full', allTemplates.length + ' ' + T('templateCount')) + statusChip('preview', customTemplates.length + ' custom')
   );
@@ -3410,7 +3412,7 @@ function renderGovernance(){
             + '<td style="padding:8px;border-bottom:1px solid var(--border)"><strong>'+esc(tpl.id)+'</strong> '+esc(tpl.name.vi)+'</td>'
             + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td>'
             + '<td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono)">'+esc(String(tpl.zoneCount))+'</td>'
-            + '<td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono)">'+esc(String(getModulesUsingTemplate(tpl).length))+'</td>'
+            + '<td style="padding:8px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono)">'+esc(String(getGovernedModulesForTemplate(tpl).length))+'</td>'
             + '</tr>';
         }).join('')
       + '</tbody></table>',
@@ -3427,7 +3429,7 @@ function renderGovernance(){
 
   h += sectionLead(
     L('Governance contract for the world-class document platform', 'Governance contract for the world-class document platform'),
-    L('Tab Giao dien tu nay la nguon su that duy nhat cho token, component contract va quy tac tuan thu. Module moi cua ERP, MES, eQMS phai an theo lop nay ngay tu dau, khong duoc tu xay mot design system rieng.', 'From now on, the Appearance tab is the single source of truth for tokens, component contracts, and compliance rules. New ERP, MES, and eQMS modules must plug into this layer from day one and may not create a separate design system.'),
+    L('Tab Giao dien la control surface cho token, component contract va quy tac tuan thu; backend graphics authority moi la machine source of truth. Module moi cua ERP, MES, eQMS phai an theo lop nay ngay tu dau, khong duoc tu xay mot design system rieng.', 'The Appearance tab is the control surface for tokens, component contracts, and compliance rules; backend graphics authority is the machine source of truth. New ERP, MES, and eQMS modules must plug into this layer from day one and may not create a separate design system.'),
     statusChip('admin', L('New-build baseline', 'New-build baseline')) + statusChip('full', L('No guessing allowed', 'No guessing allowed'))
   );
 

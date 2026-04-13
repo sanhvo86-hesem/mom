@@ -413,7 +413,8 @@
 
 /* ============================================================================
    EFFECT VARIABLES — Focus ring, Selection, Caret, Scrollbar, Backdrop
-   Controlled by admin via HmTheme.setDeep('effects.*')
+   Controlled by admin preview via HmTheme.setPreviewDeep('effects.*');
+   production authority is backend graphics governance + shared tokens.
    ============================================================================ */
 :root {
   --focus-ring-width: 3px;

@@ -60,7 +60,7 @@ official archive is SharePoint. The current control-plane model is:
 ### 2.1 State diagram
 
 ```
- ALLOCATED ──→ DOWNLOADED ──→ SUBMITTED ──→ RECEIVED ──→ ARCHIVED
+ ALLOCATED ──→ DOWNLOADED ──→ SUBMITTED ──→ RECEIVED ──→ FINALIZED
      │              │               │
      │              │               └──→ REJECTED (upload lỗi → sửa lại)
      │              │
@@ -79,7 +79,7 @@ official archive is SharePoint. The current control-plane model is:
 | 2 | **DOWNLOADED** | User downloaded .txt placeholder or Excel blank | User clicks download |
 | 3 | **SUBMITTED** | The user has uploaded the completed file to the portal | User upload action |
 | 4 | **RECEIVED** | Document Controller verifies that the file is valid | DC review + accept |
-| 5 | **ARCHIVED** | Officially stored records on SharePoint | Auto after 30 days RECEIVED |
+| 5 | **FINALIZED** | Accepted, locked, packaged, and retained as the authoritative portal evidence record/version | DC acceptance/finalization command |
 | 6 | **VOIDED** | User or admin cancels, does not use | Manual void + reason |
 | 7 | **AUTO-VOIDED** | Overdue 90 days from ALLOCATED without SUBMITTED | Cron jobs daily |
 | 8 | **REJECTED** | Invalid uploaded file (wrong version, missing data) | DC reject + write reason |
@@ -356,7 +356,7 @@ Sales Order (SO)
 
 | # | ISO 9001:2015 requirements | Implement HESEM |
 |---|----------------------|-----------------|
-| 7.5.1 | The organization must maintain documented information according to QMS requirements | All form changes are saved in `status_history[]` |
+| 7.5.1 | The organization must maintain documented information according to QMS requirements | All form changes are saved as canonical submission/evidence/audit events; legacy `status_history[]` is compatibility only |
 | 7.5.2 | When creating/updating, make sure to identify, format, and review | Form lifecycle 6 states, reviewer gate |
 | 7.5.3a | Documented information must be available and suitable for use | Active forms on portal, searchable |
 | 7.5.3b | Adequately protected | Role-based access, CSRF, audit log |
@@ -482,7 +482,7 @@ Auto-void monthly report:
 
 ---
 
-## 11. JSON Storage Structure
+## 11. Legacy JSON Storage Structure
 
 ```
 qms-data/
@@ -505,6 +505,11 @@ qms-data/
     ├── form_control_registry.json
     └── so_jo_wo_config.json
 ```
+
+The JSON structure above is retained only for migration and compatibility
+documentation. New controlled issuance, submission, finalization, amendment, and
+evidence version state must be persisted in canonical `frm_*`, `evidence_*`,
+`signature_events`, and audit/outbox tables.
 
 ---
 

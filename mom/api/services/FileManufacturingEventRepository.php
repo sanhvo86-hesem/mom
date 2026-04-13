@@ -62,15 +62,42 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
         $events = array_values(array_filter($events, fn(array $event): bool => $this->matchesFilters($event, $filters)));
         usort($events, static function (array $left, array $right): int {
             $cmp = strcmp((string)($left['occurred_at'] ?? ''), (string)($right['occurred_at'] ?? ''));
-            return $cmp !== 0 ? $cmp : strcmp((string)($left['recorded_at'] ?? ''), (string)($right['recorded_at'] ?? ''));
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = strcmp((string)($left['recorded_at'] ?? ''), (string)($right['recorded_at'] ?? ''));
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = self::eventSortRank($left) <=> self::eventSortRank($right);
+            return $cmp !== 0 ? $cmp : strcmp((string)($left['event_id'] ?? ''), (string)($right['event_id'] ?? ''));
         });
 
         $limit = min(500, max(1, (int)($filters['limit'] ?? 100)));
+        $offset = max(0, (int)($filters['offset'] ?? 0));
         if (count($events) > $limit) {
-            $events = array_slice($events, 0, $limit);
+            $events = array_slice($events, $offset, $limit);
+        } elseif ($offset > 0) {
+            $events = array_slice($events, $offset, $limit);
         }
 
         return array_map([ManufacturingEventCodec::class, 'normalizeRow'], array_values($events));
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     */
+    private static function eventSortRank(array $event): int
+    {
+        return match ((string)($event['event_type'] ?? '')) {
+            ManufacturingEventBackboneService::EVENT_ORDER_WORK_EXECUTION => 10,
+            ManufacturingEventBackboneService::EVENT_QUALITY_INSPECTION => 20,
+            ManufacturingEventBackboneService::EVENT_QUALITY_NCR_CAPA_LINKAGE => 30,
+            ManufacturingEventBackboneService::EVENT_EVIDENCE_ATTACHMENT => 40,
+            ManufacturingEventBackboneService::EVENT_TRACE_GENEALOGY_RELATION => 50,
+            ManufacturingEventBackboneService::EVENT_APPROVAL_DECISION => 60,
+            default => 100,
+        };
     }
 
     public function probe(): array

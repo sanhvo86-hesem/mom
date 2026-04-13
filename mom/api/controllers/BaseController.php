@@ -71,12 +71,21 @@ abstract class BaseController
      *
      * @return array Decoded body (empty array if not JSON).
      */
-    protected function jsonBody(): array
+    protected function jsonBody(int $maxBytes = 10485760): array
     {
         if ($this->jsonBodyCache !== null) {
             return $this->jsonBodyCache;
         }
-        $raw = $GLOBALS['__mom_raw_input'] ?? ($GLOBALS['__mom_raw_input'] = @file_get_contents('php://input') ?: '');
+        if (!array_key_exists('__mom_raw_input', $GLOBALS)) {
+            $readLimit = max(1, $maxBytes) + 1;
+            $raw = @file_get_contents('php://input', false, null, 0, $readLimit);
+            $GLOBALS['__mom_raw_input'] = ($raw !== false) ? $raw : '';
+        }
+        $raw = $GLOBALS['__mom_raw_input'];
+        if (strlen($raw) > max(1, $maxBytes)) {
+            $limitMb = round(max(1, $maxBytes) / 1048576, 1);
+            $this->error('request_body_too_large', 413, 'Request body exceeds ' . $limitMb . 'MB limit');
+        }
         if ($raw === false || trim($raw) === '') {
             return $this->jsonBodyCache = [];
         }
@@ -552,9 +561,11 @@ abstract class BaseController
             'timestamp' => $this->nowIso(),
             'context'   => $context,
         ];
-        $logFile = $this->dataDir . '/audit.log';
-        $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+        if (in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true)) {
+            $logFile = $this->dataDir . '/audit.log';
+            $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+        }
 
         try {
             $aggregateId = '';

@@ -39,7 +39,7 @@ class MobileController extends BaseController
     private function mobileService(): MobileWorkQueueService
     {
         if ($this->mobileSvc === null) {
-            $this->mobileSvc = new MobileWorkQueueService($this->dataDir);
+            $this->mobileSvc = new MobileWorkQueueService($this->dataDir, $this->data);
         }
         return $this->mobileSvc;
     }
@@ -191,7 +191,7 @@ class MobileController extends BaseController
         $this->requireMobileAccess($user);
         $this->requireCsrf();
 
-        $body = $this->jsonBody();
+        $body = $this->jsonBody(50 * 1024 * 1024);
         $this->requireFields($body, ['queue_id']);
 
         $queueId    = trim((string)($body['queue_id'] ?? ''));
@@ -235,7 +235,7 @@ class MobileController extends BaseController
         $this->requireMobileAccess($user);
         $this->requireCsrf();
 
-        $body = $this->jsonBody();
+        $body = $this->jsonBody(50 * 1024 * 1024);
         $this->requireFields($body, ['queue_id', 'result']);
 
         $queueId    = trim((string)($body['queue_id'] ?? ''));

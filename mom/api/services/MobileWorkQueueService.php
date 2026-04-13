@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace MOM\Services;
 
 use MOM\Api\Services\WorkforceQualificationGateService;
+use MOM\Database\Connection;
+use MOM\Database\DataLayer;
 use RuntimeException;
+use Throwable;
 
 /**
  * Mobile Work Queue Service for HESEM MOM Portal.
@@ -22,6 +25,7 @@ final class MobileWorkQueueService
     private readonly string $dataDir;
     private readonly string $mobileDir;
     private WorkforceQualificationGateService $qualificationGate;
+    private ?object $db;
 
     /** Valid task types. */
     private const TASK_TYPES = [
@@ -42,6 +46,9 @@ final class MobileWorkQueueService
     /** Valid sync statuses. */
     private const SYNC_STATUSES = ['synced', 'pending_sync', 'conflict'];
 
+    /** Valid inspection results. */
+    private const INSPECTION_RESULTS = ['pass', 'fail', 'conditional'];
+
     // ── Construction ────────────────────────────────────────────────────────
 
     public function __construct(
@@ -52,7 +59,7 @@ final class MobileWorkQueueService
     {
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->mobileDir = $this->dataDir . '/mobile';
-        unset($db);
+        $this->db = $db;
         $this->qualificationGate = $qualificationGate ?? new WorkforceQualificationGateService($this->dataDir);
 
         foreach (['work_queue', 'time_entries', 'inspections'] as $sub) {
@@ -355,54 +362,76 @@ final class MobileWorkQueueService
      */
     public function captureInspection(string $operatorId, array $data): array
     {
-        $captureType = $data['capture_type'] ?? 'in_process';
+        $operatorId = $this->requiredString($operatorId, 'missing_operator_id');
+        $captureType = strtolower($this->stringValue($data['capture_type'] ?? 'in_process'));
         if (!in_array($captureType, self::CAPTURE_TYPES, true)) {
             throw new RuntimeException("Invalid capture type: {$captureType}.");
         }
+        $syncStatus = strtolower($this->stringValue($data['sync_status'] ?? 'synced'));
+        if (!in_array($syncStatus, self::SYNC_STATUSES, true)) {
+            throw new RuntimeException("Invalid sync status: {$syncStatus}.");
+        }
 
         $now = $this->nowIso();
-        $id  = $this->generateUuidV4();
+        $id  = $this->stringValue($data['capture_id'] ?? '');
+        if ($id === '') {
+            $id = $this->generateUuidV4();
+        }
 
-        // Determine overall result from measurements
-        $measurements  = $data['measurements'] ?? [];
-        $overallResult = $data['overall_result'] ?? null;
-        if ($overallResult === null && !empty($measurements)) {
-            $hasFail = false;
-            foreach ($measurements as $m) {
-                if (is_array($m) && strtolower($m['pass_fail'] ?? '') === 'fail') {
-                    $hasFail = true;
-                    break;
-                }
-            }
-            $overallResult = $hasFail ? 'fail' : 'pass';
+        $measurements = $this->normalizeInspectionMeasurements($data['measurements'] ?? [], $captureType);
+        $overallResult = $this->normalizeInspectionResult($data['overall_result'] ?? $data['result'] ?? null, $measurements);
+        if ($captureType === 'first_piece' && $overallResult === null) {
+            throw new RuntimeException('first_piece_result_required');
+        }
+
+        $offlineCreated = $this->truthy($data['offline_created'] ?? false);
+        $clientCaptureId = $this->stringValue($data['client_capture_id'] ?? $data['client_record_id'] ?? '');
+        $idempotencyKey = $this->stringValue($data['idempotency_key'] ?? '');
+        if ($offlineCreated && $clientCaptureId === '' && $idempotencyKey === '') {
+            throw new RuntimeException('offline_inspection_requires_replay_key');
         }
 
         $record = [
             'capture_id'         => $id,
             'operator_id'        => $operatorId,
-            'wo_number'          => $data['wo_number'] ?? null,
-            'jo_number'          => $data['jo_number'] ?? null,
-            'operation_seq'      => $data['operation_seq'] ?? null,
+            'wo_number'          => $this->requiredString($data['wo_number'] ?? null, 'missing_wo_number'),
+            'jo_number'          => $this->nullableString($data['jo_number'] ?? null),
+            'operation_seq'      => $this->nullablePositiveInt($data['operation_seq'] ?? null, 'operation_seq'),
             'capture_type'       => $captureType,
-            'inspection_plan_id' => $data['inspection_plan_id'] ?? null,
+            'inspection_plan_id' => $this->nullableString($data['inspection_plan_id'] ?? null),
+            'machine_id'         => $this->nullableString($data['machine_id'] ?? $data['equipment_id'] ?? null),
+            'equipment_id'       => $this->nullableString($data['equipment_id'] ?? $data['machine_id'] ?? null),
+            'work_center_id'     => $this->nullableString($data['work_center_id'] ?? null),
             'measurements'       => $measurements,
             'overall_result'     => $overallResult,
-            'photos'             => $data['photos'] ?? [],
-            'notes'              => $data['notes'] ?? null,
-            'inspector_id'       => $data['inspector_id'] ?? $operatorId,
+            'photos'             => $this->normalizeStringList($data['photos'] ?? [], 'photos'),
+            'notes'              => $this->nullableString($data['notes'] ?? null),
+            'inspector_id'       => $this->nullableString($data['inspector_id'] ?? $operatorId),
             'approved_by'        => null,
             'approved_at'        => null,
-            'linked_ncr_id'      => $data['linked_ncr_id'] ?? null,
-            'offline_created'    => (bool)($data['offline_created'] ?? false),
-            'sync_status'        => $data['sync_status'] ?? 'synced',
-            'device_id'          => $data['device_id'] ?? null,
-            'metadata'           => $data['metadata'] ?? new \stdClass(),
+            'linked_ncr_id'      => $this->nullableString($data['linked_ncr_id'] ?? null),
+            'offline_created'    => $offlineCreated,
+            'sync_status'        => $syncStatus,
+            'device_id'          => $this->nullableString($data['device_id'] ?? null),
+            'client_capture_id'  => $clientCaptureId,
+            'idempotency_key'    => $idempotencyKey,
+            'metadata'           => is_array($data['metadata'] ?? null) ? (array)$data['metadata'] : new \stdClass(),
+            'captured_at'        => $this->optionalTimestamp($data['captured_at'] ?? $data['created_at'] ?? $now, 'captured_at'),
             'created_at'         => $now,
         ];
+        $record['inspection_fingerprint'] = $this->inspectionFingerprint($record);
+        if ($record['idempotency_key'] === '') {
+            $record['idempotency_key'] = 'inspection:' . hash('sha256', $record['inspection_fingerprint']);
+        }
 
         $inspections   = $this->loadFile('inspections');
+        $existing = $this->findExistingOfflineRecord($inspections, $record, 'capture_id');
+        if ($existing !== null) {
+            return $existing;
+        }
         $inspections[] = $record;
         $this->saveFile('inspections', $inspections);
+        $this->shadowInspectionCapture($record);
 
         return $record;
     }
@@ -428,12 +457,13 @@ final class MobileWorkQueueService
                 continue;
             }
 
-            $type = $entry['_type'] ?? 'work_queue';
+            $type = $this->normalizeOfflineType($entry['_type'] ?? $entry['type'] ?? 'work_queue');
 
             try {
                 $entry['offline_created'] = true;
                 $entry['sync_status']     = 'synced';
                 $entry['synced_at']       = $now;
+                $entry['idempotency_key'] = $this->offlineEntryKey($entry, $operatorId, $type);
 
                 switch ($type) {
                     case 'work_queue':
@@ -442,7 +472,7 @@ final class MobileWorkQueueService
                         $entry['operator_id'] = $operatorId;
                         $entry['created_at']  = $entry['created_at'] ?? $now;
                         $entry['updated_at']  = $now;
-                        $queue[] = $entry;
+                        $queue = $this->appendOfflineRecord($queue, $entry, 'queue_id');
                         $this->saveFile('work_queue', $queue);
                         break;
 
@@ -451,17 +481,14 @@ final class MobileWorkQueueService
                         $entry['entry_id']    = $entry['entry_id'] ?? $this->generateUuidV4();
                         $entry['operator_id'] = $operatorId;
                         $entry['created_at']  = $entry['created_at'] ?? $now;
-                        $timeEntries[] = $entry;
+                        $timeEntries = $this->appendOfflineRecord($timeEntries, $entry, 'entry_id');
                         $this->saveFile('time_entries', $timeEntries);
                         break;
 
                     case 'inspection':
-                        $inspections = $this->loadFile('inspections');
-                        $entry['capture_id']  = $entry['capture_id'] ?? $this->generateUuidV4();
                         $entry['operator_id'] = $operatorId;
                         $entry['created_at']  = $entry['created_at'] ?? $now;
-                        $inspections[] = $entry;
-                        $this->saveFile('inspections', $inspections);
+                        $this->captureInspection($operatorId, $entry);
                         break;
 
                     default:
@@ -488,6 +515,12 @@ final class MobileWorkQueueService
      */
     public function resolveConflict(string $entryId, string $resolution): array
     {
+        $resolution = match ($resolution) {
+            'keep_server' => 'accept_server',
+            'keep_local' => 'accept_client',
+            default => $resolution,
+        };
+
         // Search across all stores
         foreach (['work_queue', 'time_entries', 'inspections'] as $store) {
             $records = $this->loadFile($store);
@@ -513,7 +546,7 @@ final class MobileWorkQueueService
                     $records[$idx]['sync_status']  = 'synced';
                     $records[$idx]['updated_at']   = $now;
                 } else {
-                    throw new RuntimeException("Invalid resolution: {$resolution}. Use 'accept_server' or 'accept_client'.");
+                    throw new RuntimeException("Invalid resolution: {$resolution}. Use 'accept_server', 'accept_client', 'keep_server', or 'keep_local'.");
                 }
 
                 $this->saveFile($store, $records);
@@ -758,6 +791,498 @@ final class MobileWorkQueueService
     }
 
     // ── Private Helpers ───────────────────────────────────────────────────
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function normalizeInspectionMeasurements(mixed $value, string $captureType): array
+    {
+        if (!is_array($value) || !array_is_list($value)) {
+            throw new RuntimeException('invalid_inspection_measurements');
+        }
+        if ($captureType === 'first_piece' && $value === []) {
+            throw new RuntimeException('first_piece_measurements_required');
+        }
+
+        $measurements = [];
+        foreach ($value as $idx => $row) {
+            if (!is_array($row)) {
+                throw new RuntimeException('invalid_inspection_measurement_' . $idx);
+            }
+            $characteristic = $this->stringValue($row['characteristic_id'] ?? $row['characteristic'] ?? $row['measurement_name'] ?? '');
+            if ($characteristic === '') {
+                throw new RuntimeException('inspection_measurement_characteristic_required');
+            }
+            $measuredValue = $row['measured_value'] ?? $row['value'] ?? null;
+            if ($measuredValue === null || !is_scalar($measuredValue) || !is_numeric($measuredValue)) {
+                throw new RuntimeException('inspection_measurement_value_required');
+            }
+            $passFail = strtolower($this->stringValue($row['pass_fail'] ?? $row['result'] ?? ''));
+            if ($passFail === '') {
+                throw new RuntimeException('inspection_measurement_result_required');
+            }
+            if (!in_array($passFail, self::INSPECTION_RESULTS, true)) {
+                throw new RuntimeException('invalid_inspection_measurement_result');
+            }
+
+            $normalized = [
+                'characteristic_id' => $characteristic,
+                'measured_value' => (float)$measuredValue,
+                'unit' => $this->stringValue($row['unit'] ?? ''),
+                'nominal' => $this->nullableFloat($row['nominal'] ?? null, 'inspection_measurements.nominal'),
+                'lower_spec' => $this->nullableFloat($row['lower_spec'] ?? $row['lsl'] ?? null, 'inspection_measurements.lower_spec'),
+                'upper_spec' => $this->nullableFloat($row['upper_spec'] ?? $row['usl'] ?? null, 'inspection_measurements.upper_spec'),
+                'pass_fail' => $passFail,
+                'method' => $this->stringValue($row['method'] ?? ''),
+                'gage_id' => $this->stringValue($row['gage_id'] ?? $row['gauge_id'] ?? ''),
+                'notes' => $this->stringValue($row['notes'] ?? ''),
+            ];
+
+            $lower = $normalized['lower_spec'];
+            $upper = $normalized['upper_spec'];
+            if ($lower !== null && $upper !== null && $lower > $upper) {
+                throw new RuntimeException('inspection_measurement_spec_range_invalid');
+            }
+
+            $measurements[] = $normalized;
+        }
+
+        return $measurements;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $measurements
+     */
+    private function normalizeInspectionResult(mixed $value, array $measurements): ?string
+    {
+        $result = strtolower($this->stringValue($value));
+        if ($result === '') {
+            if ($measurements === []) {
+                return null;
+            }
+            foreach ($measurements as $measurement) {
+                if (($measurement['pass_fail'] ?? '') === 'fail') {
+                    return 'fail';
+                }
+                if (($measurement['pass_fail'] ?? '') === 'conditional') {
+                    return 'conditional';
+                }
+            }
+            return 'pass';
+        }
+        if (!in_array($result, self::INSPECTION_RESULTS, true)) {
+            throw new RuntimeException('invalid_inspection_result');
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function normalizeStringList(mixed $value, string $field): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        if (!is_array($value) || !array_is_list($value)) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+
+        $rows = [];
+        foreach ($value as $row) {
+            if (!is_scalar($row)) {
+                throw new RuntimeException('invalid_' . $field);
+            }
+            $text = trim((string)$row);
+            if ($text !== '') {
+                $rows[] = $text;
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     */
+    private function inspectionFingerprint(array $record): string
+    {
+        $fingerprint = [];
+        foreach ([
+            'operator_id',
+            'wo_number',
+            'jo_number',
+            'operation_seq',
+            'capture_type',
+            'inspection_plan_id',
+            'machine_id',
+            'work_center_id',
+            'measurements',
+            'overall_result',
+            'device_id',
+            'client_capture_id',
+        ] as $field) {
+            $fingerprint[$field] = $record[$field] ?? null;
+        }
+
+        return hash('sha256', $this->canonicalJson($fingerprint));
+    }
+
+    /**
+     * @param array<int, mixed> $records
+     * @param array<string, mixed> $candidate
+     * @return array<string, mixed>|null
+     */
+    private function findExistingOfflineRecord(array $records, array $candidate, string $idField): ?array
+    {
+        foreach ($records as $record) {
+            if (!is_array($record)) {
+                continue;
+            }
+            /** @var array<string, mixed> $record */
+            $sameIdentity = false;
+            foreach ([$idField, 'idempotency_key', 'client_capture_id', 'client_record_id'] as $field) {
+                $candidateValue = $this->stringValue($candidate[$field] ?? '');
+                if ($candidateValue !== '' && $candidateValue === $this->stringValue($record[$field] ?? '')) {
+                    $sameIdentity = true;
+                    break;
+                }
+            }
+            if (!$sameIdentity) {
+                continue;
+            }
+
+            $candidateFingerprint = $this->stringValue($candidate['inspection_fingerprint'] ?? $candidate['offline_fingerprint'] ?? '');
+            $recordFingerprint = $this->stringValue($record['inspection_fingerprint'] ?? $record['offline_fingerprint'] ?? '');
+            if ($candidateFingerprint !== '' && $recordFingerprint !== '' && !hash_equals($recordFingerprint, $candidateFingerprint)) {
+                throw new RuntimeException('offline_replay_conflict');
+            }
+
+            $record['dedupe_status'] = 'replayed';
+            return $record;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int, mixed> $records
+     * @param array<string, mixed> $entry
+     * @return array<int, mixed>
+     */
+    private function appendOfflineRecord(array $records, array $entry, string $idField): array
+    {
+        $entry['offline_fingerprint'] = $this->offlineFingerprint($entry);
+        if ($this->findExistingOfflineRecord($records, $entry, $idField) !== null) {
+            return $records;
+        }
+
+        $records[] = $entry;
+        return $records;
+    }
+
+    /**
+     * @param array<string, mixed> $entry
+     */
+    private function offlineEntryKey(array $entry, string $operatorId, string $type): string
+    {
+        $explicit = $this->stringValue($entry['idempotency_key'] ?? '');
+        if ($explicit !== '') {
+            return $explicit;
+        }
+        $clientId = $this->stringValue($entry['client_record_id'] ?? $entry['client_capture_id'] ?? $entry['queue_id'] ?? $entry['entry_id'] ?? $entry['capture_id'] ?? '');
+        if ($clientId !== '') {
+            return 'offline:' . $type . ':' . $operatorId . ':' . $clientId;
+        }
+
+        return 'offline-derived:' . $type . ':' . hash('sha256', $this->canonicalJson([
+            'operator_id' => $operatorId,
+            'type' => $type,
+            'entry' => $entry,
+        ]));
+    }
+
+    private function offlineFingerprint(array $entry): string
+    {
+        $copy = $entry;
+        unset($copy['synced_at'], $copy['updated_at']);
+
+        return hash('sha256', $this->canonicalJson($copy));
+    }
+
+    private function normalizeOfflineType(mixed $value): string
+    {
+        $type = strtolower($this->stringValue($value));
+        return match ($type) {
+            'time_entries', 'time' => 'time_entry',
+            'inspections', 'inspection_capture' => 'inspection',
+            'queue', 'work_queue' => 'work_queue',
+            default => $type,
+        };
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     */
+    private function shadowInspectionCapture(array $record): void
+    {
+        $db = $this->connection();
+        if ($db === null || !$this->tableAvailable($db, 'mobile_inspection_captures')) {
+            return;
+        }
+
+        $captureId = $this->stringValue($record['capture_id'] ?? '');
+        if (!$this->isUuid($captureId)) {
+            return;
+        }
+
+        $metadata = is_array($record['metadata'] ?? null) ? (array)$record['metadata'] : [];
+        $metadata['inspection_plan_external_id'] = $this->stringValue($record['inspection_plan_id'] ?? '');
+        $metadata['machine_id'] = $this->stringValue($record['machine_id'] ?? '');
+        $metadata['equipment_id'] = $this->stringValue($record['equipment_id'] ?? '');
+        $metadata['work_center_id'] = $this->stringValue($record['work_center_id'] ?? '');
+        $metadata['idempotency_key'] = $this->stringValue($record['idempotency_key'] ?? '');
+        $metadata['client_capture_id'] = $this->stringValue($record['client_capture_id'] ?? '');
+        $metadata['inspection_fingerprint'] = $this->stringValue($record['inspection_fingerprint'] ?? '');
+
+        try {
+            $db->queryOne(
+                "INSERT INTO mobile_inspection_captures (
+                    capture_id, operator_id, wo_number, jo_number, operation_seq,
+                    capture_type, inspection_plan_id, measurements, overall_result,
+                    photos, notes, inspector_id, linked_ncr_id, offline_created,
+                    sync_status, device_id, metadata, created_at
+                ) VALUES (
+                    :capture_id, :operator_id, :wo_number, :jo_number, :operation_seq,
+                    :capture_type, :inspection_plan_id, :measurements::jsonb, :overall_result,
+                    :photos::jsonb, :notes, :inspector_id, :linked_ncr_id, :offline_created,
+                    :sync_status, :device_id, :metadata::jsonb, COALESCE(:created_at::timestamptz, now())
+                )
+                ON CONFLICT (capture_id) DO UPDATE SET
+                    measurements = EXCLUDED.measurements,
+                    overall_result = EXCLUDED.overall_result,
+                    photos = EXCLUDED.photos,
+                    notes = EXCLUDED.notes,
+                    sync_status = EXCLUDED.sync_status,
+                    device_id = EXCLUDED.device_id,
+                    metadata = EXCLUDED.metadata
+                RETURNING capture_id::text AS capture_id",
+                [
+                    ':capture_id' => $captureId,
+                    ':operator_id' => $this->stringValue($record['operator_id'] ?? ''),
+                    ':wo_number' => $this->nullableString($record['wo_number'] ?? null),
+                    ':jo_number' => $this->nullableString($record['jo_number'] ?? null),
+                    ':operation_seq' => $record['operation_seq'] ?? null,
+                    ':capture_type' => $this->stringValue($record['capture_type'] ?? ''),
+                    ':inspection_plan_id' => $this->isUuid($this->stringValue($record['inspection_plan_id'] ?? ''))
+                        ? $this->stringValue($record['inspection_plan_id'] ?? '')
+                        : null,
+                    ':measurements' => $this->canonicalJson($record['measurements'] ?? []),
+                    ':overall_result' => $this->nullableString($record['overall_result'] ?? null),
+                    ':photos' => $this->canonicalJson($record['photos'] ?? []),
+                    ':notes' => $this->nullableString($record['notes'] ?? null),
+                    ':inspector_id' => $this->nullableString($record['inspector_id'] ?? null),
+                    ':linked_ncr_id' => $this->nullableString($record['linked_ncr_id'] ?? null),
+                    ':offline_created' => (bool)($record['offline_created'] ?? false),
+                    ':sync_status' => $this->stringValue($record['sync_status'] ?? 'synced'),
+                    ':device_id' => $this->nullableString($record['device_id'] ?? null),
+                    ':metadata' => $this->canonicalJson($metadata),
+                    ':created_at' => $this->nullableString($record['captured_at'] ?? $record['created_at'] ?? null),
+                ],
+            );
+            $this->updateInspectionBridgeColumns($db, $record);
+        } catch (Throwable $e) {
+            @error_log('[MobileWorkQueueService] mobile inspection DB bridge failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     */
+    private function updateInspectionBridgeColumns(Connection $db, array $record): void
+    {
+        if (!$this->columnAvailable($db, 'mobile_inspection_captures', 'idempotency_key')) {
+            return;
+        }
+
+        $db->queryOne(
+            'UPDATE mobile_inspection_captures
+                SET equipment_id = :equipment_id,
+                    work_center_id = :work_center_id,
+                    client_capture_id = :client_capture_id,
+                    idempotency_key = :idempotency_key,
+                    inspection_fingerprint = :inspection_fingerprint
+              WHERE capture_id = :capture_id
+              RETURNING capture_id::text AS capture_id',
+            [
+                ':equipment_id' => $this->nullableString($record['equipment_id'] ?? null),
+                ':work_center_id' => $this->nullableString($record['work_center_id'] ?? null),
+                ':client_capture_id' => $this->nullableString($record['client_capture_id'] ?? null),
+                ':idempotency_key' => $this->nullableString($record['idempotency_key'] ?? null),
+                ':inspection_fingerprint' => $this->nullableString($record['inspection_fingerprint'] ?? null),
+                ':capture_id' => $this->stringValue($record['capture_id'] ?? ''),
+            ],
+        );
+    }
+
+    private function connection(): ?Connection
+    {
+        if ($this->db instanceof DataLayer) {
+            if ($this->db->getMode() === DataLayer::MODE_JSON_ONLY) {
+                return null;
+            }
+            return $this->db->getConnection();
+        }
+        if ($this->db instanceof Connection) {
+            return $this->db;
+        }
+        if (is_object($this->db) && method_exists($this->db, 'getConnection')) {
+            $candidate = $this->db->getConnection();
+            return $candidate instanceof Connection ? $candidate : null;
+        }
+
+        return null;
+    }
+
+    private function tableAvailable(Connection $db, string $table): bool
+    {
+        try {
+            $row = $db->queryOne('SELECT to_regclass(:table_name) AS table_name', [':table_name' => $table]);
+            return is_array($row) && $this->stringValue($row['table_name'] ?? '') !== '';
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function columnAvailable(Connection $db, string $table, string $column): bool
+    {
+        try {
+            $row = $db->queryOne(
+                'SELECT 1 AS ok
+                   FROM information_schema.columns
+                  WHERE table_schema = current_schema()
+                    AND table_name = :table
+                    AND column_name = :column
+                  LIMIT 1',
+                [':table' => $table, ':column' => $column],
+            );
+            return is_array($row);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function requiredString(mixed $value, string $errorCode): string
+    {
+        $text = $this->stringValue($value);
+        if ($text === '') {
+            throw new RuntimeException($errorCode);
+        }
+
+        return $text;
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        $text = $this->stringValue($value);
+        return $text === '' ? null : $text;
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        if (is_string($value)) {
+            return trim($value);
+        }
+        if (is_int($value) || is_float($value)) {
+            return trim((string)$value);
+        }
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        return '';
+    }
+
+    private function nullablePositiveInt(mixed $value, string $field): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_numeric($value) || (int)$value <= 0) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+
+        return (int)$value;
+    }
+
+    private function nullableFloat(mixed $value, string $field): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_numeric($value)) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+
+        return (float)$value;
+    }
+
+    private function optionalTimestamp(mixed $value, string $field): string
+    {
+        $text = $this->stringValue($value);
+        if ($text === '') {
+            return '';
+        }
+        try {
+            return (new \DateTimeImmutable($text))->format('c');
+        } catch (\Throwable) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+    }
+
+    private function truthy(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (float)$value !== 0.0;
+        }
+
+        return in_array(strtolower($this->stringValue($value)), ['1', 'true', 'yes', 'y', 'on'], true);
+    }
+
+    private function canonicalJson(mixed $value): string
+    {
+        $normalized = $this->sortForHash($value);
+        $json = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('json_encode_failed');
+        }
+
+        return $json;
+    }
+
+    private function sortForHash(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+        if (!array_is_list($value)) {
+            ksort($value);
+        }
+        foreach ($value as $key => $child) {
+            $value[$key] = $this->sortForHash($child);
+        }
+
+        return $value;
+    }
+
+    private function isUuid(string $value): bool
+    {
+        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1;
+    }
 
     private function loadFile(string $name): array
     {

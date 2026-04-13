@@ -673,6 +673,10 @@ final class WorkflowEngine
     private function loadRecordState(string $recordId): ?array
     {
         $safeId = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $recordId);
+        // Prevent any remaining traversal attempts
+        if (str_contains($safeId, '..') || $safeId === '' || strlen($safeId) > 200) {
+            throw new \InvalidArgumentException('Invalid record ID');
+        }
 
         // Try PostgreSQL first
         if ($this->db !== null && $this->db->isConnected()) {
@@ -713,6 +717,10 @@ final class WorkflowEngine
     private function saveRecordState(string $recordId, array $state): void
     {
         $safeId = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $recordId);
+        // Prevent any remaining traversal attempts
+        if (str_contains($safeId, '..') || $safeId === '' || strlen($safeId) > 200) {
+            throw new \InvalidArgumentException('Invalid record ID');
+        }
 
         // Try PostgreSQL first
         if ($this->db !== null && $this->db->isConnected()) {

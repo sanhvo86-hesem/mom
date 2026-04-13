@@ -24392,6 +24392,13 @@ if ($username === '') {
     $recordTypes = load_record_type_registry();
     $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
     $reviewSla = evidence_review_sla_materialize($allocation, $recordTypes, $schema);
+    $graphicsRegistryPath = __DIR__ . '/data/registry/graphics-governance-registry.json';
+    $graphicsManifestPath = __DIR__ . '/data/registry/system-contract-manifest.json';
+    $graphicsRegistry = is_file($graphicsRegistryPath) ? (json_decode((string)file_get_contents($graphicsRegistryPath), true) ?: []) : [];
+    $graphicsManifest = is_file($graphicsManifestPath) ? (json_decode((string)file_get_contents($graphicsManifestPath), true) ?: []) : [];
+    $graphicsReleaseLink = is_array($graphicsRegistry['graphicsReleaseLink'] ?? null)
+      ? $graphicsRegistry['graphicsReleaseLink']
+      : (is_array($graphicsManifest['graphicsReleaseLink'] ?? null) ? $graphicsManifest['graphicsReleaseLink'] : []);
 
     $manifest = [
       'generated_at' => now_iso(),
@@ -24404,8 +24411,21 @@ if ($username === '') {
       'review_sla' => $reviewSla,
       'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
       'approval_checklist' => evidence_evaluate_checklist($allocation, 'approval'),
+      'graphics_evidence' => [
+        'graphicsReleaseLink' => $graphicsReleaseLink,
+        'complianceSnapshotRef' => 'graphics/graphics-governance-registry.json#/moduleGraphicsCompliance',
+        'releaseManifestRef' => 'graphics/system-contract-manifest.json#/graphicsReleaseLink',
+        'releaseBlocked' => (bool)($graphicsReleaseLink['releaseBlocked'] ?? false),
+        'blockerCount' => (int)($graphicsReleaseLink['blockerCount'] ?? 0),
+      ],
     ];
     $zip->addFromString('manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    if (is_file($graphicsRegistryPath)) {
+      $zip->addFile($graphicsRegistryPath, 'graphics/graphics-governance-registry.json');
+    }
+    if (is_file($graphicsManifestPath)) {
+      $zip->addFile($graphicsManifestPath, 'graphics/system-contract-manifest.json');
+    }
 
     if (!empty($allocation['events']) && is_array($allocation['events'])) {
       $zip->addFromString('audit-trail.json', json_encode($allocation['events'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

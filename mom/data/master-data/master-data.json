@@ -826,6 +826,48 @@
             "status": "active"
         }
     ],
+    "blocking_reason_codes": [
+        {
+            "reason_code": "BLK-MATL-WAIT",
+            "reason_name": "Material, fixture, or outsource lot not available",
+            "reason_name_vi": "Thiếu vật tư, đồ gá hoặc lô outsource",
+            "reason_group": "material",
+            "loss_class": "blocked",
+            "default_severity": "major",
+            "escalation_sla_minutes": 30,
+            "status": "active"
+        },
+        {
+            "reason_code": "BLK-QUAL-HOLD",
+            "reason_name": "Quality disposition, first-piece, or inspection release pending",
+            "reason_name_vi": "Chờ quyết định chất lượng, first-piece hoặc release kiểm tra",
+            "reason_group": "quality",
+            "loss_class": "blocked",
+            "default_severity": "major",
+            "escalation_sla_minutes": 20,
+            "status": "active"
+        },
+        {
+            "reason_code": "BLK-ENG-CLARIFY",
+            "reason_name": "Engineering, drawing, setup, or CNC program clarification required",
+            "reason_name_vi": "Cần kỹ thuật làm rõ bản vẽ, setup hoặc chương trình CNC",
+            "reason_group": "engineering",
+            "loss_class": "blocked",
+            "default_severity": "major",
+            "escalation_sla_minutes": 20,
+            "status": "active"
+        },
+        {
+            "reason_code": "BLK-OPERATOR-AUTH",
+            "reason_name": "Qualified operator, certification, or supervisor authorization missing",
+            "reason_name_vi": "Thiếu thợ đủ năng lực, chứng nhận hoặc phê duyệt trưởng ca",
+            "reason_group": "labor",
+            "loss_class": "blocked",
+            "default_severity": "major",
+            "escalation_sla_minutes": 15,
+            "status": "active"
+        }
+    ],
     "downtime_resolution_codes": [
         {
             "resolution_code": "resolved",

@@ -182,6 +182,8 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
         blocker_count = non_compliant
 
     template_meta = template_registry.get("_meta", {}) if isinstance(template_registry, dict) else {}
+    release_link = graphics_governance.get("graphicsReleaseLink", {}) if isinstance(graphics_governance.get("graphicsReleaseLink"), dict) else {}
+    drift_report = graphics_governance.get("graphicsDriftReport", {}) if isinstance(graphics_governance.get("graphicsDriftReport"), dict) else {}
     return {
         "templateCount": len(template_registry.get("templates", [])) if isinstance(template_registry.get("templates"), list) else 0,
         "componentContractCount": int(component_registry.get("count") or 0) if isinstance(component_registry, dict) else 0,
@@ -191,6 +193,7 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
         "complianceMatrixVersion": scalar(compliance.get("version")) if isinstance(compliance, dict) else "",
         "templateRegistryVersion": scalar(template_registry.get("version") or template_meta.get("version") or template_meta.get("governanceRevision")),
         "templateRegistryChecksum": scalar(template_registry.get("etag") or template_meta.get("checksum") or graphics_governance.get("_meta", {}).get("sourceHash")),
+        "driftReportGeneratedAt": scalar(release_link.get("driftReportGeneratedAt") or drift_report.get("generatedAt")),
         "changeSetPresent": isinstance(graphics_governance.get("changeSetModel"), dict),
         "lineageGraphPresent": isinstance(graphics_governance.get("moduleGraphicsLineageGraph"), dict),
         "runtimeBeaconPresent": isinstance(graphics_governance.get("runtimeGraphicsComplianceBeacon"), dict),
@@ -524,6 +527,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "controlledEmergencyOverridePathRef": source_path(GRAPHICS_GOVERNANCE) + "#/controlledEmergencyOverridePath" if graphics_summary["controlledEmergencyOverridePresent"] else "",
         "rolloutDecisionRef": "data/graphics-governance/rollouts.json#/rollouts" if graphics_governance else "",
         "rollbackPlanRef": "data/graphics-governance/snapshots" if graphics_governance else "",
+        "driftReportGeneratedAt": graphics_summary["driftReportGeneratedAt"],
         "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
         "releaseBlocked": graphics_summary["releaseBlocked"],
     }

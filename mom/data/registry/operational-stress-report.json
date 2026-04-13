@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T15:11:34.660Z",
+    "generatedAt": "2026-04-13T17:01:47.869Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -11,11 +11,11 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 21730,
+    "idempotency_mentions": 21737,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
-    "compensation_markers": 3,
+    "compensation_markers": 4,
     "correction_markers": 2287,
     "period_close_mentions": 36,
     "credit_memo_mentions": 18,
@@ -84,14 +84,14 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 21730,
+      "idempotency_mentions": 21737,
       "optimistic_concurrency_mentions": 8200,
       "if_match_mentions": 3355,
       "row_version_mentions": 26737,
-      "compensation_markers": 3,
+      "compensation_markers": 4,
       "correction_markers": 2287,
       "effective_dating_markers": 829,
-      "override_mentions": 126,
+      "override_mentions": 127,
       "waiver_mentions": 93,
       "heartbeat_mentions": 33,
       "quarantine_mentions": 298,
@@ -146,7 +146,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21730,
+        "idempotency_mentions": 21737,
         "if_match_mentions": 3355,
         "row_version_mentions": 26737,
         "mutating_endpoint_count": 2612,
@@ -173,7 +173,7 @@
         "Compensation markers, correction semantics, and reconciliation resources now exist together, so partial-completion recovery has moved out of the active remediation tier."
       ],
       "evidence": {
-        "compensation_markers": 3,
+        "compensation_markers": 4,
         "correction_markers": 2287,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -265,7 +265,7 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 126,
+        "override_mentions": 127,
         "waiver_mentions": 93,
         "esign_mentions": 195,
         "override_resources": [
@@ -296,8 +296,8 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 21730,
-        "compensation_markers": 3,
+        "idempotency_mentions": 21737,
+        "compensation_markers": 4,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
         ]
