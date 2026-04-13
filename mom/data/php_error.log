@@ -406,3 +406,167 @@ Stack trace:
 [13-Apr-2026 06:47:42 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 06:47:42 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 06:47:42 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:32 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:32 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:32 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:35:32 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:40:23 UTC] FATAL: {"type":2,"message":"stream_socket_client(): Unable to connect to tcp://127.0.0.1:1 (Connection refused)","file":"/Users/a10/Documents/mom/mom/vendor/predis/predis/src/Connection/StreamConnection.php","line":128}
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:23 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:25 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:25 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:25 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:40:25 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:40:59 UTC] FATAL: {"type":2,"message":"stream_socket_client(): Unable to connect to tcp://127.0.0.1:1 (Connection refused)","file":"/Users/a10/Documents/mom/mom/vendor/predis/predis/src/Connection/StreamConnection.php","line":128}
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:05 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:07 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:07 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:07 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:41:07 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:50:09 UTC] FATAL: {"type":2,"message":"stream_socket_client(): Unable to connect to tcp://127.0.0.1:1 (Connection refused)","file":"/Users/a10/Documents/mom/mom/vendor/predis/predis/src/Connection/StreamConnection.php","line":128}
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:22 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:24 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:24 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:24 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:53:24 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:53:30 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[13-Apr-2026 07:53:30 UTC] [runtime-observability] store write skipped: directory is not writable
+[13-Apr-2026 07:53:30 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-3603612448d1/runtime-shadow/primary-reads.jsonl
+[13-Apr-2026 07:53:33 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:53:33 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:33 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:35 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:35 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:35 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:56:35 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:56:43 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[13-Apr-2026 07:56:43 UTC] [runtime-observability] store write skipped: directory is not writable
+[13-Apr-2026 07:56:43 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-b2e0d8b665c2/runtime-shadow/primary-reads.jsonl
+[13-Apr-2026 07:56:47 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:56:47 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:28 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:30 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 07:59:30 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 07:59:37 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[13-Apr-2026 07:59:37 UTC] [runtime-observability] store write skipped: directory is not writable
+[13-Apr-2026 07:59:37 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-d75c77a61d9f/runtime-shadow/primary-reads.jsonl
+[13-Apr-2026 07:59:41 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:59:41 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 07:59:47 UTC] [API] Uncaught: Sales Order SO-2026-0001 is not released to production. CreateJobOrder requires SO status engineering_ready or in_production; current status: draft. in /Users/a10/Documents/mom/mom/api/services/OrderService.php:542
+[13-Apr-2026 07:59:47 UTC] PHP Fatal error:  Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 07:59:47 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:00:33 UTC] PHP Fatal error:  Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:00:33 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:03:47 UTC] PHP Fatal error:  Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:03:47 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:03:56 UTC] PHP Fatal error:  Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:03:56 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(174): smoke_assert(false, 'Workspace opera...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:04:36 UTC] PHP Fatal error:  Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:04:36 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:05:29 UTC] PHP Fatal error:  Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:05:29 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:05:33 UTC] PHP Fatal error:  Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62
+Stack trace:
+#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')
+#1 {main}
+  thrown in /Users/a10/Documents/mom/mom/tests/bootstrap.php on line 62
+[13-Apr-2026 08:05:33 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Actionable governance gaps should be closed; inherited/root-scope direct posture is reported separately. in /Users/a10/Documents/mom/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Documents/mom/mom/tests/data_schema_admin_smoke.php(193): smoke_assert(false, 'Actionable gove...')\n#1 {main}\n  thrown","file":"/Users/a10/Documents/mom/mom/tests/bootstrap.php","line":62}
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:50 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:52 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:52 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:52 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 08:07:52 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 08:08:30 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[13-Apr-2026 08:08:30 UTC] [runtime-observability] store write skipped: directory is not writable
+[13-Apr-2026 08:08:30 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-963abfee20a4/runtime-shadow/primary-reads.jsonl
+[13-Apr-2026 08:08:34 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
+[13-Apr-2026 08:08:34 UTC] [CacheService] Redis unavailable (127.0.0.1:6379): Class "Predis\Client" not found
