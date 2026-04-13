@@ -63,6 +63,37 @@ function currentUserKey(){
   return String(u.username || 'anon').trim().toLowerCase() || 'anon';
 }
 
+var LOCKED_WORKFLOW_STATES = ['submitted', 'received', 'in_review', 'approved', 'closed', 'finalized', 'rejected'];
+function workflowStateOf(entry){
+  return String((entry && (entry.workflow_state || entry.approval_state || entry._status)) || '').trim().toLowerCase();
+}
+
+function isLockedWorkflowState(value){
+  return LOCKED_WORKFLOW_STATES.indexOf(String(value || '').trim().toLowerCase()) >= 0;
+}
+
+function currentEntryIsLocked(){
+  return !!(state.entry && isLockedWorkflowState(workflowStateOf(state.entry)));
+}
+
+function hasAmendmentAuthority(){
+  return String(state.changeAuthorityId || '').trim() !== '' && String(state.amendmentReason || '').trim() !== '';
+}
+
+function isAmendmentEdit(){
+  return state.editOrigin === 'amendment' && hasAmendmentAuthority();
+}
+
+function restoreEntryValues(entry, overwrite){
+  if(!entry) return;
+  Object.keys(entry).forEach(function(k){
+    if(['form_code','form_version','record_id','allocation_id','signatures','_status','_ip','_server_time','submitted_by','submitted_at','entry_id','master_context','history','workflow_state','approval_state'].indexOf(k) >= 0) return;
+    if(overwrite || state.fieldValues[k] === undefined || state.fieldValues[k] === null || state.fieldValues[k] === ''){
+      state.fieldValues[k] = entry[k];
+    }
+  });
+}
+
 function normalizeRelPath(path){
   return String(path || '').trim().replace(/\\/g, '/').replace(/^\/+/, '').replace(/^\.\//, '');
 }

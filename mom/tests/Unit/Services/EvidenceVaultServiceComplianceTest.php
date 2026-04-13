@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MOM\Tests\Unit\Services;
+
+use MOM\Services\EvidenceVaultService;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use RuntimeException;
+
+final class EvidenceVaultServiceComplianceTest extends TestCase
+{
+    private string $tmpDir;
+
+    protected function setUp(): void
+    {
+        $this->tmpDir = sys_get_temp_dir() . '/mom_evidence_vault_test_' . bin2hex(random_bytes(4));
+        if (!mkdir($this->tmpDir, 0775, true) && !is_dir($this->tmpDir)) {
+            throw new RuntimeException('Unable to create temp evidence test directory.');
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        $this->removeTree($this->tmpDir);
+    }
+
+    public function testInitialCustodyActionMatchesDatabaseEnum(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $record = $service->store([
+            'title' => 'Certificate package',
+            'type' => 'certificate',
+            'content' => 'controlled evidence payload',
+        ], 'qa.user');
+
+        $this->assertSame('GENESIS', $record['previous_hash']);
+        $this->assertSame(hash('sha256', 'controlled evidence payload'), $record['file_hash']);
+
+        $custody = $service->getCustodyLog($record['evidence_id']);
+        $this->assertCount(1, $custody);
+        $this->assertSame('uploaded', $custody[0]['action']);
+
+        $this->assertTrue($service->verifyChain()['valid']);
+        $this->assertTrue($service->verifyChain($record['evidence_id'])['valid']);
+
+        $missing = $service->verifyChain('00000000-0000-4000-8000-000000000000');
+        $this->assertFalse($missing['valid']);
+        $this->assertSame('evidence_not_found', $missing['error']);
+    }
+
+    public function testLegacyEvidenceTermsMapToMigrationEnums(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+        $ref = new ReflectionClass($service);
+
+        $mapType = $ref->getMethod('mapEvidenceType');
+        $mapType->setAccessible(true);
+        $this->assertSame('material_cert', $mapType->invoke($service, 'certificate'));
+        $this->assertSame('measurement_data', $mapType->invoke($service, 'measurement'));
+        $this->assertSame('machine_log', $mapType->invoke($service, 'log'));
+        $this->assertSame('test_report', $mapType->invoke($service, 'report'));
+
+        $mapAction = $ref->getMethod('mapCustodyAction');
+        $mapAction->setAccessible(true);
+        $this->assertSame('uploaded', $mapAction->invoke($service, 'stored'));
+        $this->assertSame('viewed', $mapAction->invoke($service, 'accessed'));
+        $this->assertSame('downloaded', $mapAction->invoke($service, 'exported'));
+        $this->assertSame('verified', $mapAction->invoke($service, 'sealed'));
+    }
+
+    private function removeTree(string $path): void
+    {
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+        foreach ($it as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($path);
+    }
+}

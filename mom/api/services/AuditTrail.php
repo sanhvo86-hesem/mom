@@ -150,7 +150,7 @@ final class AuditTrail
         // Build hash chain: hash of this event includes the previous event's hash
         $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId);
         $record['prev_hash'] = $prevHash;
-        $record['event_hash'] = hash(self::HASH_ALGO, json_encode($record, JSON_UNESCAPED_UNICODE));
+        $record['event_hash'] = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($record), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         // Electronic signature block
         if ($event->esigReason !== null) {
@@ -163,7 +163,7 @@ final class AuditTrail
         }
 
         // Persist to PostgreSQL if available
-        if ($this->db !== null && $this->db->isConnected()) {
+        if ($this->db !== null) {
             try {
                 $this->persistToPostgres($record);
             } catch (\Throwable $e) {
@@ -194,7 +194,7 @@ final class AuditTrail
         $limit = min((int) ($filters['limit'] ?? 100), self::MAX_QUERY_LIMIT);
         $offset = max(0, (int) ($filters['offset'] ?? 0));
 
-        if ($this->db !== null && $this->db->isConnected()) {
+        if ($this->db !== null) {
             try {
                 return $this->queryPostgres($filters, $limit, $offset);
             } catch (\Throwable) {
@@ -308,10 +308,8 @@ final class AuditTrail
             }
 
             // Recompute event hash
-            $check = $event;
-            $storedHash = $check['event_hash'] ?? '';
-            unset($check['event_hash']);
-            $computed = hash(self::HASH_ALGO, json_encode($check, JSON_UNESCAPED_UNICODE));
+            $storedHash = (string)($event['event_hash'] ?? '');
+            $computed = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($event), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
             if ($computed !== $storedHash) {
                 $errors[] = sprintf(
@@ -382,32 +380,67 @@ final class AuditTrail
      */
     private function persistToPostgres(array $record): void
     {
-        $sql = <<<'SQL'
-            INSERT INTO audit_events (
-                event_id, event_type, aggregate_type, aggregate_id,
-                actor_id, payload, metadata, esig_reason,
-                prev_hash, event_hash, esig, recorded_at
-            ) VALUES (
-                :event_id, :event_type, :aggregate_type, :aggregate_id,
-                :actor_id, :payload::jsonb, :metadata::jsonb, :esig_reason,
-                :prev_hash, :event_hash, :esig::jsonb, :recorded_at
-            )
-        SQL;
+        $actor = (string)($record['actor_id'] ?? '');
+        $actorUuid = $this->resolveUserUuid($actor);
+        $metadata = is_array($record['metadata'] ?? null) ? $record['metadata'] : [];
+        unset($metadata['audit_chain'], $metadata['esig']);
 
-        $this->db->execute($sql, [
+        $storageMetadata = $metadata;
+        $storageMetadata['audit_chain'] = [
+            'prev_hash' => (string)($record['prev_hash'] ?? ''),
+            'event_hash' => (string)($record['event_hash'] ?? ''),
+            'esig_reason' => $record['esig_reason'] ?? null,
+            'original_actor_id' => $actor,
+        ];
+        if (isset($record['esig'])) {
+            $storageMetadata['esig'] = $record['esig'];
+        }
+
+        $params = [
             ':event_id'       => $record['event_id'],
             ':event_type'     => $record['event_type'],
             ':aggregate_type' => $record['aggregate_type'],
             ':aggregate_id'   => $record['aggregate_id'],
-            ':actor_id'       => $record['actor_id'],
-            ':payload'        => json_encode($record['payload'] ?? [], JSON_UNESCAPED_UNICODE),
-            ':metadata'       => json_encode($record['metadata'] ?? [], JSON_UNESCAPED_UNICODE),
-            ':esig_reason'    => $record['esig_reason'] ?? null,
-            ':prev_hash'      => $record['prev_hash'] ?? '',
-            ':event_hash'     => $record['event_hash'] ?? '',
-            ':esig'           => json_encode($record['esig'] ?? null, JSON_UNESCAPED_UNICODE),
+            ':actor_id'       => $actorUuid,
+            ':actor_name'     => $actorUuid === null && $actor !== '' ? $actor : null,
+            ':payload'        => json_encode($record['payload'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            ':metadata'       => json_encode($storageMetadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ':recorded_at'    => $record['recorded_at'],
-        ]);
+            ':source_event_hash' => $record['event_hash'] ?? '',
+        ];
+
+        $sql = <<<'SQL'
+            INSERT INTO audit_events (
+                event_id, event_type, aggregate_type, aggregate_id,
+                actor_id, actor_name, payload, metadata, recorded_at, source_event_hash
+            ) VALUES (
+                CAST(:event_id AS uuid), :event_type, :aggregate_type, :aggregate_id,
+                CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb), CAST(:metadata AS jsonb),
+                CAST(:recorded_at AS timestamptz), :source_event_hash
+            )
+        SQL;
+
+        try {
+            $this->db->execute($sql, $params);
+            return;
+        } catch (\Throwable $e) {
+            if (!str_contains(strtolower($e->getMessage()), 'source_event_hash')) {
+                throw $e;
+            }
+        }
+
+        unset($params[':source_event_hash']);
+        $fallbackSql = <<<'SQL'
+            INSERT INTO audit_events (
+                event_id, event_type, aggregate_type, aggregate_id,
+                actor_id, actor_name, payload, metadata, recorded_at
+            ) VALUES (
+                CAST(:event_id AS uuid), :event_type, :aggregate_type, :aggregate_id,
+                CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb), CAST(:metadata AS jsonb),
+                CAST(:recorded_at AS timestamptz)
+            )
+        SQL;
+        $this->db->execute($fallbackSql, $params);
     }
 
     /**
@@ -461,6 +494,17 @@ final class AuditTrail
                     $row[$col] = json_decode($row[$col], true) ?? [];
                 }
             }
+            $metadata = is_array($row['metadata'] ?? null) ? $row['metadata'] : [];
+            $chain = is_array($metadata['audit_chain'] ?? null) ? $metadata['audit_chain'] : [];
+            if (array_key_exists('original_actor_id', $chain)) {
+                $row['actor_id'] = (string)$chain['original_actor_id'];
+            }
+            $row['prev_hash'] = (string)($row['prev_hash'] ?? ($chain['prev_hash'] ?? ''));
+            $row['event_hash'] = (string)($row['event_hash'] ?? ($row['source_event_hash'] ?? ($chain['event_hash'] ?? '')));
+            $row['esig_reason'] = $row['esig_reason'] ?? ($chain['esig_reason'] ?? null);
+            $row['esig'] = is_array($metadata['esig'] ?? null) ? $metadata['esig'] : ($row['esig'] ?? []);
+            unset($metadata['audit_chain'], $metadata['esig']);
+            $row['metadata'] = $metadata;
             return $row;
         }, $rows);
     }
@@ -532,17 +576,33 @@ final class AuditTrail
     private function getLastEventHash(string $aggType, string $aggId): string
     {
         // Try PostgreSQL first
-        if ($this->db !== null && $this->db->isConnected()) {
+        if ($this->db !== null) {
             try {
                 $row = $this->db->queryOne(
-                    'SELECT event_hash FROM audit_events WHERE aggregate_type = :t AND aggregate_id = :id ORDER BY recorded_at DESC LIMIT 1',
+                    "SELECT COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash') AS event_hash
+                     FROM audit_events
+                     WHERE aggregate_type = :t AND aggregate_id = :id
+                     ORDER BY recorded_at DESC LIMIT 1",
                     [':t' => $aggType, ':id' => $aggId],
                 );
                 if ($row !== null) {
                     return (string) ($row['event_hash'] ?? '');
                 }
             } catch (\Throwable) {
-                // Fall through
+                try {
+                    $row = $this->db->queryOne(
+                        "SELECT metadata -> 'audit_chain' ->> 'event_hash' AS event_hash
+                         FROM audit_events
+                         WHERE aggregate_type = :t AND aggregate_id = :id
+                         ORDER BY recorded_at DESC LIMIT 1",
+                        [':t' => $aggType, ':id' => $aggId],
+                    );
+                    if ($row !== null) {
+                        return (string)($row['event_hash'] ?? '');
+                    }
+                } catch (\Throwable) {
+                    // Fall through
+                }
             }
         }
 
@@ -634,6 +694,60 @@ final class AuditTrail
             }
             return true;
         }));
+    }
+
+    /**
+     * Build the exact event subset covered by the tamper-evident event hash.
+     *
+     * Storage-only fields such as Postgres actor_name/source_event_hash and the
+     * e-signature envelope are intentionally excluded; the original hash is
+     * computed before the optional e-signature block is attached.
+     */
+    private function canonicalHashRecord(array $event): array
+    {
+        $metadata = is_array($event['metadata'] ?? null) ? $event['metadata'] : [];
+        unset($metadata['audit_chain'], $metadata['esig']);
+
+        return [
+            'event_id'       => (string)($event['event_id'] ?? ''),
+            'event_type'     => (string)($event['event_type'] ?? ''),
+            'aggregate_type' => (string)($event['aggregate_type'] ?? ''),
+            'aggregate_id'   => (string)($event['aggregate_id'] ?? ''),
+            'actor_id'       => (string)($event['actor_id'] ?? ''),
+            'payload'        => is_array($event['payload'] ?? null) ? $event['payload'] : [],
+            'metadata'       => $metadata,
+            'esig_reason'    => $event['esig_reason'] ?? null,
+            'recorded_at'    => (string)($event['recorded_at'] ?? ''),
+            'prev_hash'      => (string)($event['prev_hash'] ?? ''),
+        ];
+    }
+
+    private function resolveUserUuid(string $actor): ?string
+    {
+        $actor = trim($actor);
+        if ($actor === '') {
+            return null;
+        }
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $actor) === 1) {
+            return strtolower($actor);
+        }
+        if ($this->db === null) {
+            return null;
+        }
+
+        try {
+            $row = $this->db->queryOne(
+                'SELECT user_id FROM users WHERE username = :actor OR employee_id = :actor OR email = :actor LIMIT 1',
+                [':actor' => $actor],
+            );
+            if (is_array($row) && !empty($row['user_id'])) {
+                return (string)$row['user_id'];
+            }
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return null;
     }
 
     /**

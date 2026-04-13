@@ -229,6 +229,13 @@ final class PostgresTrustedReleaseRecordRepository implements TrustedReleaseReco
             $row[$field] = ManufacturingEventCodec::decodeJsonObject($row[$field] ?? []);
         }
 
+        $payload = is_array($row['packet_payload'] ?? null) ? $row['packet_payload'] : [];
+        foreach (['sections', 'blockers', 'release_decision'] as $field) {
+            if (!isset($row[$field]) && isset($payload[$field])) {
+                $row[$field] = $payload[$field];
+            }
+        }
+
         foreach ($row as $key => $value) {
             if ($value === null) {
                 continue;
@@ -244,4 +251,3 @@ final class PostgresTrustedReleaseRecordRepository implements TrustedReleaseReco
 if (!class_exists('MOM\\Services\\PostgresTrustedReleaseRecordRepository', false)) {
     class_alias(PostgresTrustedReleaseRecordRepository::class, 'MOM\\Services\\PostgresTrustedReleaseRecordRepository');
 }
-
