@@ -39,7 +39,7 @@ The least-risk path is a staged bridge:
 2. Keep `targets.json` and `production_logs.json` as live compatibility stores.
 3. Add append-only production report event history beside the snapshot.
 4. Use event history for idempotency replay after later snapshot updates.
-5. Serialize the file-backed target/snapshot/event update under a dispatch state lock to reduce concurrent write races while DB authority is staged.
+5. Serialize file-backed dispatch mutations under one dispatch state lock: planner target create/update/dispatch protects `targets.json` read-modify-write, operator reporting protects target/snapshot/event reads, idempotency checks, event append, snapshot update, and target lifecycle update, and multi-file dispatch read models use a shared lock for consistent target/log pairs.
 6. Add explicit report governance for planned/completed target lifecycle, correction override, backdate override, future timestamps, offline replay identifiers, and pause/resume event markers.
 7. Add lightweight CNC digital-thread reference warnings without blocking manual Phase 1 dispatch.
 8. Append canonical manufacturing events as read-model projections only.
@@ -47,7 +47,7 @@ The least-risk path is a staged bridge:
 
 ## Deferred Items
 
-- Real DB transaction boundaries across dispatch target, snapshot, and event history; the current file lock is a compatibility-stage race guard only.
+- Real DB transaction boundaries across dispatch target, snapshot, and event history; the current shared read-modify-write file lock is a compatibility-stage race guard only.
 - Dedicated pause/resume command endpoints and state-machine transitions; current support is event-ledger capture without a separate command abstraction.
 - Full route/operation/inspection-plan referential enforcement against DB tables; current support is enrichment plus warning-level validation.
 - Full MTConnect/OPC-UA ingestion. Phase 1 only preserves stable machine/equipment and timestamp semantics for later ingestion.

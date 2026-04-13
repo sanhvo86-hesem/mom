@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Tests\Unit\Services;
 
+use MOM\Database\Connection;
 use MOM\Services\AuditEvent;
 use MOM\Services\AuditEventType;
 use MOM\Services\AuditTrail;
@@ -45,6 +46,56 @@ final class AuditTrailIntegrityTest extends TestCase
         $this->assertTrue($result['valid'], implode('; ', $result['errors']));
     }
 
+    public function testControlledAuditRequiresAuthoritativeStore(): void
+    {
+        $audit = new AuditTrail($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Authoritative audit store is required');
+
+        $audit->logEvent(new AuditEvent(
+            eventType: AuditEventType::CREATED,
+            aggregateType: 'evidence_record',
+            aggregateId: 'EV-2026-001',
+            actorId: 'qa.user',
+            payload: ['record_state' => 'finalized'],
+        ));
+    }
+
+    public function testExplicitFailClosedAuditDoesNotFallbackWhenPostgresFails(): void
+    {
+        $audit = new AuditTrail($this->tmpDir, new FailingAuditTrailConnection());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Authoritative audit chain is unavailable');
+
+        $audit->logEvent(new AuditEvent(
+            eventType: AuditEventType::UPDATED,
+            aggregateType: 'legacy_record',
+            aggregateId: 'LEG-001',
+            actorId: 'qa.user',
+            payload: ['after' => ['state' => 'released']],
+            metadata: ['audit_fail_closed' => true],
+        ));
+    }
+
+    public function testLegacyAuditCanStillFallbackToJsonWhenPostgresFails(): void
+    {
+        $audit = new AuditTrail($this->tmpDir, new FailingAuditTrailConnection());
+
+        $audit->logEvent(new AuditEvent(
+            eventType: AuditEventType::UPDATED,
+            aggregateType: 'legacy_record',
+            aggregateId: 'LEG-002',
+            actorId: 'qa.user',
+            payload: ['after' => ['state' => 'draft']],
+        ));
+
+        $events = $audit->getEntityHistory('legacy_record', 'LEG-002');
+        $this->assertCount(1, $events);
+        $this->assertSame('UPDATED', $events[0]['event_type']);
+    }
+
     private function removeTree(string $path): void
     {
         if (!is_dir($path)) {
@@ -59,5 +110,27 @@ final class AuditTrailIntegrityTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         rmdir($path);
+    }
+}
+
+final class FailingAuditTrailConnection extends Connection
+{
+    public function __construct()
+    {
+    }
+
+    public function query(string $sql, array $params = []): array
+    {
+        throw new RuntimeException('simulated postgres query failure');
+    }
+
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        throw new RuntimeException('simulated postgres query failure');
+    }
+
+    public function execute(string $sql, array $params = []): int
+    {
+        throw new RuntimeException('simulated postgres write failure');
     }
 }

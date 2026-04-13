@@ -3668,6 +3668,7 @@
                     }
                 ],
                 "compliant": false,
+                "status": "blocked",
                 "linkageStatus": "blocked",
                 "templateBindingSource": "backend-template-registry",
                 "sharedTokenCoverage": 100,
@@ -3742,6 +3743,7 @@
                     }
                 ],
                 "compliant": false,
+                "status": "blocked",
                 "linkageStatus": "blocked",
                 "templateBindingSource": "backend-template-registry",
                 "sharedTokenCoverage": 100,

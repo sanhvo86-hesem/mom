@@ -258,6 +258,14 @@ final class ExcelVerificationService
             );
         }
 
+        if (!$this->verificationPayloadComplete($data)) {
+            return new VerificationResult(
+                valid: false,
+                reason: 'verification_payload_incomplete',
+                details: ['required_fields' => ['form_code', 'form_revision', 'download_timestamp', 'download_user', 'download_hash', 'system_origin']],
+            );
+        }
+
         // Verify system origin
         $origin = $data['system_origin'] ?? '';
         if ($origin !== self::SYSTEM_ORIGIN) {
@@ -667,7 +675,21 @@ final class ExcelVerificationService
             return null;
         }
 
-        return $payload['verification'] ?? null;
+        $verification = $payload['verification'] ?? null;
+        return is_array($verification) ? $verification : null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function verificationPayloadComplete(array $data): bool
+    {
+        foreach (['form_code', 'form_revision', 'download_timestamp', 'download_user', 'download_hash', 'system_origin'] as $field) {
+            if (!is_scalar($data[$field] ?? null) || trim((string)$data[$field]) === '') {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ── Template helpers ────────────────────────────────────────────────────

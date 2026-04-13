@@ -42,6 +42,35 @@ class DispatchController extends BaseController
     }
 
     /**
+     * @return resource
+     */
+    private function acquireExecutionStateLock(int $operation = LOCK_EX)
+    {
+        $lockFile = $this->dispatchDir() . '/dispatch_state.lock';
+        $lockHandle = @fopen($lockFile, 'c');
+        if (!is_resource($lockHandle)) {
+            throw new RuntimeException('dispatch_state_lock_unavailable');
+        }
+
+        if (!flock($lockHandle, $operation)) {
+            @fclose($lockHandle);
+            throw new RuntimeException('dispatch_state_lock_failed');
+        }
+
+        return $lockHandle;
+    }
+
+    private function releaseExecutionStateLock(mixed $lockHandle): void
+    {
+        if (!is_resource($lockHandle)) {
+            return;
+        }
+
+        @flock($lockHandle, LOCK_UN);
+        @fclose($lockHandle);
+    }
+
+    /**
      * @param array<int|string, mixed> $logs
      * @param array<int|string, mixed> $targets
      * @param array<int|string, mixed> $events
@@ -60,16 +89,7 @@ class DispatchController extends BaseController
         array $originalTargets,
         array $originalEvents,
     ): void {
-        $lockFile = dirname($logFile) . '/dispatch_state.lock';
-        $lockHandle = @fopen($lockFile, 'c');
-        if (!is_resource($lockHandle)) {
-            throw new RuntimeException('dispatch_state_lock_unavailable');
-        }
-
         try {
-            if (!flock($lockHandle, LOCK_EX)) {
-                throw new RuntimeException('dispatch_state_lock_failed');
-            }
             $this->writeJsonFile($logFile, $logs);
             $this->writeJsonFile($targetFile, $targets);
             $this->writeJsonFile($eventFile, $events);
@@ -82,9 +102,6 @@ class DispatchController extends BaseController
                 @error_log('[DispatchController] dispatch state rollback failed: ' . $rollback->getMessage());
             }
             throw $e;
-        } finally {
-            @flock($lockHandle, LOCK_UN);
-            @fclose($lockHandle);
         }
     }
 
@@ -170,10 +187,18 @@ class DispatchController extends BaseController
 
         $startDate = $this->query('start_date') ?? date('Y-m-d');
         $endDate   = $this->query('end_date') ?? date('Y-m-d', strtotime('+7 days'));
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
+
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $logFile = $this->dispatchDir() . '/production_logs.json';
+            $logs    = $this->readJsonFile($logFile) ?? [];
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
 
             // Filter by date range
             $filtered = array_filter($targets, function ($t) use ($startDate, $endDate) {
@@ -197,8 +222,6 @@ class DispatchController extends BaseController
             }
 
             // Load production logs for actual data
-            $logFile = $this->dispatchDir() . '/production_logs.json';
-            $logs    = $this->readJsonFile($logFile) ?? [];
             $logMap  = [];
             foreach ($logs as $log) {
                 $key = ($log['target_id'] ?? '');
@@ -214,6 +237,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('timeline_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -230,15 +255,21 @@ class DispatchController extends BaseController
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
+        $lockHandle = null;
 
         try {
+            $target = $this->shopfloor()->normalizeTargetForCreate($body, $uid, $now);
+
+            $lockHandle = $this->acquireExecutionStateLock();
+
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
 
-            $target = $this->shopfloor()->normalizeTargetForCreate($body, $uid, $now);
-
             $targets[] = $target;
             $this->writeJsonFile($file, $targets);
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
 
             $this->auditLog('dispatch_create_target', [
                 'target_id'  => $target['target_id'],
@@ -254,6 +285,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('create_target_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -272,8 +305,11 @@ class DispatchController extends BaseController
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock();
+
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
             $found   = false;
@@ -292,11 +328,17 @@ class DispatchController extends BaseController
             if (!$found) $this->error('target_not_found', 404);
 
             $this->writeJsonFile($file, $targets);
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
+
             $this->auditLog('dispatch_target', ['target_id' => $targetId], $uid);
             $this->success(['dispatched' => true]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('dispatch_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -319,14 +361,22 @@ class DispatchController extends BaseController
         }
         $date = $this->query('date') ?? date('Y-m-d');
         $shiftCode = $this->query('shift_code');
+        $lockHandle = null;
 
         try {
             $date = $this->shopfloor()->normalizeDateFilter($date, 'date');
             $shiftCode = $this->shopfloor()->normalizeOptionalShiftCode($shiftCode);
+
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
+
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
             $logFile = $this->dispatchDir() . '/production_logs.json';
             $logs    = $this->readJsonFile($logFile) ?? [];
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
+
             $logMap  = [];
             foreach ($logs as $l) {
                 if (is_array($l) && ($l['target_id'] ?? '') !== '') {
@@ -379,6 +429,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('operator_dispatch_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -397,8 +449,11 @@ class DispatchController extends BaseController
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock();
+
             // Update target status
             $tFile   = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($tFile) ?? [];
@@ -505,6 +560,10 @@ class DispatchController extends BaseController
                 $originalTargets,
                 $originalEvents,
             );
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
+
             $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             $this->auditLog('dispatch_report_production', [
@@ -520,6 +579,7 @@ class DispatchController extends BaseController
         } catch (ConnectedGovernanceException $e) {
             $this->error($e->reasonCode(), 409, $e->getMessage(), ['entitlement' => $e->details()]);
         } catch (RuntimeException $e) {
+            $this->rethrowResponse($e);
             if (in_array($e->getMessage(), ['forbidden_operator_assignment', 'missing_operator_assignment'], true)) {
                 $this->error('forbidden', 403);
             }
@@ -536,6 +596,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('report_production_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -548,12 +610,18 @@ class DispatchController extends BaseController
         $this->requireDispatchReadAccess($user);
 
         $date = $this->query('date') ?? date('Y-m-d');
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
+
             $tFile   = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($tFile) ?? [];
             $logFile = $this->dispatchDir() . '/production_logs.json';
             $logs    = $this->readJsonFile($logFile) ?? [];
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
 
             $today = array_filter($targets, fn($t) => ($t['shift_date'] ?? '') === $date);
             $logMap = [];
@@ -608,6 +676,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('dashboard_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -674,8 +744,11 @@ class DispatchController extends BaseController
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock();
+
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
             $updated = null;
@@ -692,6 +765,10 @@ class DispatchController extends BaseController
             if (!$updated) $this->error('target_not_found', 404);
 
             $this->writeJsonFile($file, $targets);
+
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
+
             $this->auditLog('dispatch_update_target', ['target_id' => $targetId], $uid);
             $this->success(['target' => $this->shopfloor()->targetResponse($updated)]);
         } catch (InvalidArgumentException $e) {
@@ -699,6 +776,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('update_target_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 }

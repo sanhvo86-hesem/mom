@@ -5156,7 +5156,7 @@ components:
 
     ModuleGraphicsComplianceEntry:
       type: object
-      required: [moduleId, templateId, compliant, findings]
+      required: [moduleId, templateId, compliant, findings, status]
       additionalProperties: true
       properties:
         moduleId:
@@ -5191,6 +5191,9 @@ components:
             additionalProperties: true
         compliant:
           type: boolean
+        status:
+          type: string
+          enum: [full-admin-controlled, bridged-to-shared-tokens, legacy-private-css, blocked]
         linkageStatus:
           type: string
           enum: [full-admin-controlled, bridged-to-shared-tokens, legacy-private-css, blocked]
@@ -5271,15 +5274,19 @@ components:
     GraphicsDebtAggregateResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          required: [debt, summary]
-          properties:
-            debt:
-              type: object
-              additionalProperties: true
-            summary:
-              type: object
-              additionalProperties: true
+        - $ref: '#/components/schemas/GraphicsDebtReport'
+
+    GraphicsDebtReport:
+      type: object
+      required: [debt, summary]
+      additionalProperties: true
+      properties:
+        debt:
+          type: object
+          additionalProperties: true
+        summary:
+          type: object
+          additionalProperties: true
 
     TokenAdoptionCoverageResponse:
       allOf:
@@ -5299,17 +5306,21 @@ components:
     GraphicsDriftResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          required: [drift, blockers]
-          properties:
-            drift:
-              type: object
-              additionalProperties: true
-            blockers:
-              type: array
-              items:
-                type: object
-                additionalProperties: true
+        - $ref: '#/components/schemas/GraphicsDriftReport'
+
+    GraphicsDriftReport:
+      type: object
+      required: [drift, blockers]
+      additionalProperties: true
+      properties:
+        drift:
+          type: object
+          additionalProperties: true
+        blockers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
 
     GraphicsReleaseBlockersResponse:
       allOf:
@@ -5796,7 +5807,7 @@ components:
           type: string
         impactType:
           type: string
-          enum: [token, template, component]
+          enum: [token, template, component, rollout]
         scope:
           type: object
           additionalProperties: true
@@ -5842,16 +5853,20 @@ components:
     GraphicsRolloutResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          required: [rollout]
-          properties:
-            rollout:
-              type: object
-              additionalProperties: true
-            registryVersion:
-              type: string
-            registryEtag:
-              type: string
+        - $ref: '#/components/schemas/GraphicsRolloutResult'
+
+    GraphicsRolloutResult:
+      type: object
+      required: [rollout]
+      additionalProperties: true
+      properties:
+        rollout:
+          type: object
+          additionalProperties: true
+        registryVersion:
+          type: string
+        registryEtag:
+          type: string
 
     GraphicsAuditEvent:
       type: object

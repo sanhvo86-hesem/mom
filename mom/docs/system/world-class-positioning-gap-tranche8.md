@@ -93,3 +93,81 @@ Priority D:
 ## Why This Is Highest Leverage
 
 Prior tranches promoted authority for idempotency, core workflow, canonical events, production history, workforce qualification, trusted release packets, and connected governance. The next largest platform gap is that planning/promise/dispatch remains split between legacy file-backed schedule endpoints and schema-only APS artifacts. A bounded planning scenario spine moves the repo toward APS-class behavior by making feasibility explainable, constraints explicit, publishability gated, and runtime state measurable without a broad rewrite.
+
+## Implemented Closure
+
+Priority 0:
+
+- Verified Tranche 7 prerequisites are present in code: connected governance repositories/service/controller, trusted release record service, production history read model, shopfloor entitlement gate integration, and runtime authority slice.
+- Confirmed the remaining live-DB proof gap is not closed by this tranche: local verification did not apply migrations to a live PostgreSQL instance.
+
+Priority A:
+
+- Added `PlanningScenarioService` with repository boundary and deterministic finite-capacity calculation.
+- Added `PlanningScenarioRepository`, `FilePlanningScenarioRepository`, and `PostgresPlanningScenarioRepository`.
+- PostgreSQL authority reuses existing migration `047_advanced_planning_scheduling.sql` and table `aps_planning_scenarios`; the richer scenario packet is stored in `metadata` with `payload_schema_version = planning_scenario.v1` to avoid creating a duplicate APS owner.
+- File persistence is explicit compatibility/fallback only and reports `json_fallback` / `authority_partial`.
+- Scenario calculation now evaluates explicit blocker categories:
+  - `capacity_overload`
+  - `capacity_missing`
+  - `quality_hold`
+  - `maintenance_window`
+  - `missing_qualification`
+  - `expired_qualification`
+  - `material_shortage`
+  - `active_revision_missing`
+- Read models now exist for scenario detail, promise/feasibility explanation, capacity/load by work center/machine/date, dispatch readiness, replanning signals, and runtime probe.
+
+Priority B:
+
+- Added a minimal publishable dispatch package inside the scenario authority packet.
+- Backend invariant blocks publish unless the scenario is approved and has no blockers.
+- Published schedule entries carry work order, job, operation, work center, machine, planned time, active revision reference, qualification requirement, and provenance.
+
+Priority C:
+
+- Added scenario-scoped `ReplanningSignal` support with deterministic categories:
+  - `capacity_loss`
+  - `quality_hold`
+  - `maintenance_block`
+  - `material_shortage`
+  - `workforce_unqualified`
+  - `promise_risk`
+- The current implementation records and queries signals; full automatic recalculation from every runtime signal remains deferred.
+
+Priority D:
+
+- `RuntimeAuthorityService` now reports `planning_scenario`.
+- Planning probe reports backend, readiness, state model, constraint categories, replanning categories, read models, and counters for calculate, infeasible, publish block, published, promise risk, quality hold, maintenance block, capacity loss, and missing qualification blockers.
+- Added controller/action and REST surfaces under planning without changing existing `schedule_*` compatibility endpoints.
+
+Generated authority artifacts:
+
+- Regenerated registry/publication artifacts after route additions.
+- Reran frontend simulator, registry doctor, global capability audit, operational blind-spot report, operational stress report, and system contract authority to clear source-vs-artifact drift.
+- Updated `contracts/registry-authority-standard.json` review timestamp so required registry authority artifacts are not falsely classified as aging during this release gate.
+
+## Verification Evidence
+
+- `php -l` passed for new planning service, repositories, controller, route module, runtime authority service, and planning test file.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-tranche8-planning-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/PlanningScenarioServiceTest.php` -> pass, 8 tests, 32 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-tranche8-focused-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/PlanningScenarioServiceTest.php tests/Unit/Services/ConnectedGovernanceServiceTest.php tests/Unit/Services/RuntimeAuthorityServiceTest.php tests/Unit/Controllers/HealthControllerRuntimeAuthorityTest.php` -> pass, 20 tests, 113 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-tranche8-full-phpunit-error.log vendor/bin/phpunit --do-not-cache-result` -> pass, 230 tests, 1444 assertions, 1 gated skip.
+- `php -d error_log=/tmp/mom-tranche8-backend-smoke-error.log tests/backend_smoke.php` -> pass.
+- `python3 tools/registry/canonical_publication_orchestrator.py` -> pass with publication proof `PASS`.
+- `python3 tools/registry/enterprise_frontend_simulator.py` -> pass with `watch` status and no blocker counts.
+- `python3 tools/registry/enterprise_registry_doctor.py --write` -> pass with `watch` status, 0 P1 findings.
+- `python3 tools/registry/generate_global_erp_mom_capability_audit.py` -> pass with 0 blocking gaps.
+- `python3 tools/registry/generate_operational_blind_spot_report.py` -> pass with 0 critical/high/medium findings.
+- `python3 tools/registry/generate_operational_stress_report.py` -> pass with 0 critical/high/medium findings.
+- `python3 tools/registry/generate_system_contract_authority.py` -> pass with 0 critical gaps.
+- `php -d display_errors=1 -d error_log=/tmp/mom-tranche8-data-schema-smoke-error.log tests/data_schema_admin_smoke.php` -> pass.
+- `php -d display_errors=1 -d error_log=/tmp/mom-tranche8-registry-smoke-error.log tests/enterprise_registry_authority_smoke.php` -> pass.
+
+## Remaining Unproven Items
+
+- No live PostgreSQL migration/apply, concurrency, lock contention, or failover test was executed locally.
+- The new Postgres repository persists scenario packets through existing `aps_planning_scenarios.metadata`; fully normalized APS tables for schedule blocks, conflicts, material pegging, and dispatch queue publication remain future work.
+- The deterministic rules engine is not a full optimizer. It proves finite-capacity blockers and promise-date explanation, not APS-grade optimization.
+- BOM explosion, multi-level MRP, alternate resource selection, sequence optimization, and cross-site planning rollup remain deferred.
+- Replanning signals are structured and queryable, but automatic scenario recalculation from all execution/quality/maintenance events is not yet complete.

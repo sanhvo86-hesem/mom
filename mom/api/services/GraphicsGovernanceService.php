@@ -531,6 +531,7 @@ class GraphicsGovernanceService
                 'gateState' => $gateState,
                 'findings' => $findings,
                 'compliant' => $findings === [],
+                'status' => $linkageStatus,
                 'linkageStatus' => $linkageStatus,
                 'templateBindingSource' => $template === null ? 'missing' : 'backend-template-registry',
                 'sharedTokenCoverage' => $consumesSharedTokens ? 100 : 40,

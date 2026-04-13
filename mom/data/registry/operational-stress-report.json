@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:26:32.463Z",
+    "generatedAt": "2026-04-13T13:55:34.666Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -91,8 +91,8 @@
       "compensation_markers": 3,
       "correction_markers": 2254,
       "effective_dating_markers": 829,
-      "override_mentions": 123,
-      "waiver_mentions": 76,
+      "override_mentions": 125,
+      "waiver_mentions": 78,
       "heartbeat_mentions": 33,
       "quarantine_mentions": 298,
       "disposition_mentions": 446,
@@ -265,8 +265,8 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 123,
-        "waiver_mentions": 76,
+        "override_mentions": 125,
+        "waiver_mentions": 78,
         "esign_mentions": 195,
         "override_resources": [
           "quality_improvement.concessions",

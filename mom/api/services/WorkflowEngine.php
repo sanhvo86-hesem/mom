@@ -722,12 +722,12 @@ final class WorkflowEngine
                 );
                 if ($existing) {
                     $this->db->execute(
-                        "UPDATE workflow_states SET state_data = :data::jsonb, current_state = :state, updated_at = NOW() WHERE record_id = :id",
+                        "UPDATE workflow_states SET state_data = CAST(:data AS jsonb), current_state = :state, updated_at = NOW() WHERE record_id = :id",
                         [':data' => $json, ':state' => $state['current_state'] ?? '', ':id' => $recordId],
                     );
                 } else {
                     $this->db->execute(
-                        "INSERT INTO workflow_states (record_id, record_type, current_state, state_data, created_at, updated_at) VALUES (:id, :type, :state, :data::jsonb, NOW(), NOW())",
+                        "INSERT INTO workflow_states (record_id, record_type, current_state, state_data, created_at, updated_at) VALUES (:id, :type, :state, CAST(:data AS jsonb), NOW(), NOW())",
                         [
                             ':id'    => $recordId,
                             ':type'  => $state['record_type'] ?? '',
@@ -806,7 +806,7 @@ final class WorkflowEngine
             try {
                 $this->db->execute(
                     "INSERT INTO workflow_step_data (workflow_type, record_id, step_name, from_state, to_state, data_fields, captured_by, captured_at)
-                     VALUES (:wtype, :rid, :step, :from, :to, :data::jsonb, (SELECT user_id FROM users WHERE username = :user LIMIT 1), :at::timestamptz)
+                     VALUES (:wtype, :rid, :step, :from, :to, CAST(:data AS jsonb), (SELECT user_id FROM users WHERE username = :user LIMIT 1), CAST(:at AS timestamptz))
                      ON CONFLICT (workflow_type, record_id, step_name, to_state)
                      DO UPDATE SET data_fields = EXCLUDED.data_fields, captured_by = EXCLUDED.captured_by, captured_at = EXCLUDED.captured_at",
                     [

@@ -821,8 +821,8 @@ final class PlanningScenarioService
     private function scheduleOperation(array $operation, array $bucket, int $sequence): array
     {
         $date = (string)$bucket['bucket_date'];
-        $startTime = trim((string)($bucket['shift_start'] ?? '08:00'));
-        $start = new DateTimeImmutable($date . 'T' . $startTime . ':00Z', new DateTimeZone('UTC'));
+        $startTime = $this->shiftStartForTimestamp($bucket['shift_start'] ?? '08:00');
+        $start = new DateTimeImmutable($date . 'T' . $startTime . 'Z', new DateTimeZone('UTC'));
         $start = $start->modify('+' . ((int)$bucket['scenario_allocated_minutes']) . ' minutes');
         $end = $start->modify('+' . ((int)$operation['required_minutes']) . ' minutes');
 
@@ -848,6 +848,18 @@ final class PlanningScenarioService
             'part_number' => (string)$operation['part_number'],
             'part_revision' => (string)$operation['part_revision'],
         ];
+    }
+
+    private function shiftStartForTimestamp(mixed $value): string
+    {
+        $time = trim((string)$value);
+        if (preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $time) === 1) {
+            return $time . ':00';
+        }
+        if (preg_match('/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/', $time) === 1) {
+            return $time;
+        }
+        return '08:00:00';
     }
 
     /**

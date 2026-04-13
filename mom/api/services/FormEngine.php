@@ -962,7 +962,7 @@ final class FormEngine
         if ($this->db !== null && $this->db->isConnected()) {
             try {
                 $this->db->execute(
-                    "INSERT INTO form_entries (entry_id, form_code, record_id, data, status, submitted_by, submitted_at) VALUES (:eid, :code, :rid, :data::jsonb, :status, :user, NOW())",
+                    "INSERT INTO form_entries (entry_id, form_code, record_id, data, status, submitted_by, submitted_at) VALUES (:eid, :code, :rid, CAST(:data AS jsonb), :status, :user, NOW())",
                     [
                         ':eid'    => $entryId,
                         ':code'   => $code,

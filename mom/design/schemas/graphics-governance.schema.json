@@ -231,7 +231,7 @@
     },
     "ModuleGraphicsComplianceEntry": {
       "type": "object",
-      "required": ["moduleId", "templateId", "compliant", "findings"],
+      "required": ["moduleId", "templateId", "compliant", "findings", "status"],
       "additionalProperties": true,
       "properties": {
         "moduleId": { "type": "string" },
@@ -244,6 +244,7 @@
         "blockFamilies": { "type": "array", "items": { "type": "string" } },
         "findings": { "type": "array", "items": { "type": "object" } },
         "compliant": { "type": "boolean" },
+        "status": { "enum": ["full-admin-controlled", "bridged-to-shared-tokens", "legacy-private-css", "blocked"] },
         "linkageStatus": { "enum": ["full-admin-controlled", "bridged-to-shared-tokens", "legacy-private-css", "blocked"] },
         "templateBindingSource": { "type": "string" },
         "sharedTokenCoverage": { "type": "number" },

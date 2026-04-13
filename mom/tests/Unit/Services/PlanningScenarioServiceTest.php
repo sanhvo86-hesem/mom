@@ -6,7 +6,9 @@ namespace MOM\Tests\Unit\Services;
 
 use MOM\Api\Services\FilePlanningScenarioRepository;
 use MOM\Api\Services\PlanningScenarioService;
+use MOM\Api\Services\PostgresPlanningScenarioRepository;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use RuntimeException;
 
 final class PlanningScenarioServiceTest extends TestCase
@@ -168,6 +170,84 @@ final class PlanningScenarioServiceTest extends TestCase
         $this->assertSame('maintenance_block', $signal['signal_category']);
         $this->assertSame(1, $signals['signal_count']);
         $this->assertSame(['maintenance_block' => 1], $signals['category_counts']);
+    }
+
+    public function testMaterialShortageAndMissingActiveRevisionAreDeterministicBlockers(): void
+    {
+        $scenario = $this->service->calculateScenario($this->baseScenario([
+            'scenario_key' => 'TR8-MATERIAL-REVISION-BLOCKERS',
+            'work_orders' => [[
+                'wo_number' => 'WO-PLAN-1',
+                'job_number' => 'JO-PLAN-1',
+                'operation_seq' => '20',
+                'work_center_id' => 'WC-5AX',
+                'machine_id' => 'MC-5AX-01',
+                'required_minutes' => 120,
+                'operator_id' => 'operator-1',
+                'required_qualification_type' => 'training',
+                'required_qualification_code' => 'WI-OP20-TRAINING',
+                'part_number' => 'PN-001',
+            ]],
+            'material_availability' => [[
+                'part_number' => 'PN-001',
+                'projected_available_balance' => -1,
+            ]],
+        ]));
+
+        $this->assertSame('infeasible', $scenario['scenario_state']);
+        $this->assertSame(['active_revision_missing', 'material_shortage'], $scenario['promise']['reason_codes']);
+    }
+
+    public function testClosedQualityHoldDoesNotBlockPlanning(): void
+    {
+        $scenario = $this->service->calculateScenario($this->baseScenario([
+            'scenario_key' => 'TR8-CLOSED-HOLD',
+            'quality_holds' => [[
+                'wo_number' => 'WO-PLAN-1',
+                'hold_status' => 'released',
+                'reason_code' => 'NCR_RELEASED',
+            ]],
+        ]));
+
+        $this->assertSame('calculated', $scenario['scenario_state']);
+        $this->assertSame([], $scenario['promise']['reason_codes']);
+    }
+
+    public function testShiftStartWithSecondsIsAccepted(): void
+    {
+        $scenario = $this->service->calculateScenario($this->baseScenario([
+            'scenario_key' => 'TR8-SHIFT-SECONDS',
+            'capacity_buckets' => [[
+                'work_center_id' => 'WC-5AX',
+                'machine_id' => 'MC-5AX-01',
+                'bucket_date' => '2026-04-13',
+                'available_minutes' => 600,
+                'shift_start' => '06:30:00',
+            ]],
+        ]));
+
+        $this->assertSame('calculated', $scenario['scenario_state']);
+        $this->assertSame('2026-04-13T06:30:00+00:00', $scenario['schedule'][0]['planned_start']);
+    }
+
+    public function testPostgresRepositorySchemaHelpersMatchExistingMigration(): void
+    {
+        $repository = (new ReflectionClass(PostgresPlanningScenarioRepository::class))->newInstanceWithoutConstructor();
+        $reflection = new ReflectionClass($repository);
+
+        $scenarioName = $reflection->getMethod('scenarioName');
+        $createdByUuid = $reflection->getMethod('createdByUuid');
+        if (PHP_VERSION_ID < 80100) {
+            $scenarioName->setAccessible(true);
+            $createdByUuid->setAccessible(true);
+        }
+
+        $longScenarioKey = str_repeat('A', 190);
+        $uuid = '11111111-1111-4111-8111-111111111111';
+
+        $this->assertSame(150, strlen((string)$scenarioName->invoke($repository, ['scenario_key' => $longScenarioKey])));
+        $this->assertNull($createdByUuid->invoke($repository, ['created_by' => 'planner-1']));
+        $this->assertSame($uuid, $createdByUuid->invoke($repository, ['created_by' => strtoupper($uuid)]));
     }
 
     /**

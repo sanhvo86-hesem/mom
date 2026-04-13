@@ -62,6 +62,22 @@ final class ExcelVerificationServiceTest extends TestCase
         $this->assertSame('hash_mismatch', $result->reason);
     }
 
+    public function testVerifyUploadRejectsIncompleteVerificationPayloadWithStableReason(): void
+    {
+        $service = new ExcelVerificationService($this->tmpDir);
+        $workbook = $this->tmpDir . '/FRM-631_Rev.03_incomplete.xlsx';
+        file_put_contents($workbook, 'not a real workbook');
+        $this->writeSidecar($workbook, [
+            'form_code' => 'FRM-631',
+            'system_origin' => 'HESEM-MOM-v3',
+        ]);
+
+        $result = $service->verifyUpload($workbook);
+
+        $this->assertFalse($result->valid);
+        $this->assertSame('verification_payload_incomplete', $result->reason);
+    }
+
     /**
      * @param array<string, mixed> $verification
      */

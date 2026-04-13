@@ -114,6 +114,30 @@ final class AuditTrail
     /** Hash algorithm for tamper-detection chain. */
     private const HASH_ALGO = 'sha256';
 
+    /** Canonical regulated aggregates must not silently downgrade to JSON fallback. */
+    private const AUTHORITATIVE_AGGREGATE_TYPES = [
+        'audit_pack',
+        'change_order',
+        'change_request',
+        'doc_revision',
+        'doc_revisions',
+        'document_revision',
+        'evidence_artifact',
+        'evidence_package',
+        'evidence_publication',
+        'evidence_record',
+        'evidence_version',
+        'frm_issuance',
+        'frm_submission_attempt',
+        'integrity_digest',
+        'integrity_exception',
+        'plm_change_order',
+        'plm_change_request',
+        'publication',
+        'retention_lock',
+        'signature_event',
+    ];
+
     /** Directory for JSON-based event storage. */
     private readonly string $eventDir;
 
@@ -124,7 +148,7 @@ final class AuditTrail
      * @param Connection|null $db      Optional database connection.
      */
     public function __construct(
-        private readonly string $dataDir,
+        string $dataDir,
         private readonly ?Connection $db = null,
     ) {
         $this->eventDir = rtrim(str_replace('\\', '/', $dataDir), '/') . '/audit-trail';
@@ -146,9 +170,10 @@ final class AuditTrail
     public function logEvent(AuditEvent $event): void
     {
         $record = $event->toArray();
+        $requiresAuthoritativeStore = $this->requiresAuthoritativeStore($event);
 
         // Build hash chain: hash of this event includes the previous event's hash
-        $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId);
+        $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId, $requiresAuthoritativeStore);
         $record['prev_hash'] = $prevHash;
         $record['event_hash'] = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($record), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
@@ -167,10 +192,20 @@ final class AuditTrail
             try {
                 $this->persistToPostgres($record);
             } catch (\Throwable $e) {
+                if ($requiresAuthoritativeStore) {
+                    throw new RuntimeException(
+                        'Authoritative audit write failed for controlled event: ' . $e->getMessage(),
+                        0,
+                        $e,
+                    );
+                }
                 error_log('[AuditTrail] PG write failed, falling back to JSON: ' . $e->getMessage());
                 $this->persistToJson($record);
             }
         } else {
+            if ($requiresAuthoritativeStore) {
+                throw new RuntimeException('Authoritative audit store is required for controlled event.');
+            }
             $this->persistToJson($record);
         }
     }
@@ -573,10 +608,11 @@ final class AuditTrail
     /**
      * Get the hash of the last event for an entity (for chain linking).
      */
-    private function getLastEventHash(string $aggType, string $aggId): string
+    private function getLastEventHash(string $aggType, string $aggId, bool $requiresAuthoritativeStore = false): string
     {
         // Try PostgreSQL first
         if ($this->db !== null) {
+            $lastFailure = null;
             try {
                 $row = $this->db->queryOne(
                     "SELECT COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash') AS event_hash
@@ -588,7 +624,8 @@ final class AuditTrail
                 if ($row !== null) {
                     return (string) ($row['event_hash'] ?? '');
                 }
-            } catch (\Throwable) {
+            } catch (\Throwable $e) {
+                $lastFailure = $e;
                 try {
                     $row = $this->db->queryOne(
                         "SELECT metadata -> 'audit_chain' ->> 'event_hash' AS event_hash
@@ -600,10 +637,23 @@ final class AuditTrail
                     if ($row !== null) {
                         return (string)($row['event_hash'] ?? '');
                     }
-                } catch (\Throwable) {
-                    // Fall through
+                } catch (\Throwable $fallbackFailure) {
+                    $lastFailure = $fallbackFailure;
                 }
             }
+
+            if ($requiresAuthoritativeStore) {
+                if ($lastFailure !== null) {
+                    throw new RuntimeException(
+                        'Authoritative audit chain is unavailable for controlled event: ' . $lastFailure->getMessage(),
+                        0,
+                        $lastFailure,
+                    );
+                }
+                return '';
+            }
+        } elseif ($requiresAuthoritativeStore) {
+            throw new RuntimeException('Authoritative audit store is required for controlled event.');
         }
 
         // JSON fallback: read last line of JSONL file
@@ -619,6 +669,32 @@ final class AuditTrail
 
         $last = json_decode(end($lines), true);
         return is_array($last) ? (string) ($last['event_hash'] ?? '') : '';
+    }
+
+    private function requiresAuthoritativeStore(AuditEvent $event): bool
+    {
+        foreach (['audit_fail_closed', 'authoritative_audit_required', 'controlled_record'] as $flag) {
+            if ($this->boolValue($event->metadata[$flag] ?? false)) {
+                return true;
+            }
+        }
+
+        $aggregateType = strtolower(trim($event->aggregateType));
+        return in_array($aggregateType, self::AUTHORITATIVE_AGGREGATE_TYPES, true);
+    }
+
+    private function boolValue(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'y'], true);
+        }
+        return false;
     }
 
     /**

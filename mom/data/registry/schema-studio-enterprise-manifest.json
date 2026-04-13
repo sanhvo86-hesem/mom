@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T13:26:31+00:00",
+        "generatedAt": "2026-04-13T13:52:56+00:00",
         "source": "schema_studio_enterprise_manifest",
         "designId": "workspace",
         "designName": "Blank Workspace Design Draft"
@@ -276,7 +276,7 @@
     },
     "health": {
         "_meta": {
-            "generatedAt": "2026-04-13T13:26:31+00:00",
+            "generatedAt": "2026-04-13T13:52:56+00:00",
             "source": "schema_studio_diagnostics",
             "designId": "workspace",
             "designName": "Blank Workspace Design Draft"
@@ -1601,7 +1601,7 @@
         ],
         "commandCenter": {
             "_meta": {
-                "generatedAt": "2026-04-13T13:26:31+00:00",
+                "generatedAt": "2026-04-13T13:52:56+00:00",
                 "source": "schema_studio_command_center_report",
                 "designId": "workspace",
                 "designName": "Blank Workspace Design Draft"
@@ -2074,7 +2074,7 @@
         },
         "round7": {
             "_meta": {
-                "generatedAt": "2026-04-13T13:26:31+00:00",
+                "generatedAt": "2026-04-13T13:52:56+00:00",
                 "source": "schema_studio_round7_report",
                 "designId": "workspace",
                 "designName": "Blank Workspace Design Draft"

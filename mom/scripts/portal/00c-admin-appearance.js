@@ -1457,6 +1457,7 @@ function templateControlBadge(tpl){
   if(mode === 'controlled') return statusChip('full', L('Controlled', 'Controlled'));
   if(mode === 'bridged') return statusChip('admin', L('Bridged', 'Bridged'));
   if(mode === 'draft-cache') return statusChip('preview', L('Draft cache', 'Draft cache'));
+  if(mode === 'preview-seed') return statusChip('preview', L('Preview seed', 'Preview seed'));
   return statusChip('partial', L('Legacy', 'Legacy'));
 }
 

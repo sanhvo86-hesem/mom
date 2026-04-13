@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:26:12.493Z",
+    "generatedAt": "2026-04-13T13:52:24.316Z",
     "domainCount": 49,
     "tableCount": 724,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-13T13:26:18.624Z"
+    "workflowCoverageGeneratedAt": "2026-04-13T13:52:36.686Z"
   },
   "domains": {
     "core_system": {

@@ -84,6 +84,50 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
         ], ['type' => 'form_upload'], 'operator');
     }
 
+    public function testControlledProgrammaticEvidenceRequiresRealArtifactHash(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('evidence_hash_required_for_controlled_record');
+
+        $service->store([
+            'title' => 'Final offline package',
+            'type' => 'form_upload',
+            'controlled_record' => true,
+        ], 'qa.user');
+    }
+
+    public function testControlledProgrammaticEvidenceRejectsInvalidArtifactHash(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('evidence_hash_invalid_for_controlled_record');
+
+        $service->store([
+            'title' => 'Final offline package',
+            'type' => 'form_upload',
+            'controlled_record' => true,
+            'file_hash' => 'not-a-sha256',
+        ], 'qa.user');
+    }
+
+    public function testGovernanceAttachmentFailsClosedWhenTempFileIsMissing(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('governance_attachment_temp_unreadable');
+
+        $service->createGovernanceAttachment([
+            'tmp_name' => $this->tmpDir . '/missing.pdf',
+            'name' => 'approval-evidence.pdf',
+            'type' => 'application/pdf',
+            'size' => 456,
+        ], 'approval-group-1', 'party-1', new \stdClass());
+    }
+
     private function removeTree(string $path): void
     {
         if (!is_dir($path)) {

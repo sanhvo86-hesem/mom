@@ -14,6 +14,8 @@ var DRAFT_CACHE_KEY = 'hesem_graphics_template_draft_cache';
 var VERSION = '20260413b';
 
 var ENDPOINTS = {
+  designConfig:      { method:'GET',  action:'admin_design_config' },
+  designConfigSave:  { method:'POST', action:'admin_design_config_save' },
   templateRegistry:  { method:'GET',  action:'admin_template_registry_get' },
   templateGet:       { method:'GET',  action:'admin_template_get' },
   templateDraftSave: { method:'POST', action:'admin_template_draft_save' },
@@ -25,6 +27,7 @@ var ENDPOINTS = {
   impactTemplate:    { method:'POST', action:'admin_graphics_impact_template' },
   impactComponent:   { method:'POST', action:'admin_graphics_impact_component' },
   complianceMatrix:  { method:'GET',  action:'admin_graphics_compliance_get' },
+  nonCompliant:      { method:'GET',  action:'admin_graphics_non_compliant_get' },
   debtReport:        { method:'GET',  action:'admin_graphics_debt_get' },
   driftReport:       { method:'GET',  action:'admin_graphics_drift_get' },
   rolloutStage:      { method:'POST', action:'admin_graphics_rollout_stage' },
@@ -32,6 +35,8 @@ var ENDPOINTS = {
   rollback:          { method:'POST', action:'admin_graphics_rollout_rollback' },
   auditHistory:      { method:'GET',  action:'admin_graphics_audit_history_get' },
   waiverRequest:     { method:'POST', action:'admin_graphics_waiver_create' },
+  waiverApprove:     { method:'POST', action:'admin_graphics_waiver_approve' },
+  waiverExpire:      { method:'POST', action:'admin_graphics_waiver_expire' },
   activeWaivers:     { method:'GET',  action:'admin_graphics_waiver_active_get' },
   releaseBlockers:   { method:'GET',  action:'admin_graphics_release_blockers_get' },
   changeSet:         { method:'GET',  action:'admin_graphics_change_set_get' },
@@ -59,6 +64,8 @@ var _state = {
   registryAuthority: 'fallback-seed',
   endpointStatus: {},
   backendAvailable: false,
+  designConfigVersion: '',
+  designConfigEtag: '',
   registryVersion: '',
   registryEtag: '',
   waiverVersion: '',
@@ -220,7 +227,7 @@ function normalizeTemplate(tpl){
       return /production|shopfloor|mes|dispatch|execution|line/i.test(String(moduleId || ''));
     }) ? 'explicit-required' : 'standard-compatible';
   }
-  out.sourceAuthority = out.sourceAuthority || (out.status === 'draft-only' ? 'local-draft-cache' : 'backend-ready-registry');
+  out.sourceAuthority = out.sourceAuthority || (out.status === 'draft-only' ? 'local-draft-cache' : 'frontend-fallback-seed');
   return out;
 }
 
@@ -299,11 +306,21 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
   var map = {};
   (seedTemplates || []).forEach(function(tpl){
     var normalized = normalizeTemplate(tpl);
+    if(_state.registryAuthority !== 'backend'){
+      normalized.sourceAuthority = 'frontend-fallback-seed';
+      if(normalized.controlMode === 'controlled') normalized.controlMode = 'preview-seed';
+    }
     if(normalized.templateId) map[normalized.templateId] = normalized;
   });
 
   (_state.templates || []).forEach(function(tpl){
     var normalized = normalizeTemplate(tpl);
+    if(_state.registryAuthority === 'backend'){
+      normalized.sourceAuthority = normalized.sourceAuthority === 'frontend-fallback-seed'
+        ? 'backend-graphics-authority'
+        : (normalized.sourceAuthority || 'backend-graphics-authority');
+      if(normalized.controlMode === 'preview-seed') normalized.controlMode = normalized.status === 'draft-only' ? 'draft-cache' : 'controlled';
+    }
     if(normalized.templateId) map[normalized.templateId] = Object.assign({}, map[normalized.templateId] || {}, normalized);
   });
 
@@ -490,6 +507,7 @@ function fallbackCompliance(modules){
       consumesHmComponents: module.consumesHmComponents === true,
       consumesSharedTokens: module.consumesSharedTokens === true,
       usesPrivateCssShell: module.usesPrivateCssShell === true,
+      status: status,
       reason: reason
     };
   });
@@ -541,6 +559,7 @@ function normalizeComplianceRows(remote){
     return Object.assign({}, row, {
       moduleId: String(row.moduleId || row.module || ''),
       route: String(row.route || ''),
+      status: row.status || linkage,
       linkageStatus: linkage,
       selectorDebt: Number(row.selectorDebt || (row.compliant === false ? findings.length || 1 : 0)),
       privateTokenDebt: Number(row.privateTokenDebt || 0),
@@ -615,7 +634,10 @@ function attachConcurrency(name, payload, headers){
   if(!expected && /^(templateDraftSave|templatePublish|templateDeprecate|rolloutStage|publishApply|rollback)$/.test(name)){
     expected = _state.registryEtag || _state.registryVersion || '';
   }
-  if(!expected && name === 'waiverRequest'){
+  if(!expected && name === 'designConfigSave'){
+    expected = _state.designConfigEtag || _state.designConfigVersion || '';
+  }
+  if(!expected && /^(waiverRequest|waiverApprove|waiverExpire)$/.test(name)){
     expected = _state.waiverEtag || _state.waiverVersion || '';
   }
   if(expected){
@@ -1432,17 +1454,81 @@ function requestWaiver(payload){
   });
 }
 
+function getDesignConfig(){
+  return callEndpoint('designConfig', {}).then(function(data){
+    _state.designConfigVersion = String(data && data.version || data && data.config && data.config._meta && data.config._meta.version || '');
+    _state.designConfigEtag = String(data && data.etag || '');
+    return clone(data || {});
+  });
+}
+
+function saveDesignConfig(payload){
+  payload = payload || {};
+  var body = payload.config ? Object.assign({}, payload) : { config: payload };
+  body.expectedVersion = body.expectedVersion || _state.designConfigEtag || _state.designConfigVersion || '';
+  return callEndpoint('designConfigSave', body).then(function(data){
+    _state.designConfigVersion = String(data && data.version || data && data.config && data.config._meta && data.config._meta.version || _state.designConfigVersion || '');
+    _state.designConfigEtag = String(data && data.etag || _state.designConfigEtag || '');
+    recordAudit('design-config-saved', 'design-config', 'backend-attested');
+    return clone(data || {});
+  });
+}
+
+function getNonCompliantModules(){
+  return callEndpoint('nonCompliant', {}).then(function(data){
+    var rows = firstArray(data, data && data.modules, data && data.rows);
+    return clone(rows || (_state.compliance || []).filter(function(row){
+      return row && row.status !== 'full-admin-controlled';
+    }));
+  }).catch(function(){
+    return clone((_state.compliance || []).filter(function(row){
+      return row && row.status !== 'full-admin-controlled';
+    }));
+  });
+}
+
+function approveWaiver(payload){
+  payload = payload || {};
+  var waiverId = String(payload.waiverId || payload.id || '');
+  if(!waiverId) return Promise.resolve({ ok:false, status:'publish-blocked', message:'Missing waiverId' });
+  return callEndpoint('waiverApprove', payload).then(function(data){
+    _state.waivers = (_state.waivers || []).map(function(row){
+      if(String(row.waiverId || row.id || '') === waiverId) row.status = 'approved';
+      return row;
+    });
+    recordAudit('waiver-approved', waiverId, 'backend-attested');
+    return clone(data || { ok:true, waiverId:waiverId, status:'approved' });
+  });
+}
+
+function expireWaiver(payload){
+  payload = payload || {};
+  var waiverId = String(payload.waiverId || payload.id || '');
+  if(!waiverId) return Promise.resolve({ ok:false, status:'publish-blocked', message:'Missing waiverId' });
+  return callEndpoint('waiverExpire', payload).then(function(data){
+    _state.waivers = (_state.waivers || []).map(function(row){
+      if(String(row.waiverId || row.id || '') === waiverId) row.status = 'expired';
+      return row;
+    });
+    recordAudit('waiver-expired', waiverId, 'backend-attested');
+    return clone(data || { ok:true, waiverId:waiverId, status:'expired' });
+  });
+}
+
 window.HmGraphicsGovernance = {
   VERSION: VERSION,
   ENDPOINTS: ENDPOINTS,
   TEMPLATE_STATES: TEMPLATE_STATES,
   refresh: refresh,
+  getDesignConfig: getDesignConfig,
+  saveDesignConfig: saveDesignConfig,
   getSnapshot: getSnapshot,
   getTemplateRegistry: function(seedTemplates){ return getSnapshot(seedTemplates).templates; },
   getTemplate: getTemplate,
   getModulesForTemplate: function(templateId, seedTemplates){ return modulesForTemplate(templateId, mergeDraftAndPreviewTemplates(seedTemplates || [])); },
   getComplianceMatrix: function(){ return clone(_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(mergeModules([]))); },
   getGraphicsComplianceMatrix: function(){ return clone(_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(mergeModules([]))); },
+  getNonCompliantModules: getNonCompliantModules,
   getGraphicsDebtReport: function(){ return clone(_state.debt || {}); },
   getGraphicsAuditHistory: function(){ return clone(_state.audit || []); },
   getActiveWaivers: function(){ return clone(_state.waivers || []); },
@@ -1477,7 +1563,9 @@ window.HmGraphicsGovernance = {
   stageGraphicsRollout: stageGraphicsRollout,
   applyGraphicsRollout: applyGraphicsRollout,
   rollbackGraphicsRollout: rollbackGraphicsRollout,
-  requestWaiver: requestWaiver
+  requestWaiver: requestWaiver,
+  approveWaiver: approveWaiver,
+  expireWaiver: expireWaiver
 };
 
 })();

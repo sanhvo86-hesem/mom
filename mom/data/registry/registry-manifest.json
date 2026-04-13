@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-13T13:26:24.607Z",
+    "generatedAt": "2026-04-13T13:52:46.332Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "ce560843-acd2-4cf7-a149-ac14b2b6ba21",
-    "enterpriseAuthorityGeneratedAt": "2026-04-13T13:26:45.342119+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-13T13:31:38.740487+00:00"
+    "publication_run_id": "7a0cef97-c7d2-4cb3-986f-cb41e1ee55c9",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-13T13:55:08.452393+00:00",
+    "enterpriseAuthorityGeneratedAt": "2026-04-13T13:55:08.257022+00:00"
   },
   "coverage": {
     "router_actions": 3951,
@@ -191,6 +191,16 @@
       "blocking_gap_count": 0,
       "frontend_ready": true
     },
+    "enterprise_frontend_simulation": {
+      "status": "watch",
+      "scenario_count": 10,
+      "blocked_scenario_count": 0,
+      "blocker_counts": {},
+      "warning_counts": {
+        "frontend_surface_not_explicit": 1,
+        "missing_command_or_state_model": 2
+      }
+    },
     "enterprise_registry_doctor": {
       "status": "watch",
       "finding_count": 2,
@@ -205,16 +215,6 @@
       "generic_runtime_classification_count": 539,
       "bound_command_runtime_binding_count": 276,
       "unbound_command_runtime_binding_count": 0
-    },
-    "enterprise_frontend_simulation": {
-      "status": "watch",
-      "scenario_count": 10,
-      "blocked_scenario_count": 0,
-      "blocker_counts": {},
-      "warning_counts": {
-        "frontend_surface_not_explicit": 1,
-        "missing_command_or_state_model": 2
-      }
     }
   },
   "assets": {
@@ -394,6 +394,14 @@
       "kind": "foundation-governance-publication-summary",
       "records": 1
     },
+    "enterprise-frontend-simulation-report.json": {
+      "kind": "enterprise-frontend-simulation-report",
+      "records": 10
+    },
+    "enterprise-frontend-simulation-report.md": {
+      "kind": "enterprise-frontend-simulation-markdown",
+      "records": 10
+    },
     "registry-authority-standard.json": {
       "kind": "enterprise-registry-authority-standard",
       "records": 1
@@ -425,14 +433,6 @@
     "ai-authority-chain.json": {
       "kind": "ai-authority-chain",
       "records": 4
-    },
-    "enterprise-frontend-simulation-report.json": {
-      "kind": "enterprise-frontend-simulation-report",
-      "records": 10
-    },
-    "enterprise-frontend-simulation-report.md": {
-      "kind": "enterprise-frontend-simulation-markdown",
-      "records": 10
     }
   }
 }

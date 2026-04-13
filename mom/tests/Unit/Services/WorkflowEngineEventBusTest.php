@@ -47,6 +47,17 @@ final class WorkflowEngineEventBusTest extends TestCase
         $this->assertSame('author', $events[0]->metadata['user_id'] ?? null);
     }
 
+    public function testPostgresWritesDoNotUsePdoUnsafeNamedParameterCasts(): void
+    {
+        $source = file_get_contents(__DIR__ . '/../../../api/services/WorkflowEngine.php');
+        $this->assertIsString($source);
+
+        $this->assertStringContainsString('CAST(:data AS jsonb)', $source);
+        $this->assertStringContainsString('CAST(:at AS timestamptz)', $source);
+        $this->assertStringNotContainsString(':data::jsonb', $source);
+        $this->assertStringNotContainsString(':at::timestamptz', $source);
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {

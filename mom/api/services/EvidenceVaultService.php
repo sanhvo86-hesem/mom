@@ -62,6 +62,30 @@ final class EvidenceVaultService
         return $this->dataLayer->getMode() !== DataLayer::MODE_POSTGRES_ONLY;
     }
 
+    private function requiresControlledArtifactHash(array $evidence): bool
+    {
+        foreach (['controlled_record', 'final_evidence', 'immutable_package', 'requires_original_artifact'] as $flag) {
+            if ($this->boolValue($evidence[$flag] ?? false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function boolValue(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'y'], true);
+        }
+        return false;
+    }
+
     // ── Public API ──────────────────────────────────────────────────────────
 
     /**
@@ -125,6 +149,12 @@ final class EvidenceVaultService
         $fileHash = $evidence['file_hash'] ?? '';
         if ($fileHash === '' && isset($evidence['content'])) {
             $fileHash = hash('sha256', (string)$evidence['content']);
+        }
+        if ($fileHash === '' && $this->requiresControlledArtifactHash($evidence)) {
+            throw new RuntimeException('evidence_hash_required_for_controlled_record');
+        }
+        if ($fileHash !== '' && $this->requiresControlledArtifactHash($evidence) && preg_match('/^[a-f0-9]{64}$/i', (string)$fileHash) !== 1) {
+            throw new RuntimeException('evidence_hash_invalid_for_controlled_record');
         }
         if ($fileHash === '') {
             $fileHash = hash('sha256', json_encode($evidence) . $now);
@@ -521,16 +551,23 @@ final class EvidenceVaultService
         $contentType = $file['type'] ?? 'application/octet-stream';
         $fileSize = $file['size'] ?? 0;
 
-        $checksum = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+        if (!is_string($tmpPath) || $tmpPath === '' || !is_file($tmpPath)) {
+            throw new \RuntimeException('governance_attachment_temp_unreadable');
+        }
+
+        $checksum = hash_file('sha256', $tmpPath);
+        if ($checksum === false) {
+            throw new \RuntimeException('governance_attachment_hash_failed');
+        }
 
         $uploadDir = $this->dataDir . '/uploads/evidence';
-        if (!is_dir($uploadDir)) {
-            @mkdir($uploadDir, 0775, true);
+        if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            throw new \RuntimeException('governance_attachment_store_unavailable');
         }
         $storedName = $this->generateUuidV4() . '_' . basename($originalName);
         $storedPath = $uploadDir . '/' . $storedName;
-        if (is_file($tmpPath)) {
-            @move_uploaded_file($tmpPath, $storedPath);
+        if (!@move_uploaded_file($tmpPath, $storedPath) && !@copy($tmpPath, $storedPath)) {
+            throw new \RuntimeException('governance_attachment_store_failed');
         }
 
         $attachmentId = $this->generateUuidV4();

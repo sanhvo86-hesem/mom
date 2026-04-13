@@ -59,7 +59,7 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **Field-edit constraints by state**: `SO.total_qty` editable only in draft/quoted; `WO.machine_id` only in scheduled/setup
 - **ECR required** for part_revision, material_spec, routing_id changes after order is released/active/running
 - **Cancel/Reopen permissions**: manager+ to cancel; director+ to reopen from `closed`
-- **Target reporting is replay-safe**: accepted reports append to `production_report_events.json`; the latest per-target snapshot is updated in `production_logs.json`; duplicate `idempotency_key` with the same fingerprint replays, while conflicts return `idempotency_conflict`
+- **Target reporting is replay-safe**: accepted reports append to `production_report_events.json`; the latest per-target snapshot is updated in `production_logs.json`; duplicate `idempotency_key` with the same fingerprint replays, while conflicts return `idempotency_conflict`; file-backed dispatch mutations share a read-modify-write lock
 - **Target completion is explicit**: quantity alone does not complete a target; completion requires completion intent and `actual_end`
 - **Report governance is explicit**: planned targets cannot be reported by normal operators, completed targets require correction mode, corrections/backdates require planner override, and offline reports require replay-safe IDs
 - **Manual pause/resume is ledger-only**: `execution_event_type` captures progress, downtime, blocked, pause, resume, correction, and completion markers without introducing a second execution command system
@@ -69,4 +69,4 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **Order number sequences are stateful**: `OrderService::generateOrderNumber()` is not atomic; concurrent calls can cause gaps
 - **WorkflowService config dependency**: `OrderWorkflowService` reads `so_jo_wo_config.json`; if missing, falls back to legacy role permissions
 - **Dispatch is shift-based**: targets filtered by `shift_date` + `shift_code`; shift definitions come from master data
-- **Dispatch storage is still staged**: file-backed writes are serialized with a dispatch lock, but DB transaction authority remains a later migration to `shift_targets`, `shift_production_log`, and `mes_operational_event_ledger`
+- **Dispatch storage is still staged**: file-backed planner target mutations and production-report read-modify-write are serialized with an exclusive dispatch lock, and target/log read models use a shared lock, but DB transaction authority remains a later migration to `shift_targets`, `shift_production_log`, and `mes_operational_event_ledger`

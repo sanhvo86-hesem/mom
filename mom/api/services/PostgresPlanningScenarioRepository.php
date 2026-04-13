@@ -23,9 +23,13 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
             }
 
             $uuid = $this->uuidFor($scenarioId);
+            $createdByActor = trim((string)($scenario['created_by'] ?? $scenario['calculated_by'] ?? ''));
             $scenario['scenario_id'] = $scenarioId;
             $scenario['postgres_aps_scenario_id'] = $uuid;
             $scenario['payload_schema_version'] = (string)($scenario['payload_schema_version'] ?? 'planning_scenario.v1');
+            if ($createdByActor !== '') {
+                $scenario['created_by_actor'] = $createdByActor;
+            }
 
             $row = $this->db->insertReturning(
                 'INSERT INTO ' . self::SCENARIO_TABLE . ' (
@@ -63,7 +67,7 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
                     ':scenario_name' => $this->scenarioName($scenario),
                     ':scenario_status' => $this->postgresState($scenario),
                     ':snapshot_at' => (string)($scenario['calculated_at'] ?? $scenario['updated_at'] ?? gmdate(DATE_ATOM)),
-                    ':created_by' => (string)($scenario['created_by'] ?? $scenario['calculated_by'] ?? 'planning-scenario-service'),
+                    ':created_by' => $this->createdByUuid($scenario),
                     ':notes' => (string)($scenario['scenario_name'] ?? $scenario['scenario_key'] ?? $scenarioId),
                     ':metadata' => $this->encodeJson($scenario),
                 ],
@@ -124,7 +128,7 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
         }
 
         return $this->db->transactional(function () use ($scenarioId, $signal): array {
-            $scenario = $this->findScenario($scenarioId);
+            $scenario = $this->findScenarioForUpdate($scenarioId);
             if ($scenario === null) {
                 throw new RuntimeException('planning_scenario_not_found');
             }
@@ -146,6 +150,30 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
             $this->saveScenario($scenario);
             return $signal;
         });
+    }
+
+    private function findScenarioForUpdate(string $scenarioIdOrKey): ?array
+    {
+        $needle = trim($scenarioIdOrKey);
+        if ($needle === '') {
+            return null;
+        }
+
+        $row = $this->db->queryOne(
+            'SELECT * FROM ' . self::SCENARIO_TABLE . '
+             WHERE aps_scenario_id = :uuid
+                OR scenario_name = :needle
+                OR metadata->>\'scenario_id\' = :needle
+                OR metadata->>\'scenario_key\' = :needle
+             LIMIT 1
+             FOR UPDATE',
+            [
+                ':needle' => $needle,
+                ':uuid' => $this->uuidFor($needle),
+            ],
+        );
+
+        return is_array($row) ? $this->normalizeRow($row) : null;
     }
 
     public function listReplanningSignals(array $filters = []): array
@@ -247,7 +275,7 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
     private function scenarioName(array $scenario): string
     {
         $name = trim((string)($scenario['scenario_key'] ?? $scenario['scenario_name'] ?? $scenario['scenario_id'] ?? ''));
-        return $name !== '' ? substr($name, 0, 255) : 'planning-scenario';
+        return $name !== '' ? substr($name, 0, 150) : 'planning-scenario';
     }
 
     /**
@@ -266,7 +294,7 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
     private function uuidFor(string $value): string
     {
         $value = trim($value);
-        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1) {
+        if ($this->isUuid($value)) {
             return strtolower($value);
         }
 
@@ -280,6 +308,25 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
             substr($hash, 17, 3),
             substr($hash, 20, 12),
         );
+    }
+
+    /**
+     * @param array<string, mixed> $scenario
+     */
+    private function createdByUuid(array $scenario): ?string
+    {
+        $candidate = trim((string)($scenario['created_by_user_id']
+            ?? $scenario['created_by_uuid']
+            ?? $scenario['created_by']
+            ?? $scenario['calculated_by_user_id']
+            ?? ''));
+
+        return $this->isUuid($candidate) ? strtolower($candidate) : null;
+    }
+
+    private function isUuid(string $value): bool
+    {
+        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1;
     }
 
     /**
