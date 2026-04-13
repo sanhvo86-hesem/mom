@@ -163,6 +163,9 @@ smoke_assert(array_key_exists('db_target_next_action', (array)($workspace['conne
 smoke_assert(array_key_exists('migration_table_present', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the schema_migrations ledger table exists.');
 smoke_assert(array_key_exists('applied_migration_count', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose the applied migration count.');
 smoke_assert(array_key_exists('pending_migration_count', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose pending migration backlog count.');
+smoke_assert(array_key_exists('pending_migration_ids', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose exact pending migration IDs when the ledger is behind.');
+smoke_assert(array_key_exists('pending_migrations', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose exact pending migration file metadata when the ledger is behind.');
+smoke_assert(array_key_exists('extra_applied_migration_ids', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose ledger rows that no longer match source-controlled migration files.');
 smoke_assert(array_key_exists('structural_drift_table_count', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose structural drift counts.');
 smoke_assert(array_key_exists('runtime_path_active', (array)($workspace['connection'] ?? [])), 'Workspace connection should expose whether the application runtime is actually on the PostgreSQL path.');
 smoke_assert(array_key_exists('releaseGate', (array)($workspace['operational'] ?? [])), 'Workspace operational state should expose a release gate.');

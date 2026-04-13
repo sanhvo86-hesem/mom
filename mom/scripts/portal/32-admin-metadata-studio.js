@@ -180,8 +180,9 @@ function _dbTargetAlert(connection){
   var tone = (status === 'not_configured') ? 'neutral' : 'warn';
   var reason = connection && connection.db_target_reason ? String(connection.db_target_reason) : '';
   var nextAction = connection && connection.db_target_next_action ? String(connection.db_target_next_action) : '';
+  var pending = connection && Array.isArray(connection.pending_migration_ids) ? connection.pending_migration_ids.filter(Boolean) : [];
   var label = status.replace(/_/g, ' ');
-  return '<div class="ds-inline-alert tone-' + _esc(tone) + '"><strong>' + _esc(_t('DB target', 'DB target')) + ': ' + _esc(label) + '.</strong> ' + _esc(reason) + (nextAction ? ' ' + _esc(_t('Hành động', 'Action')) + ': ' + _esc(nextAction) : '') + '</div>';
+  return '<div class="ds-inline-alert tone-' + _esc(tone) + '"><strong>' + _esc(_t('DB target', 'DB target')) + ': ' + _esc(label) + '.</strong> ' + _esc(reason) + (pending.length ? ' ' + _esc(_t('Migration còn pending', 'Pending migrations')) + ': <code>' + _esc(pending.slice(0, 6).join(', ')) + '</code>.' : '') + (nextAction ? ' ' + _esc(_t('Hành động', 'Action')) + ': ' + _esc(nextAction) : '') + '</div>';
 }
 function _dbProbeTone(status){
   var key = String(status || '').toLowerCase();
@@ -890,7 +891,9 @@ function _renderOverview(){
   var operational = ws.operational || {};
   var domains = Array.isArray(ws.domains) ? ws.domains.slice(0, 12) : [];
 
-  var blockers = Array.isArray(highlights.blockers) ? highlights.blockers : [];
+  var operationalRisks = Array.isArray(operational.risks) ? operational.risks : [];
+  var qualityBlockers = Array.isArray(highlights.blockers) ? highlights.blockers : [];
+  var blockers = operationalRisks.filter(function(item){ return !!(item && item.blocking); }).concat(qualityBlockers).slice(0, 12);
   var governanceGaps = Array.isArray(highlights.governance_gaps) ? highlights.governance_gaps : [];
   var governanceDirectMissing = Array.isArray(highlights.governance_direct_missing) ? highlights.governance_direct_missing : [];
   var unlinkedComponents = Array.isArray(highlights.unlinked_components) ? highlights.unlinked_components : [];
@@ -901,7 +904,6 @@ function _renderOverview(){
   var blindSpots = Array.isArray(highlights.blind_spots) ? highlights.blind_spots : [];
   var stressScenarios = Array.isArray(highlights.stress_scenarios) ? highlights.stress_scenarios : [];
   var migrationHotspots = Array.isArray(highlights.migration_hotspots) ? highlights.migration_hotspots : [];
-  var operationalRisks = Array.isArray(operational.risks) ? operational.risks : [];
   var coverageGaps = Array.isArray(operational.coverageGaps) ? operational.coverageGaps : [];
   var freshness = operational.freshness || {};
   var freshnessArtifacts = Array.isArray(freshness.artifacts) ? freshness.artifacts : [];
@@ -913,6 +915,7 @@ function _renderOverview(){
   var appliedMigrationCount = Number(connection.applied_migration_count || 0);
   var migrationFileCount = Number(connection.migration_file_count || 0);
   var pendingMigrationCount = Number(connection.pending_migration_count || 0);
+  var pendingMigrationIds = Array.isArray(connection.pending_migration_ids) ? connection.pending_migration_ids.filter(Boolean) : [];
   var migrationLedgerTone = !dbProbeReachable ? 'neutral' : (migrationTablePresent ? (appliedMigrationCount > 0 ? 'good' : 'bad') : 'bad');
   var migrationLedgerStatus = !dbProbeReachable
     ? _t('N/A', 'N/A')
@@ -986,6 +989,7 @@ function _renderOverview(){
           (!dbProbeApplicable ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Chưa có hồ sơ DB thật nên module này chưa thể kiểm tra production truth từ PostgreSQL.', 'No live DB profile is configured yet, so this module cannot verify production truth from PostgreSQL.')) + '</div>' : ''),
           (dbProbeApplicable && dbProbeReachable && !runtimePathActive ? '<div class="ds-inline-alert tone-warn">' + _esc(_t('DB thật đang reachable, nhưng runtime ứng dụng vẫn chưa chạy trên PostgreSQL. Đây là trạng thái split-brain: Data Schema nhìn thấy DB truth còn app runtime vẫn có thể đọc/ghi qua JSON path.', 'The live DB is reachable, but the application runtime is still not on PostgreSQL. This is a split-brain state: Data Schema can see DB truth while the app runtime may still read/write through the JSON path.')) + '</div>' : ''),
           (dbProbeReachable && connection.present_table_count > 0 && (!migrationTablePresent || appliedMigrationCount <= 0) ? '<div class="ds-inline-alert tone-bad">' + _esc(_t('PostgreSQL đã có bảng live, nhưng authority ledger schema_migrations đang thiếu hoặc rỗng. Đây là khe hở vận hành: không thể biết DB hiện tại đã được áp những migration nào.', 'PostgreSQL already contains live tables, but the schema_migrations authority ledger is missing or empty. This is an operational gap: the system cannot prove which migrations produced the current DB state.')) + '</div>' : ''),
+          (dbProbeReachable && appliedMigrationCount > 0 && pendingMigrationCount > 0 ? '<div class="ds-inline-alert tone-warn"><strong>' + _esc(_t('Migration còn pending', 'Pending migrations')) + ':</strong> <code>' + _esc(pendingMigrationIds.length ? pendingMigrationIds.slice(0, 8).join(', ') : _fmtInt(pendingMigrationCount)) + '</code>. ' + _esc(_t('Chạy php database/migrate.php --status rồi apply qua governed migration runner trên server.', 'Run php database/migrate.php --status, then apply through the governed migration runner on the server.')) + '</div>' : ''),
           (connection.error ? '<div class="ds-inline-alert tone-bad"><strong>' + _esc(_t('DB probe error', 'DB probe error')) + ':</strong> ' + _esc(connection.error) + '</div>' : ''),
         '</div>',
       '</section>',

@@ -1,0 +1,317 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MOM\Api\Controllers;
+
+use MOM\Api\Router;
+
+return static function (Router $router, string $dataDir): void {
+    // Orders (SO/JO/WO)
+    $router->actions([
+        'order_so_list'           => [OrderController::class, 'listSalesOrders'],
+        'order_so_detail'         => [OrderController::class, 'getSalesOrderDetail'],
+        'order_so_create'         => [OrderController::class, 'createSalesOrder'],
+        'order_so_update'         => [OrderController::class, 'updateSalesOrder'],
+        'order_jo_list'           => [OrderController::class, 'listJobOrders'],
+        'order_jo_detail'         => [OrderController::class, 'getJobOrderDetail'],
+        'order_jo_create'         => [OrderController::class, 'createJobOrder'],
+        'order_jo_update'         => [OrderController::class, 'updateJobOrder'],
+        'order_wo_create'         => [OrderController::class, 'createWorkOrder'],
+        'order_wo_update'         => [OrderController::class, 'updateWorkOrder'],
+        'order_transition'        => [OrderController::class, 'transition'],
+        'order_contract_review'   => [OrderController::class, 'contractReview'],
+        'order_hold_set'          => [OrderController::class, 'setHold'],
+        'order_hold_release'      => [OrderController::class, 'releaseHold'],
+        'order_note_add'          => [OrderController::class, 'addNote'],
+        'order_hierarchy'         => [OrderController::class, 'getHierarchy'],
+        'order_timeline'          => [OrderController::class, 'getTimeline'],
+        'order_dashboard_stats'   => [OrderController::class, 'getDashboardStats'],
+        'order_dashboard_kpi'     => [OrderController::class, 'getDashboardKpi'],
+        'order_search'            => [OrderController::class, 'search'],
+        'order_link_form'         => [OrderController::class, 'linkForm'],
+        'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
+        'order_shipment_gate_override' => [OrderController::class, 'overrideShipmentGate'],
+        'order_shipment_gate_overrides' => [OrderController::class, 'listShipmentGateOverrides'],
+        'order_schedule_get'      => [OrderController::class, 'getSchedule'],
+        'order_schedule_slot'     => [OrderController::class, 'createScheduleSlot'],
+        'order_schedule_update'   => [OrderController::class, 'updateScheduleSlot'],
+        'order_capacity_heatmap'  => [OrderController::class, 'getCapacityHeatmap'],
+        'order_promise_suggest'   => [OrderController::class, 'suggestPromiseDate'],
+    ]);
+    
+    // Exception Management
+    $router->actions([
+        'exception_dashboard'       => [ExceptionController::class, 'dashboard'],
+        'exception_list'            => [ExceptionController::class, 'listAll'],
+        'exception_detail'          => [ExceptionController::class, 'detail'],
+        'exception_complaint_create'=> [ExceptionController::class, 'createComplaint'],
+        'exception_complaint_update'=> [ExceptionController::class, 'updateComplaint'],
+        'exception_mrb_create'      => [ExceptionController::class, 'createMrb'],
+        'exception_mrb_update'      => [ExceptionController::class, 'updateMrb'],
+        'exception_deviation_create'=> [ExceptionController::class, 'createDeviation'],
+        'exception_deviation_update'=> [ExceptionController::class, 'updateDeviation'],
+        'exception_concession_create' => [ExceptionController::class, 'createConcession'],
+        'exception_concession_update' => [ExceptionController::class, 'updateConcession'],
+        'exception_transition'      => [ExceptionController::class, 'transition'],
+        'exception_copq_summary'    => [ExceptionController::class, 'copqSummary'],
+        'exception_trends'          => [ExceptionController::class, 'trends'],
+        'exception_escalate'        => [ExceptionController::class, 'escalate'],
+    ]);
+    
+    // Finance control objects
+    $router->actions([
+        'finance_period_close_list' => [FinanceController::class, 'listPeriodCloses'],
+        'finance_period_close_create' => [FinanceController::class, 'createPeriodClose'],
+        'finance_period_close_transition' => [FinanceController::class, 'transitionPeriodClose'],
+        'finance_backdate_exception_list' => [FinanceController::class, 'listBackdateExceptions'],
+        'finance_backdate_exception_create' => [FinanceController::class, 'createBackdateException'],
+        'finance_backdate_exception_transition' => [FinanceController::class, 'transitionBackdateException'],
+        'finance_credit_memo_list' => [FinanceController::class, 'listCreditMemos'],
+        'finance_credit_memo_create' => [FinanceController::class, 'createCreditMemo'],
+        'finance_debit_memo_list' => [FinanceController::class, 'listDebitMemos'],
+        'finance_debit_memo_create' => [FinanceController::class, 'createDebitMemo'],
+    ]);
+    
+    // Commercial customer purchase-order controls
+    $router->actions([
+        'customer_purchase_order_list' => [CustomerPurchaseOrderController::class, 'listPurchaseOrders'],
+        'customer_purchase_order_detail' => [CustomerPurchaseOrderController::class, 'getPurchaseOrder'],
+        'customer_purchase_order_create' => [CustomerPurchaseOrderController::class, 'createPurchaseOrder'],
+        'customer_purchase_order_transition' => [CustomerPurchaseOrderController::class, 'transitionPurchaseOrder'],
+    ]);
+    
+    // Supplier Quality Management
+    $router->actions([
+        'supplier_dashboard'        => [SupplierController::class, 'dashboard'],
+        'supplier_scorecard_list'   => [SupplierController::class, 'listScorecards'],
+        'supplier_scorecard_detail' => [SupplierController::class, 'scorecardDetail'],
+        'supplier_scorecard_calc'   => [SupplierController::class, 'calculateScorecard'],
+        'supplier_incoming_list'    => [SupplierController::class, 'listIncoming'],
+        'supplier_incoming_create'  => [SupplierController::class, 'createIncoming'],
+        'supplier_incoming_update'  => [SupplierController::class, 'updateIncoming'],
+        'supplier_skip_lot_status'  => [SupplierController::class, 'skipLotStatus'],
+        'supplier_skip_lot_update'  => [SupplierController::class, 'updateSkipLot'],
+        'supplier_asl_list'         => [SupplierController::class, 'listAsl'],
+        'supplier_asl_upsert'       => [SupplierController::class, 'upsertAsl'],
+        'supplier_scar_list'        => [SupplierController::class, 'listScar'],
+        'supplier_scar_create'      => [SupplierController::class, 'createScar'],
+        'supplier_scar_update'      => [SupplierController::class, 'updateScar'],
+        'supplier_scar_transition'  => [SupplierController::class, 'scarTransition'],
+        'supplier_audit_list'       => [SupplierController::class, 'listAudits'],
+        'supplier_audit_upsert'     => [SupplierController::class, 'upsertAudit'],
+    ]);
+    
+    // Quoting & Estimation
+    $router->actions([
+        'quote_list'              => [QuoteController::class, 'listQuotes'],
+        'quote_detail'            => [QuoteController::class, 'detail'],
+        'quote_create'            => [QuoteController::class, 'create'],
+        'quote_update'            => [QuoteController::class, 'update'],
+        'quote_transition'        => [QuoteController::class, 'transition'],
+        'quote_convert_to_so'     => [QuoteController::class, 'convertToSo'],
+        'quote_estimate_cycle'    => [QuoteController::class, 'estimateCycleTime'],
+        'quote_estimate_material' => [QuoteController::class, 'estimateMaterial'],
+        'quote_dashboard'         => [QuoteController::class, 'dashboard'],
+    ]);
+    
+    // Evidence Vault
+    $router->actions([
+        'evidence_list'           => [EvidenceController::class, 'listEvidence'],
+        'evidence_detail'         => [EvidenceController::class, 'detail'],
+        'evidence_upload'         => [EvidenceController::class, 'upload'],
+        'evidence_link'           => [EvidenceController::class, 'link'],
+        'evidence_chain_custody'  => [EvidenceController::class, 'chainOfCustody'],
+        'evidence_verify_chain'   => [EvidenceController::class, 'verifyChain'],
+        'evidence_search'         => [EvidenceController::class, 'search'],
+    ]);
+    
+    // FMEA & Control Plan
+    $router->actions([
+        'fmea_list'               => [FmeaController::class, 'listFmeas'],
+        'fmea_detail'             => [FmeaController::class, 'getFmeaDetail'],
+        'fmea_create'             => [FmeaController::class, 'createFmea'],
+        'fmea_update'             => [FmeaController::class, 'updateFmea'],
+        'fmea_add_failure_mode'   => [FmeaController::class, 'addFailureMode'],
+        'fmea_update_failure_mode'=> [FmeaController::class, 'updateFailureMode'],
+        'fmea_add_action'         => [FmeaController::class, 'addAction'],
+        'fmea_complete_action'    => [FmeaController::class, 'completeAction'],
+        'fmea_generate_cp'        => [FmeaController::class, 'generateControlPlan'],
+        'fmea_control_plans'      => [FmeaController::class, 'listControlPlans'],
+        'fmea_cp_detail'          => [FmeaController::class, 'getControlPlanDetail'],
+        'fmea_rpn_trend'          => [FmeaController::class, 'getRpnTrend'],
+        'fmea_link_ncr'           => [FmeaController::class, 'linkNcrToFmea'],
+    ]);
+    
+    // APQP / PPAP
+    $router->actions([
+        'apqp_list'               => [ApqpController::class, 'listProjects'],
+        'apqp_detail'             => [ApqpController::class, 'getProjectDetail'],
+        'apqp_create'             => [ApqpController::class, 'createProject'],
+        'apqp_update'             => [ApqpController::class, 'updateProject'],
+        'apqp_advance_phase'      => [ApqpController::class, 'advancePhase'],
+        'apqp_gate_review'        => [ApqpController::class, 'submitGateReview'],
+        'apqp_gate_approve'       => [ApqpController::class, 'approveGate'],
+        'apqp_gate_reject'        => [ApqpController::class, 'rejectGate'],
+        'apqp_ppap_create'        => [ApqpController::class, 'createPpapSubmission'],
+        'apqp_ppap_element'       => [ApqpController::class, 'updatePpapElement'],
+        'apqp_ppap_response'      => [ApqpController::class, 'recordCustomerResponse'],
+        'apqp_deliverables'       => [ApqpController::class, 'getPhaseDeliverables'],
+        'apqp_dashboard'          => [ApqpController::class, 'getDashboard'],
+    ]);
+    
+    // Mobile Shop Floor
+    $router->actions([
+        'mobile_my_queue'         => [MobileController::class, 'getMyQueue'],
+        'mobile_start_task'       => [MobileController::class, 'startTask'],
+        'mobile_complete_task'    => [MobileController::class, 'completeTask'],
+        'mobile_clock_in'         => [MobileController::class, 'clockIn'],
+        'mobile_clock_out'        => [MobileController::class, 'clockOut'],
+        'mobile_capture_inspection' => [MobileController::class, 'captureInspection'],
+        'mobile_sync_batch'       => [MobileController::class, 'submitOfflineBatch'],
+        'mobile_sync_status'      => [MobileController::class, 'getSyncStatus'],
+        'mobile_resolve_conflict' => [MobileController::class, 'resolveConflict'],
+        'mobile_shop_overview'    => [MobileController::class, 'getShopFloorOverview'],
+        'mobile_dashboard'        => [MobileController::class, 'getOperatorDashboard'],
+    ]);
+    
+    // Master Data Management
+    $router->actions([
+        'master_data_list'            => [MasterDataController::class, 'listRecords'],
+        'master_data_detail'          => [MasterDataController::class, 'getDetail'],
+        'master_data_create'          => [MasterDataController::class, 'createRecord'],
+        'master_data_update'          => [MasterDataController::class, 'updateRecord'],
+        'master_data_delete'          => [MasterDataController::class, 'deleteRecord'],
+        'master_data_status'          => [MasterDataController::class, 'changeStatus'],
+        'master_data_history'         => [MasterDataController::class, 'getHistory'],
+        'master_data_entities'        => [MasterDataController::class, 'listEntities'],
+        'master_data_snapshot'        => [MasterDataController::class, 'listRecords'],
+        // Shifts
+        'shift_list'                  => [MasterDataController::class, 'listShifts'],
+        'shift_save'                  => [MasterDataController::class, 'saveShift'],
+        'shift_assignments'           => [MasterDataController::class, 'listShiftAssignments'],
+        'shift_assign'                => [MasterDataController::class, 'saveShiftAssignment'],
+        'shift_holidays'              => [MasterDataController::class, 'listHolidays'],
+        'shift_holiday_save'          => [MasterDataController::class, 'saveHoliday'],
+    ]);
+    
+    // Production Dispatch & Shift Targets
+    $router->actions([
+        'dispatch_timeline'          => [DispatchController::class, 'getTimeline'],
+        'dispatch_dashboard'         => [DispatchController::class, 'getDashboard'],
+        'dispatch_list_targets'      => [DispatchController::class, 'listTargets'],
+        'dispatch_create_target'     => [DispatchController::class, 'createTarget'],
+        'dispatch_update_target'     => [DispatchController::class, 'updateTarget'],
+        'dispatch_send'              => [DispatchController::class, 'dispatchTarget'],
+        'dispatch_operator_tasks'    => [DispatchController::class, 'getOperatorDispatch'],
+        'dispatch_report_production' => [DispatchController::class, 'reportProduction'],
+    ]);
+    
+    // Logistics: Subcontract, OQC, Packing, Delivery
+    $router->actions([
+        'subcontract_list'          => [LogisticsController::class, 'subcontract_list'],
+        'subcontract_create'        => [LogisticsController::class, 'subcontract_create'],
+        'subcontract_update'        => [LogisticsController::class, 'subcontract_update'],
+        'subcontract_receive'       => [LogisticsController::class, 'subcontract_receive'],
+        'oqc_list'                  => [LogisticsController::class, 'oqc_list'],
+        'oqc_create'                => [LogisticsController::class, 'oqc_create'],
+        'oqc_update'                => [LogisticsController::class, 'oqc_update'],
+        'packing_list'              => [LogisticsController::class, 'packing_list'],
+        'packing_create'            => [LogisticsController::class, 'packing_create'],
+        'packing_update'            => [LogisticsController::class, 'packing_update'],
+        'delivery_confirm'          => [LogisticsController::class, 'delivery_confirm'],
+    ]);
+    
+    // CNC Programs
+    $router->actions([
+        'cnc_program_list'          => [CncProgramController::class, 'listPrograms'],
+        'cnc_program_detail'        => [CncProgramController::class, 'getDetail'],
+        'cnc_program_create'        => [CncProgramController::class, 'create'],
+        'cnc_program_update'        => [CncProgramController::class, 'update'],
+        'cnc_program_upload_version'=> [CncProgramController::class, 'addVersion'],
+        'cnc_program_approve'       => [CncProgramController::class, 'approve'],
+        'cnc_program_setup_sheets'  => [CncProgramController::class, 'listSetupSheets'],
+        'cnc_program_setup_create'  => [CncProgramController::class, 'createSetupSheet'],
+    ]);
+    
+    // Product Passport
+    $router->actions([
+        'product_passport_list'      => [ProductPassportController::class, 'listPassports'],
+        'product_passport_detail'    => [ProductPassportController::class, 'getDetail'],
+        'product_passport_create'    => [ProductPassportController::class, 'create'],
+        'product_passport_add_event' => [ProductPassportController::class, 'addEvent'],
+        'product_passport_trace'     => [ProductPassportController::class, 'trace'],
+        'product_passport_qr'        => [ProductPassportController::class, 'getQrData'],
+    ]);
+    
+    // AI Quality Scheduling
+    $router->actions([
+        'ai_prediction_list'         => [AiSchedulingController::class, 'listPredictions'],
+        'ai_prediction_acknowledge'  => [AiSchedulingController::class, 'acknowledgePrediction'],
+        'ai_prediction_resolve'      => [AiSchedulingController::class, 'resolvePrediction'],
+        'ai_spc_anomalies'           => [AiSchedulingController::class, 'getSpcAnomalies'],
+        'ai_tool_wear'               => [AiSchedulingController::class, 'getToolWearPredictions'],
+        'ai_dashboard'               => [AiSchedulingController::class, 'getDashboard'],
+        'schedule_get'               => [AiSchedulingController::class, 'getSchedule'],
+        'schedule_slot_create'       => [AiSchedulingController::class, 'createSlot'],
+        'schedule_slot_update'       => [AiSchedulingController::class, 'updateSlot'],
+        'schedule_conflicts'         => [AiSchedulingController::class, 'getConflicts'],
+        'schedule_capacity'          => [AiSchedulingController::class, 'getCapacityHeatmap'],
+        'schedule_promise'           => [AiSchedulingController::class, 'suggestPromiseDate'],
+    ]);
+    
+    // Customer Portal
+    $router->actions([
+        'customer_portal_users'         => [CustomerPortalController::class, 'listUsers'],
+        'customer_portal_user_create'   => [CustomerPortalController::class, 'createUser'],
+        'customer_portal_user_update'   => [CustomerPortalController::class, 'updateUser'],
+        'customer_portal_access_list'   => [CustomerPortalController::class, 'listAccessGrants'],
+        'customer_portal_access_grant'  => [CustomerPortalController::class, 'grantAccess'],
+        'customer_portal_access_revoke' => [CustomerPortalController::class, 'revokeAccess'],
+        'customer_portal_complaints'    => [CustomerPortalController::class, 'listComplaints'],
+        'customer_portal_documents'     => [CustomerPortalController::class, 'listDocAccess'],
+        'customer_portal_analytics'     => [CustomerPortalController::class, 'getAnalytics'],
+    ]);
+    
+    // Compliance Reports
+    $router->actions([
+        'compliance_report_types'           => [ComplianceReportController::class, 'listReportTypes'],
+        'compliance_report_generate'        => [ComplianceReportController::class, 'generateReport'],
+        'compliance_report_history'         => [ComplianceReportController::class, 'getHistory'],
+        'compliance_report_management_review' => [ComplianceReportController::class, 'getManagementReviewData'],
+        'compliance_report_customer_quality'  => [ComplianceReportController::class, 'getCustomerQualityData'],
+        'compliance_report_supplier_review'   => [ComplianceReportController::class, 'getSupplierReviewData'],
+        'compliance_report_copq'            => [ComplianceReportController::class, 'getCopqData'],
+        'compliance_report_evidence_package' => [ComplianceReportController::class, 'getEvidencePackage'],
+    ]);
+    
+    // Knowledge Base
+    $router->actions([
+        'knowledge_list'    => [KnowledgeController::class, 'listTips'],
+        'knowledge_detail'  => [KnowledgeController::class, 'getDetail'],
+        'knowledge_create'  => [KnowledgeController::class, 'create'],
+        'knowledge_update'  => [KnowledgeController::class, 'update'],
+        'knowledge_vote'    => [KnowledgeController::class, 'vote'],
+        'knowledge_comment' => [KnowledgeController::class, 'addComment'],
+    ]);
+    
+    // Continuous Improvement
+    $router->actions([
+        'ci_dashboard'           => [CiController::class, 'dashboard'],
+        'ci_suggestion_list'     => [CiController::class, 'listSuggestions'],
+        'ci_suggestion_create'   => [CiController::class, 'createSuggestion'],
+        'ci_project_list'        => [CiController::class, 'listProjects'],
+        'ci_project_create'      => [CiController::class, 'createProject'],
+        'ci_project_update'      => [CiController::class, 'updateProject'],
+        'ci_project_transition'  => [CiController::class, 'transitionProject'],
+        'ci_roi_summary'         => [CiController::class, 'getRoiSummary'],
+    ]);
+    
+    // Energy Dashboard
+    $router->actions([
+        'energy_overview'       => [EnergyController::class, 'getOverview'],
+        'energy_machine_detail' => [EnergyController::class, 'getMachineDetail'],
+        'energy_per_part'       => [EnergyController::class, 'getPerPartEnergy'],
+        'energy_cost_trend'     => [EnergyController::class, 'getCostTrend'],
+    ]);
+};

@@ -824,9 +824,10 @@ final class DataSchemaService
                 'requiredForRelease' => true,
                 'dependencyPaths' => [
                     $this->registryPath('table-registry'),
+                    $this->registryPath('data-fields'),
                     $this->registryPath('api-params'),
-                    $this->rootDir . '/mom/api/index.php',
-                    $this->rootDir . '/mom/api/controllers/*.php',
+                    $this->rootDir . '/mom/tools/registry/generate-module-builder-registry.mjs',
+                    $this->rootDir . '/mom/api/controllers/GenericCrudController.php',
                 ],
             ],
             'endpoint_catalog_index' => [
@@ -1271,7 +1272,7 @@ final class DataSchemaService
         $knownDependencyTimestamps = [];
 
         foreach ($specs as $id => $spec) {
-            $path = (string)($spec['path'] ?? '');
+            $path = (string)$spec['path'];
             if ($path === '') {
                 continue;
             }
@@ -1290,7 +1291,7 @@ final class DataSchemaService
                 (int)$spec['targetAgeSeconds'],
                 (array)($documents[$id] ?? []),
                 !empty($spec['requiredForRelease']),
-                array_values(array_filter((array)($spec['dependencyPaths'] ?? []), 'is_string')),
+                array_values(array_filter((array)$spec['dependencyPaths'], 'is_string')),
                 $knownDependencyTimestamps
             );
             $items[] = $item;
@@ -1382,7 +1383,7 @@ final class DataSchemaService
             }
             if ($latestDependencyTimestamp === null || $timestamp > $latestDependencyTimestamp) {
                 $latestDependencyTimestamp = $timestamp;
-                $latestDependencyPath = (string)($dependencyTimestamp['path'] ?? $dependencyPath);
+                $latestDependencyPath = (string)$dependencyTimestamp['path'];
             }
         }
         $sourceDriftSeconds = ($basisTimestamp !== null && $latestDependencyTimestamp !== null && $latestDependencyTimestamp > $basisTimestamp)
@@ -1434,7 +1435,12 @@ final class DataSchemaService
         $generatedAt = $payload !== [] ? $this->extractArtifactGeneratedAt($payload) : $this->extractArtifactGeneratedAtFromPath($path);
         $generatedTimestamp = $this->isoToTimestamp($generatedAt);
         $mtime = $this->pathTimestamp($path);
-        $basisTimestamp = $generatedTimestamp ?? $mtime;
+        $basisTimestamp = null;
+        if ($generatedTimestamp !== null && $mtime !== null) {
+            $basisTimestamp = max($generatedTimestamp, $mtime);
+        } else {
+            $basisTimestamp = $generatedTimestamp ?? $mtime;
+        }
         $this->artifactTimestampCache[$path] = $basisTimestamp;
 
         return $basisTimestamp;
@@ -1680,8 +1686,8 @@ final class DataSchemaService
         }
 
         usort($structuralDrift, static function (array $a, array $b): int {
-            $aScore = count((array)($a['missing_columns'] ?? [])) + count((array)($a['unexpected_columns'] ?? [])) + count((array)($a['type_drifts'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
-            $bScore = count((array)($b['missing_columns'] ?? [])) + count((array)($b['unexpected_columns'] ?? [])) + count((array)($b['type_drifts'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
+            $aScore = count((array)$a['missing_columns']) + count((array)$a['unexpected_columns']) + count((array)$a['type_drifts']) + (!empty($a['pk_drift']) ? 1 : 0);
+            $bScore = count((array)$b['missing_columns']) + count((array)$b['unexpected_columns']) + count((array)$b['type_drifts']) + (!empty($b['pk_drift']) ? 1 : 0);
             return $bScore <=> $aScore;
         });
 
@@ -1692,12 +1698,12 @@ final class DataSchemaService
             'db_probe_applicable' => !empty($dbProbe['db_probe_applicable']),
             'db_probe_reachable' => !empty($dbProbe['db_probe_reachable']),
             'db_probe_resolved' => !empty($dbProbe['db_probe_resolved']),
-            'db_target_status' => (string)($dbTarget['status'] ?? 'not_configured'),
-            'db_target_healthy' => (bool)($dbTarget['healthy'] ?? false),
-            'db_target_reason' => (string)($dbTarget['reason'] ?? ''),
-            'db_target_next_action' => (string)($dbTarget['nextAction'] ?? ''),
+            'db_target_status' => (string)$dbTarget['status'],
+            'db_target_healthy' => (bool)$dbTarget['healthy'],
+            'db_target_reason' => (string)$dbTarget['reason'],
+            'db_target_next_action' => (string)$dbTarget['nextAction'],
             'db_target_authority_table_count' => $authorityTableCount,
-            'authority_coverage_ratio' => (float)($dbTarget['coverageRatio'] ?? 0.0),
+            'authority_coverage_ratio' => (float)$dbTarget['coverageRatio'],
             'configured' => !empty($dbProbe['configured']),
             'reachable' => (bool)($dbProbe['reachable'] ?? false),
             'host' => (string)($dbProbe['host'] ?? ''),
@@ -1717,6 +1723,10 @@ final class DataSchemaService
             'applied_migration_count' => (int)($dbProbe['applied_migration_count'] ?? 0),
             'migration_file_count' => (int)($dbProbe['migration_file_count'] ?? 0),
             'pending_migration_count' => (int)($dbProbe['pending_migration_count'] ?? 0),
+            'pending_migrations' => array_values(array_filter((array)($dbProbe['pending_migrations'] ?? []), 'is_array')),
+            'pending_migration_ids' => array_values(array_filter((array)($dbProbe['pending_migration_ids'] ?? []), 'is_scalar')),
+            'applied_migration_ids' => array_values(array_filter((array)($dbProbe['applied_migration_ids'] ?? []), 'is_scalar')),
+            'extra_applied_migration_ids' => array_values(array_filter((array)($dbProbe['extra_applied_migration_ids'] ?? []), 'is_scalar')),
             'latest_migration_id' => (string)($dbProbe['latest_migration_id'] ?? ''),
             'latest_migration_applied_at' => (string)($dbProbe['latest_migration_applied_at'] ?? ''),
             'structural_drift_table_count' => count($structuralDrift),
@@ -1744,6 +1754,7 @@ final class DataSchemaService
         $migrationTablePresent = !empty($dbProbe['migration_table_present']);
         $appliedMigrationCount = (int)($dbProbe['applied_migration_count'] ?? 0);
         $migrationFileCount = (int)($dbProbe['migration_file_count'] ?? 0);
+        $pendingMigrationCount = (int)($dbProbe['pending_migration_count'] ?? 0);
         $coverageRatio = $authorityTableCount > 0 ? round($presentTableCount / max(1, $authorityTableCount), 4) : 0.0;
 
         if (!$applicable) {
@@ -1815,11 +1826,11 @@ final class DataSchemaService
             ];
         }
 
-        if ($migrationFileCount > 0 && $appliedMigrationCount > 0 && $appliedMigrationCount < $migrationFileCount) {
+        if ($migrationFileCount > 0 && $appliedMigrationCount > 0 && $pendingMigrationCount > 0) {
             return [
                 'status' => 'migration_backlog',
                 'healthy' => false,
-                'reason' => sprintf('%d/%d migrations are recorded as applied.', $appliedMigrationCount, $migrationFileCount),
+                'reason' => sprintf('%d/%d migrations are recorded as applied; %d migration(s) are still pending.', $appliedMigrationCount, $migrationFileCount, $pendingMigrationCount),
                 'nextAction' => 'Apply pending migrations through the governed migration runner.',
                 'coverageRatio' => $coverageRatio,
             ];
@@ -1934,6 +1945,7 @@ final class DataSchemaService
             $unlinkedTableCount += !empty($table['unlinked']) ? 1 : 0;
         }
 
+        /** @var list<array{id:string,severity:string,blocking:bool,title:string,detail:string,nextAction:string}> $risks */
         $risks = [];
         if ((int)($freshnessSummary['missingCount'] ?? 0) > 0) {
             $risks[] = [
@@ -2024,6 +2036,18 @@ final class DataSchemaService
                 'title' => 'Live DB has tables but zero applied migrations are recorded',
                 'detail' => 'schema_migrations exists, but it does not record the live schema baseline.',
                 'nextAction' => 'Backfill the current migration baseline before running new migrations or trusting authority-chain status.',
+            ];
+        }
+
+        if ($dbProbeReachable && (int)($connection['applied_migration_count'] ?? 0) > 0 && (int)($connection['pending_migration_count'] ?? 0) > 0) {
+            $pendingIds = array_values(array_filter((array)($connection['pending_migration_ids'] ?? []), 'is_scalar'));
+            $risks[] = [
+                'id' => 'migration_backlog_pending',
+                'severity' => 'high',
+                'blocking' => true,
+                'title' => 'Pending migrations have not reached the live DB',
+                'detail' => 'Pending migrations: ' . ($pendingIds !== [] ? implode(', ', array_slice(array_map('strval', $pendingIds), 0, 8)) : (string)($connection['pending_migration_count'] ?? 0)),
+                'nextAction' => 'Run php database/migrate.php --status, then apply the pending migration through php database/migrate.php on the governed server runtime.',
             ];
         }
 
@@ -2155,7 +2179,7 @@ final class DataSchemaService
             if (!empty($risk['blocking'])) {
                 $blockingRiskCount += 1;
             }
-            $severity = (string)($risk['severity'] ?? '');
+            $severity = (string)$risk['severity'];
             if (in_array($severity, ['critical', 'high'], true)) {
                 $status = $blockingRiskCount > 0 ? 'blocked' : 'warning';
             } elseif ($status === 'ok' && $severity === 'medium') {
@@ -2168,7 +2192,7 @@ final class DataSchemaService
             if (empty($risk['blocking'])) {
                 continue;
             }
-            $releaseReasons[] = (string)($risk['title'] ?? $risk['id'] ?? 'risk');
+            $releaseReasons[] = (string)$risk['title'];
         }
 
         $coverageGaps = [];
@@ -2511,6 +2535,7 @@ final class DataSchemaService
         $databaseConfig = $this->normalizedDatabaseProbeConfig();
         $dbProbeConfigured = $this->databaseProbeConfigured($databaseConfig);
         $postgresPathActive = !empty($modeSummary['postgres_path_active']);
+        $migrationFiles = $this->migrationFiles();
         $result = [
             'data_layer' => $modeSummary,
             'db_probe_applicable' => $dbProbeConfigured,
@@ -2536,8 +2561,13 @@ final class DataSchemaService
             'unexpected_tables' => [],
             'migration_table_present' => false,
             'applied_migration_count' => 0,
-            'migration_file_count' => $this->migrationFileCount(),
+            'migration_file_count' => count($migrationFiles),
+            'migration_files' => array_values($migrationFiles),
             'pending_migration_count' => 0,
+            'pending_migrations' => [],
+            'pending_migration_ids' => [],
+            'applied_migration_ids' => [],
+            'extra_applied_migration_ids' => [],
             'latest_migration_id' => '',
             'latest_migration_applied_at' => '',
             'error' => '',
@@ -2687,19 +2717,50 @@ final class DataSchemaService
             ")->fetch(PDO::FETCH_ASSOC) ?: [];
             $migrationTablePresent = ((int)($migrationMeta['table_present'] ?? 0) === 1);
             $appliedMigrationCount = 0;
+            $appliedMigrationRows = [];
+            $appliedMigrationLookup = [];
             $latestMigrationId = '';
             $latestMigrationAppliedAt = '';
             if ($migrationTablePresent) {
-                $migrationSummary = $pdo->query("
-                    SELECT
-                        COUNT(*)::int AS applied_count,
-                        COALESCE(MAX(migration_id), '') AS latest_migration_id,
-                        COALESCE(MAX(applied_at)::text, '') AS latest_applied_at
+                $migrationRows = $pdo->query("
+                    SELECT migration_id, applied_at::text AS applied_at, checksum
                     FROM schema_migrations
-                ")->fetch(PDO::FETCH_ASSOC) ?: [];
-                $appliedMigrationCount = max(0, (int)($migrationSummary['applied_count'] ?? 0));
-                $latestMigrationId = trim((string)($migrationSummary['latest_migration_id'] ?? ''));
-                $latestMigrationAppliedAt = trim((string)($migrationSummary['latest_applied_at'] ?? ''));
+                    ORDER BY migration_id
+                ")->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                foreach ($migrationRows as $row) {
+                    $id = trim((string)($row['migration_id'] ?? ''));
+                    if ($id === '') {
+                        continue;
+                    }
+                    $appliedMigrationLookup[$id] = true;
+                    $appliedMigrationRows[] = [
+                        'id' => $id,
+                        'applied_at' => trim((string)($row['applied_at'] ?? '')),
+                        'checksum' => trim((string)($row['checksum'] ?? '')),
+                    ];
+                }
+                $appliedMigrationCount = count($appliedMigrationRows);
+                if ($appliedMigrationRows !== []) {
+                    $latest = $appliedMigrationRows[$appliedMigrationCount - 1];
+                    $latestMigrationId = (string)$latest['id'];
+                    $latestMigrationAppliedAt = (string)$latest['applied_at'];
+                }
+            }
+
+            $pendingMigrations = [];
+            if ($migrationTablePresent) {
+                foreach ($migrationFiles as $id => $file) {
+                    if (!isset($appliedMigrationLookup[$id])) {
+                        $pendingMigrations[] = $file;
+                    }
+                }
+            }
+            $migrationFileLookup = array_fill_keys(array_keys($migrationFiles), true);
+            $extraAppliedMigrationIds = [];
+            foreach (array_keys($appliedMigrationLookup) as $id) {
+                if (!isset($migrationFileLookup[$id])) {
+                    $extraAppliedMigrationIds[] = $id;
+                }
             }
 
             $dbLookup = array_fill_keys($dbTables, true);
@@ -2734,7 +2795,11 @@ final class DataSchemaService
             $result['unexpected_tables'] = array_slice($unexpected, 0, 50);
             $result['migration_table_present'] = $migrationTablePresent;
             $result['applied_migration_count'] = $appliedMigrationCount;
-            $result['pending_migration_count'] = max(0, (int)($result['migration_file_count'] ?? 0) - $appliedMigrationCount);
+            $result['pending_migration_count'] = count($pendingMigrations);
+            $result['pending_migrations'] = array_slice($pendingMigrations, 0, 20);
+            $result['pending_migration_ids'] = array_map(static fn(array $row): string => (string)$row['id'], array_slice($pendingMigrations, 0, 50));
+            $result['applied_migration_ids'] = array_slice(array_keys($appliedMigrationLookup), 0, 50);
+            $result['extra_applied_migration_ids'] = array_slice($extraAppliedMigrationIds, 0, 20);
             $result['latest_migration_id'] = $latestMigrationId;
             $result['latest_migration_applied_at'] = $latestMigrationAppliedAt;
         } catch (Throwable $e) {
@@ -2773,15 +2838,37 @@ final class DataSchemaService
         ];
     }
 
-    private function migrationFileCount(): int
+    /**
+     * @return array<string, array{id:string, file:string, path:string, checksum:string}>
+     */
+    private function migrationFiles(): array
     {
         $dir = $this->rootDir . '/mom/database/migrations';
         if (!is_dir($dir)) {
-            return 0;
+            return [];
         }
 
         $files = glob($dir . '/*.sql');
-        return is_array($files) ? count($files) : 0;
+        if (!is_array($files)) {
+            return [];
+        }
+        sort($files);
+
+        $rows = [];
+        foreach ($files as $path) {
+            if (!is_string($path) || !is_file($path)) {
+                continue;
+            }
+            $id = basename($path, '.sql');
+            $rows[$id] = [
+                'id' => $id,
+                'file' => basename($path),
+                'path' => $this->relativePath($path),
+                'checksum' => hash_file('sha256', $path) ?: '',
+            ];
+        }
+
+        return $rows;
     }
 
     /**
@@ -2896,8 +2983,8 @@ final class DataSchemaService
             $governancePosture = $this->governancePosture($key, $table, $entity, $governanceMissing, $governanceCarriers);
             $actionableGovernanceMissing = $this->scalarStringList($governancePosture['actionableMissing'] ?? []);
             $endpointStats = $endpointCounts[$key] ?? ['total' => 0, 'linked' => 0];
-            $endpointCount = (int)($endpointStats['total'] ?? 0);
-            $linkedEndpointCount = (int)($endpointStats['linked'] ?? 0);
+            $endpointCount = (int)$endpointStats['total'];
+            $linkedEndpointCount = (int)$endpointStats['linked'];
             $dbColumns = array_keys(is_array($dbColumnLookup[$key] ?? null) ? $dbColumnLookup[$key] : []);
             $expectedPkFields = $this->scalarStringList($table['primaryKeys'] ?? ($entity['primaryKeyFields'] ?? []));
             if ($expectedPkFields === []) {
@@ -3197,8 +3284,8 @@ final class DataSchemaService
 
         usort($rows, static function (array $a, array $b): int {
             $order = ['workspace' => 0, 'system_contract_registry' => 1];
-            $aOrder = $order[(string)($a['id'] ?? '')] ?? 99;
-            $bOrder = $order[(string)($b['id'] ?? '')] ?? 99;
+            $aOrder = $order[(string)$a['id']] ?? 99;
+            $bOrder = $order[(string)$b['id']] ?? 99;
             if ($aOrder !== $bOrder) {
                 return $aOrder <=> $bOrder;
             }
@@ -3437,6 +3524,18 @@ final class DataSchemaService
         }
 
         $migrationHotspots = [];
+        foreach (array_slice(array_values(array_filter((array)($connection['pending_migrations'] ?? []), 'is_array')), 0, 10) as $item) {
+            $id = (string)($item['id'] ?? '');
+            if ($id === '') {
+                continue;
+            }
+            $migrationHotspots[] = [
+                'table' => $id,
+                'priority' => 'high',
+                'suggestedMigration' => (string)($item['file'] ?? $id . '.sql'),
+                'reason' => 'Migration file exists in source control but is not recorded in schema_migrations on the live DB target.',
+            ];
+        }
         foreach (array_slice(array_values(array_filter((array)($migrationGap['missingTables'] ?? []), 'is_array')), 0, 10) as $item) {
             $migrationHotspots[] = [
                 'table' => (string)($item['table'] ?? ''),
@@ -3469,8 +3568,8 @@ final class DataSchemaService
             ];
         }
         usort($structuralDrift, static function (array $a, array $b): int {
-            $aScore = count((array)($a['missing'] ?? [])) + count((array)($a['unexpected'] ?? [])) + count((array)($a['type_drifts'] ?? [])) + (!empty($a['pk_drift']) ? 1 : 0);
-            $bScore = count((array)($b['missing'] ?? [])) + count((array)($b['unexpected'] ?? [])) + count((array)($b['type_drifts'] ?? [])) + (!empty($b['pk_drift']) ? 1 : 0);
+            $aScore = count((array)$a['missing']) + count((array)$a['unexpected']) + count((array)$a['type_drifts']) + (!empty($a['pk_drift']) ? 1 : 0);
+            $bScore = count((array)$b['missing']) + count((array)$b['unexpected']) + count((array)$b['type_drifts']) + (!empty($b['pk_drift']) ? 1 : 0);
             return $bScore <=> $aScore;
         });
 
@@ -3490,7 +3589,7 @@ final class DataSchemaService
             'structural_drift' => array_slice($structuralDrift, 0, 12),
             'blind_spots' => array_slice(array_values(array_filter((array)($blindSpotAudit['critical'] ?? []), 'is_array')), 0, 8),
             'stress_scenarios' => array_slice(array_values(array_filter((array)($stressAudit['critical'] ?? []), 'is_array')), 0, 8),
-            'migration_hotspots' => $migrationHotspots,
+            'migration_hotspots' => array_slice($migrationHotspots, 0, 12),
         ];
     }
 

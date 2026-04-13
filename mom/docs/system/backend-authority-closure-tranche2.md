@@ -11,10 +11,10 @@
 | Idempotency behavior tests | VERIFIED COMPLETE | Unit and gated integration tests cover first mutation, replay, conflict, failure, DB-disabled fallback, long scope hash authority, namespace sanity, and active backend probe reporting. |
 | Idempotency docs | VERIFIED COMPLETE | Tranche 1 doc now reflects `scope_key_hash` authority and fail-closed in-progress semantics. |
 | Idempotency registry generation | VERIFIED COMPLETE | `generate-table-architecture.mjs` now maps `idempotency_replay_ledger` to `system_infrastructure`; publication pipeline can regenerate table, endpoint, workflow, and system-contract artifacts with `659` registry tables. |
-| Data Schema operational gate | VERIFIED COMPLETE | Data Schema smoke returns zero operational risks after artifact refresh and a root-scope exception for the platform idempotency replay ledger. |
+| Data Schema operational gate | VERIFIED COMPLETE | Data Schema smoke returns zero operational risks after artifact refresh and a root-scope exception for the platform idempotency replay ledger; PostgreSQL migration backlog evidence now includes exact pending/extra migration IDs. |
 | Order workflow authority | VERIFIED COMPLETE | `OrderWorkflowService` now uses `OrderWorkflowRepository`; JSON layout, audit JSONL, notification JSONL, users config, and PostgreSQL shadow-write mechanics live in `JsonOrderWorkflowRepository`. |
 | Master-data authority | VERIFIED COMPLETE | `MasterDataService` now uses `MasterDataRepository`; active/history/pending/archive stores plus order/MES reference-store reads live in `JsonMasterDataRepository`. |
-| Route registration | DEFERRED BUT ACCEPTABLE | `mom/api/index.php` remains large at more than 1,100 lines with many route registrations. It is broad compatibility work and is deferred until the authority slices are closed and verified. |
+| Route registration | VERIFIED COMPLETE | `mom/api/index.php` is now bootstrap/middleware/dispatch only; route declarations live in ordered modules under `mom/api/routes/`, and a route snapshot comparison matched the previous `4051` action routes and `153` REST routes. |
 | Local runtime artifacts | DEFERRED BUT ACCEPTABLE | `.DS_Store`, `.phpunit.cache/test-results`, and `data/php_error.log` are runtime/local artifacts and are excluded from closure commits. |
 
 ## Closure Scope
@@ -38,7 +38,11 @@ Priority C closes master-data persistence ownership:
 - Move active store, history, pending approvals, archive, order references, and MES runtime file layout behind the repository.
 - Keep duplicate detection, lifecycle transitions, approvals, referential checks, and archive decisions in `MasterDataService`.
 
-Priority D route modularization is not in this closure pass.
+Priority D route modularization is closed as a follow-up after the authority slices:
+
+- Move route declarations out of `mom/api/index.php` into ordered modules under `mom/api/routes/`.
+- Keep middleware registration and dispatch in `mom/api/index.php`.
+- Preserve action alias precedence and REST matching order.
 
 Authority artifact closure is included because the reaudit found the new ledger table was present in migrations but missing from generated registry authority.
 
@@ -51,6 +55,8 @@ Authority artifact closure is included because the reaudit found the new ledger 
 - Data Schema authority smoke reported stale generated artifacts and then a governance gap for `idempotency_replay_ledger` because the platform replay ledger is not an org-scoped business aggregate.
 - Order workflow service still knows the file layout and file append formats.
 - Master-data service still knows the file layout for active/history/pending/archive stores.
+- Route registration remained monolithic in `mom/api/index.php`.
+- PostgreSQL migration backlog reporting exposed only counts, making operational remediation less auditable than the live ledger data allowed.
 
 ## Files Touched
 
@@ -58,6 +64,14 @@ Planned closure files:
 
 - `mom/api/services/IdempotencyService.php`
 - `mom/api/services/DataSchemaService.php`
+- `mom/api/index.php`
+- `mom/api/routes/auth-routes.php`
+- `mom/api/routes/core-routes.php`
+- `mom/api/routes/operations-routes.php`
+- `mom/api/routes/platform-routes.php`
+- `mom/api/routes/generic-runtime-routes.php`
+- `mom/api/routes/frontend-alias-routes.php`
+- `mom/api/routes/rest-routes.php`
 - `mom/api/services/OrderWorkflowService.php`
 - `mom/api/services/OrderWorkflowRepository.php`
 - `mom/api/services/JsonOrderWorkflowRepository.php`
@@ -67,7 +81,10 @@ Planned closure files:
 - `mom/tests/Unit/Services/IdempotencyServiceTest.php`
 - `mom/tests/Unit/Services/OrderWorkflowRepositoryBoundaryTest.php`
 - `mom/tests/Unit/Services/MasterDataRepositoryBoundaryTest.php`
+- `mom/tests/data_schema_admin_smoke.php`
 - `mom/tests/order_runtime_governance_smoke.php`
+- `mom/database/migrate.php`
+- `mom/scripts/portal/32-admin-metadata-studio.js`
 - `mom/tools/registry/generate-table-architecture.mjs`
 - `mom/contracts/registry-authority-standard.json`
 - `mom/data/registry/*` generated authority artifacts refreshed by `canonical_publication_orchestrator.py`, `enterprise_registry_doctor.py`, and `enterprise_frontend_simulator.py`
@@ -86,6 +103,11 @@ Planned closure files:
 - Added `MasterDataRepository` and `JsonMasterDataRepository`; the master-data service now owns governance rules while the repository owns active/history/pending/archive/reference store persistence.
 - Added focused repository-boundary tests for order workflow transitions, quantity guard behavior, master-data duplicate rejection, pending approval, referential delete block, and archive flow.
 - Updated order runtime smoke setup to create the parent SO in `engineering_ready`, matching the current JO creation gate.
+- Added exact PostgreSQL migration backlog evidence (`pending_migrations`, `pending_migration_ids`, `applied_migration_ids`, and `extra_applied_migration_ids`) to Data Schema operational output, smoke coverage, and the admin metadata studio alert.
+- Refined endpoint-catalog freshness dependencies to track registry inputs, the generator, and `GenericCrudController` instead of the API bootstrap file; route modularization no longer creates false source-vs-artifact drift.
+- Made the migration runner force an eager PDO connection before reporting a successful PostgreSQL connection.
+- Moved route declarations into ordered route modules and verified the new module stack matches the previous route map exactly.
+- Cleaned touched `DataSchemaService` PHPStan strictness issues; focused PHPStan now reports no errors.
 
 ## Migration / Test Plan
 
@@ -94,8 +116,9 @@ Planned closure files:
 - Verify registry publication with `python3 tools/registry/canonical_publication_orchestrator.py`.
 - Verify Data Schema authority with `php tests/data_schema_admin_smoke.php`.
 - Run focused PHPUnit tests for idempotency, order workflow, and master data.
+- Verify route modularization with a snapshot comparison against `HEAD:mom/api/index.php`.
 - Run full PHPUnit and `tests/backend_smoke.php`.
-- Run PHPStan on touched services/tests.
+- Run PHPStan on `mom/api/services/DataSchemaService.php`.
 
 ## Compatibility Plan
 
@@ -105,11 +128,9 @@ Planned closure files:
 - Preserve `OrderWorkflowService` constructor compatibility and controller usage.
 - Preserve `MasterDataService` constructor compatibility and controller usage.
 - Preserve Data Schema release gate behavior; the idempotency ledger is treated as root-scope infrastructure rather than weakening the governance check globally.
-- Do not change public routes or middleware order.
+- Preserve public route behavior and middleware order; route module order is explicitly fixed and snapshot-verified against the previous monolithic registration.
 
 ## Deferred Items With Reason
 
-- Route modularization is deferred because it touches a broad compatibility surface and should follow after repository authority closure.
 - Full PostgreSQL-native order workflow and master-data persistence is deferred because current closure focuses on repository boundaries without a big-bang migration.
 - Live PostgreSQL idempotency integration remains gated by `MOM_TEST_POSTGRES_IDEMPOTENCY=1` to avoid mutating an arbitrary local database by default.
-- PHPStan on the full `DataSchemaService.php` file still reports pre-existing strictness issues unrelated to the three-line idempotency root-scope exception; syntax and Data Schema smoke cover this touched path in the closure pass.

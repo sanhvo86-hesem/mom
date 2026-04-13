@@ -111,6 +111,7 @@ foreach (($argv ?? []) as $arg) {
 
 try {
     $db = Connection::getInstance($config);
+    $db->getPdo();
     echo "Connected to PostgreSQL.\n";
 } catch (\Throwable $e) {
     echo "ERROR: Cannot connect to PostgreSQL: " . $e->getMessage() . "\n";
