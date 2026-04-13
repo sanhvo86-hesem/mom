@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\ManufacturingEventBackboneService;
+use MOM\Api\Services\CanonicalManufacturingSpineService;
+use MOM\Api\Services\ProductionHistoryReadModelService;
 use Throwable;
 
 final class ManufacturingEventController extends BaseController
@@ -45,6 +47,33 @@ final class ManufacturingEventController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('manufacturing_event_probe_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function productionHistory(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+
+        try {
+            $filters = [];
+            foreach (ManufacturingEventBackboneService::timelineFilterFields() as $field) {
+                $value = $this->input($field);
+                if ($value !== null && trim($value) !== '') {
+                    $filters[$field] = trim($value);
+                }
+            }
+            $filters['limit'] = (int)($this->input('limit', '100') ?? '100');
+
+            $packet = (new ProductionHistoryReadModelService(
+                $this->service(),
+                new CanonicalManufacturingSpineService(dirname($this->dataDir)),
+            ))->packet($filters);
+
+            $this->success(['production_history' => $packet]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('production_history_packet_failed', 500, $e->getMessage());
         }
     }
 

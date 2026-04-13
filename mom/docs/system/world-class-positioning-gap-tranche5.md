@@ -87,3 +87,51 @@ Priority C:
 
 The repo already has many schema objects. The limiting gap is proof: operators and admins need to know which manufacturing identities are canonical, whether history can be queried as one packet, and whether a person is qualified before execution starts. This tranche adds those runtime invariants and read models without a broad rewrite or duplicate canonical tables.
 
+## Implementation Closure Evidence
+
+Priority A was verified and hardened:
+
+- The current baseline contains a canonical manufacturing spine service that maps existing canonical owners instead of creating duplicate entities.
+- The service validates 20 critical identity definitions:
+  - organization company, legal entity, site, plant, work center, line/cell, equipment/machine
+  - item/part, item revision, lot, serial
+  - sales order, job/production order, work order, operation
+  - inspection execution, evidence attachment
+  - employee, qualification requirement, certification evidence
+- Each definition declares canonical key strategy, record id field, org scope strategy, source authority, authority state, and relation map.
+- Runtime authority includes `canonical_manufacturing_spine`.
+- Existing read/probe routes were verified:
+  - `manufacturing_spine_model`
+  - `manufacturing_spine_probe`
+  - `/api/manufacturing-spine/model`
+  - `/api/manufacturing-spine/probe`
+
+Priority B was implemented:
+
+- Added a production-history packet read model over `mes_operational_event_ledger`.
+- The packet groups deterministic event history into execution, quality, evidence, genealogy, approvals, and workforce sections.
+- The packet exposes canonical references for order, operation, lot, serial, NCR, CAPA, evidence, actor, org scope, and source aggregate.
+- Runtime authority now includes `production_history`.
+- Added read route:
+  - `manufacturing_history_packet`
+  - `/api/manufacturing-events/production-history`
+
+Priority C was implemented:
+
+- Added workforce qualification gate service.
+- `MobileWorkQueueService::startTask()` now evaluates qualification requirements before moving a task to `in_progress`.
+- If a matching requirement exists and the operator is missing qualification, expired/suspended/revoked/inactive, or below minimum proficiency, start is blocked with stable reason codes.
+- The gate emits a canonical manufacturing event for pass/block decisions when an event backbone is supplied, so qualification denials are visible in production history.
+- Runtime authority now includes `workforce_qualification_gate`; the probe reports `authoritative_ready` only when qualification requirements are configured, and `authority_partial` when the invariant exists but no runtime requirements are loaded.
+
+Verification evidence generated:
+
+- Canonical publication pipeline PASS.
+- Data Schema admin workspace probe returned zero outdated artifacts, zero operational risks, and zero governance gaps.
+- Focused unit tests cover canonical identity validation, relation map existence, production-history packet grouping and deterministic ordering, qualified start success, expired qualification block, missing qualification block, configured-gate authority, no-requirement partial authority, runtime authority surfaces, and health payload surfaces.
+
+## Remaining Risk Notes
+
+- The qualification gate currently uses explicit runtime requirements and qualification records; full live DB-backed HCM requirement resolution remains a later promotion step, and deployments without configured requirements remain explicitly `authority_partial`.
+- The production-history packet is authoritative over the canonical event ledger; it does not yet perform full historical projection from every legacy genealogy/passport/evidence table.
+- The canonical spine validates registry-backed model truth; it does not enforce every write path to those canonical tables yet.

@@ -22,6 +22,8 @@ final class RuntimeAuthorityService
         private readonly ?array $modeSummaryOverride = null,
         private readonly ?ManufacturingEventBackboneService $manufacturingEvents = null,
         private readonly ?CanonicalManufacturingSpineService $manufacturingSpine = null,
+        private readonly ?ProductionHistoryReadModelService $productionHistory = null,
+        private readonly ?WorkforceQualificationGateService $workforceQualification = null,
     ) {
     }
 
@@ -34,8 +36,12 @@ final class RuntimeAuthorityService
         $idempotency = ($this->idempotency ?? new IdempotencyService($this->dataDir))->backendProbe();
         $orderWorkflow = ($this->orderWorkflow ?? new OrderWorkflowService($this->dataDir))->authorityProbe($modeSummary);
         $masterData = ($this->masterData ?? new MasterDataService($this->dataDir))->authorityProbe($modeSummary);
-        $manufacturingEvents = ($this->manufacturingEvents ?? new ManufacturingEventBackboneService($this->dataDir, $this->data))->authorityProbe();
-        $manufacturingSpine = ($this->manufacturingSpine ?? new CanonicalManufacturingSpineService(dirname($this->dataDir)))->probe();
+        $eventBackbone = $this->manufacturingEvents ?? new ManufacturingEventBackboneService($this->dataDir, $this->data);
+        $spineService = $this->manufacturingSpine ?? new CanonicalManufacturingSpineService($this->baseDir());
+        $manufacturingEvents = $eventBackbone->authorityProbe();
+        $manufacturingSpine = $spineService->probe();
+        $productionHistory = ($this->productionHistory ?? new ProductionHistoryReadModelService($eventBackbone, $spineService))->probe();
+        $workforceQualification = ($this->workforceQualification ?? new WorkforceQualificationGateService($this->dataDir, $eventBackbone))->probe();
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),
@@ -43,6 +49,8 @@ final class RuntimeAuthorityService
             'master_data' => $this->normalizeOperationalSlice($masterData),
             'manufacturing_events' => $this->normalizeOperationalSlice($manufacturingEvents),
             'canonical_manufacturing_spine' => $this->normalizeOperationalSlice($manufacturingSpine),
+            'production_history' => $this->normalizeOperationalSlice($productionHistory),
+            'workforce_qualification_gate' => $this->normalizeOperationalSlice($workforceQualification),
         ];
 
         $states = [];
@@ -129,13 +137,23 @@ final class RuntimeAuthorityService
     private function normalizeOperationalSlice(array $probe): array
     {
         $state = (string)($probe['readiness_state'] ?? 'degraded');
+        $authorityMode = trim((string)($probe['authority_mode'] ?? ''));
         return array_merge($probe, [
-            'authority_mode' => match ($state) {
+            'authority_mode' => $authorityMode !== '' ? $authorityMode : match ($state) {
                 'authoritative_ready' => 'postgres_primary',
                 'authority_partial' => 'shadow_mode',
                 'compatibility_only' => 'json_fallback',
                 default => 'degraded',
             },
         ]);
+    }
+
+    private function baseDir(): string
+    {
+        $fromDataDir = dirname($this->dataDir);
+        if (is_file($fromDataDir . '/data/registry/table-registry.json')) {
+            return $fromDataDir;
+        }
+        return dirname(__DIR__, 2);
     }
 }

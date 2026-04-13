@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\WorkforceQualificationException;
 use MOM\Services\MobileWorkQueueService;
 use Throwable;
 
@@ -209,6 +210,10 @@ class MobileController extends BaseController
             ], $userId);
 
             $this->success(['task' => $task]);
+        } catch (WorkforceQualificationException $e) {
+            $this->error($e->reasonCode(), 403, $e->getMessage(), [
+                'qualification_gate' => $e->details(),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('task_start_failed', 500, $e->getMessage());

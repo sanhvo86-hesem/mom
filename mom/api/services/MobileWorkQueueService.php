@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Api\Services\WorkforceQualificationGateService;
 use RuntimeException;
 
 /**
@@ -21,6 +22,7 @@ final class MobileWorkQueueService
     private readonly string $dataDir;
     private readonly string $mobileDir;
     private ?object $db = null;
+    private WorkforceQualificationGateService $qualificationGate;
 
     /** Valid task types. */
     private const TASK_TYPES = [
@@ -43,11 +45,16 @@ final class MobileWorkQueueService
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir, ?object $db = null)
+    public function __construct(
+        string $dataDir,
+        ?object $db = null,
+        ?WorkforceQualificationGateService $qualificationGate = null,
+    )
     {
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->mobileDir = $this->dataDir . '/mobile';
         $this->db        = $db;
+        $this->qualificationGate = $qualificationGate ?? new WorkforceQualificationGateService($this->dataDir);
 
         foreach (['work_queue', 'time_entries', 'inspections'] as $sub) {
             $dir = $this->mobileDir . '/' . $sub;
@@ -180,11 +187,13 @@ final class MobileWorkQueueService
             if (($task['operator_id'] ?? '') !== $operatorId) {
                 throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
             }
+            $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
 
             $queue[$idx] = array_merge($task, [
                 'task_status' => 'in_progress',
                 'started_at'  => $now,
                 'updated_at'  => $now,
+                'qualification_gate' => $qualification,
             ]);
 
             $this->saveFile('work_queue', $queue);
