@@ -211,6 +211,41 @@ final class MasterDataService
             ?? new JsonMasterDataRepository($dataDir, $this->defaultStore());
     }
 
+    /**
+     * Report the master-data persistence posture explicitly. The current
+     * default adapter is repository-bound but still JSON primary.
+     *
+     * @param array<string, mixed> $dataLayerSummary
+     * @return array<string, mixed>
+     */
+    public function authorityProbe(array $dataLayerSummary = []): array
+    {
+        $repoProbe = method_exists($this->repository, 'authorityProbe')
+            ? (array)$this->repository->authorityProbe($dataLayerSummary)
+            : [
+                'repository_class' => $this->repository::class,
+                'primary_backend' => 'custom',
+            ];
+
+        $primary = strtolower(trim((string)($repoProbe['primary_backend'] ?? 'custom')));
+        $readiness = match ($primary) {
+            'postgres' => 'authoritative_ready',
+            'json' => 'compatibility_only',
+            default => 'degraded',
+        };
+
+        return array_merge($repoProbe, [
+            'slice' => 'master_data',
+            'readiness_state' => $readiness,
+            'authoritative_primary' => $readiness === 'authoritative_ready',
+            'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
+            'postgres_configured' => (bool)($dataLayerSummary['use_postgres'] ?? false),
+            'notes' => $readiness === 'compatibility_only'
+                ? 'Master data governance is repository-bound but JSON primary; PostgreSQL-native repository remains deferred.'
+                : (string)($repoProbe['notes'] ?? ''),
+        ]);
+    }
+
     // ── Public API ──────────────────────────────────────────────────────────
 
     /**

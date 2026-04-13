@@ -7,6 +7,7 @@ namespace MOM\Api\Controllers;
 use MOM\Api\Services\CacheService;
 use MOM\Api\Services\QueueService;
 use MOM\Api\Services\LogTransport;
+use MOM\Api\Services\RuntimeAuthorityService;
 
 /**
  * HealthController - Kubernetes-ready health check endpoints.
@@ -51,10 +52,24 @@ class HealthController extends BaseController
         $checks['user_store'] = $store !== null;
         if (!$checks['user_store']) $allOk = false;
 
+        // Check promoted runtime authority posture.
+        try {
+            $authority = (new RuntimeAuthorityService($this->data, $dataDir))->report();
+            $checks['runtime_authority'] = (bool)($authority['summary']['idempotency_expected_authority_met'] ?? true);
+            if (!$checks['runtime_authority']) {
+                $allOk = false;
+            }
+        } catch (\Throwable $e) {
+            $checks['runtime_authority'] = false;
+            $allOk = false;
+            $authority = ['ok' => false, 'error' => $e->getMessage()];
+        }
+
         $this->json([
             'ok'          => $allOk,
             'status'      => $allOk ? 'ready' : 'not_ready',
             'checks'      => $checks,
+            'authority'   => $authority,
             'server_time' => gmdate('c'),
         ], $allOk ? 200 : 503);
     }
@@ -94,6 +109,13 @@ class HealthController extends BaseController
             $infra['logging'] = ['available' => false, 'error' => $e->getMessage()];
         }
 
+        // Runtime authority
+        try {
+            $authority = (new RuntimeAuthorityService($this->data, $dataDir))->report();
+        } catch (\Throwable $e) {
+            $authority = ['ok' => false, 'error' => $e->getMessage()];
+        }
+
         // PHP info
         $php = [
             'version'        => PHP_VERSION,
@@ -113,6 +135,7 @@ class HealthController extends BaseController
             'ok'             => true,
             'version'        => '2.1.0',
             'infrastructure' => $infra,
+            'authority'      => $authority,
             'php'            => $php,
             'server_time'    => gmdate('c'),
         ]);

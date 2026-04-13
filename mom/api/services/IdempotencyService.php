@@ -18,6 +18,20 @@ final class IdempotencyService
     private int $ttlSeconds;
     private int $retryWindowSeconds;
     private IdempotencyReplayRepository $repository;
+    /** @var array<string, mixed> */
+    private array $databaseConfig;
+    /** @var array<string, int> */
+    private array $metrics = [
+        'first_execution' => 0,
+        'replay' => 0,
+        'conflict' => 0,
+        'fingerprint_conflict' => 0,
+        'in_progress_conflict' => 0,
+        'fallback_execution' => 0,
+        'postgres_execution' => 0,
+        'failure' => 0,
+        'disabled_passthrough' => 0,
+    ];
 
     public function __construct(
         string $dataDir,
@@ -31,7 +45,8 @@ final class IdempotencyService
         $this->enabled = (bool)($idempotency['enabled'] ?? true);
         $this->ttlSeconds = max(300, (int)($idempotency['ttl_seconds'] ?? 86400));
         $this->retryWindowSeconds = max(15, (int)($idempotency['retry_window_seconds'] ?? 120));
-        $this->repository = $repository ?? $this->defaultRepository($dataDir, $cacheService, $databaseConfig);
+        $this->databaseConfig = $databaseConfig ?? $this->loadDatabaseConfig();
+        $this->repository = $repository ?? $this->defaultRepository($dataDir, $cacheService, $this->databaseConfig);
     }
 
     public function isEnabled(): bool
@@ -45,17 +60,16 @@ final class IdempotencyService
     }
 
     /**
-     * @return array{enabled:bool, repository_class:string, backend:string, authoritative:bool, fallback_only:bool}
+     * @return array<string, mixed>
      */
     public function backendProbe(): array
     {
         $repositoryClass = $this->repository::class;
-        $backend = match (true) {
-            $this->repository instanceof PostgresIdempotencyReplayRepository => 'postgres',
-            $this->repository instanceof CacheIdempotencyReplayRepository => 'cache',
-            $this->repository instanceof FileIdempotencyReplayRepository => 'file',
-            default => 'custom',
-        };
+        $backend = $this->backendName();
+        $expectsPostgres = $this->expectsPostgresAuthority();
+        $readiness = $backend === 'postgres'
+            ? 'authoritative_ready'
+            : ($expectsPostgres ? 'degraded' : 'compatibility_only');
 
         return [
             'enabled' => $this->enabled,
@@ -63,7 +77,39 @@ final class IdempotencyService
             'backend' => $backend,
             'authoritative' => $backend === 'postgres',
             'fallback_only' => in_array($backend, ['cache', 'file'], true),
+            'expected_backend' => $expectsPostgres ? 'postgres_primary' : 'fallback_allowed',
+            'active_backend' => $backend === 'postgres' ? 'postgres_primary' : $backend . '_fallback',
+            'readiness_state' => $readiness,
+            'expected_authority_met' => !$expectsPostgres || $backend === 'postgres',
+            'configuration_error' => $expectsPostgres && $backend !== 'postgres'
+                ? 'expected_postgres_authority_but_active_backend_is_' . $backend
+                : '',
+            'metrics' => $this->metrics(),
         ];
+    }
+
+    /**
+     * Fail closed when the active repository does not match the configured
+     * PostgreSQL authority expectation.
+     */
+    public function assertExpectedPostgresAuthority(): void
+    {
+        if (!$this->expectsPostgresAuthority()) {
+            return;
+        }
+        if ($this->backendName() === 'postgres') {
+            return;
+        }
+
+        throw new RuntimeException('expected_postgres_idempotency_authority_but_active_backend_is_' . $this->backendName());
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function metrics(): array
+    {
+        return $this->metrics;
     }
 
     /**
@@ -74,6 +120,7 @@ final class IdempotencyService
     public function execute(array $descriptor, callable $operation): array
     {
         if (!$this->enabled) {
+            $this->incrementMetric('disabled_passthrough');
             $result = $operation();
             return [
                 'status_code' => max(200, (int)($result['status_code'] ?? 200)),
@@ -94,13 +141,41 @@ final class IdempotencyService
         $startedAt = $this->nowIso();
         $state = $this->baseState($descriptor, $scopeKey, $idempotencyKey, $fingerprintHash, $ttlSeconds, $startedAt);
 
-        return $this->repository->execute(
-            $state,
-            $idempotencyKey,
-            $fingerprintHash,
-            $this->retryWindowSeconds,
-            $operation,
-        );
+        $backend = $this->backendName();
+        $this->incrementMetric($backend === 'postgres' ? 'postgres_execution' : 'fallback_execution');
+
+        try {
+            $result = $this->repository->execute(
+                $state,
+                $idempotencyKey,
+                $fingerprintHash,
+                $this->retryWindowSeconds,
+                $operation,
+            );
+        } catch (RecordConflictException $e) {
+            $this->incrementMetric('conflict');
+            if (str_contains(strtolower($e->getMessage()), 'in progress')) {
+                $this->incrementMetric('in_progress_conflict');
+            } else {
+                $this->incrementMetric('fingerprint_conflict');
+            }
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->incrementMetric('failure');
+            throw $e;
+        }
+
+        $this->incrementMetric(($result['replayed'] ?? false) ? 'replay' : 'first_execution');
+        return $result;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadDatabaseConfig(): array
+    {
+        $dbConfigPath = dirname(__DIR__, 2) . '/database/config.php';
+        return is_file($dbConfigPath) ? (array)(require $dbConfigPath) : [];
     }
 
     private function defaultRepository(
@@ -108,11 +183,7 @@ final class IdempotencyService
         ?CacheService $cacheService,
         ?array $databaseConfig
     ): IdempotencyReplayRepository {
-        $dbConfig = $databaseConfig;
-        if ($dbConfig === null) {
-            $dbConfigPath = dirname(__DIR__, 2) . '/database/config.php';
-            $dbConfig = is_file($dbConfigPath) ? (array)(require $dbConfigPath) : [];
-        }
+        $dbConfig = $databaseConfig ?? [];
         if ((bool)($dbConfig['use_postgres'] ?? false)) {
             return new PostgresIdempotencyReplayRepository(Connection::getInstance($dbConfig));
         }
@@ -123,6 +194,29 @@ final class IdempotencyService
         }
 
         return new FileIdempotencyReplayRepository($dataDir);
+    }
+
+    private function backendName(): string
+    {
+        return match (true) {
+            $this->repository instanceof PostgresIdempotencyReplayRepository => 'postgres',
+            $this->repository instanceof CacheIdempotencyReplayRepository => 'cache',
+            $this->repository instanceof FileIdempotencyReplayRepository => 'file',
+            default => 'custom',
+        };
+    }
+
+    private function expectsPostgresAuthority(): bool
+    {
+        return (bool)($this->databaseConfig['use_postgres'] ?? false);
+    }
+
+    private function incrementMetric(string $key): void
+    {
+        if (!array_key_exists($key, $this->metrics)) {
+            $this->metrics[$key] = 0;
+        }
+        $this->metrics[$key]++;
     }
 
     /**

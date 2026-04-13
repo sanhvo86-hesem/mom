@@ -14,6 +14,9 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
     private readonly string $configFile;
     private readonly string $ordersFile;
     private readonly string $usersFile;
+    private int $shadowWriteAttempts = 0;
+    private int $shadowWriteFailures = 0;
+    private string $lastShadowError = '';
 
     public function __construct(
         private readonly string $dataDir,
@@ -100,6 +103,30 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
     }
 
     /**
+     * @param array<string, mixed> $dataLayerSummary
+     * @return array<string, mixed>
+     */
+    public function authorityProbe(array $dataLayerSummary = []): array
+    {
+        return [
+            'repository_class' => self::class,
+            'primary_backend' => 'json',
+            'shadow_backend' => $this->db !== null ? 'postgres' : '',
+            'shadow_write_active' => $this->db !== null,
+            'shadow_write_attempts' => $this->shadowWriteAttempts,
+            'shadow_write_failures' => $this->shadowWriteFailures,
+            'last_shadow_error' => $this->lastShadowError,
+            'drift_detection' => [
+                'shadow_path_present' => $this->db !== null,
+                'mismatch_counter' => $this->shadowWriteFailures,
+                'data_layer_declares_postgres' => (bool)($dataLayerSummary['use_postgres'] ?? false),
+                'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
+            ],
+            'notes' => 'JSON compatibility adapter owns order store, audit JSONL, notification JSONL, and optional PostgreSQL shadow writes.',
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $data
      */
     private function shadowWriteOrders(array $data): void
@@ -107,6 +134,8 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
         if ($this->db === null) {
             return;
         }
+
+        $this->shadowWriteAttempts++;
 
         try {
             if (method_exists($this->db, 'isConnected') && !$this->db->isConnected()) {
@@ -134,6 +163,8 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
                 $this->upsertWorkOrderRow($wo);
             }
         } catch (\Throwable $e) {
+            $this->shadowWriteFailures++;
+            $this->lastShadowError = $e->getMessage();
             error_log('[OrderWorkflowRepository] Shadow write to PostgreSQL failed: ' . $e->getMessage());
         }
     }
@@ -182,6 +213,8 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
                 [':id' => $idValue, ':status' => $status, ':meta' => $metadata, ':at' => $updatedAt],
             );
         } catch (\Throwable $e) {
+            $this->shadowWriteFailures++;
+            $this->lastShadowError = $e->getMessage();
             error_log("[OrderWorkflowRepository] Upsert {$table}.{$idValue} failed: " . $e->getMessage());
         }
     }
@@ -214,6 +247,8 @@ final class JsonOrderWorkflowRepository implements OrderWorkflowRepository
                 [':wo' => $woNumber, ':status' => $status, ':meta' => $metadata],
             );
         } catch (\Throwable $e) {
+            $this->shadowWriteFailures++;
+            $this->lastShadowError = $e->getMessage();
             error_log("[OrderWorkflowRepository] Upsert WO {$woNumber} failed: " . $e->getMessage());
         }
     }

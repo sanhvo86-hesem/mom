@@ -181,6 +181,45 @@ final class OrderWorkflowService
         $this->repository = $repository ?? new JsonOrderWorkflowRepository($dataDir, $db);
     }
 
+    /**
+     * Report the active workflow persistence posture without implying DB
+     * authority where the runtime still uses compatibility storage.
+     *
+     * @param array<string, mixed> $dataLayerSummary
+     * @return array<string, mixed>
+     */
+    public function authorityProbe(array $dataLayerSummary = []): array
+    {
+        $repoProbe = method_exists($this->repository, 'authorityProbe')
+            ? (array)$this->repository->authorityProbe($dataLayerSummary)
+            : [
+                'repository_class' => $this->repository::class,
+                'primary_backend' => 'custom',
+                'shadow_backend' => '',
+                'shadow_write_active' => false,
+            ];
+
+        $primary = strtolower(trim((string)($repoProbe['primary_backend'] ?? 'custom')));
+        $shadowActive = !empty($repoProbe['shadow_write_active']);
+        $readiness = match (true) {
+            $primary === 'postgres' => 'authoritative_ready',
+            $shadowActive => 'authority_partial',
+            $primary === 'json' => 'compatibility_only',
+            default => 'degraded',
+        };
+
+        return array_merge($repoProbe, [
+            'slice' => 'order_workflow',
+            'readiness_state' => $readiness,
+            'authoritative_primary' => $readiness === 'authoritative_ready',
+            'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
+            'postgres_configured' => (bool)($dataLayerSummary['use_postgres'] ?? false),
+            'notes' => $readiness === 'compatibility_only'
+                ? 'Order workflow is repository-bound but JSON primary in current entrypoints.'
+                : (string)($repoProbe['notes'] ?? ''),
+        ]);
+    }
+
     // ── Public API ──────────────────────────────────────────────────────────
 
     /**

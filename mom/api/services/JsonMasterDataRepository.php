@@ -104,6 +104,33 @@ final class JsonMasterDataRepository implements MasterDataRepository
     }
 
     /**
+     * @param array<string, mixed> $dataLayerSummary
+     * @return array<string, mixed>
+     */
+    public function authorityProbe(array $dataLayerSummary = []): array
+    {
+        return [
+            'repository_class' => self::class,
+            'primary_backend' => 'json',
+            'shadow_backend' => '',
+            'shadow_write_active' => false,
+            'stores' => [
+                'active' => 'master-data/master-data.json',
+                'history' => 'master-data/master-data-history.json',
+                'pending' => 'master-data/master-data-pending.json',
+                'archive' => 'master-data/master-data-archive.json',
+            ],
+            'drift_detection' => [
+                'shadow_path_present' => false,
+                'mismatch_counter' => 0,
+                'data_layer_declares_postgres' => (bool)($dataLayerSummary['use_postgres'] ?? false),
+                'data_layer_mode' => (string)($dataLayerSummary['mode'] ?? ''),
+            ],
+            'notes' => 'JSON compatibility adapter owns active, history, pending approval, archive, and reference stores.',
+        ];
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
     private function readJson(string $path): ?array

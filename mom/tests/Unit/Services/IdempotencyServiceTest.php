@@ -164,6 +164,74 @@ final class IdempotencyServiceTest extends TestCase
         $this->assertTrue($probe['fallback_only']);
     }
 
+    public function testExpectedPostgresAuthorityFailsLoudlyWhenFallbackInjected(): void
+    {
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new FileIdempotencyReplayRepository($this->tmpDir),
+            databaseConfig: ['use_postgres' => true],
+        );
+
+        $probe = $service->backendProbe();
+
+        $this->assertSame('degraded', $probe['readiness_state']);
+        $this->assertFalse($probe['expected_authority_met']);
+        $this->assertSame('expected_postgres_authority_but_active_backend_is_file', $probe['configuration_error']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('expected_postgres_idempotency_authority_but_active_backend_is_file');
+        $service->assertExpectedPostgresAuthority();
+    }
+
+    public function testIdempotencyMetricsTrackReplayConflictFallbackAndFailure(): void
+    {
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new FileIdempotencyReplayRepository($this->tmpDir),
+            databaseConfig: ['use_postgres' => false],
+        );
+        $descriptor = $this->descriptor('metrics-key');
+
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 201,
+            'payload' => ['ok' => true],
+        ]);
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 500,
+            'payload' => ['should_not' => 'run'],
+        ]);
+
+        $conflicting = $descriptor;
+        $conflicting['fingerprint']['payload']['customer_po'] = 'PO-DIFFERENT';
+        try {
+            $service->execute($conflicting, static fn(): array => [
+                'status_code' => 200,
+                'payload' => ['ok' => true],
+            ]);
+            $this->fail('Conflicting fingerprint should throw.');
+        } catch (RecordConflictException) {
+        }
+
+        try {
+            $service->execute($this->descriptor('metrics-failure-key'), static function (): array {
+                throw new \RuntimeException('metrics failure');
+            });
+            $this->fail('Failing operation should throw.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('metrics failure', $e->getMessage());
+        }
+
+        $metrics = $service->metrics();
+        $this->assertSame(1, $metrics['first_execution']);
+        $this->assertSame(1, $metrics['replay']);
+        $this->assertSame(1, $metrics['conflict']);
+        $this->assertSame(1, $metrics['fingerprint_conflict']);
+        $this->assertSame(0, $metrics['in_progress_conflict']);
+        $this->assertSame(4, $metrics['fallback_execution']);
+        $this->assertSame(1, $metrics['failure']);
+        $this->assertSame($metrics, $service->backendProbe()['metrics']);
+    }
+
     public function testDbBackedRepositoryRejectsConflictingFingerprint(): void
     {
         $db = new IdempotencyFakeConnection();
