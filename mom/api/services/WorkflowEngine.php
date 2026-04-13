@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Api\Services\DomainEvent;
+use MOM\Api\Services\EventBus;
+use MOM\Api\Services\WorkflowDefinitionRegistry;
 use MOM\Database\Connection;
 use RuntimeException;
 
@@ -84,12 +87,14 @@ final class WorkflowEngine
      * @param Connection|null      $db                  Optional database connection.
      * @param AuditTrail|null      $auditTrail          Optional audit trail for logging transitions.
      * @param NotificationService|null $notificationService Optional notification service.
+     * @param EventBus|null        $eventBus            Optional event bus for domain events.
      */
     public function __construct(
         private readonly string $dataDir,
         private readonly ?Connection $db = null,
         private readonly ?AuditTrail $auditTrail = null,
         private readonly ?NotificationService $notificationService = null,
+        private readonly ?EventBus $eventBus = null,
     ) {
         $this->stateDir = rtrim(str_replace('\\', '/', $dataDir), '/') . '/workflow-states';
         if (!is_dir($this->stateDir)) {
@@ -281,6 +286,16 @@ final class WorkflowEngine
             ));
         }
 
+        $this->publishWorkflowTransition(
+            $recordType,
+            $recordId,
+            $currentState,
+            $targetState,
+            $userId,
+            $triggeredActions,
+            $comment,
+        );
+
         return new TransitionResult(
             success: true,
             recordId: $recordId,
@@ -288,6 +303,35 @@ final class WorkflowEngine
             toState: $targetState,
             triggeredActions: $triggeredActions,
         );
+    }
+
+    /**
+     * Publish a workflow transition event after state persistence succeeds.
+     *
+     * @param array<int, mixed> $triggeredActions
+     */
+    private function publishWorkflowTransition(
+        string $recordType,
+        string $recordId,
+        string $fromState,
+        string $toState,
+        string $userId,
+        array $triggeredActions,
+        ?string $comment,
+    ): void {
+        try {
+            ($this->eventBus ?? EventBus::getInstance())->publish(DomainEvent::workflowTransitioned(
+                $recordType,
+                $recordId,
+                $fromState,
+                $toState,
+                $userId,
+                $triggeredActions,
+                $comment,
+            ));
+        } catch (\Throwable $e) {
+            @error_log('[WorkflowEngine] Failed to publish workflow transition event: ' . $e->getMessage());
+        }
     }
 
     /**

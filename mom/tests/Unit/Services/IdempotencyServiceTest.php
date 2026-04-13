@@ -129,7 +129,6 @@ final class IdempotencyServiceTest extends TestCase
     private function forceCachePrimaryPath(CacheService $cache): void
     {
         $property = new \ReflectionProperty($cache, 'redisAvailable');
-        $property->setAccessible(true);
         $property->setValue($cache, true);
     }
 

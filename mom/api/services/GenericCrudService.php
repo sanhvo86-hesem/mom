@@ -37,15 +37,17 @@ class GenericCrudService
     private RegistryService $registry;
     private string $dataDir;
     private ?WorkflowEngine $workflowEngine = null;
+    private ?EventBus $eventBus;
 
     /** @var array<string, array<string, mixed>> */
     private array $tables = [];
     /** @var array<string, array<string, mixed>>|null */
     private ?array $tableGovernanceOverlay = null;
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?EventBus $eventBus = null)
     {
         $this->dataDir = $dataDir;
+        $this->eventBus = $eventBus;
         $portalRoot = dirname(__DIR__, 2);
         $config = (array)(require $portalRoot . '/database/config.php');
         $this->db = Connection::getInstance($config);
@@ -435,7 +437,15 @@ class GenericCrudService
             throw new RuntimeException('Insert did not return a record');
         }
 
-        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        $record = $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row) ?? $row;
+        $this->publishRecordEvent(DomainEvent::recordCreated(
+            $domain,
+            $tableName,
+            $this->recordIdForEvent($table, $record),
+            $record,
+        ));
+
+        return $record;
     }
 
     /**
@@ -480,7 +490,22 @@ class GenericCrudService
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Update');
         }
 
-        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        $record = $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row) ?? $row;
+        $oldValues = [];
+        foreach (array_keys($data) as $column) {
+            if (array_key_exists($column, $existing)) {
+                $oldValues[$column] = $existing[$column];
+            }
+        }
+        $this->publishRecordEvent(DomainEvent::recordUpdated(
+            $domain,
+            $tableName,
+            $this->recordIdForEvent($table, $record, $identity),
+            $data,
+            $oldValues,
+        ));
+
+        return $record;
     }
 
     /**
@@ -531,7 +556,16 @@ class GenericCrudService
             if (!is_array($row)) {
                 $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
             }
-            return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+            $record = $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row) ?? $row;
+            $this->publishRecordEvent(DomainEvent::recordDeleted(
+                $domain,
+                $tableName,
+                $this->recordIdForEvent($table, $record, $identity),
+                'soft',
+                $record,
+            ));
+
+            return $record;
         }
 
         $sql = 'DELETE FROM ' . $this->q($tableName)
@@ -540,7 +574,16 @@ class GenericCrudService
         if (!is_array($row)) {
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Delete');
         }
-        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        $record = $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row) ?? $row;
+        $this->publishRecordEvent(DomainEvent::recordDeleted(
+            $domain,
+            $tableName,
+            $this->recordIdForEvent($table, $record, $identity),
+            'hard',
+            $record,
+        ));
+
+        return $record;
     }
 
     private function workflowEngine(): WorkflowEngine
@@ -637,7 +680,7 @@ class GenericCrudService
             $params[$param] = $value;
         }
 
-        return $this->db->transactional(function () use ($domain, $tableName, $table, $recordId, $engineTargetState, $userId, $params, $sets, $where, $identity, $scope, $expectedVersion): array {
+        $record = $this->db->transactional(function () use ($domain, $tableName, $table, $recordId, $engineTargetState, $userId, $params, $sets, $where, $identity, $scope, $expectedVersion): array {
             $result = $this->workflowEngine()->transition($recordId, $engineTargetState, $userId);
             if (!$result->success) {
                 throw new RuntimeException((string)($result->error ?? 'Workflow engine transition failed'));
@@ -651,8 +694,18 @@ class GenericCrudService
                 $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Transition');
             }
 
-            return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+            return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row) ?? $row;
         });
+
+        $this->publishRecordEvent(DomainEvent::recordUpdated(
+            $domain,
+            $tableName,
+            $this->recordIdForEvent($table, $record, $identity),
+            [$statusColumn => $toStatus],
+            [$statusColumn => $existing[$statusColumn] ?? null],
+        ));
+
+        return $record;
     }
 
     /**
@@ -719,7 +772,67 @@ class GenericCrudService
             $this->assertMutationResult($tableName, $table, $identity, $scope, $expectedVersion, 'Transition');
         }
 
-        return $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        $record = $this->augmentRowWithJoinFields($domain, $tableName, 'detail', $row);
+        $record = $record ?? $row;
+        $recordId = $this->recordIdForEvent($table, $record, $identity);
+        $this->publishRecordEvent(DomainEvent::recordUpdated(
+            $domain,
+            $tableName,
+            $recordId,
+            [$statusColumn => $toStatus],
+            [$statusColumn => $currentStatus],
+        ));
+        $this->publishRecordEvent(DomainEvent::workflowTransitioned(
+            "{$domain}.{$tableName}",
+            $recordId,
+            $currentStatus,
+            $toStatus,
+            $userId,
+        ));
+
+        return $record;
+    }
+
+    private function publishRecordEvent(DomainEvent $event): void
+    {
+        try {
+            ($this->eventBus ?? EventBus::getInstance())->publish($event);
+        } catch (\Throwable $e) {
+            @error_log('[GenericCrudService] Failed to publish domain event: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $table
+     * @param array<string, mixed> $record
+     * @param array<string, mixed> $identity
+     */
+    private function recordIdForEvent(array $table, array $record, array $identity = []): string
+    {
+        $primaryKey = $this->primaryKeyMeta($table);
+        $fields = (array)($primaryKey['fields'] ?? []);
+        $parts = [];
+
+        foreach ($fields as $field) {
+            $value = $record[$field] ?? $identity[$field] ?? ($identity['id'] ?? null);
+            if (is_scalar($value) && (string)$value !== '') {
+                $parts[] = $field . '=' . (string)$value;
+            }
+        }
+
+        if ($parts !== []) {
+            return implode('|', $parts);
+        }
+
+        foreach (['record_id', 'id', 'uuid', 'number', 'code'] as $fallbackField) {
+            $value = $record[$fallbackField] ?? $identity[$fallbackField] ?? null;
+            if (is_scalar($value) && (string)$value !== '') {
+                return (string)$value;
+            }
+        }
+
+        $encoded = json_encode($identity !== [] ? $identity : $record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return 'unknown:' . hash('sha256', is_string($encoded) ? $encoded : serialize($record));
     }
 
     /**

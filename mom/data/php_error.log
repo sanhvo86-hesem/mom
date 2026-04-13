@@ -277,3 +277,118 @@ Stack trace:
 [13-Apr-2026 05:02:45 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 05:02:45 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 05:02:45 UTC] FATAL: {"type":2,"message":"stream_socket_client(): Unable to connect to tcp://127.0.0.1:1 (Connection refused)","file":"/Users/a10/Documents/mom/mom/vendor/predis/predis/src/Connection/StreamConnection.php","line":128}
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis SETNX error: Call to a member function set() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis DEL error: Call to a member function del() on null
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:02:53 UTC] FATAL: {"type":2,"message":"stream_socket_client(): Unable to connect to tcp://127.0.0.1:1 (Connection refused)","file":"/Users/a10/Documents/mom/mom/vendor/predis/predis/src/Connection/StreamConnection.php","line":128}
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis SETNX error: Call to a member function set() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis DEL error: Call to a member function del() on null
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:15 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:17 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:17 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:17 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:03:17 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis SETNX error: Call to a member function set() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis DEL error: Call to a member function del() on null
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:04:58 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:05:00 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:05:00 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:05:00 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:05:00 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis SETNX error: Call to a member function set() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis DEL error: Call to a member function del() on null
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:43 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:45 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:45 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:45 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:11:45 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis SETNX error: Call to a member function set() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis GET error: Call to a member function get() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis SET error: Call to a member function setex() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis DEL error: Call to a member function del() on null
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:12:59 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:13:01 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:13:01 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:13:01 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 05:13:01 UTC] [EventBus] Listener error for error.test: Listener error

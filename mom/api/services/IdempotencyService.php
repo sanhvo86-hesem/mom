@@ -44,7 +44,7 @@ final class IdempotencyService
 
     /**
      * @param array<string, mixed> $descriptor
-     * @param callable():array{status_code:int, payload:array<string, mixed>} $operation
+     * @param callable():array{status_code?:int, payload?:array<string, mixed>} $operation
      * @return array{status_code:int, payload:array<string, mixed>, replayed:bool, stored_at:string}
      */
     public function execute(array $descriptor, callable $operation): array
@@ -144,7 +144,7 @@ final class IdempotencyService
 
     /**
      * @param array<string, mixed> $descriptor
-     * @param callable():array{status_code:int, payload:array<string, mixed>} $operation
+     * @param callable():array{status_code?:int, payload?:array<string, mixed>} $operation
      * @return array{status_code:int, payload:array<string, mixed>, replayed:bool, stored_at:string}
      */
     private function executeWithCache(

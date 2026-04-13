@@ -347,7 +347,9 @@ final class EpicorTransportAdapter
             $error = error_get_last();
             throw new RuntimeException((string)($error['message'] ?? 'epicor_transport_http_failed'));
         }
-        $responseHeaders = is_array($http_response_header ?? null) ? $http_response_header : [];
+        $responseHeaders = function_exists('http_get_last_response_headers')
+            ? (http_get_last_response_headers() ?: [])
+            : [];
         $statusCode = 0;
         if (!empty($responseHeaders[0]) && preg_match('/\s(\d{3})\s/', (string)$responseHeaders[0], $matches)) {
             $statusCode = (int)$matches[1];
