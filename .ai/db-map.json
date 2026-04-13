@@ -1,10 +1,10 @@
 {
     "_meta": {
-        "generated_at": "2026-04-13T05:40:10+00:00",
+        "generated_at": "2026-04-13T07:07:21+00:00",
         "description": "Database tables: which migration defines them, primary key, foreign keys, related services/contracts.",
         "migrations_dir": "mom/database/migrations/",
-        "total_migrations": 96,
-        "total_tables": 658
+        "total_migrations": 97,
+        "total_tables": 659
     },
     "migrations": [
         {
@@ -2279,6 +2279,15 @@
             "description": "",
             "dependencies": [],
             "tables_created": [],
+            "tables_extended": []
+        },
+        {
+            "file": "097_idempotency_replay_ledger.sql",
+            "description": "",
+            "dependencies": [],
+            "tables_created": [
+                "idempotency_replay_ledger"
+            ],
             "tables_extended": []
         }
     ],
@@ -5130,7 +5139,8 @@
             ],
             "contract": null,
             "related_services": [
-                "FileHelper"
+                "FileHelper",
+                "FileIdempotencyReplayRepository"
             ]
         },
         "fin_asset_depreciation": {
@@ -6086,6 +6096,19 @@
             "foreign_keys": [],
             "contract": null,
             "related_services": []
+        },
+        "idempotency_replay_ledger": {
+            "defined_in": "097_idempotency_replay_ledger.sql",
+            "extended_in": [],
+            "primary_key": "ledger_id",
+            "foreign_keys": [],
+            "contract": null,
+            "related_services": [
+                "FileIdempotencyReplayRepository",
+                "IdempotencyReplayRepository",
+                "IdempotencyService",
+                "PostgresIdempotencyReplayRepository"
+            ]
         },
         "improvement_projects": {
             "defined_in": "014_audit_risk.sql",

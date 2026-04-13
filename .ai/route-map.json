@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-13T05:40:10+00:00",
+        "generated_at": "2026-04-13T07:07:21+00:00",
         "description": "All API routes with controller, method, services used, and domain. Search by action key or URL path.",
         "usage": "Find the right controller by searching action key or path. Then open only that controller file."
     },
@@ -1670,6 +1670,7 @@
             "controller": "QuoteController",
             "method": "listQuotes",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1679,6 +1680,7 @@
             "controller": "QuoteController",
             "method": "detail",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1688,6 +1690,7 @@
             "controller": "QuoteController",
             "method": "create",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1697,6 +1700,7 @@
             "controller": "QuoteController",
             "method": "update",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1706,6 +1710,7 @@
             "controller": "QuoteController",
             "method": "transition",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1715,6 +1720,7 @@
             "controller": "QuoteController",
             "method": "convertToSo",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1724,6 +1730,7 @@
             "controller": "QuoteController",
             "method": "estimateCycleTime",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1733,6 +1740,7 @@
             "controller": "QuoteController",
             "method": "estimateMaterial",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -1742,6 +1750,7 @@
             "controller": "QuoteController",
             "method": "dashboard",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -3640,6 +3649,7 @@
             "controller": "QuoteController",
             "method": "dashboard",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -3649,6 +3659,7 @@
             "controller": "QuoteController",
             "method": "create",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -5431,6 +5442,7 @@
             "controller": "QuoteController",
             "handler": "listQuotes",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -5441,6 +5453,7 @@
             "controller": "QuoteController",
             "handler": "create",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -5451,6 +5464,7 @@
             "controller": "QuoteController",
             "handler": "detail",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -5461,6 +5475,7 @@
             "controller": "QuoteController",
             "handler": "update",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"
@@ -5471,6 +5486,7 @@
             "controller": "QuoteController",
             "handler": "convertToSo",
             "services": [
+                "IdempotencyService",
                 "QuoteService"
             ],
             "domain": "commercial_customer"

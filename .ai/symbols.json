@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-13T05:40:10+00:00",
+        "generated_at": "2026-04-13T07:07:21+00:00",
         "description": "All PHP classes with public methods and file paths. Search by class or method name to find the right file.",
         "usage": "grep this file for a class or method name to get its file path."
     },
@@ -1202,6 +1202,16 @@
             ]
         },
         {
+            "class": "FileIdempotencyReplayRepository",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/FileIdempotencyReplayRepository.php",
+            "methods": [
+                "__construct",
+                "execute"
+            ]
+        },
+        {
             "class": "FinanceControlService",
             "type": "final class",
             "namespace": "MOM\\Services",
@@ -1320,6 +1330,15 @@
                 "update",
                 "delete",
                 "transition"
+            ]
+        },
+        {
+            "class": "IdempotencyReplayRepository",
+            "type": "interface",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/IdempotencyReplayRepository.php",
+            "methods": [
+                "execute"
             ]
         },
         {
@@ -1632,6 +1651,16 @@
                 "onEvent",
                 "__construct",
                 "__construct"
+            ]
+        },
+        {
+            "class": "PostgresIdempotencyReplayRepository",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/PostgresIdempotencyReplayRepository.php",
+            "methods": [
+                "__construct",
+                "execute"
             ]
         },
         {
