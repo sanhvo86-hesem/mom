@@ -59,8 +59,7 @@ final class EditResult
  * editing by state, cancel/reopen governance, change-history logging,
  * and auto-actions on transition for the SO > JO > WO hierarchy.
  *
- * Reads configuration from data/config/so_jo_wo_config.json.
- * Persists orders in data/orders/orders.json.
+ * Reads and persists workflow state through OrderWorkflowRepository.
  *
  * @package MOM\Services
  * @since   4.0.0
@@ -162,14 +161,10 @@ final class OrderWorkflowService
 
     // ── Dependencies ────────────────────────────────────────────────────────
 
-    private readonly string $configFile;
-    private readonly string $ordersFile;
+    private readonly OrderWorkflowRepository $repository;
 
     /** Cached config loaded from disk. */
     private ?array $configCache = null;
-
-    /** Optional database connection for PostgreSQL dual-write. */
-    private ?object $db = null;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -177,12 +172,13 @@ final class OrderWorkflowService
      * @param string      $dataDir Absolute path to data directory.
      * @param object|null $db      Optional database connection (Connection instance) for PostgreSQL dual-write.
      */
-    public function __construct(private readonly string $dataDir, ?object $db = null)
+    public function __construct(
+        private readonly string $dataDir,
+        ?object $db = null,
+        ?OrderWorkflowRepository $repository = null,
+    )
     {
-        $base = rtrim(str_replace('\\', '/', $dataDir), '/');
-        $this->configFile = $base . '/config/so_jo_wo_config.json';
-        $this->ordersFile = $base . '/orders/orders.json';
-        $this->db = $db;
+        $this->repository = $repository ?? new JsonOrderWorkflowRepository($dataDir, $db);
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -916,14 +912,9 @@ final class OrderWorkflowService
             return $this->migrateRole((string)$_SESSION['role']);
         }
 
-        // Try loading from users config
-        $usersFile = rtrim(str_replace('\\', '/', $this->dataDir), '/') . '/config/users.json';
-        $users = $this->readJson($usersFile);
-        if (is_array($users)) {
-            foreach ($users as $u) {
-                if (is_array($u) && (string)($u['username'] ?? '') === $userId) {
-                    return $this->migrateRole((string)($u['role'] ?? 'system'));
-                }
+        foreach ($this->repository->loadUsers() as $u) {
+            if (is_array($u) && (string)($u['username'] ?? '') === $userId) {
+                return $this->migrateRole((string)($u['role'] ?? 'system'));
             }
         }
 
@@ -954,15 +945,15 @@ final class OrderWorkflowService
         }
 
         if (!$result['ready']) {
-            $failedCodes = implode(', ', $result['failed_gates'] ?? []);
+            $failedCodes = implode(', ', $result['failed_gates']);
             return new OrderTransitionResult(
                 false,
                 "Cannot ship: shipment readiness gate NOT READY. Failed gates: {$failedCodes}. " .
                 "Resolve all required gate failures or request an override from QA Manager.",
                 errorCode: 'shipment_gate_not_ready',
                 data: [
-                    'failed_gates' => $result['failed_gates'] ?? [],
-                    'items'        => $result['items'] ?? [],
+                    'failed_gates' => $result['failed_gates'],
+                    'items'        => $result['items'],
                 ],
             );
         }
@@ -1045,32 +1036,7 @@ final class OrderWorkflowService
      */
     private function appendImmutableAuditEvent(string $orderType, string $orderId, array $event): void
     {
-        $base    = rtrim(str_replace('\\', '/', $this->dataDir), '/');
-        $logDir  = $base . '/orders/audit_trail';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0775, true);
-        }
-
-        $logFile = $logDir . '/' . preg_replace('/[^A-Za-z0-9_-]/', '_', $orderId) . '.jsonl';
-
-        // Read last hash for chain
-        $prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
-        if (is_file($logFile)) {
-            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            if (!empty($lines)) {
-                $lastLine = end($lines);
-                $lastEvent = json_decode($lastLine, true);
-                $prevHash = $lastEvent['event_hash'] ?? $prevHash;
-            }
-        }
-
-        $event['order_type']  = $orderType;
-        $event['order_id']    = $orderId;
-        $event['prev_hash']   = $prevHash;
-        $event['event_hash']  = hash('sha256', json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-        $line = json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
-        @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
+        $this->repository->appendImmutableAuditEvent($orderType, $orderId, $event);
     }
 
     // ── Notification dispatch ───────────────────────────────────────────────
@@ -1118,16 +1084,7 @@ final class OrderWorkflowService
             'read'        => false,
         ];
 
-        // Persist to notification queue
-        $base     = rtrim(str_replace('\\', '/', $this->dataDir), '/');
-        $queueDir = $base . '/notifications';
-        if (!is_dir($queueDir)) {
-            @mkdir($queueDir, 0775, true);
-        }
-
-        $queueFile = $queueDir . '/order_notifications.jsonl';
-        $line = json_encode($notification, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
-        @file_put_contents($queueFile, $line, FILE_APPEND | LOCK_EX);
+        $this->repository->appendOrderNotification($notification);
     }
 
     // ── File I/O ────────────────────────────────────────────────────────────
@@ -1137,178 +1094,18 @@ final class OrderWorkflowService
         if ($this->configCache !== null) {
             return $this->configCache;
         }
-        $this->configCache = $this->readJson($this->configFile) ?? [];
+        $this->configCache = $this->repository->loadConfig();
         return $this->configCache;
     }
 
     private function loadOrders(): array
     {
-        // Try PostgreSQL first if DB available (for future POSTGRES_PRIMARY mode)
-        // Currently: always read from JSON (JSON_ONLY / SHADOW_WRITE)
-        return $this->readJson($this->ordersFile) ?? [
-            '_meta'        => ['version' => '1.0'],
-            'sales_orders' => [],
-            'job_orders'   => [],
-            'work_orders'  => [],
-        ];
+        return $this->repository->loadOrders();
     }
 
     private function saveOrders(array $data): void
     {
-        $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
-        $data['_meta']['updated'] = $this->nowIso();
-
-        // ── 1. Always write JSON (primary store) ────────────────────────
-        $this->writeJson($this->ordersFile, $data);
-
-        // ── 2. Shadow-write to PostgreSQL if DB available ───────────────
-        $this->shadowWriteOrders($data);
-    }
-
-    /**
-     * Shadow-write order data to PostgreSQL tables.
-     * Non-blocking: errors are logged but do not fail the operation.
-     *
-     * Writes to: sales_orders, job_orders, job_operations (via RuntimeShadowSync pattern)
-     */
-    private function shadowWriteOrders(array $data): void
-    {
-        if ($this->db === null) {
-            return;
-        }
-
-        try {
-            // Check if DB is connected (duck-type: method_exists for flexibility)
-            if (method_exists($this->db, 'isConnected') && !$this->db->isConnected()) {
-                return;
-            }
-
-            // Upsert each SO
-            foreach (($data['sales_orders'] ?? []) as $so) {
-                if (!is_array($so) || empty($so['so_number'] ?? '')) continue;
-                $this->upsertOrderRow('sales_orders', 'sales_order_number', $so['so_number'], $so);
-            }
-
-            // Upsert each JO
-            foreach (($data['job_orders'] ?? []) as $jo) {
-                if (!is_array($jo) || empty($jo['jo_number'] ?? '')) continue;
-                $this->upsertOrderRow('job_orders', 'job_number', $jo['jo_number'], $jo);
-            }
-
-            // Upsert each WO into job_operations
-            foreach (($data['work_orders'] ?? []) as $wo) {
-                if (!is_array($wo) || empty($wo['wo_number'] ?? '')) continue;
-                $this->upsertWorkOrderRow($wo);
-            }
-        } catch (\Throwable $e) {
-            error_log('[OrderWorkflowService] Shadow write to PostgreSQL failed: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Upsert a single order row into PostgreSQL.
-     */
-    private function upsertOrderRow(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-
-        $status    = $row['status'] ?? 'draft';
-        $metadata  = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $updatedAt = $row['updated_at'] ?? $this->nowIso();
-        $statusColumn = match ($table) {
-            'sales_orders' => 'so_status',
-            'job_orders' => 'job_status',
-            default => throw new \RuntimeException('Unsupported shadow-write table: ' . $table),
-        };
-
-        try {
-            $existing = null;
-            if (method_exists($this->db, 'queryOne')) {
-                $existing = $this->db->queryOne(
-                    "SELECT 1 FROM {$table} WHERE {$idColumn} = :id LIMIT 1",
-                    [':id' => $idValue],
-                );
-            }
-
-            if ($existing) {
-                $this->db->execute(
-                    "UPDATE {$table} SET {$statusColumn} = :status, metadata = :meta::jsonb, updated_at = :at::timestamptz WHERE {$idColumn} = :id",
-                    [':status' => $status, ':meta' => $metadata, ':at' => $updatedAt, ':id' => $idValue],
-                );
-            } else {
-                // Insert with minimal required fields -- full sync handled by RuntimeShadowSync
-                $this->db->execute(
-                    "INSERT INTO {$table} ({$idColumn}, {$statusColumn}, metadata, created_at, updated_at) VALUES (:id, :status, :meta::jsonb, :at::timestamptz, :at::timestamptz)
-                     ON CONFLICT ({$idColumn}) DO UPDATE SET {$statusColumn} = EXCLUDED.{$statusColumn}, metadata = EXCLUDED.metadata, updated_at = EXCLUDED.updated_at",
-                    [':id' => $idValue, ':status' => $status, ':meta' => $metadata, ':at' => $updatedAt],
-                );
-            }
-        } catch (\Throwable $e) {
-            // Log but don't fail -- shadow write is non-critical
-            error_log("[OrderWorkflowService] Upsert {$table}.{$idValue} failed: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Upsert a work order row into job_operations table.
-     */
-    private function upsertWorkOrderRow(array $wo): void
-    {
-        if ($this->db === null) return;
-
-        $woNumber = $wo['wo_number'] ?? '';
-        if ($woNumber === '') return;
-
-        $status   = $wo['status'] ?? 'scheduled';
-        $metadata = json_encode($wo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        try {
-            $this->db->execute(
-                "INSERT INTO job_operations (operation_code, status, metadata, created_at)
-                 VALUES (:wo, :status, :meta::jsonb, NOW())
-                 ON CONFLICT (operation_code) DO UPDATE SET status = EXCLUDED.status, metadata = EXCLUDED.metadata",
-                [':wo' => $woNumber, ':status' => $status, ':meta' => $metadata],
-            );
-        } catch (\Throwable $e) {
-            error_log("[OrderWorkflowService] Upsert WO {$woNumber} failed: " . $e->getMessage());
-        }
-    }
-
-    private function readJson(string $path): ?array
-    {
-        if (!is_file($path)) {
-            return null;
-        }
-        $raw = @file_get_contents($path);
-        if ($raw === false) {
-            return null;
-        }
-        $decoded = json_decode($raw, true);
-        return is_array($decoded) ? $decoded : null;
-    }
-
-    private function writeJson(string $path, array $data): void
-    {
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
-        }
-        $tmp  = $path . '.tmp.' . getmypid();
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        if ($json === false) {
-            throw new RuntimeException('Failed to encode JSON for ' . basename($path));
-        }
-        if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
-            @unlink($tmp);
-            throw new RuntimeException('Cannot write ' . basename($path));
-        }
-        if (file_exists($path)) {
-            @unlink($path);
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new RuntimeException('Failed to atomically replace ' . basename($path));
-        }
+        $this->repository->saveOrders($data);
     }
 
     private function nowIso(): string

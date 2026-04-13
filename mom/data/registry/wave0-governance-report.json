@@ -1,18 +1,18 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:05.735Z",
-    "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
+    "generatedAt": "2026-04-13T08:03:30.243Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 669,
-    "canonical_resources": 64,
-    "implemented_canonical_resources": 64,
+    "total_frontend_entities": 670,
+    "canonical_resources": 67,
+    "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
-    "core_value_stream_entities": 69,
-    "governed_support_entities": 594,
+    "core_value_stream_entities": 73,
+    "governed_support_entities": 591,
     "conditional_extension_entities": 1,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
@@ -319,6 +319,19 @@
         ]
       },
       {
+        "entity_key": "fmea_apqp.control_plans",
+        "entity": "control_plans",
+        "profile": "business_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 11,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.control-plans"
+        ]
+      },
+      {
         "entity_key": "governance.override_controls",
         "entity": "operational_override_controls",
         "profile": "governed_case",
@@ -449,6 +462,19 @@
         ]
       },
       {
+        "entity_key": "mes_execution.mes_machine_alarms",
+        "entity": "mes_machine_alarms",
+        "profile": "operator_console",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "mes_execution.machine-alarms"
+        ]
+      },
+      {
         "entity_key": "mes_execution.mes_oee_snapshots",
         "entity": "mes_oee_snapshots",
         "profile": "projection_record",
@@ -459,6 +485,19 @@
         "readiness": "ready",
         "canonical_resources": [
           "analytics.mes-oee-snapshots"
+        ]
+      },
+      {
+        "entity_key": "mes_execution.mes_part_genealogy",
+        "entity": "mes_part_genealogy",
+        "profile": "business_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "traceability_serialization.lot-genealogy"
         ]
       },
       {
@@ -905,6 +944,19 @@
         "readiness": "ready",
         "canonical_resources": [
           "inventory_logistics.shipments"
+        ]
+      },
+      {
+        "entity_key": "traceability_serialization.genealogy_link",
+        "entity": "genealogy_link",
+        "profile": "business_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "traceability_serialization.lot-genealogy"
         ]
       },
       {
@@ -2757,17 +2809,6 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "fmea_apqp.control_plans",
-        "entity": "control_plans",
-        "profile": "business_record",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 11,
-        "workflow_state": "ready",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "fmea_apqp.fmea_actions",
         "entity": "fmea_actions",
         "profile": "business_record",
@@ -4143,17 +4184,6 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "mes_execution.mes_machine_alarms",
-        "entity": "mes_machine_alarms",
-        "profile": "operator_console",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 4,
-        "workflow_state": "ready",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "mes_execution.mes_machine_snapshot",
         "entity": "mes_machine_snapshot",
         "profile": "operator_console",
@@ -4270,17 +4300,6 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "mes_execution.mes_part_genealogy",
-        "entity": "mes_part_genealogy",
-        "profile": "business_record",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 6,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -6673,6 +6692,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "system_infrastructure.idempotency_replay_ledger",
+        "entity": "idempotency_replay_ledger",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "system_infrastructure.integration_monitors",
         "entity": "integration_monitors",
         "profile": "business_record",
@@ -6911,17 +6941,6 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "ready",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "traceability_serialization.genealogy_link",
-        "entity": "genealogy_link",
-        "profile": "business_record",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 5,
-        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },

@@ -64,6 +64,39 @@ final class OrderWorkflowEngineeringReadinessTest extends TestCase
         $this->assertSame('engineering_ready', $result->data['status'] ?? null);
     }
 
+    public function testSalesOrderCannotBecomeEngineeringReadyWithMissingReleaseStatus(): void
+    {
+        $this->writeOrders([[
+            'so_number' => 'SO-2026-0003',
+            'status' => 'confirmed',
+            'engineering_release_id' => 'ER-1',
+            'bom_id' => 'BOM-1',
+            'routing_id' => 'RT-1',
+            'control_plan_id' => 'CP-1',
+            'inspection_plan_id' => 'IP-1',
+        ]]);
+
+        $service = new OrderWorkflowService($this->dataDir);
+        $result = $service->executeTransition('so', 'SO-2026-0003', 'engineering_ready', 'qa-user', 'release');
+
+        $this->assertFalse($result->ok);
+        $this->assertSame('engineering_release_incomplete', $result->errorCode);
+        $this->assertSame('', $result->data['engineering_release_status'] ?? null);
+    }
+
+    public function testCompletedJobAndWorkOrderCannotBeCancelledDirectly(): void
+    {
+        $service = new OrderWorkflowService($this->dataDir);
+
+        $job = $service->validateTransition('jo', 'completed', 'cancelled', 'production_manager');
+        $work = $service->validateTransition('wo', 'completed', 'cancelled', 'production_manager');
+
+        $this->assertFalse($job->ok);
+        $this->assertSame('invalid_transition', $job->errorCode);
+        $this->assertFalse($work->ok);
+        $this->assertSame('invalid_transition', $work->errorCode);
+    }
+
     /**
      * @param array<int, array<string, mixed>> $salesOrders
      */

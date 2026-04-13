@@ -600,7 +600,10 @@ final class SupplierQualityService
             $skipLot[] = $entry;
         }
 
-        $currentLevel = $entry['level'] ?? 'normal';
+        $currentLevel = (string)($entry['level'] ?? 'normal');
+        if (!in_array($currentLevel, self::SKIP_LOT_LEVELS, true)) {
+            $currentLevel = 'normal';
+        }
         $consAccept   = (int)($entry['consecutive_accept'] ?? 0);
         $consReject   = (int)($entry['consecutive_reject'] ?? 0);
         $recentResults = (array)($entry['recent_results'] ?? []);
@@ -898,7 +901,7 @@ final class SupplierQualityService
             }
 
             // ── 8D methodology validation ───────────────────────────────
-            $requiredFields = self::SCAR_8D_REQUIREMENTS[$target] ?? [];
+            $requiredFields = self::SCAR_8D_REQUIREMENTS[$target];
             $missing8d = [];
             foreach ($requiredFields as $field) {
                 if (empty($rec[$field]) && empty($rec[$field] ?? null)) {

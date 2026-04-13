@@ -24,7 +24,12 @@ Allowed only after implementation and runtime-safe review:
 
 | API | Purpose | Required status |
 | --- | --- | --- |
+| `POST /api/v1/commands/CreateQuote` | Quote creation with governed counter/audit | New required command |
+| `POST /api/v1/commands/SubmitQuoteForInternalReview` | Quote review routing | New required command |
+| `POST /api/v1/commands/SendQuote` | Send approved quote package | New required command |
+| `POST /api/v1/commands/AcceptQuote` | Record customer quote acceptance | New required command |
 | `POST /api/v1/commands/ConvertQuoteToSalesOrder` | Convert accepted quote to SO atomically | New required command |
+| `POST /api/v1/commands/RecordContractReview` | Contract review bound to SO | New required command |
 | `POST /api/v1/commands/ConfirmSalesOrder` | Contract/PO confirmation | New required command |
 | `POST /api/v1/commands/ReleaseSalesOrderToProduction` | Engineering readiness | New required command |
 | `POST /api/v1/commands/CreateJobOrder` | JO creation | New required command |
@@ -36,13 +41,28 @@ Allowed only after implementation and runtime-safe review:
 | `POST /api/v1/commands/RecordOqcResult` | OQC result and quality gate | New required command |
 | `POST /api/v1/commands/ConfirmPacking` | Packing confirmation | New required command |
 | `POST /api/v1/commands/ConfirmDelivery` | Shipment/delivery confirmation | New required command |
+| `POST /api/v1/commands/CreatePurchaseOrder` | PO creation under ASL/supplier gates | New required command |
+| `POST /api/v1/commands/ApprovePurchaseOrder` | PO approval and SoD | New required command |
 | `POST /api/v1/commands/ReceivePurchaseOrder` | PO receiving | New required command |
 | `POST /api/v1/commands/RecordIqcResult` | IQC result | New required command |
 | `POST /api/v1/commands/PutawayInventory` | Putaway | New required command |
 | `POST /api/v1/commands/PostApInvoice` | AP posting | New required command |
 | `POST /api/v1/commands/RunThreeWayMatch` | 3-way match | New required command |
 | `POST /api/v1/commands/CloseFinancePeriod` | Period close enforcement | New required command |
+| `POST /api/v1/commands/OpenFinancePeriod` | Period state authority | New required command |
+| `POST /api/v1/commands/PostArInvoice` | AR posting for shipped SO | New required command |
+| `POST /api/v1/commands/PostPayment` | AP payment posting | New required command |
 | `POST /api/v1/commands/CreateElectronicSignature` | Part 11 signature | New required command |
+| `POST /api/v1/commands/SplitLot` | Governed lot split | New required command |
+| `POST /api/v1/commands/MergeLot` | Governed lot merge | New required command |
+| `POST /api/v1/commands/ProduceOutputLotSerial` | Production output genealogy | New required command |
+| `POST /api/v1/commands/GenerateDppFromShipment` | DPP from shipment/genealogy | New required command |
+| `POST /api/v1/commands/SimulateRecall` | Recall simulation evidence | New required command |
+| `POST /api/v1/commands/RecordMachineEvent` | Immutable machine raw event ingestion | New required command |
+| `POST /api/v1/commands/DeriveProductionEvent` | Derived MES/OEE event | New required command |
+| `POST /api/v1/commands/ApplyQualityHold` | Canonical hold creation | New required command |
+| `POST /api/v1/commands/ReleaseQualityHold` | Governed hold release | New required command |
+| `POST /api/v1/commands/PostCopqEntry` | COPQ ledger posting | New required command |
 | `GET /api/v1/projections/*` | Read models only | Must be versioned and owner-approved |
 
 Existing dedicated endpoints may stay for internal/admin/compatibility until replaced, but must be marked `not runtime-safe for frontend mutation` unless the command contract is met.
@@ -137,6 +157,8 @@ Every mutation command requires:
 
 - `Idempotency-Key` header.
 - Command fingerprint hash over normalized DTO, actor, tenant/site, command name.
+- PostgreSQL replay authority stores raw `scope_key` as `TEXT` and enforces uniqueness with `scope_key_hash`; command scopes may exceed 255 chars.
+- `in_progress` replay rows are fail-closed. Automatic retry must not reclaim them; only an operator recovery workflow may resolve stale rows after side-effect investigation.
 - TTL at least 24 hours for ordinary commands, longer for finance/shipment/quality if needed.
 - Replay returns same response, status code, command ID, and entity IDs.
 - Different payload with same key returns `409 idempotency_conflict`.

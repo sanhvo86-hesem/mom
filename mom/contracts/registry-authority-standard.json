@@ -2,6 +2,7 @@
   "_meta": {
     "version": "1.0.0",
     "effectiveDate": "2026-04-11",
+    "updatedAt": "2026-04-13T08:04:30Z",
     "status": "authoritative_policy",
     "description": "Enterprise registry authority standard for HESEM ERP+MOM+MES+eQMS. This file defines the required machine-readable contract layers so backend, frontend, AI tools, and auditors do not infer system truth from labels or UI drafts."
   },

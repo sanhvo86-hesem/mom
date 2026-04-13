@@ -2322,6 +2322,9 @@ final class DataSchemaService
         if ($domain === 'master_data_governance' && (str_contains($key, 'registry') || str_contains($key, 'retention'))) {
             return true;
         }
+        if ($domain === 'system_infrastructure' && $key === 'idempotency_replay_ledger') {
+            return true;
+        }
 
         return false;
     }

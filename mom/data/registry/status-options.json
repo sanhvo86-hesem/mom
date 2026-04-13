@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-11T08:49:00.003Z",
-    "enumCount": 733
+    "generatedAt": "2026-04-13T08:03:24.055Z",
+    "enumCount": 734
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -5383,8 +5383,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "workflow_step_data",
-    "statusColumn": "to_state",
+    "sourceTable": "idempotency_replay_ledger",
+    "statusColumn": "status",
     "options": [
       {
         "value": "complete",
@@ -35866,6 +35866,49 @@
     "standard": "internal",
     "sourceTable": "workflow_step_data",
     "statusColumn": "to_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "idempotency_replay_ledger_status": {
+    "label": "Idempotency Replay sổ cái - Status",
+    "labelEn": "Idempotency Replay Ledger Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "idempotency_replay_ledger",
+    "statusColumn": "status",
     "aliasOf": "digital_thread_status",
     "options": [
       {

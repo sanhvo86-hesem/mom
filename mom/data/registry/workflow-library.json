@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-11T08:49:00.003Z",
-    "workflowCount": 277
+    "generatedAt": "2026-04-13T08:03:24.055Z",
+    "workflowCount": 278
   },
   "workflows": {
     "wf_allocation": {
@@ -15667,6 +15667,28 @@
           "hcm_employees",
           "hcm_positions"
         ]
+      }
+    },
+    "wf_idempotency_replay_ledger": {
+      "workflowId": "wf_idempotency_replay_ledger",
+      "name": "Idempotency Replay sổ cái - Luong xu ly",
+      "nameEn": "Idempotency Replay Ledger Workflow",
+      "entity": "idempotency_replay_ledger",
+      "domain": "system_infrastructure",
+      "standard": "internal",
+      "primaryTable": "idempotency_replay_ledger",
+      "relatedTables": [
+        "idempotency_replay_ledger"
+      ],
+      "stateField": "status",
+      "statusSet": "digital_thread_status",
+      "lifecycleMode": "generic_status_only",
+      "states": [],
+      "transitions": [],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": []
       }
     },
     "wf_improvement_project": {

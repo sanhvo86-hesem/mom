@@ -19,12 +19,14 @@ No governed domain may have multiple conflicting authorities. The target rule is
 | --- | --- | --- |
 | Governed Generic CRUD mutation | `GenericCrudController` blocks create/update/delete/transition for governed domains and high-risk tables with `409 domain_command_required`; internal backfill requires `HESEM_ALLOW_GOVERNED_GENERIC_MUTATION` and `X-HESEM-Internal-Generic-Override: domain-command-backfill`. | This is a safety guard, not a replacement for command APIs. |
 | Quote conversion retry safety | `QuoteController::convertToSo()` applies idempotency, and `QuoteService::convertToSalesOrder()` serializes conversion with a lock and returns an already-created SO when quote state is stale. | JSON runtime is safer, but PostgreSQL `ConvertQuoteToSalesOrder` remains the target authority. |
-| SO engineering readiness | Runtime SO config includes `engineering_ready`; `OrderWorkflowService` requires release package fields before transition; `OrderService::createJobOrder()` blocks confirmed-only SOs. | This converts the former orphan state into a partial runtime gate; canonical release must still verify released master-data rows. |
+| Quote/SO/logistics counters | Quote/SO and logistics document counters now use file locks around read-increment-write. | Still compatibility-only; command APIs must use PostgreSQL sequence or `record_counters` row locks. |
+| Idempotency replay authority | PostgreSQL idempotency ledger now uses `scope_key_hash` for long scopes and rejects both active and expired `in_progress` rows instead of reclaiming them. | Command framework must expose monitored stale-row recovery; automatic retry must not double-execute side effects. |
+| SO engineering readiness | Runtime SO config includes `engineering_ready`; `OrderWorkflowService` requires release package fields plus explicit released/approved/complete `engineering_release_status` before transition; `OrderService::createJobOrder()` blocks confirmed-only SOs. | This converts the former orphan state into a partial runtime gate; canonical release must still verify released master-data rows. |
 | Shipment gate on legacy logistics routes | `LogisticsController` calls `ShipmentGateService` before `delivery_confirm` and before `packing_update` can set `status=shipped`. | Legacy routes are still compatibility surfaces; final authority must be `ConfirmPacking` and `ConfirmDelivery`. |
-| OQC failure containment | `oqc_update(result=fail)` creates an OQC-sourced JSONL NCR and an active order quality hold that shipment gate reads. | This closes the immediate shipment bypass but remains JSON/JSONL multi-authority until canonical quality commands exist. |
+| OQC failure containment | `oqc_update(result=fail)` ignores client-supplied fake `ncr_reference`, creates/reuses an OQC-sourced JSONL NCR, writes the governed NCR reference, and creates an active order quality hold that shipment gate reads. | This closes the immediate shipment bypass but remains JSON/JSONL multi-authority until canonical quality commands exist. |
 | Shipment gate config | Runtime accepts `gate_items` by normalizing it into `gates`. | Removes one documentation-runtime mismatch, while contract review/NCR/CAPA store fragmentation remains. |
-| Finance closed-period memo posting | Debit/credit memo creation now rejects closed AP/AR periods unless a matching approved backdate exception is supplied; the exception is consumed on use. | Other posting domains must reuse the same policy. |
-| Supplier scorecard formula | Scorecard calculation now includes PPM, OTD, SCAR severity/open/overdue, supplier audit, and ASL/cert expiry risk. | Scorecard is still JSON primary and does not yet own ASL/PO/payment release decisions. |
+| Finance closed-period memo posting | Debit/credit memo creation now rejects closed AP/AR periods unless a matching approved backdate exception is supplied; period check, exception consume, and memo write run under a finance-control lock with rollback attempt if memo persistence fails. | Other posting domains must reuse the same policy. |
+| Supplier scorecard formula | Scorecard calculation now includes PPM, OTD, SCAR severity/open/overdue including still-open prior-period SCARs, supplier audit, and ASL/cert expiry risk. | Scorecard is still JSON primary and does not yet own ASL/PO/payment release decisions. |
 | Workflow result class collision | `OrderWorkflowService` no longer declares the same `MOM\Services\TransitionResult` class as `WorkflowEngine`; the order service result is now `OrderTransitionResult`. | Removes a runtime fatal; target command framework should publish typed results from dedicated files. |
 | Runtime drift audit | Fatal call signature mismatch is fixed and the tool runs in `JSON_ONLY` mode. | Coverage must expand before any PostgreSQL cutover decision. |
 
@@ -53,7 +55,7 @@ No governed domain may have multiple conflicting authorities. The target rule is
 | --- | --- | --- | --- |
 | Status/workflow vocabulary | `docs/backend/WORKFLOW_STATUS_UNIFICATION_SPEC.md` as design, then a machine-readable `workflow-status-authority.json` | PHP constants, `so_jo_wo_config.json`, `status-options.json`, `workflow-library.json`, DB checks/enums, OpenAPI, frontend options | Workflow/status generator + CI |
 | Business mutation | Domain command service | OpenAPI command endpoints, command audit, outbox events | Domain service owner |
-| Transaction and idempotency | Command framework | `idempotency_keys`, transaction envelope, deterministic replay response | Platform backend |
+| Transaction and idempotency | Command framework | PostgreSQL `idempotency_replay_ledger`, transaction envelope, deterministic replay response | Platform backend |
 | Ledger posting | Inventory/finance ledger services | Inventory/WIP/cost/AP/GL ledgers, balances, projections | Finance/inventory backend |
 | Regulatory evidence | Evidence/e-signature service | Audit event, evidence link, e-signature record, hash chain | QMS/platform backend |
 | Master data | PostgreSQL after cutover; JSON import/export only | JSON runtime cache, registry metadata, read projections | MDM backend |
@@ -76,8 +78,8 @@ Current target: Sales/Quote/SO, JO/WO, quality, inventory, purchasing, finance, 
 | Quote | Runtime `draft, internal_review, sent, accepted, rejected, expired, revised, converted`; registry `draft, review, sent, won, lost, expired`. | Canonicalize to runtime/DB enum; map `review->internal_review`, `won->accepted`, `lost->rejected`. |
 | SO | Runtime/config now includes `engineering_ready`, but registry `sales_order_status` still omits `quoted/cancelled` and `sales_order_status_code` still has unrelated `released/in_progress/completed`. | Canonical SO lifecycle includes `engineering_ready`; align status sets and table columns. |
 | `wf_sales_order` | `statusSet=sales_order_status_code` does not match workflow states. | Point workflow to canonical SO status set and migrate columns. |
-| JO | Runtime supports `planned, released, active, on_hold, completed, closed, cancelled`; config/registry omit `cancelled` and registry omits `on_hold` in places. | Add canonical JO status set and migrate unknowns. |
-| WO | Runtime supports `scheduled, setup, running, inspection, completed, on_hold, cancelled`; registry workflow has `draft, planned, released, in_production, quality_hold, closed, cancelled`. | Split production WO lifecycle from service/maintenance WO or rename clearly. |
+| JO | Runtime config/service supports `planned, released, active, on_hold, completed, closed, cancelled`; registry/workflow still omit `cancelled`/`on_hold` in places. | Generate config, registry, workflow, DB status checks, and OpenAPI from one JO status set; completed jobs cannot be directly cancelled. |
+| WO | Runtime config/service supports `scheduled, setup, running, inspection, completed, on_hold, cancelled`; registry workflow has `draft, planned, released, in_production, quality_hold, closed, cancelled`. | Split production WO lifecycle from service/maintenance WO or rename clearly; completed WOs cannot be directly cancelled. |
 | NCR | Registry has `draft/submitted/...`; JSONL auto NCR uses `open`. | Map `open` to `submitted` or `containment_active`; reject unregistered states. |
 | CAPA | Registry has `draft/initiated/action_planning/...`; JSONL trigger uses `pending_review`. | Add formal trigger state or map to `initiated`. |
 | OQC/IQC | OQC result status and logistics result strings are not a command-owned quality state. | `RecordOqcResult` and `RecordIqcResult` own the result and linked hold/NCR state. |
@@ -87,7 +89,7 @@ Current target: Sales/Quote/SO, JO/WO, quality, inventory, purchasing, finance, 
 | State | Location | Classification |
 | --- | --- | --- |
 | `engineering_ready` | Runtime SO config/service and registry/workflow SO | partially enforced runtime state; still requires canonical generated status authority and released master-data validation |
-| `cancelled` JO/WO | Runtime constants/cancel transition, not config/workflow | unregistered runtime state |
+| `cancelled` JO/WO | Runtime constants and `so_jo_wo_config.json`; registry/workflow/DB still not unified | partially registered runtime state; generator/migration still required |
 | `open` NCR | Quality JSONL auto NCR | unregistered runtime state |
 | `pending_review` CAPA trigger | Quality JSONL auto CAPA trigger | unregistered runtime state |
 | `quality_hold` WO | Registry WO workflow, not runtime WO constants | orphan workflow state for production WO |

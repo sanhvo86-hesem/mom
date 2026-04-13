@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-11T08:49:13.302Z",
+    "generatedAt": "2026-04-13T08:03:38.175Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "f2594699-0b3e-43dd-a3c3-f21ed31618ad",
+    "publication_run_id": "7c3137ba-7c5a-40af-a929-21affde304f5",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -23,19 +23,19 @@
     "purpose": "Full DB-derived table contract index. Read-only; regenerate from registry authority."
   },
   "summary": {
-    "tableCount": 658,
+    "tableCount": 659,
     "relationCount": 3128,
-    "relationEntityCount": 658,
-    "endpointCount": 3610,
-    "endpointBoundTableCount": 658,
-    "workflowCount": 277,
-    "workflowEligibleTableCount": 328,
-    "workflowBoundTableCount": 297,
+    "relationEntityCount": 659,
+    "endpointCount": 3616,
+    "endpointBoundTableCount": 659,
+    "workflowCount": 278,
+    "workflowEligibleTableCount": 329,
+    "workflowBoundTableCount": 298,
     "workflowBindingCoveragePercent": 91,
-    "statusManagedTableCount": 309,
+    "statusManagedTableCount": 310,
     "supportTableCount": 113,
     "domainCount": 49,
-    "contractCount": 658,
+    "contractCount": 659,
     "criticalGapCount": 0,
     "warningCount": 2,
     "capabilityCount": 18,
@@ -7340,6 +7340,40 @@
         "update": 1
       },
       "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.idempotency_replay_ledger",
+      "table": "idempotency_replay_ledger",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Idempotency Replay sổ cái",
+      "labelEn": "Idempotency Replay Ledger",
+      "primaryKey": "ledger_id",
+      "statusColumn": "status",
+      "statusSet": "digital_thread_status",
+      "workflowId": "wf_idempotency_replay_ledger",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 16,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
     },
     {
       "tableKey": "public.improvement_projects",

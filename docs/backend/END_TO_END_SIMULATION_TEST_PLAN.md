@@ -26,9 +26,11 @@ The tables below are the reviewed baseline. Implementation tickets must expand e
 | `GenericCrudControllerRuntimeSafetyTest` | Governed Generic CRUD mutation is rejected with `409 domain_command_required` even for admin; read remains allowed; internal override requires env+header. | Replace legacy mutation surfaces with command APIs and generated OpenAPI deny markers. |
 | `LogisticsControllerQualityGateTest` | OQC fail creates a legacy JSONL NCR and active SO hold; shipment gate config accepts `gate_items` by normalizing to `gates`. | Move OQC/NCR/hold to canonical PostgreSQL command transaction and dashboard projection. |
 | `QuoteServiceConversionTest` | Quote conversion retry returns the same SO and repairs stale accepted/converted quote state instead of creating duplicates. | Move conversion to PostgreSQL transaction with unique `source_quote_id` and command idempotency table. |
-| `OrderWorkflowEngineeringReadinessTest` / `OrderServiceEngineeringGateTest` | SO transition to `engineering_ready` requires release package fields; JO creation rejects confirmed-only SO. | Replace field-presence checks with released BOM/routing/control plan/inspection plan version locks. |
+| Quote/logistics counter lock review | Quote/SO and logistics document counters are now protected by file locks around read-increment-write. | Replace JSON counters with PostgreSQL sequence/`record_counters` row lock tests. |
+| `OrderWorkflowEngineeringReadinessTest` / `OrderServiceEngineeringGateTest` | SO transition to `engineering_ready` requires release package fields and explicit released/approved/complete release status; JO creation rejects confirmed-only SO; completed JO/WO cannot be directly cancelled. | Replace field-presence checks with released BOM/routing/control plan/inspection plan version locks and generated transition authority. |
 | `FinanceControlServicePeriodPolicyTest` | AP/AR memo posting into a closed period fails unless a matching approved backdate exception is supplied and consumed. | Apply the same period policy to every inventory/AP/AR/GL/COPQ/payment posting command. |
-| `SupplierQualityServiceScorecardTest` | Supplier scorecard includes PPM, OTD, SCAR severity/open/overdue, supplier audit, and ASL/cert expiry risk. | Compute scorecard from canonical PO receipt/IQC/SCAR/audit/cert/COPQ tables and enforce supplier release gates. |
+| `SupplierQualityServiceScorecardTest` | Supplier scorecard includes PPM, OTD, SCAR severity/open/overdue including still-open prior-period SCARs, supplier audit, and ASL/cert expiry risk. | Compute scorecard from canonical PO receipt/IQC/SCAR/audit/cert/COPQ tables and enforce supplier release gates. |
+| `IdempotencyServiceTest` | PostgreSQL replay ledger rejects conflicting fingerprints, rejects active and expired `in_progress`, preserves non-reexecution after completion persist failure, and supports scope keys over 255 chars through `scope_key_hash`. | Run real PostgreSQL integration in CI and add operator recovery workflow for stale `in_progress` rows. |
 | `WorkflowEngineEventBusTest` plus full suite load order | `OrderWorkflowService` and `WorkflowEngine` can now load in the same PHP process without redeclaring `MOM\Services\TransitionResult`. | Move result DTOs to explicit files/namespaces when command framework is introduced. |
 | Backend smoke | Registry manifest now registers governance wave assets required by smoke tests. | Keep registry manifest generated from source artifacts and fail CI on missing entries. |
 | Runtime authority audit | Drift tool now runs without fatal error in `JSON_ONLY` mode. | Expand drift coverage to quality, supplier-quality, finance controls, status authority, and readiness master data. |
@@ -64,6 +66,7 @@ Negative tests:
 - QTC-N02: SO confirmed cannot create JO until `engineering_ready`. Covered by `OrderServiceEngineeringGateTest`; repeat at API/DB command level.
 - QTC-N03: `delivery_confirm` with failed OQC is rejected.
 - QTC-N04: `/api/runtime/sales/sales_orders` mutation rejected for frontend role.
+- QTC-N05: `oqc_update(result=fail, ncr_reference="FAKE")` overwrites the client-supplied reference with the governed OQC NCR and creates an active hold.
 
 ### Quote To Cash Target State Before/After
 
@@ -213,6 +216,33 @@ Negative tests:
 | BYPASS-004 | Generic CRUD insert `inventory_transactions` | Rejected with `409 domain_command_required`; use posting command. |
 | BYPASS-005 | Generic CRUD close `ncr_records` | Rejected with `409 domain_command_required`; use quality command/e-sign. |
 | BYPASS-006 | `schema_studio_table_row_save` used by product role | Rejected; admin-only. |
+| BYPASS-007 | `oqc_update(result=fail)` with fake `ncr_reference` | Runtime OQC mitigation ignores the fake reference; target command returns canonical NCR/hold IDs from the transaction. |
+
+## Additional Command Acceptance Tests
+
+| Test ID | Command | Preconditions | Steps | Expected DB/API/workflow result |
+| --- | --- | --- | --- | --- |
+| CMD-QT-001 | `CreateQuote` | Active customer and released item revision | Submit two concurrent creates | Two unique quote numbers, two quote rows, no counter collision |
+| CMD-QT-002 | `SubmitQuoteForInternalReview` | Quote `draft` with full costing | Submit review command | Quote `internal_review`; review tasks/evidence linked |
+| CMD-QT-003 | `SendQuote` | Quote `internal_review` with all approvals | Send with PDF evidence | Quote `sent`; immutable sent package recorded |
+| CMD-QT-004 | `AcceptQuote` | Quote `sent` not expired | Accept with customer evidence | Quote `accepted`; conversion is now allowed |
+| CMD-SO-001 | `RecordContractReview` | SO draft/quoted and customer PO linked | Complete checklist and sign | Canonical review row linked to SO; `ConfirmSalesOrder` can read it |
+| CMD-PO-001 | `CreatePurchaseOrder` | Supplier ASL approved for item/process | Create PO | PO `draft`; blocked supplier returns policy error |
+| CMD-PO-002 | `ApprovePurchaseOrder` | PO submitted and approval route complete | Approve with signer not buyer | PO `approved`; SoD violation fails |
+| CMD-TRACE-001 | `SplitLot` | Available parent lot with qty 10 | Split into qty 4 and 6 | Child lots inherit parent genealogy/cost/hold status |
+| CMD-TRACE-002 | `MergeLot` | Two same-item lots, one active hold | Try merge without QA release | Merge fails and no genealogy edge is written |
+| CMD-TRACE-003 | `ProduceOutputLotSerial` | WO running with input lot issued | Record output lot/serial | Output links WO, inputs, operation, inspection evidence |
+| CMD-TRACE-004 | `GenerateDppFromShipment` | Shipment confirmed with complete genealogy | Generate DPP | DPP `issued` with shipment/genealogy/evidence package |
+| CMD-TRACE-005 | `SimulateRecall` | Shipped lot with parent input lots | Simulate backward/forward | Returns suppliers, receipts, WOs, shipments, customers, evidence |
+| CMD-MES-001 | `RecordMachineEvent` | Valid adapter identity | Replay same source timestamp/node/value | One raw event stored; duplicate replay returns same event |
+| CMD-MES-002 | `DeriveProductionEvent` | Raw event recorded | Run derivation twice | Exactly one derived cycle/downtime/alarm event |
+| CMD-HOLD-001 | `ApplyQualityHold` | NCR source exists | Apply hold to SO/lot | Hold active; shipment/putaway/issue gates block subject |
+| CMD-HOLD-002 | `ReleaseQualityHold` | MRB/reinspection evidence complete | Release with e-sign | Hold released; subject projection updated; unsigned release fails |
+| CMD-COPQ-001 | `PostCopqEntry` | NCR/MRB exists and period closed | Post without exception | Rejected; with matching exception posts and consumes exception |
+| CMD-AR-001 | `PostArInvoice` | SO shipped and period open | Post invoice | AR invoice posted; duplicate shipment invoice rejected |
+| CMD-SO-002 | `CloseSalesOrder` | SO shipped, invoiced, no holds | Close SO | SO `closed`; open hold or missing invoice blocks close |
+| CMD-FIN-001 | `OpenFinancePeriod` | Period not open | Open AP period | Period state authority returns open for posting policy |
+| CMD-AP-001 | `PostPayment` | AP invoice matched | Pay invoice | Payment posted; disputed invoice or closed period rejected |
 
 ## Race/Retry/Idempotency Tests
 
@@ -224,6 +254,8 @@ Negative tests:
 | IDEMP-004 | Concurrent material issue same lot causing shortage | One commits, other fails stock lock/insufficient stock. |
 | IDEMP-005 | Closed period while AP post in flight | Serializable/row lock ensures deterministic allow-before-close or reject-after-close. |
 | IDEMP-006 | Duplicate MTConnect raw event | Raw event ignored/replayed idempotently; derived event not duplicated. |
+| IDEMP-007 | Expired PostgreSQL `in_progress` command row retried by another worker | Retry is rejected, not reclaimed; operator recovery process must resolve stale row. |
+| IDEMP-008 | Idempotency `scope_key` longer than 255 chars | DB insert succeeds by unique `scope_key_hash`; raw `scope_key` remains available for audit. |
 
 ## Frontend Unsafe Endpoint Tests
 
@@ -269,3 +301,5 @@ Negative tests:
 | RR-009 | Part 11 scope may vary by customer/regulatory product. | Medium | Record retention/e-sign policy matrix by product/customer. |
 | RR-010 | Existing OpenAPI may advertise endpoints that policy now blocks. | Medium | Regenerate OpenAPI with runtime-safe tags and deprecation markers. |
 | RR-011 | P0 legacy mitigations use JSON/JSONL stores, not canonical PostgreSQL command transactions. | High | Implement command APIs and import legacy mitigation records into canonical quality/hold tables before regulated release. |
+| RR-012 | JSON/file idempotency fallback can fail closed if final completion state cannot persist after a side effect. | High | Use PostgreSQL idempotency for governed commands; provide operator recovery for stale `in_progress` rows; do not certify JSON fallback for regulated mutation. |
+| RR-013 | Real PostgreSQL idempotency integration may be skipped where no test database is configured. | Medium | CI must run `IdempotencyPostgresIntegrationTest` against PostgreSQL before promoting DB-backed command runtime. |

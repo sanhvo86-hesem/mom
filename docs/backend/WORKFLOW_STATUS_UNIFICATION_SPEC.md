@@ -7,8 +7,8 @@ This specification replaces fragmented status authority across PHP constants, JS
 | Entity | Runtime PHP/JSON | Registry/status-options | Workflow-library | Database/migration evidence | Finding |
 | --- | --- | --- | --- | --- | --- |
 | Quote | `draft, internal_review, sent, accepted, rejected, expired, revised, converted` | `draft, review, sent, won, lost, expired` | `draft, review, sent, won, lost, expired` | Quote migration enum includes runtime-like values | documentation-runtime mismatch |
-| SO | Runtime config/service now includes `draft, quoted, confirmed, engineering_ready, in_production, shipped, closed, cancelled`; JO creation rejects parent SO unless SO is `engineering_ready` or `in_production` | `sales_order_status`: `draft, confirmed, engineering_ready, in_production, shipped, closed`; `sales_order_status_code`: `draft, released, in_progress, completed, closed, cancelled` | `wf_sales_order` states `draft, confirmed, engineering_ready, in_production, shipped, closed` but statusSet `sales_order_status_code` | Multiple SO table variants | P0 mismatch; `engineering_ready` is partially runtime-enforced, but still not one generated authority across registry/DB/OpenAPI |
-| JO | `planned, released, active, on_hold, completed, closed, cancelled` | `draft, planned, released, active, completed, closed` | `draft, planned, released, active, completed, closed` | `job_orders` schema exists | `cancelled/on_hold` mismatch; `draft` registry not runtime |
+| SO | Runtime config/service now includes `draft, quoted, confirmed, engineering_ready, in_production, shipped, closed, cancelled`; JO creation rejects parent SO unless SO is `engineering_ready` or `in_production`; missing `engineering_release_status` fails readiness. | `sales_order_status`: `draft, confirmed, engineering_ready, in_production, shipped, closed`; `sales_order_status_code`: `draft, released, in_progress, completed, closed, cancelled` | `wf_sales_order` states `draft, confirmed, engineering_ready, in_production, shipped, closed` but statusSet `sales_order_status_code` | Multiple SO table variants | P0 mismatch; `engineering_ready` is partially runtime-enforced, but still not one generated authority across registry/DB/OpenAPI |
+| JO | Runtime config/service `planned, released, active, on_hold, completed, closed, cancelled` | `draft, planned, released, active, completed, closed` | `draft, planned, released, active, completed, closed` | `job_orders` schema exists | Runtime config now registers `cancelled`; registry/workflow still miss `cancelled/on_hold`; `draft` registry not runtime |
 | WO | `scheduled, setup, running, inspection, completed, on_hold, cancelled` | `draft, planned, released, in_production, quality_hold, closed, cancelled` | same as registry for `wf_work_order_execution` | `work_order` and `work_orders` both exist | Production WO lifecycle conflated with service/maintenance WO |
 | NCR | Exception JSON + JSONL use `open` in automation | `draft, submitted, under_review, disposition_set, containment_active, close_requested, closed` | `wf_ncr` | `ncr_records` exists | unregistered runtime states |
 | CAPA | JSONL trend trigger uses `pending_review` | `draft, initiated, action_planning, implementation, effectiveness_review, closed` | `wf_capa` | `capa_records` exists | unregistered trigger state |
@@ -75,7 +75,7 @@ Canonical states:
 
 Alternate states:
 
-`released|active -> on_hold -> released|active`, any non-closed state -> `cancelled` with reason.
+`released|active -> on_hold -> released|active`; `planned|released|active|on_hold -> cancelled` with reason. Completed jobs must close or be reversed through a governed correction, not cancelled directly.
 
 Rules:
 
@@ -92,7 +92,7 @@ Production WO canonical states:
 
 Alternate states:
 
-`scheduled|setup|running|inspection -> on_hold -> scheduled|setup|running|inspection`; non-completed -> `cancelled`.
+`scheduled|setup|running|inspection -> on_hold -> scheduled|setup|running|inspection`; `scheduled|setup|running|inspection|on_hold -> cancelled` with reason. Completed WOs require reversal/rework/MRB correction instead of direct cancellation.
 
 Rules:
 
@@ -178,7 +178,7 @@ CI must fail if a generated artifact is edited manually or if any runtime state 
    - If registry/PG has `released/in_progress/completed`, map only with evidence. Otherwise set `migration_hold` and require manual remediation.
    - Keep or insert `engineering_ready` only when release package evidence exists; otherwise keep `confirmed` and block JO/WO creation.
 7. Migrate JO/WO statuses:
-   - Add `cancelled` to config/registry.
+   - Keep current runtime config `cancelled` entries and add the same state to registry/workflow/DB generated artifacts.
    - Map registry WO `in_production -> running`; `quality_hold -> on_hold`; `closed -> completed|closed` depending table semantics.
 8. Migrate NCR/CAPA/SCAR:
    - Convert JSONL triggers to canonical records or mark as `legacy_trigger_imported`.
@@ -199,3 +199,5 @@ CI must fail if a generated artifact is edited manually or if any runtime state 
 | WF-006 | Quality JSONL `open` NCR import | Creates canonical NCR `submitted` or `containment_active`. |
 | WF-007 | CAPA `pending_review` trigger | Creates CAPA `initiated` with trigger review metadata. |
 | WF-008 | CI diff detects manual edit to generated `status-options.json` | CI fails with source-of-truth violation. |
+| WF-009 | Attempt JO/WO `completed -> cancelled` | Fails; completed production work uses reversal/rework/MRB correction, not direct cancel. |
+| WF-010 | Attempt SO `confirmed -> engineering_ready` with package IDs but missing `engineering_release_status` | Fails; missing release status must not default to released. |

@@ -554,8 +554,7 @@
           "cancelled"
         ],
         "completed": [
-          "closed",
-          "cancelled"
+          "closed"
         ],
         "closed": [],
         "cancelled": []
@@ -630,9 +629,7 @@
           "running",
           "cancelled"
         ],
-        "completed": [
-          "cancelled"
-        ],
+        "completed": [],
         "on_hold": [
           "scheduled",
           "setup",

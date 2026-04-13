@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
+    "generatedAt": "2026-04-13T08:03:33.472113+00:00",
     "description": "Canonical ERP+MOM object inventory for the business contract authority layer.",
     "objectCount": 67,
     "authoredPackageCount": 67
@@ -608,41 +608,25 @@
           "action": "commercial_customer.customer_purchase_orders.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/commercial/customer-purchase-orders",
-          "source": "api-router",
-          "controller": "CustomerPurchaseOrderController",
-          "handler": "createPurchaseOrder",
-          "storageTable": "customer_purchase_orders"
+          "path": "/api/v1/commercial/customer-purchase-orders"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}",
-          "source": "api-router",
-          "controller": "CustomerPurchaseOrderController",
-          "handler": "getPurchaseOrder",
-          "storageTable": "customer_purchase_orders"
+          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/commercial/customer-purchase-orders",
-          "source": "api-router",
-          "controller": "CustomerPurchaseOrderController",
-          "handler": "listPurchaseOrders",
-          "storageTable": "customer_purchase_orders"
+          "path": "/api/v1/commercial/customer-purchase-orders"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
-          "source": "api-router",
-          "controller": "CustomerPurchaseOrderController",
-          "handler": "transitionPurchaseOrder",
-          "storageTable": "customer_purchase_orders"
+          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition"
         }
       ],
       "contractAuthority": "authored_package",
@@ -717,7 +701,8 @@
       ],
       "legacyTablesToIsolate": [],
       "childTables": [
-        "quotation_lines"
+        "quotation_lines",
+        "quote_lines"
       ],
       "recommendedActions": [
         "submit",
@@ -1297,41 +1282,25 @@
           "action": "finance.backdate_exceptions.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/backdate-exceptions",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "createBackdateException",
-          "storageTable": "backdate_exceptions"
+          "path": "/api/v1/finance/backdate-exceptions"
         },
         {
           "action": "finance.backdate_exceptions.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "getBackdateException",
-          "storageTable": "backdate_exceptions"
+          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}"
         },
         {
           "action": "finance.backdate_exceptions.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/backdate-exceptions",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "listBackdateExceptions",
-          "storageTable": "backdate_exceptions"
+          "path": "/api/v1/finance/backdate-exceptions"
         },
         {
           "action": "finance.backdate_exceptions.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "transitionBackdateException",
-          "storageTable": "backdate_exceptions"
+          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1423,31 +1392,19 @@
           "action": "finance.credit_memos.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/credit-memos",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "createCreditMemo",
-          "storageTable": "credit_memos"
+          "path": "/api/v1/finance/credit-memos"
         },
         {
           "action": "finance.credit_memos.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/credit-memos/{creditMemoId}",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "getCreditMemo",
-          "storageTable": "credit_memos"
+          "path": "/api/v1/finance/credit-memos/{creditMemoId}"
         },
         {
           "action": "finance.credit_memos.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/credit-memos",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "listCreditMemos",
-          "storageTable": "credit_memos"
+          "path": "/api/v1/finance/credit-memos"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1537,31 +1494,19 @@
           "action": "finance.debit_memos.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/debit-memos",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "createDebitMemo",
-          "storageTable": "debit_memos"
+          "path": "/api/v1/finance/debit-memos"
         },
         {
           "action": "finance.debit_memos.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/debit-memos/{debitMemoId}",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "getDebitMemo",
-          "storageTable": "debit_memos"
+          "path": "/api/v1/finance/debit-memos/{debitMemoId}"
         },
         {
           "action": "finance.debit_memos.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/debit-memos",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "listDebitMemos",
-          "storageTable": "debit_memos"
+          "path": "/api/v1/finance/debit-memos"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1817,44 +1762,28 @@
       ],
       "currentRuntimeEndpoints": [
         {
-          "action": "finance.period_closes.create",
+          "action": "finance.period_close_controls.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/period-closes",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "createPeriodClose",
-          "storageTable": "period_close_controls"
+          "path": "/api/v1/finance/period-closes"
         },
         {
-          "action": "finance.period_closes.detail",
+          "action": "finance.period_close_controls.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/period-closes/{periodCloseId}",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "getPeriodClose",
-          "storageTable": "period_close_controls"
+          "path": "/api/v1/finance/period-closes/{periodCloseId}"
         },
         {
-          "action": "finance.period_closes.list",
+          "action": "finance.period_close_controls.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/period-closes",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "listPeriodCloses",
-          "storageTable": "period_close_controls"
+          "path": "/api/v1/finance/period-closes"
         },
         {
-          "action": "finance.period_closes.transition",
+          "action": "finance.period_close_controls.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
-          "source": "api-router",
-          "controller": "FinanceController",
-          "handler": "transitionPeriodClose",
-          "storageTable": "period_close_controls"
+          "path": "/api/v1/finance/period-closes/{periodCloseId}:transition"
         }
       ],
       "contractAuthority": "authored_package",
@@ -7257,44 +7186,28 @@
       ],
       "currentRuntimeEndpoints": [
         {
-          "action": "quality_improvement.override_controls.create",
+          "action": "governance.override_controls.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/governance/override-controls",
-          "source": "api-router",
-          "controller": "OperationalOverrideController",
-          "handler": "createOverride",
-          "storageTable": "operational_override_controls"
+          "path": "/api/v1/governance/override-controls"
         },
         {
-          "action": "quality_improvement.override_controls.detail",
+          "action": "governance.override_controls.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/governance/override-controls/{overrideId}",
-          "source": "api-router",
-          "controller": "OperationalOverrideController",
-          "handler": "getOverride",
-          "storageTable": "operational_override_controls"
+          "path": "/api/v1/governance/override-controls/{overrideId}"
         },
         {
-          "action": "quality_improvement.override_controls.list",
+          "action": "governance.override_controls.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/governance/override-controls",
-          "source": "api-router",
-          "controller": "OperationalOverrideController",
-          "handler": "listOverrides",
-          "storageTable": "operational_override_controls"
+          "path": "/api/v1/governance/override-controls"
         },
         {
-          "action": "quality_improvement.override_controls.transition",
+          "action": "governance.override_controls.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/governance/override-controls/{overrideId}:transition",
-          "source": "api-router",
-          "controller": "OperationalOverrideController",
-          "handler": "transitionOverride",
-          "storageTable": "operational_override_controls"
+          "path": "/api/v1/governance/override-controls/{overrideId}:transition"
         }
       ],
       "contractAuthority": "authored_package",

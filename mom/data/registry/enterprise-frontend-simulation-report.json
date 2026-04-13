@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T14:58:28.511132+00:00",
+    "generatedAt": "2026-04-13T08:05:23.058055+00:00",
     "simulationType": "contract_level_frontend_interaction",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
@@ -21,13 +21,13 @@
   "summary": {
     "scenarioCount": 10,
     "scenarioStatus": {
-      "pass": 6,
-      "watch": 4
+      "pass": 7,
+      "watch": 3
     },
     "blockerCounts": {},
     "warningCounts": {
       "frontend_surface_not_explicit": 1,
-      "missing_command_or_state_model": 3
+      "missing_command_or_state_model": 2
     },
     "doctorStatus": "watch"
   },
@@ -213,16 +213,9 @@
       "id": "quote_to_cash",
       "persona": "Sales / customer service",
       "goal": "Quote, customer PO, SO confirmation, shipment, invoice and customer care are traceable end-to-end.",
-      "status": "watch",
+      "status": "pass",
       "blockers": [],
-      "warnings": [
-        {
-          "code": "missing_command_or_state_model",
-          "tables": [
-            "quote_lines"
-          ]
-        }
-      ],
+      "warnings": [],
       "tableEvidence": [
         {
           "table": "customers",
@@ -314,7 +307,7 @@
             "PUT"
           ],
           "commandCount": 0,
-          "boundCommandCount": 0,
+          "boundCommandCount": 7,
           "stateModelCount": 0,
           "eventCount": 0,
           "quarantinedDeleteCount": 0,

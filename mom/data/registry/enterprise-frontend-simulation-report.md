@@ -1,14 +1,14 @@
 # Enterprise Frontend Simulation Report
 
-Generated: 2026-04-11T14:58:28.511132+00:00
+Generated: 2026-04-13T08:05:23.058055+00:00
 Status: watch
 
 ## Summary
 
 - Scenario count: 10
-- Scenario status: {"pass": 6, "watch": 4}
+- Scenario status: {"pass": 7, "watch": 3}
 - Blockers: {}
-- Warnings: {"frontend_surface_not_explicit": 1, "missing_command_or_state_model": 3}
+- Warnings: {"frontend_surface_not_explicit": 1, "missing_command_or_state_model": 2}
 
 ## Operating Standard
 
@@ -26,10 +26,9 @@ Status: watch
 - Persona: CEO / plant director
 - Goal: KPI cockpit drills from OEE, OTD, COPQ, inventory, finance and safety KPI to source records.
 
-### quote_to_cash - watch
+### quote_to_cash - pass
 - Persona: Sales / customer service
 - Goal: Quote, customer PO, SO confirmation, shipment, invoice and customer care are traceable end-to-end.
-- Warning `missing_command_or_state_model`: quote_lines
 
 ### procure_to_pay_supplier_quality - pass
 - Persona: Buyer / supplier quality

@@ -140,7 +140,7 @@ Acceptance:
 
 ## Period Close Enforcement
 
-Current runtime boundary: `FinanceControlService::createMemo()` enforces closed-period policy for AP/AR debit and credit memos and consumes a matching approved backdate exception. This is a real mitigation, but it is not global ledger control.
+Current runtime boundary: `FinanceControlService::createMemo()` enforces closed-period policy for AP/AR debit and credit memos, consumes a matching approved backdate exception under a finance-control lock, and attempts to restore the exception if memo persistence fails after consumption. This is a real mitigation, but it is not global ledger control and is still JSON-based.
 
 Every posting command must call:
 

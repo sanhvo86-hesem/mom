@@ -811,6 +811,7 @@ const tableDomainOverrides = {
   ehs_incidents: 'ehs_sustainability',
   engineering_change_requests: 'plm_change_control',
   workflow_step_data: 'system_infrastructure',
+  idempotency_replay_ledger: 'system_infrastructure',
   ncr_mrb_decisions: 'quality_management',
   ncr_human_factors: 'quality_management',
   capa_8d_steps: 'quality_management',

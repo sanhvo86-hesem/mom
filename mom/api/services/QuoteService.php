@@ -20,7 +20,6 @@ final class QuoteService
     private readonly string $dataDir;
     private readonly string $quotesDir;
     private readonly string $conversionLockFile;
-    private ?object $db = null;
 
     /** Quote status transitions. */
     private const TRANSITIONS = [
@@ -62,7 +61,7 @@ final class QuoteService
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->quotesDir = $this->dataDir . '/quotes';
         $this->conversionLockFile = $this->quotesDir . '/quote_conversion.lock';
-        $this->db        = $db;
+        unset($db);
 
         if (!is_dir($this->quotesDir)) {
             @mkdir($this->quotesDir, 0775, true);
@@ -577,15 +576,6 @@ final class QuoteService
         return 'QT-' . $year . '-' . str_pad((string)$counter, 4, '0', STR_PAD_LEFT);
     }
 
-    private function generateSoNumber(): string
-    {
-        $year        = date('Y');
-        $counterFile = $this->dataDir . '/counters/order_so_' . $year . '.json';
-        $counter = $this->nextCounter($counterFile);
-
-        return 'SO-' . $year . '-' . str_pad((string)$counter, 4, '0', STR_PAD_LEFT);
-    }
-
     private function nextCounter(string $counterFile): int
     {
         return (int)$this->withFileLock($counterFile . '.lock', function () use ($counterFile): int {
@@ -782,29 +772,4 @@ final class QuoteService
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
     }
 
-    private function generateUuidV4(): string
-    {
-        $data    = random_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
-
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-
-    // ── PostgreSQL dual-write ──────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[QuoteService] Shadow write to {$table} failed: " . $e->getMessage());
-        }
-    }
 }

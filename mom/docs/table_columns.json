@@ -4414,6 +4414,24 @@
     "status",
     "updated_at"
   ],
+  "idempotency_replay_ledger": [
+    "completed_at",
+    "created_at",
+    "error_class",
+    "error_message",
+    "expires_at",
+    "fingerprint_hash",
+    "idempotency_key",
+    "ledger_id",
+    "lock_owner",
+    "metadata",
+    "response_payload",
+    "scope_key",
+    "scope_key_hash",
+    "status",
+    "status_code",
+    "updated_at"
+  ],
   "improvement_projects": [
     "baseline_value",
     "created_at",

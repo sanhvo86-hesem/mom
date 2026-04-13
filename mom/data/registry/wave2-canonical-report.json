@@ -1,14 +1,14 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:07.046Z",
-    "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
+    "generatedAt": "2026-04-13T08:03:31.636Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 2 canonical governance verification report."
   },
   "summary": {
-    "canonical_resources": 64,
-    "canonical_catalog_meta_resource_count": 64,
+    "canonical_resources": 67,
+    "canonical_catalog_meta_resource_count": 67,
     "canonical_catalog_meta_mismatch": 0,
     "catalog_alignment_targets": 12,
     "catalog_alignment_failures": 0,
@@ -17,7 +17,7 @@
     "planned_canonical_resources_not_yet_in_registry": 0,
     "archive_isolation_targets": 5,
     "archive_isolation_targets_failed": 0,
-    "direct_table_matches": 48,
+    "direct_table_matches": 51,
     "legacy_table_matches": 11,
     "service_backed_slice_matches": 5,
     "true_schema_gaps": 0,
@@ -857,6 +857,18 @@
       ]
     },
     {
+      "resource_key": "quality_improvement.control-plans",
+      "table": "control_plans",
+      "legacy_tables": [
+        "fmea_control_plans"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "fmea_apqp.control_plans"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
       "resource_key": "quality_improvement.msa-studies",
       "table": "calibration_grr_studies",
       "legacy_tables": [
@@ -981,6 +993,33 @@
         "governance.override_controls"
       ],
       "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "mes_execution.machine-alarms",
+      "table": "mes_machine_alarms",
+      "legacy_tables": [
+        "machine_alarm_events"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "mes_execution.mes_machine_alarms"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "traceability_serialization.lot-genealogy",
+      "table": "genealogy_link",
+      "legacy_tables": [
+        "lot_genealogy",
+        "mes_part_genealogy"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "traceability_serialization.genealogy_link"
+      ],
+      "matched_legacy_tables": [
+        "mes_part_genealogy"
+      ]
     },
     {
       "resource_key": "maintenance_ehs.maintenance-plans",

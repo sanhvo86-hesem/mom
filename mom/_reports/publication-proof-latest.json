@@ -1,43 +1,43 @@
 {
-  "publication_run_id": "3e4feb88-c641-4e5b-8b5b-d897922f0ebc",
-  "generatedAt": "2026-04-11T08:49:13.569Z",
-  "source_commit": "68af0dfa",
+  "publication_run_id": "6cca0b73-e3b8-4a5b-a4bf-2450e4066e6e",
+  "generatedAt": "2026-04-13T08:03:38.469Z",
+  "source_commit": "4cea39e4",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "ce685fa9da2c035e836ace63dcdd7d4ab5e6b76429a82831c8277fa0be51252f",
-    "frontend-foundation-catalog.json": "4aff9fd621d6884f5bb60fd45519a53f33fad71a3fb1bb6f2c8d2ad428daba42",
-    "registry-manifest.json": "10a005efc83f874be59b80d33d7a2f1fdcb70ee7262e1e08fd4325f8bde631a7",
-    "registry-quality-report.json": "32777e39ddc5861e39c3c262446eed3030e7d42753126c585924eccc7e7d1754",
-    "domain-field-packs.json": "ac3776bc7ebff4b6de894a3ca0056790f707a87cbd6def74962f6b9c2f97e66b",
-    "data-fields-part2.json": "24a8729e1350be326d4326e51d45a373a0c16551668d238065009ff21edf051c",
-    "wave-gap-ledger.json": "64efdd8e66592889f10876f8ca98acd32daba550dd21683eea1789736fe0b2d6",
-    "global-erp-mom-capability-audit.json": "8130710f048f119942ea51c78797bade62f3cacc2c0580034f8b4d33881fe084",
-    "system-contract-runtime-projections.json": "6989c7b6551adf2d4693cb69581e8423031c60993c83b4792b07c2e57764306d",
-    "system-contract-registry-contracts.json": "b55240a0abe66898a520e0fd27fc779ce2c32f5e46499da9cb7e9e4c1b24f423",
-    "system-contract-diagnostics.json": "c2299f92ec3bc0f0cdd99276764b4286148cc3fea70e7f1ca5340d4bb31a6077",
-    "system-contract-manifest.json": "a7bf60bbc84e628c022ac0409579c851bb9245eb5100a4025fdca86ea5775996"
+    "endpoint-catalog.json": "267c6d89559913f8efb20f5a34a222e7b01cfff6fa4bf128e861db5799de5d2d",
+    "frontend-foundation-catalog.json": "1fac9a796ffcc2ebf3421c93b91b3cb294ce3e7950adad38b62bb7f5e59421e5",
+    "registry-manifest.json": "147c22fb4d7e669dc9cd61312896f50dd8ba82d7da4bd8bdfd07aa6419eb4794",
+    "registry-quality-report.json": "c17be3b71d1685ac1fe6a933e2e5c611644fdb88e61eaf8b3dc9be97f7de51a2",
+    "domain-field-packs.json": "f16cf4bf72faebe48b74aeceddb7c43d33d5640a0fda792dfaeee5d1d0e1368d",
+    "data-fields-part2.json": "1627eb6af8d115b777f4c87e9d73335930dd4d04e564dc1aaae8761baac5c5e0",
+    "wave-gap-ledger.json": "7ad56134cc93173c6a40efce105dcd8817788b49f6dd4af72f3fc0da1d5ed083",
+    "global-erp-mom-capability-audit.json": "52e0df550bd06b5efa287d512851fffa9944b91b43e924882d7f1e48db575975",
+    "system-contract-runtime-projections.json": "a428a588be9f857caf19b6c5d8962e88c11df3fb8001a927a62771fb4784005a",
+    "system-contract-registry-contracts.json": "d409cddcbd5af003f3cafa894cc367cc85d6cf3fc7a36bc97c400bc101fecbec",
+    "system-contract-diagnostics.json": "c18d6f642085bf6bd449a69c12a4642ba27da4564136da93995546764ada72d4",
+    "system-contract-manifest.json": "32f570ba11107da6648df36e2bec192138aa5eb8d430886e2cec8661c1ae7777"
   },
   "summary_counts": {
-    "ready": 669,
+    "ready": 670,
     "partial": 0,
     "blocked": 0,
-    "wf_ready": 314,
+    "wf_ready": 315,
     "bridge_ready": 261,
     "bridge_blocked": 0,
-    "endpoints": 3610
+    "endpoints": 3616
   },
   "invariant_checks": [
     {
       "name": "endpoint_count_matches_manifest",
       "status": "PASS",
-      "detail": "catalog_meta=3610, actual_keys=3610, manifest=3610"
+      "detail": "catalog_meta=3616, actual_keys=3616, manifest=3616"
     },
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=669 vs actual=669; ready=669/669; partial=0/0; blocked=0/0"
+      "detail": "summary.entity_count=670 vs actual=670; ready=670/670; partial=0/0; blocked=0/0"
     },
     {
       "name": "bridge_counts_consistent",
@@ -47,7 +47,7 @@
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['f2594699-0b3e-43dd-a3c3-f21ed31618ad']"
+      "detail": "distinct_run_ids=['7c3137ba-7c5a-40af-a929-21affde304f5']"
     },
     {
       "name": "approval_group_not_split_truth",

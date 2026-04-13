@@ -1,12 +1,14 @@
 # Enterprise Registry Remediation Roadmap
 
-Generated: 2026-04-11T14:58:13.657848+00:00
+Generated: 2026-04-13T08:05:23.070039+00:00
 Status: watch
 
 ## Findings
 
 - **P2 REG-ENDPOINT-001**: Endpoint catalog needs governance classification as release input
   Recommendation: Use endpoint-governance-classification.json as the frontend/AI filter. Do not expose generic runtime CRUD until authorityClass, exposure, sideEffectLevel and deletion risk are reviewed.
+- **P3 REG-API-001**: OpenAPI policy is behind latest approved profile
+  Recommendation: Keep 3.1.x as approved compatibility or plan a controlled upgrade path to 3.2.x. Do not mix generated contract versions silently.
 
 ## Roadmap
 

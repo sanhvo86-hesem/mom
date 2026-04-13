@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-11T08:49:00.003Z",
-    "formulaCount": 1177
+    "generatedAt": "2026-04-13T08:03:24.055Z",
+    "formulaCount": 1179
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -26019,6 +26019,48 @@
       {
         "type": "endpoint",
         "id": "system_infrastructure.workflow_step_data.transition"
+      }
+    ]
+  },
+  "f_idempotency_replay_ledger_record_count": {
+    "formulaId": "f_idempotency_replay_ledger_record_count",
+    "name": "Idempotency Replay sổ cái - Số bản ghi",
+    "nameEn": "Idempotency Replay Ledger Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM idempotency_replay_ledger",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "idempotency_replay_ledger_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.idempotency_replay_ledger.list"
+      }
+    ]
+  },
+  "f_idempotency_replay_ledger_closed_count": {
+    "formulaId": "f_idempotency_replay_ledger_closed_count",
+    "name": "Idempotency Replay sổ cái - Số hồ sơ đã đóng",
+    "nameEn": "Idempotency Replay Ledger Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM idempotency_replay_ledger",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "idempotency_replay_ledger_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.idempotency_replay_ledger.transition"
       }
     ]
   }

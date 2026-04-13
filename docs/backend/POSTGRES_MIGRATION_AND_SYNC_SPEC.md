@@ -22,6 +22,7 @@ Current code supports these modes in `DataLayer`, but runtime services do not co
 | MES | `MtconnectPollingService` syncs master/orders/MES stores to PG when not JSON-only; raw event stream is not canonical. | Add raw event table and idempotent replay. |
 | Quality | Exception JSON, logistics OQC JSON, supplier-quality JSON, quality JSONL, and PG quality tables diverge. | Canonical quality importer and single command authority. |
 | Supplier quality shadow write | `SupplierQualityService` now maps SCAR shadow writes to `scar_records` instead of the wrong `supplier_scorecards` target; scorecard remains JSON primary with PG shadow best-effort only. | Add deterministic upsert keys, table-specific column mapping, reconciliation, and failure reporting before trusting supplier quality PG projections. |
+| Idempotency ledger | Migration `097` now uses `scope_key TEXT`, `scope_key_hash CHAR(64)`, and unique `(scope_key_hash, idempotency_key)` so long command scopes are not truncated; runtime refuses to reclaim `in_progress` rows automatically. | Add real PostgreSQL CI integration and operator recovery workflow for stale `in_progress` rows. |
 | Drift tool | `audit_runtime_authority_consistency.php` now runs in current `JSON_ONLY` mode after the `audit_collection()` argument fix. | Expand coverage and fail conditions before trusting cutover reports. |
 
 ## Missing Sync Keys
@@ -110,6 +111,7 @@ Required report sections:
 | Master-data readiness reconciliation | BOM/routing/CP/IP/traveler/approval parity | Yes |
 | Orders reconciliation | Quote/SO/JO/WO hierarchy parity and status mapping | Yes |
 | Quality reconciliation | NCR/CAPA/MRB/SCAR/OQC/IQC/holds parity | Yes |
+| Supplier quality projection reconciliation | JSON `incoming`, `scar`, `asl`, `audits`, `scorecards` to PG `iqc_inspections`, `scar_records`, ASL/cert tables, audit records, scorecard snapshots | Yes |
 | Inventory ledger reconciliation | Ledger sum equals balance, lot status parity | Yes |
 | Finance reconciliation | Period close/backdate/AP/AR/GL posting parity | Yes |
 | MES event reconciliation | Raw events, derived events, latest signal parity | Yes for machine cutover |
@@ -153,3 +155,8 @@ Rollback is not allowed from `POSTGRES_ONLY` unless a tested restore procedure r
 | PG-005 | Ledger balance mismatch | Cutover blocked. |
 | PG-006 | PG primary read falls back to JSON | Observability report records fallback and reason. |
 | PG-007 | Rollback snapshot restore | Command-created record remains consistent in JSON and PG. |
+| PG-008 | Supplier quality shadow write maps a SCAR record | `scar_records` row is upserted with deterministic key; no write to `supplier_scorecards`. |
+| PG-009 | Supplier quality reconciliation with one missing SCAR in PG | Report exits non-zero and lists the missing `scar_id`. |
+| PG-010 | Supplier quality shadow write failure | JSON command response reports warning/telemetry and reconciliation marks PG projection stale; no silent cutover pass. |
+| PG-011 | Idempotency scope key over 255 chars | Insert succeeds, raw `scope_key` is preserved as `TEXT`, and unique replay is enforced by `scope_key_hash`. |
+| PG-012 | Expired `in_progress` idempotency row | Runtime rejects retry instead of reclaiming the row; operator recovery report lists the stale row. |

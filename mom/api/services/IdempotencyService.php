@@ -45,6 +45,28 @@ final class IdempotencyService
     }
 
     /**
+     * @return array{enabled:bool, repository_class:string, backend:string, authoritative:bool, fallback_only:bool}
+     */
+    public function backendProbe(): array
+    {
+        $repositoryClass = $this->repository::class;
+        $backend = match (true) {
+            $this->repository instanceof PostgresIdempotencyReplayRepository => 'postgres',
+            $this->repository instanceof CacheIdempotencyReplayRepository => 'cache',
+            $this->repository instanceof FileIdempotencyReplayRepository => 'file',
+            default => 'custom',
+        };
+
+        return [
+            'enabled' => $this->enabled,
+            'repository_class' => $repositoryClass,
+            'backend' => $backend,
+            'authoritative' => $backend === 'postgres',
+            'fallback_only' => in_array($backend, ['cache', 'file'], true),
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $descriptor
      * @param callable():array{status_code?:int, payload?:array<string, mixed>} $operation
      * @return array{status_code:int, payload:array<string, mixed>, replayed:bool, stored_at:string}

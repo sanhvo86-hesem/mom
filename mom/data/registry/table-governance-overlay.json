@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T14:58:13.657848+00:00",
+    "generatedAt": "2026-04-13T08:05:23.070039+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 658
+    "tableCount": 659
   },
   "summary": {
     "domains": {
@@ -56,7 +56,7 @@
       "service_warranty": 13,
       "shipping_compliance": 7,
       "supplier_relationship": 20,
-      "system_infrastructure": 12,
+      "system_infrastructure": 13,
       "tooling_lifecycle": 14,
       "traceability_serialization": 15,
       "trade_compliance": 12,
@@ -71,10 +71,10 @@
       "governed_support": 24,
       "machine_runtime": 87,
       "platform_governance": 15,
-      "process_runtime": 406
+      "process_runtime": 407
     },
     "targetDeletionMode": {
-      "archive_only": 658
+      "archive_only": 659
     },
     "hardDeleteWaiverRequired": 0
   },
@@ -10355,6 +10355,53 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "idempotency_replay_ledger": {
+      "systemOfRecord": "postgres_migration:097_idempotency_replay_ledger.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "confidential_financial",
+      "retentionClass": "financial_record_10y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "system_infrastructure.idempotency_replay_ledger.create",
+        "system_infrastructure.idempotency_replay_ledger.delete",
+        "system_infrastructure.idempotency_replay_ledger.detail",
+        "system_infrastructure.idempotency_replay_ledger.list",
+        "system_infrastructure.idempotency_replay_ledger.transition",
+        "system_infrastructure.idempotency_replay_ledger.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_idempotency_replay_ledger"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -23100,7 +23147,9 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "commercial_customer.quotations"
+      ],
       "uiSurfaces": [
         "admin_data_schema",
         "process_command_workspace",

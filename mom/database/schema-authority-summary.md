@@ -1,7 +1,7 @@
 # Schema Authority Summary
 
 **Declared**: 2026-04-13
-**Scope**: Platform-global (658 tables)
+**Scope**: Platform-global (659 tables)
 **Migration range**: 001–097 (97 migrations)
 
 ## Authority Chain

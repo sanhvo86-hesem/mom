@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:48:55.576Z",
-    "description": "Resolution plan for 0 orphan registry fields and 413 orphan DB column names."
+    "generatedAt": "2026-04-13T08:03:19.637Z",
+    "description": "Resolution plan for 0 orphan registry fields and 421 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 341,
+      "count": 348,
       "columns": [
         {
           "column": "item_class",
@@ -4488,6 +4488,97 @@
             "NUMERIC(6,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "scope_key",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Phạm vi Key",
+          "suggestedLabelEn": "Scope Key",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "scope_key_hash",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Phạm vi Key Băm",
+          "suggestedLabelEn": "Scope Key Hash",
+          "suggestedType": "string",
+          "dbTypes": [
+            "CHAR(64)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "idempotency_key",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Idempotency Key",
+          "suggestedLabelEn": "Idempotency Key",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(255)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "fingerprint_hash",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Fingerprint Băm",
+          "suggestedLabelEn": "Fingerprint Hash",
+          "suggestedType": "string",
+          "dbTypes": [
+            "CHAR(64)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "response_payload",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Response gói dữ liệu",
+          "suggestedLabelEn": "Response Payload",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "lock_owner",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Lock chủ sở hữu",
+          "suggestedLabelEn": "Lock Owner",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "error_class",
+          "tables": [
+            "idempotency_replay_ledger"
+          ],
+          "suggestedLabel": "Error Cla",
+          "suggestedLabelEn": "Error Class",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4498,7 +4589,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 72,
+      "count": 73,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -5215,6 +5306,16 @@
           "column": "plant_performance_snapshot_id",
           "tables": [
             "plant_performance_snapshots"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "ledger_id",
+          "tables": [
+            "idempotency_replay_ledger"
           ],
           "dbTypes": [
             "UUID"

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
-use RuntimeException;
-
 /**
  * Result object returned by MasterDataService mutation methods.
  */
@@ -36,11 +34,7 @@ final class MasterDataResult
  * checks, change-history logging, pending-approval workflow, and archival
  * for all master-data entity types (customers, suppliers, parts, revisions, capas).
  *
- * JSON storage layout under data/master-data/:
- *   master-data.json         -- active records
- *   master-data-history.json -- change-history log
- *   master-data-pending.json -- pending-approval changes
- *   master-data-archive.json -- obsolete / archived records
+ * Persistence layout is owned by MasterDataRepository adapters.
  *
  * @package MOM\Services
  * @since   4.0.0
@@ -199,35 +193,22 @@ final class MasterDataService
      */
     private const APPROVAL_REQUIRED_STATUSES = ['active', 'approved', 'released'];
 
-    // ── File paths ──────────────────────────────────────────────────────────
-
-    private readonly string $masterFile;
-    private readonly string $historyFile;
-    private readonly string $pendingFile;
-    private readonly string $archiveFile;
-    private readonly string $ordersDir;
-    private readonly string $mesRuntimeFile;
+    private readonly MasterDataRepository $repository;
 
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
      * @param string $dataDir Absolute path to data directory.
      */
-    public function __construct(private readonly string $dataDir)
+    public function __construct(
+        string $dataDir,
+        mixed $rootDirOrRepository = null,
+        ?MasterDataRepository $repository = null,
+    )
     {
-        $base = rtrim(str_replace('\\', '/', $dataDir), '/');
-        $mdDir = $base . '/master-data';
-
-        $this->masterFile  = $mdDir . '/master-data.json';
-        $this->historyFile = $mdDir . '/master-data-history.json';
-        $this->pendingFile = $mdDir . '/master-data-pending.json';
-        $this->archiveFile = $mdDir . '/master-data-archive.json';
-        $this->ordersDir      = $base . '/orders';
-        $this->mesRuntimeFile = $base . '/mes/mes-runtime.json';
-
-        if (!is_dir($mdDir)) {
-            @mkdir($mdDir, 0775, true);
-        }
+        $this->repository = $repository
+            ?? ($rootDirOrRepository instanceof MasterDataRepository ? $rootDirOrRepository : null)
+            ?? new JsonMasterDataRepository($dataDir, $this->defaultStore());
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -1158,68 +1139,52 @@ final class MasterDataService
 
     private function loadStore(): array
     {
-        return $this->readJson($this->masterFile) ?? $this->defaultStore();
+        return $this->repository->loadStore();
     }
 
     private function saveStore(array $data): void
     {
-        $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
-        $data['_meta']['updated'] = $this->nowIso();
-        $this->writeJson($this->masterFile, $data);
+        $this->repository->saveStore($data);
     }
 
     private function loadHistory(): array
     {
-        return $this->readJson($this->historyFile) ?? ['_meta' => ['version' => '1.0'], 'entries' => []];
+        return $this->repository->loadHistory();
     }
 
     private function saveHistory(array $data): void
     {
-        $this->writeJson($this->historyFile, $data);
+        $this->repository->saveHistory($data);
     }
 
     private function loadPending(): array
     {
-        return $this->readJson($this->pendingFile) ?? ['_meta' => ['version' => '1.0'], 'entries' => []];
+        return $this->repository->loadPending();
     }
 
     private function savePending(array $data): void
     {
-        $this->writeJson($this->pendingFile, $data);
+        $this->repository->savePending($data);
     }
 
     private function loadArchive(): array
     {
-        return $this->readJson($this->archiveFile) ?? ['_meta' => ['version' => '1.0']];
+        return $this->repository->loadArchive();
     }
 
     private function saveArchive(array $data): void
     {
-        $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
-        $data['_meta']['updated'] = $this->nowIso();
-        $this->writeJson($this->archiveFile, $data);
+        $this->repository->saveArchive($data);
     }
 
     private function loadOrders(): array
     {
-        $file = $this->ordersDir . '/orders.json';
-        return $this->readJson($file) ?? ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
+        return $this->repository->loadOrders();
     }
 
     private function loadMesRuntime(): array
     {
-        return $this->readJson($this->mesRuntimeFile) ?? [
-            'downtime_events' => [],
-            'maintenance_requests' => [],
-            'progress_reports' => [],
-            'tooling_status' => [],
-            'connector_feeds' => [],
-            'machine_signals' => [],
-            'mes_connectivity_events' => [],
-            'machine_alarm_events' => [],
-            'nc_download_receipts' => [],
-            'mes_tool_preset_offsets' => [],
-        ];
+        return $this->repository->loadMesRuntime();
     }
 
     private function defaultStore(): array
@@ -1260,36 +1225,6 @@ final class MasterDataService
             'mes_alarm_playbooks' => [],
             'tool_assemblies' => [],
         ];
-    }
-
-    private function readJson(string $path): ?array
-    {
-        if (!is_file($path)) {
-            return null;
-        }
-        $raw = @file_get_contents($path);
-        if ($raw === false) {
-            return null;
-        }
-        $decoded = json_decode($raw, true);
-        return is_array($decoded) ? $decoded : null;
-    }
-
-    private function writeJson(string $path, array $data): void
-    {
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
-        }
-        $tmp  = $path . '.tmp';
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        if ($json === false) {
-            throw new RuntimeException('Failed to encode JSON for ' . basename($path));
-        }
-        if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
-            throw new RuntimeException('Cannot write ' . basename($path));
-        }
-        @rename($tmp, $path);
     }
 
     private function nowIso(): string

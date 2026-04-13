@@ -53,7 +53,7 @@ try {
         'total_qty' => 12,
         'total_value' => 2400,
         'priority' => 'normal',
-        'status' => 'draft',
+        'status' => 'engineering_ready',
         'created_by' => 'smoke',
         'created_at' => $now,
         'updated_at' => $now,

@@ -125,6 +125,45 @@ final class IdempotencyServiceTest extends TestCase
         $this->assertDirectoryDoesNotExist($this->tmpDir . '/idempotency');
     }
 
+    public function testBackendProbeReportsDefaultPostgresAuthorityWhenDbEnabled(): void
+    {
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            databaseConfig: [
+                'use_postgres' => true,
+                'host' => 'localhost',
+                'port' => 5432,
+                'database' => 'mom',
+                'username' => 'mom_app',
+                'password' => 'not-used-by-lazy-connection',
+                'schema' => 'public',
+            ],
+        );
+
+        $probe = $service->backendProbe();
+
+        $this->assertTrue($probe['enabled']);
+        $this->assertSame('postgres', $probe['backend']);
+        $this->assertTrue($probe['authoritative']);
+        $this->assertFalse($probe['fallback_only']);
+        $this->assertSame(PostgresIdempotencyReplayRepository::class, $probe['repository_class']);
+        $this->assertDirectoryDoesNotExist($this->tmpDir . '/idempotency');
+    }
+
+    public function testBackendProbeReportsFileFallbackWhenDbDisabledAndRedisUnavailable(): void
+    {
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            databaseConfig: ['use_postgres' => false],
+        );
+
+        $probe = $service->backendProbe();
+
+        $this->assertSame('file', $probe['backend']);
+        $this->assertFalse($probe['authoritative']);
+        $this->assertTrue($probe['fallback_only']);
+    }
+
     public function testDbBackedRepositoryRejectsConflictingFingerprint(): void
     {
         $db = new IdempotencyFakeConnection();

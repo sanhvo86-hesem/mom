@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:11.451Z",
-    "registryDir": "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/data/registry",
+    "generatedAt": "2026-04-13T08:03:36.126Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
   "summary": {
@@ -11,12 +11,12 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 18549,
+    "idempotency_mentions": 18690,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
     "compensation_markers": 2,
-    "correction_markers": 339,
+    "correction_markers": 2144,
     "period_close_mentions": 36,
     "credit_memo_mentions": 18,
     "debit_memo_mentions": 18,
@@ -84,12 +84,12 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 18549,
-      "optimistic_concurrency_mentions": 7156,
+      "idempotency_mentions": 18690,
+      "optimistic_concurrency_mentions": 7168,
       "if_match_mentions": 2970,
       "row_version_mentions": 23621,
       "compensation_markers": 2,
-      "correction_markers": 339,
+      "correction_markers": 2144,
       "effective_dating_markers": 696,
       "override_mentions": 123,
       "waiver_mentions": 24,
@@ -100,19 +100,19 @@
       "credit_memo_mentions": 18,
       "debit_memo_mentions": 18,
       "backdate_exception_mentions": 28,
-      "archive_mentions": 15249,
+      "archive_mentions": 24529,
       "snapshot_mentions": 1062,
       "esign_mentions": 170,
       "cycle_count_mentions": 339
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2274,
-      "idempotent_endpoint_count": 2274,
+      "mutating_endpoint_count": 2278,
+      "idempotent_endpoint_count": 2278,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2274,
+      "default_retry_safe_endpoint_count": 2278,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2274
+      "response_replay_documented_count": 2278
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -146,16 +146,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 18549,
+        "idempotency_mentions": 18690,
         "if_match_mentions": 2970,
         "row_version_mentions": 23621,
-        "mutating_endpoint_count": 2274,
-        "idempotent_endpoint_count": 2274,
+        "mutating_endpoint_count": 2278,
+        "idempotent_endpoint_count": 2278,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2274,
+        "default_retry_safe_endpoint_count": 2278,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2274
+        "response_replay_documented_count": 2278
       },
       "required_controls": [
         "idempotency_key_or_equivalent_duplicate_suppression",
@@ -174,7 +174,7 @@
       ],
       "evidence": {
         "compensation_markers": 2,
-        "correction_markers": 339,
+        "correction_markers": 2144,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
         ]
@@ -296,7 +296,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 18549,
+        "idempotency_mentions": 18690,
         "compensation_markers": 2,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -318,8 +318,8 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 15249,
-        "correction_markers": 339,
+        "archive_mentions": 24529,
+        "correction_markers": 2144,
         "esign_mentions": 170
       },
       "required_controls": [

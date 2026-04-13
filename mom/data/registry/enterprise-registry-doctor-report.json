@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T14:58:13.657848+00:00",
+    "generatedAt": "2026-04-13T08:05:23.070039+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -22,16 +22,16 @@
   "status": "watch",
   "scorecard": {
     "tables": {
-      "count": 658,
+      "count": 659,
       "domains": 49,
       "missingOwnerRole": 0,
       "missingSystemOfRecord": 0,
       "governanceOverlayApplied": true,
-      "governanceOverlayCount": 658
+      "governanceOverlayCount": 659
     },
     "endpoints": {
-      "count": 3582,
-      "classified": 3582,
+      "count": 3616,
+      "classified": 3616,
       "hardDelete": 0,
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
@@ -55,9 +55,9 @@
       "manifestDeletionModes": {
         "hard_delete": 0,
         "soft_delete": 0,
-        "archive_only": 660
+        "archive_only": 659
       },
-      "openapiVersion": "",
+      "openapiVersion": "3.1.2",
       "aiAuthorityChainGenerated": true,
       "destructiveEndpointQuarantineGenerated": true
     }
@@ -69,39 +69,57 @@
       "title": "Endpoint catalog needs governance classification as release input",
       "evidence": {
         "gapCounts": {
-          "generic_runtime_classification": 454,
+          "generic_runtime_classification": 459,
           "runtime_safe_false": 780
         },
         "classificationSummary": {
           "authorityClass": {
-            "admin_governance_contract": 227,
-            "canonical_process_contract": 2028,
-            "generic_runtime_contract": 454,
+            "admin_governance_contract": 234,
+            "canonical_process_contract": 2046,
+            "generic_runtime_contract": 459,
             "machine_runtime_contract": 478,
             "master_data_contract": 90,
-            "support_or_read_model_contract": 305
+            "support_or_read_model_contract": 309
           },
           "exposure": {
-            "admin_governance": 221,
-            "admin_or_internal": 305,
+            "admin_governance": 228,
+            "admin_or_internal": 309,
             "blocked_runtime_internal": 780,
-            "frontend_process": 1422,
+            "frontend_process": 1440,
             "machine_or_operator_ui": 400,
-            "needs_owner_review": 454
+            "needs_owner_review": 459
           },
           "sideEffectLevel": {
-            "destructive": 651,
-            "none": 1319,
-            "transactional_write": 647,
-            "workflow_transition": 965
+            "destructive": 652,
+            "none": 1338,
+            "transactional_write": 654,
+            "workflow_transition": 972
           },
           "gapCounts": {
-            "generic_runtime_classification": 454,
+            "generic_runtime_classification": 459,
             "runtime_safe_false": 780
           }
         }
       },
       "recommendation": "Use endpoint-governance-classification.json as the frontend/AI filter. Do not expose generic runtime CRUD until authorityClass, exposure, sideEffectLevel and deletion risk are reviewed."
+    },
+    {
+      "id": "REG-API-001",
+      "severity": "P3",
+      "title": "OpenAPI policy is behind latest approved profile",
+      "evidence": {
+        "current": "3.1.2",
+        "approvedProfile": {
+          "standard": "OpenAPI",
+          "approvedVersions": [
+            "3.1.x",
+            "3.2.x"
+          ],
+          "purpose": "Every frontend-callable HTTP contract must be explicit and versioned.",
+          "url": "https://spec.openapis.org/oas/latest.html"
+        }
+      },
+      "recommendation": "Keep 3.1.x as approved compatibility or plan a controlled upgrade path to 3.2.x. Do not mix generated contract versions silently."
     }
   ],
   "roadmap": [

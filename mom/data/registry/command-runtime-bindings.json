@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T14:58:13.657848+00:00",
+    "generatedAt": "2026-04-13T08:05:23.070039+00:00",
     "sourceArtifacts": [
       "mom/contracts/command-index.json",
       "mom/contracts/object-index.json",
@@ -213,7 +213,7 @@
       "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "acknowledge",
@@ -241,7 +241,7 @@
       "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "cancel",
@@ -269,7 +269,7 @@
       "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "close",
@@ -297,7 +297,7 @@
       "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
       "endpointKey": "commercial_customer.customer_purchase_orders.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "confirm",
@@ -1001,7 +1001,7 @@
       "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "close",
@@ -1027,7 +1027,7 @@
       "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "expire",
@@ -1053,7 +1053,7 @@
       "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
       "endpointKey": "finance.backdate_exceptions.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "revoke",
@@ -1081,7 +1081,7 @@
       "path": "/api/v1/finance/credit-memos",
       "endpointKey": "finance.credit_memos.create",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "create",
@@ -1109,7 +1109,7 @@
       "path": "/api/v1/finance/debit-memos",
       "endpointKey": "finance.debit_memos.create",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "create",
@@ -1245,9 +1245,9 @@
       "bindingKind": "transition",
       "method": "POST",
       "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
-      "endpointKey": "finance.period_closes.transition",
+      "endpointKey": "finance.period_close_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "close",
@@ -1271,9 +1271,9 @@
       "bindingKind": "transition",
       "method": "POST",
       "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
-      "endpointKey": "finance.period_closes.transition",
+      "endpointKey": "finance.period_close_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "reopen",
@@ -7508,9 +7508,9 @@
       "bindingKind": "transition",
       "method": "POST",
       "path": "/api/v1/governance/override-controls/{overrideId}:transition",
-      "endpointKey": "quality_improvement.override_controls.transition",
+      "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "close",
@@ -7534,9 +7534,9 @@
       "bindingKind": "transition",
       "method": "POST",
       "path": "/api/v1/governance/override-controls/{overrideId}:transition",
-      "endpointKey": "quality_improvement.override_controls.transition",
+      "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "expire",
@@ -7560,9 +7560,9 @@
       "bindingKind": "transition",
       "method": "POST",
       "path": "/api/v1/governance/override-controls/{overrideId}:transition",
-      "endpointKey": "quality_improvement.override_controls.transition",
+      "endpointKey": "governance.override_controls.transition",
       "routeSource": "object_index.currentRuntimeEndpoints",
-      "executableInEndpointCatalog": false,
+      "executableInEndpointCatalog": true,
       "executableInRouter": true,
       "requestBodyTemplate": {
         "command": "revoke",

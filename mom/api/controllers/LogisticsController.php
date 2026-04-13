@@ -215,7 +215,7 @@ class LogisticsController extends BaseController
         }
         $path = $dir . '/ncr_log.jsonl';
 
-        return $this->withFileLock($dir . '/ncr_log.lock', function () use ($oqc, $userId, $now, $path, $sourceId): ?array {
+        return $this->withFileLock($dir . '/ncr_log.lock', function () use ($oqc, $userId, $now, $path, $sourceId): array {
             if (is_file($path)) {
                 $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
                 foreach ($lines as $line) {
@@ -667,7 +667,7 @@ class LogisticsController extends BaseController
         $now = $this->nowIso();
 
         try {
-            $updated = $this->withFileLock($this->logisticsDir() . '/oqc_update.lock', function () use ($body, $id, $uid, $now): ?array {
+            $updated = $this->withFileLock($this->logisticsDir() . '/oqc_update.lock', function () use ($body, $id, $uid, $now): array {
                 $file    = $this->logisticsDir() . '/oqc.json';
                 $items   = $this->readJsonFile($file) ?? [];
                 $updated = null;
@@ -714,8 +714,6 @@ class LogisticsController extends BaseController
                 $this->writeJsonFile($file, $items);
                 return $updated;
             });
-
-            if (!$updated) $this->error('oqc_not_found', 404);
 
             $this->auditLog('oqc_update', [
                 'id'     => $id,

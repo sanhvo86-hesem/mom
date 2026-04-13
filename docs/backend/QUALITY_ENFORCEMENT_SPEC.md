@@ -6,12 +6,12 @@ This spec unifies NCR, CAPA, MRB, SCAR, OQC, IQC, holds, quarantine, COPQ, and s
 
 | Finding | Runtime evidence | Classification |
 | --- | --- | --- |
-| OQC fail containment is now partial | `LogisticsController::oqc_update` writes logistics JSON, sets `ncr_required`, creates/reuses an OQC-sourced JSONL NCR, writes `ncr_reference`, and creates an active SO quality hold. | P0 runtime bypass mitigated; canonical command gap remains |
+| OQC fail containment is now partial | `LogisticsController::oqc_update` writes logistics JSON under an update lock, ignores client-supplied `ncr_reference` for failed results, creates/reuses an OQC-sourced JSONL NCR, writes the governed `ncr_reference`, and creates an active SO quality hold. | P0 runtime bypass mitigated; canonical command gap remains |
 | Quality gate store coverage is partial | `ShipmentGateService` now reads active SO holds and normalizes `gate_items`; it still expects SO-embedded contract review and `orders['ncrs']` for some quality evidence while actual records are separate JSON/JSONL/exception stores. | documentation-runtime mismatch remains |
 | NCR/CAPA/MRB/SCAR multi-authority | Exceptions JSON, supplier-quality JSON, quality JSONL, and PG registry tables all store quality state. | P0 multi-authority |
 | Auto quality events are unconsumed | `QualityIntegrationService` writes JSONL NCR/CAPA/COPQ triggers; not canonical records/gates. | orphan automation |
 | IQC does not block putaway | Supplier incoming inspection records are separate from PO receipt/lot availability. | decorative IQC |
-| Supplier scorecard formula is now partial | `SupplierQualityService::calculateScorecard()` now computes PPM, OTD, SCAR severity/count/open/overdue, supplier audit, and ASL/cert expiry risk from JSON stores. | P1 runtime formula improved; still not canonical PO/IQC/COPQ authority |
+| Supplier scorecard formula is now partial | `SupplierQualityService::calculateScorecard()` now computes PPM, OTD, SCAR severity/count/open/overdue including still-open prior-period SCARs, supplier audit, and ASL/cert expiry risk from JSON stores. | P1 runtime formula improved; still not canonical PO/IQC/COPQ authority |
 
 ## Target Unified Model
 
@@ -44,9 +44,10 @@ The 2026-04-13 runtime patch intentionally closes the immediate OQC-to-shipment 
 
 1. OQC fail creates an active SO hold in `data/orders/holds.json`.
 2. OQC fail creates or reuses an OQC-sourced record in `data/quality/ncr/ncr_log.jsonl`.
-3. `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`.
-4. `ShipmentGateService` blocks shipment when the SO has an active hold.
-5. Supplier scorecard calculation includes quantity PPM, delivery timeliness, SCAR severity/open/overdue, supplier audit findings/status, and ASL/cert expiry penalties.
+3. OQC fail ignores any client-supplied `ncr_reference`; the server-owned NCR ID is written back to the OQC record.
+4. `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`.
+5. `ShipmentGateService` blocks shipment when the SO has an active hold.
+6. Supplier scorecard calculation includes quantity PPM, delivery timeliness, SCAR severity/open/overdue including still-open prior-period SCARs, supplier audit findings/status, and ASL/cert expiry penalties.
 
 This mitigation is not sufficient for regulated release because it does not create canonical PostgreSQL `quality_events`, `ncr_records`, `quality_holds`, `mrb_records`, `capa_records`, or `copq_ledger` in one transaction. The command model below remains mandatory.
 
@@ -88,6 +89,7 @@ Acceptance tests:
 - `ConfirmPacking` fails while OQC hold is active.
 - `ConfirmDelivery` fails if packing endpoint tries to bypass SO transition.
 - OQC pass after reinspection cannot release hold without MRB/rework evidence where required.
+- Legacy regression: `oqc_update(result=fail, ncr_reference="FAKE")` replaces the fake value with the governed OQC NCR and leaves the active shipment hold in place.
 
 ## IQC Failure Enforcement
 
@@ -128,6 +130,14 @@ CAPA lifecycle includes 30/60/90-day effectiveness:
 - `effectiveness_review`: QA validates closure criteria.
 
 CAPA cannot close until all effectiveness checks pass or a documented extension is signed.
+
+CAPA acceptance tests:
+
+- `CreateCapaFromTrigger` with repeated NCRs for same part/process/defect creates one CAPA and rejects duplicate CAPA creation for the same open trigger set.
+- CAPA with missing 30-day, 60-day, or 90-day effectiveness evidence cannot transition to `closed`.
+- Failed 60-day or 90-day effectiveness check reopens corrective action and emits escalation outbox event.
+- CAPA closure requires QA e-signature, record hash verification, and immutable audit entry.
+- Supplier-caused CAPA links back to SCAR and supplier scorecard risk until effectiveness passes.
 
 ## MRB Disposition Rules
 
@@ -177,6 +187,13 @@ The canonical command/projection formula must additionally include:
 - Policy actions: score below threshold or critical SCAR blocks new PO approval/release or payment release according to supplier governance policy.
 
 Acceptance: a severe SCAR reduces supplier score even if incoming inspection count is low.
+
+Additional scorecard acceptance tests:
+
+- Open SCAR issued in an earlier period still counts as open/overdue risk in the current period until closed with an effective close date.
+- SCAR issued and closed before the current period does not count as current open risk.
+- Critical SCAR plus expired certification produces supplier release-blocking action, not only a dashboard warning.
+- Supplier scorecard reconciliation compares JSON source rows to canonical PO/IQC/SCAR/audit/cert/COPQ tables and fails if a SCAR is missing from either side.
 
 ## FMEA To Control Plan Enforcement
 
