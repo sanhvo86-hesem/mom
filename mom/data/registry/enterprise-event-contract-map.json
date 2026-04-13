@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:36.128648+00:00",
+    "generatedAt": "2026-04-13T13:26:45.342119+00:00",
     "sourceArtifact": "mom/contracts/event-index.json",
     "standard": "CloudEvents 1.0 envelope + AsyncAPI-ready message map",
     "eventCount": 229

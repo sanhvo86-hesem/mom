@@ -39,7 +39,7 @@ final class DomainOutboxService
                 'INSERT INTO domain_outbox_events
                     (aggregate_type, aggregate_id, event_type, payload, idempotency_key, correlation_id)
                  VALUES
-                    (:aggregate_type, :aggregate_id, :event_type, :payload::jsonb, :idempotency_key, :correlation_id)
+                    (:aggregate_type, :aggregate_id, :event_type, CAST(:payload AS jsonb), :idempotency_key, :correlation_id)
                  ON CONFLICT DO NOTHING',
                 [
                     ':aggregate_type' => $aggregateType,

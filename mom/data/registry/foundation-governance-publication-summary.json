@@ -2,8 +2,8 @@
   "slice_publication": {
     "scope": "foundation_governance_contract_slice",
     "truth_model": "slice_within_global_canonical",
-    "publication_run_family": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546",
-    "generated_at": "2026-04-13T11:20:33.200Z",
+    "publication_run_family": "ce560843-acd2-4cf7-a149-ac14b2b6ba21",
+    "generated_at": "2026-04-13T13:26:33.627Z",
     "slice_verdict": "PASS",
     "blockers": "none",
     "entity_count": 6,
@@ -32,6 +32,7 @@
         "party_site",
         "reason_code",
         "shift",
+        "signature_events",
         "status_code",
         "uom"
       ],

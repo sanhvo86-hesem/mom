@@ -2,25 +2,25 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-13T11:20:20.896Z",
+    "generatedAt": "2026-04-13T13:26:24.607Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546"
+    "publication_run_id": "ce560843-acd2-4cf7-a149-ac14b2b6ba21"
   },
   "summary": {
-    "endpoint_count": 3808,
-    "pack_count": 4164,
-    "relation_edge_count": 3174,
-    "workflow_count": 294,
-    "status_set_count": 769,
-    "validation_rule_count": 45295,
-    "formula_count": 1231,
-    "formula_reference_count": 1231,
-    "field_context_count": 50836,
-    "row_version_tables": 565,
-    "org_scoped_tables": 546,
+    "endpoint_count": 3983,
+    "pack_count": 4344,
+    "relation_edge_count": 3225,
+    "workflow_count": 311,
+    "status_set_count": 819,
+    "validation_rule_count": 46820,
+    "formula_count": 1286,
+    "formula_reference_count": 1286,
+    "field_context_count": 52961,
+    "row_version_tables": 593,
+    "org_scoped_tables": 557,
     "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -29,29 +29,29 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 277,
-    "workflow_engine_bridge_ready": 278,
+    "transition_runtime_warnings": 294,
+    "workflow_engine_bridge_ready": 295,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 694,
+    "archive_only_tables": 724,
     "soft_delete_tables": 0,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 354,
-      "generic_status_only": 32,
+      "stateless": 359,
+      "generic_status_only": 40,
       "guarded_transition_runtime": 31,
-      "persisted": 277,
+      "persisted": 294,
       "unknown": 0
     },
-    "frontend_foundation_entities": 705,
-    "frontend_ready_entities": 705,
+    "frontend_foundation_entities": 735,
+    "frontend_ready_entities": 735,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 5,
-    "frontend_publishable_entities": 689,
+    "frontend_publishable_entities": 719,
     "frontend_unpublishable_entities": 0,
-    "attachment_contract_entities": 693,
-    "comment_contract_entities": 693,
-    "activity_contract_entities": 551,
+    "attachment_contract_entities": 723,
+    "comment_contract_entities": 723,
+    "activity_contract_entities": 565,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -74,44 +74,44 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 694,
-      "target": 694
+      "actual": 724,
+      "target": 724
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 694,
-      "target": 694
+      "actual": 724,
+      "target": 724
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 694,
-      "target": 694
+      "actual": 724,
+      "target": 724
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3174,
-      "target": 3174
+      "actual": 3225,
+      "target": 3225
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 421,
-      "target": 421
+      "actual": 445,
+      "target": 445
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 327,
-      "target": 327
+      "actual": 352,
+      "target": 352
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 674,
-      "target": 662
+      "actual": 704,
+      "target": 692
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -140,8 +140,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 694,
-      "target": 694
+      "actual": 724,
+      "target": 724
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -164,7 +164,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 294,
+      "actual": 311,
       "target": 60
     },
     {
@@ -176,26 +176,26 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 769,
+      "actual": 819,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 45295,
+      "actual": 46820,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1231,
+      "actual": 1286,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1231,
-      "target": 1231
+      "actual": 1286,
+      "target": 1286
     }
   ],
   "warnings": {
@@ -317,6 +317,10 @@
         "concurrency_field": "row_version"
       },
       {
+        "table": "background_jobs",
+        "concurrency_field": "row_version"
+      },
+      {
         "table": "bill_of_materials",
         "concurrency_field": "row_version"
       },
@@ -434,10 +438,6 @@
       },
       {
         "table": "commercial_accounts",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "competency",
         "concurrency_field": "row_version"
       }
     ],
@@ -695,6 +695,15 @@
         ]
       },
       {
+        "table": "background_jobs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "bill_of_materials",
         "scope_fields": [
           "org_company_code",
@@ -966,15 +975,6 @@
       },
       {
         "table": "competency",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "complaint",
         "scope_fields": [
           "org_company_code",
           "org_legal_entity_code",
@@ -1233,6 +1233,13 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "background_jobs",
+        "workflowId": "wf_background_job",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "bill_of_materials",
         "workflowId": "wf_bill_of_material",
         "lifecycle_mode": "persisted",
@@ -1424,13 +1431,6 @@
       {
         "table": "crm_forecasts",
         "workflowId": "wf_crm_forecast",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "crm_leads",
-        "workflowId": "wf_crm_lead",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1649,6 +1649,12 @@
         "governance_level": "governed"
       },
       {
+        "table": "background_jobs",
+        "domain": "system_infrastructure",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "bill_of_materials",
         "domain": "master_data",
         "mode": "archive_only",
@@ -1788,12 +1794,6 @@
       },
       {
         "table": "com_credit_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_customer_scorecards",
         "domain": "commercial_contracts",
         "mode": "archive_only",
         "governance_level": "governed"

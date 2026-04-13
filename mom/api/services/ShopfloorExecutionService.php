@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Services;
 
 use InvalidArgumentException;
+use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Api\Services\ManufacturingEventBackboneService;
 use MOM\Database\DataLayer;
 use RuntimeException;
@@ -29,16 +30,25 @@ final class ShopfloorExecutionService
     /** @var list<string> */
     private const ISSUE_SEVERITIES = ['minor', 'major', 'critical'];
 
+    /** @var list<string> */
+    private const REPORT_MODES = ['snapshot', 'correction'];
+
+    /** @var list<string> */
+    private const COMPLETION_INTENTS = ['none', 'complete_shift', 'complete_target'];
+
     private readonly string $dataDir;
     private ?ManufacturingEventBackboneService $eventBackbone;
+    private ?ConnectedGovernanceService $connectedGovernance;
 
     public function __construct(
         string $dataDir,
         private readonly ?DataLayer $dataLayer = null,
         ?ManufacturingEventBackboneService $eventBackbone = null,
+        ?ConnectedGovernanceService $connectedGovernance = null,
     ) {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->eventBackbone = $eventBackbone;
+        $this->connectedGovernance = $connectedGovernance;
     }
 
     /**
@@ -67,6 +77,8 @@ final class ShopfloorExecutionService
             'item_description' => $this->stringValue($body['item_description'] ?? $body['part_description'] ?? ''),
             'operation_seq' => $this->nullablePositiveInt($body['operation_seq'] ?? null, 'operation_seq'),
             'operation_id' => $this->stringValue($body['operation_id'] ?? ''),
+            'operation_revision' => $this->stringValue($body['operation_revision'] ?? ''),
+            'routing_id' => $this->stringValue($body['routing_id'] ?? ''),
             'operation_name' => $this->stringValue($body['operation_name'] ?? $body['operation'] ?? ''),
             'machine_id' => $machineId,
             'equipment_id' => $equipmentId,
@@ -89,6 +101,11 @@ final class ShopfloorExecutionService
             'cnc_program_id' => $this->stringValue($body['cnc_program_id'] ?? $body['program_id'] ?? ''),
             'cnc_program_revision' => $this->stringValue($body['cnc_program_revision'] ?? $body['program_revision'] ?? ''),
             'setup_sheet_id' => $this->stringValue($body['setup_sheet_id'] ?? ''),
+            'setup_sheet_revision' => $this->stringValue($body['setup_sheet_revision'] ?? ''),
+            'inspection_plan_id' => $this->stringValue($body['inspection_plan_id'] ?? ''),
+            'material_lot_number' => $this->stringValue($body['material_lot_number'] ?? $body['lot_number'] ?? ''),
+            'heat_number' => $this->stringValue($body['heat_number'] ?? ''),
+            'traveler_number' => $this->stringValue($body['traveler_number'] ?? ''),
             'due_at' => $this->optionalTimestampString($body['due_at'] ?? null, 'due_at'),
             'status' => 'planned',
             'notes' => $this->stringValue($body['notes'] ?? ''),
@@ -98,7 +115,7 @@ final class ShopfloorExecutionService
             'updated_at' => $now,
         ];
 
-        return $this->finalizeTarget($target);
+        return $this->finalizeTarget($this->enrichTargetFromOrderStore($target));
     }
 
     /**
@@ -133,10 +150,17 @@ final class ShopfloorExecutionService
             'item_description',
             'operation_seq',
             'operation_id',
+            'operation_revision',
+            'routing_id',
             'operation_name',
             'cnc_program_id',
             'cnc_program_revision',
             'setup_sheet_id',
+            'setup_sheet_revision',
+            'inspection_plan_id',
+            'material_lot_number',
+            'heat_number',
+            'traveler_number',
             'due_at',
             'metadata',
         ];
@@ -191,18 +215,32 @@ final class ShopfloorExecutionService
         $target['metadata'] = is_array($target['metadata'] ?? null) ? (array)$target['metadata'] : new \stdClass();
         $target['updated_at'] = $now;
 
-        return $this->finalizeTarget($target);
+        return $this->finalizeTarget($this->enrichTargetFromOrderStore($target));
     }
 
     /**
      * @param array<string, mixed> $target
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>|null
      */
-    public function assertReportActorCanSubmit(array $target, string $actorId, bool $hasPlannerOverride): void
+    public function assertReportActorCanSubmit(array $target, string $actorId, bool $hasPlannerOverride, array $context = []): ?array
     {
         $assignedOperator = $this->stringValue($target['operator_id'] ?? '');
+        if ($assignedOperator === '' && !$hasPlannerOverride) {
+            throw new RuntimeException('missing_operator_assignment');
+        }
         if ($assignedOperator !== '' && $assignedOperator !== $actorId && !$hasPlannerOverride) {
             throw new RuntimeException('forbidden_operator_assignment');
         }
+
+        if ($this->connectedGovernance === null) {
+            return null;
+        }
+
+        return $this->connectedGovernance->assertExecutionEntitled($actorId, $target, array_merge([
+            'action' => 'dispatch.report_production',
+            'correlation_id' => (string)($target['target_id'] ?? $target['wo_number'] ?? ''),
+        ], $context));
     }
 
     /**
@@ -215,6 +253,16 @@ final class ShopfloorExecutionService
     {
         if (($target['status'] ?? '') === 'cancelled') {
             throw new InvalidArgumentException('target_cancelled');
+        }
+
+        $reportMode = $this->normalizeReportMode($body['report_mode'] ?? 'snapshot');
+        $completionIntent = $this->normalizeCompletionIntent($body['completion_intent'] ?? ($this->truthy($body['complete_target'] ?? false) ? 'complete_target' : 'none'));
+        $correctionReason = $this->stringValue($body['correction_reason'] ?? '');
+        if ($reportMode === 'correction' && !is_array($existingLog)) {
+            throw new InvalidArgumentException('correction_requires_existing_report');
+        }
+        if ($reportMode === 'correction' && $correctionReason === '') {
+            throw new InvalidArgumentException('correction_reason_required');
         }
 
         $quantityGood = $this->nonNegativeInt($body['quantity_good'] ?? 0, 'quantity_good');
@@ -247,6 +295,10 @@ final class ShopfloorExecutionService
         }
 
         $targetQuantity = $this->nonNegativeInt($target['target_quantity'] ?? 0, 'target_quantity');
+        $overproductionReason = $this->stringValue($body['overproduction_reason'] ?? '');
+        if ($targetQuantity > 0 && $quantityGood > $targetQuantity && $overproductionReason === '') {
+            throw new InvalidArgumentException('overproduction_reason_required');
+        }
         $achievementPct = $targetQuantity > 0 ? round(($quantityGood / $targetQuantity) * 100, 1) : 0.0;
         $ngRatePct = $quantityTotal > 0 ? round(($quantityNg / $quantityTotal) * 100, 1) : 0.0;
         $reworkRatePct = $quantityTotal > 0 ? round(($quantityRework / $quantityTotal) * 100, 1) : 0.0;
@@ -266,6 +318,8 @@ final class ShopfloorExecutionService
             'part_revision' => (string)($target['part_revision'] ?? ''),
             'operation_seq' => $target['operation_seq'] ?? null,
             'operation_id' => (string)($target['operation_id'] ?? ''),
+            'operation_revision' => (string)($target['operation_revision'] ?? ''),
+            'routing_id' => (string)($target['routing_id'] ?? ''),
             'operation_name' => (string)($target['operation_name'] ?? ''),
             'machine_id' => (string)($target['machine_id'] ?? ''),
             'equipment_id' => (string)($target['equipment_id'] ?? $target['machine_id'] ?? ''),
@@ -276,6 +330,11 @@ final class ShopfloorExecutionService
             'cnc_program_id' => (string)($target['cnc_program_id'] ?? ''),
             'cnc_program_revision' => (string)($target['cnc_program_revision'] ?? ''),
             'setup_sheet_id' => (string)($target['setup_sheet_id'] ?? ''),
+            'setup_sheet_revision' => (string)($target['setup_sheet_revision'] ?? ''),
+            'inspection_plan_id' => (string)($target['inspection_plan_id'] ?? ''),
+            'material_lot_number' => (string)($target['material_lot_number'] ?? ''),
+            'heat_number' => (string)($target['heat_number'] ?? ''),
+            'traveler_number' => (string)($target['traveler_number'] ?? ''),
             'quantity_good' => $quantityGood,
             'quantity_ng' => $quantityNg,
             'quantity_rework' => $quantityRework,
@@ -298,12 +357,18 @@ final class ShopfloorExecutionService
             'device_id' => $this->stringValue($body['device_id'] ?? ''),
             'client_report_id' => $this->stringValue($body['client_report_id'] ?? ''),
             'idempotency_key' => $this->stringValue($body['idempotency_key'] ?? ''),
+            'execution_entitlement' => is_array($target['execution_entitlement'] ?? null) ? $target['execution_entitlement'] : null,
+            'report_mode' => $reportMode,
+            'completion_intent' => $completionIntent,
+            'correction_reason' => $correctionReason,
+            'overproduction_reason' => $overproductionReason,
             'source_schema_version' => 'phase1_shopfloor_execution.v1',
             'updated_at' => $now,
             'quantity_total' => $quantityTotal,
             'achievement_pct' => $achievementPct,
             'ng_rate_pct' => $ngRatePct,
             'rework_rate_pct' => $reworkRatePct,
+            'report_count' => is_array($existingLog) ? ((int)($existingLog['report_count'] ?? 1) + 1) : 1,
         ];
 
         if ($log['log_id'] === '') {
@@ -321,11 +386,36 @@ final class ShopfloorExecutionService
      * @param array<int|string, mixed> $logs
      * @return array<string, mixed>|null
      */
-    public function replayProductionLogForIdempotency(array $candidateLog, array $logs): ?array
+    public function replayProductionLogForIdempotency(array $candidateLog, array $logs, array $events = []): ?array
     {
         $idempotencyKey = $this->stringValue($candidateLog['idempotency_key'] ?? '');
         if ($idempotencyKey === '') {
             return null;
+        }
+
+        foreach ($events as $event) {
+            if (!is_array($event)) {
+                continue;
+            }
+            /** @var array<string, mixed> $event */
+            if ($this->stringValue($event['idempotency_key'] ?? '') !== $idempotencyKey) {
+                continue;
+            }
+            if ($this->stringValue($event['target_id'] ?? '') !== $this->stringValue($candidateLog['target_id'] ?? '')) {
+                throw new RuntimeException('idempotency_conflict');
+            }
+            if (!hash_equals(
+                $this->stringValue($event['report_fingerprint'] ?? ''),
+                $this->stringValue($candidateLog['report_fingerprint'] ?? ''),
+            )) {
+                throw new RuntimeException('idempotency_conflict');
+            }
+            $eventLog = $event['production_log'] ?? null;
+            if (is_array($eventLog)) {
+                /** @var array<string, mixed> $eventLog */
+                return $eventLog;
+            }
+            return $candidateLog;
         }
 
         foreach ($logs as $existingLog) {
@@ -359,6 +449,97 @@ final class ShopfloorExecutionService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed>      $log
+     * @param array<string, mixed>      $target
+     * @param array<string, mixed>|null $previousLog
+     * @return array<string, mixed>
+     */
+    public function buildProductionReportEvent(array $log, array $target, ?array $previousLog, string $actorId, string $now): array
+    {
+        $previousFingerprint = is_array($previousLog) ? $this->stringValue($previousLog['report_fingerprint'] ?? '') : '';
+
+        return [
+            'event_id' => 'PRE-' . bin2hex(random_bytes(8)),
+            'event_type' => 'dispatch.production_report_recorded',
+            'event_schema_version' => 'phase1_shopfloor_execution_event.v1',
+            'target_id' => (string)($log['target_id'] ?? ''),
+            'log_id' => (string)($log['log_id'] ?? ''),
+            'report_mode' => (string)($log['report_mode'] ?? 'snapshot'),
+            'completion_intent' => (string)($log['completion_intent'] ?? 'none'),
+            'idempotency_key' => (string)($log['idempotency_key'] ?? ''),
+            'client_report_id' => (string)($log['client_report_id'] ?? ''),
+            'report_fingerprint' => (string)($log['report_fingerprint'] ?? ''),
+            'previous_report_fingerprint' => $previousFingerprint,
+            'previous_log_id' => is_array($previousLog) ? (string)($previousLog['log_id'] ?? '') : '',
+            'actor_id' => $actorId,
+            'occurred_at' => (string)(($log['actual_end'] ?? '') ?: ($log['updated_at'] ?? $now)),
+            'recorded_at' => $now,
+            'source_controller' => 'DispatchController',
+            'source_store' => 'dispatch/production_report_events.json',
+            'operational_truth' => true,
+            'digital_thread' => [
+                'wo_number' => (string)($log['wo_number'] ?? ''),
+                'jo_number' => (string)($log['jo_number'] ?? ''),
+                'item_id' => (string)($log['item_id'] ?? ''),
+                'part_number' => (string)($log['part_number'] ?? ''),
+                'part_revision' => (string)($log['part_revision'] ?? ''),
+                'routing_id' => (string)($log['routing_id'] ?? ''),
+                'operation_seq' => $log['operation_seq'] ?? null,
+                'operation_id' => (string)($log['operation_id'] ?? ''),
+                'operation_revision' => (string)($log['operation_revision'] ?? ''),
+                'machine_id' => (string)($log['machine_id'] ?? ''),
+                'equipment_id' => (string)($log['equipment_id'] ?? ''),
+                'work_center_id' => (string)($log['work_center_id'] ?? ''),
+                'operator_id' => (string)($log['operator_id'] ?? ''),
+                'shift_date' => (string)($log['shift_date'] ?? ''),
+                'shift_code' => (string)($log['shift_code'] ?? ''),
+                'cnc_program_id' => (string)($log['cnc_program_id'] ?? ''),
+                'cnc_program_revision' => (string)($log['cnc_program_revision'] ?? ''),
+                'setup_sheet_id' => (string)($log['setup_sheet_id'] ?? ''),
+                'setup_sheet_revision' => (string)($log['setup_sheet_revision'] ?? ''),
+                'inspection_plan_id' => (string)($log['inspection_plan_id'] ?? ''),
+                'material_lot_number' => (string)($log['material_lot_number'] ?? ''),
+                'heat_number' => (string)($log['heat_number'] ?? ''),
+                'traveler_number' => (string)($log['traveler_number'] ?? ''),
+            ],
+            'quantity_delta' => [
+                'good' => (int)($log['quantity_good'] ?? 0) - (int)($previousLog['quantity_good'] ?? 0),
+                'ng' => (int)($log['quantity_ng'] ?? 0) - (int)($previousLog['quantity_ng'] ?? 0),
+                'rework' => (int)($log['quantity_rework'] ?? 0) - (int)($previousLog['quantity_rework'] ?? 0),
+            ],
+            'time_delta_minutes' => [
+                'setup' => round((float)($log['actual_setup_minutes'] ?? 0) - (float)($previousLog['actual_setup_minutes'] ?? 0), 2),
+                'run' => round((float)($log['actual_run_minutes'] ?? 0) - (float)($previousLog['actual_run_minutes'] ?? 0), 2),
+                'idle' => round((float)($log['actual_idle_minutes'] ?? 0) - (float)($previousLog['actual_idle_minutes'] ?? 0), 2),
+            ],
+            'production_log' => $log,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     * @param array<string, mixed> $body
+     */
+    public function shouldCompleteTarget(array $log, array $body): bool
+    {
+        $intent = $this->normalizeCompletionIntent($body['completion_intent'] ?? ($this->truthy($body['complete_target'] ?? false) ? 'complete_target' : 'none'));
+        if ($intent === 'none') {
+            return false;
+        }
+        if ((int)($log['target_quantity'] ?? 0) <= 0) {
+            return false;
+        }
+        if ((int)($log['quantity_good'] ?? 0) < (int)($log['target_quantity'] ?? 0)) {
+            throw new InvalidArgumentException('completion_quantity_below_target');
+        }
+        if ($this->stringValue($log['actual_end'] ?? '') === '') {
+            throw new InvalidArgumentException('completion_requires_actual_end');
+        }
+
+        return true;
     }
 
     /**
@@ -420,6 +601,9 @@ final class ShopfloorExecutionService
             'part_number' => (string)($target['part_number'] ?? $target['item_id'] ?? ''),
             'part_revision' => (string)($target['part_revision'] ?? ''),
             'operation_seq' => $target['operation_seq'] ?? null,
+            'operation_id' => (string)($target['operation_id'] ?? ''),
+            'operation_revision' => (string)($target['operation_revision'] ?? ''),
+            'routing_id' => (string)($target['routing_id'] ?? ''),
             'operation_name' => (string)($target['operation_name'] ?? ''),
             'target_quantity' => (int)($target['target_quantity'] ?? 0),
             'quantity_good_reported' => (int)($log['quantity_good'] ?? 0),
@@ -427,7 +611,11 @@ final class ShopfloorExecutionService
             'quantity_rework_reported' => (int)($log['quantity_rework'] ?? 0),
             'achievement_pct' => (float)($log['achievement_pct'] ?? 0),
             'cnc_program_id' => (string)($target['cnc_program_id'] ?? ''),
+            'cnc_program_revision' => (string)($target['cnc_program_revision'] ?? ''),
             'setup_sheet_id' => (string)($target['setup_sheet_id'] ?? ''),
+            'setup_sheet_revision' => (string)($target['setup_sheet_revision'] ?? ''),
+            'inspection_plan_id' => (string)($target['inspection_plan_id'] ?? ''),
+            'report_count' => (int)($log['report_count'] ?? 0),
             'notes' => (string)($target['notes'] ?? ''),
         ];
     }
@@ -492,7 +680,7 @@ final class ShopfloorExecutionService
                 ],
                 'metadata' => [
                     'source_controller' => 'DispatchController',
-                    'source_store' => 'dispatch/production_logs.json',
+                    'source_store' => 'dispatch/production_report_events.json',
                     'ot_boundary' => 'manual_capture_no_machine_control',
                 ],
             ]);
@@ -767,6 +955,9 @@ final class ShopfloorExecutionService
         if ((string)($log['cnc_program_id'] ?? '') === '') {
             $flags[] = 'missing_cnc_program_reference';
         }
+        if ((string)($log['inspection_plan_id'] ?? '') === '') {
+            $flags[] = 'missing_inspection_plan_reference';
+        }
         if ((float)($log['actual_run_minutes'] ?? 0) <= 0.0 && (int)($log['quantity_total'] ?? 0) > 0) {
             $flags[] = 'missing_actual_run_time';
         }
@@ -851,6 +1042,8 @@ final class ShopfloorExecutionService
             'part_revision',
             'operation_seq',
             'operation_id',
+            'operation_revision',
+            'routing_id',
             'machine_id',
             'equipment_id',
             'work_center_id',
@@ -860,6 +1053,11 @@ final class ShopfloorExecutionService
             'cnc_program_id',
             'cnc_program_revision',
             'setup_sheet_id',
+            'setup_sheet_revision',
+            'inspection_plan_id',
+            'material_lot_number',
+            'heat_number',
+            'traveler_number',
             'quantity_good',
             'quantity_ng',
             'quantity_rework',
@@ -878,6 +1076,10 @@ final class ShopfloorExecutionService
             'offline_created',
             'device_id',
             'client_report_id',
+            'report_mode',
+            'completion_intent',
+            'correction_reason',
+            'overproduction_reason',
         ];
     }
 
@@ -907,6 +1109,141 @@ final class ShopfloorExecutionService
         }
 
         return $value;
+    }
+
+    private function normalizeReportMode(mixed $value): string
+    {
+        $mode = strtolower($this->stringValue($value));
+        if ($mode === '') {
+            $mode = 'snapshot';
+        }
+        if (!in_array($mode, self::REPORT_MODES, true)) {
+            throw new InvalidArgumentException('invalid_report_mode');
+        }
+
+        return $mode;
+    }
+
+    private function normalizeCompletionIntent(mixed $value): string
+    {
+        if (is_bool($value)) {
+            $value = $value ? 'complete_target' : 'none';
+        }
+        $intent = strtolower($this->stringValue($value));
+        if ($intent === '') {
+            $intent = 'none';
+        }
+        if (!in_array($intent, self::COMPLETION_INTENTS, true)) {
+            throw new InvalidArgumentException('invalid_completion_intent');
+        }
+
+        return $intent;
+    }
+
+    private function truthy(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (float)$value !== 0.0;
+        }
+        $text = strtolower($this->stringValue($value));
+
+        return in_array($text, ['1', 'true', 'yes', 'y', 'on'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function enrichTargetFromOrderStore(array $target): array
+    {
+        $woNumber = $this->stringValue($target['wo_number'] ?? '');
+        if ($woNumber === '') {
+            return $target;
+        }
+
+        $orders = $this->ordersStore();
+        $workOrders = is_array($orders['work_orders'] ?? null) ? (array)$orders['work_orders'] : [];
+        $matchedWorkOrder = null;
+        foreach ($workOrders as $workOrder) {
+            if (!is_array($workOrder)) {
+                continue;
+            }
+            if ($this->stringValue($workOrder['wo_number'] ?? $workOrder['work_order_no'] ?? '') === $woNumber) {
+                $matchedWorkOrder = $workOrder;
+                break;
+            }
+        }
+        if (!is_array($matchedWorkOrder)) {
+            return $target;
+        }
+
+        $fillMap = [
+            'jo_number' => ['jo_number'],
+            'operation_seq' => ['operation_seq', 'operation_number'],
+            'operation_id' => ['operation_id'],
+            'operation_name' => ['operation_name', 'operation_desc', 'operation'],
+            'machine_id' => ['machine_id'],
+            'equipment_id' => ['equipment_id', 'machine_id'],
+            'work_center_id' => ['work_center_id'],
+            'operator_id' => ['operator_id'],
+            'cnc_program_id' => ['cnc_program_id', 'nc_program_id', 'program_id'],
+            'cnc_program_revision' => ['cnc_program_revision', 'program_revision'],
+            'setup_sheet_id' => ['setup_sheet_id'],
+            'setup_sheet_revision' => ['setup_sheet_revision'],
+            'inspection_plan_id' => ['inspection_plan_id'],
+            'material_lot_number' => ['material_lot_number', 'lot_number'],
+            'heat_number' => ['heat_number'],
+            'traveler_number' => ['traveler_number'],
+        ];
+
+        foreach ($fillMap as $targetField => $sourceFields) {
+            if ($this->stringValue($target[$targetField] ?? '') !== '') {
+                continue;
+            }
+            foreach ($sourceFields as $sourceField) {
+                $value = $matchedWorkOrder[$sourceField] ?? null;
+                if ($this->stringValue($value) !== '') {
+                    $target[$targetField] = $value;
+                    break;
+                }
+            }
+        }
+
+        if ((float)($target['standard_setup_minutes'] ?? 0) <= 0.0 && isset($matchedWorkOrder['setup_time_est'])) {
+            $target['standard_setup_minutes'] = $matchedWorkOrder['setup_time_est'];
+        }
+        if ((float)($target['setup_time_minutes'] ?? 0) <= 0.0 && isset($matchedWorkOrder['setup_time_est'])) {
+            $target['setup_time_minutes'] = $matchedWorkOrder['setup_time_est'];
+        }
+        if ((float)($target['expected_run_minutes'] ?? 0) <= 0.0 && isset($matchedWorkOrder['run_time_est'])) {
+            $target['expected_run_minutes'] = $matchedWorkOrder['run_time_est'];
+        }
+        if ((float)($target['standard_run_minutes'] ?? 0) <= 0.0 && isset($matchedWorkOrder['run_time_est'])) {
+            $target['standard_run_minutes'] = $matchedWorkOrder['run_time_est'];
+        }
+
+        return $target;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function ordersStore(): array
+    {
+        $file = $this->dataDir . '/orders/orders.json';
+        if (!is_file($file)) {
+            return [];
+        }
+        $raw = @file_get_contents($file);
+        if (!is_string($raw) || trim($raw) === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**

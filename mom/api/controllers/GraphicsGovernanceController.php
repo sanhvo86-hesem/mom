@@ -332,6 +332,48 @@ class GraphicsGovernanceController extends BaseController
         $this->respond(fn(): array => $this->graphics()->releaseBlockers());
     }
 
+    public function changeSetModel(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->graphicsChangeSetModel());
+    }
+
+    public function lineageGraph(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->lineageGraph());
+    }
+
+    public function runtimeBeacon(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->runtimeComplianceBeacon());
+    }
+
+    public function debtObservatory(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->visualDebtObservatory());
+    }
+
+    public function environmentPolicyPacks(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->environmentPolicyPacks());
+    }
+
+    public function releaseDashboard(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->graphicsReleaseDashboard());
+    }
+
     /**
      * @param callable(): array<string, mixed> $fn
      */

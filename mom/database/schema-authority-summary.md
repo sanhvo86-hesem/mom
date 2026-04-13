@@ -1,14 +1,14 @@
 # Schema Authority Summary
 
 **Declared**: 2026-04-13
-**Scope**: Platform-global (694 tables)
-**Migration range**: 001–104 (104 migrations)
+**Scope**: Platform-global (724 tables)
+**Migration range**: 001–106 (106 migrations)
 
 ## Authority Chain
 
 | Layer | File | Role |
 |-------|------|------|
-| **Executable Source of Truth** | `database/migrations/001–104_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
+| **Executable Source of Truth** | `database/migrations/001–106_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
 | **Generated Snapshot** | `database/schema.sql` | Aggregate of all migrations. Built by `build_schema_snapshot.php`. Reference only; regenerate after any migration change. |
 | **Conceptual Blueprint** | `database/canonical-erp-mes-eqms-7-layer-blueprint.sql` | ISA-95/IEC 62264 7-layer design input. NOT executable authority. |
 | **Specification Reference** | `database/mes-schema-specification.sql` | MES specification reference. NOT executable authority. |
@@ -25,7 +25,7 @@ No table definition outside migrations is authoritative.
 - `schema.sql` is a generated artifact; if it differs from migrations, regenerate it.
 - `table-registry.json` derives table metadata from `schema.sql` via `generate-table-architecture.mjs`.
 - Registry does not modify schema; schema does not depend on registry.
-- Snapshot CREATE TABLE count: 708
+- Snapshot CREATE TABLE count: 738
 - Drift verifier: `tools/verify_schema_authority.py`
 
 ## Verification

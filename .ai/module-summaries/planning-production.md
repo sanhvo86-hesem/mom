@@ -31,7 +31,8 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - `work_orders` — WO execution records (`work_order_status`)
 - `job_orders` — JO records (`job_status`)
 - `dispatch/targets.json` *(file)* — Planner-created shift production targets
-- `dispatch/production_logs.json` *(file)* — Operator-reported actual output (good/NG/rework/downtime)
+- `dispatch/production_report_events.json` *(file)* — Append-only accepted manual production report events
+- `dispatch/production_logs.json` *(file)* — Latest per-target production report snapshot for legacy dashboards
 
 ## Workflow States
 
@@ -47,7 +48,7 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **Create SO:** `OrderController::createSalesOrder()` → `OrderService::createSalesOrder()` → status = `draft`
 - **Release JO:** `OrderController::transition()` → `OrderWorkflowService::validateTransition()` → checks SO is confirmed
 - **Dispatch WO to floor:** `DispatchController::createTarget()` → `targets.json`, status = `planned`
-- **Report production:** `DispatchController::reportProduction()` → `production_logs.json`; auto-completes if achievement ≥ 100%
+- **Report production:** `DispatchController::reportProduction()` → appends `production_report_events.json` and updates `production_logs.json`; completion requires explicit intent plus actual end
 - **Get operator tasks:** `DispatchController::getOperatorDispatch(operator_id, date)` → filtered by operator + `shift_date`
 - **Allocate record ID:** `AllocationController::allocate(record_type, department)` → `RecordIdGenerator::allocate()`
 
@@ -58,7 +59,8 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **Field-edit constraints by state**: `SO.total_qty` editable only in draft/quoted; `WO.machine_id` only in scheduled/setup
 - **ECR required** for part_revision, material_spec, routing_id changes after order is released/active/running
 - **Cancel/Reopen permissions**: manager+ to cancel; director+ to reopen from `closed`
-- **Target reporting is idempotent**: multiple reports for same `target_id` update the same log row
+- **Target reporting is replay-safe**: accepted reports append to `production_report_events.json`; the latest per-target snapshot is updated in `production_logs.json`; duplicate `idempotency_key` with the same fingerprint replays, while conflicts return `idempotency_conflict`
+- **Target completion is explicit**: quantity alone does not complete a target; completion requires completion intent and `actual_end`
 
 ## Notes / Gotchas
 - **Inconsistent status field names**: SO = `status`, JO = `job_status`, WO = `work_order_status` — use the correct field per object type

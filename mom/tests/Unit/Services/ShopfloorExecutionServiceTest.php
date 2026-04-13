@@ -262,6 +262,49 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->service()->assertReportActorCanSubmit($target, 'operator-2', false);
     }
 
+    public function testBlankOperatorAssignmentRequiresPlannerOverride(): void
+    {
+        $target = $this->target();
+        $target['operator_id'] = '';
+
+        try {
+            $this->service()->assertReportActorCanSubmit($target, 'operator-1', false);
+            $this->fail('Unassigned target should not be reportable by any operator without planner override.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('missing_operator_assignment', $e->getMessage());
+        }
+
+        $this->service()->assertReportActorCanSubmit($target, 'planner-1', true);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testOverproductionRequiresExplicitReason(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('overproduction_reason_required');
+
+        $this->service()->buildProductionLog([
+            'quantity_good' => 101,
+            'actual_run_minutes' => 455,
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+    }
+
+    public function testCompletionRequiresIntentAndActualEnd(): void
+    {
+        $service = $this->service();
+        $log = $service->buildProductionLog([
+            'quantity_good' => 100,
+            'actual_run_minutes' => 450,
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertFalse($service->shouldCompleteTarget($log, []));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('completion_requires_actual_end');
+
+        $service->shouldCompleteTarget($log, ['completion_intent' => 'complete_target']);
+    }
+
     public function testBuildsAiReadyProductionLogAndManufacturingEventProjection(): void
     {
         $eventBackbone = new ManufacturingEventBackboneService(
@@ -353,6 +396,128 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->expectExceptionMessage('idempotency_conflict');
 
         $service->replayProductionLogForIdempotency($candidate, [$existing]);
+    }
+
+    public function testProductionReportEventHistoryPreservesPreviousSnapshotContext(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+        $previous = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'first-report',
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        $correction = $service->buildProductionLog([
+            'quantity_good' => 9,
+            'actual_run_minutes' => 41,
+            'report_mode' => 'correction',
+            'correction_reason' => 'Supervisor verified one missed part.',
+            'idempotency_key' => 'correction-report',
+        ], $target, $previous, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $event = $service->buildProductionReportEvent($correction, $target, $previous, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $this->assertSame('dispatch.production_report_recorded', $event['event_type']);
+        $this->assertSame('correction', $event['report_mode']);
+        $this->assertSame($previous['report_fingerprint'], $event['previous_report_fingerprint']);
+        $this->assertSame(1, $event['quantity_delta']['good']);
+        $this->assertSame('NC-714-1101-OP20', $event['digital_thread']['cnc_program_id']);
+        $this->assertSame($correction['report_fingerprint'], $event['production_log']['report_fingerprint']);
+    }
+
+    public function testCorrectionRequiresExistingReportAndReason(): void
+    {
+        $service = $this->service();
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 8,
+                'report_mode' => 'correction',
+                'correction_reason' => 'Wrong entry',
+            ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('Correction without an existing report should fail.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('correction_requires_existing_report', $e->getMessage());
+        }
+
+        $existing = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('correction_reason_required');
+
+        $service->buildProductionLog([
+            'quantity_good' => 9,
+            'actual_run_minutes' => 41,
+            'report_mode' => 'correction',
+        ], $this->target(), $existing, 'operator-1', '2026-04-13T09:00:00Z');
+    }
+
+    public function testIdempotencyCanReplayFromEventHistoryAfterSnapshotChanged(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+        $firstBody = [
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'first-report',
+        ];
+        $firstLog = $service->buildProductionLog($firstBody, $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        $event = $service->buildProductionReportEvent($firstLog, $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        $latestLog = $service->buildProductionLog([
+            'quantity_good' => 9,
+            'actual_run_minutes' => 41,
+            'idempotency_key' => 'second-report',
+        ], $target, $firstLog, 'operator-1', '2026-04-13T09:00:00Z');
+        $retry = $service->buildProductionLog($firstBody, $target, $latestLog, 'operator-1', '2026-04-13T10:00:00Z');
+
+        $replayed = $service->replayProductionLogForIdempotency($retry, [$latestLog], [$event]);
+
+        $this->assertIsArray($replayed);
+        $this->assertSame($firstLog['report_fingerprint'], $replayed['report_fingerprint']);
+        $this->assertSame(8, $replayed['quantity_good']);
+    }
+
+    public function testTargetEnrichmentUsesOrderStoreWithoutCreatingAnotherWorkOrderModel(): void
+    {
+        mkdir($this->dataDir . '/orders', 0775, true);
+        file_put_contents($this->dataDir . '/orders/orders.json', json_encode([
+            'sales_orders' => [],
+            'job_orders' => [],
+            'work_orders' => [
+                [
+                    'wo_number' => 'WO-ORDER-1',
+                    'jo_number' => 'JO-ORDER-1',
+                    'operation_number' => 30,
+                    'operation_desc' => 'Finish bore',
+                    'machine_id' => 'MC-TURN-02',
+                    'work_center_id' => 'WC-TURN',
+                    'operator_id' => 'operator-7',
+                    'nc_program_id' => 'NC-FINISH-BORE-V4',
+                    'run_time_est' => 120,
+                    'setup_time_est' => 25,
+                    'material_lot_number' => 'LOT-174PH-001',
+                    'traveler_number' => 'TRV-001',
+                ],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $target = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-ORDER-1',
+            'machine_id' => 'MC-TURN-02',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('JO-ORDER-1', $target['jo_number']);
+        $this->assertSame(30, $target['operation_seq']);
+        $this->assertSame('Finish bore', $target['operation_name']);
+        $this->assertSame('NC-FINISH-BORE-V4', $target['cnc_program_id']);
+        $this->assertSame('operator-7', $target['operator_id']);
+        $this->assertSame('TRV-001', $target['traveler_number']);
     }
 
     /**

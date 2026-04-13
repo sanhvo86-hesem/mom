@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use InvalidArgumentException;
+use MOM\Api\Services\ConnectedGovernanceException;
+use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Services\ShopfloorExecutionService;
 use RuntimeException;
 use Throwable;
@@ -29,7 +31,11 @@ class DispatchController extends BaseController
     private function shopfloor(): ShopfloorExecutionService
     {
         if ($this->shopfloorSvc === null) {
-            $this->shopfloorSvc = new ShopfloorExecutionService($this->dataDir, $this->data);
+            $this->shopfloorSvc = new ShopfloorExecutionService(
+                $this->dataDir,
+                $this->data,
+                connectedGovernance: new ConnectedGovernanceService($this->dataDir, $this->data),
+            );
         }
 
         return $this->shopfloorSvc;
@@ -38,24 +44,31 @@ class DispatchController extends BaseController
     /**
      * @param array<int|string, mixed> $logs
      * @param array<int|string, mixed> $targets
+     * @param array<int|string, mixed> $events
      * @param array<int|string, mixed> $originalLogs
      * @param array<int|string, mixed> $originalTargets
+     * @param array<int|string, mixed> $originalEvents
      */
     private function writeExecutionState(
         string $logFile,
         array $logs,
         string $targetFile,
         array $targets,
+        string $eventFile,
+        array $events,
         array $originalLogs,
         array $originalTargets,
+        array $originalEvents,
     ): void {
         try {
             $this->writeJsonFile($logFile, $logs);
             $this->writeJsonFile($targetFile, $targets);
+            $this->writeJsonFile($eventFile, $events);
         } catch (Throwable $e) {
             try {
                 $this->writeJsonFile($logFile, $originalLogs);
                 $this->writeJsonFile($targetFile, $originalTargets);
+                $this->writeJsonFile($eventFile, $originalEvents);
             } catch (Throwable $rollback) {
                 @error_log('[DispatchController] dispatch state rollback failed: ' . $rollback->getMessage());
             }
@@ -311,6 +324,10 @@ class DispatchController extends BaseController
 
             $myTasks = [];
             foreach ($targets as $t) {
+                $status = (string)($t['status'] ?? 'planned');
+                if (!in_array($status, ['dispatched', 'in_progress', 'completed'], true)) {
+                    continue;
+                }
                 if (($t['operator_id'] ?? '') === $operatorId && ($t['shift_date'] ?? '') === $date) {
                     if ($shiftCode !== null && $shiftCode !== '' && ($t['shift_code'] ?? '') !== $shiftCode) {
                         continue;
@@ -355,7 +372,7 @@ class DispatchController extends BaseController
 
     /**
      * POST reportProduction â€” Operator reports shift output (qty good, NG, rework).
-     * Can be called multiple times (updates existing log for same target).
+     * Appends report history and updates the latest per-target snapshot.
      */
     public function reportProduction(): never
     {
@@ -391,17 +408,30 @@ class DispatchController extends BaseController
             unset($t);
 
             if (!$target) $this->error('target_not_found', 404);
-            $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $this->userHasAnyRole($user, $this->dispatchWriteRoles()));
+            $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $this->userHasAnyRole($user, $this->dispatchWriteRoles()), [
+                'action' => 'dispatch.report_production',
+                'request_id' => trim((string)($body['client_report_id'] ?? $body['idempotency_key'] ?? '')),
+                'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
+                'correlation_id' => (string)($target['target_id'] ?? ''),
+            ]);
+            if (is_array($entitlement)) {
+                $target['execution_entitlement'] = $entitlement;
+            }
 
             // Create or update production log
             $logFile = $this->dispatchDir() . '/production_logs.json';
             $logs    = $this->readJsonFile($logFile) ?? [];
             $originalLogs = $logs;
+            $eventFile = $this->dispatchDir() . '/production_report_events.json';
+            $events = $this->readJsonFile($eventFile) ?? [];
+            $originalEvents = $events;
 
             $existingIdx = -1;
+            $previousLog = null;
             foreach ($logs as $idx => $l) {
                 if (($l['target_id'] ?? '') === $target['target_id']) {
                     $existingIdx = $idx;
+                    $previousLog = is_array($l) ? $l : null;
                     break;
                 }
             }
@@ -409,12 +439,12 @@ class DispatchController extends BaseController
             $log = $this->shopfloor()->buildProductionLog(
                 $body,
                 $target,
-                $existingIdx >= 0 && is_array($logs[$existingIdx] ?? null) ? $logs[$existingIdx] : null,
+                $previousLog,
                 $uid,
                 $now,
             );
 
-            $replayedLog = $this->shopfloor()->replayProductionLogForIdempotency($log, $logs);
+            $replayedLog = $this->shopfloor()->replayProductionLogForIdempotency($log, $logs, $events);
             if ($replayedLog !== null) {
                 $this->auditLog('dispatch_report_production_replay', [
                     'target_id' => (string)($replayedLog['target_id'] ?? ''),
@@ -429,8 +459,10 @@ class DispatchController extends BaseController
                 $logs[] = $log;
             }
 
-            // Auto-complete target if achievement >= 100%
-            if ($log['achievement_pct'] >= 100) {
+            $event = $this->shopfloor()->buildProductionReportEvent($log, $target, $previousLog, $uid, $now);
+            $events[] = $event;
+
+            if ($this->shopfloor()->shouldCompleteTarget($log, $body)) {
                 foreach ($targets as &$t2) {
                     if (($t2['target_id'] ?? '') === $target['target_id']) {
                         $t2['status']       = 'completed';
@@ -442,7 +474,17 @@ class DispatchController extends BaseController
                 unset($t2);
             }
 
-            $this->writeExecutionState($logFile, $logs, $tFile, $targets, $originalLogs, $originalTargets);
+            $this->writeExecutionState(
+                $logFile,
+                $logs,
+                $tFile,
+                $targets,
+                $eventFile,
+                $events,
+                $originalLogs,
+                $originalTargets,
+                $originalEvents,
+            );
             $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             $this->auditLog('dispatch_report_production', [
@@ -452,11 +494,13 @@ class DispatchController extends BaseController
                 'achieve'   => $log['achievement_pct'] . '%',
             ], $uid);
 
-            $this->success(['production_log' => $log]);
+            $this->success(['production_log' => $log, 'production_event' => $event]);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
+        } catch (ConnectedGovernanceException $e) {
+            $this->error($e->reasonCode(), 409, $e->getMessage(), ['entitlement' => $e->details()]);
         } catch (RuntimeException $e) {
-            if ($e->getMessage() === 'forbidden_operator_assignment') {
+            if (in_array($e->getMessage(), ['forbidden_operator_assignment', 'missing_operator_assignment'], true)) {
                 $this->error('forbidden', 403);
             }
             if ($e->getMessage() === 'idempotency_conflict') {

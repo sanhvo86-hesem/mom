@@ -3,6 +3,20 @@
 __pycache__/
 *.py[cod]
 
+# Generated analysis/build/test artifacts
+_reports/
+_build/
+_Deleted/
+.tmp/
+.tmp-*.png
+.tmp-*.jpg
+.tmp-*.jpeg
+.tmp-*.webm
+.codex-playwright/
+mom/.phpunit.cache/
+mom/_reports/
+mom/docs/tmp/
+
 # Composer
 mom/vendor/
 mom/composer

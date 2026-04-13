@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:04.628Z",
+    "generatedAt": "2026-04-13T13:26:12.493Z",
     "domainCount": 49,
-    "tableCount": 694,
+    "tableCount": 724,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-13T11:20:13.124Z"
+    "workflowCoverageGeneratedAt": "2026-04-13T13:26:18.624Z"
   },
   "domains": {
     "core_system": {
@@ -353,6 +353,7 @@
         "party_site",
         "reason_code",
         "shift",
+        "signature_events",
         "status_code",
         "uom"
       ],
@@ -460,6 +461,11 @@
       "description": "Tài liệu có kiểm soát, phiên bản, phân phối và xác nhận đọc.",
       "businessProcess": "Controlled documents, revisions, release, acknowledgment, and retrieval.",
       "tables": [
+        "doc_distributions",
+        "doc_effectivities",
+        "doc_families",
+        "doc_read_acknowledgements",
+        "doc_revisions",
         "document",
         "document_distribution",
         "document_embeddings",
@@ -473,6 +479,8 @@
         "eqms_document_revision"
       ],
       "primaryWorkflows": [
+        "wf_doc_distribution",
+        "wf_doc_family",
         "wf_document",
         "wf_document_revision",
         "wf_document_change_control",
@@ -495,6 +503,8 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_doc_distribution",
+        "wf_doc_family",
         "wf_document",
         "wf_document_change_control",
         "wf_document_revision",
@@ -874,6 +884,7 @@
         "customer_complaints",
         "deviation",
         "deviations",
+        "eqms_controlled_revision_rollout",
         "fai_characteristics",
         "fai_records",
         "fai_trigger_log",
@@ -904,6 +915,7 @@
         "wf_concession",
         "wf_customer_complaint",
         "wf_deviation",
+        "wf_eqms_controlled_revision_rollout",
         "wf_fai",
         "wf_receiving_inspection",
         "wf_inspection_lot",
@@ -931,7 +943,8 @@
         "fmea_apqp",
         "lean_manufacturing",
         "mobile_operations",
-        "quality_lab"
+        "quality_lab",
+        "training_hr"
       ],
       "supportDomain": false,
       "workflows": [
@@ -941,6 +954,7 @@
         "wf_concession",
         "wf_customer_complaint",
         "wf_deviation",
+        "wf_eqms_controlled_revision_rollout",
         "wf_fai",
         "wf_inspection_lot",
         "wf_inspection_plan",
@@ -1054,6 +1068,7 @@
         "competency",
         "employee_certifications",
         "employees",
+        "eqms_training_obligation",
         "skills_matrix",
         "training_matrix",
         "training_record",
@@ -1062,6 +1077,7 @@
       "primaryWorkflows": [
         "wf_employee_certification",
         "wf_employee",
+        "wf_eqms_training_obligation",
         "wf_training_record",
         "wf_training_qualification"
       ],
@@ -1070,6 +1086,7 @@
         "document_control",
         "foundation_governance",
         "mes_execution",
+        "quality_management",
         "record_system"
       ],
       "downstreamDomains": [
@@ -1084,6 +1101,7 @@
       "workflows": [
         "wf_employee",
         "wf_employee_certification",
+        "wf_eqms_training_obligation",
         "wf_training_qualification",
         "wf_training_record"
       ]
@@ -1180,6 +1198,7 @@
         "alarm_event",
         "dispatch_queue",
         "downtime_event",
+        "eqms_execution_entitlement_decision",
         "job",
         "job_event",
         "labor_capture",
@@ -1248,6 +1267,7 @@
         "work_order"
       ],
       "primaryWorkflows": [
+        "wf_eqms_execution_entitlement_decision",
         "wf_job",
         "wf_mes_alarm_playbook",
         "wf_mes_connectivity_adapter",
@@ -1419,6 +1439,7 @@
         }
       },
       "workflows": [
+        "wf_eqms_execution_entitlement_decision",
         "wf_job",
         "wf_mes_alarm_playbook",
         "wf_mes_connectivity_adapter",
@@ -1552,10 +1573,17 @@
         "eqms_change_resulting_object",
         "eqms_field_change_authorization",
         "eqms_field_governance_rule",
+        "field_governance_rules",
+        "plm_change_affected_objects",
+        "plm_change_effectiveness_reviews",
+        "plm_change_effectivities",
         "plm_change_order_lines",
         "plm_change_orders",
         "plm_change_requests",
+        "plm_change_resulting_objects",
         "plm_change_review_board",
+        "plm_change_training_requirements",
+        "plm_change_verifications",
         "plm_design_reviews",
         "plm_deviation_permits",
         "plm_obsolescence_tracking",
@@ -1569,8 +1597,11 @@
         "wf_change_control",
         "wf_engineering_change_request",
         "wf_eqms_field_governance_rule",
+        "wf_field_governance_rule",
         "wf_plm_change_order",
         "wf_plm_change_request",
+        "wf_plm_change_resulting_object",
+        "wf_plm_change_verification",
         "wf_plm_deviation_permit",
         "wf_plm_obsolescence_tracking",
         "wf_plm_product_configuration",
@@ -1580,6 +1611,7 @@
       "upstreamDomains": [
         "core_system",
         "document_control",
+        "evidence_vault",
         "foundation_governance",
         "inventory",
         "master_data",
@@ -1597,8 +1629,11 @@
         "wf_change_control",
         "wf_engineering_change_request",
         "wf_eqms_field_governance_rule",
+        "wf_field_governance_rule",
         "wf_plm_change_order",
         "wf_plm_change_request",
+        "wf_plm_change_resulting_object",
+        "wf_plm_change_verification",
         "wf_plm_deviation_permit",
         "wf_plm_obsolescence_tracking",
         "wf_plm_product_configuration",
@@ -2659,7 +2694,12 @@
         "form_attachments",
         "form_drafts",
         "form_entries",
-        "form_schemas"
+        "form_schemas",
+        "frm_families",
+        "frm_issuances",
+        "frm_schema_versions",
+        "frm_submission_attempts",
+        "frm_template_revisions"
       ],
       "primaryWorkflows": [
         "wf_eqms_form_family",
@@ -2669,7 +2709,10 @@
         "wf_eqms_form_submission_attempt",
         "wf_eqms_form_template_revision",
         "wf_form_submission",
-        "wf_form_schema"
+        "wf_form_schema",
+        "wf_frm_family",
+        "wf_frm_issuance",
+        "wf_frm_submission_attempt"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2680,6 +2723,7 @@
         "record_system"
       ],
       "downstreamDomains": [
+        "evidence_vault",
         "record_system"
       ],
       "supportDomain": false,
@@ -2691,7 +2735,10 @@
         "wf_eqms_form_submission_attempt",
         "wf_eqms_form_template_revision",
         "wf_form_schema",
-        "wf_form_submission"
+        "wf_form_submission",
+        "wf_frm_family",
+        "wf_frm_issuance",
+        "wf_frm_submission_attempt"
       ]
     },
     "record_system": {
@@ -2708,11 +2755,13 @@
         "eqms_retention_lock",
         "record_counters",
         "record_links",
-        "records"
+        "records",
+        "retention_locks"
       ],
       "primaryWorkflows": [
         "wf_allocation",
-        "wf_record_lifecycle"
+        "wf_record_lifecycle",
+        "wf_retention_lock"
       ],
       "upstreamDomains": [
         "core_system",
@@ -2735,7 +2784,8 @@
       "supportDomain": false,
       "workflows": [
         "wf_allocation",
-        "wf_record_lifecycle"
+        "wf_record_lifecycle",
+        "wf_retention_lock"
       ]
     },
     "system_infrastructure": {
@@ -2746,6 +2796,7 @@
       "description": "Biến hệ thống, naming, file, tag, comment, notification và workflow runtime.",
       "businessProcess": "Infrastructure, metadata, notification, workflow runtime, and system-level services.",
       "tables": [
+        "background_jobs",
         "comments",
         "domain_outbox_events",
         "escalation_log",
@@ -2755,6 +2806,7 @@
         "integration_monitors",
         "naming_patterns",
         "notifications",
+        "outbox_events",
         "tags",
         "variable_registry",
         "workflow_definitions",
@@ -2762,6 +2814,7 @@
         "workflow_step_data"
       ],
       "primaryWorkflows": [
+        "wf_background_job",
         "wf_idempotency_replay_ledger",
         "wf_integration_monitor",
         "wf_workflow_definition",
@@ -2778,6 +2831,7 @@
       ],
       "supportDomain": true,
       "workflows": [
+        "wf_background_job",
         "wf_idempotency_replay_ledger",
         "wf_integration_monitor",
         "wf_workflow_definition",
@@ -2833,30 +2887,47 @@
         "eqms_publication_event",
         "eqms_publication_job",
         "eqms_publication_target",
+        "evidence_artifacts",
         "evidence_chain_custody",
         "evidence_fts",
         "evidence_links",
-        "evidence_vault"
+        "evidence_publications",
+        "evidence_records",
+        "evidence_vault",
+        "evidence_versions",
+        "integrity_digests",
+        "integrity_exceptions"
       ],
       "primaryWorkflows": [
         "wf_eqms_evidence_record",
         "wf_eqms_integrity_digest",
         "wf_eqms_integrity_exception",
-        "wf_eqms_publication_job"
+        "wf_eqms_publication_job",
+        "wf_evidence_publication",
+        "wf_evidence_record",
+        "wf_integrity_digest",
+        "wf_integrity_exception"
       ],
       "upstreamDomains": [
         "core_system",
+        "forms_system",
         "foundation_governance",
         "mes_execution",
         "plm_change_control"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "plm_change_control"
+      ],
       "supportDomain": true,
       "workflows": [
         "wf_eqms_evidence_record",
         "wf_eqms_integrity_digest",
         "wf_eqms_integrity_exception",
-        "wf_eqms_publication_job"
+        "wf_eqms_publication_job",
+        "wf_evidence_publication",
+        "wf_evidence_record",
+        "wf_integrity_digest",
+        "wf_integrity_exception"
       ]
     },
     "cnc_programs": {

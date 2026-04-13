@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:28.353Z",
+    "generatedAt": "2026-04-13T13:26:30.116Z",
     "description": "Global ERP+MOM+MES+EQMS backend capability audit mapped against current registry, contracts, workflows, endpoint catalog and OpenAPI.",
     "authority": "Read-only governance artifact. Storage authority remains database/migrations/*.sql -> database/schema.sql."
   },
@@ -1039,8 +1039,8 @@
           "advanced_planning.capacity_snapshots.detail",
           "advanced_planning.capacity_snapshots.list",
           "advanced_planning.capacity_snapshots.update",
-          "finance.backdate_exceptions.create",
-          "finance.backdate_exceptions.detail"
+          "evidence_vault.integrity_exceptions.create",
+          "evidence_vault.integrity_exceptions.delete"
         ],
         "workflowPassed": true,
         "openapiTerms": [],
@@ -1613,12 +1613,14 @@
               "eqms_evidence_manifest",
               "eqms_evidence_record",
               "eqms_evidence_version",
+              "evidence_artifacts",
               "evidence_chain_custody",
               "evidence_fts",
               "evidence_links",
+              "evidence_publications",
+              "evidence_records",
               "evidence_vault",
-              "qual_compliance_evidence",
-              "trace_material_certificates"
+              "evidence_versions"
             ],
             "serviceBacked": false
           },
@@ -1662,7 +1664,8 @@
             "matches": [
               "electronic_signature",
               "electronic_signatures",
-              "eqms_electronic_signature_event"
+              "eqms_electronic_signature_event",
+              "signature_events"
             ],
             "serviceBacked": false
           }

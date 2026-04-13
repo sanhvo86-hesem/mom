@@ -186,9 +186,10 @@ final class ExcelVerificationService
             $revision = $this->extractRevisionFromFilename(basename($templatePath));
         }
 
-        $timestamp    = gmdate('Y-m-d\TH:i:s\Z');
-        $hash         = $this->computeHash($formCode, $revision, $timestamp, $userId);
         $allocationId = $allocationId ?? $this->generateUuid();
+        $timestamp    = gmdate('Y-m-d\TH:i:s\Z');
+        $templateChecksum = $this->templateChecksum($templatePath);
+        $hash         = $this->computeHash($formCode, $revision, $timestamp, $userId, $allocationId, $templateChecksum, $recordId ?? '');
 
         // Build verification data array matching spec cells A1-A20
         $verifyData = $this->buildVerificationData(
@@ -198,6 +199,7 @@ final class ExcelVerificationService
             userId:       $userId,
             hash:         $hash,
             allocationId: $allocationId,
+            templateChecksum: $templateChecksum,
             templatePath: $templatePath,
             recordId:     $recordId,
         );
@@ -275,8 +277,11 @@ final class ExcelVerificationService
         $timestamp = $data['download_timestamp'] ?? '';
         $user      = $data['download_user'] ?? '';
         $storedHash = $data['download_hash'] ?? '';
+        $allocationId = $data['allocation_id'] ?? null;
+        $templateChecksum = (string)($data['template_checksum'] ?? '');
+        $recordId = (string)($data['issued_record_id'] ?? '');
 
-        $recomputed = $this->computeHash($formCode, $revision, $timestamp, $user);
+        $recomputed = $this->computeHash($formCode, $revision, $timestamp, $user, (string)($allocationId ?? ''), $templateChecksum, $recordId);
 
         if (!hash_equals($recomputed, $storedHash)) {
             return new VerificationResult(
@@ -291,7 +296,6 @@ final class ExcelVerificationService
         }
 
         // Verify allocation exists and is in an uploadable state
-        $allocationId = $data['allocation_id'] ?? null;
         if ($allocationId !== null) {
             $allocCheck = $this->checkAllocationStatus($allocationId);
             if ($allocCheck !== null) {
@@ -408,9 +412,12 @@ final class ExcelVerificationService
         string $revision,
         string $timestamp,
         string $user,
+        string $allocationId = '',
+        string $templateChecksum = '',
+        string $recordId = '',
     ): string {
         $salt    = $this->getServerSalt();
-        $payload = implode('|', [$formCode, $revision, $timestamp, $user, $salt]);
+        $payload = implode('|', [$formCode, $revision, $timestamp, $user, $allocationId, $templateChecksum, $recordId, $salt]);
 
         return hash('sha256', $payload);
     }
@@ -442,6 +449,16 @@ final class ExcelVerificationService
         }
 
         return self::DEFAULT_SALT;
+    }
+
+    private function templateChecksum(string $templatePath): string
+    {
+        if (!is_file($templatePath)) {
+            return '';
+        }
+
+        $hash = hash_file('sha256', $templatePath);
+        return is_string($hash) ? $hash : '';
     }
 
     /**
@@ -722,13 +739,10 @@ final class ExcelVerificationService
         string  $userId,
         string  $hash,
         string  $allocationId,
+        string  $templateChecksum,
         string  $templatePath,
         ?string $recordId,
     ): array {
-        $templateChecksum = is_file($templatePath)
-            ? hash_file('sha256', $templatePath)
-            : '';
-
         $filenamePattern = '^' . preg_quote($formCode, '/') . '_'
             . preg_quote($revision, '/') . '_.*\\.xlsx$';
 

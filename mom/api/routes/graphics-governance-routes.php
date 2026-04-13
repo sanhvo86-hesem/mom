@@ -37,6 +37,12 @@ return static function (Router $router, string $dataDir): void {
         'graphics_waiver_expire'              => [GraphicsGovernanceController::class, 'expireWaiver'],
         'graphics_waivers_active'             => [GraphicsGovernanceController::class, 'activeWaivers'],
         'graphics_release_blockers_get'        => [GraphicsGovernanceController::class, 'releaseBlockers'],
+        'graphics_change_set_get'              => [GraphicsGovernanceController::class, 'changeSetModel'],
+        'graphics_lineage_get'                 => [GraphicsGovernanceController::class, 'lineageGraph'],
+        'graphics_runtime_beacon_get'          => [GraphicsGovernanceController::class, 'runtimeBeacon'],
+        'graphics_debt_observatory_get'        => [GraphicsGovernanceController::class, 'debtObservatory'],
+        'graphics_environment_policy_packs_get'=> [GraphicsGovernanceController::class, 'environmentPolicyPacks'],
+        'graphics_release_dashboard_get'       => [GraphicsGovernanceController::class, 'releaseDashboard'],
 
         'admin_template_registry_get'          => [GraphicsGovernanceController::class, 'listTemplates'],
         'admin_template_get'                   => [GraphicsGovernanceController::class, 'getTemplate'],
@@ -61,6 +67,12 @@ return static function (Router $router, string $dataDir): void {
         'admin_graphics_waiver_expire'         => [GraphicsGovernanceController::class, 'expireWaiver'],
         'admin_graphics_waiver_active_get'     => [GraphicsGovernanceController::class, 'activeWaivers'],
         'admin_graphics_release_blockers_get'  => [GraphicsGovernanceController::class, 'releaseBlockers'],
+        'admin_graphics_change_set_get'        => [GraphicsGovernanceController::class, 'changeSetModel'],
+        'admin_graphics_lineage_get'           => [GraphicsGovernanceController::class, 'lineageGraph'],
+        'admin_graphics_runtime_beacon_get'    => [GraphicsGovernanceController::class, 'runtimeBeacon'],
+        'admin_graphics_debt_observatory_get'  => [GraphicsGovernanceController::class, 'debtObservatory'],
+        'admin_graphics_environment_policy_packs_get' => [GraphicsGovernanceController::class, 'environmentPolicyPacks'],
+        'admin_graphics_release_dashboard_get' => [GraphicsGovernanceController::class, 'releaseDashboard'],
     ]);
 
     $router->get('/api/graphics/design-config', GraphicsGovernanceController::class, 'getDesignConfig');
@@ -85,6 +97,12 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/graphics/compliance/debt', GraphicsGovernanceController::class, 'debtReport');
     $router->get('/api/graphics/drift', GraphicsGovernanceController::class, 'driftReport');
     $router->get('/api/graphics/release-blockers', GraphicsGovernanceController::class, 'releaseBlockers');
+    $router->get('/api/graphics/change-set', GraphicsGovernanceController::class, 'changeSetModel');
+    $router->get('/api/graphics/lineage', GraphicsGovernanceController::class, 'lineageGraph');
+    $router->get('/api/graphics/runtime-beacon', GraphicsGovernanceController::class, 'runtimeBeacon');
+    $router->get('/api/graphics/debt-observatory', GraphicsGovernanceController::class, 'debtObservatory');
+    $router->get('/api/graphics/environment-policy-packs', GraphicsGovernanceController::class, 'environmentPolicyPacks');
+    $router->get('/api/graphics/release-dashboard', GraphicsGovernanceController::class, 'releaseDashboard');
 
     $router->post('/api/graphics/impact/token', GraphicsGovernanceController::class, 'analyzeTokenImpact');
     $router->post('/api/graphics/impact/template', GraphicsGovernanceController::class, 'analyzeTemplateImpact');

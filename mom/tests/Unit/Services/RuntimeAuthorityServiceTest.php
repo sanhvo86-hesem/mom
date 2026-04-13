@@ -47,6 +47,7 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('authoritative_ready', $report['slices']['production_history']['readiness_state']);
         $this->assertSame('authority_partial', $report['slices']['workforce_qualification_gate']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['trusted_release_record']['readiness_state']);
+        $this->assertSame('authority_partial', $report['slices']['connected_governance']['readiness_state']);
         $this->assertSame('json_fallback', $report['slices']['order_workflow']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['master_data']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['manufacturing_events']['authority_mode']);
@@ -54,6 +55,7 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $this->assertSame('event_ledger_read_model', $report['slices']['production_history']['authority_mode']);
         $this->assertSame('service_invariant_no_requirements', $report['slices']['workforce_qualification_gate']['authority_mode']);
         $this->assertSame('json_fallback', $report['slices']['trusted_release_record']['authority_mode']);
+        $this->assertSame('json_fallback', $report['slices']['connected_governance']['authority_mode']);
     }
 
     public function testReportMarksExpectedPostgresIdempotencyFallbackAsDegraded(): void

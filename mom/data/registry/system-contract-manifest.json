@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T12:23:49.092Z",
+    "generatedAt": "2026-04-13T13:26:34.581Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546",
+    "publication_run_id": "ce560843-acd2-4cf7-a149-ac14b2b6ba21",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,19 +24,19 @@
     "purpose": "Single manifest for the full read-only backend contract layer."
   },
   "summary": {
-    "tableCount": 694,
-    "relationCount": 3174,
-    "relationEntityCount": 694,
-    "endpointCount": 3808,
-    "endpointBoundTableCount": 694,
-    "workflowCount": 294,
-    "workflowEligibleTableCount": 346,
-    "workflowBoundTableCount": 314,
-    "workflowBindingCoveragePercent": 91,
-    "statusManagedTableCount": 327,
-    "supportTableCount": 114,
+    "tableCount": 724,
+    "relationCount": 3225,
+    "relationEntityCount": 724,
+    "endpointCount": 3983,
+    "endpointBoundTableCount": 724,
+    "workflowCount": 311,
+    "workflowEligibleTableCount": 371,
+    "workflowBoundTableCount": 331,
+    "workflowBindingCoveragePercent": 89,
+    "statusManagedTableCount": 352,
+    "supportTableCount": 121,
     "domainCount": 49,
-    "contractCount": 694,
+    "contractCount": 724,
     "criticalGapCount": 0,
     "warningCount": 3,
     "capabilityCount": 18,
@@ -47,11 +47,11 @@
     "graphicsReleaseBlockerCount": 3,
     "graphicsGovernanceReleaseBlocked": true,
     "releaseReadinessScore": 85,
-    "projectionCount": 694,
-    "fieldCount": 13156,
+    "projectionCount": 724,
+    "fieldCount": 13727,
     "canonicalCoveragePercent": 100,
     "registrySyncScore": 100,
-    "rlsTableCount": 546
+    "rlsTableCount": 557
   },
   "artifacts": {
     "runtimeProjections": "data/registry/system-contract-runtime-projections.json",
@@ -77,7 +77,7 @@
     "endpointSource": "data/registry/endpoint-catalog.json",
     "workflowSource": "data/registry/workflow-library.json",
     "relationSource": "data/registry/relation-map.json",
-    "registryManifestRunId": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546",
+    "registryManifestRunId": "ce560843-acd2-4cf7-a149-ac14b2b6ba21",
     "graphicsGovernanceSource": "data/registry/graphics-governance-registry.json"
   },
   "deletePolicy": {

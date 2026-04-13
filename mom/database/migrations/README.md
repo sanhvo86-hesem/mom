@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains ordered PostgreSQL migration files that compose the full HESEM MOM/ERP/MES/eQMS database schema. The migration set now spans `001` through `098`, and the current authority registry tracks the full platform contract across ERP, MOM, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, finance, quality, maintenance, analytics, runtime idempotency, and canonical manufacturing event backbone domains.
+This directory contains ordered PostgreSQL migration files that compose the full HESEM MOM/ERP/MES/eQMS database schema. The migration set now spans `001` through `106`, and the current authority registry tracks the full platform contract across ERP, MOM, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, finance, quality, maintenance, analytics, runtime idempotency, canonical manufacturing event backbone, trusted release record, connected governance, and eQMS control-plane domains.
 
 ## Prerequisites
 
@@ -53,7 +53,7 @@ This directory contains ordered PostgreSQL migration files that compose the full
 | `061`-`068` | Quality lab/compliance, EHS/ESG, manufacturing engineering, MDM, pricing/contracts, traceability, outsource execution, advanced trade compliance |
 | `069`-`071` | Lean manufacturing uplift, enterprise governance uplift, and MES identity hardening |
 | `072`-`078` | Canonical ERP + MES + eQMS 7-layer backbone: foundation, master data, engineering, planning, MES execution, inventory/traceability, and eQMS compliance |
-| `079`-`098` | Runtime hardening, JSON seed migration, enum reconciliation, allocation/procurement/quality projections, canonical logistics/EHS/finance/analytics projections, lineage governance, risk-register contract reconciliation, runtime-observed contract columns, production department-code alignment, authoritative idempotency replay ledger, and canonical manufacturing operational event ledger |
+| `079`-`106` | Runtime hardening, JSON seed migration, enum reconciliation, allocation/procurement/quality projections, canonical logistics/EHS/finance/analytics projections, lineage governance, risk-register contract reconciliation, runtime-observed contract columns, production department-code alignment, authoritative idempotency replay ledger, canonical manufacturing operational event ledger, trusted release record spine, eQMS control plane, and connected revision-training-execution governance |
 
 ## Running Migrations
 
@@ -98,7 +98,7 @@ done
 
 ## Rolling Back
 
-Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`098` first, then `097`, and so on).
+Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`106` first, then `105`, and so on).
 
 ## Notes
 
@@ -107,4 +107,4 @@ Each migration file contains rollback instructions in comments at the bottom of 
 - The `020_indexes.sql` file creates all indexes; if running tables and indexes together, you can skip the inline index creation in table files (they are duplicated in 020 for the split-file approach)
 - Partitioned tables (audit_events, inventory_transactions, labor_transactions) include partition definitions in their respective migration files
 - Production-like databases with existing untracked data must use `mom/tools/schema/probe_live_db_promotion.sh` first and `mom/tools/schema/apply_live_db_promotion.sh --execute` only after the clone probe reaches `dataschema_status=aligned`.
-- The current migration set contains `001` through `098`, with the internal `schema_migrations` ledger, the authoritative idempotency replay ledger, and the canonical manufacturing operational event ledger. This is the ERP+MOM/MES/eQMS system contract authority used by Data Schema.
+- The current migration set contains `001` through `106`, with the internal `schema_migrations` ledger, the authoritative idempotency replay ledger, canonical manufacturing operational event ledger, trusted release record spine, eQMS control-plane tables, and connected governance revision/training/execution tables. This is the ERP+MOM/MES/eQMS system contract authority used by Data Schema.

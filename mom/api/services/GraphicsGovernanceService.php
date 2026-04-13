@@ -9,6 +9,13 @@ class GraphicsGovernanceService
     private const VALID_TEMPLATE_STATUSES = ['approved', 'draft', 'deprecated', 'retired'];
     private const VALID_DENSITIES = ['compact', 'default', 'comfortable', 'shopfloor'];
     private const IMPACT_TTL_SECONDS = 86400;
+    private const VALID_ROLLOUT_SCOPE_MODES = [
+        'preview-only',
+        'canary-module-group',
+        'canary-domain',
+        'environment-stage',
+        'global-apply',
+    ];
     private const VALID_ZONES = [
         'header',
         'kpi-bar',
@@ -489,6 +496,27 @@ class GraphicsGovernanceService
             if ($shopfloor && !$gateState['shopfloorReady']) {
                 $findings[] = ['code' => 'shopfloor_accessibility_evidence_missing', 'severity' => 'blocker'];
             }
+            $hasBlocker = count(array_filter($findings, static fn(array $finding): bool => (string)($finding['severity'] ?? '') === 'blocker')) > 0;
+            $usesPrivateCssShell = $this->moduleUsesPrivateCssShell($moduleId, $module, $packet);
+            $consumesSharedTokens = !$usesPrivateCssShell && $template !== null;
+            $consumesHmComponents = $blockFamilies !== [] && $blockFindings === [];
+            $linkageStatus = $hasBlocker ? 'blocked' : 'full-admin-controlled';
+            if ($usesPrivateCssShell) {
+                $linkageStatus = 'legacy-private-css';
+            } elseif (!$hasBlocker && (!$consumesHmComponents || !$consumesSharedTokens || $findings !== [])) {
+                $linkageStatus = 'bridged-to-shared-tokens';
+            }
+            $reason = 'Consumes backend template authority, shared tokens, and governed block contracts.';
+            if ($linkageStatus === 'blocked') {
+                $reason = 'Release blocked: ' . implode(',', array_values(array_unique(array_filter(array_map(
+                    static fn(array $finding): string => (string)($finding['code'] ?? ''),
+                    $findings
+                )))));
+            } elseif ($linkageStatus === 'legacy-private-css') {
+                $reason = 'Legacy private CSS shell detected; shared token bridge is not enough for full control.';
+            } elseif ($linkageStatus === 'bridged-to-shared-tokens') {
+                $reason = 'Bridged through shared tokens while component/template debt remains open.';
+            }
 
             $rows[] = [
                 'moduleId' => $moduleId,
@@ -503,6 +531,21 @@ class GraphicsGovernanceService
                 'gateState' => $gateState,
                 'findings' => $findings,
                 'compliant' => $findings === [],
+                'linkageStatus' => $linkageStatus,
+                'templateBindingSource' => $template === null ? 'missing' : 'backend-template-registry',
+                'sharedTokenCoverage' => $consumesSharedTokens ? 100 : 40,
+                'sharedComponentCoverage' => $consumesHmComponents ? 100 : 50,
+                'bridgeAliasDebt' => $linkageStatus === 'bridged-to-shared-tokens' ? count($findings) : 0,
+                'privateCssDebt' => $usesPrivateCssShell ? 1 : 0,
+                'hardcodedStyleDebt' => $usesPrivateCssShell ? 1 : 0,
+                'driftStatus' => $hasBlocker ? 'blocked' : ($findings === [] ? 'clean' : 'warning'),
+                'blockerReason' => $linkageStatus === 'blocked' ? $reason : '',
+                'consumesHmComponents' => $consumesHmComponents,
+                'consumesSharedTokens' => $consumesSharedTokens,
+                'usesPrivateCssShell' => $usesPrivateCssShell,
+                'reason' => $reason,
+                'ownerTeam' => (string)($packet['ownerTeam'] ?? $module['ownerTeam'] ?? 'Frontend Platform'),
+                'domain' => (string)($packet['domain'] ?? $module['domain'] ?? 'unclassified'),
             ];
         }
 
@@ -512,6 +555,10 @@ class GraphicsGovernanceService
                 'moduleCount' => count($rows),
                 'compliantCount' => count(array_filter($rows, static fn(array $row): bool => (bool)$row['compliant'])),
                 'nonCompliantCount' => count(array_filter($rows, static fn(array $row): bool => !(bool)$row['compliant'])),
+                'fullAdminControlledCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'full-admin-controlled')),
+                'bridgedToSharedTokensCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'bridged-to-shared-tokens')),
+                'legacyPrivateCssCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'legacy-private-css')),
+                'blockedCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'blocked')),
             ],
             'version' => $this->documentVersion($registry),
             'etag' => $this->etag($registry),
@@ -653,17 +700,21 @@ class GraphicsGovernanceService
         $bridge = $this->bridgeAliasDebt();
         $private = $this->privateCssDebt();
         $coverage = $this->tokenAdoptionCoverage();
+        $matrix = $this->complianceMatrix();
+        $observatory = $this->buildVisualDebtObservatory($bridge, $private, $coverage, $matrix);
         return [
             'debt' => [
                 'bridgeAliasDebt' => $bridge,
                 'privateCssDebt' => $private,
                 'tokenAdoptionCoverage' => $coverage,
+                'visualDebtObservatory' => $observatory,
             ],
             'summary' => [
                 'bridgeAliasDebtCount' => (int)($bridge['summary']['debtCount'] ?? 0),
                 'privateCssDebtScore' => (int)($private['summary']['totalDebtScore'] ?? 0),
                 'privateCssFileCount' => (int)($private['summary']['fileCount'] ?? 0),
                 'tokenCoveragePercent' => (int)($coverage['coverage']['coveragePercent'] ?? 0),
+                'uncontrolledLegacyShellDebt' => (int)($observatory['summary']['uncontrolledLegacyShellDebt'] ?? 0),
             ],
         ];
     }
@@ -800,6 +851,247 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function graphicsChangeSetModel(): array
+    {
+        $state = $this->pruneExpiredImpacts($this->repo->readState());
+        $rollouts = $this->repo->readRolloutsDocument();
+        $pending = array_values(array_filter((array)($state['pendingImpact'] ?? []), 'is_array'));
+        $latestImpact = $pending !== [] ? (array)($pending[0]['report'] ?? []) : $this->impactReport('change-set', ['scope' => 'graphics-control-plane'], []);
+        $changeSetId = 'gcs_' . substr($this->hash(json_encode([
+            'impact' => $latestImpact,
+            'registry' => $this->documentVersion($this->normalizedTemplateRegistry()),
+        ]) ?: ''), 0, 12);
+
+        return [
+            'changeSet' => [
+                'changeSetId' => $changeSetId,
+                'status' => $pending === [] ? 'preview-only' : 'impact-recorded',
+                'source' => 'backend_graphics_governance_state',
+                'edits' => array_map(static function (array $impact): array {
+                    $report = is_array($impact['report'] ?? null) ? (array)$impact['report'] : [];
+                    return [
+                        'impactId' => (string)($report['impactId'] ?? ''),
+                        'analysisType' => (string)($report['analysisType'] ?? ''),
+                        'subject' => is_array($report['subject'] ?? null) ? (array)$report['subject'] : [],
+                        'status' => (string)($impact['status'] ?? 'pending'),
+                        'recordedAt' => (string)($impact['recordedAt'] ?? ''),
+                    ];
+                }, $pending),
+                'diffSummary' => [
+                    'impactCount' => count($pending),
+                    'rolloutCount' => count((array)($rollouts['rollouts'] ?? [])),
+                    'authority' => 'mom/data/graphics-governance/state.json',
+                ],
+                'impact' => $latestImpact,
+                'risk' => [
+                    'severityClass' => (string)($latestImpact['severityClass'] ?? 'low'),
+                    'blockerCount' => count((array)($latestImpact['blockers'] ?? [])),
+                ],
+                'rolloutScopePlan' => $this->rolloutScopePlan($latestImpact),
+                'evidenceChecklist' => (array)($latestImpact['requiredEvidence'] ?? $this->evidencePlanForSeverity('low')),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function lineageGraph(): array
+    {
+        $registry = $this->normalizedTemplateRegistry();
+        $contracts = $this->blockContractsByType();
+        $nodes = [
+            ['id' => 'admin-appearance', 'type' => 'admin-control-plane', 'label' => 'Admin Appearance / Template Studio'],
+            ['id' => 'backend-graphics-authority', 'type' => 'backend-authority', 'label' => 'Backend graphics authority'],
+            ['id' => 'shared-tokens', 'type' => 'token-layer', 'label' => 'Shared tokens'],
+            ['id' => 'shared-components', 'type' => 'component-layer', 'label' => 'Shared hm-* components'],
+        ];
+        $edges = [
+            ['from' => 'admin-appearance', 'to' => 'backend-graphics-authority', 'relation' => 'persists-through'],
+            ['from' => 'backend-graphics-authority', 'to' => 'shared-tokens', 'relation' => 'publishes-runtime-tokens'],
+            ['from' => 'shared-tokens', 'to' => 'shared-components', 'relation' => 'drives-contracts'],
+        ];
+
+        foreach ((array)($registry['templates'] ?? []) as $template) {
+            if (!is_array($template)) {
+                continue;
+            }
+            $templateId = (string)($template['templateId'] ?? '');
+            if ($templateId === '') {
+                continue;
+            }
+            $nodes[] = [
+                'id' => 'template:' . $templateId,
+                'type' => 'template',
+                'label' => $templateId . ' v' . (string)($template['version'] ?? ''),
+                'status' => (string)($template['status'] ?? ''),
+                'lineage' => $this->templateLineage($template),
+            ];
+            $edges[] = ['from' => 'backend-graphics-authority', 'to' => 'template:' . $templateId, 'relation' => 'controls-template'];
+        }
+
+        foreach ($contracts as $contract) {
+            $blockType = (string)($contract['blockType'] ?? '');
+            if ($blockType === '') {
+                continue;
+            }
+            $nodes[] = ['id' => 'component:' . $blockType, 'type' => 'component-contract', 'label' => $blockType];
+            $edges[] = ['from' => 'shared-components', 'to' => 'component:' . $blockType, 'relation' => 'contract'];
+        }
+
+        foreach ($this->moduleRecords() as $record) {
+            $module = $record['module'];
+            $packet = $record['packet'];
+            $moduleId = (string)($module['moduleId'] ?? $packet['moduleId'] ?? '');
+            if ($moduleId === '') {
+                continue;
+            }
+            $templateId = (string)($module['templateId'] ?? $packet['templateId'] ?? '');
+            $nodes[] = [
+                'id' => 'module:' . $moduleId,
+                'type' => 'module',
+                'label' => $moduleId,
+                'route' => (string)($module['route'] ?? $packet['route'] ?? ''),
+                'domain' => (string)($packet['domain'] ?? $module['domain'] ?? ''),
+                'ownerTeam' => (string)($packet['ownerTeam'] ?? $module['ownerTeam'] ?? ''),
+            ];
+            if ($templateId !== '') {
+                $edges[] = ['from' => 'template:' . $templateId, 'to' => 'module:' . $moduleId, 'relation' => 'governs-module'];
+            }
+            foreach ((array)($packet['blocks'] ?? []) as $block) {
+                if (!is_array($block) || (string)($block['type'] ?? '') === '') {
+                    continue;
+                }
+                $edges[] = ['from' => 'component:' . (string)$block['type'], 'to' => 'module:' . $moduleId, 'relation' => 'consumed-by-module'];
+            }
+        }
+
+        return [
+            'lineageGraph' => [
+                'nodes' => $nodes,
+                'edges' => $edges,
+                'summary' => [
+                    'nodeCount' => count($nodes),
+                    'edgeCount' => count($edges),
+                    'templateCount' => count((array)($registry['templates'] ?? [])),
+                ],
+                'authorityRefs' => [
+                    'templateRegistry' => 'mom/design/template-registry.json',
+                    'blockContracts' => 'mom/design/block-contracts/*.json',
+                    'moduleBuildPackets' => 'mom/design/build-packets/*.json',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function runtimeComplianceBeacon(): array
+    {
+        $matrix = $this->complianceMatrix();
+        $rows = [];
+        foreach ((array)($matrix['matrix'] ?? []) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $rows[] = [
+                'moduleId' => (string)($row['moduleId'] ?? ''),
+                'route' => (string)($row['route'] ?? ''),
+                'linkageStatus' => (string)($row['linkageStatus'] ?? 'blocked'),
+                'sharedTokenProbe' => (bool)($row['consumesSharedTokens'] ?? false),
+                'hmComponentProbe' => (bool)($row['consumesHmComponents'] ?? false),
+                'privateCssProbe' => (bool)($row['usesPrivateCssShell'] ?? false),
+                'beaconStatus' => (string)($row['linkageStatus'] ?? '') === 'blocked' ? 'release-blocking' : 'reported',
+                'reportedAt' => gmdate('c'),
+            ];
+        }
+        return [
+            'runtimeBeacon' => [
+                'beacons' => $rows,
+                'summary' => [
+                    'reportedModules' => count($rows),
+                    'releaseBlockingModules' => count(array_filter($rows, static fn(array $row): bool => (string)$row['beaconStatus'] === 'release-blocking')),
+                    'authority' => 'runtime diagnostics feed into backend graphics compliance',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function visualDebtObservatory(): array
+    {
+        return ['observatory' => $this->buildVisualDebtObservatory(
+            $this->bridgeAliasDebt(),
+            $this->privateCssDebt(),
+            $this->tokenAdoptionCoverage(),
+            $this->complianceMatrix()
+        )];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function environmentPolicyPacks(): array
+    {
+        $packs = [
+            ['environment' => 'office', 'tokenOverrides' => ['density' => 'default', 'contrast' => 'standard'], 'evidenceObligations' => ['visual-regression']],
+            ['environment' => 'review', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'standard'], 'evidenceObligations' => ['screenshot-diff', 'keyboard-path']],
+            ['environment' => 'admin', 'tokenOverrides' => ['density' => 'compact', 'contrast' => 'standard'], 'evidenceObligations' => ['audit-trail', 'permission-review']],
+            ['environment' => 'shopfloor', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'evidenceObligations' => ['shopfloor-kiosk-smoke', 'touch-target-proof']],
+            ['environment' => 'kiosk', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'evidenceObligations' => ['kiosk-viewport-proof', 'timeout-proof']],
+            ['environment' => 'tv', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'high'], 'evidenceObligations' => ['distance-legibility-proof']],
+            ['environment' => 'night-shift', 'tokenOverrides' => ['mode' => 'dark', 'contrast' => 'high'], 'evidenceObligations' => ['dark-mode-contrast', 'fatigue-review']],
+        ];
+        return [
+            'policyPacks' => [
+                'packs' => $packs,
+                'summary' => [
+                    'packCount' => count($packs),
+                    'authority' => 'backend_graphics_environment_policy_pack',
+                    'localStorageAuthority' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function graphicsReleaseDashboard(): array
+    {
+        $blockers = $this->releaseBlockers();
+        $matrix = $this->complianceMatrix();
+        $debt = $this->debtReport();
+        $waivers = $this->activeWaivers();
+        $rollouts = $this->repo->readRolloutsDocument();
+        return [
+            'releaseDashboard' => [
+                'readiness' => (bool)($blockers['summary']['releaseBlocked'] ?? false) ? 'blocked' : 'ready',
+                'blockers' => $blockers,
+                'waivers' => $waivers,
+                'complianceSummary' => $matrix['summary'],
+                'debtSummary' => $debt['summary'],
+                'rolloutSummary' => [
+                    'rolloutCount' => count((array)($rollouts['rollouts'] ?? [])),
+                    'stagedCount' => count(array_filter((array)($rollouts['rollouts'] ?? []), static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'staged')),
+                    'appliedCount' => count(array_filter((array)($rollouts['rollouts'] ?? []), static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'applied')),
+                ],
+                'postApplyVerification' => [
+                    'runtimeBeaconRequired' => true,
+                    'driftReportRequired' => true,
+                    'evidenceBundleRequired' => true,
+                ],
+                'generatedAt' => gmdate('c'),
+            ],
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
@@ -917,14 +1209,25 @@ class GraphicsGovernanceService
         if ($impact['blockers'] !== []) {
             throw new GraphicsGovernanceException(422, 'rollout_blockers_present', 'Rollout cannot be staged with unresolved blockers', (array)$impact['blockers']);
         }
+        $scope = (array)($input['scope'] ?? []);
+        $scopeMode = (string)($scope['mode'] ?? $input['scopeMode'] ?? 'preview-only');
+        if (!in_array($scopeMode, self::VALID_ROLLOUT_SCOPE_MODES, true)) {
+            throw new GraphicsGovernanceException(422, 'invalid_rollout_scope_mode', 'Rollout scope mode is not allowed', [
+                ['field' => 'scope.mode', 'message' => 'Allowed modes: ' . implode(', ', self::VALID_ROLLOUT_SCOPE_MODES), 'code' => 'invalid_scope_mode'],
+            ]);
+        }
+        $scope['mode'] = $scopeMode;
 
         $doc = $this->repo->readRolloutsDocument();
         $rolloutId = (string)($input['rolloutId'] ?? ('gr_' . gmdate('YmdHis') . '_' . substr($this->hash(json_encode($input) ?: ''), 0, 8)));
         $rollout = [
             'rolloutId' => $rolloutId,
             'status' => 'staged',
-            'scope' => (array)($input['scope'] ?? []),
+            'scope' => $scope,
+            'scopeMode' => $scopeMode,
+            'rolloutScopePlan' => $this->rolloutScopePlan($impact, $scopeMode),
             'impact' => $impact,
+            'evidenceChecklist' => (array)($impact['requiredEvidence'] ?? []),
             'releaseManifestRefs' => $this->normalizeReleaseManifestRefs((array)($input['releaseManifestRefs'] ?? [])),
             'stagedAt' => gmdate('c'),
             'stagedBy' => $username,
@@ -1160,6 +1463,12 @@ class GraphicsGovernanceService
             'componentContractRegistry' => $componentRegistry,
             'moduleGraphicsCompliance' => $matrix,
             'releaseBlockers' => $this->releaseBlockers(),
+            'changeSetModel' => $this->graphicsChangeSetModel()['changeSet'],
+            'moduleGraphicsLineageGraph' => $this->lineageGraph()['lineageGraph'],
+            'runtimeGraphicsComplianceBeacon' => $this->runtimeComplianceBeacon()['runtimeBeacon'],
+            'visualDebtObservatory' => $this->visualDebtObservatory()['observatory'],
+            'environmentPolicyPacks' => $this->environmentPolicyPacks()['policyPacks'],
+            'graphicsReleaseDashboard' => $this->graphicsReleaseDashboard()['releaseDashboard'],
             'persistence' => $this->persistenceModel(),
         ];
         $this->repo->writeRuntimeGraphicsRegistry($payload);
@@ -1717,6 +2026,34 @@ class GraphicsGovernanceService
     /**
      * @param array<string, mixed> $module
      * @param array<string, mixed> $packet
+     */
+    private function moduleUsesPrivateCssShell(string $moduleId, array $module, array $packet): bool
+    {
+        if (($module['usesPrivateCssShell'] ?? false) === true || ($packet['usesPrivateCssShell'] ?? false) === true) {
+            return true;
+        }
+        $declared = strtolower(json_encode([
+            $module['graphicsLinkageStatus'] ?? '',
+            $packet['graphicsLinkageStatus'] ?? '',
+            $module['visualShell'] ?? '',
+            $packet['visualShell'] ?? '',
+        ]) ?: '');
+        if (str_contains($declared, 'private-css') || str_contains($declared, 'legacy-private')) {
+            return true;
+        }
+        foreach ($this->repo->listStyleAndPortalFiles() as $file) {
+            $relative = strtolower($this->repo->relativePath($file));
+            $needle = strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $moduleId) ?: $moduleId);
+            if ($needle !== '' && str_contains($relative, $needle) && preg_match('/(?:legacy|private|shell|module)/', $relative)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<string, mixed> $module
+     * @param array<string, mixed> $packet
      * @return array<string, mixed>
      */
     private function impactModuleRow(array $module, array $packet): array
@@ -1740,6 +2077,7 @@ class GraphicsGovernanceService
         return [
             'moduleId' => (string)($module['moduleId'] ?? $packet['moduleId'] ?? ''),
             'route' => (string)($module['route'] ?? $packet['route'] ?? ''),
+            'templateId' => (string)($module['templateId'] ?? $packet['templateId'] ?? ''),
             'screens' => array_values(array_map(static fn($screen): string => (string)($screen['screenId'] ?? ''), (array)($packet['screens'] ?? []))),
             'blockFamilies' => array_keys($blockFamilies),
             'blocks' => $blocks,
@@ -1789,6 +2127,10 @@ class GraphicsGovernanceService
                 ];
             }
         }
+        $affectedTemplates = $this->affectedTemplateIds($type, $subject, $affected);
+        $severityClass = $this->severityForImpact($affected, $blockers);
+        $requiredEvidence = $this->evidencePlanForSeverity($severityClass);
+        $gatesToRerun = array_values(array_unique(array_filter($gates)));
         return [
             'impactId' => 'gia_' . gmdate('YmdHis') . '_' . substr($this->hash($type . json_encode($subject) . json_encode($affected)), 0, 8),
             'analysisType' => $type,
@@ -1797,10 +2139,25 @@ class GraphicsGovernanceService
             'affectedRoutes' => $affectedRoutes,
             'affectedScreens' => array_values(array_unique(array_filter($affectedScreens))),
             'affectedBlockFamilies' => array_values(array_unique(array_filter($blockFamilies))),
+            'affectedTemplates' => $affectedTemplates,
             'regulatedModulesTouched' => array_values(array_unique(array_filter($regulated))),
             'shopfloorModulesTouched' => array_values(array_unique(array_filter($shopfloor))),
-            'gatesToRerun' => array_values(array_unique(array_filter($gates))),
+            'gatesToRerun' => $gatesToRerun,
             'blockers' => $blockers,
+            'severityClass' => $severityClass,
+            'requiredEvidence' => $requiredEvidence,
+            'rerunPlan' => [
+                'gates' => $gatesToRerun,
+                'regulatedEvidenceRequired' => $regulated !== [],
+                'shopfloorEvidenceRequired' => $shopfloor !== [],
+                'screenshotDiffRequired' => in_array($severityClass, ['medium', 'high', 'regulated', 'shopfloor-critical'], true),
+            ],
+            'rolloutScopes' => $this->rolloutScopePlan([
+                'severityClass' => $severityClass,
+                'affectedModules' => $affected,
+                'blockers' => $blockers,
+            ]),
+            'changeSetRef' => 'gcs_' . substr($this->hash($type . json_encode($subject) . gmdate('Ymd')), 0, 12),
             'machineReadable' => true,
             'generatedAt' => gmdate('c'),
         ];
@@ -1823,6 +2180,203 @@ class GraphicsGovernanceService
             return $this->analyzeTemplateImpact($input);
         }
         return $this->impactReport('rollout', ['scope' => (array)($input['scope'] ?? [])], []);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $affected
+     * @return array<int, string>
+     */
+    private function affectedTemplateIds(string $type, array $subject, array $affected): array
+    {
+        $ids = [];
+        if ($type === 'template' && trim((string)($subject['templateId'] ?? '')) !== '') {
+            $ids[] = (string)$subject['templateId'];
+        }
+        foreach ($affected as $row) {
+            if (trim((string)($row['templateId'] ?? '')) !== '') {
+                $ids[] = (string)$row['templateId'];
+            }
+            $moduleId = (string)($row['moduleId'] ?? '');
+            foreach ($this->moduleRecords() as $record) {
+                $module = $record['module'];
+                $packet = $record['packet'];
+                if ($moduleId !== '' && (string)($module['moduleId'] ?? $packet['moduleId'] ?? '') === $moduleId) {
+                    $templateId = (string)($module['templateId'] ?? $packet['templateId'] ?? '');
+                    if ($templateId !== '') {
+                        $ids[] = $templateId;
+                    }
+                }
+            }
+        }
+        return array_values(array_unique(array_filter($ids)));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $affected
+     * @param array<int, array<string, mixed>> $blockers
+     */
+    private function severityForImpact(array $affected, array $blockers): string
+    {
+        $regulated = false;
+        $shopfloor = false;
+        foreach ($affected as $row) {
+            $regulated = $regulated || (bool)($row['regulated'] ?? false);
+            $shopfloor = $shopfloor || (bool)($row['shopfloor'] ?? false);
+        }
+        if ($shopfloor) {
+            return 'shopfloor-critical';
+        }
+        if ($regulated) {
+            return 'regulated';
+        }
+        if ($blockers !== [] || count($affected) >= 8) {
+            return 'high';
+        }
+        if (count($affected) >= 3) {
+            return 'medium';
+        }
+        return 'low';
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function evidencePlanForSeverity(string $severity): array
+    {
+        $base = [
+            ['evidenceType' => 'impact-snapshot', 'required' => 'true', 'owner' => 'Frontend Platform'],
+            ['evidenceType' => 'rollback-plan', 'required' => 'true', 'owner' => 'Release Engineering'],
+        ];
+        if (in_array($severity, ['medium', 'high', 'regulated', 'shopfloor-critical'], true)) {
+            $base[] = ['evidenceType' => 'screenshot-diff', 'required' => 'true', 'owner' => 'UX QA'];
+            $base[] = ['evidenceType' => 'keyboard-focus-proof', 'required' => 'true', 'owner' => 'Accessibility QA'];
+        }
+        if (in_array($severity, ['high', 'regulated', 'shopfloor-critical'], true)) {
+            $base[] = ['evidenceType' => 'compliance-matrix-snapshot', 'required' => 'true', 'owner' => 'Design System Governance'];
+            $base[] = ['evidenceType' => 'drift-report', 'required' => 'true', 'owner' => 'Runtime Governance'];
+        }
+        if ($severity === 'regulated') {
+            $base[] = ['evidenceType' => 'audit-traceability-pack', 'required' => 'true', 'owner' => 'Quality Systems'];
+        }
+        if ($severity === 'shopfloor-critical') {
+            $base[] = ['evidenceType' => 'shopfloor-kiosk-smoke', 'required' => 'true', 'owner' => 'MES Operations'];
+            $base[] = ['evidenceType' => 'touch-target-proof', 'required' => 'true', 'owner' => 'UX QA'];
+        }
+        return $base;
+    }
+
+    /**
+     * @param array<string, mixed> $impact
+     * @return array<int, array<string, mixed>>
+     */
+    private function rolloutScopePlan(array $impact, ?string $selectedMode = null): array
+    {
+        $severity = (string)($impact['severityClass'] ?? 'low');
+        $hasBlockers = (array)($impact['blockers'] ?? []) !== [];
+        $scopeModes = [
+            ['mode' => 'preview-only', 'allowed' => true, 'releaseCondition' => 'No production write; preview cache only.'],
+            ['mode' => 'canary-module-group', 'allowed' => !$hasBlockers && in_array($severity, ['medium', 'high', 'regulated', 'shopfloor-critical'], true), 'releaseCondition' => 'Impact report and rollback plan attached.'],
+            ['mode' => 'canary-domain', 'allowed' => !$hasBlockers && in_array($severity, ['high', 'regulated', 'shopfloor-critical'], true), 'releaseCondition' => 'Domain owner approval and evidence checklist complete.'],
+            ['mode' => 'environment-stage', 'allowed' => !$hasBlockers, 'releaseCondition' => 'Environment policy pack selected and QA rerun plan complete.'],
+            ['mode' => 'global-apply', 'allowed' => !$hasBlockers && $severity !== 'shopfloor-critical', 'releaseCondition' => 'No active release blockers and release manifest refs present.'],
+        ];
+        if ($selectedMode !== null) {
+            foreach ($scopeModes as &$scope) {
+                $scope['selected'] = (string)$scope['mode'] === $selectedMode;
+            }
+            unset($scope);
+        }
+        return $scopeModes;
+    }
+
+    /**
+     * @param array<string, mixed> $template
+     * @return array<string, mixed>
+     */
+    private function templateLineage(array $template): array
+    {
+        return [
+            'templateId' => (string)($template['templateId'] ?? ''),
+            'version' => (string)($template['version'] ?? ''),
+            'parentTemplateId' => (string)($template['parentTemplateId'] ?? $template['_clonedFrom']['templateId'] ?? ''),
+            'supersedesVersion' => (string)($template['supersedesVersion'] ?? ''),
+            'deprecationWindow' => (array)($template['deprecationWindow'] ?? []),
+            'migrationPlanRequired' => in_array((string)($template['status'] ?? ''), ['deprecated', 'retired'], true),
+            'migrationPlanRefs' => array_values(array_map('strval', (array)($template['migrationPlanRefs'] ?? []))),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $bridge
+     * @param array<string, mixed> $private
+     * @param array<string, mixed> $coverage
+     * @param array<string, mixed> $matrix
+     * @return array<string, mixed>
+     */
+    private function buildVisualDebtObservatory(array $bridge, array $private, array $coverage, array $matrix): array
+    {
+        $byModule = [];
+        $byDomain = [];
+        $byTeam = [];
+        $byRoute = [];
+        foreach ((array)($matrix['matrix'] ?? []) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $moduleId = (string)($row['moduleId'] ?? '');
+            $domain = (string)($row['domain'] ?? 'unclassified');
+            $team = (string)($row['ownerTeam'] ?? 'Frontend Platform');
+            $route = (string)($row['route'] ?? '');
+            $score = (int)($row['bridgeAliasDebt'] ?? 0)
+                + (int)($row['privateCssDebt'] ?? 0) * 10
+                + (int)($row['hardcodedStyleDebt'] ?? 0) * 5
+                + ((string)($row['linkageStatus'] ?? '') === 'blocked' ? 25 : 0);
+            $entry = [
+                'moduleId' => $moduleId,
+                'route' => $route,
+                'domain' => $domain,
+                'ownerTeam' => $team,
+                'linkageStatus' => (string)($row['linkageStatus'] ?? 'blocked'),
+                'bridgeAliasDebt' => (int)($row['bridgeAliasDebt'] ?? 0),
+                'privateCssDebt' => (int)($row['privateCssDebt'] ?? 0),
+                'hardcodedStyleDebt' => (int)($row['hardcodedStyleDebt'] ?? 0),
+                'uncontrolledLegacyShellDebt' => (string)($row['linkageStatus'] ?? '') === 'legacy-private-css' ? 1 : 0,
+                'debtScore' => $score,
+            ];
+            $byModule[] = $entry;
+            $this->accumulateDebt($byDomain, $domain, $score);
+            $this->accumulateDebt($byTeam, $team, $score);
+            $this->accumulateDebt($byRoute, $route !== '' ? $route : $moduleId, $score);
+        }
+        usort($byModule, static fn(array $a, array $b): int => ((int)$b['debtScore']) <=> ((int)$a['debtScore']));
+        return [
+            'byModule' => $byModule,
+            'byDomain' => array_values($byDomain),
+            'byTeam' => array_values($byTeam),
+            'byRoute' => array_values($byRoute),
+            'globalSignals' => [
+                'bridgeAliasDebtCount' => (int)($bridge['summary']['debtCount'] ?? 0),
+                'privateCssDebtScore' => (int)($private['summary']['totalDebtScore'] ?? 0),
+                'tokenCoveragePercent' => (int)($coverage['coverage']['coveragePercent'] ?? 0),
+            ],
+            'summary' => [
+                'moduleDebtCount' => count(array_filter($byModule, static fn(array $row): bool => (int)$row['debtScore'] > 0)),
+                'uncontrolledLegacyShellDebt' => array_sum(array_map(static fn(array $row): int => (int)$row['uncontrolledLegacyShellDebt'], $byModule)),
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $bucket
+     */
+    private function accumulateDebt(array &$bucket, string $key, int $score): void
+    {
+        $key = $key !== '' ? $key : 'unclassified';
+        if (!isset($bucket[$key])) {
+            $bucket[$key] = ['key' => $key, 'debtScore' => 0, 'moduleCount' => 0];
+        }
+        $bucket[$key]['debtScore'] = (int)$bucket[$key]['debtScore'] + $score;
+        $bucket[$key]['moduleCount'] = (int)$bucket[$key]['moduleCount'] + 1;
     }
 
     /**

@@ -1,53 +1,53 @@
 {
-  "publication_run_id": "9a2cb634-71f6-413a-a426-fa32fe40e8c1",
-  "generatedAt": "2026-04-13T11:20:34.944Z",
-  "source_commit": "260bdf1c",
+  "publication_run_id": "e3805208-1a24-4d17-bbd1-ada1ad88268e",
+  "generatedAt": "2026-04-13T13:26:34.897Z",
+  "source_commit": "685d51d7",
   "authority_version": "4.0",
   "generator_name": "canonical_publication_orchestrator",
   "slice_scope": "foundation_governance_contract_slice",
   "artifact_checksums": {
-    "endpoint-catalog.json": "f5a16d19d8d3007e24673ef7d718bdd57f7b4d9152f5bda9c6855021b631e7ce",
-    "frontend-foundation-catalog.json": "3fa4e7bc50ca10e5ec10ce1c597dfbd0ae9e09698e79f1a8eaec6185c27c21eb",
-    "registry-manifest.json": "d766723a44c4263830d0dc793295ba663c7f8a9d928af2a2d5b9940632b51f70",
-    "registry-quality-report.json": "985fbce83859559c571e59a35dfb780d89970ddd75c443bf60644f3001c045d2",
-    "domain-field-packs.json": "ac4040e6355e3020815c61059c1309d107c3efa250dafd00a782b52130325e66",
-    "data-fields-part2.json": "a7dd234862ca122c33c43ea2a9f945cc4a15812fc44da1decface09fee766767",
-    "wave-gap-ledger.json": "f9da9671a26d0141a7c118df27a5e9da52bfbc5ec222a54e664bb53e6bddd927",
-    "global-erp-mom-capability-audit.json": "67c09f7504ac5c6f59d5d804e639ac38aa0f9f0d318656f4e32a114d45500cfb",
-    "system-contract-runtime-projections.json": "7bd6ba53e1ae161ff47005a0fa545ca48dda990d99873d82f393779027c4bb06",
-    "system-contract-registry-contracts.json": "ab0ec8501802713c161d8877482aeb471ebf5169cdc774bc455202f022079c87",
-    "system-contract-diagnostics.json": "3d4285e38f8e8a52c06b6a29329e620dd933db06f6354069d8edd3f1666406f1",
-    "system-contract-manifest.json": "44a1c5acff30abf375f846df396b48d0510c0e0e825308f65c4098f94d3baed5"
+    "endpoint-catalog.json": "763b0e52eaaffc9277010cdab6385bb7fb34fa0e9296afc0ef2c8e77020fef55",
+    "frontend-foundation-catalog.json": "667466ad477a8393627869871da5e2ab6dc1b862c4134ddd3d85a8fd82a83820",
+    "registry-manifest.json": "5e1270827adc38701bcfb9d0b0554f51d07cead1854c9543cd16929a335eaf05",
+    "registry-quality-report.json": "dc4c2d0b1fc1f5db62ec6e8b4f6eafa2a0f37ee0dcf788716b00471c8c3ef19a",
+    "domain-field-packs.json": "ed9fbf0dcf716f6d4835564edecf825606aed783bbfa1176fb7e3a46ebf1223e",
+    "data-fields-part2.json": "8d07f22b6258bbb05dbf5325f73189821c90e54b395511b2359fda350dba5e07",
+    "wave-gap-ledger.json": "8c87eea02871b0a8d0e886eb8e0ca6a3bb0703ea00930f68e3d832f1964c35da",
+    "global-erp-mom-capability-audit.json": "2b104c823ae074a2cd6ca3916e983d43f2f5931a9fd7dbc6b637f5bc7f656c39",
+    "system-contract-runtime-projections.json": "cc10d04a9ea8394198df7c34f3c42acaf86d7c8dee62dc868183c09fedaf8085",
+    "system-contract-registry-contracts.json": "90d79e2b86bc2e0b4fa29ca0bc601b0d19141cbdd7c34aefcf86ca0bed3decbb",
+    "system-contract-diagnostics.json": "e6e6dffa1dcbb86efae0e23559a2627ad4b18062d9e536cb08e1ce9bb3d7f54a",
+    "system-contract-manifest.json": "00b13443fc001c811afb1991bef4387a1ba312a9f7b118c5e600213ed7529e52"
   },
   "summary_counts": {
-    "ready": 705,
+    "ready": 735,
     "partial": 0,
     "blocked": 0,
-    "wf_ready": 332,
-    "bridge_ready": 278,
+    "wf_ready": 357,
+    "bridge_ready": 295,
     "bridge_blocked": 0,
-    "endpoints": 3808
+    "endpoints": 3983
   },
   "invariant_checks": [
     {
       "name": "endpoint_count_matches_manifest",
       "status": "PASS",
-      "detail": "catalog_meta=3808, actual_keys=3808, manifest=3808"
+      "detail": "catalog_meta=3983, actual_keys=3983, manifest=3983"
     },
     {
       "name": "frontend_entity_counts_consistent",
       "status": "PASS",
-      "detail": "summary.entity_count=705 vs actual=705; ready=705/705; partial=0/0; blocked=0/0"
+      "detail": "summary.entity_count=735 vs actual=735; ready=735/735; partial=0/0; blocked=0/0"
     },
     {
       "name": "bridge_counts_consistent",
       "status": "PASS",
-      "detail": "qr: ready=278, blocked=0; manifest: ready=278, blocked=0"
+      "detail": "qr: ready=295, blocked=0; manifest: ready=295, blocked=0"
     },
     {
       "name": "no_split_run_id",
       "status": "PASS",
-      "detail": "distinct_run_ids=['fa526d9a-18f9-4ae9-bf48-1a7c92f9e546']"
+      "detail": "distinct_run_ids=['ce560843-acd2-4cf7-a149-ac14b2b6ba21']"
     },
     {
       "name": "approval_group_not_split_truth",

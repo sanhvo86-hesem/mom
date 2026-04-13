@@ -283,6 +283,7 @@ final class PostgresConnectedGovernanceRepository implements ConnectedGovernance
             'correlation_id',
             'request_id',
             'traceparent',
+            'payload_schema_version',
             'source_system',
             'source_record_id',
             'created_at',
@@ -405,4 +406,3 @@ final class PostgresConnectedGovernanceRepository implements ConnectedGovernance
 if (!class_exists('MOM\\Services\\PostgresConnectedGovernanceRepository', false)) {
     class_alias(PostgresConnectedGovernanceRepository::class, 'MOM\\Services\\PostgresConnectedGovernanceRepository');
 }
-

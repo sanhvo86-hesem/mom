@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-13T11:20:13.124Z",
-    "workflowCount": 294
+    "generatedAt": "2026-04-13T13:26:18.624Z",
+    "workflowCount": 311
   },
   "workflows": {
     "wf_ai_recommendation_action": {
@@ -3150,6 +3150,111 @@
         "downstreamEffects": [
           "audit"
         ]
+      }
+    },
+    "wf_background_job": {
+      "workflowId": "wf_background_job",
+      "name": "Background Lệnh - Luong xu ly",
+      "nameEn": "Background Jobs Workflow",
+      "entity": "background_jobs",
+      "domain": "system_infrastructure",
+      "standard": "internal",
+      "primaryTable": "background_jobs",
+      "relatedTables": [
+        "background_jobs"
+      ],
+      "stateField": "job_state",
+      "statusSet": "background_jobs_job_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": []
       }
     },
     "wf_bill_of_material": {
@@ -8510,6 +8615,227 @@
         "downstreamEffects": []
       }
     },
+    "wf_doc_distribution": {
+      "workflowId": "wf_doc_distribution",
+      "name": "Doc Phân phối - Luong xu ly",
+      "nameEn": "Doc Distributions Workflow",
+      "entity": "doc_distributions",
+      "domain": "document_control",
+      "standard": "ISO9001",
+      "primaryTable": "doc_distributions",
+      "relatedTables": [
+        "doc_distributions",
+        "doc_revisions"
+      ],
+      "stateField": "distribution_state",
+      "statusSet": "doc_distributions_distribution_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "doc_revisions"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_doc_family": {
+      "workflowId": "wf_doc_family",
+      "name": "Doc nhóm - Luong xu ly",
+      "nameEn": "Doc Families Workflow",
+      "entity": "doc_families",
+      "domain": "document_control",
+      "standard": "ISO9001",
+      "primaryTable": "doc_families",
+      "relatedTables": [
+        "doc_families",
+        "users",
+        "doc_revisions",
+        "frm_families"
+      ],
+      "stateField": "family_state",
+      "statusSet": "doc_families_family_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "users"
+        ],
+        "downstreamEffects": [
+          "doc_revisions",
+          "frm_families"
+        ]
+      }
+    },
     "wf_document": {
       "workflowId": "wf_document",
       "name": "undefined - Luong xu ly",
@@ -11445,6 +11771,114 @@
         "downstreamEffects": []
       }
     },
+    "wf_eqms_controlled_revision_rollout": {
+      "workflowId": "wf_eqms_controlled_revision_rollout",
+      "name": "Eqm Controlled Phiên bản Rollout - Luong xu ly",
+      "nameEn": "Eqms Controlled Revision Rollout Workflow",
+      "entity": "eqms_controlled_revision_rollout",
+      "domain": "quality_management",
+      "standard": "AS9100",
+      "primaryTable": "eqms_controlled_revision_rollout",
+      "relatedTables": [
+        "eqms_controlled_revision_rollout",
+        "eqms_training_obligation"
+      ],
+      "stateField": "rollout_state",
+      "statusSet": "eqms_controlled_revision_rollout_rollout_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": [
+          "eqms_training_obligation"
+        ]
+      }
+    },
     "wf_eqms_document_family": {
       "workflowId": "wf_eqms_document_family",
       "name": "Eqm Tài liệu Family - Luong xu ly",
@@ -11785,6 +12219,111 @@
         "downstreamEffects": [
           "eqms_evidence_version"
         ]
+      }
+    },
+    "wf_eqms_execution_entitlement_decision": {
+      "workflowId": "wf_eqms_execution_entitlement_decision",
+      "name": "Eqm Thực thi Entitlement Decision - Luong xu ly",
+      "nameEn": "Eqms Execution Entitlement Decision Workflow",
+      "entity": "eqms_execution_entitlement_decision",
+      "domain": "mes_execution",
+      "standard": "internal",
+      "primaryTable": "eqms_execution_entitlement_decision",
+      "relatedTables": [
+        "eqms_execution_entitlement_decision"
+      ],
+      "stateField": "assertion_state",
+      "statusSet": "eqms_execution_entitlement_decision_assertion_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "mes_execution_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": []
       }
     },
     "wf_eqms_field_governance_rule": {
@@ -13032,6 +13571,114 @@
         ]
       }
     },
+    "wf_eqms_training_obligation": {
+      "workflowId": "wf_eqms_training_obligation",
+      "name": "Eqm Đào tạo Obligation - Luong xu ly",
+      "nameEn": "Eqms Training Obligation Workflow",
+      "entity": "eqms_training_obligation",
+      "domain": "training_hr",
+      "standard": "internal",
+      "primaryTable": "eqms_training_obligation",
+      "relatedTables": [
+        "eqms_training_obligation",
+        "eqms_controlled_revision_rollout"
+      ],
+      "stateField": "obligation_state",
+      "statusSet": "eqms_training_obligation_obligation_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "training_hr_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "training_hr_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "training_hr_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "eqms_controlled_revision_rollout"
+        ],
+        "downstreamEffects": []
+      }
+    },
     "wf_equipment": {
       "workflowId": "wf_equipment",
       "name": "Thiết bị - Luong xu ly",
@@ -13489,6 +14136,232 @@
         ]
       }
     },
+    "wf_evidence_publication": {
+      "workflowId": "wf_evidence_publication",
+      "name": "Bằng chứng Publication - Luong xu ly",
+      "nameEn": "Evidence Publications Workflow",
+      "entity": "evidence_publications",
+      "domain": "evidence_vault",
+      "standard": "internal",
+      "primaryTable": "evidence_publications",
+      "relatedTables": [
+        "evidence_publications",
+        "evidence_versions"
+      ],
+      "stateField": "publication_state",
+      "statusSet": "evidence_publications_publication_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "evidence_versions"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_evidence_record": {
+      "workflowId": "wf_evidence_record",
+      "name": "Bằng chứng hồ sơ - Luong xu ly",
+      "nameEn": "Evidence Records Workflow",
+      "entity": "evidence_records",
+      "domain": "evidence_vault",
+      "standard": "internal",
+      "primaryTable": "evidence_records",
+      "relatedTables": [
+        "evidence_records",
+        "frm_issuances",
+        "frm_submission_attempts",
+        "plm_change_orders",
+        "evidence_versions",
+        "plm_change_verifications"
+      ],
+      "stateField": "record_state",
+      "statusSet": "evidence_records_record_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "evidence_versions",
+          "frm_issuances",
+          "frm_submission_attempts",
+          "plm_change_orders"
+        ],
+        "downstreamEffects": [
+          "evidence_versions",
+          "plm_change_verifications"
+        ]
+      }
+    },
     "wf_export_licens": {
       "workflowId": "wf_export_licens",
       "name": "Xuất khẩu giấy phép - Luong xu ly",
@@ -13655,6 +14528,111 @@
           "shipment_release_hold",
           "doc_package_create"
         ]
+      }
+    },
+    "wf_field_governance_rule": {
+      "workflowId": "wf_field_governance_rule",
+      "name": "Field quản trị quy tắc - Luong xu ly",
+      "nameEn": "Field Governance Rules Workflow",
+      "entity": "field_governance_rules",
+      "domain": "plm_change_control",
+      "standard": "internal",
+      "primaryTable": "field_governance_rules",
+      "relatedTables": [
+        "field_governance_rules"
+      ],
+      "stateField": "lifecycle_state",
+      "statusSet": "field_governance_rules_lifecycle_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": []
       }
     },
     "wf_treasury_close": {
@@ -16139,6 +17117,349 @@
         ],
         "downstreamEffects": [
           "freight_order_stops"
+        ]
+      }
+    },
+    "wf_frm_family": {
+      "workflowId": "wf_frm_family",
+      "name": "Frm nhóm - Luong xu ly",
+      "nameEn": "Frm Families Workflow",
+      "entity": "frm_families",
+      "domain": "forms_system",
+      "standard": "internal",
+      "primaryTable": "frm_families",
+      "relatedTables": [
+        "frm_families",
+        "doc_families",
+        "frm_template_revisions"
+      ],
+      "stateField": "family_state",
+      "statusSet": "frm_families_family_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "doc_families"
+        ],
+        "downstreamEffects": [
+          "frm_template_revisions"
+        ]
+      }
+    },
+    "wf_frm_issuance": {
+      "workflowId": "wf_frm_issuance",
+      "name": "Frm Issuance - Luong xu ly",
+      "nameEn": "Frm Issuances Workflow",
+      "entity": "frm_issuances",
+      "domain": "forms_system",
+      "standard": "internal",
+      "primaryTable": "frm_issuances",
+      "relatedTables": [
+        "frm_issuances",
+        "frm_template_revisions",
+        "frm_schema_versions",
+        "users",
+        "evidence_records",
+        "frm_submission_attempts"
+      ],
+      "stateField": "issuance_state",
+      "statusSet": "frm_issuances_issuance_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "frm_schema_versions",
+          "frm_template_revisions",
+          "users"
+        ],
+        "downstreamEffects": [
+          "evidence_records",
+          "frm_submission_attempts"
+        ]
+      }
+    },
+    "wf_frm_submission_attempt": {
+      "workflowId": "wf_frm_submission_attempt",
+      "name": "Frm bản nộp Attempt - Luong xu ly",
+      "nameEn": "Frm Submission Attempts Workflow",
+      "entity": "frm_submission_attempts",
+      "domain": "forms_system",
+      "standard": "internal",
+      "primaryTable": "frm_submission_attempts",
+      "relatedTables": [
+        "frm_submission_attempts",
+        "frm_issuances",
+        "users",
+        "evidence_records"
+      ],
+      "stateField": "attempt_state",
+      "statusSet": "frm_submission_attempts_attempt_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "forms_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "frm_issuances",
+          "frm_submission_attempts",
+          "users"
+        ],
+        "downstreamEffects": [
+          "evidence_records",
+          "frm_submission_attempts"
         ]
       }
     },
@@ -18748,6 +20069,224 @@
         "downstreamEffects": [
           "audit_log"
         ]
+      }
+    },
+    "wf_integrity_digest": {
+      "workflowId": "wf_integrity_digest",
+      "name": "Integrity Digest - Luong xu ly",
+      "nameEn": "Integrity Digests Workflow",
+      "entity": "integrity_digests",
+      "domain": "evidence_vault",
+      "standard": "internal",
+      "primaryTable": "integrity_digests",
+      "relatedTables": [
+        "integrity_digests",
+        "integrity_exceptions"
+      ],
+      "stateField": "digest_state",
+      "statusSet": "integrity_digests_digest_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": [
+          "integrity_exceptions"
+        ]
+      }
+    },
+    "wf_integrity_exception": {
+      "workflowId": "wf_integrity_exception",
+      "name": "Integrity ngoại lệ - Luong xu ly",
+      "nameEn": "Integrity Exceptions Workflow",
+      "entity": "integrity_exceptions",
+      "domain": "evidence_vault",
+      "standard": "internal",
+      "primaryTable": "integrity_exceptions",
+      "relatedTables": [
+        "integrity_exceptions",
+        "integrity_digests",
+        "users"
+      ],
+      "stateField": "exception_state",
+      "statusSet": "integrity_exceptions_exception_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "evidence_vault_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "integrity_digests",
+          "users"
+        ],
+        "downstreamEffects": []
       }
     },
     "wf_inventory_transaction": {
@@ -35036,6 +36575,8 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "doc_effectivities",
+        "doc_revisions",
         "eqms_change_affected_object",
         "eqms_change_resulting_object",
         "eqms_document_revision",
@@ -35043,8 +36584,18 @@
         "eqms_field_change_authorization",
         "eqms_form_record_version",
         "eqms_form_template_revision",
+        "evidence_records",
+        "evidence_versions",
+        "frm_schema_versions",
+        "frm_template_revisions",
+        "plm_change_affected_objects",
+        "plm_change_effectiveness_reviews",
+        "plm_change_effectivities",
         "plm_change_order_lines",
-        "plm_change_review_board"
+        "plm_change_resulting_objects",
+        "plm_change_review_board",
+        "plm_change_training_requirements",
+        "plm_change_verifications"
       ],
       "stateField": "status",
       "statusSet": "plm_change_orders_status",
@@ -35175,6 +36726,7 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "plm_change_affected_objects",
         "plm_change_orders"
       ],
       "stateField": "status",
@@ -35287,6 +36839,228 @@
         "downstreamEffects": [
           "plm_change_orders"
         ]
+      }
+    },
+    "wf_plm_change_resulting_object": {
+      "workflowId": "wf_plm_change_resulting_object",
+      "name": "PLM thay đổi Resulting Object - Luong xu ly",
+      "nameEn": "PLM Change Resulting Objects Workflow",
+      "entity": "plm_change_resulting_objects",
+      "domain": "plm_change_control",
+      "standard": "internal",
+      "primaryTable": "plm_change_resulting_objects",
+      "relatedTables": [
+        "plm_change_resulting_objects",
+        "plm_change_orders",
+        "plm_change_affected_objects"
+      ],
+      "stateField": "release_state",
+      "statusSet": "plm_change_resulting_objects_release_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "plm_change_affected_objects",
+          "plm_change_orders"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_plm_change_verification": {
+      "workflowId": "wf_plm_change_verification",
+      "name": "PLM thay đổi xác minh - Luong xu ly",
+      "nameEn": "PLM Change Verifications Workflow",
+      "entity": "plm_change_verifications",
+      "domain": "plm_change_control",
+      "standard": "internal",
+      "primaryTable": "plm_change_verifications",
+      "relatedTables": [
+        "plm_change_verifications",
+        "plm_change_orders",
+        "evidence_records",
+        "users"
+      ],
+      "stateField": "verification_state",
+      "statusSet": "plm_change_verifications_verification_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "evidence_records",
+          "plm_change_orders",
+          "users"
+        ],
+        "downstreamEffects": []
       }
     },
     "wf_plm_deviation_permit": {
@@ -42677,6 +44451,114 @@
           "scar_records",
           "training_records"
         ]
+      }
+    },
+    "wf_retention_lock": {
+      "workflowId": "wf_retention_lock",
+      "name": "Lưu giữ Lock - Luong xu ly",
+      "nameEn": "Retention Locks Workflow",
+      "entity": "retention_locks",
+      "domain": "record_system",
+      "standard": "internal",
+      "primaryTable": "retention_locks",
+      "relatedTables": [
+        "retention_locks",
+        "users"
+      ],
+      "stateField": "lock_state",
+      "statusSet": "retention_locks_lock_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "users"
+        ],
+        "downstreamEffects": []
       }
     },
     "wf_retention_policy": {
@@ -51931,6 +53813,9 @@
         "crm_opportunities",
         "customer_complaints",
         "deviations",
+        "doc_families",
+        "doc_read_acknowledgements",
+        "doc_revisions",
         "document_distribution",
         "ehs_corrective_actions",
         "ehs_emergency_drills",
@@ -51955,6 +53840,7 @@
         "evidence_chain_custody",
         "evidence_links",
         "evidence_vault",
+        "evidence_versions",
         "fai_trigger_log",
         "file_attachments",
         "fin_lc_draw_requests",
@@ -51964,6 +53850,8 @@
         "fmea_revisions",
         "form_attachments",
         "form_entries",
+        "frm_issuances",
+        "frm_submission_attempts",
         "gl_transactions",
         "hcm_attendance_records",
         "hcm_disciplinary_actions",
@@ -51971,6 +53859,7 @@
         "hcm_payroll_runs",
         "incoming_inspections",
         "inspection_results",
+        "integrity_exceptions",
         "inventory_transactions",
         "ipqc_inspections",
         "job_operations",
@@ -51995,10 +53884,12 @@
         "order_notes",
         "order_timeline_events",
         "packing_lists",
+        "plm_change_effectiveness_reviews",
         "plm_change_order_lines",
         "plm_change_orders",
         "plm_change_requests",
         "plm_change_review_board",
+        "plm_change_verifications",
         "plm_design_reviews",
         "plm_deviation_permits",
         "plm_obsolescence_tracking",
@@ -52033,11 +53924,13 @@
         "quote_history",
         "quotes",
         "records",
+        "retention_locks",
         "risk_register",
         "scar_records",
         "schedule_conflicts",
         "sessions",
         "setup_sheets",
+        "signature_events",
         "skills_matrix",
         "sop_action_items",
         "sop_meeting_cycles",

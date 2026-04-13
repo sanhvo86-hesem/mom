@@ -21,7 +21,7 @@ final class SharePointPublicationAdapter
     public function __construct(
         private readonly array $targetConfig,
     ) {
-        if (($this->targetConfig['direct_user_upload_allowed'] ?? false) === true) {
+        if ($this->boolConfig('direct_user_upload_allowed')) {
             throw new RuntimeException('SharePoint direct user upload is not allowed for controlled evidence.');
         }
     }
@@ -41,11 +41,17 @@ final class SharePointPublicationAdapter
             throw new RuntimeException('Publication requires a readable snapshot artifact.');
         }
 
+        $manifestHash = trim((string)($evidencePackage['manifest_hash_sha256'] ?? ''));
+        $packageHash = trim((string)($evidencePackage['package_hash_sha256'] ?? ''));
+        if (!$this->sha256($manifestHash) || !$this->sha256($packageHash)) {
+            throw new RuntimeException('Publication requires valid evidence package and manifest hashes.');
+        }
+
         return [
             'target_type' => 'sharepoint_graph',
             'authority_role' => 'read_only_replica',
-            'source_manifest_hash_sha256' => (string)($evidencePackage['manifest_hash_sha256'] ?? ''),
-            'source_package_hash_sha256' => (string)($evidencePackage['package_hash_sha256'] ?? ''),
+            'source_manifest_hash_sha256' => $manifestHash,
+            'source_package_hash_sha256' => $packageHash,
             'source_snapshot_uri' => $snapshotUri,
             'sharepoint' => [
                 'site_id' => (string)($this->targetConfig['site_id'] ?? ''),
@@ -55,5 +61,25 @@ final class SharePointPublicationAdapter
             ],
             'manifest' => $manifest,
         ];
+    }
+
+    private function boolConfig(string $key): bool
+    {
+        $value = $this->targetConfig[$key] ?? false;
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 't', 'yes', 'y'], true);
+        }
+        return false;
+    }
+
+    private function sha256(string $value): bool
+    {
+        return preg_match('/^[a-f0-9]{64}$/', $value) === 1;
     }
 }

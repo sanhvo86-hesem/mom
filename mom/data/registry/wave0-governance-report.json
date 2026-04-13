@@ -1,18 +1,18 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:23.239Z",
+    "generatedAt": "2026-04-13T13:26:26.362Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 705,
+    "total_frontend_entities": 735,
     "canonical_resources": 67,
     "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 73,
-    "governed_support_entities": 624,
+    "governed_support_entities": 654,
     "conditional_extension_entities": 3,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
@@ -1802,7 +1802,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 218,
+        "relation_count": 231,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2195,6 +2195,61 @@
       {
         "entity_key": "digital_product_passport.product_passports",
         "entity": "product_passports",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 9,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.doc_distributions",
+        "entity": "doc_distributions",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.doc_effectivities",
+        "entity": "doc_effectivities",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.doc_families",
+        "entity": "doc_families",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.doc_read_acknowledgements",
+        "entity": "doc_read_acknowledgements",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.doc_revisions",
+        "entity": "doc_revisions",
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
@@ -2600,6 +2655,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "evidence_vault.evidence_artifacts",
+        "entity": "evidence_artifacts",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "evidence_vault.evidence_chain_custody",
         "entity": "evidence_chain_custody",
         "profile": "document_record",
@@ -2633,6 +2699,28 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "evidence_vault.evidence_publications",
+        "entity": "evidence_publications",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.evidence_records",
+        "entity": "evidence_records",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "evidence_vault.evidence_vault",
         "entity": "evidence_vault",
         "profile": "document_record",
@@ -2640,6 +2728,39 @@
         "archive_candidate": false,
         "relation_count": 8,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.evidence_versions",
+        "entity": "evidence_versions",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.integrity_digests",
+        "entity": "integrity_digests",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.integrity_exceptions",
+        "entity": "integrity_exceptions",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3161,6 +3282,61 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "forms_system.frm_families",
+        "entity": "frm_families",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.frm_issuances",
+        "entity": "frm_issuances",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.frm_schema_versions",
+        "entity": "frm_schema_versions",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.frm_submission_attempts",
+        "entity": "frm_submission_attempts",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.frm_template_revisions",
+        "entity": "frm_template_revisions",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "foundation.calendar",
         "entity": "calendar",
         "profile": "master_data",
@@ -3420,6 +3596,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation_governance.signature_events",
+        "entity": "signature_events",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4180,6 +4367,17 @@
         "archive_candidate": false,
         "relation_count": 2,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "mes_execution.eqms_execution_entitlement_decision",
+        "entity": "eqms_execution_entitlement_decision",
+        "profile": "operator_console",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -5526,6 +5724,50 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "plm_change_control.field_governance_rules",
+        "entity": "field_governance_rules",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_affected_objects",
+        "entity": "plm_change_affected_objects",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_effectiveness_reviews",
+        "entity": "plm_change_effectiveness_reviews",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_effectivities",
+        "entity": "plm_change_effectivities",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "plm_change_control.plm_change_order_lines",
         "entity": "plm_change_order_lines",
         "profile": "governed_case",
@@ -5542,7 +5784,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 16,
+        "relation_count": 28,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5553,7 +5795,18 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
+        "relation_count": 8,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_resulting_objects",
+        "entity": "plm_change_resulting_objects",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5566,6 +5819,28 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_training_requirements",
+        "entity": "plm_change_training_requirements",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.plm_change_verifications",
+        "entity": "plm_change_verifications",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6186,6 +6461,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "quality_management.eqms_controlled_revision_rollout",
+        "entity": "eqms_controlled_revision_rollout",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "quality_management.fai_characteristics",
         "entity": "fai_characteristics",
         "profile": "transactional_record",
@@ -6434,6 +6720,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 37,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.retention_locks",
+        "entity": "retention_locks",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -7000,6 +7297,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "system_infrastructure.background_jobs",
+        "entity": "background_jobs",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "system_infrastructure.comments",
         "entity": "comments",
         "profile": "business_record",
@@ -7095,6 +7403,17 @@
         "archive_candidate": false,
         "relation_count": 5,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.outbox_events",
+        "entity": "outbox_events",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -7611,6 +7930,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "training_hr.eqms_training_obligation",
+        "entity": "eqms_training_obligation",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []

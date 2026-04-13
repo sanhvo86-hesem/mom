@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:04.628Z",
-    "description": "Resolution plan for 0 orphan registry fields and 427 orphan DB column names."
+    "generatedAt": "2026-04-13T13:26:12.493Z",
+    "description": "Resolution plan for 0 orphan registry fields and 431 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 351,
+      "count": 354,
       "columns": [
         {
           "column": "item_class",
@@ -949,19 +949,6 @@
           "suggestedType": "select",
           "dbTypes": [
             "VARCHAR(50)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "job_type",
-          "tables": [
-            "job_orders"
-          ],
-          "suggestedLabel": "Lệnh Loại",
-          "suggestedLabelEn": "Job Type",
-          "suggestedType": "select",
-          "dbTypes": [
-            "JOB_TYPE_ENUM"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4491,6 +4478,7 @@
         {
           "column": "traceparent",
           "tables": [
+            "eqms_execution_entitlement_decision",
             "mes_operational_event_ledger",
             "mes_trusted_release_record"
           ],
@@ -4544,6 +4532,7 @@
         {
           "column": "target_aggregate_type",
           "tables": [
+            "eqms_execution_entitlement_decision",
             "mes_trusted_release_record"
           ],
           "suggestedLabel": "Mục tiêu tổng thể Loại",
@@ -4618,6 +4607,58 @@
             "JSONB"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "required_qualification_type",
+          "tables": [
+            "eqms_controlled_revision_rollout"
+          ],
+          "suggestedLabel": "Bắt buộc Qualification Loại",
+          "suggestedLabelEn": "Required Qualification Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "superseded_at",
+          "tables": [
+            "eqms_training_obligation"
+          ],
+          "suggestedLabel": "Superseded lúc",
+          "suggestedLabelEn": "Superseded At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "training_obligation",
+          "tables": [
+            "eqms_execution_entitlement_decision"
+          ],
+          "suggestedLabel": "Đào tạo Obligation",
+          "suggestedLabelEn": "Training Obligation",
+          "suggestedType": "json",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qualification_assertion",
+          "tables": [
+            "eqms_execution_entitlement_decision"
+          ],
+          "suggestedLabel": "Qualification Assertion",
+          "suggestedLabelEn": "Qualification Assertion",
+          "suggestedType": "json",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4628,7 +4669,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 76,
+      "count": 77,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -5304,10 +5345,12 @@
         {
           "column": "work_instruction_id",
           "tables": [
+            "eqms_controlled_revision_rollout",
             "work_instruction"
           ],
           "dbTypes": [
-            "UUID"
+            "UUID",
+            "VARCHAR(160)"
           ],
           "role": "primary_key"
         },
@@ -5354,6 +5397,7 @@
         {
           "column": "request_id",
           "tables": [
+            "eqms_execution_entitlement_decision",
             "mes_operational_event_ledger",
             "mes_trusted_release_record"
           ],
@@ -5385,7 +5429,18 @@
         {
           "column": "target_aggregate_id",
           "tables": [
+            "eqms_execution_entitlement_decision",
             "mes_trusted_release_record"
+          ],
+          "dbTypes": [
+            "VARCHAR(160)"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "qualification_assertion_id",
+          "tables": [
+            "eqms_execution_entitlement_decision"
           ],
           "dbTypes": [
             "VARCHAR(160)"

@@ -90,6 +90,83 @@ final class ChangeAuthorityServiceTest extends TestCase
         $this->assertSame('ECO-2026-001', $db->lastAffectedParams[':co_ref_number'] ?? null);
     }
 
+    public function testCanonicalAffectedObjectFieldScopeMustAuthorizeExactField(): void
+    {
+        $db = new FakeChangeAuthorityDb([
+            'governance' => [[
+                'object_type' => 'evidence_record',
+                'field_path' => '*',
+                'lifecycle_state' => 'locked',
+                'governance_class' => 'post_release_locked',
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+            ]],
+            'affected' => [
+                [
+                    'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
+                    'change_order_number' => 'ECO-2026-001',
+                    'status' => 'released',
+                    'allowed_effect' => 'amend',
+                    'effectivity_rule' => '{}',
+                    'field_scope' => ['fields' => ['wrong_field']],
+                    'authority_source' => 'affected_object',
+                ],
+                [
+                    'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
+                    'change_order_number' => 'ECO-2026-001',
+                    'status' => 'released',
+                    'allowed_effect' => 'amend',
+                    'effectivity_rule' => '{}',
+                    'field_scope' => ['fields' => ['package_metadata']],
+                    'authority_source' => 'affected_object',
+                ],
+            ],
+        ]);
+        $service = new ChangeAuthorityService($db);
+
+        $decision = $service->assertFieldEditAllowed('evidence_record', 'EV-001', 'package_metadata', 'a', 'b', 'locked', [
+            'change_authority_id' => 'ECO-2026-001',
+        ]);
+
+        $this->assertTrue($decision->allowed, $decision->message);
+        $this->assertSame('ECO-2026-001', $db->lastAffectedParams[':co_ref_number'] ?? null);
+    }
+
+    public function testCanonicalGovernanceAllowedEffectsAreEnforced(): void
+    {
+        $db = new FakeChangeAuthorityDb([
+            'governance' => [[
+                'object_type' => 'evidence_record',
+                'field_path' => '*',
+                'lifecycle_state' => 'locked',
+                'governance_class' => 'post_release_locked',
+                'allowed_effects' => ['metadata_update'],
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+            ]],
+            'affected' => [[
+                'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
+                'change_order_number' => 'ECO-2026-001',
+                'status' => 'released',
+                'allowed_effect' => 'amend',
+                'effectivity_rule' => '{}',
+                'field_scope' => ['fields' => ['package_metadata']],
+                'authority_source' => 'affected_object',
+            ]],
+        ]);
+        $service = new ChangeAuthorityService($db);
+
+        $decision = $service->assertFieldEditAllowed('evidence_record', 'EV-001', 'package_metadata', 'a', 'b', 'locked', [
+            'change_authority_id' => 'ECO-2026-001',
+            'requested_effect' => 'amend',
+        ]);
+
+        $this->assertFalse($decision->allowed);
+        $this->assertSame('change_effect_not_authorized', $decision->errorCode);
+    }
+
     public function testNeverEditableFieldDeniesEvenWithReleasedChangeOrder(): void
     {
         $db = new FakeChangeAuthorityDb([
@@ -153,11 +230,18 @@ final class FakeChangeAuthorityDb
      */
     public function query(string $sql, array $params = []): array
     {
+        if (str_contains($sql, 'field_governance_rules')) {
+            return $this->governance;
+        }
         if (str_contains($sql, 'eqms_field_governance_rule')) {
             return $this->governance;
         }
         if (str_contains($sql, 'eqms_field_change_authorization')) {
             return $this->filterByChangeOrder($this->explicit, (string)($params[':fca_co_ref_number'] ?? ''));
+        }
+        if (str_contains($sql, 'plm_change_affected_objects')) {
+            $this->lastAffectedParams = $params;
+            return $this->filterByChangeOrder($this->affected, (string)($params[':co_ref_number'] ?? ''));
         }
         if (str_contains($sql, 'eqms_change_affected_object')) {
             $this->lastAffectedParams = $params;

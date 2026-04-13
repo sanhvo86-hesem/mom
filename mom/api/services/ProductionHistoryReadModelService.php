@@ -184,7 +184,8 @@ final class ProductionHistoryReadModelService
      */
     private function eventSummary(array $event): array
     {
-        return [
+        $payload = is_array($event['payload'] ?? null) ? $event['payload'] : [];
+        $summary = [
             'event_id' => (string)($event['event_id'] ?? ''),
             'event_type' => (string)($event['event_type'] ?? ''),
             'event_category' => (string)($event['event_category'] ?? ''),
@@ -202,6 +203,30 @@ final class ProductionHistoryReadModelService
             'actor_id' => $event['actor_id'] ?? null,
             'event_hash' => $event['event_hash'] ?? null,
         ];
+
+        if (is_array($payload['qualification_gate'] ?? null)) {
+            $summary['qualification_gate'] = [
+                'action' => (string)($payload['qualification_gate']['action'] ?? ''),
+                'outcome' => (string)($payload['qualification_gate']['outcome'] ?? $payload['qualification_gate']['status'] ?? ''),
+                'reason_code' => (string)($payload['qualification_gate']['reason_code'] ?? ''),
+            ];
+        }
+
+        if (is_array($payload['connected_governance'] ?? null)) {
+            $governance = $payload['connected_governance'];
+            $summary['connected_governance'] = [
+                'event' => (string)($governance['event'] ?? ''),
+                'action' => (string)($governance['action'] ?? ''),
+                'outcome' => (string)($governance['outcome'] ?? ''),
+                'reason_code' => (string)($governance['reason_code'] ?? ''),
+                'entitlement_decision_id' => (string)($governance['entitlement_decision_id'] ?? ''),
+                'active_revision' => is_array($governance['active_revision'] ?? null) ? $governance['active_revision'] : [],
+                'training_obligation' => is_array($governance['training_obligation'] ?? null) ? $governance['training_obligation'] : [],
+                'qualification_assertion' => is_array($governance['qualification_assertion'] ?? null) ? $governance['qualification_assertion'] : [],
+            ];
+        }
+
+        return $summary;
     }
 
     /**

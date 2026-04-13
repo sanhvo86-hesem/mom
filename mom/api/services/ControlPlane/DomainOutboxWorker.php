@@ -12,6 +12,8 @@ use MOM\Database\DataLayer;
  */
 final class DomainOutboxWorker
 {
+    private const MAX_ATTEMPTS = 5;
+
     private ?object $db;
 
     /**
@@ -23,12 +25,12 @@ final class DomainOutboxWorker
     }
 
     /**
-     * @return array{processed: int, failed: int}
+     * @return array{processed: int, failed: int, dead_letter: int}
      */
     public function runOnce(int $limit = 50): array
     {
         if ($this->db === null || !method_exists($this->db, 'query') || !method_exists($this->db, 'execute')) {
-            return ['processed' => 0, 'failed' => 0];
+            return ['processed' => 0, 'failed' => 0, 'dead_letter' => 0];
         }
 
         $rows = $this->db->query(
@@ -43,6 +45,7 @@ final class DomainOutboxWorker
 
         $processed = 0;
         $failed = 0;
+        $deadLetter = 0;
         foreach ($rows as $row) {
             if (!is_array($row)) {
                 continue;
@@ -58,12 +61,17 @@ final class DomainOutboxWorker
                 $this->mark($id, 'done', null);
                 $processed++;
             } catch (\Throwable $e) {
+                $attempts = max(0, (int)($row['attempts'] ?? 0)) + 1;
                 $this->mark($id, 'failed', $e);
-                $failed++;
+                if ($attempts >= self::MAX_ATTEMPTS) {
+                    $deadLetter++;
+                } else {
+                    $failed++;
+                }
             }
         }
 
-        return ['processed' => $processed, 'failed' => $failed];
+        return ['processed' => $processed, 'failed' => $failed, 'dead_letter' => $deadLetter];
     }
 
     private function mark(string $id, string $status, ?\Throwable $error): void
@@ -74,16 +82,23 @@ final class DomainOutboxWorker
 
         $this->db->execute(
             "UPDATE domain_outbox_events
-             SET status = :status,
+             SET status = CASE
+                     WHEN :status = 'failed' AND attempts + 1 >= :max_attempts THEN 'dead_letter'
+                     ELSE :status
+                 END,
                  attempts = CASE WHEN :status = 'failed' THEN attempts + 1 ELSE attempts END,
                  last_attempt_at = now(),
-                 next_attempt_at = CASE WHEN :status = 'failed' THEN now() + interval '5 minutes' ELSE NULL END,
+                 next_attempt_at = CASE
+                     WHEN :status = 'failed' AND attempts + 1 < :max_attempts THEN now() + interval '5 minutes'
+                     ELSE NULL
+                 END,
                  error_class = :error_class,
                  error_message = :error_message,
                  updated_at = now()
-             WHERE domain_outbox_event_id = :id::uuid",
+             WHERE domain_outbox_event_id = CAST(:id AS uuid)",
             [
                 ':status' => $status,
+                ':max_attempts' => self::MAX_ATTEMPTS,
                 ':error_class' => $error ? $error::class : null,
                 ':error_message' => $error ? $error->getMessage() : null,
                 ':id' => $id,

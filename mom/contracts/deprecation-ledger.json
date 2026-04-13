@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:27.921023+00:00",
+    "generatedAt": "2026-04-13T13:26:29.825296+00:00",
     "description": "Ledger of legacy object names and tables retained for non-destructive migration and compatibility.",
     "entryCount": 217
   },

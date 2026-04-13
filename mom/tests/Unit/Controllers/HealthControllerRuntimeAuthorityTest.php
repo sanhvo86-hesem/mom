@@ -49,6 +49,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertSame('authoritative_ready', $payload['authority']['slices']['production_history']['readiness_state'] ?? null);
         $this->assertSame('authority_partial', $payload['authority']['slices']['workforce_qualification_gate']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['trusted_release_record']['readiness_state'] ?? null);
+        $this->assertSame('authority_partial', $payload['authority']['slices']['connected_governance']['readiness_state'] ?? null);
     }
 
     private function removeDir(string $dir): void

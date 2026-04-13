@@ -258,6 +258,13 @@ return static function (Router $router, string $dataDir): void {
         'trusted_release_record_provenance' => [TrustedReleaseRecordController::class, 'provenance'],
         'trusted_release_record_rollup' => [TrustedReleaseRecordController::class, 'rollup'],
         'trusted_release_record_probe' => [TrustedReleaseRecordController::class, 'probe'],
+        'connected_governance_release_revision' => [ConnectedGovernanceController::class, 'releaseRevision'],
+        'connected_governance_active_revision' => [ConnectedGovernanceController::class, 'activeRevision'],
+        'connected_governance_operator_readiness' => [ConnectedGovernanceController::class, 'operatorReadiness'],
+        'connected_governance_rollout_readiness' => [ConnectedGovernanceController::class, 'rolloutReadiness'],
+        'connected_governance_enterprise_rollout' => [ConnectedGovernanceController::class, 'enterpriseRollout'],
+        'connected_governance_blockers' => [ConnectedGovernanceController::class, 'blockers'],
+        'connected_governance_probe' => [ConnectedGovernanceController::class, 'probe'],
     ]);
     $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
     $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
@@ -271,6 +278,13 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/trusted-release-record/probe', TrustedReleaseRecordController::class, 'probe');
     $router->post('/api/trusted-release-record/assemble', TrustedReleaseRecordController::class, 'assemble');
     $router->post('/api/trusted-release-record/release', TrustedReleaseRecordController::class, 'release');
+    $router->post('/api/connected-governance/revisions/release', ConnectedGovernanceController::class, 'releaseRevision');
+    $router->get('/api/connected-governance/active-revision', ConnectedGovernanceController::class, 'activeRevision');
+    $router->get('/api/connected-governance/operator-readiness', ConnectedGovernanceController::class, 'operatorReadiness');
+    $router->get('/api/connected-governance/rollout-readiness', ConnectedGovernanceController::class, 'rolloutReadiness');
+    $router->get('/api/connected-governance/enterprise-rollout', ConnectedGovernanceController::class, 'enterpriseRollout');
+    $router->get('/api/connected-governance/blockers', ConnectedGovernanceController::class, 'blockers');
+    $router->get('/api/connected-governance/probe', ConnectedGovernanceController::class, 'probe');
     
     // AI Quality Scheduling
     $router->actions([

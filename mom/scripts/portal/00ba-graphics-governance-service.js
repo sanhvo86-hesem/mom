@@ -33,7 +33,13 @@ var ENDPOINTS = {
   auditHistory:      { method:'GET',  action:'admin_graphics_audit_history_get' },
   waiverRequest:     { method:'POST', action:'admin_graphics_waiver_create' },
   activeWaivers:     { method:'GET',  action:'admin_graphics_waiver_active_get' },
-  releaseBlockers:   { method:'GET',  action:'admin_graphics_release_blockers_get' }
+  releaseBlockers:   { method:'GET',  action:'admin_graphics_release_blockers_get' },
+  changeSet:         { method:'GET',  action:'admin_graphics_change_set_get' },
+  lineageGraph:      { method:'GET',  action:'admin_graphics_lineage_get' },
+  runtimeBeacon:     { method:'GET',  action:'admin_graphics_runtime_beacon_get' },
+  debtObservatory:   { method:'GET',  action:'admin_graphics_debt_observatory_get' },
+  environmentPacks:  { method:'GET',  action:'admin_graphics_environment_policy_packs_get' },
+  releaseDashboard:  { method:'GET',  action:'admin_graphics_release_dashboard_get' }
 };
 
 var TEMPLATE_STATES = [
@@ -63,6 +69,12 @@ var _state = {
   drift: null,
   debt: null,
   releaseBlockers: [],
+  changeSet: null,
+  lineageGraph: null,
+  runtimeBeacon: null,
+  debtObservatory: null,
+  environmentPolicyPacks: null,
+  releaseDashboard: null,
   audit: [],
   waivers: [],
   rolloutsByTemplate: {},
@@ -664,8 +676,29 @@ function refresh(seedTemplates){
   var audit = callEndpoint('auditHistory', {}).catch(function(){ return null; });
   var waivers = callEndpoint('activeWaivers', {}).catch(function(){ return null; });
   var releaseBlockers = callEndpoint('releaseBlockers', {}).catch(function(){ return null; });
+  var changeSet = callEndpoint('changeSet', {}).catch(function(){ return null; });
+  var lineageGraph = callEndpoint('lineageGraph', {}).catch(function(){ return null; });
+  var runtimeBeacon = callEndpoint('runtimeBeacon', {}).catch(function(){ return null; });
+  var debtObservatory = callEndpoint('debtObservatory', {}).catch(function(){ return null; });
+  var environmentPacks = callEndpoint('environmentPacks', {}).catch(function(){ return null; });
+  var releaseDashboard = callEndpoint('releaseDashboard', {}).catch(function(){ return null; });
 
-  return Promise.all([registry, compliance, debt, drift, audit, waivers, releaseBlockers, localModules]).then(function(parts){
+  return Promise.all([
+    registry,
+    compliance,
+    debt,
+    drift,
+    audit,
+    waivers,
+    releaseBlockers,
+    changeSet,
+    lineageGraph,
+    runtimeBeacon,
+    debtObservatory,
+    environmentPacks,
+    releaseDashboard,
+    localModules
+  ]).then(function(parts){
     var remoteRegistry = parts[0];
     var remoteCompliance = parts[1];
     var remoteDebt = parts[2];
@@ -673,7 +706,13 @@ function refresh(seedTemplates){
     var remoteAudit = parts[4];
     var remoteWaivers = parts[5];
     var remoteReleaseBlockers = parts[6];
-    var localSchemas = parts[7];
+    var remoteChangeSet = parts[7];
+    var remoteLineageGraph = parts[8];
+    var remoteRuntimeBeacon = parts[9];
+    var remoteDebtObservatory = parts[10];
+    var remoteEnvironmentPacks = parts[11];
+    var remoteReleaseDashboard = parts[12];
+    var localSchemas = parts[13];
     var complianceRows = normalizeComplianceRows(remoteCompliance);
     var auditRows = normalizeAuditRows(remoteAudit);
     var waiverRows = normalizeWaiverRows(remoteWaivers);
@@ -695,12 +734,24 @@ function refresh(seedTemplates){
     _state.audit = auditRows || defaultAudit();
     _state.waivers = waiverRows || _state.waivers || [];
     _state.releaseBlockers = remoteReleaseBlockers && Array.isArray(remoteReleaseBlockers.blockers) ? remoteReleaseBlockers.blockers : [];
+    _state.changeSet = remoteChangeSet && (remoteChangeSet.changeSet || remoteChangeSet);
+    _state.lineageGraph = remoteLineageGraph && (remoteLineageGraph.lineageGraph || remoteLineageGraph);
+    _state.runtimeBeacon = remoteRuntimeBeacon && (remoteRuntimeBeacon.runtimeBeacon || remoteRuntimeBeacon);
+    _state.debtObservatory = remoteDebtObservatory && (remoteDebtObservatory.observatory || remoteDebtObservatory);
+    _state.environmentPolicyPacks = remoteEnvironmentPacks && (remoteEnvironmentPacks.policyPacks || remoteEnvironmentPacks);
+    _state.releaseDashboard = remoteReleaseDashboard && (remoteReleaseDashboard.releaseDashboard || remoteReleaseDashboard);
     _state.waiverVersion = String(remoteWaivers && remoteWaivers.version || '');
     _state.waiverEtag = String(remoteWaivers && remoteWaivers.etag || '');
     _state.loaded = true;
     _state.loading = false;
     _state.lastLoadedAt = nowIso();
     _state.lastImpact = computeImpact(_state.lastChange, seedTemplates);
+    _state.changeSet = _state.changeSet || buildChangeSet(_state.lastImpact);
+    _state.lineageGraph = _state.lineageGraph || buildLineageGraph(seedTemplates);
+    _state.runtimeBeacon = _state.runtimeBeacon || collectRuntimeBeacon();
+    _state.debtObservatory = _state.debtObservatory || buildDebtObservatory();
+    _state.environmentPolicyPacks = _state.environmentPolicyPacks || buildEnvironmentPolicyPacks();
+    _state.releaseDashboard = _state.releaseDashboard || buildReleaseDashboard();
     return getSnapshot(seedTemplates);
   }).catch(function(){
     _state.modules = mergeModules([]);
@@ -713,6 +764,12 @@ function refresh(seedTemplates){
     _state.loading = false;
     _state.lastLoadedAt = nowIso();
     _state.lastImpact = computeImpact(_state.lastChange, seedTemplates);
+    _state.changeSet = buildChangeSet(_state.lastImpact);
+    _state.lineageGraph = buildLineageGraph(seedTemplates);
+    _state.runtimeBeacon = collectRuntimeBeacon();
+    _state.debtObservatory = buildDebtObservatory();
+    _state.environmentPolicyPacks = buildEnvironmentPolicyPacks();
+    _state.releaseDashboard = buildReleaseDashboard();
     return getSnapshot(seedTemplates);
   });
 }
@@ -741,6 +798,12 @@ function getSnapshot(seedTemplates){
     debt: clone(_state.debt),
     drift: clone(_state.drift),
     runtimeDiagnostics: runtimeDiagnostics,
+    runtimeBeacon: clone(_state.runtimeBeacon || collectRuntimeBeacon()),
+    changeSet: clone(_state.changeSet || buildChangeSet(_state.lastImpact || computeImpact(_state.lastChange, seedTemplates || []))),
+    lineageGraph: clone(_state.lineageGraph || buildLineageGraph(seedTemplates || [])),
+    debtObservatory: clone(_state.debtObservatory || buildDebtObservatory()),
+    environmentPolicyPacks: clone(_state.environmentPolicyPacks || buildEnvironmentPolicyPacks()),
+    releaseDashboard: clone(_state.releaseDashboard || buildReleaseDashboard()),
     releaseBlockers: clone(_state.releaseBlockers),
     audit: clone(_state.audit),
     waivers: clone(_state.waivers),
@@ -775,6 +838,195 @@ function collectRuntimeDiagnostics(){
     inlineStyleCount: inlineStyles,
     releaseBlocker: linkageStatus === 'blocked',
     checkedAt: nowIso()
+  };
+}
+
+function collectRuntimeBeacon(){
+  var diagnostics = collectRuntimeDiagnostics();
+  var rows = (_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(_state.modules || mergeModules([]))).map(function(row){
+    return {
+      moduleId: row.moduleId,
+      route: row.route || '',
+      linkageStatus: row.linkageStatus || (row.compliant ? 'full-admin-controlled' : 'blocked'),
+      sharedTokenProbe: row.consumesSharedTokens === true,
+      hmComponentProbe: row.consumesHmComponents === true,
+      privateCssProbe: row.usesPrivateCssShell === true,
+      beaconStatus: row.linkageStatus === 'blocked' ? 'release-blocking' : 'reported',
+      reportedAt: diagnostics.checkedAt || nowIso()
+    };
+  });
+  return {
+    beacons: rows,
+    summary: {
+      reportedModules: rows.length,
+      releaseBlockingModules: rows.filter(function(row){ return row.beaconStatus === 'release-blocking'; }).length,
+      shellLinkageStatus: diagnostics.linkageStatus,
+      shellPrivateSelectorCount: diagnostics.privateShellSelectorCount || 0,
+      shellInlineStyleCount: diagnostics.inlineStyleCount || 0
+    }
+  };
+}
+
+function severityForImpact(affected, blockers){
+  var regulated = affected.some(function(module){ return String(module.criticality || '').indexOf('regulated') >= 0; });
+  var shopfloor = affected.some(function(module){ return String(module.criticality || '').indexOf('shopfloor') >= 0; });
+  if(shopfloor) return 'shopfloor-critical';
+  if(regulated) return 'regulated';
+  if((blockers || []).length || affected.length >= 8) return 'high';
+  if(affected.length >= 3) return 'medium';
+  return 'low';
+}
+
+function evidencePlanForSeverity(severity){
+  var plan = [
+    { evidenceType:'impact-snapshot', required:true, owner:'Frontend Platform' },
+    { evidenceType:'rollback-plan', required:true, owner:'Release Engineering' }
+  ];
+  if(['medium','high','regulated','shopfloor-critical'].indexOf(severity) >= 0){
+    plan.push({ evidenceType:'screenshot-diff', required:true, owner:'UX QA' });
+    plan.push({ evidenceType:'keyboard-focus-proof', required:true, owner:'Accessibility QA' });
+  }
+  if(['high','regulated','shopfloor-critical'].indexOf(severity) >= 0){
+    plan.push({ evidenceType:'compliance-matrix-snapshot', required:true, owner:'Design System Governance' });
+    plan.push({ evidenceType:'drift-report', required:true, owner:'Runtime Governance' });
+  }
+  if(severity === 'regulated') plan.push({ evidenceType:'audit-traceability-pack', required:true, owner:'Quality Systems' });
+  if(severity === 'shopfloor-critical'){
+    plan.push({ evidenceType:'shopfloor-kiosk-smoke', required:true, owner:'MES Operations' });
+    plan.push({ evidenceType:'touch-target-proof', required:true, owner:'UX QA' });
+  }
+  return plan;
+}
+
+function rolloutScopePlan(severity, blockers){
+  var blocked = (blockers || []).length > 0;
+  return [
+    { mode:'preview-only', allowed:true, releaseCondition:'No production write; preview cache only.' },
+    { mode:'canary-module-group', allowed:!blocked && ['medium','high','regulated','shopfloor-critical'].indexOf(severity) >= 0, releaseCondition:'Impact report and rollback plan attached.' },
+    { mode:'canary-domain', allowed:!blocked && ['high','regulated','shopfloor-critical'].indexOf(severity) >= 0, releaseCondition:'Domain owner approval and evidence checklist complete.' },
+    { mode:'environment-stage', allowed:!blocked, releaseCondition:'Environment policy pack selected and QA rerun plan complete.' },
+    { mode:'global-apply', allowed:!blocked && severity !== 'shopfloor-critical', releaseCondition:'No active release blockers and release manifest refs present.' }
+  ];
+}
+
+function affectedTemplatesForModules(affected){
+  var templates = {};
+  (affected || []).forEach(function(module){
+    if(module.templateId) templates[module.templateId] = true;
+  });
+  return Object.keys(templates);
+}
+
+function buildChangeSet(impact){
+  impact = impact || computeImpact(_state.lastChange, []);
+  return {
+    changeSetId: impact.changeSetRef || ('gcs_' + String(Date.now()).slice(-8)),
+    status: impact.backendAttested ? 'impact-recorded' : 'preview-only',
+    source: impact.backendAttested ? 'backend-attested' : 'frontend-fallback',
+    edits: [{
+      analysisType: impact.kind || 'graphics',
+      subject: { target: impact.target || '', label: impact.label || '' },
+      status: impact.backendAttested ? 'recorded' : 'preview-only',
+      recordedAt: impact.computedAt || nowIso()
+    }],
+    diffSummary: {
+      affectedModules: (impact.affectedModules || []).length,
+      affectedTemplates: (impact.affectedTemplates || []).length,
+      blockers: String(impact.releaseBlockerSummary || '').indexOf('No ') === 0 ? 0 : 1
+    },
+    impact: impact,
+    risk: { severityClass: impact.severityClass || 'low' },
+    rolloutScopePlan: impact.rolloutScopes || rolloutScopePlan(impact.severityClass || 'low', []),
+    evidenceChecklist: impact.requiredEvidence || evidencePlanForSeverity(impact.severityClass || 'low')
+  };
+}
+
+function buildLineageGraph(seedTemplates){
+  var templates = mergeDraftAndPreviewTemplates(seedTemplates || []);
+  var nodes = [
+    { id:'admin-appearance', type:'admin-control-plane', label:'Admin Appearance / Template Studio' },
+    { id:'backend-graphics-authority', type:'backend-authority', label:'Canonical backend graphics authority' },
+    { id:'shared-tokens', type:'token-layer', label:'Shared tokens' },
+    { id:'shared-components', type:'component-layer', label:'Shared hm-* components' }
+  ];
+  var edges = [
+    { from:'admin-appearance', to:'backend-graphics-authority', relation:'persists-through' },
+    { from:'backend-graphics-authority', to:'shared-tokens', relation:'publishes-runtime-tokens' },
+    { from:'shared-tokens', to:'shared-components', relation:'drives-contracts' }
+  ];
+  templates.forEach(function(tpl){
+    var id = String(tpl.templateId || tpl.id || '');
+    if(!id) return;
+    nodes.push({ id:'template:' + id, type:'template', label:id + ' v' + (tpl.version || ''), status:tpl.status || '' });
+    edges.push({ from:'backend-graphics-authority', to:'template:' + id, relation:'controls-template' });
+  });
+  (_state.modules || mergeModules([])).forEach(function(module){
+    nodes.push({ id:'module:' + module.moduleId, type:'module', label:module.moduleId, route:module.route || '' });
+    if(module.templateId) edges.push({ from:'template:' + module.templateId, to:'module:' + module.moduleId, relation:'governs-module' });
+    (module.blockFamilies || []).forEach(function(family){
+      var componentId = 'component:' + family;
+      if(!nodes.some(function(node){ return node.id === componentId; })) nodes.push({ id:componentId, type:'component-contract', label:family });
+      edges.push({ from:componentId, to:'module:' + module.moduleId, relation:'consumed-by-module' });
+    });
+  });
+  return { nodes:nodes, edges:edges, summary:{ nodeCount:nodes.length, edgeCount:edges.length, templateCount:templates.length } };
+}
+
+function buildDebtObservatory(){
+  var rows = (_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(_state.modules || mergeModules([]))).map(function(row){
+    var score = Number(row.bridgeAliasDebt || 0) + Number(row.privateCssDebt || 0) * 10 + Number(row.hardcodedStyleDebt || 0) * 5 + (row.linkageStatus === 'blocked' ? 25 : 0);
+    return {
+      moduleId: row.moduleId,
+      route: row.route || '',
+      domain: row.domain || 'unclassified',
+      ownerTeam: row.ownerTeam || 'Frontend Platform',
+      linkageStatus: row.linkageStatus || 'blocked',
+      bridgeAliasDebt: Number(row.bridgeAliasDebt || 0),
+      privateCssDebt: Number(row.privateCssDebt || 0),
+      hardcodedStyleDebt: Number(row.hardcodedStyleDebt || 0),
+      uncontrolledLegacyShellDebt: row.linkageStatus === 'legacy-private-css' ? 1 : 0,
+      debtScore: score
+    };
+  });
+  rows.sort(function(a, b){ return b.debtScore - a.debtScore; });
+  return {
+    byModule: rows,
+    summary: {
+      moduleDebtCount: rows.filter(function(row){ return row.debtScore > 0; }).length,
+      uncontrolledLegacyShellDebt: rows.reduce(function(sum, row){ return sum + row.uncontrolledLegacyShellDebt; }, 0)
+    }
+  };
+}
+
+function buildEnvironmentPolicyPacks(){
+  return {
+    packs: [
+      { environment:'office', tokenOverrides:{ density:'default', contrast:'standard' }, evidenceObligations:['visual-regression'] },
+      { environment:'review', tokenOverrides:{ density:'comfortable', contrast:'standard' }, evidenceObligations:['screenshot-diff','keyboard-path'] },
+      { environment:'admin', tokenOverrides:{ density:'compact', contrast:'standard' }, evidenceObligations:['audit-trail','permission-review'] },
+      { environment:'shopfloor', tokenOverrides:{ density:'shopfloor', contrast:'high' }, evidenceObligations:['shopfloor-kiosk-smoke','touch-target-proof'] },
+      { environment:'kiosk', tokenOverrides:{ density:'shopfloor', contrast:'high' }, evidenceObligations:['kiosk-viewport-proof','timeout-proof'] },
+      { environment:'tv', tokenOverrides:{ density:'comfortable', contrast:'high' }, evidenceObligations:['distance-legibility-proof'] },
+      { environment:'night-shift', tokenOverrides:{ mode:'dark', contrast:'high' }, evidenceObligations:['dark-mode-contrast','fatigue-review'] }
+    ],
+    summary: { authority:'frontend-fallback-backend-contract', localStorageAuthority:false }
+  };
+}
+
+function buildReleaseDashboard(){
+  var blockers = _state.releaseBlockers || [];
+  var observatory = _state.debtObservatory || buildDebtObservatory();
+  return {
+    readiness: blockers.some(function(row){ return String(row.status || '') === 'active'; }) ? 'blocked' : 'ready',
+    blockers: { blockers:blockers, summary:{ blockerCount:blockers.length, releaseBlocked:blockers.length > 0 } },
+    complianceSummary: {
+      moduleCount: (_state.compliance || []).length,
+      blockedCount: (_state.compliance || []).filter(function(row){ return row.linkageStatus === 'blocked'; }).length
+    },
+    debtSummary: observatory.summary || {},
+    rolloutSummary: { rolloutCount:Object.keys(_state.rolloutsByTemplate || {}).length },
+    postApplyVerification: { runtimeBeaconRequired:true, driftReportRequired:true, evidenceBundleRequired:true },
+    generatedAt: nowIso()
   };
 }
 
@@ -843,6 +1095,10 @@ function computeImpact(change, seedTemplates){
   if(!_state.backendAvailable) blockers.push('Backend authority endpoint unavailable: publish/apply must remain blocked.');
   if(regulated.length) blockers.push('Regulated modules touched: audit evidence and rollback manifest required.');
   if(shopfloor.length) blockers.push('Shopfloor modules touched: kiosk/mobile smoke gate required.');
+  var severityClass = severityForImpact(affected, blockers);
+  var affectedTemplates = affectedTemplatesForModules(affected);
+  var requiredEvidence = evidencePlanForSeverity(severityClass);
+  var scopes = rolloutScopePlan(severityClass, blockers);
 
   return {
     kind: kind,
@@ -852,9 +1108,20 @@ function computeImpact(change, seedTemplates){
     affectedRoutes: Object.keys(routes),
     affectedScreens: Object.keys(screens),
     affectedBlockFamilies: Object.keys(families),
+    affectedTemplates: affectedTemplates,
     regulatedModules: regulated.map(function(module){ return module.moduleId; }),
     shopfloorModules: shopfloor.map(function(module){ return module.moduleId; }),
     gatesToRerun: gates,
+    severityClass: severityClass,
+    requiredEvidence: requiredEvidence,
+    rerunPlan: {
+      gates: gates,
+      regulatedEvidenceRequired: regulated.length > 0,
+      shopfloorEvidenceRequired: shopfloor.length > 0,
+      screenshotDiffRequired: ['medium','high','regulated','shopfloor-critical'].indexOf(severityClass) >= 0
+    },
+    rolloutScopes: scopes,
+    changeSetRef: 'gcs-' + String(kind + '-' + target).replace(/[^A-Za-z0-9_-]+/g, '-'),
     releaseBlockerSummary: blockers.length ? blockers.join(' ') : 'No frontend blocker detected in current snapshot.',
     computedAt: nowIso()
   };
@@ -896,9 +1163,15 @@ function normalizeBackendImpact(remote, change, localImpact){
     affectedRoutes: remote.affectedRoutes || localImpact.affectedRoutes || [],
     affectedScreens: remote.affectedScreens || localImpact.affectedScreens || [],
     affectedBlockFamilies: remote.affectedBlockFamilies || localImpact.affectedBlockFamilies || [],
+    affectedTemplates: remote.affectedTemplates || localImpact.affectedTemplates || [],
     regulatedModules: remote.regulatedModulesTouched || remote.regulatedModules || localImpact.regulatedModules || [],
     shopfloorModules: remote.shopfloorModulesTouched || remote.shopfloorModules || localImpact.shopfloorModules || [],
     gatesToRerun: remote.gatesToRerun || localImpact.gatesToRerun || [],
+    severityClass: remote.severityClass || localImpact.severityClass || 'low',
+    requiredEvidence: remote.requiredEvidence || localImpact.requiredEvidence || [],
+    rerunPlan: remote.rerunPlan || localImpact.rerunPlan || {},
+    rolloutScopes: remote.rolloutScopes || localImpact.rolloutScopes || [],
+    changeSetRef: remote.changeSetRef || localImpact.changeSetRef || '',
     releaseBlockerSummary: remote.blockers && remote.blockers.length
       ? remote.blockers.map(function(item){ return item.code || item.message || 'backend_blocker'; }).join(', ')
       : (localImpact.releaseBlockerSummary || 'No backend blocker detected.'),
@@ -914,6 +1187,8 @@ function analyzeImpact(change, seedTemplates){
   if(!endpointName) return Promise.resolve(localImpact);
   return callEndpoint(endpointName, impactPayloadForChange(_state.lastChange)).then(function(remote){
     _state.lastImpact = normalizeBackendImpact(remote, _state.lastChange, localImpact);
+    _state.changeSet = buildChangeSet(_state.lastImpact);
+    _state.releaseDashboard = buildReleaseDashboard();
     recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'backend-attested', { impactId:_state.lastImpact.impactId || '' });
     return clone(_state.lastImpact);
   }).catch(function(){
@@ -941,6 +1216,8 @@ function markChange(change, seedTemplates){
     source:'admin-appearance'
   }, change || {});
   _state.lastImpact = computeImpact(_state.lastChange, seedTemplates || []);
+  _state.changeSet = buildChangeSet(_state.lastImpact);
+  _state.releaseDashboard = buildReleaseDashboard();
   return clone(_state.lastImpact);
 }
 
@@ -1006,7 +1283,7 @@ function templateAction(action, templateId, payload){
   if(body.template) body.template = toBackendTemplate(body.template, action);
   if(action === 'stage'){
     body.impactType = body.impactType || 'template';
-    body.scope = body.scope || { templates:[id] };
+    body.scope = Object.assign({ mode:'preview-only', templates:[id] }, body.scope || {});
   }
   if(action === 'publish'){
     body.impactAnalysisId = body.impactAnalysisId || (_state.lastImpact && _state.lastImpact.backendAttested && _state.lastImpact.impactId) || '';
@@ -1150,7 +1427,15 @@ window.HmGraphicsGovernance = {
   getGraphicsAuditHistory: function(){ return clone(_state.audit || []); },
   getActiveWaivers: function(){ return clone(_state.waivers || []); },
   getReleaseBlockers: function(){ return clone(_state.releaseBlockers || []); },
+  getGraphicsReleaseBlockers: function(){ return clone(_state.releaseBlockers || []); },
+  getGraphicsChangeSet: function(seedTemplates){ return clone(_state.changeSet || buildChangeSet(_state.lastImpact || computeImpact(_state.lastChange, seedTemplates || []))); },
+  getModuleGraphicsLineageGraph: function(seedTemplates){ return clone(_state.lineageGraph || buildLineageGraph(seedTemplates || [])); },
+  getRuntimeGraphicsComplianceBeacon: function(){ return clone(_state.runtimeBeacon || collectRuntimeBeacon()); },
+  getVisualDebtObservatory: function(){ return clone(_state.debtObservatory || buildDebtObservatory()); },
+  getEnvironmentPolicyPacks: function(){ return clone(_state.environmentPolicyPacks || buildEnvironmentPolicyPacks()); },
+  getGraphicsReleaseDashboard: function(){ return clone(_state.releaseDashboard || buildReleaseDashboard()); },
   collectRuntimeDiagnostics: collectRuntimeDiagnostics,
+  collectRuntimeBeacon: collectRuntimeBeacon,
   computeImpact: computeImpact,
   markChange: markChange,
   analyzeImpact: analyzeImpact,

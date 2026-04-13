@@ -1663,6 +1663,8 @@ function renderImpactAnalysisPanel(wrap){
     + infoCard(L('Affected routes', 'Affected routes'), String((impact.affectedRoutes || []).length), 'preview')
     + infoCard(L('Affected screens', 'Affected screens'), String((impact.affectedScreens || []).length), 'preview')
     + infoCard(L('Block families', 'Block families'), String((impact.affectedBlockFamilies || []).length), 'admin')
+    + infoCard(L('Affected templates', 'Affected templates'), String((impact.affectedTemplates || []).length), 'admin')
+    + infoCard(L('Severity', 'Severity'), impact.severityClass || 'low', (impact.severityClass === 'regulated' || impact.severityClass === 'shopfloor-critical' || impact.severityClass === 'high') ? 'partial' : 'full')
     + infoCard(L('Regulated touched', 'Regulated touched'), String((impact.regulatedModules || []).length), (impact.regulatedModules || []).length ? 'partial' : 'full')
     + infoCard(L('Shopfloor touched', 'Shopfloor touched'), String((impact.shopfloorModules || []).length), (impact.shopfloorModules || []).length ? 'partial' : 'full')
     + '</div>'
@@ -1674,12 +1676,14 @@ function renderImpactAnalysisPanel(wrap){
     + '<strong>'+esc(L('Modules', 'Modules'))+':</strong> '+joinList(impact.affectedModules)+'<br>'
     + '<strong>'+esc(L('Routes', 'Routes'))+':</strong> '+joinList(impact.affectedRoutes)+'<br>'
     + '<strong>'+esc(L('Screens', 'Screens'))+':</strong> '+joinList((impact.affectedScreens || []).slice(0, 10), '-')+'<br>'
+    + '<strong>'+esc(L('Templates', 'Templates'))+':</strong> '+joinList(impact.affectedTemplates)+'<br>'
     + '<strong>'+esc(L('Block families', 'Block families'))+':</strong> '+joinList(impact.affectedBlockFamilies)
     + '</div></div>'
     + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
     + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Release blockers', 'Release blockers'))+'</div>'
     + '<div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'
     + '<strong>'+esc(L('Gates cần rerun', 'Gates to rerun'))+':</strong> '+joinList(impact.gatesToRerun)+'<br>'
+    + '<strong>'+esc(L('Evidence', 'Evidence'))+':</strong> '+joinList((impact.requiredEvidence || []).map(function(row){ return row.evidenceType || row; }))+'<br>'
     + '<strong>'+esc(L('Regulated modules', 'Regulated modules'))+':</strong> '+joinList(impact.regulatedModules)+'<br>'
     + '<strong>'+esc(L('Shopfloor modules', 'Shopfloor modules'))+':</strong> '+joinList(impact.shopfloorModules)+'<br>'
     + '<strong>'+esc(L('Attestation', 'Attestation'))+':</strong> '+esc(impact.backendAttested ? L('Backend attested', 'Backend attested') : L('Frontend estimate', 'Frontend estimate'))+'<br>'
@@ -1858,6 +1862,163 @@ function renderDriftDetectorPanel(){
 	    statusChip(dx.releaseBlocker ? 'partial' : 'full', dx.releaseBlocker ? L('Runtime blocker', 'Runtime blocker') : L('Runtime linked', 'Runtime linked'))
 	  );
 	}
+
+function renderChangeSetPanel(){
+  var snap = graphicsSnapshot();
+  var cs = snap.changeSet || {};
+  var impact = cs.impact || snap.impact || {};
+  var scopes = cs.rolloutScopePlan || impact.rolloutScopes || [];
+  var scopeRows = scopes.map(function(scope){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(scope.mode || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip(scope.allowed ? 'full' : 'partial', scope.allowed ? 'allowed' : 'blocked')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary);line-height:1.55">'+esc(scope.releaseCondition || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Graphics change set', 'Graphics change set'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Change set', 'Change set'), cs.changeSetId || '-', cs.source === 'backend-attested' || cs.source === 'backend_graphics_governance_state' ? 'full' : 'preview')
+      + infoCard(L('Status', 'Status'), cs.status || 'preview-only', cs.status === 'impact-recorded' ? 'full' : 'preview')
+      + infoCard(L('Severity', 'Severity'), (cs.risk && cs.risk.severityClass) || impact.severityClass || 'low', ((cs.risk && cs.risk.severityClass) || impact.severityClass) === 'low' ? 'full' : 'partial')
+      + infoCard(L('Evidence items', 'Evidence items'), String((cs.evidenceChecklist || impact.requiredEvidence || []).length), 'admin')
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Rollout scope</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Allowed</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Release condition</th>'
+      + '</tr></thead><tbody>'+(scopeRows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No rollout scope plan</td></tr>')+'</tbody></table>',
+    true,
+    statusChip('admin', L('Diff + impact + rollout scope', 'Diff + impact + rollout scope'))
+  );
+}
+
+function renderLineageGraphPanel(){
+  var snap = graphicsSnapshot();
+  var graph = snap.lineageGraph || {};
+  var nodes = graph.nodes || [];
+  var edges = graph.edges || [];
+  var rows = edges.slice(0, 12).map(function(edge){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.from || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.relation || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.to || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Module graphics lineage graph', 'Module graphics lineage graph'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Nodes', 'Nodes'), String(nodes.length || (graph.summary && graph.summary.nodeCount) || 0), 'full')
+      + infoCard(L('Edges', 'Edges'), String(edges.length || (graph.summary && graph.summary.edgeCount) || 0), 'full')
+      + infoCard(L('Templates', 'Templates'), String((graph.summary && graph.summary.templateCount) || 0), 'admin')
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">From</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Relation</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">To</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No lineage edges</td></tr>')+'</tbody></table>',
+    true,
+    statusChip('full', 'Admin -> backend -> tokens -> components -> module')
+  );
+}
+
+function renderRuntimeBeaconPanel(){
+  var snap = graphicsSnapshot();
+  var beacon = snap.runtimeBeacon || {};
+  var rows = (beacon.beacons || []).slice(0, 12).map(function(row){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)"><strong>'+esc(row.moduleId || '-')+'</strong><div style="font-size:11px;color:var(--text-secondary)">'+esc(row.route || '-')+'</div></td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip(row.linkageStatus === 'full-admin-controlled' ? 'full' : 'partial', row.linkageStatus || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+(row.sharedTokenProbe ? statusChip('full','tokens') : statusChip('partial','no tokens'))+' '+(row.hmComponentProbe ? statusChip('full','hm-*') : statusChip('partial','no hm-*'))+' '+(row.privateCssProbe ? statusChip('partial','private css') : statusChip('full','no private css'))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.beaconStatus || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Runtime graphics compliance beacon', 'Runtime graphics compliance beacon'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Reported modules', 'Reported modules'), String((beacon.summary && beacon.summary.reportedModules) || (beacon.beacons || []).length || 0), 'full')
+      + infoCard(L('Blocking modules', 'Blocking modules'), String((beacon.summary && beacon.summary.releaseBlockingModules) || 0), (beacon.summary && beacon.summary.releaseBlockingModules) ? 'partial' : 'full')
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Module</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Linkage</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Runtime probes</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Beacon</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="4" style="padding:12px;color:var(--text-secondary)">No runtime beacon rows</td></tr>')+'</tbody></table>',
+    true,
+    statusChip('admin', L('Runtime proof', 'Runtime proof'))
+  );
+}
+
+function renderDebtObservatoryPanel(){
+  var snap = graphicsSnapshot();
+  var obs = snap.debtObservatory || {};
+  var rows = (obs.byModule || []).slice(0, 12).map(function(row){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)"><strong>'+esc(row.moduleId || '-')+'</strong><div style="font-size:11px;color:var(--text-secondary)">'+esc(row.route || '-')+'</div></td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.domain || 'unclassified')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.ownerTeam || 'Frontend Platform')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(String(row.bridgeAliasDebt || 0))+' / '+esc(String(row.privateCssDebt || 0))+' / '+esc(String(row.hardcodedStyleDebt || 0))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(String(row.debtScore || 0))+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Visual debt observatory', 'Visual debt observatory'),
+    '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">'+esc(L('Debt columns: bridge alias / private CSS / hardcoded style. Observatory groups debt by module, domain, team, and route when backend provides those dimensions.', 'Debt columns: bridge alias / private CSS / hardcoded style. Observatory groups debt by module, domain, team, and route when backend provides those dimensions.'))+'</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Module</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Domain</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Team</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Debt</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Score</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="5" style="padding:12px;color:var(--text-secondary)">No visual debt rows</td></tr>')+'</tbody></table>',
+    true,
+    statusChip((obs.summary && obs.summary.moduleDebtCount) ? 'partial' : 'full', L('Debt observable', 'Debt observable'))
+  );
+}
+
+function renderPolicyPacksPanel(){
+  var snap = graphicsSnapshot();
+  var packs = (snap.environmentPolicyPacks && snap.environmentPolicyPacks.packs) || [];
+  var rows = packs.map(function(pack){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(pack.environment || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+esc(JSON.stringify(pack.tokenOverrides || {}))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+joinList(pack.evidenceObligations || [])+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Environment policy packs', 'Environment policy packs'),
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Environment</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Token policy</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Evidence obligations</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No policy packs</td></tr>')+'</tbody></table>',
+    false,
+    statusChip('admin', L('Environment scoped rollout', 'Environment scoped rollout'))
+  );
+}
+
+function renderReleaseDashboardPanel(){
+  var snap = graphicsSnapshot();
+  var dash = snap.releaseDashboard || {};
+  var summary = dash.complianceSummary || {};
+  var debt = dash.debtSummary || {};
+  return sect(
+    L('Graphics release dashboard', 'Graphics release dashboard'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Readiness', 'Readiness'), dash.readiness || 'unknown', dash.readiness === 'ready' ? 'full' : 'partial')
+      + infoCard(L('Blocked modules', 'Blocked modules'), String(summary.blockedCount || summary.nonCompliantCount || 0), (summary.blockedCount || summary.nonCompliantCount) ? 'partial' : 'full')
+      + infoCard(L('Legacy shell debt', 'Legacy shell debt'), String(debt.uncontrolledLegacyShellDebt || 0), debt.uncontrolledLegacyShellDebt ? 'partial' : 'full')
+      + infoCard(L('Rollouts', 'Rollouts'), String((dash.rolloutSummary && dash.rolloutSummary.rolloutCount) || 0), 'admin')
+      + '</div>'
+      + '<div style="font-size:11px;line-height:1.7;color:var(--text-secondary)">'
+      + esc(L('Release dashboard buộc release manifest/evidence bundle phải chứa graphics authority refs, compliance snapshot, impact report ref, waiver refs và rollback plan ref.', 'Release dashboard requires release manifest/evidence bundle to carry graphics authority refs, compliance snapshot, impact report ref, waiver refs, and rollback plan ref.'))
+      + '</div>',
+    true,
+    statusChip(dash.readiness === 'ready' ? 'full' : 'partial', dash.readiness || 'pending')
+  );
+}
 
 	function renderWaiverGovernancePanel(){
   var snap = graphicsSnapshot();
@@ -2147,6 +2308,38 @@ function renderTemplateGallery(){
   return h;
 }
 
+function renderTemplateLineagePanel(tpl){
+  var snap = graphicsSnapshot();
+  var graph = snap.lineageGraph || {};
+  var templateId = tpl && (tpl.templateId || tpl.id) || '';
+  var edges = (graph.edges || []).filter(function(edge){
+    return edge.from === 'template:' + templateId || edge.to === 'template:' + templateId;
+  });
+  var rows = edges.map(function(edge){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.from || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.relation || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(edge.to || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Template lineage', 'Template lineage'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard('templateId', templateId || '-', 'admin')
+      + infoCard('version', (tpl && tpl.version) || '-', 'admin')
+      + infoCard(L('Deprecated window', 'Deprecated window'), (tpl && tpl.deprecationWindow) ? JSON.stringify(tpl.deprecationWindow) : '-', 'preview')
+      + infoCard(L('Migration plan', 'Migration plan'), (tpl && (tpl.migrationPlanRefs || []).length) ? joinList(tpl.migrationPlanRefs) : L('Required on deprecation', 'Required on deprecation'), 'preview')
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">From</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Relation</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">To</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No backend lineage edge for selected template yet</td></tr>')+'</tbody></table>',
+    false,
+    statusChip('admin', L('Version lineage', 'Version lineage'))
+  );
+}
+
 function renderTemplateDetail(id){
   var tpl = getTemplateById(id);
   if(!tpl) return '<div class="hm-empty">'+esc(T('noTemplate'))+'</div>';
@@ -2180,6 +2373,7 @@ function renderTemplateDetail(id){
   h += '<div class="zone-scrollable" style="display:grid;gap:14px;max-height:620px;padding-right:4px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>'+renderZoneMiniDiagram(tpl)+'</div>';
 	  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">templateId</td><td style="padding:6px 0;text-align:right;color:var(--text-primary);font-family:var(--font-mono)">'+esc(tpl.templateId || tpl.id)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">version</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.version || '1.0.0')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">status</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+templateStatusChip(tpl)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">owner</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.owner || '-')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">regulated</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templateCompatibility(tpl, 'regulatedCompatibility'))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">shopfloor</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templateCompatibility(tpl, 'shopfloorCompatibility'))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">publish eligibility</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templatePublishEligibility(tpl))+'</td></tr></table></div>';
+  h += renderTemplateLineagePanel(tpl);
   h += '</div></div>';
   return h;
 }
@@ -3052,10 +3246,16 @@ function renderGovernance(){
   );
   h += renderAuthorityStatusPanel();
 	  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
+	  h += renderChangeSetPanel();
+	  h += renderLineageGraphPanel();
 	  h += renderComplianceMatrixPanel();
 	  h += renderDriftDetectorPanel();
+	  h += renderDebtObservatoryPanel();
 	  h += renderReleaseBlockersPanel(10);
 	  h += renderRuntimeGraphicsDiagnosticsPanel();
+	  h += renderRuntimeBeaconPanel();
+	  h += renderReleaseDashboardPanel();
+	  h += renderPolicyPacksPanel();
 	  h += renderAuditHistoryPanel(10);
 	  h += renderWaiverGovernancePanel();
 
@@ -3222,6 +3422,9 @@ function renderGovernance(){
 function renderAdvanced(){
   var selected = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
   var h = renderRolloutControls(selected);
+  h += renderChangeSetPanel();
+  h += renderReleaseDashboardPanel();
+  h += renderPolicyPacksPanel();
   h += renderReleaseBlockersPanel(8);
   h += renderWaiverGovernancePanel();
   h += renderAuditHistoryPanel(8);

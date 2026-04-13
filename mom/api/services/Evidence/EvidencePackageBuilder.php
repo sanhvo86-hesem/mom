@@ -14,9 +14,12 @@ use RuntimeException;
  * - canonical structured payload
  * - readable snapshot
  * - hash manifest
+ * - publication state record
  */
 final class EvidencePackageBuilder
 {
+    private const PUBLICATION_STATES = ['pending', 'queued', 'publishing', 'published', 'failed', 'retry_scheduled', 'dead_letter', 'withdrawn', 'superseded'];
+
     public function __construct(
         private readonly ImmutableStorageAdapter $storage,
     ) {
@@ -58,6 +61,8 @@ final class EvidencePackageBuilder
             'created_at' => $this->nowIso(),
             'actor_id' => (string)($input['actor_id'] ?? ''),
             'source' => is_array($input['source'] ?? null) ? $input['source'] : [],
+            'signature_events' => is_array($input['signature_events'] ?? null) ? $input['signature_events'] : [],
+            'publication_state' => $this->publicationState($input),
             'artifacts' => [
                 'original' => $this->artifactManifest($artifacts['original']),
                 'canonical_payload' => $this->artifactManifest($artifacts['canonical_payload']),
@@ -86,6 +91,8 @@ final class EvidencePackageBuilder
             'package_hash_sha256' => $packageHash,
             'manifest_hash_sha256' => $manifestHash,
             'canonical_payload_hash_sha256' => $artifacts['canonical_payload']['sha256'],
+            'readable_snapshot_hash_sha256' => $artifacts['readable_snapshot']['sha256'],
+            // Backward-compatible alias for migration 103 callers.
             'snapshot_hash_sha256' => $artifacts['readable_snapshot']['sha256'],
             'manifest' => $manifest,
             'artifacts' => $artifacts,
@@ -141,6 +148,55 @@ final class EvidencePackageBuilder
             'sha256' => $artifact['sha256'],
             'size_bytes' => $artifact['size_bytes'],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private function publicationState(array $input): array
+    {
+        if (is_array($input['publication_state'] ?? null)) {
+            $state = $input['publication_state'];
+        } else {
+            $state = [
+                'state' => 'pending',
+                'target_type' => (string)($input['publication_target'] ?? 'sharepoint_graph'),
+                'authority_role' => 'read_only_replica',
+            ];
+        }
+
+        $publicationState = strtolower(trim((string)($state['state'] ?? 'pending')));
+        if (!in_array($publicationState, self::PUBLICATION_STATES, true)) {
+            throw new RuntimeException('Invalid publication_state.state for evidence package.');
+        }
+
+        $authorityRole = strtolower(trim((string)($state['authority_role'] ?? 'read_only_replica')));
+        if ($authorityRole !== 'read_only_replica') {
+            throw new RuntimeException('Evidence package publication state must be a read-only replica.');
+        }
+
+        if ($this->boolValue($state['direct_user_upload'] ?? $input['direct_user_upload'] ?? false)) {
+            throw new RuntimeException('Evidence package cannot represent direct user upload to publication target.');
+        }
+
+        $state['state'] = $publicationState;
+        $state['authority_role'] = $authorityRole;
+        return $state;
+    }
+
+    private function boolValue(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 't', 'yes', 'y'], true);
+        }
+        return false;
     }
 
     /**

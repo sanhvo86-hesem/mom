@@ -17,7 +17,7 @@ Read before implementation:
 - `mom/database/config.php`
 - `mom/database/Connection.php`
 - `mom/database/DataLayer.php`
-- `mom/database/migrations/078_canonical_eqMS_compliance_backbone.sql`
+- `mom/database/migrations/078_canonical_eqms_compliance_backbone.sql`
 - `mom/database/migrations/098_canonical_manufacturing_event_backbone.sql`
 - `mom/database/migrations/100_trusted_release_record_spine.sql`
 - `mom/database/migrations/102_eqms_document_form_control.sql`
@@ -96,6 +96,68 @@ Priority D:
 - Live PostgreSQL concurrency/failover proof for rollout state and entitlement decisions.
 - Full platform-wide eDHR/eBR, Part 11 validation package, and export copy generation.
 - APS optimization, AI/search, and UI work.
+
+## Implemented Closure
+
+Priority 0:
+
+- Verified tranche 6 release packet, production history, workforce qualification gate, runtime authority, and canonical event prerequisites are present and usable.
+- Extended production history event summaries so connected governance and qualification decisions appear in deterministic release/history packets.
+
+Priority A:
+
+- Added `ConnectedGovernanceService` with repository boundaries for controlled revision rollout, training obligations, execution entitlement decisions, active revision lookup, operator readiness, rollout readiness, blockers, enterprise rollout aggregation, and runtime probe.
+- Added file-backed compatibility and PostgreSQL repository implementations. PostgreSQL is the schema-backed authoritative target when migration `105` is applied; file mode remains compatibility/fallback and reports `json_fallback`.
+- Connected shopfloor production report submission to a backend entitlement invariant. Existing dispatch behavior is preserved when no controlled rollout is configured; once a matching rollout exists, execution is blocked for site-not-adopted, non-active rollout, missing qualification, expired/superseded assertion, or assignment failures.
+- Entitlement decisions emit canonical manufacturing events with `connected_governance` and `qualification_gate` payloads, including request/correlation context where supplied.
+
+Priority B:
+
+- Site rollout state is explicit through company/legal entity/plant/site scope, effective dates, rollout states, and enterprise rollout aggregation.
+- Read models expose active revision, operator readiness, rollout readiness, blockers, and per-site coverage without cross-site leakage in tested filters.
+
+Priority C:
+
+- Trusted release packet proof now picks up revision and qualification assertion references through production history events rather than controller-time stitching.
+- Tests verify that a trusted release packet can surface active revision and assertion evidence emitted by the governed execution path.
+
+Priority D:
+
+- Runtime authority now reports `connected_governance` readiness and probe state.
+- Governance service metrics include release, training obligation, entitlement check, entitlement block, entitlement allow, site rollout lag, packet blocker, and provenance event failure counters.
+
+Reaudit hardening:
+
+- Rollout entitlement now respects the `effective_from` / `effective_to` window. A future or expired rollout no longer authorizes current execution and returns a stable `site_revision_not_active` blocker.
+- Entitlement decision records now carry explicit `connected_governance_decision.v1` payload schema metadata through both file and PostgreSQL persistence paths.
+- Sparse target scope no longer erases rollout scope when writing entitlement decisions.
+- Revision-release and entitlement provenance events now fail closed if the manufacturing event backbone cannot persist the event, instead of logging and continuing as if the governed mutation had complete audit evidence.
+- Enterprise frontend simulation was rerun after publication so `registry-manifest.json` registers the simulator report assets required by the registry authority smoke.
+
+Related schema/control-plane closure:
+
+- Added migration `105_connected_governance_revision_training_execution.sql` for the connected governance slice.
+- A concurrently present control-plane migration `106_eqms_world_class_control_plane.sql` was made schema-publication compatible by adding missing domain mappings and direct scope/source/payload metadata required by Data Schema governance checks.
+- Regenerated `schema.sql`, schema authority summaries, table registry, endpoint/catalog artifacts, system-contract artifacts, publication proof, doctor, and frontend simulation artifacts. Publication proof passed after refresh.
+
+## Verification Evidence
+
+- `php -d memory_limit=512M -d error_log=/tmp/mom-reaudit-connected-governance-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/ConnectedGovernanceServiceTest.php` -> pass, 8 tests, 40 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-reaudit-focused-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/ConnectedGovernanceServiceTest.php tests/Unit/Services/ShopfloorExecutionServiceTest.php tests/Unit/Services/RuntimeAuthorityServiceTest.php tests/Unit/Controllers/HealthControllerRuntimeAuthorityTest.php` -> pass, 24 tests, 137 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-reaudit-full-phpunit-error.log vendor/bin/phpunit --do-not-cache-result` -> pass, 200 tests, 1336 assertions, 1 skipped gated integration.
+- `php -d error_log=/tmp/mom-reaudit-backend-smoke-error.log tests/backend_smoke.php` -> pass.
+- `php -d display_errors=1 -d error_log=/tmp/mom-reaudit-data-schema-smoke-error.log tests/data_schema_admin_smoke.php` -> pass.
+- `php -d display_errors=1 -d error_log=/tmp/mom-reaudit-registry-smoke-error.log tests/enterprise_registry_authority_smoke.php` -> pass.
+- `python3 tools/registry/canonical_publication_orchestrator.py` -> pass with publication proof `PASS`.
+- `python3 tools/registry/enterprise_registry_doctor.py --write` -> pass with `watch` findings only, no P1 findings.
+- `python3 tools/registry/enterprise_frontend_simulator.py` -> pass with `watch` status and no blocker counts.
+
+## Remaining Unproven Items
+
+- Live PostgreSQL migration/apply was not executed in this local run; DB evidence is schema/repository/test harness proof, not live DB promotion proof.
+- Full Part 11 validation package, production export copy, and legal retention procedure remain outside this tranche.
+- Full closed-loop CAPA/SCAR-to-training closure is still deferred; this tranche enforces one change-to-training-to-execution slice.
+- Full HCM/training matrix authority across every role/document family remains deferred.
 
 ## Why This Is Highest Leverage
 

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T11:20:36.128648+00:00",
+    "generatedAt": "2026-04-13T13:26:45.342119+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -22,21 +22,21 @@
   "status": "watch",
   "scorecard": {
     "tables": {
-      "count": 694,
+      "count": 724,
       "domains": 49,
       "missingOwnerRole": 0,
       "missingSystemOfRecord": 0,
       "governanceOverlayApplied": true,
-      "governanceOverlayCount": 694
+      "governanceOverlayCount": 724
     },
     "endpoints": {
-      "count": 3808,
-      "classified": 3808,
+      "count": 3983,
+      "classified": 3983,
       "hardDelete": 0,
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
       "runtimeUnsafeExposed": 0,
-      "runtimeUnsafeBlocked": 831,
+      "runtimeUnsafeBlocked": 882,
       "missingWriteRequestSchemaRef": 0
     },
     "businessContracts": {
@@ -55,7 +55,7 @@
       "manifestDeletionModes": {
         "hard_delete": 0,
         "soft_delete": 0,
-        "archive_only": 694
+        "archive_only": 724
       },
       "openapiVersion": "3.1.2",
       "aiAuthorityChainGenerated": true,
@@ -69,35 +69,35 @@
       "title": "Endpoint catalog needs governance classification as release input",
       "evidence": {
         "gapCounts": {
-          "generic_runtime_classification": 519,
-          "runtime_safe_false": 831
+          "generic_runtime_classification": 539,
+          "runtime_safe_false": 882
         },
         "classificationSummary": {
           "authorityClass": {
-            "admin_governance_contract": 245,
-            "canonical_process_contract": 2136,
-            "generic_runtime_contract": 519,
-            "machine_runtime_contract": 494,
+            "admin_governance_contract": 263,
+            "canonical_process_contract": 2262,
+            "generic_runtime_contract": 539,
+            "machine_runtime_contract": 500,
             "master_data_contract": 90,
-            "support_or_read_model_contract": 324
+            "support_or_read_model_contract": 329
           },
           "exposure": {
-            "admin_governance": 236,
-            "admin_or_internal": 324,
-            "blocked_runtime_internal": 831,
-            "frontend_process": 1485,
-            "machine_or_operator_ui": 413,
-            "needs_owner_review": 519
+            "admin_governance": 251,
+            "admin_or_internal": 329,
+            "blocked_runtime_internal": 882,
+            "frontend_process": 1566,
+            "machine_or_operator_ui": 416,
+            "needs_owner_review": 539
           },
           "sideEffectLevel": {
-            "destructive": 687,
-            "none": 1408,
-            "transactional_write": 690,
-            "workflow_transition": 1023
+            "destructive": 717,
+            "none": 1468,
+            "transactional_write": 700,
+            "workflow_transition": 1098
           },
           "gapCounts": {
-            "generic_runtime_classification": 519,
-            "runtime_safe_false": 831
+            "generic_runtime_classification": 539,
+            "runtime_safe_false": 882
           }
         }
       },

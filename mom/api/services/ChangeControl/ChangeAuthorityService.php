@@ -163,6 +163,25 @@ final class ChangeAuthorityService
             ]);
         }
 
+        $requestedEffect = $this->requestedEffect($context);
+        $allowedEffects = $this->textList($governance['allowed_effects'] ?? []);
+        if ($allowedEffects !== [] && !in_array('*', $allowedEffects, true) && !in_array($requestedEffect, $allowedEffects, true)) {
+            return new ChangeAuthorityDecision(
+                false,
+                "Field '{$fieldPath}' does not allow '{$requestedEffect}' under the active governance rule.",
+                'change_effect_not_authorized',
+                [
+                    'object_type' => $objectType,
+                    'object_id' => $objectId,
+                    'field_path' => $fieldPath,
+                    'lifecycle_state' => $lifecycleState,
+                    'requested_effect' => $requestedEffect,
+                    'allowed_effects' => $allowedEffects,
+                    'governance_rule' => $governance,
+                ],
+            );
+        }
+
         $changeOrderRef = $this->extractChangeOrderRef($context);
         if ($changeOrderRef === '') {
             return new ChangeAuthorityDecision(
@@ -267,10 +286,17 @@ final class ChangeAuthorityService
         }
 
         try {
-            /** @var object{query: callable} $db */
             $db = $this->db;
             $lifecycleAlias = $this->governanceLifecycleAlias($objectType, $lifecycleState);
-            $rows = $db->query(
+            $rows = $this->queryCanonicalGovernanceRule($db, $objectType, $fieldPath, $lifecycleState, $lifecycleAlias);
+            foreach ($rows as $row) {
+                if (is_array($row)) {
+                    return $row;
+                }
+            }
+
+            $rows = $this->queryRows(
+                $db,
                 "SELECT
                     object_type,
                     field_path,
@@ -315,6 +341,59 @@ final class ChangeAuthorityService
     }
 
     /**
+     * @return list<array<string, mixed>>
+     */
+    private function queryCanonicalGovernanceRule(
+        object $db,
+        string $objectType,
+        string $fieldPath,
+        string $lifecycleState,
+        string $lifecycleAlias,
+    ): array {
+        try {
+            $rows = $this->queryRows(
+                $db,
+                "SELECT
+                    object_type,
+                    field_path,
+                    lifecycle_state,
+                    governance_class,
+                    change_required,
+                    signature_required,
+                    FALSE AS warn_only,
+                    allowed_effects,
+                    effectivity_required,
+                    policy_expression,
+                    effective_from,
+                    effective_to,
+                    metadata
+                 FROM field_governance_rules
+                 WHERE lower(object_type) IN (:object_type, :object_type_alias)
+                   AND lower(lifecycle_state) IN (:lifecycle_state, :lifecycle_state_alias)
+                   AND (field_path = :field_path OR field_path = '*')
+                   AND effective_from <= now()
+                   AND (effective_to IS NULL OR effective_to > now())
+                 ORDER BY
+                    CASE WHEN lower(lifecycle_state) = :lifecycle_state_exact THEN 0 ELSE 1 END,
+                    length(field_path) DESC,
+                    effective_from DESC
+                 LIMIT 1",
+                [
+                    ':object_type' => $objectType,
+                    ':object_type_alias' => $this->legacyObjectAlias($objectType),
+                    ':lifecycle_state' => $lifecycleState,
+                    ':lifecycle_state_alias' => $lifecycleAlias,
+                    ':lifecycle_state_exact' => $lifecycleState,
+                    ':field_path' => $fieldPath,
+                ],
+            );
+            return $rows;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /**
      * @param array<string, mixed> $context
      * @return array<string, mixed>|null
      */
@@ -331,10 +410,15 @@ final class ChangeAuthorityService
             return $explicit;
         }
 
+        $canonical = $this->findCanonicalAffectedObjectAuthority($changeOrderRef, $objectType, $objectId, $fieldPath, $requestedEffect, $context);
+        if ($canonical !== null) {
+            return $canonical;
+        }
+
         try {
-            /** @var object{query: callable} $db */
             $db = $this->db;
-            $rows = $db->query(
+            $rows = $this->queryRows(
+                $db,
                 "SELECT
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
@@ -387,6 +471,72 @@ final class ChangeAuthorityService
      * @param array<string, mixed> $context
      * @return array<string, mixed>|null
      */
+    private function findCanonicalAffectedObjectAuthority(
+        string $changeOrderRef,
+        string $objectType,
+        string $objectId,
+        string $fieldPath,
+        string $requestedEffect,
+        array $context,
+    ): ?array {
+        if ($this->db === null || !method_exists($this->db, 'query')) {
+            return null;
+        }
+
+        try {
+            $db = $this->db;
+            $rows = $this->queryRows(
+                $db,
+                "SELECT
+                    co.plm_change_order_id::text AS plm_change_order_id,
+                    co.change_order_number,
+                    co.status,
+                    cao.requested_effect AS allowed_effect,
+                    cao.effectivity_scope AS effectivity_rule,
+                    cao.field_scope,
+                    'affected_object' AS authority_source
+                 FROM plm_change_orders co
+                 INNER JOIN plm_change_affected_objects cao
+                    ON cao.plm_change_order_id = co.plm_change_order_id
+                 WHERE (co.plm_change_order_id::text = :co_ref_id OR co.change_order_number = :co_ref_number)
+                   AND co.status = 'released'
+                   AND lower(cao.object_type) IN (:object_type, :object_type_alias)
+                   AND (cao.object_id = :object_id OR cao.object_id = '*')
+                   AND cao.requested_effect IN (:requested_effect, 'revise', 'amend', 'metadata_update', 'deviation')
+                   AND cao.disposition = 'accepted'
+                 ORDER BY cao.created_at DESC",
+                [
+                    ':co_ref_id' => $changeOrderRef,
+                    ':co_ref_number' => $changeOrderRef,
+                    ':object_type' => $objectType,
+                    ':object_type_alias' => $this->legacyObjectAlias($objectType),
+                    ':object_id' => $objectId,
+                    ':requested_effect' => $requestedEffect,
+                ],
+            );
+        } catch (\Throwable) {
+            return null;
+        }
+
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            if (!$this->fieldScopeMatches($row['field_scope'] ?? null, $fieldPath)) {
+                continue;
+            }
+            if ($this->effectivityMatches($row['effectivity_rule'] ?? null, $context)) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>|null
+     */
     private function findExplicitFieldAuthorization(
         string $changeOrderRef,
         string $objectType,
@@ -400,9 +550,9 @@ final class ChangeAuthorityService
         }
 
         try {
-            /** @var object{query: callable} $db */
             $db = $this->db;
-            $rows = $db->query(
+            $rows = $this->queryRows(
+                $db,
                 "SELECT
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
@@ -451,6 +601,25 @@ final class ChangeAuthorityService
     }
 
     /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    private function queryRows(object $db, string $sql, array $params = []): array
+    {
+        $query = [$db, 'query'];
+        if (!is_callable($query)) {
+            return [];
+        }
+
+        $rows = $query($sql, $params);
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        return array_values(array_filter($rows, 'is_array'));
+    }
+
+    /**
      * @param array<string, mixed> $context
      */
     private function effectivityMatches(mixed $ruleRaw, array $context): bool
@@ -495,6 +664,36 @@ final class ChangeAuthorityService
         return true;
     }
 
+    private function fieldScopeMatches(mixed $scopeRaw, string $fieldPath): bool
+    {
+        $scope = $scopeRaw;
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scope = is_array($decoded) ? $decoded : [];
+        }
+
+        if (!is_array($scope) || $scope === []) {
+            return true;
+        }
+
+        foreach (['fields', 'field_paths', 'affected_fields'] as $key) {
+            $fields = $scope[$key] ?? null;
+            if (is_string($fields)) {
+                $fields = [$fields];
+            }
+            if (is_array($fields) && (in_array('*', $fields, true) || in_array($fieldPath, $fields, true))) {
+                return true;
+            }
+        }
+
+        $field = $scope['field_path'] ?? null;
+        if (is_scalar($field)) {
+            return (string)$field === '*' || (string)$field === $fieldPath;
+        }
+
+        return false;
+    }
+
     private function sameValue(mixed $oldValue, mixed $newValue): bool
     {
         return json_encode($oldValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
@@ -525,6 +724,33 @@ final class ChangeAuthorityService
             }
         }
         return 'amend';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function textList(mixed $value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_unique(array_filter(array_map(
+                fn(mixed $item): string => is_scalar($item) ? $this->normalizeToken((string)$item) : '',
+                $value,
+            ))));
+        }
+
+        if (!is_string($value) || trim($value) === '') {
+            return [];
+        }
+
+        $text = trim($value);
+        if (str_starts_with($text, '{') && str_ends_with($text, '}')) {
+            $text = substr($text, 1, -1);
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            fn(string $item): string => $this->normalizeToken($item),
+            str_getcsv($text),
+        ))));
     }
 
     private function governanceLifecycleAlias(string $objectType, string $lifecycleState): string
