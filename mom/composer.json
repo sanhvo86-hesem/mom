@@ -1,0 +1,50 @@
+{
+    "name": "hesem/mom-portal",
+    "description": "HESEM Manufacturing Operations Management Portal - ERP/MOM/MES/EQMS",
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "predis/predis": "^2.2",
+        "php-amqplib/php-amqplib": "^3.7",
+        "lcobucci/jwt": "^5.4",
+        "symfony/console": "^6.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^1.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "MOM\\Api\\Controllers\\": "api/controllers/",
+            "MOM\\Api\\Middleware\\": "api/middleware/",
+            "MOM\\Api\\Validators\\": "api/validators/",
+            "MOM\\Api\\Services\\": "api/services/",
+            "MOM\\Api\\": "api/",
+            "MOM\\Services\\": "api/services/",
+            "MOM\\Database\\": "database/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MOM\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "8.5.2"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "check": [
+            "@analyse",
+            "@test"
+        ]
+    }
+}

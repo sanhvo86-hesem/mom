@@ -96,6 +96,11 @@ final class WorkflowEngine
             @mkdir($this->stateDir, 0775, true);
         }
         $this->workflows = $this->buildWorkflowDefinitions();
+
+        // Populate the shared registry so other services can query definitions
+        // without needing a WorkflowEngine instance.
+        WorkflowDefinitionRegistry::register($this->workflows);
+        WorkflowDefinitionRegistry::registerStepRequirements($this->buildStepDataRequirements());
     }
 
     // ── Public API ──────────────────────────────────────────────────────────

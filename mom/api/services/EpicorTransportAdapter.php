@@ -6,6 +6,7 @@ namespace MOM\Services;
 
 require_once __DIR__ . '/CircuitBreaker.php';
 
+use MOM\Api\Services\CacheService;
 use RuntimeException;
 
 /**
@@ -31,7 +32,8 @@ final class EpicorTransportAdapter
         $this->policy = $this->loadPolicy();
 
         $stateDir = $this->dataDir . '/state';
-        $this->circuitBreaker = new CircuitBreaker($stateDir, 'epicor', 3, 60);
+        $circuitCache = new CacheService($this->dataDir, 'mom:circuitbreaker:');
+        $this->circuitBreaker = new CircuitBreaker($stateDir, 'epicor', 3, 60, 1, $circuitCache);
     }
 
     /** @return array<string, mixed> */

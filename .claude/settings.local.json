@@ -36,7 +36,10 @@
       "Bash(git -C \"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms\" push origin main)",
       "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 upgrade — CSS polish, 16 new sections, Vietnamese:*)",
       "Bash(pkill -9 -f \"git.*status.*porcelain\")",
-      "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 upgrade:*)"
+      "Bash(git -C '/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms' commit -m 'feat\\(design-system\\): v4.1 upgrade:*)",
+      "Bash(php -r \"echo 'PHP version: ' . PHP_VERSION . PHP_EOL;\")",
+      "Bash(curl -sS https://getcomposer.org/installer)",
+      "Bash(php -- --install-dir=/usr/local/bin --filename=composer)"
     ]
   }
 }

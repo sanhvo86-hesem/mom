@@ -61,6 +61,8 @@ return [
             'POST /api/auth/login',
             'POST /api/auth/mfa',
             'POST /api/auth/enroll',
+            'GET /api/health/live',
+            'GET /api/health/ready',
         ]),
     ],
     'observability' => [

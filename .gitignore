@@ -3,6 +3,11 @@
 __pycache__/
 *.py[cod]
 
+# Composer
+mom/vendor/
+mom/composer
+mom/composer.phar
+
 # MOM runtime noise and archives
 mom/data/php_error.log
 mom/data/audit.log

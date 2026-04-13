@@ -1,0 +1,132 @@
+{
+    "common": {
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "edit": "Sửa",
+        "create": "Tạo mới",
+        "search": "Tìm kiếm",
+        "filter": "Lọc",
+        "export": "Xuất",
+        "import": "Nhập",
+        "refresh": "Làm mới",
+        "loading": "Đang tải...",
+        "no_data": "Không có dữ liệu",
+        "confirm": "Bạn có chắc chắn?",
+        "success": "Thao tác thành công",
+        "error": "Đã xảy ra lỗi",
+        "required": "Trường này là bắt buộc",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "previous": "Trước đó",
+        "close": "Đóng",
+        "submit": "Gửi",
+        "approve": "Phê duyệt",
+        "reject": "Từ chối",
+        "yes": "Có",
+        "no": "Không"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "username": "Tên đăng nhập",
+        "password": "Mật khẩu",
+        "mfa_required": "Yêu cầu xác thực hai yếu tố",
+        "mfa_code": "Nhập mã 6 chữ số",
+        "session_expired": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
+        "unauthorized": "Bạn không có quyền thực hiện thao tác này",
+        "invalid_credentials": "Tên đăng nhập hoặc mật khẩu không đúng"
+    },
+    "nav": {
+        "dashboard": "Bảng điều khiển",
+        "documents": "Tài liệu",
+        "quality": "Chất lượng",
+        "production": "Sản xuất",
+        "inventory": "Kho hàng",
+        "procurement": "Mua hàng",
+        "finance": "Tài chính",
+        "hr": "Nhân sự",
+        "maintenance": "Bảo trì",
+        "settings": "Cài đặt",
+        "admin": "Quản trị",
+        "reports": "Báo cáo"
+    },
+    "quality": {
+        "ncr": {
+            "title": "Báo cáo không phù hợp",
+            "create": "Tạo NCR",
+            "opened": "NCR {ncr_id} đã được mở",
+            "closed": "NCR {ncr_id} đã được đóng",
+            "disposition": "Quyết định xử lý",
+            "root_cause": "Phân tích nguyên nhân gốc",
+            "containment": "Hành động khắc phục tạm thời"
+        },
+        "capa": {
+            "title": "Hành động khắc phục / Phòng ngừa",
+            "create": "Tạo CAPA",
+            "required": "Yêu cầu CAPA cho NCR {ncr_id}",
+            "verification": "Xác minh",
+            "effective": "Hiệu quả",
+            "not_effective": "Không hiệu quả"
+        },
+        "spc": {
+            "title": "Kiểm soát quy trình thống kê",
+            "out_of_control": "Quy trình ngoài kiểm soát: {parameter}",
+            "cpk_below": "Cpk dưới ngưỡng: {value}"
+        },
+        "inspection": {
+            "title": "Kiểm tra",
+            "passed": "Kiểm tra đạt",
+            "failed": "Kiểm tra không đạt cho lô {lot_id}",
+            "iqc": "Kiểm tra chất lượng đầu vào",
+            "ipqc": "Kiểm tra chất lượng trong quá trình",
+            "fqc": "Kiểm tra chất lượng cuối cùng"
+        },
+        "fmea": {
+            "title": "Phân tích FMEA",
+            "rpn": "Chỉ số ưu tiên rủi ro"
+        }
+    },
+    "production": {
+        "job_order": "Lệnh sản xuất",
+        "work_order": "Phiếu công việc",
+        "dispatch": "Điều phối sản xuất",
+        "schedule": "Lịch sản xuất",
+        "oee": "Hiệu suất thiết bị tổng thể",
+        "started": "Lệnh {job_id} đã bắt đầu",
+        "completed": "Lệnh {job_id} đã hoàn thành",
+        "alarm": "Cảnh báo trên máy {machine_id}"
+    },
+    "order": {
+        "sales_order": "Đơn hàng bán",
+        "purchase_order": "Đơn hàng mua",
+        "created": "Đơn hàng {order_id} đã tạo",
+        "approved": "Đơn hàng {order_id} đã phê duyệt",
+        "shipped": "Đơn hàng {order_id} đã giao"
+    },
+    "notification": {
+        "new": "Thông báo mới",
+        "mark_read": "Đánh dấu đã đọc",
+        "mark_all_read": "Đánh dấu tất cả đã đọc",
+        "workflow_transition": "{record_type} {record_id} chuyển sang trạng thái {state}",
+        "sla_alert": "Cảnh báo SLA: {record_type} {record_id} - {message}",
+        "approval_required": "Yêu cầu phê duyệt cho {record_type} {record_id}"
+    },
+    "error": {
+        "not_found": "Không tìm thấy bản ghi",
+        "conflict": "Bản ghi đã được sửa bởi người dùng khác",
+        "validation": "Lỗi xác thực: {field} - {message}",
+        "rate_limited": "Quá nhiều yêu cầu. Vui lòng chờ {seconds} giây.",
+        "server_error": "Lỗi máy chủ. Vui lòng thử lại.",
+        "forbidden": "Truy cập bị từ chối"
+    },
+    "document": {
+        "title": "Kiểm soát tài liệu",
+        "create": "Tạo tài liệu",
+        "draft": "Bản nháp",
+        "review": "Đang xem xét",
+        "approved": "Đã phê duyệt",
+        "superseded": "Đã thay thế",
+        "obsolete": "Đã lỗi thời"
+    }
+}

@@ -1,0 +1,19 @@
+parameters:
+    level: 5
+    paths:
+        - api/controllers
+        - api/middleware
+        - api/validators
+        - api/services
+        - api/Router.php
+        - database/Connection.php
+        - database/DataLayer.php
+        - database/QueryBuilder.php
+    excludePaths:
+        - api/services/SchemaStudioController.php
+        - vendor
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Function [a-z_]+ not found#'
+        - '#Variable \$store might not be defined#'
+        - '#Variable \$DATA_DIR might not be defined#'

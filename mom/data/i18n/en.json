@@ -1,0 +1,132 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "import": "Import",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "no_data": "No data available",
+        "confirm": "Are you sure?",
+        "success": "Operation successful",
+        "error": "An error occurred",
+        "required": "This field is required",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "close": "Close",
+        "submit": "Submit",
+        "approve": "Approve",
+        "reject": "Reject",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "auth": {
+        "login": "Login",
+        "logout": "Logout",
+        "username": "Username",
+        "password": "Password",
+        "mfa_required": "Two-factor authentication required",
+        "mfa_code": "Enter 6-digit code",
+        "session_expired": "Session expired. Please login again.",
+        "unauthorized": "You are not authorized to perform this action",
+        "invalid_credentials": "Invalid username or password"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "documents": "Documents",
+        "quality": "Quality",
+        "production": "Production",
+        "inventory": "Inventory",
+        "procurement": "Procurement",
+        "finance": "Finance",
+        "hr": "Human Resources",
+        "maintenance": "Maintenance",
+        "settings": "Settings",
+        "admin": "Administration",
+        "reports": "Reports"
+    },
+    "quality": {
+        "ncr": {
+            "title": "Nonconformance Reports",
+            "create": "Create NCR",
+            "opened": "NCR {ncr_id} has been opened",
+            "closed": "NCR {ncr_id} has been closed",
+            "disposition": "Disposition",
+            "root_cause": "Root Cause Analysis",
+            "containment": "Containment Action"
+        },
+        "capa": {
+            "title": "Corrective / Preventive Actions",
+            "create": "Create CAPA",
+            "required": "CAPA required for NCR {ncr_id}",
+            "verification": "Verification",
+            "effective": "Effective",
+            "not_effective": "Not Effective"
+        },
+        "spc": {
+            "title": "Statistical Process Control",
+            "out_of_control": "Process out of control: {parameter}",
+            "cpk_below": "Cpk below threshold: {value}"
+        },
+        "inspection": {
+            "title": "Inspections",
+            "passed": "Inspection passed",
+            "failed": "Inspection failed for lot {lot_id}",
+            "iqc": "Incoming Quality Control",
+            "ipqc": "In-Process Quality Control",
+            "fqc": "Final Quality Control"
+        },
+        "fmea": {
+            "title": "FMEA Analysis",
+            "rpn": "Risk Priority Number"
+        }
+    },
+    "production": {
+        "job_order": "Job Order",
+        "work_order": "Work Order",
+        "dispatch": "Production Dispatch",
+        "schedule": "Production Schedule",
+        "oee": "Overall Equipment Effectiveness",
+        "started": "Job {job_id} started",
+        "completed": "Job {job_id} completed",
+        "alarm": "Alarm triggered on {machine_id}"
+    },
+    "order": {
+        "sales_order": "Sales Order",
+        "purchase_order": "Purchase Order",
+        "created": "Order {order_id} created",
+        "approved": "Order {order_id} approved",
+        "shipped": "Order {order_id} shipped"
+    },
+    "notification": {
+        "new": "New notification",
+        "mark_read": "Mark as read",
+        "mark_all_read": "Mark all as read",
+        "workflow_transition": "{record_type} {record_id} transitioned to {state}",
+        "sla_alert": "SLA alert: {record_type} {record_id} - {message}",
+        "approval_required": "Approval required for {record_type} {record_id}"
+    },
+    "error": {
+        "not_found": "Record not found",
+        "conflict": "Record has been modified by another user",
+        "validation": "Validation failed: {field} - {message}",
+        "rate_limited": "Too many requests. Please wait {seconds} seconds.",
+        "server_error": "Internal server error. Please try again.",
+        "forbidden": "Access denied"
+    },
+    "document": {
+        "title": "Document Control",
+        "create": "Create Document",
+        "draft": "Draft",
+        "review": "Under Review",
+        "approved": "Approved",
+        "superseded": "Superseded",
+        "obsolete": "Obsolete"
+    }
+}

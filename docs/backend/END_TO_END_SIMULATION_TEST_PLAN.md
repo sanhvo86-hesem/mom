@@ -1,0 +1,255 @@
+# End-To-End Simulation Test Plan
+
+This plan records workflow simulations from code/schema/API review and defines tests needed to prove remediation. Simulations do not require frontend. Existing endpoint names are current runtime surfaces where found; target command APIs are the replacement contract.
+
+## Simulation Row Contract
+
+Every implementation test derived from this plan must record:
+
+- API/endpoint or target command.
+- Table/store written.
+- Workflow state before/after.
+- Gate checked.
+- Whether the gate is enforced or decorative.
+- Transaction and idempotency behavior.
+- Audit/evidence behavior.
+- Mismatch found.
+- Documentation/spec section updated.
+- Regression test ID.
+
+The tables below are the reviewed baseline. Implementation tickets must expand each row into executable API/DB tests using this contract.
+
+## Simulation A - Quote To Cash
+
+| Step | Current API/endpoint | Current store/table | Current gate | Enforced or decorative | Transaction/idempotency | Audit/evidence | Mismatch/remediation | Test ID |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Create quote | `quote_create`, `/api/quotes` | `data/quotes/quotes.json`, PG schema exists | Role permission | Partial | No command transaction | Controller audit only | Move to command-backed quote create or read-only legacy | QTC-001 |
+| Internal review | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Registry uses `review`, runtime uses `internal_review` | QTC-002 |
+| Send quote | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Align status source | QTC-003 |
+| Accept quote | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Registry `won` vs runtime `accepted` | QTC-004 |
+| Convert quote to SO | `quote_convert_to_so`, `/api/quotes/{id}/convert` | quote JSON, orders JSON, customer PO JSON | Quote must be accepted | Enforced but incomplete | Not atomic; no idempotency | Partial audit | Implement `ConvertQuoteToSalesOrder` with unique source quote | QTC-005 |
+| Link customer PO | conversion/customer PO service | customer PO JSON | PO status partial | Partial | Separate write | Partial | Include in conversion transaction | QTC-006 |
+| Contract review | `order_contract_review` | `data/orders/reviews/{SO}.json` | Separate checklist | Decorative for shipment gate | No SO transaction | Audit log | Gate expects embedded SO `contract_review` | QTC-007 |
+| Confirm SO | `order_transition` to `confirmed` or update | orders JSON | Role transition | Partial | No idempotency | Order transition hash-chain | Must require contract review + PO | QTC-008 |
+| Engineering readiness | Not enforced in runtime SO | Registry/workflow only | None | Decorative/orphan | N/A | N/A | Implement `ReleaseSalesOrderToProduction` | QTC-009 |
+| Create JO | `order_jo_create`, `/api/orders/jobs` | orders JSON | Parent SO exists only | Incomplete | No transaction | Audit log | Must require SO `engineering_ready` and release package | QTC-010 |
+| Create WO | `order_wo_create`, `/api/orders/work` | orders JSON | Parent JO exists only | Incomplete | No transaction | Audit log | Must require JO released and routing operation | QTC-011 |
+| Release WO | `order_transition` | orders JSON | Role transition | Partial | No idempotency | Hash-chain | Must check material/tool/gage/operator/NC program | QTC-012 |
+| Issue material | Generic/MES stores possible | `mes_material_consumption`, inventory schema | None found | Decorative | Not transactional | Not sufficient | Implement `IssueMaterialToWorkOrder` | QTC-013 |
+| Start operation | mobile clock-in/start task | mobile JSON | Assigned operator only partial | Partial | No command idempotency | Audit log | Mobile signature mismatch for clock-out path discovered | QTC-014 |
+| Complete operation | mobile complete/clock-out | mobile JSON/orders maybe | Qty checks partial | Decorative for ledger/quality | No transaction | Audit log | Implement `CompleteOperation` with WIP/inspection | QTC-015 |
+| OQC | `oqc_create`, `oqc_update` | `data/logistics/oqc.json` | Result flag | Decorative on fail | No transaction | Audit log | Implement `RecordOqcResult` auto NCR/hold | QTC-016 |
+| Pack | `packing_create/update` | `data/logistics/packing.json` | None | Bypass | No | Audit log | Implement `ConfirmPacking` gate | QTC-017 |
+| Ship | `delivery_confirm` or SO transition | logistics JSON/orders JSON | Gate only on SO->shipped | Bypass via delivery | No | Audit log | Implement `ConfirmDelivery` gate | QTC-018 |
+| Invoice | Finance/AP/AR schema/generic | finance schema | Period close not enforced | Decorative | No posting engine | Partial | Add AR invoice/posting command | QTC-019 |
+| Close SO | order transition | orders JSON | Role only | Partial | No | Hash-chain | Require shipment/invoice/no open quality/ledger recon | QTC-020 |
+
+Negative tests:
+
+- QTC-N01: retry conversion after simulated crash between SO create and quote update returns same SO, no duplicate.
+- QTC-N02: SO confirmed cannot create JO until `engineering_ready`.
+- QTC-N03: `delivery_confirm` with failed OQC is rejected.
+- QTC-N04: `/api/runtime/sales/sales_orders` mutation rejected for frontend role.
+
+### Quote To Cash Target State Before/After
+
+| Command | Before | After | Mandatory gate |
+| --- | --- | --- | --- |
+| `ConvertQuoteToSalesOrder` | Quote `accepted` | Quote `converted`, SO `draft`, customer PO linked | unique source quote, idempotency |
+| `ConfirmSalesOrder` | SO `draft/quoted` | SO `confirmed` | contract review + customer PO |
+| `ReleaseSalesOrderToProduction` | SO `confirmed` | SO `engineering_ready` | released BOM/routing/control plan/inspection plan |
+| `CreateJobOrder` | SO `engineering_ready` | JO `planned` | release package snapshot |
+| `ReleaseJobOrder` | JO `planned` | JO `released` | material/routing readiness |
+| `CreateWorkOrder` | JO `released` | WO `scheduled` | route operation exists |
+| `ReleaseWorkOrder` | WO `scheduled` | WO `setup/running` | machine/tool/gage/operator/NC release |
+| `IssueMaterialToWorkOrder` | lot `available`, WO released | inventory issued, WIP debited | stock, lot hold, period open |
+| `CompleteOperation` | WO `running/setup` | WO `inspection/completed` | inspection/material/WIP reconciliation |
+| `RecordOqcResult` pass | OQC `pending` | OQC `accepted` | plan and inspector qualification |
+| `RecordOqcResult` fail | OQC `pending` | OQC `rejected`, NCR/hold active | auto NCR/hold |
+| `ConfirmPacking` | SO in production, OQC accepted | packing `confirmed` | no open quality hold |
+| `ConfirmDelivery` | packing `confirmed` | SO `shipped` | shipment readiness gate |
+
+## Simulation B - Procure To Pay
+
+| Step | Current API/endpoint | Current store/table | Gate | Enforced/decorative | Remediation | Test ID |
+| --- | --- | --- | --- | --- | --- | --- |
+| Create supplier | supplier/master data endpoints/generic | supplier JSON/PG vendors | Role | Partial | MDM command/approval | P2P-001 |
+| ASL approval | supplier ASL endpoints/PG `approved_supplier_list` | JSON/PG | ASL status | Partial | ASL command blocks PO if not approved | P2P-002 |
+| Create PO | Generic/schema | `purchase_orders` | None found | Decorative | `CreatePurchaseOrder` or approved PO command | P2P-003 |
+| Receive goods | Generic/schema | `purchase_receipts` | None found | Decorative | `ReceivePurchaseOrder` | P2P-004 |
+| IQC | supplier incoming inspection JSON | `incoming.json`, IQC schema | Result only | Decorative for inventory | `RecordIqcResult` | P2P-005 |
+| Reject/accept lot | supplier incoming status | JSON | Not linked to lot availability | Decorative | Lot status/quality hold command | P2P-006 |
+| Putaway | Generic/schema | WMS/inventory tables | None found | Decorative | `PutawayInventory` blocks failed IQC | P2P-007 |
+| AP invoice | Finance/generic | `ap_invoices` | Period not enforced | Decorative | `PostApInvoice` | P2P-008 |
+| 3-way match | Schema fields | AP/PO/receipt tables | None found | Decorative | `RunThreeWayMatch` | P2P-009 |
+| Payment | Schema/generic | finance tables | SoD/period missing | Decorative | `PostPayment` | P2P-010 |
+| Scorecard | `supplier_scorecard` | supplier-quality JSON | Incoming only | Incomplete | Canonical scorecard formula | P2P-011 |
+
+Negative tests:
+
+- P2P-N01: PO creation fails for blocked/unapproved supplier.
+- P2P-N02: Putaway fails for rejected IQC lot.
+- P2P-N03: AP invoice post fails in closed period.
+- P2P-N04: 3-way match over tolerance creates dispute and blocks payment.
+
+### Procure To Pay Target State Before/After
+
+| Command | Before | After | Mandatory gate |
+| --- | --- | --- | --- |
+| `ReceivePurchaseOrder` | PO approved/open | receipt posted, lot `pending_iqc` | supplier ASL, PO open, period open |
+| `RecordIqcResult` pass | lot `pending_iqc` | lot `iqc_accepted` | released inspection plan |
+| `RecordIqcResult` fail | lot `pending_iqc` | lot `quality_hold/rejected`, NCR/SCAR created | containment |
+| `PutawayInventory` | lot `iqc_accepted` | lot `available`, stock balance updated | no hold, period open |
+| `PostApInvoice` | invoice received | AP invoice `posted` | period open/backdate exception |
+| `RunThreeWayMatch` | AP invoice `posted` | `matched` or `disputed` | PO/receipt/invoice tolerance |
+| `PostPayment` | AP invoice `matched` | payment posted | SoD, approval, period open |
+
+## Simulation C - Quality Nonconformance
+
+| Step | Current API/endpoint | Current store/table | Gate | Current issue | Target command/test |
+| --- | --- | --- | --- | --- | --- |
+| OQC fail | `oqc_update` | logistics OQC JSON | Flag only | No NCR/hold | QNC-001 `RecordOqcResult` creates NCR/hold |
+| NCR creation | exception/quality JSONL/generic | exceptions JSON, quality JSONL, `ncr_records` | Multiple | Multi-authority | QNC-002 canonical NCR |
+| Containment/quarantine | `ExceptionService::quarantineOnNcr()` exists | holds JSON | Not auto-called | Store shape mismatch | QNC-003 auto hold canonical |
+| MRB disposition | exception MRB | exceptions JSON | Partial transitions | No ledger | QNC-004 `ApproveMrbDisposition` posts ledger |
+| Rework/scrap/use-as-is/RTS | MRB JSON fields | exceptions/inventory schema | None | Decorative | QNC-005 disposition-specific postings |
+| CAPA trigger | quality JSONL | `auto_capa_triggers.jsonl` | Queue only | Not canonical | QNC-006 `CreateCapaFromTrigger` |
+| Root cause/action | CAPA workflow/generic | `capa_records`/JSON | Fragmented | Multi-authority | QNC-007 canonical CAPA |
+| 30/60/90 effectiveness | Mentioned in design comments | none enforced | None | Decorative | QNC-008 scheduled checks required |
+| Closure | CAPA/NCR transitions | fragmented | Partial | no e-sign policy | QNC-009 closure requires evidence/e-sign |
+| COPQ posting | JSONL/CopqEngine | `copq_log.jsonl` | none | Not ledger | QNC-010 COPQ ledger |
+| Dashboard reflection | dashboard services | mixed stores | incomplete | misses JSONL/PG | QNC-011 canonical projections |
+
+### Quality Target State Before/After
+
+| Command | Before | After | Mandatory gate |
+| --- | --- | --- | --- |
+| `CreateNcrFromQualityFailure` | source failure event | NCR `containment_active`, hold active | duplicate check, severity |
+| `ApproveMrbDisposition` scrap | NCR `under_review`, MRB pending | MRB disposition approved/executed, lot scrapped | e-sign, inventory/COPQ ledger |
+| `ApproveMrbDisposition` rework | NCR `under_review`, MRB pending | rework WO created, hold remains | route/reinspection plan |
+| `CreateCapaFromTrigger` | trigger threshold met | CAPA `initiated` | duplicate CAPA check |
+| CAPA effectiveness | CAPA implementation complete | 30/60/90 checks complete | no recurrence, evidence |
+| CAPA close | CAPA effectiveness passed | CAPA `closed` | QA e-sign and audit |
+
+## Simulation D - Inventory And Traceability
+
+| Step | Current state | Gap | Target/test |
+| --- | --- | --- | --- |
+| Receive lot | P2P schema/generic | no receipt command | INV-001 `ReceivePurchaseOrder` creates pending IQC lot |
+| Split lot | Trace schema likely present | no command found | INV-002 `SplitLot` preserves genealogy/hold/cost |
+| Merge lot | Trace schema likely present | no command found | INV-003 `MergeLot` blocks held parent |
+| Issue to WO | MES/inventory schema | no ledger command | INV-004 issue posts inventory/WIP |
+| Produce output lot/serial | MES/DPP schemas | no completion command | INV-005 output links inputs/WO/inspection |
+| Genealogy chain | DPP trace by same lot/SO only | incomplete | INV-006 canonical forward/backward genealogy |
+| Shipment | logistics JSON | gate bypass | INV-007 shipment links lot/serial |
+| Recall simulation | no authoritative recall command found | incomplete | INV-008 affected shipments returned |
+| DPP/passport | manual JSON controller | not auto-created | INV-009 shipment/production generates DPP |
+
+## Simulation E - Finance Control
+
+| Step | Current API/endpoint | Gap | Target/test |
+| --- | --- | --- | --- |
+| Open period | Finance controls can create/reopen records | no central posting policy | FIN-001 period state service |
+| Post inventory transaction | Generic/schema | no period check | FIN-002 open period allowed |
+| Post AP invoice | finance/generic | no period check | FIN-003 open period allowed |
+| Close period | `finance_period_close_create/transition` | creates control only | FIN-004 close locks scope |
+| Try posting closed period | Not blocked by posting services | P0 | FIN-005 all posting commands reject |
+| Backdate exception | `finance_backdate_exception_create/transition` | not consumed by postings | FIN-006 single-use exception consumed |
+| Audit evidence | Finance controller idempotency/audit partial | not linked to ledgers | FIN-007 audit/e-sign package |
+
+### Finance Target State Before/After
+
+| Command | Before | After | Mandatory gate |
+| --- | --- | --- | --- |
+| `CloseFinancePeriod` | period open | period closed | reconciliations, no unposted blockers, e-sign |
+| posting command with closed period | period closed | rejected | no valid backdate exception |
+| posting command with approved exception | period closed | posted and exception consumed | scope/date/expiry/use-count |
+
+## Simulation F - Machine/MES
+
+| Step | Current API/service | Current behavior | Gap | Target/test |
+| --- | --- | --- | --- | --- |
+| MTConnect ingestion | `MtconnectPollingService`, `EdgeConnectorService` | Polls current XML, normalizes latest signal, has stale timestamp guard | No immutable raw event authority/quality code | MES-001 raw event stored with source timestamp/hash |
+| OPC-UA ingestion | `EdgeConnectorService` normalizes OPC-UA payload shape | No full OPC-UA client/worker found | partial/schema-only | MES-002 adapter client or ingestion API |
+| Raw event storage | latest signal/connectivity event JSON | not append-only raw stream | incomplete | MES-003 raw stream replay |
+| Production derivation | MES projections/DataLayer | partial | no deterministic derived event engine | MES-004 derive cycle/downtime/alarm |
+| OEE calculation | `OeeService` JSONL and optional PG shadow | manual calculation inputs; quality alert queue only | not closed-loop | MES-005 OEE from event spine |
+| Downtime/alarm escalation | `MesAlarmService`, OEE queue | partial queues | no confirmed dispatch evidence | MES-006 escalation delivery proof |
+| Quality signal creates NCR/hold | OEE quality alert only | recommendation, not record | decorative | MES-007 creates NCR/hold on configured threshold |
+| Idempotency/replay | MTConnect stale timestamp guard | no event replay key | partial | MES-008 duplicate raw event ignored |
+| Mobile MES | `MobileController/MobileWorkQueueService` | clock-out/offline/resolve signatures mismatch; inspection fail does not NCR | runtime bug | MES-009 controller-service contract tests |
+
+### Machine/MES Target State Before/After
+
+| Command | Before | After | Mandatory gate |
+| --- | --- | --- | --- |
+| `RecordMachineEvent` | adapter active | raw event appended | adapter identity, source timestamp, quality code, replay key |
+| `DeriveProductionEvent` | raw event unprocessed | derived cycle/downtime/alarm event | idempotent derivation |
+| `CompleteOperation` from machine/manual evidence | WO running | operation complete or quality hold | material, inspection, qty reconciliation |
+| Quality signal threshold | derived quality alert | NCR/hold active | configured threshold and defect evidence |
+
+## Gate Bypass Tests
+
+| Test ID | Bypass attempt | Expected result after remediation |
+| --- | --- | --- |
+| BYPASS-001 | `delivery_confirm` after OQC fail | Rejected by `ConfirmDelivery` gate; legacy route disabled. |
+| BYPASS-002 | `packing_update` to shipped without SO transition | Rejected; packing cannot ship. |
+| BYPASS-003 | Generic CRUD update `sales_orders.so_status=shipped` | Rejected for frontend/governed table. |
+| BYPASS-004 | Generic CRUD insert `inventory_transactions` | Rejected; use posting command. |
+| BYPASS-005 | Generic CRUD close `ncr_records` | Rejected; use quality command/e-sign. |
+| BYPASS-006 | `schema_studio_table_row_save` used by product role | Rejected; admin-only. |
+
+## Race/Retry/Idempotency Tests
+
+| Test ID | Race/retry | Expected result |
+| --- | --- | --- |
+| IDEMP-001 | Two concurrent quote conversions same quote, different keys | One SO created; second returns duplicate/source locked conflict or same SO by quote constraint. |
+| IDEMP-002 | Same idempotency key, same command payload | Same response replayed. |
+| IDEMP-003 | Same idempotency key, different payload | `409 idempotency_conflict`. |
+| IDEMP-004 | Concurrent material issue same lot causing shortage | One commits, other fails stock lock/insufficient stock. |
+| IDEMP-005 | Closed period while AP post in flight | Serializable/row lock ensures deterministic allow-before-close or reject-after-close. |
+| IDEMP-006 | Duplicate MTConnect raw event | Raw event ignored/replayed idempotently; derived event not duplicated. |
+
+## Frontend Unsafe Endpoint Tests
+
+| Test ID | Endpoint | Expected result for product frontend role |
+| --- | --- | --- |
+| FE-001 | `POST /api/runtime/sales/sales_orders` | `403 forbidden_runtime_unsafe`. |
+| FE-002 | `PUT /api/runtime/inventory/inventory_transactions/{id}` | `403 forbidden_runtime_unsafe`. |
+| FE-003 | `DELETE /api/runtime/quality_management/ncr_records/{id}` | `403 forbidden_runtime_unsafe`. |
+| FE-004 | `POST /api/runtime/finance/ap_invoices/{id}/transition` | `403 forbidden_runtime_unsafe`. |
+| FE-005 | `schema_studio_apply_migration` | `403 admin_only` for product role. |
+| FE-006 | `admin_git_discard_local` | `403 admin_only` and requires re-auth for admin. |
+
+## Regression Checklist
+
+- Status artifacts generated from one source.
+- No unknown runtime state in JSON or PG.
+- Generic CRUD mutation default-deny for governed tables.
+- Quote conversion atomic and idempotent.
+- Engineering readiness enforced before JO/WO.
+- OQC/IQC fail creates canonical NCR/hold.
+- Packing/delivery cannot bypass shipment gate.
+- Material issue posts inventory/WIP ledger.
+- Period close blocks all posting commands.
+- Backdate exception is consumed atomically.
+- Drift tool runs without fatal error.
+- Master-data sync includes BOM/routing/control plan/inspection plan.
+- E-signature requires re-auth and rejects TOTP replay.
+- Machine raw event stream is append-only and replayable.
+- Mobile MES controller-service signatures covered by tests.
+
+## Residual Risk Register
+
+| Risk ID | Residual risk | Severity | Mitigation before implementation |
+| --- | --- | --- | --- |
+| RR-001 | Existing JSON data may contain statuses that cannot be automatically mapped. | High | Migration hold report and manual disposition workflow. |
+| RR-002 | Singular/plural duplicate tables may contain divergent production data. | High | Table-pair reconciliation and canonical mapping. |
+| RR-003 | Some domain services bypass `DataLayer`; dual-write may be incomplete during cutover. | High | Command rewrite before PG cutover. |
+| RR-004 | Generic CRUD remains broad for admin use and can be misconfigured. | High | Default-deny governed mutation and CI contract tests. |
+| RR-005 | Quality JSONL automation may contain historical triggers not imported. | Medium | Import/reconciliation job with legacy trigger evidence. |
+| RR-006 | Notification email queue has no sender. | Medium | Worker implementation and dead-letter dashboard. |
+| RR-007 | MTConnect current-state polling may miss transient events. | Medium | Raw event stream/agent history support and quality code policy. |
+| RR-008 | PostgreSQL constraints may initially be `NOT VALID` during migration. | Medium | Cutover checklist blocks `POSTGRES_ONLY` until validated. |
+| RR-009 | Part 11 scope may vary by customer/regulatory product. | Medium | Record retention/e-sign policy matrix by product/customer. |
+| RR-010 | Existing OpenAPI may advertise endpoints that policy now blocks. | Medium | Regenerate OpenAPI with runtime-safe tags and deprecation markers. |

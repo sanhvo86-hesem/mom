@@ -44,32 +44,37 @@ $apiConfig = require __DIR__ . '/config.php';
 
 // â”€â”€ Autoloader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Simple PSR-4-like autoloader for MOM namespace
-spl_autoload_register(function (string $class): void {
-    // Namespace prefix -> directory mappings
-    $map = [
-        'MOM\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
-        'MOM\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
-        'MOM\\Api\\Validators\\'    => __DIR__ . '/validators/',
-        'MOM\\Api\\Services\\'      => __DIR__ . '/services/',
-        'MOM\\Services\\'           => __DIR__ . '/services/',
-        'MOM\\Api\\'               => __DIR__ . '/',
-        'MOM\\Database\\'           => dirname(__DIR__) . '/database/',
-    ];
+// Composer autoloader (includes PSR-4 mappings defined in composer.json)
+$composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+if (is_file($composerAutoload)) {
+    require_once $composerAutoload;
+} else {
+    // Fallback: Simple PSR-4-like autoloader when Composer is not installed
+    spl_autoload_register(function (string $class): void {
+        $map = [
+            'MOM\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
+            'MOM\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
+            'MOM\\Api\\Validators\\'    => __DIR__ . '/validators/',
+            'MOM\\Api\\Services\\'      => __DIR__ . '/services/',
+            'MOM\\Services\\'           => __DIR__ . '/services/',
+            'MOM\\Api\\'               => __DIR__ . '/',
+            'MOM\\Database\\'           => dirname(__DIR__) . '/database/',
+        ];
 
-    foreach ($map as $prefix => $baseDir) {
-        $len = strlen($prefix);
-        if (strncmp($class, $prefix, $len) !== 0) {
-            continue;
+        foreach ($map as $prefix => $baseDir) {
+            $len = strlen($prefix);
+            if (strncmp($class, $prefix, $len) !== 0) {
+                continue;
+            }
+            $relativeClass = substr($class, $len);
+            $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+            if (is_file($file)) {
+                require_once $file;
+                return;
+            }
         }
-        $relativeClass = substr($class, $len);
-        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-        if (is_file($file)) {
-            require_once $file;
-            return;
-        }
-    }
-});
+    });
+}
 
 // â”€â”€ Load Legacy Functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -102,7 +107,17 @@ use MOM\Api\Middleware\AuthMiddleware;
 use MOM\Api\Middleware\CorsMiddleware;
 use MOM\Api\Middleware\RateLimitMiddleware;
 use MOM\Api\Middleware\AuditMiddleware;
+use MOM\Api\Middleware\ApiKeyMiddleware;
+use MOM\Api\Services\CacheService;
+use MOM\Api\Services\QueueService;
+use MOM\Api\Services\EventBroadcaster;
+use MOM\Api\Services\LogTransport;
+use MOM\Api\Services\EventBus;
+use MOM\Api\Services\DomainEvent;
 use MOM\Api\Controllers\AuthController;
+use MOM\Api\Controllers\ApiKeyController;
+use MOM\Api\Controllers\EventStreamController;
+use MOM\Api\Controllers\HealthController;
 use MOM\Api\Controllers\DocumentController;
 use MOM\Api\Controllers\FormController;
 use MOM\Api\Controllers\FileController;
@@ -154,6 +169,17 @@ $router->setEmitBackendHeaders((bool)($apiConfig['observability']['emit_backend_
 
 // â”€â”€ Register Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+// Infrastructure services (Phase 0.2+)
+$cacheService   = new CacheService($DATA_DIR);
+$queueService   = new QueueService($DATA_DIR);
+$logTransport   = new LogTransport($DATA_DIR);
+$eventBroadcast = new EventBroadcaster($cacheService);
+
+// Event-Driven Architecture (Phase 4.1)
+$eventBus = new EventBus($queueService, $eventBroadcast, $logTransport);
+$eventBus->registerDefaultRules();
+EventBus::setInstance($eventBus);
+
 $corsMiddleware      = new CorsMiddleware(
     (array)($apiConfig['cors']['allowed_origins'] ?? []),
     (array)($apiConfig['cors']['allowed_methods'] ?? ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
@@ -161,11 +187,13 @@ $corsMiddleware      = new CorsMiddleware(
     (int)($apiConfig['cors']['max_age'] ?? 86400),
     (bool)($apiConfig['cors']['allow_credentials'] ?? true),
 );
+$apiKeyMiddleware    = new ApiKeyMiddleware($DATA_DIR, $cacheService);
 $authMiddleware      = new AuthMiddleware($store, (array)($apiConfig['auth'] ?? []));
-$rateLimitMiddleware = new RateLimitMiddleware($DATA_DIR . '/ratelimit');
+$rateLimitMiddleware = new RateLimitMiddleware($DATA_DIR . '/ratelimit', 120, 60, [], $cacheService);
 $auditMiddleware     = new AuditMiddleware($DATA_DIR . '/audit.log');
 
 $router->use($corsMiddleware->handler());
+$router->use($apiKeyMiddleware->handler());  // API key/JWT checked before session auth
 $router->use($authMiddleware->handler());
 $router->use($rateLimitMiddleware->handler());
 $router->use($auditMiddleware->handler());
@@ -180,6 +208,28 @@ $router->actions([
     'auth_enroll_verify'  => [AuthController::class, 'enrollVerify'],
     'auth_logout'         => [AuthController::class, 'logout'],
 ]);
+
+// API Key Management & JWT (Phase 1.1)
+$router->actions([
+    'auth_create_api_key' => [ApiKeyController::class, 'create'],
+    'auth_list_api_keys'  => [ApiKeyController::class, 'list'],
+    'auth_revoke_api_key' => [ApiKeyController::class, 'revoke'],
+    'auth_generate_jwt'   => [ApiKeyController::class, 'generateJwt'],
+]);
+
+// RESTful routes for API keys
+$router->post('/api/auth/api-keys', ApiKeyController::class, 'create');
+$router->get('/api/auth/api-keys', ApiKeyController::class, 'list');
+$router->delete('/api/auth/api-keys/{keyId}', ApiKeyController::class, 'revoke');
+$router->post('/api/auth/jwt', ApiKeyController::class, 'generateJwt');
+
+// Server-Sent Events stream (Phase 1.2)
+$router->get('/api/events/stream', EventStreamController::class, 'stream');
+
+// Health checks (Kubernetes-ready)
+$router->get('/api/health/live', HealthController::class, 'live');
+$router->get('/api/health/ready', HealthController::class, 'ready');
+$router->get('/api/health/status', HealthController::class, 'status');
 
 // Documents
 $router->actions([
