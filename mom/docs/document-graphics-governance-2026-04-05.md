@@ -343,11 +343,11 @@ Admin Appearance is now governed as the Graphics Control Plane. It is not only a
 The frontend expects these action contracts to exist:
 
 - template registry: `admin_template_registry_get`, `admin_template_get`, `admin_template_draft_save`, `admin_template_validate`, `admin_template_publish`, `admin_template_deprecate`, `admin_template_modules_get`
-- impact analysis: `admin_graphics_impact_token`, `admin_graphics_impact_template`, `admin_graphics_impact_component`
+- impact analysis: `admin_graphics_impact_token`, `admin_graphics_impact_template`, `admin_graphics_impact_component`, `admin_graphics_impact_policy_pack`
 - compliance/debt/drift: `admin_graphics_compliance_get`, `admin_graphics_non_compliant_get`, `admin_graphics_debt_get`, `admin_graphics_drift_get`
-- rollout: `admin_graphics_rollout_stage`, `admin_graphics_rollout_apply`, `admin_graphics_rollout_rollback`
+- rollout: `admin_graphics_rollout_stage`, `admin_graphics_rollout_apply`, `admin_graphics_rollout_rollback`, `admin_graphics_rollout_canary_apply`
 - audit/waiver/blockers: `admin_graphics_audit_history_get`, `admin_graphics_waiver_create`, `admin_graphics_waiver_approve`, `admin_graphics_waiver_expire`, `admin_graphics_waiver_active_get`, `admin_graphics_release_blockers_get`
-- leadership control-plane artifacts: `admin_graphics_change_set_get`, `admin_graphics_lineage_get`, `admin_graphics_runtime_beacon_get`, `admin_graphics_debt_observatory_get`, `admin_graphics_environment_policy_packs_get`, `admin_graphics_release_dashboard_get`
+- leadership control-plane artifacts: `admin_graphics_change_set_get`, `admin_graphics_lineage_get`, `admin_graphics_runtime_beacon_get`, `admin_graphics_debt_observatory_get`, `admin_graphics_environment_policy_packs_get`, `admin_graphics_release_dashboard_get`, `admin_graphics_release_link_get`
 
 Mutating actions must require optimistic concurrency through `expectedVersion` or `If-Match`.
 

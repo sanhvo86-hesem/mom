@@ -96,13 +96,11 @@ final class SessionService
             }
 
             try {
-                session_start();
+                self::sessionStartOrThrow();
                 return;
             } catch (\Throwable $e) {
                 $lastError = $e;
-                if (session_status() === PHP_SESSION_ACTIVE) {
-                    @session_write_close();
-                }
+                @session_write_close();
                 if (self::exceptionAllowsFreshStart($e)) {
                     if (self::startWithFreshId()) {
                         return;
@@ -115,7 +113,7 @@ final class SessionService
             throw $lastError;
         }
 
-        session_start();
+        self::sessionStartOrThrow();
     }
 
     /**
@@ -128,7 +126,7 @@ final class SessionService
         self::clearAuthState();
         if (ini_get('session.use_cookies') && !headers_sent()) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 3600, $params['path'] ?: '/', $params['domain'] ?? '', (bool)($params['secure'] ?? false), (bool)($params['httponly'] ?? true));
+            setcookie(session_name(), '', time() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
         }
         $_SESSION = [];
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -247,9 +245,8 @@ final class SessionService
         if (!$systemRequiresMfa) {
             return false;
         }
-        $userMfa = $user['mfa'] ?? [];
-        $userHasMfa = is_array($userMfa) && (bool)($userMfa['enabled'] ?? false);
-        return $systemRequiresMfa || $userHasMfa;
+
+        return true;
     }
 
     /**
@@ -302,6 +299,21 @@ final class SessionService
 
     // ── Internal helpers ────────────────────────────────────────────────
 
+    private static function sessionStartOrThrow(): void
+    {
+        set_error_handler(static function (int $severity, string $message, string $file, int $line): never {
+            throw new \RuntimeException($message . ' in ' . $file . ':' . $line, $severity);
+        });
+
+        try {
+            if (!session_start()) {
+                throw new \RuntimeException('session_start_failed');
+            }
+        } finally {
+            restore_error_handler();
+        }
+    }
+
     private static function exceptionAllowsFreshStart(\Throwable $e): bool
     {
         $message = strtolower(trim($e->getMessage()));
@@ -339,7 +351,7 @@ final class SessionService
         @session_id(bin2hex(random_bytes(16)));
 
         try {
-            session_start();
+            self::sessionStartOrThrow();
             return true;
         } catch (\Throwable $retryError) {
             @error_log('[API] Session recovery failed: ' . $retryError->getMessage() . ' in ' . $retryError->getFile() . ':' . $retryError->getLine());

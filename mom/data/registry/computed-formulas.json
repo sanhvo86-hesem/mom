@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-13T13:52:36.686Z",
-    "formulaCount": 1286
+    "generatedAt": "2026-04-13T15:11:19.549Z",
+    "formulaCount": 1331
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -28308,6 +28308,951 @@
       {
         "type": "endpoint",
         "id": "foundation_governance.signature_events.transition"
+      }
+    ]
+  },
+  "f_shift_dispatch_execution_events_record_count": {
+    "formulaId": "f_shift_dispatch_execution_events_record_count",
+    "name": "Ca Điều độ Thực thi sự kiện - Số bản ghi",
+    "nameEn": "Shift Dispatch Execution Events Record Count",
+    "category": "manufacturing",
+    "domain": "production",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM shift_dispatch_execution_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "shift_dispatch_execution_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "production.shift_dispatch_execution_events.list"
+      }
+    ]
+  },
+  "f_shift_dispatch_execution_events_closed_count": {
+    "formulaId": "f_shift_dispatch_execution_events_closed_count",
+    "name": "Ca Điều độ Thực thi sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Shift Dispatch Execution Events Closed Count",
+    "category": "manufacturing",
+    "domain": "production",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE target_status IN ('closed','completed','archived','paid','delivered')) FROM shift_dispatch_execution_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "shift_dispatch_execution_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "production.shift_dispatch_execution_events.transition"
+      }
+    ]
+  },
+  "f_shift_production_report_events_record_count": {
+    "formulaId": "f_shift_production_report_events_record_count",
+    "name": "Ca Sản xuất Báo cáo sự kiện - Số bản ghi",
+    "nameEn": "Shift Production Report Events Record Count",
+    "category": "manufacturing",
+    "domain": "production",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM shift_production_report_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "shift_production_report_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "production.shift_production_report_events.list"
+      }
+    ]
+  },
+  "f_as_manufactured_snapshots_record_count": {
+    "formulaId": "f_as_manufactured_snapshots_record_count",
+    "name": "As Manufactured ảnh chụp - Số bản ghi",
+    "nameEn": "As Manufactured Snapshots Record Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM as_manufactured_snapshots",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "as_manufactured_snapshots_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.as_manufactured_snapshots.list"
+      }
+    ]
+  },
+  "f_as_manufactured_snapshots_closed_count": {
+    "formulaId": "f_as_manufactured_snapshots_closed_count",
+    "name": "As Manufactured ảnh chụp - Số hồ sơ đã đóng",
+    "nameEn": "As Manufactured Snapshots Closed Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE snapshot_state IN ('closed','completed','archived','paid','delivered')) FROM as_manufactured_snapshots",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "as_manufactured_snapshots_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.as_manufactured_snapshots.transition"
+      }
+    ]
+  },
+  "f_audit_pack_exports_record_count": {
+    "formulaId": "f_audit_pack_exports_record_count",
+    "name": "Pack Xuất khẩu Đánh giá - Số bản ghi",
+    "nameEn": "Audit Pack Exports Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM audit_pack_exports",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "audit_pack_exports_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.audit_pack_exports.list"
+      }
+    ]
+  },
+  "f_audit_pack_exports_closed_count": {
+    "formulaId": "f_audit_pack_exports_closed_count",
+    "name": "Pack Xuất khẩu Đánh giá - Số hồ sơ đã đóng",
+    "nameEn": "Audit Pack Exports Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE export_state IN ('closed','completed','archived','paid','delivered')) FROM audit_pack_exports",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "audit_pack_exports_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.audit_pack_exports.transition"
+      }
+    ]
+  },
+  "f_control_plane_object_registry_record_count": {
+    "formulaId": "f_control_plane_object_registry_record_count",
+    "name": "Plane Object sổ đăng ký Kiểm soát - Số bản ghi",
+    "nameEn": "Control Plane Object Registry Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM control_plane_object_registry",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "control_plane_object_registry_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.control_plane_object_registry.list"
+      }
+    ]
+  },
+  "f_control_plane_object_registry_closed_count": {
+    "formulaId": "f_control_plane_object_registry_closed_count",
+    "name": "Plane Object sổ đăng ký Kiểm soát - Số hồ sơ đã đóng",
+    "nameEn": "Control Plane Object Registry Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE lifecycle_state IN ('closed','completed','archived','paid','delivered')) FROM control_plane_object_registry",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "control_plane_object_registry_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.control_plane_object_registry.transition"
+      }
+    ]
+  },
+  "f_duplicate_detection_fingerprints_record_count": {
+    "formulaId": "f_duplicate_detection_fingerprints_record_count",
+    "name": "Trùng lặp Phát hiện Fingerprint - Số bản ghi",
+    "nameEn": "Duplicate Detection Fingerprints Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM duplicate_detection_fingerprints",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "duplicate_detection_fingerprints_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.duplicate_detection_fingerprints.list"
+      }
+    ]
+  },
+  "f_effectivity_conflicts_record_count": {
+    "formulaId": "f_effectivity_conflicts_record_count",
+    "name": "Effectivity xung đột - Số bản ghi",
+    "nameEn": "Effectivity Conflicts Record Count",
+    "category": "system",
+    "domain": "plm_change_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM effectivity_conflicts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "effectivity_conflicts_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "plm_change_control.effectivity_conflicts.list"
+      }
+    ]
+  },
+  "f_effectivity_conflicts_closed_count": {
+    "formulaId": "f_effectivity_conflicts_closed_count",
+    "name": "Effectivity xung đột - Số hồ sơ đã đóng",
+    "nameEn": "Effectivity Conflicts Closed Count",
+    "category": "system",
+    "domain": "plm_change_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE conflict_state IN ('closed','completed','archived','paid','delivered')) FROM effectivity_conflicts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "effectivity_conflicts_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "plm_change_control.effectivity_conflicts.transition"
+      }
+    ]
+  },
+  "f_eqms_command_ledger_record_count": {
+    "formulaId": "f_eqms_command_ledger_record_count",
+    "name": "Eqm Command sổ cái - Số bản ghi",
+    "nameEn": "Eqms Command Ledger Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_command_ledger",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_command_ledger_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.eqms_command_ledger.list"
+      }
+    ]
+  },
+  "f_eqms_command_ledger_closed_count": {
+    "formulaId": "f_eqms_command_ledger_closed_count",
+    "name": "Eqm Command sổ cái - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Command Ledger Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE command_state IN ('closed','completed','archived','paid','delivered')) FROM eqms_command_ledger",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_command_ledger_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.eqms_command_ledger.transition"
+      }
+    ]
+  },
+  "f_genealogy_edges_record_count": {
+    "formulaId": "f_genealogy_edges_record_count",
+    "name": "Phả hệ Edge - Số bản ghi",
+    "nameEn": "Genealogy Edges Record Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM genealogy_edges",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "genealogy_edges_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.genealogy_edges.list"
+      }
+    ]
+  },
+  "f_genealogy_nodes_record_count": {
+    "formulaId": "f_genealogy_nodes_record_count",
+    "name": "Phả hệ Node - Số bản ghi",
+    "nameEn": "Genealogy Nodes Record Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM genealogy_nodes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "genealogy_nodes_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.genealogy_nodes.list"
+      }
+    ]
+  },
+  "f_genealogy_nodes_closed_count": {
+    "formulaId": "f_genealogy_nodes_closed_count",
+    "name": "Phả hệ Node - Số hồ sơ đã đóng",
+    "nameEn": "Genealogy Nodes Closed Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE lifecycle_state IN ('closed','completed','archived','paid','delivered')) FROM genealogy_nodes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "genealogy_nodes_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.genealogy_nodes.transition"
+      }
+    ]
+  },
+  "f_immutable_storage_objects_record_count": {
+    "formulaId": "f_immutable_storage_objects_record_count",
+    "name": "Immutable lưu trữ Object - Số bản ghi",
+    "nameEn": "Immutable Storage Objects Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM immutable_storage_objects",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "immutable_storage_objects_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.immutable_storage_objects.list"
+      }
+    ]
+  },
+  "f_legal_holds_record_count": {
+    "formulaId": "f_legal_holds_record_count",
+    "name": "Legal tạm giữ - Số bản ghi",
+    "nameEn": "Legal Holds Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM legal_holds",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "legal_holds_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.legal_holds.list"
+      }
+    ]
+  },
+  "f_legal_holds_closed_count": {
+    "formulaId": "f_legal_holds_closed_count",
+    "name": "Legal tạm giữ - Số hồ sơ đã đóng",
+    "nameEn": "Legal Holds Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE hold_state IN ('closed','completed','archived','paid','delivered')) FROM legal_holds",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "legal_holds_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.legal_holds.transition"
+      }
+    ]
+  },
+  "f_online_form_sessions_record_count": {
+    "formulaId": "f_online_form_sessions_record_count",
+    "name": "Online biểu mẫu phiên - Số bản ghi",
+    "nameEn": "Online Form Sessions Record Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM online_form_sessions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "online_form_sessions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.online_form_sessions.list"
+      }
+    ]
+  },
+  "f_online_form_sessions_closed_count": {
+    "formulaId": "f_online_form_sessions_closed_count",
+    "name": "Online biểu mẫu phiên - Số hồ sơ đã đóng",
+    "nameEn": "Online Form Sessions Closed Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE session_state IN ('closed','completed','archived','paid','delivered')) FROM online_form_sessions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "online_form_sessions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.online_form_sessions.transition"
+      }
+    ]
+  },
+  "f_promotion_receipts_record_count": {
+    "formulaId": "f_promotion_receipts_record_count",
+    "name": "Promotion phiếu nhận - Số bản ghi",
+    "nameEn": "Promotion Receipts Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM promotion_receipts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "promotion_receipts_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.promotion_receipts.list"
+      }
+    ]
+  },
+  "f_promotion_receipts_closed_count": {
+    "formulaId": "f_promotion_receipts_closed_count",
+    "name": "Promotion phiếu nhận - Số hồ sơ đã đóng",
+    "nameEn": "Promotion Receipts Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE promotion_state IN ('closed','completed','archived','paid','delivered')) FROM promotion_receipts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "promotion_receipts_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.promotion_receipts.transition"
+      }
+    ]
+  },
+  "f_publication_attempts_record_count": {
+    "formulaId": "f_publication_attempts_record_count",
+    "name": "Publication Attempt - Số bản ghi",
+    "nameEn": "Publication Attempts Record Count",
+    "category": "compliance",
+    "domain": "evidence_vault",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM publication_attempts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "publication_attempts_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "evidence_vault.publication_attempts.list"
+      }
+    ]
+  },
+  "f_publication_attempts_closed_count": {
+    "formulaId": "f_publication_attempts_closed_count",
+    "name": "Publication Attempt - Số hồ sơ đã đóng",
+    "nameEn": "Publication Attempts Closed Count",
+    "category": "compliance",
+    "domain": "evidence_vault",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE attempt_state IN ('closed','completed','archived','paid','delivered')) FROM publication_attempts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "publication_attempts_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "evidence_vault.publication_attempts.transition"
+      }
+    ]
+  },
+  "f_publication_receipts_record_count": {
+    "formulaId": "f_publication_receipts_record_count",
+    "name": "Publication phiếu nhận - Số bản ghi",
+    "nameEn": "Publication Receipts Record Count",
+    "category": "compliance",
+    "domain": "evidence_vault",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM publication_receipts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "publication_receipts_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "evidence_vault.publication_receipts.list"
+      }
+    ]
+  },
+  "f_read_ack_gate_decisions_record_count": {
+    "formulaId": "f_read_ack_gate_decisions_record_count",
+    "name": "Read Ack cổng Decision - Số bản ghi",
+    "nameEn": "Read Ack Gate Decisions Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM read_ack_gate_decisions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "read_ack_gate_decisions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.read_ack_gate_decisions.list"
+      }
+    ]
+  },
+  "f_read_ack_gate_decisions_closed_count": {
+    "formulaId": "f_read_ack_gate_decisions_closed_count",
+    "name": "Read Ack cổng Decision - Số hồ sơ đã đóng",
+    "nameEn": "Read Ack Gate Decisions Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE gate_state IN ('closed','completed','archived','paid','delivered')) FROM read_ack_gate_decisions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "read_ack_gate_decisions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.read_ack_gate_decisions.transition"
+      }
+    ]
+  },
+  "f_release_manifests_record_count": {
+    "formulaId": "f_release_manifests_record_count",
+    "name": "Phát hành Manifest - Số bản ghi",
+    "nameEn": "Release Manifests Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM release_manifests",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "release_manifests_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.release_manifests.list"
+      }
+    ]
+  },
+  "f_release_manifests_closed_count": {
+    "formulaId": "f_release_manifests_closed_count",
+    "name": "Phát hành Manifest - Số hồ sơ đã đóng",
+    "nameEn": "Release Manifests Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE manifest_state IN ('closed','completed','archived','paid','delivered')) FROM release_manifests",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "release_manifests_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.release_manifests.transition"
+      }
+    ]
+  },
+  "f_reverse_sync_intakes_record_count": {
+    "formulaId": "f_reverse_sync_intakes_record_count",
+    "name": "Reverse Sync Intake - Số bản ghi",
+    "nameEn": "Reverse Sync Intakes Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM reverse_sync_intakes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "reverse_sync_intakes_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.reverse_sync_intakes.list"
+      }
+    ]
+  },
+  "f_reverse_sync_intakes_closed_count": {
+    "formulaId": "f_reverse_sync_intakes_closed_count",
+    "name": "Reverse Sync Intake - Số hồ sơ đã đóng",
+    "nameEn": "Reverse Sync Intakes Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE disposition_state IN ('closed','completed','archived','paid','delivered')) FROM reverse_sync_intakes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "reverse_sync_intakes_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.reverse_sync_intakes.transition"
+      }
+    ]
+  },
+  "f_source_boundary_violations_record_count": {
+    "formulaId": "f_source_boundary_violations_record_count",
+    "name": "Nguồn Boundary vi phạm - Số bản ghi",
+    "nameEn": "Source Boundary Violations Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM source_boundary_violations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "source_boundary_violations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.source_boundary_violations.list"
+      }
+    ]
+  },
+  "f_state_transition_events_record_count": {
+    "formulaId": "f_state_transition_events_record_count",
+    "name": "Trạng thái Chuyển trạng thái sự kiện - Số bản ghi",
+    "nameEn": "State Transition Events Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM state_transition_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "state_transition_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.state_transition_events.list"
+      }
+    ]
+  },
+  "f_state_transition_events_closed_count": {
+    "formulaId": "f_state_transition_events_closed_count",
+    "name": "Trạng thái Chuyển trạng thái sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "State Transition Events Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE to_state IN ('closed','completed','archived','paid','delivered')) FROM state_transition_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "state_transition_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.state_transition_events.transition"
+      }
+    ]
+  },
+  "f_submission_validation_errors_record_count": {
+    "formulaId": "f_submission_validation_errors_record_count",
+    "name": "Bản nộp Kiểm tra tính hợp lệ Error - Số bản ghi",
+    "nameEn": "Submission Validation Errors Record Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM submission_validation_errors",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "submission_validation_errors_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.submission_validation_errors.list"
+      }
+    ]
+  },
+  "f_submission_validation_results_record_count": {
+    "formulaId": "f_submission_validation_results_record_count",
+    "name": "Bản nộp Kiểm tra tính hợp lệ kết quả - Số bản ghi",
+    "nameEn": "Submission Validation Results Record Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM submission_validation_results",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "submission_validation_results_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.submission_validation_results.list"
+      }
+    ]
+  },
+  "f_submission_validation_results_closed_count": {
+    "formulaId": "f_submission_validation_results_closed_count",
+    "name": "Bản nộp Kiểm tra tính hợp lệ kết quả - Số hồ sơ đã đóng",
+    "nameEn": "Submission Validation Results Closed Count",
+    "category": "system",
+    "domain": "forms_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE validation_state IN ('closed','completed','archived','paid','delivered')) FROM submission_validation_results",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "submission_validation_results_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "forms_system.submission_validation_results.transition"
+      }
+    ]
+  },
+  "f_traceability_exceptions_record_count": {
+    "formulaId": "f_traceability_exceptions_record_count",
+    "name": "Truy xuất nguồn gốc ngoại lệ - Số bản ghi",
+    "nameEn": "Traceability Exceptions Record Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM traceability_exceptions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "traceability_exceptions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.traceability_exceptions.list"
+      }
+    ]
+  },
+  "f_traceability_exceptions_closed_count": {
+    "formulaId": "f_traceability_exceptions_closed_count",
+    "name": "Truy xuất nguồn gốc ngoại lệ - Số hồ sơ đã đóng",
+    "nameEn": "Traceability Exceptions Closed Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE exception_state IN ('closed','completed','archived','paid','delivered')) FROM traceability_exceptions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "traceability_exceptions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.traceability_exceptions.transition"
+      }
+    ]
+  },
+  "f_training_gate_decisions_record_count": {
+    "formulaId": "f_training_gate_decisions_record_count",
+    "name": "Đào tạo cổng Decision - Số bản ghi",
+    "nameEn": "Training Gate Decisions Record Count",
+    "category": "system",
+    "domain": "training_hr",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM training_gate_decisions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "training_gate_decisions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "training_hr.training_gate_decisions.list"
+      }
+    ]
+  },
+  "f_training_gate_decisions_closed_count": {
+    "formulaId": "f_training_gate_decisions_closed_count",
+    "name": "Đào tạo cổng Decision - Số hồ sơ đã đóng",
+    "nameEn": "Training Gate Decisions Closed Count",
+    "category": "system",
+    "domain": "training_hr",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE gate_state IN ('closed','completed','archived','paid','delivered')) FROM training_gate_decisions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "training_gate_decisions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "training_hr.training_gate_decisions.transition"
+      }
+    ]
+  },
+  "f_wip_dispositions_record_count": {
+    "formulaId": "f_wip_dispositions_record_count",
+    "name": "WIP Xử lý - Số bản ghi",
+    "nameEn": "WIP Dispositions Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM wip_dispositions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "wip_dispositions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.wip_dispositions.list"
+      }
+    ]
+  },
+  "f_wip_dispositions_closed_count": {
+    "formulaId": "f_wip_dispositions_closed_count",
+    "name": "WIP Xử lý - Số hồ sơ đã đóng",
+    "nameEn": "WIP Dispositions Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE disposition_state IN ('closed','completed','archived','paid','delivered')) FROM wip_dispositions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "wip_dispositions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.wip_dispositions.transition"
       }
     ]
   }

@@ -126,7 +126,7 @@ class CorsMiddleware
             }
             // Wildcard matching: https://*.example.com
             if (str_contains($allowed, '*')) {
-                $regex = '/^' . str_replace('\*', '[a-z0-9-]+', preg_quote($allowed, '/')) . '$/';
+                $regex = '/^' . str_replace('\*', '[a-z0-9-]+', preg_quote($allowed, '/')) . '$/i';
                 if (preg_match($regex, $origin)) {
                     return true;
                 }

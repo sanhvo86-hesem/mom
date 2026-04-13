@@ -1,14 +1,14 @@
 # Schema Authority Summary
 
 **Declared**: 2026-04-13
-**Scope**: Platform-global (724 tables)
-**Migration range**: 001–106 (106 migrations)
+**Scope**: Platform-global (750 tables)
+**Migration range**: 001–108 (108 migrations)
 
 ## Authority Chain
 
 | Layer | File | Role |
 |-------|------|------|
-| **Executable Source of Truth** | `database/migrations/001–106_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
+| **Executable Source of Truth** | `database/migrations/001–108_*.sql` | Sequential DDL. Applied in order. This IS the schema. |
 | **Generated Snapshot** | `database/schema.sql` | Aggregate of all migrations. Built by `build_schema_snapshot.php`. Reference only; regenerate after any migration change. |
 | **Conceptual Blueprint** | `database/canonical-erp-mes-eqms-7-layer-blueprint.sql` | ISA-95/IEC 62264 7-layer design input. NOT executable authority. |
 | **Specification Reference** | `database/mes-schema-specification.sql` | MES specification reference. NOT executable authority. |

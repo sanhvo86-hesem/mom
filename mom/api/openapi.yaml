@@ -56,6 +56,10 @@ info:
     ```json
     { "ok": false, "error": "error_code", "detail": "optional message", "server_time": "..." }
     ```
+
+    Graphics Governance endpoints use RFC 9457-style `application/problem+json`
+    for authentication, permission, concurrency, validation and release-blocker
+    failures so Admin can fail closed without interpreting legacy envelopes.
   version: 2.0.0
   contact:
     name: HESEM QMS Team
@@ -125,6 +129,8 @@ tags:
       Backend authority for design config, template registry, component contracts,
       graphics compliance, impact analysis, rollout, rollback, audit and waivers.
       Browser localStorage is cache only; the backend registry/design artifacts are authority.
+      Error responses are `application/problem+json` and include `code`, `status`,
+      `detail`, optional field errors and release blocker context where applicable.
 
 paths:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -3684,6 +3690,8 @@ paths:
 
         **Legacy actions:** `graphics_design_config_get`, `admin_design_config`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Design config returned.
           content:
@@ -3714,6 +3722,8 @@ paths:
             schema:
               $ref: '#/components/schemas/DesignConfigSaveRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Design config saved.
           content:
@@ -3735,6 +3745,8 @@ paths:
 
         **Action aliases:** `graphics_template_registry_get`, `admin_template_registry_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Template registry returned.
           content:
@@ -3752,6 +3764,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/TemplateIdPath'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Template returned.
           content:
@@ -3781,6 +3795,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemplateDraftSaveRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Draft saved.
           content:
@@ -3808,6 +3824,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemplateCloneRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Draft clone created.
           content:
@@ -3835,6 +3853,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemplateDeprecateRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Template deprecated or retired.
           content:
@@ -3862,6 +3882,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemplateValidateRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Validation result returned.
           content:
@@ -3892,6 +3914,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GraphicsPublishRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Template published.
           content:
@@ -3911,6 +3935,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/TemplateIdPath'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Module usage returned.
           content:
@@ -3926,6 +3952,8 @@ paths:
       description: |
         **Legacy action:** `graphics_component_contract_registry`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Component contract registry returned.
           content:
@@ -3941,6 +3969,8 @@ paths:
       description: |
         **Action aliases:** `graphics_compliance_matrix`, `admin_graphics_compliance_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Compliance matrix returned.
           content:
@@ -3956,6 +3986,8 @@ paths:
       description: |
         **Action aliases:** `graphics_non_compliant_modules`, `admin_graphics_non_compliant_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Non-compliant modules returned.
           content:
@@ -3971,6 +4003,8 @@ paths:
       description: |
         **Legacy action:** `graphics_bridge_alias_debt`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Bridge alias debt returned.
           content:
@@ -3986,6 +4020,8 @@ paths:
       description: |
         **Legacy action:** `graphics_private_css_debt`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Private CSS debt returned.
           content:
@@ -4001,6 +4037,8 @@ paths:
       description: |
         **Legacy action:** `graphics_token_adoption_coverage`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Token coverage returned.
           content:
@@ -4018,6 +4056,8 @@ paths:
 
         **Legacy actions:** `admin_graphics_debt_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Aggregate graphics debt returned.
           content:
@@ -4033,6 +4073,8 @@ paths:
       description: |
         **Action aliases:** `graphics_drift_report`, `admin_graphics_drift_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Drift report returned.
           content:
@@ -4051,6 +4093,8 @@ paths:
 
         **Legacy actions:** `graphics_release_blockers_get`, `admin_graphics_release_blockers_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Graphics release blockers returned.
           content:
@@ -4069,6 +4113,8 @@ paths:
 
         **Action aliases:** `graphics_change_set_get`, `admin_graphics_change_set_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Graphics change set returned.
           content:
@@ -4087,6 +4133,8 @@ paths:
 
         **Action aliases:** `graphics_lineage_get`, `admin_graphics_lineage_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Graphics lineage graph returned.
           content:
@@ -4104,6 +4152,8 @@ paths:
 
         **Action aliases:** `graphics_runtime_beacon_get`, `admin_graphics_runtime_beacon_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime beacon returned.
           content:
@@ -4122,6 +4172,8 @@ paths:
 
         **Action aliases:** `graphics_debt_observatory_get`, `admin_graphics_debt_observatory_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Visual debt observatory returned.
           content:
@@ -4139,6 +4191,8 @@ paths:
 
         **Action aliases:** `graphics_environment_policy_packs_get`, `admin_graphics_environment_policy_packs_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Environment policy packs returned.
           content:
@@ -4157,12 +4211,35 @@ paths:
 
         **Action aliases:** `graphics_release_dashboard_get`, `admin_graphics_release_dashboard_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Graphics release dashboard returned.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GraphicsReleaseDashboardResponse'
+
+  /api/graphics/release-link:
+    get:
+      operationId: graphicsReleaseLinkGet
+      tags: [Graphics Governance]
+      summary: Read release-grade graphics authority linkage
+      description: |
+        Returns the graphics authority refs, registry checksum, compliance snapshot refs,
+        impact-analysis refs, waiver refs, runtime beacon refs, rollout decision refs and
+        evidence bundle obligations required by release engineering.
+
+        **Action aliases:** `graphics_release_link_get`, `admin_graphics_release_link_get`
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
+        '200':
+          description: Graphics release linkage returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsReleaseLinkResponse'
 
   /api/graphics/impact/token:
     post:
@@ -4180,6 +4257,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TokenImpactRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Token impact report returned.
           content:
@@ -4203,6 +4282,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemplateImpactRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Template impact report returned.
           content:
@@ -4226,8 +4307,37 @@ paths:
             schema:
               $ref: '#/components/schemas/ComponentImpactRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Component impact report returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsImpactReportResponse'
+
+  /api/graphics/impact/policy-pack:
+    post:
+      operationId: graphicsPolicyPackImpactAnalyze
+      tags: [Graphics Governance]
+      summary: Analyze environment policy-pack impact
+      description: |
+        Computes blast radius and rerun evidence for office/review/admin/shopfloor/kiosk/TV/night-shift/glare/glove policy pack changes.
+
+        **Action aliases:** `graphics_impact_policy_pack`, `admin_graphics_impact_policy_pack`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyPackImpactRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
+        '200':
+          description: Environment policy-pack impact report returned.
           content:
             application/json:
               schema:
@@ -4250,6 +4360,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GraphicsRolloutRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Rollout staged.
           content:
@@ -4274,8 +4386,40 @@ paths:
             schema:
               $ref: '#/components/schemas/GraphicsRolloutApplyRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Rollout applied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsRolloutResponse'
+
+  /api/graphics/rollouts/canary-apply:
+    post:
+      operationId: graphicsRolloutCanaryApply
+      tags: [Graphics Governance]
+      summary: Apply staged graphics rollout to canary scope
+      description: |
+        Moves a staged rollout into canary-applied state for canary-module-group or
+        canary-domain scope. Requires release manifest refs, registry version/etag match,
+        and no active scoped release blockers.
+
+        **Action aliases:** `graphics_rollout_canary_apply`, `admin_graphics_rollout_canary_apply`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsRolloutApplyRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
+        '200':
+          description: Rollout canary applied.
           content:
             application/json:
               schema:
@@ -4298,6 +4442,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GraphicsRollbackRequest'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Rollout rolled back.
           content:
@@ -4320,6 +4466,8 @@ paths:
             type: integer
             default: 200
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Audit history returned.
           content:
@@ -4344,6 +4492,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GraphicsWaiver'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Waiver created.
           content:
@@ -4363,6 +4513,8 @@ paths:
         - $ref: '#/components/parameters/IfMatchHeader'
         - $ref: '#/components/parameters/WaiverIdPath'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Waiver approved.
           content:
@@ -4382,6 +4534,8 @@ paths:
         - $ref: '#/components/parameters/IfMatchHeader'
         - $ref: '#/components/parameters/WaiverIdPath'
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Waiver expired.
           content:
@@ -4397,6 +4551,8 @@ paths:
       description: |
         **Action aliases:** `graphics_waivers_active`, `admin_graphics_waiver_active_get`
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Active waivers returned.
           content:
@@ -4425,6 +4581,8 @@ paths:
           schema:
             type: string
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime records returned.
           content:
@@ -4460,6 +4618,8 @@ paths:
               type: object
               additionalProperties: true
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime record created.
           content:
@@ -4496,6 +4656,8 @@ paths:
           schema:
             type: string
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime record returned.
           content:
@@ -4534,6 +4696,8 @@ paths:
               type: object
               additionalProperties: true
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime record updated.
           content:
@@ -4565,6 +4729,8 @@ paths:
           schema:
             type: string
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime record deleted or archived.
           content:
@@ -4608,6 +4774,8 @@ paths:
               type: object
               additionalProperties: true
       responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
         '200':
           description: Runtime record transitioned.
           content:
@@ -5468,6 +5636,10 @@ components:
           type: object
           additionalProperties: true
 
+    RuntimeComplianceBeacon:
+      allOf:
+        - $ref: '#/components/schemas/RuntimeGraphicsComplianceBeacon'
+
     RuntimeGraphicsComplianceBeaconResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
@@ -5522,10 +5694,14 @@ components:
       properties:
         environment:
           type: string
-          enum: [office, review, admin, shopfloor, kiosk, tv, night-shift]
+          enum: [office, review, admin, shopfloor, kiosk, tv, night-shift, glare-dirty-screen, glove-mode]
         tokenOverrides:
           type: object
           additionalProperties: true
+        componentPolicy:
+          type: array
+          items:
+            type: string
         evidenceObligations:
           type: array
           items:
@@ -5572,6 +5748,12 @@ components:
         postApplyVerification:
           type: object
           additionalProperties: true
+        trendDashboard:
+          type: object
+          additionalProperties: true
+        emergencyOverridePath:
+          type: object
+          additionalProperties: true
         generatedAt:
           type: string
           format: date-time
@@ -5593,7 +5775,7 @@ components:
           type: string
         analysisType:
           type: string
-          enum: [token, template, component, rollout, change-set]
+          enum: [token, template, component, rollout, change-set, environment-policy, policy-pack]
         subject:
           type: object
           additionalProperties: true
@@ -5668,6 +5850,9 @@ components:
           type: string
           format: date-time
           description: Time after which publish must rerun impact analysis.
+        blastRadius:
+          type: object
+          additionalProperties: true
 
     GraphicsImpactReportResponse:
       allOf:
@@ -5701,6 +5886,21 @@ components:
         blockType:
           type: string
 
+    PolicyPackImpactRequest:
+      type: object
+      required: [policyPack]
+      properties:
+        policyPack:
+          type: string
+        environment:
+          type: string
+        environmentPolicyPack:
+          type: string
+        changedPolicyPacks:
+          type: array
+          items:
+            type: string
+
     GraphicsReleaseManifestRef:
       type: object
       required: [refType, refId]
@@ -5731,9 +5931,38 @@ components:
           type: string
         waiversRef:
           type: string
+        runtimeBeaconRef:
+          type: string
+        debtObservatoryRef:
+          type: string
+        multiSitePlantBrandingGovernanceRef:
+          type: string
+        controlledEmergencyOverridePathRef:
+          type: string
+        rolloutDecisionRef:
+          type: string
+        rollbackPlanRef:
+          type: string
+        releaseBlocked:
+          type: boolean
+        blockerCount:
+          type: integer
+        evidenceBundleRequirements:
+          type: array
+          items:
+            type: string
         driftReportGeneratedAt:
           type: string
           format: date-time
+
+    GraphicsReleaseLinkResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [releaseLink]
+          properties:
+            releaseLink:
+              $ref: '#/components/schemas/GraphicsReleaseLink'
 
     GraphicsPublishRequest:
       type: object
@@ -5799,7 +6028,7 @@ components:
 
     GraphicsRolloutRequest:
       type: object
-      required: [expectedVersion]
+      required: [expectedVersion, impactType, scope]
       properties:
         expectedVersion:
           type: string
@@ -5807,7 +6036,7 @@ components:
           type: string
         impactType:
           type: string
-          enum: [token, template, component, rollout]
+          enum: [token, template, component, rollout, policy-pack, environment-policy]
         scope:
           type: object
           additionalProperties: true
@@ -5821,6 +6050,10 @@ components:
           items:
             type: string
         componentId:
+          type: string
+        policyPack:
+          type: string
+        environmentPolicyPack:
           type: string
         releaseManifestRefs:
           type: array
@@ -5915,24 +6148,24 @@ components:
           type: string
         waiverId:
           type: string
-          scope:
-            type: string
-            enum: [template, module, component, token, release_gate, graphics-governance]
-          targetId:
-            type: string
-          reason:
-            type: string
-          risk:
-            type: string
-          compensatingControl:
-            type: string
-          owner:
-            type: string
-          approver:
-            type: string
-          riskClass:
-            type: string
-            enum: [low, medium, high, regulated]
+        scope:
+          type: string
+          enum: [template, module, component, token, release_gate, graphics-governance]
+        targetId:
+          type: string
+        reason:
+          type: string
+        risk:
+          type: string
+        compensatingControl:
+          type: string
+        owner:
+          type: string
+        approver:
+          type: string
+        riskClass:
+          type: string
+          enum: [low, medium, high, regulated, shopfloor-critical]
         status:
           type: string
           enum: [draft, approved, expired]
@@ -7505,6 +7738,13 @@ components:
             server_time: "2025-06-01T08:00:00+00:00"
 
     # ── RFC 9457 ProblemDetail error responses ──
+
+    DefaultProblem:
+      description: RFC 9457 Problem Detail for authentication, permission, validation, concurrency, release-blocker or server failures.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
 
     BadRequestProblem:
       description: Bad request -- the request body or parameters are invalid.

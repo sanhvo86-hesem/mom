@@ -101,8 +101,8 @@ final class InputSanitizer
             'title'                => (string)($user['title'] ?? ''),
             'hcm_org_unit_id'      => (string)($user['hcm_org_unit_id'] ?? ''),
             'hcm_position_id'      => (string)($user['hcm_position_id'] ?? ''),
-            'cccd'                 => (string)($user['cccd'] ?? ''),
-            'phone'                => (string)($user['phone'] ?? ''),
+            'cccd'                 => self::maskPii((string)($user['cccd'] ?? '')),
+            'phone'                => self::maskPii((string)($user['phone'] ?? '')),
             'personal_email'       => (string)($user['personal_email'] ?? ''),
             'org_company_code'     => (string)($user['org_company_code'] ?? ''),
             'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
@@ -112,5 +112,21 @@ final class InputSanitizer
             'updated_at'           => (string)($user['updated_at'] ?? ''),
             'created_at'           => (string)($user['created_at'] ?? ''),
         ];
+    }
+
+    /**
+     * Mask personally identifiable information for safe display.
+     *
+     * @param string $value Value to mask.
+     * @param int $visibleChars Number of trailing characters to keep visible.
+     * @return string Masked value.
+     */
+    private static function maskPii(string $value, int $visibleChars = 4): string
+    {
+        $len = mb_strlen($value);
+        if ($len <= $visibleChars) {
+            return str_repeat('*', $len);
+        }
+        return str_repeat('*', $len - $visibleChars) . mb_substr($value, -$visibleChars);
     }
 }

@@ -254,29 +254,29 @@
 
 /* ── online-forms.css (--ec-* variables) ── */
 [data-color-mode="dark"] {
-  --ec-bg: #0f172a;
-  --ec-surface: #1e293b;
-  --ec-border: #334155;
-  --ec-border-focus: #60a5fa;
-  --ec-text: #f1f5f9;
-  --ec-text-secondary: #94a3b8;
-  --ec-text-muted: #64748b;
-  --ec-primary: #60a5fa;
-  --ec-primary-hover: #93c5fd;
-  --ec-primary-light: rgba(96,165,250,0.15);
-  --ec-primary-bg: rgba(96,165,250,0.08);
-  --ec-success: #22c55e;
-  --ec-success-light: rgba(34,197,94,0.15);
-  --ec-warning: #fbbf24;
-  --ec-warning-light: rgba(251,191,36,0.15);
-  --ec-danger: #f87171;
-  --ec-danger-light: rgba(248,113,113,0.15);
-  --ec-purple: #a78bfa;
-  --ec-purple-light: rgba(167,139,250,0.15);
-  --ec-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
-  --ec-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --ec-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-  --ec-shadow-lg: 0 10px 24px rgba(0,0,0,0.4);
+  --ec-bg: var(--bg-page, #0f172a);
+  --ec-surface: var(--bg-surface, #1e293b);
+  --ec-border: var(--border, #334155);
+  --ec-border-focus: var(--focus-ring-color, var(--brand-light, #60a5fa));
+  --ec-text: var(--text-primary, #f1f5f9);
+  --ec-text-secondary: var(--text-secondary, #94a3b8);
+  --ec-text-muted: var(--text-tertiary, #64748b);
+  --ec-primary: var(--brand-light, #60a5fa);
+  --ec-primary-hover: color-mix(in srgb, var(--brand-light, #60a5fa) 82%, #fff 18%);
+  --ec-primary-light: var(--blue-bg, rgba(96,165,250,0.15));
+  --ec-primary-bg: color-mix(in srgb, var(--brand-light, #60a5fa) 8%, var(--bg-surface, #1e293b));
+  --ec-success: var(--green, #22c55e);
+  --ec-success-light: var(--green-bg, rgba(34,197,94,0.15));
+  --ec-warning: var(--amber, #fbbf24);
+  --ec-warning-light: var(--amber-bg, rgba(251,191,36,0.15));
+  --ec-danger: var(--red, #f87171);
+  --ec-danger-light: var(--red-bg, rgba(248,113,113,0.15));
+  --ec-purple: var(--purple, #a78bfa);
+  --ec-purple-light: var(--purple-bg, rgba(167,139,250,0.15));
+  --ec-shadow-sm: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.2));
+  --ec-shadow: var(--shadow, 0 1px 3px rgba(0,0,0,0.3));
+  --ec-shadow-md: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.3));
+  --ec-shadow-lg: var(--shadow-lg, 0 10px 24px rgba(0,0,0,0.4));
 }
 
 /* ── online-forms.css specific selectors ── */

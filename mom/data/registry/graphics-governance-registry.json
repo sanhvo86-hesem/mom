@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T13:44:52+00:00",
+        "generatedAt": "2026-04-13T15:25:40+00:00",
         "source": "graphics_governance_backend",
         "authorityLayer": "system_contract_registry",
         "authority": "mom/design/template-registry.json",
@@ -566,7 +566,7 @@
     },
     "componentContractRegistry": {
         "_meta": {
-            "generatedAt": "2026-04-13T13:44:52+00:00",
+            "generatedAt": "2026-04-13T15:25:39+00:00",
             "authority": "mom/design/block-contracts",
             "authorityRole": "component_contract_registry",
             "componentModel": "frontend_block_contracts"
@@ -3677,6 +3677,7 @@
                 "privateCssDebt": 0,
                 "hardcodedStyleDebt": 0,
                 "driftStatus": "blocked",
+                "runtimeBeaconStatus": "release-blocking",
                 "blockerReason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
                 "consumesHmComponents": true,
                 "consumesSharedTokens": true,
@@ -3752,6 +3753,7 @@
                 "privateCssDebt": 0,
                 "hardcodedStyleDebt": 0,
                 "driftStatus": "blocked",
+                "runtimeBeaconStatus": "release-blocking",
                 "blockerReason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
                 "consumesHmComponents": true,
                 "consumesSharedTokens": true,
@@ -3772,6 +3774,2144 @@
         },
         "version": "2026.04.11-p0",
         "etag": "sha256:136e36f950c87af3c578bc2622732a03"
+    },
+    "graphicsDebtReport": {
+        "debt": {
+            "bridgeAliasDebt": {
+                "debt": [],
+                "aliases": [
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-surface",
+                        "value": "var(--bg-surface, var(--surface, #fff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-surface-alt",
+                        "value": "var(--bg-surface-alt, #f8fafc)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-text",
+                        "value": "var(--text-primary, var(--text, #0f172a))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-muted",
+                        "value": "var(--text-secondary, #64748b)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-muted-2",
+                        "value": "var(--text-tertiary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-accent",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-accent-strong",
+                        "value": "color-mix(in srgb, var(--brand-2, #1565c0) 88%, #000 12%)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "token": "--cr-card-pad",
+                        "value": "var(--card-body-padding, 16px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-bg",
+                        "value": "var(--bg-page, #0f172a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-surface",
+                        "value": "var(--bg-surface, #1e293b)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-border",
+                        "value": "var(--border, #334155)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-border-focus",
+                        "value": "var(--focus-ring-color, var(--brand-light, #60a5fa))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-text",
+                        "value": "var(--text-primary, #f1f5f9)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-text-secondary",
+                        "value": "var(--text-secondary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-text-muted",
+                        "value": "var(--text-tertiary, #64748b)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-primary",
+                        "value": "var(--brand-light, #60a5fa)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-primary-hover",
+                        "value": "color-mix(in srgb, var(--brand-light, #60a5fa) 82%, #fff 18%)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-primary-light",
+                        "value": "var(--blue-bg, rgba(96,165,250,0.15))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-primary-bg",
+                        "value": "color-mix(in srgb, var(--brand-light, #60a5fa) 8%, var(--bg-surface, #1e293b))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-success",
+                        "value": "var(--green, #22c55e)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-success-light",
+                        "value": "var(--green-bg, rgba(34,197,94,0.15))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-warning",
+                        "value": "var(--amber, #fbbf24)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-warning-light",
+                        "value": "var(--amber-bg, rgba(251,191,36,0.15))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-danger",
+                        "value": "var(--red, #f87171)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-danger-light",
+                        "value": "var(--red-bg, rgba(248,113,113,0.15))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-purple",
+                        "value": "var(--purple, #a78bfa)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-purple-light",
+                        "value": "var(--purple-bg, rgba(167,139,250,0.15))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-shadow-sm",
+                        "value": "var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.2))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-shadow",
+                        "value": "var(--shadow, 0 1px 3px rgba(0,0,0,0.3))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-shadow-md",
+                        "value": "var(--shadow-md, 0 4px 12px rgba(0,0,0,0.3))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "token": "--ec-shadow-lg",
+                        "value": "var(--shadow-lg, 0 10px 24px rgba(0,0,0,0.4))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-bg",
+                        "value": "var(--bg-page, #f8fafc)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-surface",
+                        "value": "var(--bg-surface, #ffffff)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text",
+                        "value": "var(--text-primary, #0f172a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text-2",
+                        "value": "var(--text-secondary, #475569)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text-3",
+                        "value": "var(--text-tertiary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-primary",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-primary-light",
+                        "value": "var(--brand-light, #dbeafe)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-success",
+                        "value": "var(--green, #16a34a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-success-light",
+                        "value": "color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-warning",
+                        "value": "var(--amber, #d97706)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-warning-light",
+                        "value": "color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-danger",
+                        "value": "var(--red, #dc2626)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-danger-light",
+                        "value": "color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-radius",
+                        "value": "var(--hds-control-radius, var(--radius-lg, 8px))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-font",
+                        "value": "var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-mono",
+                        "value": "var(--font-mono, 'Consolas', 'SF Mono', monospace)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-bg",
+                        "value": "var(--bg-page, #f8fafc)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-surface",
+                        "value": "var(--bg-surface, #ffffff)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text",
+                        "value": "var(--text-primary, #0f172a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text-2",
+                        "value": "var(--text-secondary, #475569)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-text-3",
+                        "value": "var(--text-tertiary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-primary",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-primary-light",
+                        "value": "var(--brand-light, #dbeafe)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-success",
+                        "value": "var(--green, #16a34a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-success-light",
+                        "value": "color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-warning",
+                        "value": "var(--amber, #d97706)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-warning-light",
+                        "value": "color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-danger",
+                        "value": "var(--red, #dc2626)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-danger-light",
+                        "value": "color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-radius",
+                        "value": "var(--hds-control-radius, var(--radius-lg, 8px))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-font",
+                        "value": "var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "token": "--eqms-mono",
+                        "value": "var(--font-mono, 'Consolas', 'SF Mono', monospace)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-surface",
+                        "value": "var(--bg-surface, var(--surface, #fff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-surface-alt",
+                        "value": "var(--bg-surface-alt, #f8fafc)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-text",
+                        "value": "var(--text-primary, var(--text, #0f172a))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-text-secondary",
+                        "value": "var(--text-secondary, var(--text-2, #475569))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-text-tertiary",
+                        "value": "var(--text-tertiary, var(--text-3, #94a3b8))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-primary",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-primary-strong",
+                        "value": "color-mix(in srgb, var(--brand-2, #1565c0) 88%, #000 12%)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-success",
+                        "value": "var(--green, #22c55e)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-danger",
+                        "value": "var(--red, #ef4444)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "token": "--ev-warning",
+                        "value": "var(--amber, #f59e0b)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-bg",
+                        "value": "var(--bg-page, #f1f5f9)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-surface",
+                        "value": "var(--bg-surface, #ffffff)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-border-focus",
+                        "value": "var(--focus-ring-color, var(--brand-2, #1565c0))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text",
+                        "value": "var(--text-primary, #0f172a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text-secondary",
+                        "value": "var(--text-secondary, #475569)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text-muted",
+                        "value": "var(--text-tertiary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-hover",
+                        "value": "color-mix(in srgb, var(--brand-2, #1565c0) 88%, #000 12%)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-light",
+                        "value": "var(--brand-light, #dbeafe)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-bg",
+                        "value": "color-mix(in srgb, var(--brand-light, #dbeafe) 28%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-success",
+                        "value": "var(--green, #16a34a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-success-light",
+                        "value": "color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-warning",
+                        "value": "var(--amber, #d97706)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-warning-light",
+                        "value": "color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-danger",
+                        "value": "var(--red, #dc2626)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-danger-light",
+                        "value": "color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-purple",
+                        "value": "var(--purple, #7c3aed)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-purple-light",
+                        "value": "color-mix(in srgb, var(--purple, #7c3aed) 14%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius",
+                        "value": "var(--hds-control-radius, var(--radius-lg, 8px))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius-lg",
+                        "value": "var(--radius-xl, 12px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius-xl",
+                        "value": "var(--radius-2xl, 16px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-sm",
+                        "value": "var(--shadow-sm, 0 1px 2px rgba(0,0,0,.05))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow",
+                        "value": "var(--card-shadow, var(--shadow-sm, 0 1px 3px rgba(0,0,0,.08)))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-md",
+                        "value": "var(--shadow-md, 0 4px 12px rgba(0,0,0,.06))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-lg",
+                        "value": "var(--shadow-lg, 0 10px 24px rgba(0,0,0,.08))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-sidebar-w",
+                        "value": "var(--layout-sidebar-w, 300px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-font",
+                        "value": "var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-mono",
+                        "value": "var(--font-mono, 'SF Mono', 'Cascadia Code', 'Consolas', monospace)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-transition",
+                        "value": "var(--transition-normal, 0.15s ease)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-bg",
+                        "value": "var(--bg-page, #f1f5f9)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-surface",
+                        "value": "var(--bg-surface, #ffffff)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-border",
+                        "value": "var(--border, #e2e8f0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-border-focus",
+                        "value": "var(--focus-ring-color, var(--brand-2, #1565c0))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text",
+                        "value": "var(--text-primary, #0f172a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text-secondary",
+                        "value": "var(--text-secondary, #475569)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-text-muted",
+                        "value": "var(--text-tertiary, #94a3b8)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary",
+                        "value": "var(--brand-2, #1565c0)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-hover",
+                        "value": "color-mix(in srgb, var(--brand-2, #1565c0) 88%, #000 12%)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-light",
+                        "value": "var(--brand-light, #dbeafe)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-primary-bg",
+                        "value": "color-mix(in srgb, var(--brand-light, #dbeafe) 28%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-success",
+                        "value": "var(--green, #16a34a)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-success-light",
+                        "value": "color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-warning",
+                        "value": "var(--amber, #d97706)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-warning-light",
+                        "value": "color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-danger",
+                        "value": "var(--red, #dc2626)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-danger-light",
+                        "value": "color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-purple",
+                        "value": "var(--purple, #7c3aed)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-purple-light",
+                        "value": "color-mix(in srgb, var(--purple, #7c3aed) 14%, var(--bg-surface, #ffffff))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius",
+                        "value": "var(--hds-control-radius, var(--radius-lg, 8px))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius-lg",
+                        "value": "var(--radius-xl, 12px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-radius-xl",
+                        "value": "var(--radius-2xl, 16px)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-sm",
+                        "value": "var(--shadow-sm, 0 1px 2px rgba(0,0,0,.05))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow",
+                        "value": "var(--card-shadow, var(--shadow-sm, 0 1px 3px rgba(0,0,0,.08)))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-md",
+                        "value": "var(--shadow-md, 0 4px 12px rgba(0,0,0,.06))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-shadow-lg",
+                        "value": "var(--shadow-lg, 0 10px 24px rgba(0,0,0,.08))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-font",
+                        "value": "var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif))",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-mono",
+                        "value": "var(--font-mono, 'SF Mono', 'Cascadia Code', 'Consolas', monospace)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "token": "--ec-transition",
+                        "value": "var(--transition-normal, 0.15s ease)",
+                        "compliantAlias": true,
+                        "severity": "info"
+                    }
+                ],
+                "summary": {
+                    "aliasCount": 136,
+                    "debtCount": 0
+                }
+            },
+            "privateCssDebt": {
+                "debt": [
+                    {
+                        "file": "mom/scripts/portal/31-module-builder.js",
+                        "rawColorCount": 1573,
+                        "inlineStyleCount": 529,
+                        "privateVariableCount": 0,
+                        "debtScore": 2102,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/portal.main.css",
+                        "rawColorCount": 1582,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 1582,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/02-state-auth-ui.js",
+                        "rawColorCount": 426,
+                        "inlineStyleCount": 805,
+                        "privateVariableCount": 0,
+                        "debtScore": 1231,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/03-editor-core.js",
+                        "rawColorCount": 479,
+                        "inlineStyleCount": 490,
+                        "privateVariableCount": 0,
+                        "debtScore": 969,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/00c-admin-appearance.js",
+                        "rawColorCount": 291,
+                        "inlineStyleCount": 659,
+                        "privateVariableCount": 0,
+                        "debtScore": 950,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/00-block-engine.js",
+                        "rawColorCount": 386,
+                        "inlineStyleCount": 151,
+                        "privateVariableCount": 0,
+                        "debtScore": 537,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "rawColorCount": 503,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 23,
+                        "debtScore": 526,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "rawColorCount": 426,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 59,
+                        "debtScore": 485,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/vps-control-tower.css",
+                        "rawColorCount": 312,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 312,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/form-builder.css",
+                        "rawColorCount": 311,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 311,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/22-ai-quality-scheduling.js",
+                        "rawColorCount": 169,
+                        "inlineStyleCount": 132,
+                        "privateVariableCount": 0,
+                        "debtScore": 301,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/14-mes-control-center.js",
+                        "rawColorCount": 203,
+                        "inlineStyleCount": 48,
+                        "privateVariableCount": 0,
+                        "debtScore": 251,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/deploy-dashboard.css",
+                        "rawColorCount": 234,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 234,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/25-apqp-ppap.js",
+                        "rawColorCount": 108,
+                        "inlineStyleCount": 67,
+                        "privateVariableCount": 0,
+                        "debtScore": 175,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/14-exception-dashboard.js",
+                        "rawColorCount": 164,
+                        "inlineStyleCount": 8,
+                        "privateVariableCount": 0,
+                        "debtScore": 172,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/26-mobile-shopfloor.js",
+                        "rawColorCount": 100,
+                        "inlineStyleCount": 70,
+                        "privateVariableCount": 0,
+                        "debtScore": 170,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/30-production-dispatch.js",
+                        "rawColorCount": 104,
+                        "inlineStyleCount": 54,
+                        "privateVariableCount": 0,
+                        "debtScore": 158,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/so-jo-wo-dashboard.css",
+                        "rawColorCount": 158,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 158,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/24-fmea-control-plan.js",
+                        "rawColorCount": 97,
+                        "inlineStyleCount": 58,
+                        "privateVariableCount": 0,
+                        "debtScore": 155,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/18-evidence-vault.js",
+                        "rawColorCount": 102,
+                        "inlineStyleCount": 50,
+                        "privateVariableCount": 0,
+                        "debtScore": 152,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/32-schema-studio.js",
+                        "rawColorCount": 77,
+                        "inlineStyleCount": 72,
+                        "privateVariableCount": 0,
+                        "debtScore": 149,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/20-cnc-programs.js",
+                        "rawColorCount": 80,
+                        "inlineStyleCount": 63,
+                        "privateVariableCount": 0,
+                        "debtScore": 143,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/17-quoting-engine.js",
+                        "rawColorCount": 87,
+                        "inlineStyleCount": 55,
+                        "privateVariableCount": 0,
+                        "debtScore": 142,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/15-quality-exception-hub.js",
+                        "rawColorCount": 89,
+                        "inlineStyleCount": 50,
+                        "privateVariableCount": 0,
+                        "debtScore": 139,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/23-compliance-reports.js",
+                        "rawColorCount": 108,
+                        "inlineStyleCount": 24,
+                        "privateVariableCount": 0,
+                        "debtScore": 132,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/19-customer-portal-admin.js",
+                        "rawColorCount": 78,
+                        "inlineStyleCount": 52,
+                        "privateVariableCount": 0,
+                        "debtScore": 130,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/01-data-config.js",
+                        "rawColorCount": 79,
+                        "inlineStyleCount": 50,
+                        "privateVariableCount": 0,
+                        "debtScore": 129,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/gateway-landing.css",
+                        "rawColorCount": 129,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 129,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "rawColorCount": 93,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 34,
+                        "debtScore": 127,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/16-supplier-quality.js",
+                        "rawColorCount": 71,
+                        "inlineStyleCount": 54,
+                        "privateVariableCount": 0,
+                        "debtScore": 125,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/21-product-passport.js",
+                        "rawColorCount": 70,
+                        "inlineStyleCount": 51,
+                        "privateVariableCount": 0,
+                        "debtScore": 121,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/04-workflow-actions.js",
+                        "rawColorCount": 44,
+                        "inlineStyleCount": 69,
+                        "privateVariableCount": 0,
+                        "debtScore": 113,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/29-energy-dashboard.js",
+                        "rawColorCount": 65,
+                        "inlineStyleCount": 46,
+                        "privateVariableCount": 0,
+                        "debtScore": 111,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/TEMPLATE-module.js",
+                        "rawColorCount": 28,
+                        "inlineStyleCount": 79,
+                        "privateVariableCount": 0,
+                        "debtScore": 107,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/28-continuous-improvement.js",
+                        "rawColorCount": 66,
+                        "inlineStyleCount": 40,
+                        "privateVariableCount": 0,
+                        "debtScore": 106,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/27-knowledge-base.js",
+                        "rawColorCount": 74,
+                        "inlineStyleCount": 30,
+                        "privateVariableCount": 0,
+                        "debtScore": 104,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/03-commands-table.js",
+                        "rawColorCount": 12,
+                        "inlineStyleCount": 87,
+                        "privateVariableCount": 0,
+                        "debtScore": 99,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/hesem-design-tokens.css",
+                        "rawColorCount": 97,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 97,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/00b-theme-manager.js",
+                        "rawColorCount": 96,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 96,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/schema-studio.css",
+                        "rawColorCount": 85,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 85,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/11-e-signature.js",
+                        "rawColorCount": 59,
+                        "inlineStyleCount": 13,
+                        "privateVariableCount": 0,
+                        "debtScore": 72,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/form-runtime-frm-403.css",
+                        "rawColorCount": 72,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 72,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/FORM-DESIGN-SYSTEM-SPEC.css",
+                        "rawColorCount": 70,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 70,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/data-schema-control.css",
+                        "rawColorCount": 69,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 69,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09h-allocation-tracker.js",
+                        "rawColorCount": 58,
+                        "inlineStyleCount": 10,
+                        "privateVariableCount": 0,
+                        "debtScore": 68,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09-online-forms.js",
+                        "rawColorCount": 24,
+                        "inlineStyleCount": 42,
+                        "privateVariableCount": 0,
+                        "debtScore": 66,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/DEMO-gpt-blueprint.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 64,
+                        "privateVariableCount": 0,
+                        "debtScore": 64,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09d-upload-verify.js",
+                        "rawColorCount": 54,
+                        "inlineStyleCount": 5,
+                        "privateVariableCount": 0,
+                        "debtScore": 59,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09b-form-fill-download.js",
+                        "rawColorCount": 13,
+                        "inlineStyleCount": 45,
+                        "privateVariableCount": 0,
+                        "debtScore": 58,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09e-so-jo-wo-dashboard.js",
+                        "rawColorCount": 35,
+                        "inlineStyleCount": 21,
+                        "privateVariableCount": 0,
+                        "debtScore": 56,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/22c-ai-recommendations.js",
+                        "rawColorCount": 9,
+                        "inlineStyleCount": 45,
+                        "privateVariableCount": 0,
+                        "debtScore": 54,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "rawColorCount": 42,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 11,
+                        "debtScore": 53,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/13-master-data-control.js",
+                        "rawColorCount": 51,
+                        "inlineStyleCount": 1,
+                        "privateVariableCount": 0,
+                        "debtScore": 52,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/01-module-router.js",
+                        "rawColorCount": 11,
+                        "inlineStyleCount": 40,
+                        "privateVariableCount": 0,
+                        "debtScore": 51,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/22a-echarts-bridge.js",
+                        "rawColorCount": 47,
+                        "inlineStyleCount": 4,
+                        "privateVariableCount": 0,
+                        "debtScore": 51,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/10-eqms-form-runtime.js",
+                        "rawColorCount": 27,
+                        "inlineStyleCount": 11,
+                        "privateVariableCount": 0,
+                        "debtScore": 38,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/22b-ai-chat-interface.js",
+                        "rawColorCount": 1,
+                        "inlineStyleCount": 35,
+                        "privateVariableCount": 0,
+                        "debtScore": 36,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "rawColorCount": 23,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 9,
+                        "debtScore": 32,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/05-workflow-panel.js",
+                        "rawColorCount": 6,
+                        "inlineStyleCount": 25,
+                        "privateVariableCount": 0,
+                        "debtScore": 31,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/quality-exception.css",
+                        "rawColorCount": 31,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 31,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/scripts/portal/12-searchable-input.js",
+                        "rawColorCount": 26,
+                        "inlineStyleCount": 1,
+                        "privateVariableCount": 0,
+                        "debtScore": 27,
+                        "severity": "high"
+                    },
+                    {
+                        "file": "mom/styles/order-management.css",
+                        "rawColorCount": 24,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 24,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/styles/quoting.css",
+                        "rawColorCount": 22,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 22,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09f-form-builder-engine.js",
+                        "rawColorCount": 7,
+                        "inlineStyleCount": 13,
+                        "privateVariableCount": 0,
+                        "debtScore": 20,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/08-deploy-dashboard.js",
+                        "rawColorCount": 15,
+                        "inlineStyleCount": 3,
+                        "privateVariableCount": 0,
+                        "debtScore": 18,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/styles/supplier-quality.css",
+                        "rawColorCount": 16,
+                        "inlineStyleCount": 0,
+                        "privateVariableCount": 0,
+                        "debtScore": 16,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/33-vps-control-tower.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 14,
+                        "privateVariableCount": 0,
+                        "debtScore": 14,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/10-upload-validator.js",
+                        "rawColorCount": 9,
+                        "inlineStyleCount": 3,
+                        "privateVariableCount": 0,
+                        "debtScore": 12,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/90-qrcodegen.js",
+                        "rawColorCount": 2,
+                        "inlineStyleCount": 6,
+                        "privateVariableCount": 0,
+                        "debtScore": 8,
+                        "severity": "medium"
+                    },
+                    {
+                        "file": "mom/scripts/portal/03-commands-layout.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 4,
+                        "privateVariableCount": 0,
+                        "debtScore": 4,
+                        "severity": "low"
+                    },
+                    {
+                        "file": "mom/scripts/portal/06-tiptap-pilot.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 4,
+                        "privateVariableCount": 0,
+                        "debtScore": 4,
+                        "severity": "low"
+                    },
+                    {
+                        "file": "mom/scripts/portal/00a-registry-service.js",
+                        "rawColorCount": 2,
+                        "inlineStyleCount": 1,
+                        "privateVariableCount": 0,
+                        "debtScore": 3,
+                        "severity": "low"
+                    },
+                    {
+                        "file": "mom/scripts/portal/09g-cascading-dropdown.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 2,
+                        "privateVariableCount": 0,
+                        "debtScore": 2,
+                        "severity": "low"
+                    },
+                    {
+                        "file": "mom/scripts/portal/34-purchasing-workspace.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 2,
+                        "privateVariableCount": 0,
+                        "debtScore": 2,
+                        "severity": "low"
+                    },
+                    {
+                        "file": "mom/scripts/portal/00ba-graphics-governance-service.js",
+                        "rawColorCount": 0,
+                        "inlineStyleCount": 1,
+                        "privateVariableCount": 0,
+                        "debtScore": 1,
+                        "severity": "low"
+                    }
+                ],
+                "summary": {
+                    "fileCount": 75,
+                    "totalDebtScore": 14575
+                }
+            },
+            "tokenAdoptionCoverage": {
+                "coverage": {
+                    "tokenReferences": 11763,
+                    "rawReferences": 28638,
+                    "coveragePercent": 29
+                },
+                "files": [
+                    {
+                        "file": "mom/scripts/portal/00a-registry-service.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 6,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/00b-theme-manager.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 96,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/06-tiptap-pilot.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 7,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/08-deploy-dashboard.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 15,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/33-vps-control-tower.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 8,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/34-purchasing-workspace.js",
+                        "tokenReferences": 0,
+                        "rawReferences": 3,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/styles/deploy-dashboard.css",
+                        "tokenReferences": 0,
+                        "rawReferences": 533,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/styles/form-builder.css",
+                        "tokenReferences": 0,
+                        "rawReferences": 678,
+                        "coveragePercent": 0
+                    },
+                    {
+                        "file": "mom/scripts/portal/14-exception-dashboard.js",
+                        "tokenReferences": 10,
+                        "rawReferences": 320,
+                        "coveragePercent": 3
+                    },
+                    {
+                        "file": "mom/styles/vps-control-tower.css",
+                        "tokenReferences": 25,
+                        "rawReferences": 881,
+                        "coveragePercent": 3
+                    },
+                    {
+                        "file": "mom/scripts/portal/22a-echarts-bridge.js",
+                        "tokenReferences": 4,
+                        "rawReferences": 62,
+                        "coveragePercent": 6
+                    },
+                    {
+                        "file": "mom/scripts/portal/14-mes-control-center.js",
+                        "tokenReferences": 50,
+                        "rawReferences": 498,
+                        "coveragePercent": 9
+                    },
+                    {
+                        "file": "mom/styles/so-jo-wo-dashboard.css",
+                        "tokenReferences": 62,
+                        "rawReferences": 500,
+                        "coveragePercent": 11
+                    },
+                    {
+                        "file": "mom/scripts/portal/04-workflow-actions.js",
+                        "tokenReferences": 17,
+                        "rawReferences": 120,
+                        "coveragePercent": 12
+                    },
+                    {
+                        "file": "mom/scripts/portal/03-editor-core.js",
+                        "tokenReferences": 160,
+                        "rawReferences": 957,
+                        "coveragePercent": 14
+                    },
+                    {
+                        "file": "mom/styles/data-schema-control.css",
+                        "tokenReferences": 50,
+                        "rawReferences": 241,
+                        "coveragePercent": 17
+                    },
+                    {
+                        "file": "mom/styles/form-runtime-frm-403.css",
+                        "tokenReferences": 45,
+                        "rawReferences": 213,
+                        "coveragePercent": 17
+                    },
+                    {
+                        "file": "mom/styles/gateway-landing.css",
+                        "tokenReferences": 87,
+                        "rawReferences": 414,
+                        "coveragePercent": 17
+                    },
+                    {
+                        "file": "mom/scripts/portal/13-master-data-control.js",
+                        "tokenReferences": 34,
+                        "rawReferences": 152,
+                        "coveragePercent": 18
+                    },
+                    {
+                        "file": "mom/scripts/portal/27-knowledge-base.js",
+                        "tokenReferences": 53,
+                        "rawReferences": 239,
+                        "coveragePercent": 18
+                    },
+                    {
+                        "file": "mom/scripts/portal/02-state-auth-ui.js",
+                        "tokenReferences": 434,
+                        "rawReferences": 1688,
+                        "coveragePercent": 20
+                    },
+                    {
+                        "file": "mom/scripts/portal/03-commands-table.js",
+                        "tokenReferences": 9,
+                        "rawReferences": 35,
+                        "coveragePercent": 20
+                    },
+                    {
+                        "file": "mom/scripts/portal/28-continuous-improvement.js",
+                        "tokenReferences": 54,
+                        "rawReferences": 209,
+                        "coveragePercent": 21
+                    },
+                    {
+                        "file": "mom/styles/quality-exception.css",
+                        "tokenReferences": 41,
+                        "rawReferences": 141,
+                        "coveragePercent": 23
+                    },
+                    {
+                        "file": "mom/scripts/portal/31-module-builder.js",
+                        "tokenReferences": 1345,
+                        "rawReferences": 4265,
+                        "coveragePercent": 24
+                    },
+                    {
+                        "file": "mom/scripts/portal/32-schema-studio.js",
+                        "tokenReferences": 65,
+                        "rawReferences": 209,
+                        "coveragePercent": 24
+                    },
+                    {
+                        "file": "mom/scripts/portal/24-fmea-control-plan.js",
+                        "tokenReferences": 80,
+                        "rawReferences": 244,
+                        "coveragePercent": 25
+                    },
+                    {
+                        "file": "mom/scripts/portal/25-apqp-ppap.js",
+                        "tokenReferences": 99,
+                        "rawReferences": 305,
+                        "coveragePercent": 25
+                    },
+                    {
+                        "file": "mom/styles/portal.main.css",
+                        "tokenReferences": 1417,
+                        "rawReferences": 4223,
+                        "coveragePercent": 25
+                    },
+                    {
+                        "file": "mom/scripts/portal/09-online-forms.js",
+                        "tokenReferences": 25,
+                        "rawReferences": 66,
+                        "coveragePercent": 27
+                    },
+                    {
+                        "file": "mom/scripts/portal/09h-allocation-tracker.js",
+                        "tokenReferences": 50,
+                        "rawReferences": 136,
+                        "coveragePercent": 27
+                    },
+                    {
+                        "file": "mom/scripts/portal/18-evidence-vault.js",
+                        "tokenReferences": 109,
+                        "rawReferences": 290,
+                        "coveragePercent": 27
+                    },
+                    {
+                        "file": "mom/styles/order-management.css",
+                        "tokenReferences": 47,
+                        "rawReferences": 130,
+                        "coveragePercent": 27
+                    },
+                    {
+                        "file": "mom/scripts/portal/01-data-config.js",
+                        "tokenReferences": 56,
+                        "rawReferences": 145,
+                        "coveragePercent": 28
+                    },
+                    {
+                        "file": "mom/scripts/portal/23-compliance-reports.js",
+                        "tokenReferences": 103,
+                        "rawReferences": 259,
+                        "coveragePercent": 28
+                    },
+                    {
+                        "file": "mom/scripts/portal/30-production-dispatch.js",
+                        "tokenReferences": 118,
+                        "rawReferences": 309,
+                        "coveragePercent": 28
+                    },
+                    {
+                        "file": "mom/scripts/portal/05-workflow-panel.js",
+                        "tokenReferences": 15,
+                        "rawReferences": 36,
+                        "coveragePercent": 29
+                    },
+                    {
+                        "file": "mom/scripts/portal/12-searchable-input.js",
+                        "tokenReferences": 29,
+                        "rawReferences": 70,
+                        "coveragePercent": 29
+                    },
+                    {
+                        "file": "mom/scripts/portal/15-quality-exception-hub.js",
+                        "tokenReferences": 124,
+                        "rawReferences": 283,
+                        "coveragePercent": 30
+                    },
+                    {
+                        "file": "mom/styles/density-darkmode.css",
+                        "tokenReferences": 308,
+                        "rawReferences": 708,
+                        "coveragePercent": 30
+                    },
+                    {
+                        "file": "mom/scripts/portal/09d-upload-verify.js",
+                        "tokenReferences": 58,
+                        "rawReferences": 127,
+                        "coveragePercent": 31
+                    },
+                    {
+                        "file": "mom/scripts/portal/26-mobile-shopfloor.js",
+                        "tokenReferences": 135,
+                        "rawReferences": 302,
+                        "coveragePercent": 31
+                    },
+                    {
+                        "file": "mom/styles/quoting.css",
+                        "tokenReferences": 59,
+                        "rawReferences": 129,
+                        "coveragePercent": 31
+                    },
+                    {
+                        "file": "mom/scripts/portal/21-product-passport.js",
+                        "tokenReferences": 106,
+                        "rawReferences": 229,
+                        "coveragePercent": 32
+                    },
+                    {
+                        "file": "mom/styles/online-forms.css",
+                        "tokenReferences": 781,
+                        "rawReferences": 1696,
+                        "coveragePercent": 32
+                    },
+                    {
+                        "file": "mom/scripts/portal/90-qrcodegen.js",
+                        "tokenReferences": 2,
+                        "rawReferences": 4,
+                        "coveragePercent": 33
+                    },
+                    {
+                        "file": "mom/styles/supplier-quality.css",
+                        "tokenReferences": 55,
+                        "rawReferences": 111,
+                        "coveragePercent": 33
+                    },
+                    {
+                        "file": "mom/scripts/portal/09e-so-jo-wo-dashboard.js",
+                        "tokenReferences": 18,
+                        "rawReferences": 35,
+                        "coveragePercent": 34
+                    },
+                    {
+                        "file": "mom/scripts/portal/16-supplier-quality.js",
+                        "tokenReferences": 115,
+                        "rawReferences": 219,
+                        "coveragePercent": 34
+                    },
+                    {
+                        "file": "mom/scripts/portal/00-block-engine.js",
+                        "tokenReferences": 398,
+                        "rawReferences": 711,
+                        "coveragePercent": 36
+                    },
+                    {
+                        "file": "mom/scripts/portal/00c-admin-appearance.js",
+                        "tokenReferences": 886,
+                        "rawReferences": 1578,
+                        "coveragePercent": 36
+                    },
+                    {
+                        "file": "mom/scripts/portal/09f-form-builder-engine.js",
+                        "tokenReferences": 15,
+                        "rawReferences": 27,
+                        "coveragePercent": 36
+                    },
+                    {
+                        "file": "mom/scripts/portal/10-upload-validator.js",
+                        "tokenReferences": 10,
+                        "rawReferences": 17,
+                        "coveragePercent": 37
+                    },
+                    {
+                        "file": "mom/scripts/portal/11-e-signature.js",
+                        "tokenReferences": 85,
+                        "rawReferences": 147,
+                        "coveragePercent": 37
+                    },
+                    {
+                        "file": "mom/scripts/portal/19-customer-portal-admin.js",
+                        "tokenReferences": 130,
+                        "rawReferences": 226,
+                        "coveragePercent": 37
+                    },
+                    {
+                        "file": "mom/scripts/portal/20-cnc-programs.js",
+                        "tokenReferences": 149,
+                        "rawReferences": 258,
+                        "coveragePercent": 37
+                    },
+                    {
+                        "file": "mom/scripts/portal/22-ai-quality-scheduling.js",
+                        "tokenReferences": 255,
+                        "rawReferences": 440,
+                        "coveragePercent": 37
+                    },
+                    {
+                        "file": "mom/scripts/portal/10-eqms-form-runtime.js",
+                        "tokenReferences": 43,
+                        "rawReferences": 71,
+                        "coveragePercent": 38
+                    },
+                    {
+                        "file": "mom/scripts/portal/09b-form-fill-download.js",
+                        "tokenReferences": 33,
+                        "rawReferences": 42,
+                        "coveragePercent": 44
+                    },
+                    {
+                        "file": "mom/scripts/portal/17-quoting-engine.js",
+                        "tokenReferences": 201,
+                        "rawReferences": 257,
+                        "coveragePercent": 44
+                    },
+                    {
+                        "file": "mom/styles/eqms-form.css",
+                        "tokenReferences": 296,
+                        "rawReferences": 361,
+                        "coveragePercent": 45
+                    },
+                    {
+                        "file": "mom/styles/evidence-vault.css",
+                        "tokenReferences": 190,
+                        "rawReferences": 225,
+                        "coveragePercent": 46
+                    },
+                    {
+                        "file": "mom/scripts/portal/29-energy-dashboard.js",
+                        "tokenReferences": 195,
+                        "rawReferences": 207,
+                        "coveragePercent": 49
+                    },
+                    {
+                        "file": "mom/styles/schema-studio.css",
+                        "tokenReferences": 526,
+                        "rawReferences": 544,
+                        "coveragePercent": 49
+                    },
+                    {
+                        "file": "mom/styles/compliance-reports.css",
+                        "tokenReferences": 153,
+                        "rawReferences": 156,
+                        "coveragePercent": 50
+                    },
+                    {
+                        "file": "mom/styles/FORM-DESIGN-SYSTEM-SPEC.css",
+                        "tokenReferences": 361,
+                        "rawReferences": 257,
+                        "coveragePercent": 58
+                    },
+                    {
+                        "file": "mom/styles/hesem-design-tokens.css",
+                        "tokenReferences": 699,
+                        "rawReferences": 372,
+                        "coveragePercent": 65
+                    },
+                    {
+                        "file": "mom/scripts/portal/01-module-router.js",
+                        "tokenReferences": 61,
+                        "rawReferences": 25,
+                        "coveragePercent": 71
+                    },
+                    {
+                        "file": "mom/scripts/portal/TEMPLATE-module.js",
+                        "tokenReferences": 165,
+                        "rawReferences": 63,
+                        "coveragePercent": 72
+                    },
+                    {
+                        "file": "mom/scripts/portal/22b-ai-chat-interface.js",
+                        "tokenReferences": 66,
+                        "rawReferences": 25,
+                        "coveragePercent": 73
+                    },
+                    {
+                        "file": "mom/scripts/portal/DEMO-gpt-blueprint.js",
+                        "tokenReferences": 95,
+                        "rawReferences": 22,
+                        "coveragePercent": 81
+                    },
+                    {
+                        "file": "mom/scripts/portal/22c-ai-recommendations.js",
+                        "tokenReferences": 79,
+                        "rawReferences": 16,
+                        "coveragePercent": 83
+                    },
+                    {
+                        "file": "mom/styles/ai-components.css",
+                        "tokenReferences": 218,
+                        "rawReferences": 45,
+                        "coveragePercent": 83
+                    }
+                ]
+            },
+            "visualDebtObservatory": {
+                "byModule": [
+                    {
+                        "moduleId": "M2-orders",
+                        "route": "/orders",
+                        "domain": "commercial_customer",
+                        "ownerTeam": "Commercial Operations + Frontend Platform",
+                        "linkageStatus": "blocked",
+                        "bridgeAliasDebt": 0,
+                        "privateCssDebt": 0,
+                        "hardcodedStyleDebt": 0,
+                        "uncontrolledLegacyShellDebt": 0,
+                        "debtScore": 25
+                    },
+                    {
+                        "moduleId": "M4-purchasing",
+                        "route": "/purchasing",
+                        "domain": "procurement_supplier_quality",
+                        "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform",
+                        "linkageStatus": "blocked",
+                        "bridgeAliasDebt": 0,
+                        "privateCssDebt": 0,
+                        "hardcodedStyleDebt": 0,
+                        "uncontrolledLegacyShellDebt": 0,
+                        "debtScore": 25
+                    }
+                ],
+                "byDomain": [
+                    {
+                        "key": "commercial_customer",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    },
+                    {
+                        "key": "procurement_supplier_quality",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    }
+                ],
+                "byTeam": [
+                    {
+                        "key": "Commercial Operations + Frontend Platform",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    },
+                    {
+                        "key": "Supply Chain + Supplier Quality + Frontend Platform",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    }
+                ],
+                "byRoute": [
+                    {
+                        "key": "/orders",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    },
+                    {
+                        "key": "/purchasing",
+                        "debtScore": 25,
+                        "moduleCount": 1
+                    }
+                ],
+                "globalSignals": {
+                    "bridgeAliasDebtCount": 0,
+                    "privateCssDebtScore": 14575,
+                    "tokenCoveragePercent": 29
+                },
+                "summary": {
+                    "moduleDebtCount": 2,
+                    "uncontrolledLegacyShellDebt": 0
+                }
+            }
+        },
+        "summary": {
+            "bridgeAliasDebtCount": 0,
+            "privateCssDebtScore": 14575,
+            "privateCssFileCount": 75,
+            "tokenCoveragePercent": 29,
+            "uncontrolledLegacyShellDebt": 0
+        }
+    },
+    "graphicsDriftReport": {
+        "drift": {
+            "moduleCompliance": {
+                "moduleCount": 2,
+                "compliantCount": 0,
+                "nonCompliantCount": 2,
+                "fullAdminControlledCount": 0,
+                "bridgedToSharedTokensCount": 0,
+                "legacyPrivateCssCount": 0,
+                "blockedCount": 2
+            },
+            "bridgeAliasDebt": {
+                "aliasCount": 136,
+                "debtCount": 0
+            },
+            "privateCssDebt": {
+                "fileCount": 75,
+                "totalDebtScore": 14575
+            },
+            "tokenAdoptionCoverage": {
+                "tokenReferences": 11763,
+                "rawReferences": 28638,
+                "coveragePercent": 29
+            }
+        },
+        "blockers": [
+            {
+                "scope": "module",
+                "id": "M2-orders",
+                "code": "module_graphics_non_compliant"
+            },
+            {
+                "scope": "module",
+                "id": "M4-purchasing",
+                "code": "module_graphics_non_compliant"
+            }
+        ]
     },
     "releaseBlockers": {
         "blockers": [
@@ -3794,20 +5934,10 @@
                 "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
                 "releaseGate": "G19-graphics-governance",
                 "waiverAllowed": true
-            },
-            {
-                "blockerId": "graphics_drift_bridge_alias_debt",
-                "scope": "tokens",
-                "targetId": "bridge_alias_debt",
-                "severity": "blocker",
-                "status": "active",
-                "reason": "bridge_alias_raw_value_debt",
-                "releaseGate": "G19-graphics-governance",
-                "waiverAllowed": true
             }
         ],
         "summary": {
-            "blockerCount": 3,
+            "blockerCount": 2,
             "waivedCount": 0,
             "pendingImpactCount": 0,
             "releaseBlocked": true
@@ -3816,12 +5946,12 @@
             "complianceMatrixVersion": "2026.04.11-p0",
             "templateRegistryVersion": "2026.04.11-p0",
             "templateRegistryEtag": "sha256:136e36f950c87af3c578bc2622732a03",
-            "driftReportGeneratedAt": "2026-04-13T13:44:52+00:00",
+            "driftReportGeneratedAt": "2026-04-13T15:25:40+00:00",
             "authority": "mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json"
         }
     },
     "changeSetModel": {
-        "changeSetId": "gcs_464921330da4",
+        "changeSetId": "gcs_7d975c4b57ce",
         "status": "preview-only",
         "source": "backend_graphics_governance_state",
         "edits": [],
@@ -3831,7 +5961,7 @@
             "authority": "mom/data/graphics-governance/state.json"
         },
         "impact": {
-            "impactId": "gia_20260413134452_ca9111f8",
+            "impactId": "gia_20260413152540_ca9111f8",
             "analysisType": "change-set",
             "subject": {
                 "scope": "graphics-control-plane"
@@ -3893,7 +6023,7 @@
             ],
             "changeSetRef": "gcs_261e45b508f7",
             "machineReadable": true,
-            "generatedAt": "2026-04-13T13:44:52+00:00"
+            "generatedAt": "2026-04-13T15:25:40+00:00"
         },
         "risk": {
             "severityClass": "low",
@@ -4360,8 +6490,11 @@
                 "sharedTokenProbe": true,
                 "hmComponentProbe": true,
                 "privateCssProbe": false,
+                "bridgeAliasState": "clean",
+                "driftHash": "842859daebd8bf6b",
+                "complianceState": "blocked",
                 "beaconStatus": "release-blocking",
-                "reportedAt": "2026-04-13T13:44:52+00:00"
+                "reportedAt": "2026-04-13T15:25:40+00:00"
             },
             {
                 "moduleId": "M4-purchasing",
@@ -4370,8 +6503,11 @@
                 "sharedTokenProbe": true,
                 "hmComponentProbe": true,
                 "privateCssProbe": false,
+                "bridgeAliasState": "clean",
+                "driftHash": "9a303f5bf138e49e",
+                "complianceState": "blocked",
                 "beaconStatus": "release-blocking",
-                "reportedAt": "2026-04-13T13:44:52+00:00"
+                "reportedAt": "2026-04-13T15:25:40+00:00"
             }
         ],
         "summary": {
@@ -4444,8 +6580,8 @@
             }
         ],
         "globalSignals": {
-            "bridgeAliasDebtCount": 71,
-            "privateCssDebtScore": 14553,
+            "bridgeAliasDebtCount": 0,
+            "privateCssDebtScore": 14575,
             "tokenCoveragePercent": 29
         },
         "summary": {
@@ -4461,6 +6597,10 @@
                     "density": "default",
                     "contrast": "standard"
                 },
+                "componentPolicy": [
+                    "standard-toolbar",
+                    "data-table"
+                ],
                 "evidenceObligations": [
                     "visual-regression"
                 ]
@@ -4471,6 +6611,10 @@
                     "density": "comfortable",
                     "contrast": "standard"
                 },
+                "componentPolicy": [
+                    "evidence-panel",
+                    "keyboard-path"
+                ],
                 "evidenceObligations": [
                     "screenshot-diff",
                     "keyboard-path"
@@ -4482,6 +6626,10 @@
                     "density": "compact",
                     "contrast": "standard"
                 },
+                "componentPolicy": [
+                    "audit-console",
+                    "permission-editor"
+                ],
                 "evidenceObligations": [
                     "audit-trail",
                     "permission-review"
@@ -4493,6 +6641,10 @@
                     "density": "shopfloor",
                     "contrast": "high"
                 },
+                "componentPolicy": [
+                    "large-action-button",
+                    "scanner-input"
+                ],
                 "evidenceObligations": [
                     "shopfloor-kiosk-smoke",
                     "touch-target-proof"
@@ -4504,6 +6656,10 @@
                     "density": "shopfloor",
                     "contrast": "high"
                 },
+                "componentPolicy": [
+                    "timeout-banner",
+                    "large-action-button"
+                ],
                 "evidenceObligations": [
                     "kiosk-viewport-proof",
                     "timeout-proof"
@@ -4515,6 +6671,10 @@
                     "density": "comfortable",
                     "contrast": "high"
                 },
+                "componentPolicy": [
+                    "andon-tile",
+                    "distance-kpi"
+                ],
                 "evidenceObligations": [
                     "distance-legibility-proof"
                 ]
@@ -4525,14 +6685,83 @@
                     "mode": "dark",
                     "contrast": "high"
                 },
+                "componentPolicy": [
+                    "low-glare-surface",
+                    "fatigue-safe-focus"
+                ],
                 "evidenceObligations": [
                     "dark-mode-contrast",
                     "fatigue-review"
                 ]
+            },
+            {
+                "environment": "glare-dirty-screen",
+                "tokenOverrides": {
+                    "contrast": "max",
+                    "borderWeight": "strong"
+                },
+                "componentPolicy": [
+                    "high-contrast-status",
+                    "large-touch-target"
+                ],
+                "evidenceObligations": [
+                    "glare-photo-proof",
+                    "dirty-screen-readability"
+                ]
+            },
+            {
+                "environment": "glove-mode",
+                "tokenOverrides": {
+                    "density": "shopfloor",
+                    "targetSize": "large"
+                },
+                "componentPolicy": [
+                    "large-action-button",
+                    "stepper-control"
+                ],
+                "evidenceObligations": [
+                    "glove-touch-proof",
+                    "mis-tap-review"
+                ]
             }
         ],
+        "multiSitePlantBranding": {
+            "authority": "backend_graphics_policy_pack",
+            "levels": [
+                "enterprise",
+                "site",
+                "plant",
+                "area",
+                "line",
+                "cell"
+            ],
+            "allowedOverrideTypes": [
+                "logoLockup",
+                "locale",
+                "shiftPalette",
+                "contrastPack",
+                "densityPack"
+            ],
+            "prohibitedOverrideTypes": [
+                "semanticStatusColor",
+                "auditEvidenceColor",
+                "safetyMeaning",
+                "componentContractBypass"
+            ],
+            "requiredFields": [
+                "siteId",
+                "plantId",
+                "policyPack",
+                "owner",
+                "approver",
+                "effectiveFrom",
+                "expiresAt",
+                "evidenceRefs"
+            ],
+            "releaseRule": "Plant branding may change identity and environment tokens only; semantic status and shared component contracts remain global authority."
+        },
         "summary": {
-            "packCount": 7,
+            "packCount": 9,
             "authority": "backend_graphics_environment_policy_pack",
             "localStorageAuthority": false
         }
@@ -4560,20 +6789,10 @@
                     "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
                     "releaseGate": "G19-graphics-governance",
                     "waiverAllowed": true
-                },
-                {
-                    "blockerId": "graphics_drift_bridge_alias_debt",
-                    "scope": "tokens",
-                    "targetId": "bridge_alias_debt",
-                    "severity": "blocker",
-                    "status": "active",
-                    "reason": "bridge_alias_raw_value_debt",
-                    "releaseGate": "G19-graphics-governance",
-                    "waiverAllowed": true
                 }
             ],
             "summary": {
-                "blockerCount": 3,
+                "blockerCount": 2,
                 "waivedCount": 0,
                 "pendingImpactCount": 0,
                 "releaseBlocked": true
@@ -4582,14 +6801,14 @@
                 "complianceMatrixVersion": "2026.04.11-p0",
                 "templateRegistryVersion": "2026.04.11-p0",
                 "templateRegistryEtag": "sha256:136e36f950c87af3c578bc2622732a03",
-                "driftReportGeneratedAt": "2026-04-13T13:44:52+00:00",
+                "driftReportGeneratedAt": "2026-04-13T15:25:40+00:00",
                 "authority": "mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json"
             }
         },
         "waivers": {
             "waivers": [],
             "version": "1",
-            "etag": "sha256:8df7401c18c5a8e745204a10cf0fda84"
+            "etag": "sha256:e8755869ce87f1f3f37707eecd05f682"
         },
         "complianceSummary": {
             "moduleCount": 2,
@@ -4601,15 +6820,81 @@
             "blockedCount": 2
         },
         "debtSummary": {
-            "bridgeAliasDebtCount": 71,
-            "privateCssDebtScore": 14553,
+            "bridgeAliasDebtCount": 0,
+            "privateCssDebtScore": 14575,
             "privateCssFileCount": 75,
             "tokenCoveragePercent": 29,
             "uncontrolledLegacyShellDebt": 0
         },
+        "trendDashboard": {
+            "currentDebtScore": 50,
+            "activeBlockerCount": 2,
+            "trendWindow": "current-release",
+            "signals": {
+                "blockedModules": [
+                    "M2-orders",
+                    "M4-purchasing"
+                ],
+                "topDebtModules": [
+                    {
+                        "moduleId": "M2-orders",
+                        "route": "/orders",
+                        "domain": "commercial_customer",
+                        "ownerTeam": "Commercial Operations + Frontend Platform",
+                        "linkageStatus": "blocked",
+                        "bridgeAliasDebt": 0,
+                        "privateCssDebt": 0,
+                        "hardcodedStyleDebt": 0,
+                        "uncontrolledLegacyShellDebt": 0,
+                        "debtScore": 25
+                    },
+                    {
+                        "moduleId": "M4-purchasing",
+                        "route": "/purchasing",
+                        "domain": "procurement_supplier_quality",
+                        "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform",
+                        "linkageStatus": "blocked",
+                        "bridgeAliasDebt": 0,
+                        "privateCssDebt": 0,
+                        "hardcodedStyleDebt": 0,
+                        "uncontrolledLegacyShellDebt": 0,
+                        "debtScore": 25
+                    }
+                ]
+            },
+            "releaseReadinessTrend": "blocked-until-evidence-or-waiver",
+            "nextReview": "2026-04-20T15:25:40+00:00"
+        },
+        "emergencyOverridePath": {
+            "status": "exception-only",
+            "authority": "graphics_governance_waiver_register",
+            "requiredFields": [
+                "overrideId",
+                "scope",
+                "reason",
+                "owner",
+                "approver",
+                "expiresAt",
+                "rollbackPlanRef",
+                "retrospectiveDueAt"
+            ],
+            "allowedUse": [
+                "temporary accessibility rescue",
+                "production readability emergency",
+                "critical release-blocker workaround with approved waiver"
+            ],
+            "prohibitedUse": [
+                "new design preference",
+                "semantic status color change",
+                "regulated/shopfloor critical waiver without documentControlRefs and releaseManifestRefs"
+            ],
+            "maxDurationDays": 14,
+            "releaseCondition": "Emergency override requires approved waiver, expiry, evidence refs, post-incident retrospective and migration path back to shared tokens/components."
+        },
         "rolloutSummary": {
             "rolloutCount": 0,
             "stagedCount": 0,
+            "canaryAppliedCount": 0,
             "appliedCount": 0
         },
         "postApplyVerification": {
@@ -4617,7 +6902,108 @@
             "driftReportRequired": true,
             "evidenceBundleRequired": true
         },
-        "generatedAt": "2026-04-13T13:44:52+00:00"
+        "generatedAt": "2026-04-13T15:25:40+00:00"
+    },
+    "graphicsReleaseLink": {
+        "graphicsAuthorityRefs": [
+            "mom/design/template-registry.json",
+            "mom/data/registry/graphics-governance-registry.json",
+            "mom/docs/module-layout-template-design-system-v4.html",
+            "standards/36-frontend-module-layout-template-standard.md"
+        ],
+        "templateRegistryVersion": "2026.04.11-p0",
+        "templateRegistryChecksum": "sha256:136e36f950c87af3c578bc2622732a03",
+        "complianceMatrixRef": "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+        "impactAnalysisRef": "mom/data/graphics-governance/state.json#/pendingImpact",
+        "waiversRef": "mom/data/graphics-governance/waivers.json#/waivers",
+        "runtimeBeaconRef": "mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+        "debtObservatoryRef": "mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory",
+        "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
+        "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
+        "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
+        "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+        "releaseBlocked": true,
+        "blockerCount": 2,
+        "runtimeBeaconSummary": {
+            "reportedModules": 2,
+            "releaseBlockingModules": 2,
+            "authority": "runtime diagnostics feed into backend graphics compliance"
+        },
+        "debtSummary": {
+            "moduleDebtCount": 2,
+            "uncontrolledLegacyShellDebt": 0
+        },
+        "evidenceBundleRequirements": [
+            "affectedModulesSnapshot",
+            "complianceMatrixSnapshot",
+            "debtDriftSnapshot",
+            "runtimeBeaconSnapshot",
+            "rolloutDecision",
+            "rollbackPlan",
+            "waiverRegisterSnapshot"
+        ],
+        "generatedAt": "2026-04-13T15:25:40+00:00"
+    },
+    "multiSitePlantBrandingGovernance": {
+        "authority": "backend_graphics_policy_pack",
+        "levels": [
+            "enterprise",
+            "site",
+            "plant",
+            "area",
+            "line",
+            "cell"
+        ],
+        "allowedOverrideTypes": [
+            "logoLockup",
+            "locale",
+            "shiftPalette",
+            "contrastPack",
+            "densityPack"
+        ],
+        "prohibitedOverrideTypes": [
+            "semanticStatusColor",
+            "auditEvidenceColor",
+            "safetyMeaning",
+            "componentContractBypass"
+        ],
+        "requiredFields": [
+            "siteId",
+            "plantId",
+            "policyPack",
+            "owner",
+            "approver",
+            "effectiveFrom",
+            "expiresAt",
+            "evidenceRefs"
+        ],
+        "releaseRule": "Plant branding may change identity and environment tokens only; semantic status and shared component contracts remain global authority."
+    },
+    "controlledEmergencyOverridePath": {
+        "status": "exception-only",
+        "authority": "graphics_governance_waiver_register",
+        "requiredFields": [
+            "overrideId",
+            "scope",
+            "reason",
+            "owner",
+            "approver",
+            "expiresAt",
+            "rollbackPlanRef",
+            "retrospectiveDueAt"
+        ],
+        "allowedUse": [
+            "temporary accessibility rescue",
+            "production readability emergency",
+            "critical release-blocker workaround with approved waiver"
+        ],
+        "prohibitedUse": [
+            "new design preference",
+            "semantic status color change",
+            "regulated/shopfloor critical waiver without documentControlRefs and releaseManifestRefs"
+        ],
+        "maxDurationDays": 14,
+        "releaseCondition": "Emergency override requires approved waiver, expiry, evidence refs, post-incident retrospective and migration path back to shared tokens/components."
     },
     "persistence": {
         "canonicalTemplateRegistry": "mom/design/template-registry.json",

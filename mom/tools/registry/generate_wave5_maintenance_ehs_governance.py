@@ -129,6 +129,11 @@ def entity_quick_view_refs(entity_payload: dict) -> list[dict]:
 def main() -> int:
     policy = load_json(POLICY_PATH)
     normalization = load_json(NORMALIZATION_PATH)
+    source_generated_at = utc_now()
+    policy.setdefault("_meta", {})["generatedAt"] = source_generated_at
+    normalization.setdefault("_meta", {})["generatedAt"] = source_generated_at
+    dump_json(POLICY_PATH, policy)
+    dump_json(NORMALIZATION_PATH, normalization)
     canonical_catalog = load_json(CANONICAL_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)

@@ -98,7 +98,7 @@ class AuditMiddleware
         unset($query['password'], $query['pw'], $query['token'], $query['code']);
 
         // Body keys only (not values, to avoid logging sensitive data)
-        $raw = @file_get_contents('php://input');
+        $raw = $GLOBALS['__mom_raw_input'] ?? ($GLOBALS['__mom_raw_input'] = @file_get_contents('php://input') ?: '');
         $bodyKeys = [];
         if ($raw !== false && trim($raw) !== '') {
             $body = json_decode($raw, true);

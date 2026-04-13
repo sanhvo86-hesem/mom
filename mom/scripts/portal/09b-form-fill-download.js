@@ -1644,7 +1644,7 @@ function renderFormSummaryStrip(form, allocation, schema){
         '<small>' + esc(t('\u0054\u0069\u1ebf\u006e\u0020\u0111\u1ed9\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form completion')) + '</small>' +
         '<strong>' + esc(progress.completionPercent + '%') + '</strong>' +
         '<span>' + esc(progress.complete + '/' + progress.required + ' ' + t('\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063', 'required fields')) + '</span>' +
-        '<div class="ec-form-progress" style="--ec-progress:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"><span></span></div>' +
+        '<div class="ec-form-progress" style="--hds-progress-value:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"><span></span></div>' +
         '<div class="ec-form-progress-note">' + esc(nextSection ? (t('\u01afu\u0020\u0074\u0069\u00ea\u006e', 'Priority') + ': ' + nextSection) : t('\u0054\u1ea5\u0074\u0020\u0063\u1ea3\u0020\u0063\u00e1\u0063\u0020\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063\u0020\u0111\u00e3\u0020\u0068\u006f\u00e0\u006e\u0020\u0074\u1ea5\u0074', 'All required fields are complete')) + '</div>' +
       '</div>' +
     '</div>' +
@@ -1672,7 +1672,7 @@ function renderFormAside(form, allocation, schema, sections){
   var trace = traceSummary(ctx);
   var review = approvalSummary(allocation, schema);
   var nextSection = nextRequiredSectionLabel(sections, schema);
-  var accent = 'style="--ec-progress:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"';
+  var accent = 'style="--hds-progress-value:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"';
   return '<aside class="ec-form-aside">' +
     '<div class="ec-form-aside-block ec-form-aside-primary">' +
       '<small>' + esc(t('\u0054\u0069\u1ebf\u006e\u0020\u0111\u1ed9\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form completion')) + '</small>' +

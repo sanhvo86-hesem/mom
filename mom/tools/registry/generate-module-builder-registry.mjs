@@ -1358,6 +1358,7 @@ const FRONTEND_PROFILE_OVERRIDES = {
   capa_records: 'governed_case',
   calibration_grr_studies: 'assessment_record',
   com_customer_scorecards: 'assessment_record',
+  control_plane_object_registry: 'projection_record',
   dw_kpi_scorecards: 'assessment_record',
   ehs_emissions_monitoring: 'assessment_record',
   ehs_waste_shipments: 'transactional_record',
@@ -2166,7 +2167,7 @@ function frontendFoundationContract(tableName, table, dataFields, endpointCatalo
   if (profile === 'operator_console' && !attachmentSignal && transitionExpected) {
     attachmentBlockers.push('missing_attachment_contract');
   }
-  if ((table?.workflowId || profile === 'service_workspace') && !ownerField && !collaborationSignal) {
+  if ((table?.workflowId || profile === 'service_workspace') && profile !== 'projection_record' && !ownerField && !collaborationSignal) {
     collaborationBlockers.push('missing_assignment_or_activity_contract');
   }
   if ((profile === 'governed_case' || profile === 'transactional_record' || profile === 'planning_console' || profile === 'assessment_record') && formulaCount === 0) {

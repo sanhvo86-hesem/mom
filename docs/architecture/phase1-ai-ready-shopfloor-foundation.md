@@ -11,11 +11,12 @@ Phase 1 captures reliable manual execution truth for a CNC machining factory wit
 | Sales order | `data/orders/orders.json` through `OrderService` | Database tables exist, but the live MVC order flow uses the governed JSON compatibility store. |
 | Job order | `data/orders/orders.json` through `OrderService` | Preserves SO to JO hierarchy and workflow rules. |
 | Work order | `data/orders/orders.json` through `OrderService` | Dispatch references `wo_number`; it does not create another work order model. |
-| Planner dispatch target | `data/dispatch/targets.json` through `DispatchController` and `ShopfloorExecutionService` | Mirrors migration `043_production_dispatch_shift_targets.sql` shape while preserving current file-backed behavior. |
+| Planner dispatch target | `data/dispatch/targets.json` through `DispatchController` and `ShopfloorExecutionService`, shadow-written to `shift_targets` when PostgreSQL mode is enabled | Preserves current file-backed compatibility while migration `107_phase1_shopfloor_execution_bridge.sql` provides a DB bridge keyed by `source_system` and `source_record_id`. |
 | Operator assigned work | `dispatch_operator_tasks` from `DispatchController::getOperatorDispatch()` | Returns legacy `tasks` plus compact `task_cards`; no second queue is introduced. |
-| Operator production report | `data/dispatch/production_logs.json` snapshot plus `data/dispatch/production_report_events.json` event history through `DispatchController::reportProduction()` and `ShopfloorExecutionService` | The event history preserves accepted manual execution reports; the snapshot remains the compatibility current-state read model for dashboards and existing screens. |
-| Operator time entry | `data/mobile/time_entries/*.json` through `MobileWorkQueueService` | Remains the detailed mobile labor clock path; Phase 1 dispatch reporting does not replace it. |
-| Inspection capture | `data/mobile/inspections/*.json` through `MobileWorkQueueService` | Remains the tablet/mobile inspection path. Production logs may carry defect reasons but are not inspection records. |
+| Operator production report | `data/dispatch/production_logs.json` snapshot plus `data/dispatch/production_report_events.json` event history through `DispatchController::reportProduction()` and `ShopfloorExecutionService`, shadow-written to `shift_production_log` and `shift_production_report_events` when PostgreSQL mode is enabled | The event history preserves accepted manual execution reports; the snapshot remains the compatibility current-state read model for dashboards and existing screens. |
+| Dispatch lifecycle event | `data/dispatch/execution_events.json` through `DispatchController`, shadow-written to `shift_dispatch_execution_events` when PostgreSQL mode is enabled | Append-only history for target created, updated, dispatched, reported, paused, resumed, and completed lifecycle facts. |
+| Operator time entry | `data/mobile/time_entries.json` through `MobileWorkQueueService` | Remains the detailed mobile labor clock path; Phase 1 dispatch reporting does not replace it. |
+| Inspection capture | `data/mobile/inspections.json` through `MobileWorkQueueService` | Remains the tablet/mobile inspection path. Production logs may carry defect reasons but are not inspection records. Mobile capture now preserves `operation_seq`, `inspection_plan_id`, machine/equipment, work center, result, device, and offline metadata when provided. |
 | Machine/equipment | `data/master-data/master-data.json` and schema tables such as `equipment` | Dispatch stores stable `machine_id` and `equipment_id` for later MTConnect/OPC-UA mapping. |
 | Work center | Master data/schema `work_centers` and canonical `org_work_center` | Dispatch records `work_center_id` when known for ISA-95 alignment. |
 | Reason codes | `data/master-data/master-data.json` | Uses `downtime_reason_codes`, `downtime_resolution_codes`, and `defect_catalog`; no brittle hardcoded production reason list. |
@@ -32,10 +33,13 @@ No parallel MES or AI truth store was added. The live write path remains dispatc
 2. Operator retrieves assigned targets through `dispatch_operator_tasks`.
 3. Operator reports execution through `dispatch_report_production`.
 4. The accepted report is appended to `dispatch/production_report_events.json`.
-5. The latest per-target snapshot is updated in `dispatch/production_logs.json` for legacy dashboards.
-6. A best-effort manufacturing event projection is appended for digital-thread read models.
+5. A dispatch lifecycle event is appended to `dispatch/execution_events.json`.
+6. The latest per-target snapshot is updated in `dispatch/production_logs.json` for legacy dashboards.
+7. A best-effort manufacturing event projection is appended for digital-thread read models.
+8. When the app runs with PostgreSQL-backed `DataLayer`, a transaction-scoped bridge mirrors targets, production snapshots, production report events, and dispatch lifecycle events into the DB bridge tables without changing operator contracts.
 
 The manufacturing event append is not the source of truth and must not block production reporting. It exists so production history, release readiness, and later AI feature extraction can read a consistent event stream without changing the Phase 1 operator flow.
+The PostgreSQL bridge is intentionally a staged migration path: JSON remains the compatibility write authority in this branch, while DB rows provide auditable reconciliation anchors for production deployment and eventual cutover.
 
 ## Why This Is Lowest Risk
 
@@ -99,6 +103,8 @@ Validation:
 - `setup_time_minutes` cannot exceed `shift_duration_minutes`.
 - When `data/orders/orders.json` has a matching work order, missing dispatch fields such as JO, operation, work center, operator, CNC program, setup estimates, traveler, and material lot are filled from the existing order source of truth. Dispatch does not create another work-order model.
 - Dispatch target responses include `reference_validation` warnings for lightweight CNC digital-thread checks, such as an unverified CNC program reference or missing inspection plan. These warnings do not block Phase 1 manual dispatch because canonical DB referential authority is still staged.
+- `reference_policy` defaults to `warn`. When set to `enforce_dispatch` on the target, or through master-data `shopfloor_reference_policy`, dispatch blocks targets missing required CNC program or inspection-plan references, or referencing CNC programs that are not released/approved/active.
+- `first_piece_required` plus `quality_gate_policy = enforce_first_piece` blocks production output/run reporting until a passing first-piece mobile inspection capture exists for the same WO, operation, and inspection plan. Planner/supervisor override requires `quality_override_reason` and is stored as an audited quality gate override.
 
 Legacy portal aliases are accepted on input for compatibility: `wo_id`, `target_date`, `shift`, `cycle_time`, `setup_time`, `shift_duration`, and `target_qty`. They are normalized into canonical storage fields. Read responses include those legacy aliases as response-only compatibility fields so existing dispatch screens keep working without making aliases a second source of truth.
 
@@ -121,6 +127,13 @@ Response:
 ## Production Report Contract
 
 Existing action: `dispatch_report_production`
+
+Command aliases for explicit shopfloor state events:
+
+- `dispatch_pause_target`
+- `dispatch_resume_target`
+
+These route through the same production-report ledger and do not introduce a second execution command store.
 
 Required fields:
 
@@ -197,14 +210,23 @@ Validation:
 - Backdated reports outside the configured two-day grace window require planner/manager override.
 - Explicit `actual_start` and `actual_end` cannot be future-dated beyond the clock-skew tolerance and must fall on the target `shift_date`; `night` shift also permits the next calendar date.
 - `report_mode` defaults to `snapshot`; `correction` requires an existing report and `correction_reason`.
-- `execution_event_type` may be `progress`, `downtime`, `blocked`, `pause`, `resume`, `correction`, or `completion`. Pause/blocker events require governed downtime or blocking reason context; resume events require a prior event reference or operator context note.
+- `execution_event_type` may be `progress`, `downtime`, `blocked`, `pause`, `resume`, `correction`, or `completion`. Pause/blocker events require governed downtime or blocking reason context; the public resume endpoint requires `resumed_from_event_id`.
+- `dispatch_pause_target` requires `target_id`, `idempotency_key`, and a governed downtime/idle reason. It records zero quantity, preserves the event ledger, and marks the target `execution_state` as `paused`.
+- `dispatch_resume_target` requires `target_id`, `idempotency_key`, and `resumed_from_event_id`. It records zero quantity, preserves the event ledger, and marks the target `execution_state` as `running`.
 - Over-target good quantity requires `overproduction_reason`.
 - Target completion is no longer inferred from quantity alone. Completion requires `completion_intent` or `complete_target: true`, good quantity at least target quantity, and `actual_end`.
 - `offline_created: true` requires both `idempotency_key` and `client_report_id` so tablet/offline sync cannot create ambiguous duplicate facts.
 
 Legacy `ng_details` rows using `{ "type": "dimensional", "qty": 2 }` are accepted when `type` resolves to an active `defect_catalog.defect_group`, `defect_name`, or `defect_code`; the stored log still uses canonical `defect_code` and `quantity`. The seeded CNC defect catalog covers the existing dispatch UI groups: `dimensional`, `surface`, `material`, `visual`, `burr`, `thread`, `fod`, and `other`.
 
-`idempotency_key` is enforced for file-backed production reporting against both the latest snapshot and the append-only event history. A replay with the same key and same normalized report fingerprint returns the original production log with `"replayed": true`; the same key with different target or execution facts returns `409 idempotency_conflict`. The current file-backed dispatch snapshot still preserves the existing one-log-per-target read behavior for reports without an idempotency key.
+`idempotency_key` is enforced for file-backed production reporting against both the latest snapshot and the append-only event history. Online reports should provide a client key; if omitted, the server derives a deterministic `server:*` key from the normalized report fingerprint. A replay with the same key and same normalized report fingerprint returns the original response envelope with `"replayed": true`; the same key with different target or execution facts returns `409 idempotency_conflict`.
+
+Successful report responses may include `storage_bridge`. Values are advisory for operations support only:
+
+- `json_only/skipped`: the app is running without PostgreSQL write authority.
+- `postgres/mirrored`: target, snapshot, and event mirror rows were written.
+- `postgres/partial`: PostgreSQL is available but only part of the bridge schema exists.
+- `postgres/failed`: JSON execution truth was accepted, but the bridge write failed and needs operational reconciliation.
 
 ## Advisory Projection
 
@@ -219,6 +241,8 @@ This field is not execution authority and must not drive autonomous schedule cha
 
 ## Storage Notes
 
-The schema already has DB-backed equivalents in migrations such as `043_production_dispatch_shift_targets.sql`, `076_canonical_mes_execution_spine.sql`, and `098_canonical_manufacturing_event_backbone.sql`. This Phase 1 implementation keeps file-backed dispatch as the compatibility authority and uses the existing manufacturing event backbone as a read-model bridge only. Production report writes update `production_report_events.json`, `production_logs.json`, and `targets.json` together with best-effort rollback if any atomic file write fails; this is not a replacement for a future database transaction boundary. A later migration can shadow-write dispatch files into `shift_targets`, `shift_production_log`, and the canonical MES event ledger without changing operator contracts.
+The schema already has DB-backed equivalents in migrations such as `043_production_dispatch_shift_targets.sql`, `076_canonical_mes_execution_spine.sql`, and `098_canonical_manufacturing_event_backbone.sql`. Migration `107_phase1_shopfloor_execution_bridge.sql` adds reconciliation columns plus append-only `shift_production_report_events` and `shift_dispatch_execution_events` bridge tables so accepted dispatch reports and target lifecycle facts can be mirrored under a PostgreSQL transaction when DB mode is active.
 
-The file-backed dispatch paths now share a dispatch state lock. Planner target create/update/dispatch holds an exclusive lock across `targets.json` read-modify-write, operator production reporting holds an exclusive lock before reading targets, production snapshots, and event history through validation, idempotency replay checks, append-only event creation, snapshot update, and target lifecycle update, and multi-file read models use a shared lock while reading target/log pairs. This protects the critical read-modify-write sections and avoids mixed target/log snapshots for 50+ machine shift reporting while the DB migration is staged, but it remains a compatibility-stage guard rather than a substitute for a database transaction.
+The live Phase 1 authority remains file-backed for backward compatibility. Production report writes update `production_report_events.json`, `execution_events.json`, `production_logs.json`, and `targets.json` together with best-effort rollback if any atomic file write fails, then attempt the PostgreSQL bridge. A failed bridge write is surfaced in `storage_bridge` or `execution_event_bridge` but does not invalidate the accepted JSON execution fact.
+
+The file-backed dispatch paths share a dispatch state lock. Planner target create/update/dispatch holds an exclusive lock across `targets.json` read-modify-write, operator production reporting holds an exclusive lock before reading targets, production snapshots, and event history through validation, idempotency replay checks, append-only event creation, snapshot update, target lifecycle update, and DB bridge attempt, and multi-file read models use a shared lock while reading target/log pairs. This protects the critical read-modify-write sections and avoids mixed target/log snapshots for 50+ machine shift reporting while the DB cutover remains staged.

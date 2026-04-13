@@ -12,6 +12,11 @@ class GraphicsGovernanceController extends BaseController
 {
     private ?GraphicsGovernanceService $graphicsService = null;
 
+    protected function error(string $error, int $code = 400, ?string $detail = null, array $extra = []): never
+    {
+        $this->problem($code, $error, $detail ?? $error, [], $extra);
+    }
+
     private function graphics(): GraphicsGovernanceService
     {
         if ($this->graphicsService === null) {
@@ -225,6 +230,11 @@ class GraphicsGovernanceController extends BaseController
         $this->analyzeImpact('graphics.impact.component_analyzed', fn(array $body): array => $this->graphics()->analyzeComponentImpact($body));
     }
 
+    public function analyzePolicyPackImpact(): never
+    {
+        $this->analyzeImpact('graphics.impact.policy_pack_analyzed', fn(array $body): array => $this->graphics()->analyzePolicyPackImpact($body));
+    }
+
     public function stageRollout(): never
     {
         $user = $this->requireWriteRequest();
@@ -250,6 +260,20 @@ class GraphicsGovernanceController extends BaseController
         ));
         $rolloutId = (string)($result['rollout']['rolloutId'] ?? '');
         $this->graphicsAudit('graphics.rollout.applied', $rolloutId, ['rolloutId' => $rolloutId], $user);
+        $this->success($result);
+    }
+
+    public function canaryApplyRollout(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $result = $this->call(fn(): array => $this->graphics()->canaryApplyRollout(
+            $body,
+            $this->expectedVersion($body),
+            (string)($user['username'] ?? '')
+        ));
+        $rolloutId = (string)($result['rollout']['rolloutId'] ?? '');
+        $this->graphicsAudit('graphics.rollout.canary_applied', $rolloutId, ['rolloutId' => $rolloutId], $user);
         $this->success($result);
     }
 
@@ -372,6 +396,13 @@ class GraphicsGovernanceController extends BaseController
         $user = $this->requireAuth();
         $this->requireGraphicsRead($user);
         $this->respond(fn(): array => $this->graphics()->graphicsReleaseDashboard());
+    }
+
+    public function releaseLink(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->graphicsReleaseLink());
     }
 
     /**

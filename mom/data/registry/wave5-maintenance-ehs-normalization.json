@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-10T16:20:00+07:00",
+    "generatedAt": "2026-04-13T15:28:45.353Z",
     "description": "Wave 5 normalization decisions for maintenance, EHS, compliance, and lean audit lifecycle closure."
   },
   "execution_targets": {
@@ -349,95 +349,369 @@
   "workflow_role_overrides": {
     "wf_pm_maintenance_plan": {
       "required_transition_roles": {
-        "draft->approved": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "approved->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->approved": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "active->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "approved->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "active->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "retired->archived": ["maintenance_supervisor", "plant_manager", "system_admin"]
+        "draft->approved": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "approved->active": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->approved": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->active": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->on_hold": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "approved->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "retired->archived": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_pm_equipment_master": {
       "required_transition_roles": {
-        "commissioning->qualified": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->qualified": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "qualified->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "lockout->active": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "active->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "qualified->on_hold": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "active->lockout": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->lockout": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "active->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "lockout->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "on_hold->retired": ["maintenance_supervisor", "plant_manager", "system_admin"],
-        "retired->archived": ["maintenance_supervisor", "plant_manager", "system_admin"]
+        "commissioning->qualified": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->qualified": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "qualified->active": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->active": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "lockout->active": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->on_hold": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "qualified->on_hold": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->lockout": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->lockout": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "lockout->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "on_hold->retired": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ],
+        "retired->archived": [
+          "maintenance_supervisor",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_ehs_incident": {
       "required_transition_roles": {
-        "reported->triaged": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "triaged->contained": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "investigating->contained": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "triaged->investigating": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "contained->investigating": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "investigating->corrective_action": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "contained->corrective_action": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "corrective_action->closed": ["quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+        "reported->triaged": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "triaged->contained": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "investigating->contained": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "triaged->investigating": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "contained->investigating": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "investigating->corrective_action": [
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "contained->corrective_action": [
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "corrective_action->closed": [
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "closed->archived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_quality_obligation": {
       "required_transition_roles": {
-        "open->due": ["quality_engineer", "quality_manager", "system_admin"],
-        "open->overdue": ["quality_engineer", "quality_manager", "system_admin"],
-        "due->overdue": ["quality_engineer", "quality_manager", "system_admin"],
-        "open->waived": ["quality_manager", "plant_manager", "system_admin"],
-        "due->waived": ["quality_manager", "plant_manager", "system_admin"],
-        "overdue->waived": ["quality_manager", "plant_manager", "system_admin"],
-        "open->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "due->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "overdue->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "waived->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "closed->archived": ["quality_manager", "system_admin"]
+        "open->due": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "open->overdue": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "due->overdue": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "open->waived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "due->waived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "overdue->waived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "open->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "due->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "overdue->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "waived->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "closed->archived": [
+          "quality_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_ehs_permit_register": {
       "required_transition_roles": {
-        "draft->submitted": ["operations_manager", "plant_manager", "system_admin"],
-        "submitted->approved": ["quality_manager", "plant_manager", "system_admin"],
-        "approved->active": ["operations_manager", "plant_manager", "system_admin"],
-        "suspended->active": ["operations_manager", "plant_manager", "system_admin"],
-        "approved->suspended": ["quality_manager", "plant_manager", "system_admin"],
-        "active->suspended": ["quality_manager", "plant_manager", "system_admin"],
-        "approved->expired": ["quality_manager", "plant_manager", "system_admin"],
-        "active->expired": ["quality_manager", "plant_manager", "system_admin"],
-        "suspended->expired": ["quality_manager", "plant_manager", "system_admin"],
-        "active->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "suspended->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "expired->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+        "draft->submitted": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "submitted->approved": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "approved->active": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "suspended->active": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "approved->suspended": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->suspended": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "approved->expired": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->expired": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "suspended->expired": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "active->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "suspended->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "expired->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "closed->archived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_safety_observation": {
       "required_transition_roles": {
-        "logged->assigned": ["quality_engineer", "quality_manager", "operations_manager", "plant_manager", "system_admin"],
-        "assigned->in_progress": ["operations_manager", "plant_manager", "system_admin"],
-        "assigned->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "in_progress->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+        "logged->assigned": [
+          "quality_engineer",
+          "quality_manager",
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "assigned->in_progress": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "assigned->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "in_progress->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "closed->archived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     },
     "wf_lean_5s_audit": {
       "required_transition_roles": {
-        "planned->in_progress": ["operations_manager", "plant_manager", "system_admin"],
-        "in_progress->follow_up": ["operations_manager", "plant_manager", "system_admin"],
-        "follow_up->verified": ["quality_manager", "plant_manager", "system_admin"],
-        "verified->closed": ["quality_manager", "plant_manager", "system_admin"],
-        "closed->archived": ["quality_manager", "plant_manager", "system_admin"]
+        "planned->in_progress": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "in_progress->follow_up": [
+          "operations_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "follow_up->verified": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "verified->closed": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ],
+        "closed->archived": [
+          "quality_manager",
+          "plant_manager",
+          "system_admin"
+        ]
       }
     }
   }

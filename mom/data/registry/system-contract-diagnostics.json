@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T13:55:36.061Z",
+    "generatedAt": "2026-04-13T15:26:14.207Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "7a0cef97-c7d2-4cb3-986f-cb41e1ee55c9",
+    "publication_run_id": "5cb008bb-9c26-4b28-ae49-4fb011aec016",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,19 +24,19 @@
     "purpose": "Authority diagnostics proving the published contract is registry-derived, not workspace-draft-derived."
   },
   "summary": {
-    "tableCount": 724,
-    "relationCount": 3225,
-    "relationEntityCount": 724,
-    "endpointCount": 3983,
-    "endpointBoundTableCount": 724,
-    "workflowCount": 311,
-    "workflowEligibleTableCount": 371,
-    "workflowBoundTableCount": 331,
+    "tableCount": 750,
+    "relationCount": 3257,
+    "relationEntityCount": 750,
+    "endpointCount": 4132,
+    "endpointBoundTableCount": 750,
+    "workflowCount": 326,
+    "workflowEligibleTableCount": 390,
+    "workflowBoundTableCount": 346,
     "workflowBindingCoveragePercent": 89,
-    "statusManagedTableCount": 352,
-    "supportTableCount": 121,
+    "statusManagedTableCount": 371,
+    "supportTableCount": 126,
     "domainCount": 49,
-    "contractCount": 724,
+    "contractCount": 750,
     "criticalGapCount": 0,
     "warningCount": 3,
     "capabilityCount": 18,
@@ -44,9 +44,9 @@
     "graphicsTemplateCount": 2,
     "graphicsComponentContractCount": 10,
     "graphicsNonCompliantModuleCount": 2,
-    "graphicsReleaseBlockerCount": 3,
+    "graphicsReleaseBlockerCount": 2,
     "graphicsGovernanceReleaseBlocked": true,
-    "releaseReadinessScore": 85,
+    "releaseReadinessScore": 90,
     "metadataCompletenessPercent": 100,
     "graphDensityScore": 100,
     "blockerCount": 0,
@@ -58,9 +58,10 @@
     {
       "id": "status_columns_without_workflow_binding",
       "severity": "watch",
-      "count": 40,
+      "count": 44,
       "samples": [
         "ap_invoice_lines",
+        "as_manufactured_snapshots",
         "crm_quotes_pipeline",
         "doc_revisions",
         "domain_outbox_events",
@@ -88,8 +89,7 @@
         "plm_requirements",
         "plm_test_results",
         "pm_work_order_operations",
-        "purchase_order_line",
-        "purchase_receipt_correction_lines"
+        "purchase_order_line"
       ],
       "interpretation": "Status-only support/reference objects can be valid, but lifecycle owners should explicitly document why no workflow is required."
     },
@@ -112,7 +112,7 @@
     {
       "id": "graphics_governance_release_blockers_present",
       "severity": "release-blocker",
-      "count": 3,
+      "count": 2,
       "interpretation": "Graphics compliance/debt/drift must be resolved or covered by approved waiver before new module release."
     }
   ],

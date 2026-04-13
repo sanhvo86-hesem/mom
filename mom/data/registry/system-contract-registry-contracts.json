@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T13:55:36.061Z",
+    "generatedAt": "2026-04-13T15:26:14.207Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "7a0cef97-c7d2-4cb3-986f-cb41e1ee55c9",
+    "publication_run_id": "5cb008bb-9c26-4b28-ae49-4fb011aec016",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,19 +24,19 @@
     "purpose": "Full DB-derived table contract index. Read-only; regenerate from registry authority."
   },
   "summary": {
-    "tableCount": 724,
-    "relationCount": 3225,
-    "relationEntityCount": 724,
-    "endpointCount": 3983,
-    "endpointBoundTableCount": 724,
-    "workflowCount": 311,
-    "workflowEligibleTableCount": 371,
-    "workflowBoundTableCount": 331,
+    "tableCount": 750,
+    "relationCount": 3257,
+    "relationEntityCount": 750,
+    "endpointCount": 4132,
+    "endpointBoundTableCount": 750,
+    "workflowCount": 326,
+    "workflowEligibleTableCount": 390,
+    "workflowBoundTableCount": 346,
     "workflowBindingCoveragePercent": 89,
-    "statusManagedTableCount": 352,
-    "supportTableCount": 121,
+    "statusManagedTableCount": 371,
+    "supportTableCount": 126,
     "domainCount": 49,
-    "contractCount": 724,
+    "contractCount": 750,
     "criticalGapCount": 0,
     "warningCount": 3,
     "capabilityCount": 18,
@@ -44,9 +44,9 @@
     "graphicsTemplateCount": 2,
     "graphicsComponentContractCount": 10,
     "graphicsNonCompliantModuleCount": 2,
-    "graphicsReleaseBlockerCount": 3,
+    "graphicsReleaseBlockerCount": 2,
     "graphicsGovernanceReleaseBlocked": true,
-    "releaseReadinessScore": 85
+    "releaseReadinessScore": 90
   },
   "contracts": [
     {
@@ -954,6 +954,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.as_manufactured_snapshots",
+      "table": "as_manufactured_snapshots",
+      "schema": "public",
+      "domain": "traceability_serialization",
+      "label": "As Manufactured ảnh chụp",
+      "labelEn": "As Manufactured Snapshots",
+      "primaryKey": "as_manufactured_snapshot_id",
+      "statusColumn": "snapshot_state",
+      "statusSet": "as_manufactured_snapshots_snapshot_state",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 16,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.attachment",
       "table": "attachment",
       "schema": "public",
@@ -1122,6 +1156,40 @@
         "update": 1
       },
       "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.audit_pack_exports",
+      "table": "audit_pack_exports",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Pack Xuất khẩu Đánh giá",
+      "labelEn": "Audit Pack Exports",
+      "primaryKey": "audit_pack_export_id",
+      "statusColumn": "export_state",
+      "statusSet": "audit_pack_exports_export_state",
+      "workflowId": "wf_audit_pack_export",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 12,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
     },
     {
       "tableKey": "public.audit_program",
@@ -2666,6 +2734,43 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.control_plane_object_registry",
+      "table": "control_plane_object_registry",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Plane Object sổ đăng ký Kiểm soát",
+      "labelEn": "Control Plane Object Registry",
+      "primaryKey": [
+        "object_type",
+        "object_id"
+      ],
+      "statusColumn": "lifecycle_state",
+      "statusSet": "control_plane_object_registry_lifecycle_state",
+      "workflowId": "wf_control_plane_object_registry",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 13,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 7
+    },
+    {
       "tableKey": "public.control_plans",
       "table": "control_plans",
       "schema": "public",
@@ -3942,6 +4047,39 @@
       "governanceMissingCount": 8
     },
     {
+      "tableKey": "public.duplicate_detection_fingerprints",
+      "table": "duplicate_detection_fingerprints",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Trùng lặp Phát hiện Fingerprint",
+      "labelEn": "Duplicate Detection Fingerprints",
+      "primaryKey": "duplicate_detection_fingerprint_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 15,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.dw_customer_dim",
       "table": "dw_customer_dim",
       "schema": "public",
@@ -4337,6 +4475,40 @@
         "delete": 1,
         "detail": 1,
         "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.effectivity_conflicts",
+      "table": "effectivity_conflicts",
+      "schema": "public",
+      "domain": "plm_change_control",
+      "label": "Effectivity xung đột",
+      "labelEn": "Effectivity Conflicts",
+      "primaryKey": "effectivity_conflict_id",
+      "statusColumn": "conflict_state",
+      "statusSet": "effectivity_conflicts_conflict_state",
+      "workflowId": "wf_effectivity_conflict",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 10,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
         "update": 1
       },
       "governanceMissingCount": 8
@@ -5600,6 +5772,40 @@
         "delete": 1,
         "detail": 1,
         "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.eqms_command_ledger",
+      "table": "eqms_command_ledger",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Eqm Command sổ cái",
+      "labelEn": "Eqms Command Ledger",
+      "primaryKey": "eqms_command_id",
+      "statusColumn": "command_state",
+      "statusSet": "eqms_command_ledger_command_state",
+      "workflowId": "wf_eqms_command_ledger",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 18,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
         "update": 1
       },
       "governanceMissingCount": 8
@@ -8525,6 +8731,39 @@
       "governanceMissingCount": 7
     },
     {
+      "tableKey": "public.genealogy_edges",
+      "table": "genealogy_edges",
+      "schema": "public",
+      "domain": "traceability_serialization",
+      "label": "Phả hệ Edge",
+      "labelEn": "Genealogy Edges",
+      "primaryKey": "genealogy_edge_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.genealogy_link",
       "table": "genealogy_link",
       "schema": "public",
@@ -8553,6 +8792,40 @@
         "delete": 1,
         "detail": 1,
         "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.genealogy_nodes",
+      "table": "genealogy_nodes",
+      "schema": "public",
+      "domain": "traceability_serialization",
+      "label": "Phả hệ Node",
+      "labelEn": "Genealogy Nodes",
+      "primaryKey": "genealogy_node_id",
+      "statusColumn": "lifecycle_state",
+      "statusSet": "genealogy_nodes_lifecycle_state",
+      "workflowId": "wf_genealogy_node",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 15,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
         "update": 1
       },
       "governanceMissingCount": 0
@@ -9095,6 +9368,39 @@
         "update": 1
       },
       "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.immutable_storage_objects",
+      "table": "immutable_storage_objects",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Immutable lưu trữ Object",
+      "labelEn": "Immutable Storage Objects",
+      "primaryKey": "immutable_storage_object_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.improvement_projects",
@@ -10674,6 +10980,40 @@
         "update": 1
       },
       "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.legal_holds",
+      "table": "legal_holds",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Legal tạm giữ",
+      "labelEn": "Legal Holds",
+      "primaryKey": "legal_hold_id",
+      "statusColumn": "hold_state",
+      "statusSet": "legal_holds_hold_state",
+      "workflowId": "wf_legal_hold",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 10,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
     },
     {
       "tableKey": "public.location_balance",
@@ -13814,6 +14154,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.online_form_sessions",
+      "table": "online_form_sessions",
+      "schema": "public",
+      "domain": "forms_system",
+      "label": "Online biểu mẫu phiên",
+      "labelEn": "Online Form Sessions",
+      "primaryKey": "online_form_session_id",
+      "statusColumn": "session_state",
+      "statusSet": "online_form_sessions_session_state",
+      "workflowId": "wf_online_form_session",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 12,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 7
+    },
+    {
       "tableKey": "public.operation",
       "table": "operation",
       "schema": "public",
@@ -14970,7 +15344,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 24,
+      "columnCount": 29,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17499,6 +17873,107 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.promotion_receipts",
+      "table": "promotion_receipts",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Promotion phiếu nhận",
+      "labelEn": "Promotion Receipts",
+      "primaryKey": "promotion_receipt_id",
+      "statusColumn": "promotion_state",
+      "statusSet": "promotion_receipts_promotion_state",
+      "workflowId": "wf_promotion_receipt",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 12,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.publication_attempts",
+      "table": "publication_attempts",
+      "schema": "public",
+      "domain": "evidence_vault",
+      "label": "Publication Attempt",
+      "labelEn": "Publication Attempts",
+      "primaryKey": "publication_attempt_id",
+      "statusColumn": "attempt_state",
+      "statusSet": "publication_attempts_attempt_state",
+      "workflowId": "wf_publication_attempt",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 10,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.publication_receipts",
+      "table": "publication_receipts",
+      "schema": "public",
+      "domain": "evidence_vault",
+      "label": "Publication phiếu nhận",
+      "labelEn": "Publication Receipts",
+      "primaryKey": "publication_receipt_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 9,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
       "tableKey": "public.purchase_order",
       "table": "purchase_order",
       "schema": "public",
@@ -18573,6 +19048,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.read_ack_gate_decisions",
+      "table": "read_ack_gate_decisions",
+      "schema": "public",
+      "domain": "document_control",
+      "label": "Read Ack cổng Decision",
+      "labelEn": "Read Ack Gate Decisions",
+      "primaryKey": "read_ack_gate_decision_id",
+      "statusColumn": "gate_state",
+      "statusSet": "read_ack_gate_decisions_gate_state",
+      "workflowId": "wf_read_ack_gate_decision",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.reason_code",
       "table": "reason_code",
       "schema": "public",
@@ -18709,6 +19218,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.release_manifests",
+      "table": "release_manifests",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Phát hành Manifest",
+      "labelEn": "Release Manifests",
+      "primaryKey": "release_manifest_id",
+      "statusColumn": "manifest_state",
+      "statusSet": "release_manifests_manifest_state",
+      "workflowId": "wf_release_manifest",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 18,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 7
+    },
+    {
       "tableKey": "public.retention_locks",
       "table": "retention_locks",
       "schema": "public",
@@ -18756,6 +19299,40 @@
       "workflowPresent": true,
       "supportTable": false,
       "columnCount": 17,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
+      "tableKey": "public.reverse_sync_intakes",
+      "table": "reverse_sync_intakes",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Reverse Sync Intake",
+      "labelEn": "Reverse Sync Intakes",
+      "primaryKey": "reverse_sync_intake_id",
+      "statusColumn": "disposition_state",
+      "statusSet": "reverse_sync_intakes_disposition_state",
+      "workflowId": "wf_reverse_sync_intake",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 13,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -19654,19 +20231,19 @@
       "governanceMissingCount": 0
     },
     {
-      "tableKey": "public.shift_production_log",
-      "table": "shift_production_log",
+      "tableKey": "public.shift_dispatch_execution_events",
+      "table": "shift_dispatch_execution_events",
       "schema": "public",
       "domain": "production",
-      "label": "Ca Sản xuất Nhật ký",
-      "labelEn": "Shift Production Log",
-      "primaryKey": "log_id",
-      "statusColumn": "sync_status",
-      "statusSet": "sync_status",
+      "label": "Ca Điều độ Thực thi sự kiện",
+      "labelEn": "Shift Dispatch Execution Events",
+      "primaryKey": "dispatch_execution_event_id",
+      "statusColumn": "target_status",
+      "statusSet": "shift_dispatch_execution_events_target_status",
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 30,
+      "columnCount": 20,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -19685,7 +20262,74 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.shift_production_log",
+      "table": "shift_production_log",
+      "schema": "public",
+      "domain": "production",
+      "label": "Ca Sản xuất Nhật ký",
+      "labelEn": "Shift Production Log",
+      "primaryKey": "log_id",
+      "statusColumn": "sync_status",
+      "statusSet": "sync_status",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 38,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 5
+    },
+    {
+      "tableKey": "public.shift_production_report_events",
+      "table": "shift_production_report_events",
+      "schema": "public",
+      "domain": "production",
+      "label": "Ca Sản xuất Báo cáo sự kiện",
+      "labelEn": "Shift Production Report Events",
+      "primaryKey": "production_report_event_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 22,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.shift_targets",
@@ -20163,6 +20807,39 @@
       "label": "SOP cung ứng đồng thuận",
       "labelEn": "SOP Supply Consensus",
       "primaryKey": "sop_supply_consensus_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.source_boundary_violations",
+      "table": "source_boundary_violations",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Nguồn Boundary vi phạm",
+      "labelEn": "Source Boundary Violations",
+      "primaryKey": "source_boundary_violation_id",
       "statusColumn": null,
       "statusSet": null,
       "workflowId": null,
@@ -20759,6 +21436,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.state_transition_events",
+      "table": "state_transition_events",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Trạng thái Chuyển trạng thái sự kiện",
+      "labelEn": "State Transition Events",
+      "primaryKey": "state_transition_event_id",
+      "statusColumn": "to_state",
+      "statusSet": "state_transition_events_to_state",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 15,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
       "tableKey": "public.status_code",
       "table": "status_code",
       "schema": "public",
@@ -20884,6 +21595,73 @@
         "delete": 1,
         "detail": 1,
         "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.submission_validation_errors",
+      "table": "submission_validation_errors",
+      "schema": "public",
+      "domain": "forms_system",
+      "label": "Bản nộp Kiểm tra tính hợp lệ Error",
+      "labelEn": "Submission Validation Errors",
+      "primaryKey": "submission_validation_error_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 16,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.submission_validation_results",
+      "table": "submission_validation_results",
+      "schema": "public",
+      "domain": "forms_system",
+      "label": "Bản nộp Kiểm tra tính hợp lệ kết quả",
+      "labelEn": "Submission Validation Results",
+      "primaryKey": "submission_validation_result_id",
+      "statusColumn": "validation_state",
+      "statusSet": "submission_validation_results_validation_state",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 17,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
         "update": 1
       },
       "governanceMissingCount": 0
@@ -22758,6 +23536,40 @@
       "governanceMissingCount": 8
     },
     {
+      "tableKey": "public.traceability_exceptions",
+      "table": "traceability_exceptions",
+      "schema": "public",
+      "domain": "traceability_serialization",
+      "label": "Truy xuất nguồn gốc ngoại lệ",
+      "labelEn": "Traceability Exceptions",
+      "primaryKey": "traceability_exception_id",
+      "statusColumn": "exception_state",
+      "statusSet": "traceability_exceptions_exception_state",
+      "workflowId": "wf_traceability_exception",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.track_in",
       "table": "track_in",
       "schema": "public",
@@ -23222,6 +24034,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.training_gate_decisions",
+      "table": "training_gate_decisions",
+      "schema": "public",
+      "domain": "training_hr",
+      "label": "Đào tạo cổng Decision",
+      "labelEn": "Training Gate Decisions",
+      "primaryKey": "training_gate_decision_id",
+      "statusColumn": "gate_state",
+      "statusSet": "training_gate_decisions_gate_state",
+      "workflowId": "wf_training_gate_decision",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 17,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.training_matrix",
       "table": "training_matrix",
       "schema": "public",
@@ -23558,6 +24404,40 @@
         "update": 1
       },
       "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.wip_dispositions",
+      "table": "wip_dispositions",
+      "schema": "public",
+      "domain": "quality_management",
+      "label": "WIP Xử lý",
+      "labelEn": "WIP Dispositions",
+      "primaryKey": "wip_disposition_id",
+      "statusColumn": "disposition_state",
+      "statusSet": "wip_dispositions_disposition_state",
+      "workflowId": "wf_wip_disposition",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 10,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
     },
     {
       "tableKey": "public.wip_ledger",

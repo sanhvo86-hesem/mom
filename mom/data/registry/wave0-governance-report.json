@@ -1,19 +1,19 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:52:48.150Z",
+    "generatedAt": "2026-04-13T15:11:27.744Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 735,
+    "total_frontend_entities": 761,
     "canonical_resources": 67,
     "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 73,
-    "governed_support_entities": 654,
-    "conditional_extension_entities": 3,
+    "governed_support_entities": 677,
+    "conditional_extension_entities": 6,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
     "generic_status_only_core_entities": 0,
@@ -1802,7 +1802,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 231,
+        "relation_count": 245,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2380,6 +2380,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "document_control.read_ack_gate_decisions",
+        "entity": "read_ack_gate_decisions",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "ehs_sustainability.ehs_contractors",
         "entity": "ehs_contractors",
         "profile": "transactional_record",
@@ -2704,7 +2715,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 1,
+        "relation_count": 3,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2715,7 +2726,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 6,
+        "relation_count": 10,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2761,6 +2772,28 @@
         "archive_candidate": false,
         "relation_count": 3,
         "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.publication_attempts",
+        "entity": "publication_attempts",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.publication_receipts",
+        "entity": "publication_receipts",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3298,7 +3331,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 5,
+        "relation_count": 6,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3309,7 +3342,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 3,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3320,7 +3353,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 5,
+        "relation_count": 7,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3332,6 +3365,39 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.online_form_sessions",
+        "entity": "online_form_sessions",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.submission_validation_errors",
+        "entity": "submission_validation_errors",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.submission_validation_results",
+        "entity": "submission_validation_results",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5669,6 +5735,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "plm_change_control.effectivity_conflicts",
+        "entity": "effectivity_conflicts",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "plm_change_control.engineering_change_requests",
         "entity": "engineering_change_requests",
         "profile": "governed_case",
@@ -5784,7 +5861,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 28,
+        "relation_count": 31,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5984,6 +6061,17 @@
         "archive_candidate": false,
         "relation_count": 4,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "production.shift_dispatch_execution_events",
+        "entity": "shift_dispatch_execution_events",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6648,6 +6736,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "quality_management.wip_dispositions",
+        "entity": "wip_dispositions",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "record_system.allocation_events",
         "entity": "allocation_events",
         "profile": "document_record",
@@ -6670,6 +6769,28 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "record_system.audit_pack_exports",
+        "entity": "audit_pack_exports",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.control_plane_object_registry",
+        "entity": "control_plane_object_registry",
+        "profile": "projection_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "record_system.electronic_signatures",
         "entity": "electronic_signatures",
         "profile": "document_record",
@@ -6681,6 +6802,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "record_system.eqms_command_ledger",
+        "entity": "eqms_command_ledger",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "record_system.eqms_retention_lock",
         "entity": "eqms_retention_lock",
         "profile": "document_record",
@@ -6688,6 +6820,28 @@
         "archive_candidate": false,
         "relation_count": 1,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.legal_holds",
+        "entity": "legal_holds",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.promotion_receipts",
+        "entity": "promotion_receipts",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -6725,8 +6879,30 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "record_system.release_manifests",
+        "entity": "release_manifests",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "record_system.retention_locks",
         "entity": "retention_locks",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.state_transition_events",
+        "entity": "state_transition_events",
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
@@ -7330,6 +7506,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "system_infrastructure.duplicate_detection_fingerprints",
+        "entity": "duplicate_detection_fingerprints",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "system_infrastructure.escalation_log",
         "entity": "escalation_log",
         "profile": "business_record",
@@ -7413,6 +7600,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.reverse_sync_intakes",
+        "entity": "reverse_sync_intakes",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -7627,6 +7825,39 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "traceability_serialization.as_manufactured_snapshots",
+        "entity": "as_manufactured_snapshots",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "traceability_serialization.genealogy_edges",
+        "entity": "genealogy_edges",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "traceability_serialization.genealogy_nodes",
+        "entity": "genealogy_nodes",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "traceability_serialization.lot",
         "entity": "lot",
         "profile": "business_record",
@@ -7777,6 +8008,17 @@
         "archive_candidate": false,
         "relation_count": 1,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "traceability_serialization.traceability_exceptions",
+        "entity": "traceability_exceptions",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -7953,6 +8195,17 @@
         "archive_candidate": false,
         "relation_count": 6,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "training_hr.training_gate_decisions",
+        "entity": "training_gate_decisions",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -8248,6 +8501,39 @@
         "entity_key": "bi_datawarehouse.dw_kpi_scorecards",
         "entity": "dw_kpi_scorecards",
         "profile": "assessment_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "production.shift_production_report_events",
+        "entity": "shift_production_report_events",
+        "profile": "business_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "record_system.immutable_storage_objects",
+        "entity": "immutable_storage_objects",
+        "profile": "document_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.source_boundary_violations",
+        "entity": "source_boundary_violations",
+        "profile": "business_record",
         "zone": "conditional_extension",
         "archive_candidate": false,
         "relation_count": 0,

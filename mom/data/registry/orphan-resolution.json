@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:52:24.316Z",
-    "description": "Resolution plan for 0 orphan registry fields and 431 orphan DB column names."
+    "generatedAt": "2026-04-13T15:11:13.352Z",
+    "description": "Resolution plan for 0 orphan registry fields and 433 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 354,
+      "count": 355,
       "columns": [
         {
           "column": "item_class",
@@ -3878,6 +3878,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "quantity_rework",
+          "tables": [
+            "shift_production_log"
+          ],
+          "suggestedLabel": "Số lượng Rework",
+          "suggestedLabelEn": "Quantity Rework",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "quantity_total",
           "tables": [
             "shift_production_log"
@@ -4669,7 +4682,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 77,
+      "count": 78,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -5446,6 +5459,16 @@
             "VARCHAR(160)"
           ],
           "role": "foreign_key"
+        },
+        {
+          "column": "submission_validation_error_id",
+          "tables": [
+            "submission_validation_errors"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
         }
       ]
     },

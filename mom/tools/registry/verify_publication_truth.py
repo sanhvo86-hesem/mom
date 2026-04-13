@@ -323,6 +323,66 @@ def main() -> int:
               diagnostics_summary.get("criticalGapCount") == 0 and diagnostics_summary.get("blockerCount") == 0,
               f"critical={diagnostics_summary.get('criticalGapCount')} blockers={diagnostics_summary.get('blockerCount')}")
 
+    # Gate J3: Graphics governance authority contract
+    print("\nGate J3: Graphics governance authority")
+    graphics_path = REG / "graphics-governance-registry.json"
+    check("graphics_governance_registry_exists", graphics_path.is_file(), f"Missing: {graphics_path}")
+    if graphics_path.is_file():
+        graphics = load(graphics_path)
+        for key in [
+            "templateRegistry",
+            "moduleGraphicsCompliance",
+            "changeSetModel",
+            "moduleGraphicsLineageGraph",
+            "runtimeGraphicsComplianceBeacon",
+            "visualDebtObservatory",
+            "environmentPolicyPacks",
+            "graphicsReleaseDashboard",
+            "graphicsReleaseLink",
+            "multiSitePlantBrandingGovernance",
+            "controlledEmergencyOverridePath",
+        ]:
+            check(f"graphics_contract_has:{key}", isinstance(graphics.get(key), dict),
+                  f"{key} missing or not object")
+        rows = graphics.get("moduleGraphicsCompliance", {}).get("matrix", [])
+        row_fields = {
+            "moduleId",
+            "route",
+            "templateBindingSource",
+            "sharedTokenCoverage",
+            "sharedComponentCoverage",
+            "bridgeAliasDebt",
+            "privateCssDebt",
+            "hardcodedStyleDebt",
+            "driftStatus",
+            "blockerReason",
+            "runtimeBeaconStatus",
+        }
+        missing_rows = [
+            row.get("moduleId", "unknown")
+            for row in rows
+            if isinstance(row, dict) and not row_fields.issubset(row.keys())
+        ]
+        check("graphics_compliance_rows_have_required_fields", len(missing_rows) == 0,
+              f"missing_rows={missing_rows[:10]}")
+        release_link = graphics.get("graphicsReleaseLink", {})
+        link_fields = {
+            "graphicsAuthorityRefs",
+            "templateRegistryVersion",
+            "templateRegistryChecksum",
+            "complianceMatrixRef",
+            "impactAnalysisRef",
+            "waiversRef",
+            "runtimeBeaconRef",
+            "debtObservatoryRef",
+            "multiSitePlantBrandingGovernanceRef",
+            "controlledEmergencyOverridePathRef",
+            "rolloutDecisionRef",
+            "rollbackPlanRef",
+        }
+        check("graphics_release_link_complete", isinstance(release_link, dict) and link_fields.issubset(release_link.keys()),
+              f"keys={sorted(release_link.keys()) if isinstance(release_link, dict) else []}")
+
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")
     pts_path = REG / "publication-truth-summary.json"

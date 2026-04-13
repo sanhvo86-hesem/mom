@@ -2,6 +2,16 @@
 
 > Version: V0 | Effective: 2025-06-01 | Owner: QMS Engineer
 
+## 0. Authority correction - change-authorized-only release governance
+
+This workflow is superseded wherever it permits direct post-release file edits,
+SharePoint-only supersession, or uncontrolled minor updates. Released documents,
+forms, schemas, evidence records, and publication copies are immutable business
+objects. Post-release changes require a released change order authorizing the
+exact affected object, resulting object, field set, and effectivity. SharePoint
+may show a superseded or withdrawn read-only copy, but it is not the authority
+for release state.
+
 ---
 
 ## 1. Version numbering system

@@ -197,6 +197,8 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
         "debtObservatoryPresent": isinstance(graphics_governance.get("visualDebtObservatory"), dict),
         "environmentPolicyPacksPresent": isinstance(graphics_governance.get("environmentPolicyPacks"), dict),
         "releaseDashboardPresent": isinstance(graphics_governance.get("graphicsReleaseDashboard"), dict),
+        "multiSitePlantBrandingPresent": isinstance(graphics_governance.get("multiSitePlantBrandingGovernance"), dict),
+        "controlledEmergencyOverridePresent": isinstance(graphics_governance.get("controlledEmergencyOverridePath"), dict),
     }
 
 
@@ -505,6 +507,27 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         for domain, count in sorted(domain_counts.items())
     ]
 
+    graphics_release_link = {
+        "graphicsAuthorityRefs": [source_path(GRAPHICS_GOVERNANCE)] if graphics_governance else [],
+        "templateRegistryVersion": graphics_summary["templateRegistryVersion"],
+        "templateRegistryChecksum": graphics_summary["templateRegistryChecksum"],
+        "complianceMatrixRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsCompliance" if graphics_governance else "",
+        "impactAnalysisRef": "data/graphics-governance/state.json#/pendingImpact" if graphics_governance else "",
+        "waiversRef": "data/graphics-governance/waivers.json#/waivers" if graphics_governance else "",
+        "changeSetRef": source_path(GRAPHICS_GOVERNANCE) + "#/changeSetModel" if graphics_summary["changeSetPresent"] else "",
+        "lineageGraphRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsLineageGraph" if graphics_summary["lineageGraphPresent"] else "",
+        "runtimeBeaconRef": source_path(GRAPHICS_GOVERNANCE) + "#/runtimeGraphicsComplianceBeacon" if graphics_summary["runtimeBeaconPresent"] else "",
+        "debtObservatoryRef": source_path(GRAPHICS_GOVERNANCE) + "#/visualDebtObservatory" if graphics_summary["debtObservatoryPresent"] else "",
+        "environmentPolicyPacksRef": source_path(GRAPHICS_GOVERNANCE) + "#/environmentPolicyPacks" if graphics_summary["environmentPolicyPacksPresent"] else "",
+        "releaseDashboardRef": source_path(GRAPHICS_GOVERNANCE) + "#/graphicsReleaseDashboard" if graphics_summary["releaseDashboardPresent"] else "",
+        "multiSitePlantBrandingGovernanceRef": source_path(GRAPHICS_GOVERNANCE) + "#/multiSitePlantBrandingGovernance" if graphics_summary["multiSitePlantBrandingPresent"] else "",
+        "controlledEmergencyOverridePathRef": source_path(GRAPHICS_GOVERNANCE) + "#/controlledEmergencyOverridePath" if graphics_summary["controlledEmergencyOverridePresent"] else "",
+        "rolloutDecisionRef": "data/graphics-governance/rollouts.json#/rollouts" if graphics_governance else "",
+        "rollbackPlanRef": "data/graphics-governance/snapshots" if graphics_governance else "",
+        "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
+        "releaseBlocked": graphics_summary["releaseBlocked"],
+    }
+
     runtime_projection = {
         "_meta": {
             **base_meta,
@@ -518,6 +541,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "endpointBindings": endpoint_bindings,
         "domains": domains,
         "graphicsGovernance": graphics_governance,
+        "graphicsReleaseLink": graphics_release_link,
     }
 
     registry_contracts = {
@@ -585,20 +609,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "manifest": source_path(MANIFEST),
             "graphicsGovernance": source_path(GRAPHICS_GOVERNANCE) if graphics_governance else "",
         },
-        "graphicsReleaseLink": {
-            "graphicsAuthorityRefs": [source_path(GRAPHICS_GOVERNANCE)] if graphics_governance else [],
-            "templateRegistryVersion": graphics_summary["templateRegistryVersion"],
-            "templateRegistryChecksum": graphics_summary["templateRegistryChecksum"],
-            "complianceMatrixRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsCompliance" if graphics_governance else "",
-            "changeSetRef": source_path(GRAPHICS_GOVERNANCE) + "#/changeSetModel" if graphics_summary["changeSetPresent"] else "",
-            "lineageGraphRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsLineageGraph" if graphics_summary["lineageGraphPresent"] else "",
-            "runtimeBeaconRef": source_path(GRAPHICS_GOVERNANCE) + "#/runtimeGraphicsComplianceBeacon" if graphics_summary["runtimeBeaconPresent"] else "",
-            "debtObservatoryRef": source_path(GRAPHICS_GOVERNANCE) + "#/visualDebtObservatory" if graphics_summary["debtObservatoryPresent"] else "",
-            "environmentPolicyPacksRef": source_path(GRAPHICS_GOVERNANCE) + "#/environmentPolicyPacks" if graphics_summary["environmentPolicyPacksPresent"] else "",
-            "releaseDashboardRef": source_path(GRAPHICS_GOVERNANCE) + "#/graphicsReleaseDashboard" if graphics_summary["releaseDashboardPresent"] else "",
-            "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
-            "releaseBlocked": graphics_summary["releaseBlocked"],
-        },
+        "graphicsReleaseLink": graphics_release_link,
         "sourceAuthority": {
             "databaseSchema": "public",
             "databaseSchemaSource": "database/migrations/*.sql -> database/schema.sql",

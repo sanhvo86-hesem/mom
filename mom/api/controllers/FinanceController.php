@@ -166,7 +166,12 @@ final class FinanceController extends BaseController
         $this->requireFinanceRead($user);
 
         try {
-            $this->success(['period_closes' => $this->controls()->listPeriodCloses()]);
+            $all = $this->controls()->listPeriodCloses();
+            $offset = max(0, (int)($this->query('offset') ?? 0));
+            $limit = min(200, max(1, (int)($this->query('limit') ?? 50)));
+            $total = count($all);
+            $page = array_slice($all, $offset, $limit);
+            $this->success(['period_closes' => $page, 'total' => $total, 'offset' => $offset, 'limit' => $limit]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('finance_period_close_list_failed', 500, $e->getMessage());
@@ -202,7 +207,12 @@ final class FinanceController extends BaseController
         $this->requireFinanceRead($user);
 
         try {
-            $this->success(['backdate_exceptions' => $this->controls()->listBackdateExceptions()]);
+            $all = $this->controls()->listBackdateExceptions();
+            $offset = max(0, (int)($this->query('offset') ?? 0));
+            $limit = min(200, max(1, (int)($this->query('limit') ?? 50)));
+            $total = count($all);
+            $page = array_slice($all, $offset, $limit);
+            $this->success(['backdate_exceptions' => $page, 'total' => $total, 'offset' => $offset, 'limit' => $limit]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('finance_backdate_exception_list_failed', 500, $e->getMessage());
@@ -376,7 +386,12 @@ final class FinanceController extends BaseController
         $this->requireFinanceRead($user);
 
         try {
-            $this->success(['credit_memos' => $this->controls()->listCreditMemos()]);
+            $all = $this->controls()->listCreditMemos();
+            $offset = max(0, (int)($this->query('offset') ?? 0));
+            $limit = min(200, max(1, (int)($this->query('limit') ?? 50)));
+            $total = count($all);
+            $page = array_slice($all, $offset, $limit);
+            $this->success(['credit_memos' => $page, 'total' => $total, 'offset' => $offset, 'limit' => $limit]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('finance_credit_memo_list_failed', 500, $e->getMessage());

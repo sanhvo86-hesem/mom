@@ -1,5 +1,19 @@
 # 14 — M365 SharePoint architecture and operational record keeping
 
+## 0. Authority correction - portal-first control plane
+
+This standard is superseded wherever it describes SharePoint as the system of
+record, SSOT, save location, or user upload channel for controlled evidence.
+The current authority model is:
+
+- Portal/database/evidence package = authoritative record and retention object.
+- SharePoint = asynchronous read-only publication and discovery target only.
+- End users must not upload controlled evidence directly to SharePoint.
+- Offline Excel is a controlled capture carrier issued by the portal; it is not
+  the source of truth.
+- Final evidence must be accepted, locked, packaged, retained, and audited in
+  the portal before any SharePoint publication attempt.
+
 > Design a 4-site SharePoint architecture for record storage, document backup, and synchronization with web portal.
 > Web portal (qms.hesem.com.vn) = the only place to READ. SharePoint = backup + operational record storage.
 

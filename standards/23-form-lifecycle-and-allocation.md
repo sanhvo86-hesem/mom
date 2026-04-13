@@ -1,5 +1,18 @@
 # 23 — Form Lifecycle, Allocation & Order Linking
 
+## 0. Authority correction - issuance/submission/evidence separation
+
+The allocation lifecycle in this standard is superseded where it says the final
+official archive is SharePoint. The current control-plane model is:
+
+- `frm_issuance` tracks issuance/download/expiry/void/supersession.
+- `frm_submission_attempt` tracks each online/offline submission attempt.
+- `evidence_record` and `evidence_version` are the authoritative business
+  records after acceptance/finalization.
+- `evidence_publication` tracks asynchronous SharePoint publication state.
+- SharePoint publication never replaces portal acceptance, immutable package
+  building, retention, audit trail, or change authority.
+
 > Form lifecycle rules, Record-ID allocation, version control, and SO/JO/WO linking.
 > Complies with ISO 9001:2015 clause 7.5 (Documented Information), AS9100D clause 8.5.2 (Traceability),
 > and FDA 21 CFR Part 11 (Electronic Records) when applicable.

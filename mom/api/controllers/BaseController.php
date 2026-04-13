@@ -76,12 +76,15 @@ abstract class BaseController
         if ($this->jsonBodyCache !== null) {
             return $this->jsonBodyCache;
         }
-        $raw = @file_get_contents('php://input');
+        $raw = $GLOBALS['__mom_raw_input'] ?? ($GLOBALS['__mom_raw_input'] = @file_get_contents('php://input') ?: '');
         if ($raw === false || trim($raw) === '') {
             return $this->jsonBodyCache = [];
         }
         $data = json_decode($raw, true);
-        return $this->jsonBodyCache = (is_array($data) ? $data : []);
+        if (!is_array($data)) {
+            $this->error('invalid_json_body', 400, 'Request body must be a JSON object or array');
+        }
+        return $this->jsonBodyCache = $data;
     }
 
     /**

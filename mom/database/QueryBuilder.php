@@ -241,10 +241,12 @@ class QueryBuilder
      */
     public function whereJsonText(string $column, string $key, mixed $value): self
     {
-        $ph = $this->nextPlaceholder();
+        $phKey = $this->nextPlaceholder();
+        $phVal = $this->nextPlaceholder();
+        $safeCol = $this->quoteIdentifier($column);
         $this->wheres[] = [
-            'sql'       => "{$column}->>'{$key}' = {$ph}",
-            'params'    => [$ph => (string)$value],
+            'sql'       => "{$safeCol}->>{$phKey} = {$phVal}",
+            'params'    => [$phKey => $key, $phVal => (string)$value],
             'connector' => 'AND',
         ];
         return $this;
@@ -260,8 +262,9 @@ class QueryBuilder
     public function whereJsonContains(string $column, array $data): self
     {
         $ph = $this->nextPlaceholder();
+        $safeCol = $this->quoteIdentifier($column);
         $this->wheres[] = [
-            'sql'       => "{$column} @> {$ph}::jsonb",
+            'sql'       => "{$safeCol} @> {$ph}::jsonb",
             'params'    => [$ph => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)],
             'connector' => 'AND',
         ];
@@ -278,8 +281,9 @@ class QueryBuilder
     public function whereJsonHasKey(string $column, string $key): self
     {
         $ph = $this->nextPlaceholder();
+        $safeCol = $this->quoteIdentifier($column);
         $this->wheres[] = [
-            'sql'       => "{$column} ?? {$ph}",
+            'sql'       => "{$safeCol} ?? {$ph}",
             'params'    => [$ph => $key],
             'connector' => 'AND',
         ];
@@ -297,6 +301,9 @@ class QueryBuilder
      */
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
+        if (!$this->isValidIdentifier($column)) {
+            throw new InvalidArgumentException("Invalid ORDER BY column: {$column}");
+        }
         $dir = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
         $this->orderBy[] = "$column $dir";
         return $this;
@@ -685,6 +692,10 @@ class QueryBuilder
      */
     private function addWhere(string $connector, string $column, mixed $operator, mixed $value): self
     {
+        if (!$this->isValidIdentifier($column)) {
+            throw new InvalidArgumentException("Invalid WHERE column: {$column}");
+        }
+
         // Two-argument shorthand: where('col', 'value') => col = value
         if ($value === null && $operator !== null && !in_array(strtoupper((string)$operator), ['IS NULL', 'IS NOT NULL'], true)) {
             $value = $operator;
@@ -740,5 +751,30 @@ class QueryBuilder
             return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
         return $value;
+    }
+
+    /**
+     * Quote a PostgreSQL identifier (column/table name).
+     * Properly escapes double quotes and handles dotted names (table.column).
+     */
+    private function quoteIdentifier(string $identifier): string
+    {
+        // Allow dotted names (table.column) and simple names
+        $parts = explode('.', $identifier);
+        $quoted = array_map(static function (string $part): string {
+            return '"' . str_replace('"', '""', trim($part)) . '"';
+        }, $parts);
+        return implode('.', $quoted);
+    }
+
+    /**
+     * Validate that a string looks like a safe SQL identifier or expression.
+     * Allows: column names, table.column, table.column::type, function(column), column->>'key'
+     */
+    private function isValidIdentifier(string $identifier): bool
+    {
+        // Allow alphanumeric, underscores, dots, colons (for casts), parens (for functions),
+        // arrows (for JSONB), spaces (for aliases), quotes
+        return (bool)preg_match('/^[a-zA-Z0-9_."\'():,>< \-]+$/', $identifier);
     }
 }

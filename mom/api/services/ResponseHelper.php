@@ -56,6 +56,9 @@ final class ResponseHelper
      */
     public static function streamEvent(string $event, array $payload): void
     {
+        if (!preg_match('/^[a-zA-Z0-9_.:-]+$/', $event)) {
+            throw new \InvalidArgumentException('Invalid SSE event name');
+        }
         echo 'event: ' . $event . "\n";
         echo 'data: ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
         @ob_flush();

@@ -86,6 +86,11 @@ def action_absent(actions: dict, key: str) -> bool:
 def main() -> int:
     policy = load_json(POLICY_PATH)
     normalization = load_json(NORMALIZATION_PATH)
+    source_generated_at = utc_now()
+    policy.setdefault("_meta", {})["generatedAt"] = source_generated_at
+    normalization.setdefault("_meta", {})["generatedAt"] = source_generated_at
+    dump_json(POLICY_PATH, policy)
+    dump_json(NORMALIZATION_PATH, normalization)
     canonical_catalog = load_json(CANONICAL_PATH)
     frontend_catalog = load_json(FRONTEND_PATH)
     runtime_access_policy = load_json(RUNTIME_ACCESS_PATH)

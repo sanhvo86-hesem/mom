@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:52:37.940Z",
+    "generatedAt": "2026-04-13T15:11:20.237Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
-    "tableOverrideCount": 138
+    "tableOverrideCount": 143
   },
   "defaults": {
     "list": [
@@ -2829,6 +2829,36 @@
       "delete": []
     },
     "aps_pegging_links": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "as_manufactured_snapshots": {
       "list": [
         "authenticated"
       ],
@@ -5763,7 +5793,67 @@
       ],
       "delete": []
     },
+    "shift_dispatch_execution_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "shift_production_log": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "shift_production_report_events": {
       "list": [
         "authenticated"
       ],
@@ -5973,10 +6063,70 @@
       ],
       "delete": []
     },
+    "state_transition_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "stock_balances": {
       "create": [],
       "update": [],
       "transition": [],
+      "delete": []
+    },
+    "submission_validation_results": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
       "delete": []
     },
     "supplier_asn_lines": {

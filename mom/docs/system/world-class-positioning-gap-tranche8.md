@@ -164,6 +164,35 @@ Generated authority artifacts:
 - `php -d display_errors=1 -d error_log=/tmp/mom-tranche8-data-schema-smoke-error.log tests/data_schema_admin_smoke.php` -> pass.
 - `php -d display_errors=1 -d error_log=/tmp/mom-tranche8-registry-smoke-error.log tests/enterprise_registry_authority_smoke.php` -> pass.
 
+## Strict Reaudit Closure
+
+Additional reaudit on 2026-04-13 found and closed these issues:
+
+- `aps_planning_scenarios.created_by` is a nullable UUID foreign key, but the planning service can carry actor labels such as `planner` or `planner-1`. `PostgresPlanningScenarioRepository` now only binds `created_by` when the actor value is a valid UUID and preserves non-UUID actor labels in the authoritative metadata packet as `created_by_actor`.
+- `aps_planning_scenarios.scenario_name` is `VARCHAR(150)`, while the repository previously allowed 255 characters. Scenario names are now truncated to the schema limit before upsert.
+- Scenario-scoped replanning signal updates now lock the matching APS scenario row with `FOR UPDATE` before rewriting the metadata signal list, reducing lost-update risk on PostgreSQL.
+- Capacity bucket `shift_start` parsing now accepts both `HH:MM` and `HH:MM:SS` and falls back to `08:00:00` for invalid values instead of constructing malformed timestamps.
+- Focused tests now cover material shortage plus missing active revision blockers, closed/released quality holds, shift-start seconds, and PostgreSQL schema helper behavior for `scenario_name` and `created_by`.
+
+Reaudit verification:
+
+- `php -l mom/api/services/PostgresPlanningScenarioRepository.php` -> pass.
+- `php -l mom/api/services/PlanningScenarioService.php` -> pass.
+- `php -l mom/tests/Unit/Services/PlanningScenarioServiceTest.php` -> pass.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-reaudit-planning-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/PlanningScenarioServiceTest.php` -> pass, 12 tests, 41 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-reaudit-focused-phpunit-error.log vendor/bin/phpunit --do-not-cache-result tests/Unit/Services/PlanningScenarioServiceTest.php tests/Unit/Services/ConnectedGovernanceServiceTest.php tests/Unit/Services/RuntimeAuthorityServiceTest.php tests/Unit/Controllers/HealthControllerRuntimeAuthorityTest.php` -> pass, 24 tests, 122 assertions.
+- `php -d memory_limit=512M -d opcache.enable_cli=0 -d error_log=/tmp/mom-reaudit-full-phpunit-error.log vendor/bin/phpunit --do-not-cache-result` -> pass, 247 tests, 1495 assertions, 1 gated skip.
+- `php -d error_log=/tmp/mom-reaudit-backend-smoke-error.log tests/backend_smoke.php` -> pass.
+- `python3 tools/registry/canonical_publication_orchestrator.py` -> pass with publication proof `PASS`.
+- `python3 tools/registry/enterprise_frontend_simulator.py` -> pass with `watch` status and no blocker counts.
+- `python3 tools/registry/enterprise_registry_doctor.py --write` -> pass with `watch` status, 0 P1 findings.
+- `python3 tools/registry/generate_global_erp_mom_capability_audit.py` -> pass with 0 blocking gaps.
+- `python3 tools/registry/generate_operational_blind_spot_report.py` -> pass with 0 critical/high/medium findings.
+- `python3 tools/registry/generate_operational_stress_report.py` -> pass with 0 critical/high/medium findings.
+- `python3 tools/registry/generate_system_contract_authority.py` -> pass with 0 critical gaps.
+- `php -d display_errors=1 -d error_log=/tmp/mom-reaudit-data-schema-smoke-error.log tests/data_schema_admin_smoke.php` -> pass.
+- `php -d display_errors=1 -d error_log=/tmp/mom-reaudit-registry-smoke-error.log tests/enterprise_registry_authority_smoke.php` -> pass.
+
 ## Remaining Unproven Items
 
 - No live PostgreSQL migration/apply, concurrency, lock contention, or failover test was executed locally.

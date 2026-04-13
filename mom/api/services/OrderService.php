@@ -678,12 +678,13 @@ final class OrderService
                 $this->writeJsonFileAtomic($this->ordersFile, $data);
                 @flock($lockHandle, LOCK_UN);
                 return;
+            } else {
+                @fclose($lockHandle);
+                throw new \RuntimeException('Failed to acquire write lock for orders store');
             }
         } finally {
             @fclose($lockHandle);
         }
-
-        $this->writeJsonFileAtomic($this->ordersFile, $data);
     }
 
     /**

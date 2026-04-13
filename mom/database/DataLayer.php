@@ -772,9 +772,9 @@ class DataLayer
                     [
                         ':id'    => $entryId,
                         ':code'  => $code,
-                        ':data'  => json_encode($data, JSON_UNESCAPED_UNICODE),
+                        ':data'  => json_encode($data, JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
                         ':state' => $data['workflow_state'] ?? 'draft',
-                        ':meta'  => json_encode($data['metadata'] ?? [], JSON_UNESCAPED_UNICODE),
+                        ':meta'  => json_encode($data['metadata'] ?? [], JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
                     ],
                 );
                 return true;
@@ -854,8 +854,8 @@ class DataLayer
                         ':dept'   => strtoupper($department),
                         ':status' => 'open',
                         ':title'  => $data['title'] ?? $recordId,
-                        ':data'   => json_encode($data, JSON_UNESCAPED_UNICODE),
-                        ':meta'   => json_encode($data['metadata'] ?? [], JSON_UNESCAPED_UNICODE),
+                        ':data'   => json_encode($data, JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
+                        ':meta'   => json_encode($data['metadata'] ?? [], JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
                     ],
                 );
                 return true;
@@ -1471,8 +1471,8 @@ class DataLayer
                         ':agg_id'   => $aggregateId,
                         ':actor_id' => isset($entry['actor_id']) && trim((string)$entry['actor_id']) !== '' ? (string)$entry['actor_id'] : null,
                         ':actor_name' => isset($entry['actor_name']) && trim((string)$entry['actor_name']) !== '' ? (string)$entry['actor_name'] : null,
-                        ':payload'  => json_encode($payload, JSON_UNESCAPED_UNICODE),
-                        ':meta'     => json_encode($metadata !== [] ? $metadata : ['source' => 'api'], JSON_UNESCAPED_UNICODE),
+                        ':payload'  => json_encode($payload, JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
+                        ':meta'     => json_encode($metadata !== [] ? $metadata : ['source' => 'api'], JSON_UNESCAPED_UNICODE) ?: throw new \RuntimeException('JSON encoding failed: ' . json_last_error_msg()),
                         ':ip_address' => isset($entry['ip_address']) && trim((string)$entry['ip_address']) !== '' ? (string)$entry['ip_address'] : null,
                         ':session_id' => isset($entry['session_id']) && trim((string)$entry['session_id']) !== '' ? (string)$entry['session_id'] : null,
                     ],
@@ -1983,8 +1983,8 @@ class DataLayer
     }
 
     /**
-     * Shadow-write: write to JSON first (primary), then mirror to PostgreSQL.
-     * PostgreSQL failures are logged but do not fail the operation.
+     * Shadow-write: write to PostgreSQL first (authoritative), then JSON (cache/fallback).
+     * PostgreSQL failures are logged but JSON write still proceeds.
      *
      * @param callable $jsonWriter JSON writer.
      * @param callable $pgWriter   PostgreSQL writer.
@@ -1992,12 +1992,17 @@ class DataLayer
      */
     private function shadowWriteBoth(callable $jsonWriter, callable $pgWriter): bool
     {
-        $result = $jsonWriter();
-
+        $pgOk = false;
         try {
             $pgWriter();
+            $pgOk = true;
         } catch (\Throwable $e) {
-            @error_log('[DataLayer] shadow write to PG failed: ' . $e->getMessage());
+            error_log('[DataLayer] shadow write to PG failed: ' . $e->getMessage());
+        }
+
+        $result = $jsonWriter();
+        if (!$pgOk) {
+            error_log('[DataLayer] WARNING: PG write failed but JSON write succeeded - data may diverge');
         }
 
         return $result;

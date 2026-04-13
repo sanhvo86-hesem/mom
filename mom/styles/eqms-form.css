@@ -4,23 +4,23 @@
    ========================================================================== */
 
 :root {
-  --eqms-bg: #f8fafc;
-  --eqms-surface: #ffffff;
-  --eqms-border: #e2e8f0;
-  --eqms-text: #0f172a;
-  --eqms-text-2: #475569;
-  --eqms-text-3: #94a3b8;
-  --eqms-primary: #1565c0;
-  --eqms-primary-light: #dbeafe;
-  --eqms-success: #16a34a;
-  --eqms-success-light: #dcfce7;
-  --eqms-warning: #d97706;
-  --eqms-warning-light: #fef3c7;
-  --eqms-danger: #dc2626;
-  --eqms-danger-light: #fee2e2;
-  --eqms-radius: 8px;
-  --eqms-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --eqms-mono: 'Consolas', 'SF Mono', monospace;
+  --eqms-bg: var(--bg-page, #f8fafc);
+  --eqms-surface: var(--bg-surface, #ffffff);
+  --eqms-border: var(--border, #e2e8f0);
+  --eqms-text: var(--text-primary, #0f172a);
+  --eqms-text-2: var(--text-secondary, #475569);
+  --eqms-text-3: var(--text-tertiary, #94a3b8);
+  --eqms-primary: var(--brand-2, #1565c0);
+  --eqms-primary-light: var(--brand-light, #dbeafe);
+  --eqms-success: var(--green, #16a34a);
+  --eqms-success-light: color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff));
+  --eqms-warning: var(--amber, #d97706);
+  --eqms-warning-light: color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff));
+  --eqms-danger: var(--red, #dc2626);
+  --eqms-danger-light: color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff));
+  --eqms-radius: var(--hds-control-radius, var(--radius-lg, 8px));
+  --eqms-font: var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif));
+  --eqms-mono: var(--font-mono, 'Consolas', 'SF Mono', monospace);
 }
 
 /* ── Runtime container ── */

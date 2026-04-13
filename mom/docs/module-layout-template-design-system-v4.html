@@ -1443,7 +1443,9 @@ blocked transitions:
   shopfloorCompatibility,
   updatedBy,
   updatedAt,
-  evidenceRefs
+  evidenceRefs,
+  checksum,
+  authorityRef
 }</pre>
 <p>Publish chỉ hợp lệ khi version bump lớn hơn approved version hiện tại, impact analysis còn hiệu lực, gate evidence đủ, release manifest refs tồn tại và không có unresolved blocker. Deprecation yêu cầu migration plan khi template còn governed modules.</p>
 </div>
@@ -1462,6 +1464,7 @@ blocked transitions:
 <tr><td>Shared component contract</td><td>Consumers count, governed modules count, contract debt, affected block families.</td><td>medium, high, regulated</td><td>Component contract diff + consumer screenshot set.</td></tr>
 <tr><td>Template zone</td><td>Affected templates, modules, screens, routes, layout gates.</td><td>medium, shopfloor-critical</td><td>Responsive/keyboard/screenshot evidence.</td></tr>
 <tr><td>Allowed blocks</td><td>Block families, module builder candidates, release blockers.</td><td>medium, regulated</td><td>Builder validation + block schema evidence.</td></tr>
+<tr><td>Environment policy pack</td><td>Affected environment pack, token overrides, component policy, site/plant branding, routes/screens under kiosk/shopfloor/TV/night shift/glove/glare conditions.</td><td>medium, high, shopfloor-critical</td><td>Policy-pack impact report, environment screenshot proof, rollout scope and evidence obligations.</td></tr>
 <tr><td>Regulated/shopfloor module touched</td><td>Regulated modules touched, shopfloor modules touched, gates to rerun, blockers.</td><td>regulated, shopfloor-critical</td><td>QA gate matrix, CSA/Part 11 or operator walkthrough evidence.</td></tr>
 </tbody>
 </table>
@@ -1478,7 +1481,7 @@ blocked transitions:
 <table class="spec-table">
 <thead><tr><th>Status</th><th>Rule</th><th>Fields required</th><th>Upgrade acceptance</th></tr></thead>
 <tbody>
-<tr><td><code>full-admin-controlled</code></td><td>Consumes shared tokens, shared hm-* components and controlled template binding.</td><td rowspan="4"><code>moduleId</code>, <code>route</code>, <code>templateBindingSource</code>, <code>sharedTokenCoverage</code>, <code>sharedComponentCoverage</code>, <code>bridgeAliasDebt</code>, <code>privateCssDebt</code>, <code>hardcodedStyleDebt</code>, <code>driftStatus</code>, <code>blockerReason</code>.</td><td>Zero blocker debt, documented route/template binding, release evidence present.</td></tr>
+<tr><td><code>full-admin-controlled</code></td><td>Consumes shared tokens, shared hm-* components and controlled template binding.</td><td rowspan="4"><code>moduleId</code>, <code>route</code>, <code>templateBindingSource</code>, <code>sharedTokenCoverage</code>, <code>sharedComponentCoverage</code>, <code>bridgeAliasDebt</code>, <code>privateCssDebt</code>, <code>hardcodedStyleDebt</code>, <code>driftStatus</code>, <code>blockerReason</code>, <code>runtimeBeaconStatus</code>.</td><td>Zero blocker debt, documented route/template binding, release evidence present.</td></tr>
 <tr><td><code>bridged-to-shared-tokens</code></td><td>Legacy selector layer exists but aliases resolve back to shared tokens.</td><td>Bridge aliases thin, debt counted, migration owner/date present.</td></tr>
 <tr><td><code>legacy-private-css</code></td><td>Module still owns private visual shell or hardcoded styles.</td><td>Must have reason text, release blocker for new build, remediation plan.</td></tr>
 <tr><td><code>blocked</code></td><td>Module violates graphics authority and cannot publish without approved waiver.</td><td>Waiver or remediation required before release.</td></tr>
@@ -1552,10 +1555,10 @@ blocked transitions:
 <tbody>
 <tr><td>Design config</td><td><code>admin_design_config</code>, <code>admin_design_config_save</code>, <code>/api/graphics/design-config</code></td><td><code>DesignConfig</code>, version/ETag.</td><td><code>graphics.design_config.saved</code></td></tr>
 <tr><td>Template registry</td><td><code>admin_template_registry_get</code>, <code>admin_template_get</code>, <code>admin_template_draft_save</code>, <code>admin_template_validate</code>, <code>admin_template_publish</code>, <code>admin_template_deprecate</code>, <code>admin_template_modules_get</code>.</td><td><code>TemplateRegistryEntry</code>, <code>TemplateDraft</code>, <code>TemplateValidationResult</code>.</td><td>draft/validate/publish/deprecate events.</td></tr>
-<tr><td>Impact</td><td><code>admin_graphics_impact_token</code>, <code>admin_graphics_impact_template</code>, <code>admin_graphics_impact_component</code>.</td><td><code>GraphicsImpactReport</code>.</td><td><code>graphics.impact.*</code></td></tr>
+<tr><td>Impact</td><td><code>admin_graphics_impact_token</code>, <code>admin_graphics_impact_template</code>, <code>admin_graphics_impact_component</code>, <code>admin_graphics_impact_policy_pack</code>.</td><td><code>GraphicsImpactReport</code> with <code>blastRadius</code>.</td><td><code>graphics.impact.*</code></td></tr>
 <tr><td>Compliance/debt/drift</td><td><code>admin_graphics_compliance_get</code>, <code>admin_graphics_non_compliant_get</code>, <code>admin_graphics_debt_get</code>, <code>admin_graphics_drift_get</code>.</td><td><code>ModuleGraphicsComplianceEntry</code>, <code>GraphicsDebtReport</code>, <code>GraphicsDriftReport</code>.</td><td>read-only evidence snapshot.</td></tr>
-<tr><td>Rollout</td><td><code>admin_graphics_rollout_stage</code>, <code>admin_graphics_rollout_apply</code>, <code>admin_graphics_rollout_rollback</code>.</td><td><code>GraphicsRolloutRequest</code>, <code>GraphicsRolloutResult</code>.</td><td>stage/apply/rollback events.</td></tr>
-<tr><td>Audit/waiver/blockers</td><td><code>admin_graphics_audit_history_get</code>, <code>admin_graphics_waiver_create</code>, <code>admin_graphics_waiver_approve</code>, <code>admin_graphics_waiver_expire</code>, <code>admin_graphics_waiver_active_get</code>, <code>admin_graphics_release_blockers_get</code>.</td><td><code>GraphicsAuditEvent</code>, <code>GraphicsWaiver</code>, <code>GraphicsReleaseBlocker</code>, <code>GraphicsReleaseLink</code>.</td><td>waiver and release blocker evidence.</td></tr>
+<tr><td>Rollout</td><td><code>admin_graphics_rollout_stage</code>, <code>admin_graphics_rollout_canary_apply</code>, <code>admin_graphics_rollout_apply</code>, <code>admin_graphics_rollout_rollback</code>.</td><td><code>GraphicsRolloutRequest</code>, <code>GraphicsRolloutResult</code>.</td><td>stage/canary/apply/rollback events.</td></tr>
+<tr><td>Audit/waiver/blockers/linkage</td><td><code>admin_graphics_audit_history_get</code>, <code>admin_graphics_waiver_create</code>, <code>admin_graphics_waiver_approve</code>, <code>admin_graphics_waiver_expire</code>, <code>admin_graphics_waiver_active_get</code>, <code>admin_graphics_release_blockers_get</code>, <code>admin_graphics_release_link_get</code>.</td><td><code>GraphicsAuditEvent</code>, <code>GraphicsWaiver</code>, <code>GraphicsReleaseBlocker</code>, <code>GraphicsReleaseLink</code>.</td><td>waiver, release blocker and evidence linkage snapshot.</td></tr>
 </tbody>
 </table>
 </div>
@@ -1612,6 +1615,133 @@ blocked transitions:
 </div>
 </div>
 <div class="info-box info-box-red"><strong>Derivative artifacts.</strong> Backend projection must include <code>changeSetModel</code>, <code>moduleGraphicsLineageGraph</code>, <code>runtimeGraphicsComplianceBeacon</code>, <code>visualDebtObservatory</code>, <code>environmentPolicyPacks</code> and <code>graphicsReleaseDashboard</code>. Browser localStorage may never become authority for any of these artifacts.</div>
+</section>
+
+<section class="section" id="graphics-change-set-contract">
+<h2 class="section-title"><span class="section-number">2K</span>Graphics Change Set Contract <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Mọi thay đổi token, component contract, template, zone, allowed block hoặc environment policy phải được gom vào một change set có impact, risk, rollout và evidence cùng một mã truy vết.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Dimension</th><th>Implementation contract</th></tr></thead>
+<tbody>
+<tr><td>Purpose</td><td>Group multiple graphics edits into one controlled release unit so Admin, backend authority, QA gates and release manifest share the same scope.</td></tr>
+<tr><td>Required fields</td><td><code>changeId</code>, <code>changeType</code>, <code>changedTokens</code>, <code>changedComponents</code>, <code>changedTemplates</code>, <code>changedPolicyPacks</code>, <code>affectedModules</code>, <code>affectedRoutes</code>, <code>affectedScreens</code>, <code>riskClass</code>, <code>regulatedTouched</code>, <code>shopfloorTouched</code>, <code>requiredGates</code>, <code>requiredEvidence</code>, <code>rolloutPlanRef</code>, <code>rollbackPlanRef</code>, <code>approvals</code>.</td></tr>
+<tr><td>Allowed states</td><td><code>preview-only</code>, <code>impact-recorded</code>, <code>draft-saved</code>, <code>validated</code>, <code>staged</code>, <code>publish-blocked</code>, <code>applied</code>, <code>rolled-back</code>, <code>waived</code>.</td></tr>
+<tr><td>Blockers</td><td>Missing backend impact ID, stale authority ETag, unresolved blockers, missing rollback plan, missing release manifest refs, missing high-risk evidence.</td></tr>
+<tr><td>Derivative artifacts</td><td><code>changeSetModel</code>, <code>GraphicsImpactReport</code>, <code>GraphicsRolloutResult</code>, audit event, release manifest link and evidence checklist.</td></tr>
+<tr><td>Evidence / release</td><td>Severity decides evidence: low requires impact snapshot and rollback plan; medium/high add screenshot and keyboard proof; regulated/shopfloor add audit traceability, drift report and kiosk/shopfloor proof.</td></tr>
+<tr><td>Ownership</td><td>Frontend Platform owns model integrity; Release Engineering owns stage/apply/rollback; QA Governance owns evidence sufficiency.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="runtime-compliance-beacon-contract">
+<h2 class="section-title"><span class="section-number">2L</span>Runtime Compliance Beacon Contract <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Mỗi production module phải có beacon hoặc diagnostics tương đương chứng minh đường Admin -> backend authority -> shared tokens/components -> module UI thật.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Dimension</th><th>Implementation contract</th></tr></thead>
+<tbody>
+<tr><td>Required fields</td><td><code>moduleId</code>, <code>route</code>, <code>tokenSource</code>, <code>componentSource</code>, <code>sharedTokenProbe</code>, <code>hmComponentProbe</code>, <code>bridgeAliasState</code>, <code>privateCssProbe</code>, <code>driftHash</code>, <code>complianceState</code>, <code>beaconStatus</code>, <code>reportedAt</code>.</td></tr>
+<tr><td>Allowed states</td><td><code>reported</code>, <code>release-blocking</code>, <code>waived</code>, <code>missing</code>. Compliance state must map to <code>full-admin-controlled</code>, <code>bridged-to-shared-tokens</code>, <code>legacy-private-css</code>, or <code>blocked</code>.</td></tr>
+<tr><td>Blockers</td><td>Missing beacon on a new or major-refactor module; private CSS shell without approved waiver; inline style drift that changes semantic status meaning.</td></tr>
+<tr><td>Derivative artifacts</td><td><code>runtimeGraphicsComplianceBeacon</code>, compliance matrix row, drift hash and release blocker row.</td></tr>
+<tr><td>Release conditions</td><td>New modules must be <code>full-admin-controlled</code> or approved bridged status with debt owner/date. Legacy modules may remain diagnostics-only until migration window, but cannot be copied by new work.</td></tr>
+<tr><td>Ownership</td><td>Runtime Governance owns beacon schema; Module Owners own module-specific remediation.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="environment-policy-packs">
+<h2 class="section-title"><span class="section-number">2M</span>Environment Policy Packs <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Environment policy pack là backend-authoritative contract cho khác biệt token/component theo bối cảnh sử dụng, không phải theme tùy ý.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Pack</th><th>Allowed differences</th><th>Evidence expectations</th><th>Release condition</th></tr></thead>
+<tbody>
+<tr><td><code>office</code></td><td>Default density, standard contrast, normal desktop component sizing.</td><td>Visual regression.</td><td>No regulated/shopfloor override implied.</td></tr>
+<tr><td><code>review</code></td><td>Comfortable density, evidence panel emphasis, keyboard path visibility.</td><td>Screenshot diff, keyboard path proof.</td><td>Reviewer workflow must preserve audit readability.</td></tr>
+<tr><td><code>admin</code></td><td>Compact admin density, audit console and permission editor contracts.</td><td>Audit trail and permission review.</td><td>Admin authority cannot hide blocker states.</td></tr>
+<tr><td><code>shopfloor</code>, <code>kiosk</code></td><td>Shopfloor density, high contrast, large actions, scanner/timeout support.</td><td>Shopfloor kiosk smoke, touch-target proof, timeout proof.</td><td>Cannot global-apply while shopfloor-critical blockers exist.</td></tr>
+<tr><td><code>tv</code>, <code>night-shift</code></td><td>Distance KPI, dark/high contrast, low-glare surfaces and fatigue-safe focus.</td><td>Distance legibility, dark-mode contrast, fatigue review.</td><td>Post-apply verification must include runtime beacon and drift report.</td></tr>
+<tr><td><code>glare-dirty-screen</code>, <code>glove-mode</code></td><td>Max contrast, strong borders, large touch targets, stepper-safe controls.</td><td>Glare photo proof, dirty-screen readability, glove touch proof, mis-tap review.</td><td>Environment-stage rollout must name the pack and attach evidence refs.</td></tr>
+</tbody>
+</table></div></div>
+<div class="info-box info-box-blue"><strong>Ownership model.</strong> Operations owns environment applicability, Frontend Platform owns token/component limits, QA owns evidence obligations. Policy pack impact uses <code>admin_graphics_impact_policy_pack</code>.</div>
+</section>
+
+<section class="section" id="graphics-lineage-graph">
+<h2 class="section-title"><span class="section-number">2N</span>Graphics Lineage Graph <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Lineage graph stores and verifies the chain Admin control -> token -> component contract -> template -> module -> route -> screen -> release artifact.</p>
+<div class="grid-2">
+<div class="card"><div class="card-header">Required nodes</div><div class="card-body"><ul><li><code>admin-appearance</code></li><li><code>backend-graphics-authority</code></li><li><code>shared-tokens</code></li><li><code>shared-components</code></li><li><code>template:{templateId}</code></li><li><code>module:{moduleId}</code></li><li><code>route:{route}</code> and release artifact refs.</li></ul></div></div>
+<div class="card"><div class="card-header">Verification rules</div><div class="card-body"><ul><li>Missing module-to-template edge creates template drift.</li><li>Missing component-to-module edge creates component contract drift.</li><li>Missing release artifact edge blocks release for new/major-refactor modules.</li><li>Every edge must name relation, source artifact and generatedAt.</li></ul></div></div>
+</div>
+</section>
+
+<section class="section" id="visual-debt-observatory">
+<h2 class="section-title"><span class="section-number">2O</span>Visual Debt Observatory <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Debt observability turns legacy graphics into measurable release risk, not a vague cleanup backlog.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Debt signal</th><th>Required dimensions</th><th>Block / remediation rule</th></tr></thead>
+<tbody>
+<tr><td>Token adoption coverage</td><td>module, route, domain, team, sharedTokenCoverage.</td><td>New module below threshold is blocked.</td></tr>
+<tr><td>Shared component adoption</td><td>sharedComponentCoverage, consumed hm-* components, component contract version.</td><td>Private shell replacing shared component requires waiver and migration plan.</td></tr>
+<tr><td>Hardcoded style debt</td><td>selector, file, route, owner, debtScore.</td><td>Hardcoded semantic status or inline token bypass blocks release.</td></tr>
+<tr><td>Private stylesheet debt</td><td>privateCssDebt, bridgeAliasDebt, uncontrolledLegacyShellDebt.</td><td>Legacy debt must have owner, reason, remediation date and trend by release.</td></tr>
+<tr><td>Trend by release</td><td>releaseId, currentDebtScore, activeBlockerCount, topDebtModules.</td><td>Debt trend rising for controlled modules triggers governance review.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="multi-site-plant-branding-governance">
+<h2 class="section-title"><span class="section-number">2P</span>Multi-Site / Plant Branding Governance <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Plant branding được phép thay đổi identity/environment tokens có kiểm soát; không được thay semantic safety, quality or audit meaning.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Field</th><th>Contract</th></tr></thead>
+<tbody>
+<tr><td>Levels</td><td><code>enterprise</code>, <code>site</code>, <code>plant</code>, <code>area</code>, <code>line</code>, <code>cell</code>.</td></tr>
+<tr><td>Allowed override types</td><td><code>logoLockup</code>, <code>locale</code>, <code>shiftPalette</code>, <code>contrastPack</code>, <code>densityPack</code>.</td></tr>
+<tr><td>Prohibited override types</td><td><code>semanticStatusColor</code>, <code>auditEvidenceColor</code>, <code>safetyMeaning</code>, <code>componentContractBypass</code>.</td></tr>
+<tr><td>Required fields</td><td><code>siteId</code>, <code>plantId</code>, <code>policyPack</code>, <code>owner</code>, <code>approver</code>, <code>effectiveFrom</code>, <code>expiresAt</code>, <code>evidenceRefs</code>.</td></tr>
+<tr><td>Release condition</td><td>Plant branding must reference environment policy pack impact and cannot change shared component contract or semantic status meaning.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="blast-radius-estimator">
+<h2 class="section-title"><span class="section-number">2Q</span>Blast-Radius Estimator <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Blast radius converts impact analysis into release risk score so rollout scope and evidence are deterministic.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Input</th><th>Weight / effect</th><th>Output</th></tr></thead>
+<tbody>
+<tr><td>Affected modules, routes, screens, block families</td><td>Counts define base score and surface breadth.</td><td><code>moduleCount</code>, <code>routeCount</code>, <code>screenCount</code>, <code>blockFamilyCount</code>.</td></tr>
+<tr><td>Regulated modules touched</td><td>Adds regulated risk and audit evidence obligation.</td><td><code>class=regulated</code> unless shopfloor-critical dominates.</td></tr>
+<tr><td>Shopfloor modules touched</td><td>Adds shopfloor-critical risk and blocks global apply by default.</td><td><code>class=shopfloor-critical</code>, kiosk/touch evidence required.</td></tr>
+<tr><td>Existing blockers</td><td>Increase score and force publish/apply block until resolved/waived.</td><td><code>releaseCondition</code> and blocker summary.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="graphics-release-trend-dashboard">
+<h2 class="section-title"><span class="section-number">2R</span>Graphics Release Trend Dashboard <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Release dashboard is the operational board for blockers, waivers, drift counts, affected modules, rollout readiness and post-apply verification.</p>
+<div class="grid-2">
+<div class="card"><div class="card-header">Required fields</div><div class="card-body"><ul><li><code>readiness</code>, <code>blockers</code>, <code>waivers</code>.</li><li><code>complianceSummary</code>, <code>debtSummary</code>, <code>rolloutSummary</code>.</li><li><code>trendDashboard.currentDebtScore</code>, <code>activeBlockerCount</code>, <code>releaseReadinessTrend</code>.</li><li><code>postApplyVerification</code> with runtime beacon, drift report and evidence bundle flags.</li></ul></div></div>
+<div class="card"><div class="card-header">Release conditions</div><div class="card-body"><ul><li>High, regulated and shopfloor changes must attach dashboard snapshot.</li><li>Release manifest must include <code>GraphicsReleaseLink</code>.</li><li>Post-apply verification cannot close until runtime beacon and drift snapshot are captured.</li></ul></div></div>
+</div>
+</section>
+
+<section class="section" id="controlled-emergency-override-path">
+<h2 class="section-title"><span class="section-number">2S</span>Controlled Emergency Override Path <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Emergency custom CSS or visual override is exception-only. It is never design authority and must expire.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Rule</th><th>Contract</th></tr></thead>
+<tbody>
+<tr><td>Required fields</td><td><code>overrideId</code>, <code>scope</code>, <code>reason</code>, <code>risk</code>, <code>compensatingControl</code>, <code>owner</code>, <code>approver</code>, <code>expiresAt</code>, <code>rollbackPlanRef</code>, <code>retrospectiveDueAt</code>.</td></tr>
+<tr><td>Allowed use</td><td>Temporary accessibility rescue, production readability emergency, critical release-blocker workaround with approved waiver.</td></tr>
+<tr><td>Prohibited use</td><td>New design preference, semantic status color change, component contract bypass, regulated/shopfloor critical waiver without document control and release refs.</td></tr>
+<tr><td>Evidence</td><td>Approved waiver, audit event, screenshot proof, rollback plan, expiry and retrospective.</td></tr>
+<tr><td>Release condition</td><td>Override max duration is 14 days unless governance extends by new waiver; migration path back to shared tokens/components is mandatory.</td></tr>
+</tbody>
+</table></div></div>
 </section>
 
 <section class="section" id="standards">

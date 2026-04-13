@@ -21,7 +21,6 @@ final class MobileWorkQueueService
 {
     private readonly string $dataDir;
     private readonly string $mobileDir;
-    private ?object $db = null;
     private WorkforceQualificationGateService $qualificationGate;
 
     /** Valid task types. */
@@ -53,7 +52,7 @@ final class MobileWorkQueueService
     {
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->mobileDir = $this->dataDir . '/mobile';
-        $this->db        = $db;
+        unset($db);
         $this->qualificationGate = $qualificationGate ?? new WorkforceQualificationGateService($this->dataDir);
 
         foreach (['work_queue', 'time_entries', 'inspections'] as $sub) {
@@ -61,23 +60,6 @@ final class MobileWorkQueueService
             if (!is_dir($dir)) {
                 @mkdir($dir, 0775, true);
             }
-        }
-    }
-
-    // ── Shadow Write ────────────────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[MobileWorkQueueService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 
@@ -134,6 +116,10 @@ final class MobileWorkQueueService
         if (!in_array($taskType, self::TASK_TYPES, true)) {
             throw new RuntimeException("Invalid task type: {$taskType}.");
         }
+        $syncStatus = (string)($data['sync_status'] ?? self::SYNC_STATUSES[0]);
+        if (!in_array($syncStatus, self::SYNC_STATUSES, true)) {
+            throw new RuntimeException("Invalid sync status: {$syncStatus}.");
+        }
 
         $now = $this->nowIso();
         $id  = $this->generateUuidV4();
@@ -145,7 +131,7 @@ final class MobileWorkQueueService
             'jo_number'         => $data['jo_number'] ?? null,
             'operation_seq'     => $data['operation_seq'] ?? null,
             'task_type'         => $taskType,
-            'task_status'       => 'pending',
+            'task_status'       => self::TASK_STATUSES[0],
             'priority'          => (int)($data['priority'] ?? 50),
             'assigned_at'       => $now,
             'started_at'        => null,
@@ -156,7 +142,7 @@ final class MobileWorkQueueService
             'actual_minutes'    => null,
             'notes'             => $data['notes'] ?? null,
             'offline_created'   => (bool)($data['offline_created'] ?? false),
-            'sync_status'       => $data['sync_status'] ?? 'synced',
+            'sync_status'       => $syncStatus,
             'metadata'          => $data['metadata'] ?? new \stdClass(),
             'created_at'        => $now,
             'updated_at'        => $now,
@@ -190,7 +176,7 @@ final class MobileWorkQueueService
             $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
 
             $queue[$idx] = array_merge($task, [
-                'task_status' => 'in_progress',
+                'task_status' => self::TASK_STATUSES[1],
                 'started_at'  => $now,
                 'updated_at'  => $now,
                 'qualification_gate' => $qualification,
@@ -232,7 +218,7 @@ final class MobileWorkQueueService
             }
 
             $queue[$idx] = array_merge($task, [
-                'task_status'    => 'completed',
+                'task_status'    => self::TASK_STATUSES[2],
                 'completed_at'   => $now,
                 'actual_minutes'  => $actualMinutes,
                 'notes'          => $result['notes'] ?? $task['notes'],
@@ -295,7 +281,7 @@ final class MobileWorkQueueService
     /**
      * Clock out (creates clock_out entry, calculates duration on the clock_in).
      */
-    public function clockOut(string $entryId, ?int $qtyCompleted = null, ?int $qtyScrap = null): array
+    public function clockOut(string $entryId, ?int $qtyCompleted = null, ?int $qtyScrap = null, ?string $operatorId = null): array
     {
         $entries = $this->loadFile('time_entries');
         $now     = $this->nowIso();
@@ -317,6 +303,9 @@ final class MobileWorkQueueService
         }
 
         $clockIn = $entries[$clockInIdx];
+        if ($operatorId !== null && $operatorId !== '' && ($clockIn['operator_id'] ?? '') !== $operatorId) {
+            throw new RuntimeException('forbidden_clock_out_operator');
+        }
 
         // Calculate duration
         $inTime    = new \DateTimeImmutable($clockIn['entry_time']);

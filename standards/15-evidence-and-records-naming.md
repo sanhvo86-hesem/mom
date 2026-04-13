@@ -1,5 +1,13 @@
 # 15 — Rules for naming documents, evidence and completed forms
 
+## 0. Authority correction - publication naming only
+
+This naming standard applies to human-readable publication copies and controlled
+carriers. It must not be interpreted as making SharePoint or filenames the
+authority for records. The authoritative object is the portal evidence record /
+evidence version plus immutable package manifest. SharePoint filenames are
+distribution metadata only.
+
 > Naming convention is consistent for EVERY file saved to SharePoint: completed forms, produced evidence,
 > engineering baseline, training records, audits, and assets.
 > Complies with AS9100 §8.5.2 (traceability), ISO 9001 §7.5.3 (record control).

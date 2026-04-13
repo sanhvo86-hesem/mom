@@ -27,6 +27,7 @@ final class RuntimeAuthorityService
         private readonly ?TrustedReleaseRecordService $trustedReleaseRecord = null,
         private readonly ?ConnectedGovernanceService $connectedGovernance = null,
         private readonly ?PlanningScenarioService $planningScenario = null,
+        private readonly ?TraceabilityGenealogyService $traceabilityGenealogy = null,
     ) {
     }
 
@@ -48,6 +49,7 @@ final class RuntimeAuthorityService
         $trustedReleaseRecord = ($this->trustedReleaseRecord ?? new TrustedReleaseRecordService($this->dataDir, $this->data))->probe();
         $connectedGovernance = ($this->connectedGovernance ?? new ConnectedGovernanceService($this->dataDir, $this->data, events: $eventBackbone))->probe();
         $planningScenario = ($this->planningScenario ?? new PlanningScenarioService($this->dataDir, $this->data))->probe();
+        $traceabilityGenealogy = ($this->traceabilityGenealogy ?? new TraceabilityGenealogyService($this->dataDir, $this->data, $eventBackbone))->probe();
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),
@@ -60,6 +62,7 @@ final class RuntimeAuthorityService
             'trusted_release_record' => $this->normalizeOperationalSlice($trustedReleaseRecord),
             'connected_governance' => $this->normalizeOperationalSlice($connectedGovernance),
             'planning_scenario' => $this->normalizeOperationalSlice($planningScenario),
+            'traceability_genealogy' => $this->normalizeOperationalSlice($traceabilityGenealogy),
         ];
 
         $states = [];

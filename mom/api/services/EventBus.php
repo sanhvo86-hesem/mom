@@ -327,7 +327,7 @@ final class EventBus
             try {
                 $handler($event);
             } catch (\Throwable $e) {
-                @error_log("[EventBus] Listener error for {$event->eventType}: {$e->getMessage()}");
+                error_log("[EventBus] Listener error for {$event->eventType}: {$e->getMessage()}");
                 $this->log?->error("EventBus listener error: {$e->getMessage()}", [
                     'event_type' => $event->eventType,
                     'event_id'   => $event->eventId,
@@ -340,7 +340,7 @@ final class EventBus
             try {
                 $handler($event);
             } catch (\Throwable $e) {
-                @error_log("[EventBus] Wildcard listener error: {$e->getMessage()}");
+                error_log("[EventBus] Wildcard listener error: {$e->getMessage()}");
             }
         }
     }

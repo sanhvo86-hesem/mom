@@ -327,12 +327,65 @@ function validateGraphicsGovernance(graphicsGovernance, packets) {
     ['changeSetModel', 'graphics change set model'],
     ['moduleGraphicsLineageGraph', 'module graphics lineage graph'],
     ['runtimeGraphicsComplianceBeacon', 'runtime graphics compliance beacon'],
+    ['graphicsDebtReport', 'graphics debt report'],
+    ['graphicsDriftReport', 'graphics drift report'],
     ['visualDebtObservatory', 'visual debt observatory'],
     ['environmentPolicyPacks', 'environment policy packs'],
     ['graphicsReleaseDashboard', 'graphics release dashboard'],
+    ['multiSitePlantBrandingGovernance', 'multi-site plant branding governance'],
+    ['controlledEmergencyOverridePath', 'controlled emergency override path'],
+    ['graphicsReleaseLink', 'graphics release linkage'],
   ]) {
     if (!graphicsGovernance[key] || typeof graphicsGovernance[key] !== 'object') {
       warnings.push(`graphics-governance: missing ${label}; release dashboard is incomplete`);
+    }
+  }
+
+  const requiredComplianceFields = [
+    'moduleId',
+    'route',
+    'templateBindingSource',
+    'sharedTokenCoverage',
+    'sharedComponentCoverage',
+    'bridgeAliasDebt',
+    'privateCssDebt',
+    'hardcodedStyleDebt',
+    'driftStatus',
+    'blockerReason',
+    'runtimeBeaconStatus',
+  ];
+  for (const row of matrix) {
+    for (const field of requiredComplianceFields) {
+      if (!(field in row)) {
+        errors.push(`graphics-governance: compliance row "${row.moduleId || 'unknown'}" missing ${field}`);
+      }
+    }
+  }
+
+  const changeSet = graphicsGovernance.changeSetModel || {};
+  for (const field of ['changeSetId', 'status', 'edits', 'impact', 'risk', 'rolloutScopePlan', 'evidenceChecklist']) {
+    if (!(field in changeSet)) {
+      errors.push(`graphics-governance: changeSetModel missing ${field}`);
+    }
+  }
+
+  const releaseLink = graphicsGovernance.graphicsReleaseLink || {};
+  for (const field of [
+    'graphicsAuthorityRefs',
+    'templateRegistryVersion',
+    'templateRegistryChecksum',
+    'complianceMatrixRef',
+    'impactAnalysisRef',
+    'waiversRef',
+    'runtimeBeaconRef',
+    'debtObservatoryRef',
+    'multiSitePlantBrandingGovernanceRef',
+    'controlledEmergencyOverridePathRef',
+    'rolloutDecisionRef',
+    'rollbackPlanRef',
+  ]) {
+    if (!(field in releaseLink)) {
+      errors.push(`graphics-governance: graphicsReleaseLink missing ${field}`);
     }
   }
 

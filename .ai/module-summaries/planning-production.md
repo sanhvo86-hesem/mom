@@ -32,7 +32,12 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - `job_orders` — JO records (`job_status`)
 - `dispatch/targets.json` *(file)* — Planner-created shift production targets
 - `dispatch/production_report_events.json` *(file)* — Append-only accepted manual production report events
+- `dispatch/execution_events.json` *(file)* — Append-only dispatch target lifecycle events
 - `dispatch/production_logs.json` *(file)* — Latest per-target production report snapshot for legacy dashboards
+- `shift_targets` *(DB bridge when PostgreSQL mode is enabled)* — Shadow target rows keyed by `source_system` + `source_record_id`
+- `shift_production_log` *(DB bridge when PostgreSQL mode is enabled)* — Shadow latest production report snapshot rows keyed by accepted report IDs
+- `shift_production_report_events` *(DB bridge when PostgreSQL mode is enabled)* — Append-only shadow event rows from manual dispatch reports
+- `shift_dispatch_execution_events` *(DB bridge when PostgreSQL mode is enabled)* — Append-only shadow target lifecycle rows from manual dispatch
 
 ## Workflow States
 
@@ -48,7 +53,7 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **Create SO:** `OrderController::createSalesOrder()` → `OrderService::createSalesOrder()` → status = `draft`
 - **Release JO:** `OrderController::transition()` → `OrderWorkflowService::validateTransition()` → checks SO is confirmed
 - **Dispatch WO to floor:** `DispatchController::createTarget()` → `targets.json`, status = `planned`
-- **Report production:** `DispatchController::reportProduction()` → appends `production_report_events.json` and updates `production_logs.json`; completion requires explicit intent plus actual end
+- **Report production:** `DispatchController::reportProduction()` → appends `production_report_events.json`, appends `execution_events.json`, and updates `production_logs.json`; completion requires explicit intent plus actual end
 - **Get operator tasks:** `DispatchController::getOperatorDispatch(operator_id, date)` → filtered by operator + `shift_date`
 - **Allocate record ID:** `AllocationController::allocate(record_type, department)` → `RecordIdGenerator::allocate()`
 
@@ -60,13 +65,17 @@ Governs the transformation of sales demand into executable shopfloor work throug
 - **ECR required** for part_revision, material_spec, routing_id changes after order is released/active/running
 - **Cancel/Reopen permissions**: manager+ to cancel; director+ to reopen from `closed`
 - **Target reporting is replay-safe**: accepted reports append to `production_report_events.json`; the latest per-target snapshot is updated in `production_logs.json`; duplicate `idempotency_key` with the same fingerprint replays, while conflicts return `idempotency_conflict`; file-backed dispatch mutations share a read-modify-write lock
+- **Target lifecycle is append-only**: create/update/dispatch/report/pause/resume/complete events append to `dispatch/execution_events.json`; target/log JSON files remain compatibility snapshots
 - **Target completion is explicit**: quantity alone does not complete a target; completion requires completion intent and `actual_end`
+- **State-based target edits are controlled**: after dispatch/in-progress, engineering and identity fields require `supervisor_override_reason`; completed/cancelled targets are locked except notes/metadata without override
 - **Report governance is explicit**: planned targets cannot be reported by normal operators, completed targets require correction mode, corrections/backdates require planner override, and offline reports require replay-safe IDs
-- **Manual pause/resume is ledger-only**: `execution_event_type` captures progress, downtime, blocked, pause, resume, correction, and completion markers without introducing a second execution command system
+- **Manual pause/resume stays in the same execution ledger**: `dispatch_pause_target` and `dispatch_resume_target` route through the production-report ledger, require idempotency, and update `execution_state` without introducing a second execution command system
+- **CNC digital-thread checks are staged**: dispatch references item revision, operation, CNC program, setup sheet, inspection plan, traveler, and material lots; default policy warns, while `reference_policy = enforce_dispatch` blocks missing or unreleased CNC/inspection references
+- **First-piece quality gate is enforceable**: `first_piece_required` or `quality_gate_policy = enforce_first_piece` blocks production output/run reports until a passing mobile first-piece capture exists; supervisor overrides require `quality_override_reason`
 
 ## Notes / Gotchas
 - **Inconsistent status field names**: SO = `status`, JO = `job_status`, WO = `work_order_status` — use the correct field per object type
 - **Order number sequences are stateful**: `OrderService::generateOrderNumber()` is not atomic; concurrent calls can cause gaps
 - **WorkflowService config dependency**: `OrderWorkflowService` reads `so_jo_wo_config.json`; if missing, falls back to legacy role permissions
 - **Dispatch is shift-based**: targets filtered by `shift_date` + `shift_code`; shift definitions come from master data
-- **Dispatch storage is still staged**: file-backed planner target mutations and production-report read-modify-write are serialized with an exclusive dispatch lock, and target/log read models use a shared lock, but DB transaction authority remains a later migration to `shift_targets`, `shift_production_log`, and `mes_operational_event_ledger`
+- **Dispatch storage is staged with a DB bridge**: file-backed planner target mutations and production-report read-modify-write are serialized with an exclusive dispatch lock, target/log read models use a shared lock, and PostgreSQL mode shadow-writes to `shift_targets`, `shift_production_log`, `shift_production_report_events`, and `shift_dispatch_execution_events`; JSON remains compatibility authority until a controlled DB cutover

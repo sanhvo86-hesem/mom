@@ -2,31 +2,31 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "7a0cef97-c7d2-4cb3-986f-cb41e1ee55c9",
-    "generated_at": "2026-04-13T13:53:00.855Z",
+    "publication_run_id": "5cb008bb-9c26-4b28-ae49-4fb011aec016",
+    "generated_at": "2026-04-13T15:11:35.967Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
-    "table_count": 724,
+    "table_count": 750,
     "entity_counts": {
-      "total": 735,
-      "ready": 735,
+      "total": 761,
+      "ready": 761,
       "partial": 0,
       "blocked": 0,
-      "explanation": "735 frontend entities are published from 724 registered tables, with 8 non-table entities and 3 additional view aliases."
+      "explanation": "761 frontend entities are published from 750 registered tables, with 8 non-table entities and 3 additional view aliases."
     },
     "field_coverage": {
-      "tables_with_fields": 729,
+      "tables_with_fields": 755,
       "tables_without_fields": 0,
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
-      "ready": 295,
+      "ready": 310,
       "blocked": 0,
-      "unneeded": 440,
+      "unneeded": 451,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
     "openapi": {
       "version": "3.1.2",
-      "path_count": 120,
+      "path_count": 123,
       "foundation_governance_paths": 10
     },
     "publishability": {

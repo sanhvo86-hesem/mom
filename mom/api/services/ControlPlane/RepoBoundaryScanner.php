@@ -1,0 +1,109 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MOM\Services\ControlPlane;
+
+/**
+ * Scans the working tree for artifacts that do not belong in controlled source.
+ *
+ * This is intentionally deterministic and side-effect free. Cleanup/promotion
+ * jobs can persist the returned findings into source_boundary_violations.
+ */
+final class RepoBoundaryScanner
+{
+    /**
+     * @var list<array{pattern: string, type: string, severity: string}>
+     */
+    private const RULES = [
+        ['pattern' => '#(^|/)\.codex-playwright($|/)#', 'type' => 'browser_output', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)\.tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)\.tmp-[^/]+\.(png|jpg|jpeg|webm)$#i', 'type' => 'browser_output', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)_reports($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)_build($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)_Deleted($|/)#', 'type' => 'deleted_archive', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
+        ['pattern' => '#(^|/)standards/prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
+        ['pattern' => '#\.(docx|pptx|xlsx)$#i', 'type' => 'runtime_artifact', 'severity' => 'P2'],
+        ['pattern' => '#(^|/)mom/docs/tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P2'],
+        ['pattern' => '#(^|/)mom/data/php_error\.log$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/\.phpunit\.cache($|/)#', 'type' => 'generated_report', 'severity' => 'P2'],
+    ];
+
+    /**
+     * @param list<string> $paths Repository-relative paths.
+     * @return list<array{path: string, violation_type: string, severity: string}>
+     */
+    public function scanPaths(array $paths): array
+    {
+        $findings = [];
+        foreach ($paths as $path) {
+            $normalized = $this->normalizePath($path);
+            if ($normalized === '' || str_starts_with($normalized, '.git/')) {
+                continue;
+            }
+
+            foreach (self::RULES as $rule) {
+                if (preg_match($rule['pattern'], $normalized) !== 1) {
+                    continue;
+                }
+                $findings[] = [
+                    'path' => $normalized,
+                    'violation_type' => $rule['type'],
+                    'severity' => $rule['severity'],
+                ];
+                break;
+            }
+        }
+
+        usort($findings, static fn(array $a, array $b): int => strcmp($a['path'], $b['path']));
+        return $findings;
+    }
+
+    /**
+     * @return list<array{path: string, violation_type: string, severity: string}>
+     */
+    public function scanTree(string $rootDir, int $maxDepth = 4): array
+    {
+        $root = rtrim(str_replace('\\', '/', $rootDir), '/');
+        if ($root === '' || !is_dir($root)) {
+            return [];
+        }
+
+        $paths = [];
+        $this->walk($root, $root, max(0, $maxDepth), $paths);
+        return $this->scanPaths($paths);
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    private function walk(string $root, string $dir, int $depth, array &$paths): void
+    {
+        if ($depth < 0) {
+            return;
+        }
+
+        $entries = scandir($dir);
+        if (!is_array($entries)) {
+            return;
+        }
+
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..' || $entry === '.git' || $entry === 'vendor' || $entry === 'node_modules') {
+                continue;
+            }
+            $path = $dir . '/' . $entry;
+            $relative = ltrim(substr($path, strlen($root)), '/');
+            $paths[] = $relative;
+            if (is_dir($path)) {
+                $this->walk($root, $path, $depth - 1, $paths);
+            }
+        }
+    }
+
+    private function normalizePath(string $path): string
+    {
+        return trim(str_replace('\\', '/', $path), '/');
+    }
+}

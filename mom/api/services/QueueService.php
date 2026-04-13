@@ -371,7 +371,7 @@ final class QueueService
         if (!is_file($file)) return;
 
         $remaining = [];
-        $fp = @fopen($file, 'r');
+        $fp = @fopen($file, 'r+');
         if (!$fp) return;
 
         if (!flock($fp, LOCK_EX)) {

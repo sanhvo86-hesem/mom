@@ -4,36 +4,36 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-  --ec-bg: #f1f5f9;
-  --ec-surface: #ffffff;
-  --ec-border: #e2e8f0;
-  --ec-border-focus: #93c5fd;
-  --ec-text: #0f172a;
-  --ec-text-secondary: #475569;
-  --ec-text-muted: #94a3b8;
-  --ec-primary: #1565c0;
-  --ec-primary-hover: #1255a1;
-  --ec-primary-light: #dbeafe;
-  --ec-primary-bg: #eff6ff;
-  --ec-success: #16a34a;
-  --ec-success-light: #dcfce7;
-  --ec-warning: #d97706;
-  --ec-warning-light: #fef3c7;
-  --ec-danger: #dc2626;
-  --ec-danger-light: #fee2e2;
-  --ec-purple: #7c3aed;
-  --ec-purple-light: #f3e8ff;
-  --ec-radius: 10px;
-  --ec-radius-lg: 14px;
-  --ec-radius-xl: 18px;
-  --ec-shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-  --ec-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-  --ec-shadow-md: 0 4px 12px rgba(0,0,0,.06);
-  --ec-shadow-lg: 0 10px 24px rgba(0,0,0,.08);
-  --ec-sidebar-w: 300px;
-  --ec-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --ec-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-  --ec-transition: 0.15s ease;
+  --ec-bg: var(--bg-page, #f1f5f9);
+  --ec-surface: var(--bg-surface, #ffffff);
+  --ec-border: var(--border, #e2e8f0);
+  --ec-border-focus: var(--focus-ring-color, var(--brand-2, #1565c0));
+  --ec-text: var(--text-primary, #0f172a);
+  --ec-text-secondary: var(--text-secondary, #475569);
+  --ec-text-muted: var(--text-tertiary, #94a3b8);
+  --ec-primary: var(--brand-2, #1565c0);
+  --ec-primary-hover: color-mix(in srgb, var(--brand-2, #1565c0) 88%, #000 12%);
+  --ec-primary-light: var(--brand-light, #dbeafe);
+  --ec-primary-bg: color-mix(in srgb, var(--brand-light, #dbeafe) 28%, var(--bg-surface, #ffffff));
+  --ec-success: var(--green, #16a34a);
+  --ec-success-light: color-mix(in srgb, var(--green, #16a34a) 16%, var(--bg-surface, #ffffff));
+  --ec-warning: var(--amber, #d97706);
+  --ec-warning-light: color-mix(in srgb, var(--amber, #d97706) 18%, var(--bg-surface, #ffffff));
+  --ec-danger: var(--red, #dc2626);
+  --ec-danger-light: color-mix(in srgb, var(--red, #dc2626) 16%, var(--bg-surface, #ffffff));
+  --ec-purple: var(--purple, #7c3aed);
+  --ec-purple-light: color-mix(in srgb, var(--purple, #7c3aed) 14%, var(--bg-surface, #ffffff));
+  --ec-radius: var(--hds-control-radius, var(--radius-lg, 8px));
+  --ec-radius-lg: var(--radius-xl, 12px);
+  --ec-radius-xl: var(--radius-2xl, 16px);
+  --ec-shadow-sm: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.05));
+  --ec-shadow: var(--card-shadow, var(--shadow-sm, 0 1px 3px rgba(0,0,0,.08)));
+  --ec-shadow-md: var(--shadow-md, 0 4px 12px rgba(0,0,0,.06));
+  --ec-shadow-lg: var(--shadow-lg, 0 10px 24px rgba(0,0,0,.08));
+  --ec-sidebar-w: var(--layout-sidebar-w, 300px);
+  --ec-font: var(--font-body, var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif));
+  --ec-mono: var(--font-mono, 'SF Mono', 'Cascadia Code', 'Consolas', monospace);
+  --ec-transition: var(--transition-normal, 0.15s ease);
 }
 
 /* ── Top tabs ── */
@@ -875,7 +875,7 @@
 }
 .ec-form-progress span {
   display: block;
-  width: var(--ec-progress, 0%);
+  width: var(--hds-progress-value, var(--ec-progress, 0%));
   height: 100%;
   margin: 0;
   background: linear-gradient(90deg, #0f4c81 0%, #1565c0 50%, #42a5f5 100%);
@@ -1389,7 +1389,7 @@
 }
 .ec-form-progress span {
   display: block;
-  width: var(--ec-progress, 0%);
+  width: var(--hds-progress-value, var(--ec-progress, 0%));
   height: 100%;
   margin: 0;
   background: linear-gradient(90deg, #0c2d48 0%, #1565c0 60%, #5dade2 100%);

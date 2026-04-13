@@ -215,6 +215,25 @@ class CncProgramController extends BaseController
         return (string)max(1, $count + 1);
     }
 
+    private function nextSetupSheetRevision(string $current): string
+    {
+        $current = strtoupper(trim($current));
+        if ($current === '') {
+            return 'A';
+        }
+        if (preg_match('/^[A-Z]$/', $current) === 1) {
+            return $current === 'Z' ? 'AA' : chr(ord($current) + 1);
+        }
+        if (preg_match('/^([A-Z]+)(\\d*)$/', $current, $matches) === 1) {
+            $suffix = (string)$matches[2];
+            if ($suffix !== '') {
+                return $matches[1] . ((int)$suffix + 1);
+            }
+        }
+
+        return $current . '-1';
+    }
+
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -513,6 +532,7 @@ class CncProgramController extends BaseController
             $file  = $this->cncDir() . '/programs.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -539,7 +559,7 @@ class CncProgramController extends BaseController
             }
             unset($entry);
 
-            if (!$found) {
+            if (!$found || !is_array($updated)) {
                 $this->error('not_found', 404, "CNC program {$id} not found.");
             }
 
@@ -578,7 +598,7 @@ class CncProgramController extends BaseController
         $body = $this->jsonBody();
         if (!isset($body['program_id']) && isset($body['id'])) $body['program_id'] = $body['id'];
         if (!isset($body['change_note']) && isset($body['notes'])) $body['change_note'] = $body['notes'];
-        if (!isset($body['revision']) || trim((string)($body['revision'] ?? '')) === '') {
+        if (!isset($body['revision']) || trim((string)$body['revision']) === '') {
             $existingVersions = $this->readJsonFile($this->cncDir() . '/versions.json') ?? [];
             $body['revision'] = $this->nextVersionLabel($existingVersions, trim((string)($body['program_id'] ?? '')));
         }
@@ -601,8 +621,8 @@ class CncProgramController extends BaseController
             $version = [
                 'id'          => 'CNCV-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
                 'program_id'  => $programId,
-                'revision'    => strtoupper(trim((string)($body['revision'] ?? ''))),
-                'version'     => trim((string)($body['revision'] ?? '')),
+                'revision'    => strtoupper(trim((string)$body['revision'])),
+                'version'     => trim((string)$body['revision']),
                 'change_note' => trim((string)($body['change_note'] ?? '')),
                 'notes'       => trim((string)($body['change_note'] ?? '')),
                 'file_name'   => trim((string)($body['file_name'] ?? '')),
@@ -617,11 +637,12 @@ class CncProgramController extends BaseController
             $allVersions[] = $version;
             $this->writeJsonFile($versionsFile, $allVersions);
 
-            // Update current_rev on the program
+            // Keep pending revision separate until approval so execution gates do not treat it as released truth.
             foreach ($programs as &$p) {
                 if (($p['id'] ?? '') === $version['program_id']) {
-                    $p['current_rev'] = $version['revision'];
-                    $p['current_version'] = (string)$version['version'];
+                    $p['pending_rev'] = $version['revision'];
+                    $p['pending_version'] = (string)$version['version'];
+                    $p['pending_version_id'] = $version['id'];
                     $p['updated_at']  = $this->nowIso();
                     $p['status']      = 'in_review';
                     break;
@@ -749,11 +770,15 @@ class CncProgramController extends BaseController
             $allApprovals  = $this->readJsonFile($approvalsFile) ?? [];
             $versionsFile = $this->cncDir() . '/versions.json';
             $versions     = $this->readJsonFile($versionsFile) ?? [];
+            $programsFile = $this->cncDir() . '/programs.json';
+            $programs     = $this->readJsonFile($programsFile) ?? [];
 
             $versionExists = false;
+            $approvedVersion = null;
             foreach ($versions as $version) {
                 if (($version['id'] ?? '') === $versionId) {
                     $versionExists = true;
+                    $approvedVersion = is_array($version) ? $version : null;
                     break;
                 }
             }
@@ -781,11 +806,44 @@ class CncProgramController extends BaseController
             foreach ($versions as &$v) {
                 if (($v['id'] ?? '') === $versionId) {
                     $v['status'] = $decision;
+                    $v['approved_at'] = $decision === 'approved' ? $approval['decided_at'] : ($v['approved_at'] ?? null);
+                    $v['approved_by'] = $decision === 'approved' ? $userId : ($v['approved_by'] ?? null);
+                    $approvedVersion = $v;
                     break;
                 }
             }
             unset($v);
             $this->writeJsonFile($versionsFile, $versions);
+
+            if ($decision === 'approved' && is_array($approvedVersion)) {
+                foreach ($programs as &$program) {
+                    if (($program['id'] ?? '') === ($approvedVersion['program_id'] ?? '')) {
+                        $program['current_rev'] = strtoupper(trim((string)($approvedVersion['revision'] ?? '')));
+                        $program['current_version'] = trim((string)($approvedVersion['version'] ?? $approvedVersion['revision'] ?? ''));
+                        $program['released_version_id'] = $versionId;
+                        $program['released_at'] = $approval['decided_at'];
+                        $program['status'] = 'released';
+                        if (($program['pending_version_id'] ?? '') === $versionId) {
+                            unset($program['pending_rev'], $program['pending_version'], $program['pending_version_id']);
+                        }
+                        $program['updated_at'] = $this->nowIso();
+                        break;
+                    }
+                }
+                unset($program);
+                $this->writeJsonFile($programsFile, $programs);
+            } elseif ($decision === 'rejected' && is_array($approvedVersion)) {
+                foreach ($programs as &$program) {
+                    if (($program['id'] ?? '') === ($approvedVersion['program_id'] ?? '') && ($program['pending_version_id'] ?? '') === $versionId) {
+                        unset($program['pending_rev'], $program['pending_version'], $program['pending_version_id']);
+                        $program['status'] = trim((string)($program['current_rev'] ?? '')) !== '' ? 'released' : 'draft';
+                        $program['updated_at'] = $this->nowIso();
+                        break;
+                    }
+                }
+                unset($program);
+                $this->writeJsonFile($programsFile, $programs);
+            }
 
             $this->auditLog('cnc_approve', [
                 'approval_id' => $approval['id'],
@@ -882,10 +940,10 @@ class CncProgramController extends BaseController
             if ($program === null) {
                 $this->error('not_found', 404, "CNC program {$programIdentifier} not found.");
             }
-            if (!isset($body['machine']) || trim((string)($body['machine'] ?? '')) === '') {
+            if (!isset($body['machine']) || trim((string)$body['machine']) === '') {
                 $body['machine'] = $program['machine'] ?? '';
             }
-            if (!isset($body['title']) || trim((string)($body['title'] ?? '')) === '') {
+            if (!isset($body['title']) || trim((string)$body['title']) === '') {
                 $body['title'] = (string)($program['program_number'] ?? $program['name'] ?? 'Setup Sheet');
             }
             $this->requireFields($body, ['program_id', 'machine', 'title']);
@@ -894,8 +952,9 @@ class CncProgramController extends BaseController
                 'id'         => 'SS-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
                 'program_id' => trim((string)($program['id'] ?? $programIdentifier)),
                 'program_number' => trim((string)($program['program_number'] ?? $program['name'] ?? $programIdentifier)),
-                'machine'    => trim((string)($body['machine'] ?? '')),
-                'title'      => trim((string)($body['title'] ?? '')),
+                'revision'   => strtoupper(trim((string)($body['revision'] ?? 'A'))),
+                'machine'    => trim((string)$body['machine']),
+                'title'      => trim((string)$body['title']),
                 'tools'      => (array)($body['tools'] ?? []),
                 'fixtures'   => trim((string)($body['fixtures'] ?? '')),
                 'notes'      => trim((string)($body['notes'] ?? '')),
@@ -904,6 +963,12 @@ class CncProgramController extends BaseController
                 'created_at' => $this->nowIso(),
                 'updated_at' => $this->nowIso(),
             ];
+            $sheet['revision_history'] = [[
+                'revision' => $sheet['revision'],
+                'changed_by' => $userId,
+                'changed_at' => $sheet['created_at'],
+                'change_note' => trim((string)($body['change_note'] ?? 'Initial setup sheet.')),
+            ]];
 
             $all[] = $sheet;
             $this->writeJsonFile($file, $all);
@@ -945,16 +1010,28 @@ class CncProgramController extends BaseController
             $file  = $this->cncDir() . '/setup-sheets.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
+                    $previousRevision = trim((string)($entry['revision'] ?? 'A'));
                     if (isset($body['title']))    $entry['title']    = trim((string)$body['title']);
                     if (isset($body['tools']))    $entry['tools']    = (array)$body['tools'];
                     if (isset($body['fixtures'])) $entry['fixtures'] = trim((string)$body['fixtures']);
                     if (isset($body['notes']))    $entry['notes']    = trim((string)$body['notes']);
                     if (isset($body['machine']))  $entry['machine']  = trim((string)$body['machine']);
+                    $entry['revision'] = strtoupper(trim((string)($body['revision'] ?? $this->nextSetupSheetRevision($previousRevision))));
                     $entry['updated_at'] = $this->nowIso();
                     $entry['updated_by'] = $userId;
+                    $history = is_array($entry['revision_history'] ?? null) ? $entry['revision_history'] : [];
+                    $history[] = [
+                        'revision' => $entry['revision'],
+                        'previous_revision' => $previousRevision,
+                        'changed_by' => $userId,
+                        'changed_at' => $entry['updated_at'],
+                        'change_note' => trim((string)($body['change_note'] ?? 'Setup sheet updated.')),
+                    ];
+                    $entry['revision_history'] = $history;
                     $found   = true;
                     $updated = $entry;
                     break;
@@ -962,7 +1039,7 @@ class CncProgramController extends BaseController
             }
             unset($entry);
 
-            if (!$found) {
+            if (!$found || !is_array($updated)) {
                 $this->error('not_found', 404, "Setup sheet {$id} not found.");
             }
 

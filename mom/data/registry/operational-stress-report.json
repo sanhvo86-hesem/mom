@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T13:55:34.666Z",
+    "generatedAt": "2026-04-13T15:11:34.660Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -11,12 +11,12 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 20916,
+    "idempotency_mentions": 21730,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
     "compensation_markers": 3,
-    "correction_markers": 2254,
+    "correction_markers": 2287,
     "period_close_mentions": 36,
     "credit_memo_mentions": 18,
     "debit_memo_mentions": 18,
@@ -84,35 +84,35 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 20916,
-      "optimistic_concurrency_mentions": 7902,
-      "if_match_mentions": 3265,
-      "row_version_mentions": 25990,
+      "idempotency_mentions": 21730,
+      "optimistic_concurrency_mentions": 8200,
+      "if_match_mentions": 3355,
+      "row_version_mentions": 26737,
       "compensation_markers": 3,
-      "correction_markers": 2254,
+      "correction_markers": 2287,
       "effective_dating_markers": 829,
-      "override_mentions": 125,
-      "waiver_mentions": 78,
+      "override_mentions": 126,
+      "waiver_mentions": 93,
       "heartbeat_mentions": 33,
       "quarantine_mentions": 298,
-      "disposition_mentions": 446,
+      "disposition_mentions": 783,
       "period_close_mentions": 36,
       "credit_memo_mentions": 18,
       "debit_memo_mentions": 18,
       "backdate_exception_mentions": 28,
-      "archive_mentions": 26926,
-      "snapshot_mentions": 1130,
+      "archive_mentions": 27898,
+      "snapshot_mentions": 1332,
       "esign_mentions": 195,
       "cycle_count_mentions": 339
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2515,
-      "idempotent_endpoint_count": 2515,
+      "mutating_endpoint_count": 2612,
+      "idempotent_endpoint_count": 2612,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2515,
+      "default_retry_safe_endpoint_count": 2612,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2515
+      "response_replay_documented_count": 2612
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -146,16 +146,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 20916,
-        "if_match_mentions": 3265,
-        "row_version_mentions": 25990,
-        "mutating_endpoint_count": 2515,
-        "idempotent_endpoint_count": 2515,
+        "idempotency_mentions": 21730,
+        "if_match_mentions": 3355,
+        "row_version_mentions": 26737,
+        "mutating_endpoint_count": 2612,
+        "idempotent_endpoint_count": 2612,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2515,
+        "default_retry_safe_endpoint_count": 2612,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2515
+        "response_replay_documented_count": 2612
       },
       "required_controls": [
         "idempotency_key_or_equivalent_duplicate_suppression",
@@ -174,7 +174,7 @@
       ],
       "evidence": {
         "compensation_markers": 3,
-        "correction_markers": 2254,
+        "correction_markers": 2287,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
         ]
@@ -220,7 +220,7 @@
       ],
       "evidence": {
         "effective_dating_markers": 829,
-        "snapshot_mentions": 1130,
+        "snapshot_mentions": 1332,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
           "analytics.mes-oee-snapshots",
@@ -265,8 +265,8 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 125,
-        "waiver_mentions": 78,
+        "override_mentions": 126,
+        "waiver_mentions": 93,
         "esign_mentions": 195,
         "override_resources": [
           "quality_improvement.concessions",
@@ -296,7 +296,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 20916,
+        "idempotency_mentions": 21730,
         "compensation_markers": 3,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -318,8 +318,8 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 26926,
-        "correction_markers": 2254,
+        "archive_mentions": 27898,
+        "correction_markers": 2287,
         "esign_mentions": 195
       },
       "required_controls": [

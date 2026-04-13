@@ -180,42 +180,64 @@ class RateLimitMiddleware
             @mkdir($this->stateDir, 0775, true);
         }
 
-        // Load current state
-        $now   = time();
-        $state = ['start' => $now, 'hits' => 0, 'tokens' => $maxRequests];
+        $now = time();
 
-        if (is_file($stateFile)) {
-            $raw = @file_get_contents($stateFile);
-            $tmp = json_decode((string)$raw, true);
-            if (is_array($tmp) && isset($tmp['start'], $tmp['hits'])) {
-                $state = $tmp;
+        // Atomic read-check-write with exclusive file lock
+        $fp = @fopen($stateFile, 'c+');
+        if ($fp === false) {
+            // Cannot open state file, allow request through
+            return;
+        }
+
+        if (!flock($fp, LOCK_EX)) {
+            fclose($fp);
+            return;
+        }
+
+        try {
+            // Read current state under lock
+            $raw = '';
+            fseek($fp, 0);
+            $size = fstat($fp)['size'] ?? 0;
+            if ($size > 0) {
+                $raw = fread($fp, $size);
             }
-        }
 
-        // Token bucket: refill tokens based on elapsed time
-        $elapsed = $now - (int)$state['start'];
-        if ($elapsed >= $windowSeconds) {
-            // Window expired, reset
             $state = ['start' => $now, 'hits' => 0, 'tokens' => $maxRequests];
-        } else {
-            // Refill tokens proportionally
-            $refillRate   = (float)$maxRequests / (float)$windowSeconds;
-            $refillTokens = (int)floor($elapsed * $refillRate);
-            $state['tokens'] = min($maxRequests, (int)($state['tokens'] ?? 0) + $refillTokens);
+            if ($raw !== '' && $raw !== false) {
+                $tmp = json_decode($raw, true);
+                if (is_array($tmp) && isset($tmp['start'], $tmp['hits'])) {
+                    $state = $tmp;
+                }
+            }
+
+            // Token bucket: refill tokens based on elapsed time
+            $elapsed = $now - (int)$state['start'];
+            if ($elapsed >= $windowSeconds) {
+                $state = ['start' => $now, 'hits' => 0, 'tokens' => $maxRequests];
+            } else {
+                $refillRate   = (float)$maxRequests / (float)$windowSeconds;
+                $refillTokens = (int)floor($elapsed * $refillRate);
+                $state['tokens'] = min($maxRequests, (int)($state['tokens'] ?? 0) + $refillTokens);
+            }
+
+            // Consume a token
+            $state['hits'] = (int)($state['hits'] ?? 0) + 1;
+            $exceeded = (int)$state['hits'] > $maxRequests;
+
+            // Write state back under lock
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($state));
+            fflush($fp);
+        } finally {
+            flock($fp, LOCK_UN);
+            fclose($fp);
         }
 
-        // Consume a token
-        $state['hits'] = (int)($state['hits'] ?? 0) + 1;
-
-        if ((int)$state['hits'] > $maxRequests) {
-            // Rate limited
-            @file_put_contents($stateFile, json_encode($state), LOCK_EX);
-
+        if ($exceeded) {
             $this->throwRateLimited($maxRequests, $windowSeconds, (int)$state['start'], $now);
         }
-
-        // Save state and set rate-limit headers
-        @file_put_contents($stateFile, json_encode($state), LOCK_EX);
 
         $remaining = max(0, $maxRequests - (int)$state['hits']);
         $this->emitRateLimitHeaders($maxRequests, $remaining, (int)$state['start'] + $windowSeconds);
@@ -280,6 +302,23 @@ class RateLimitMiddleware
      */
     private function clientIp(): string
     {
-        return (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        $remoteAddr = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+
+        // Only trust X-Forwarded-For when behind a configured trusted proxy
+        $trustedProxies = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: '127.0.0.1,::1'))));
+        if ($trustedProxies === [] || !in_array($remoteAddr, $trustedProxies, true)) {
+            return $remoteAddr;
+        }
+
+        $forwarded = (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
+        if ($forwarded !== '') {
+            $ips = array_map('trim', explode(',', $forwarded));
+            $clientIp = $ips[0] ?? '';
+            if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                return $clientIp;
+            }
+        }
+
+        return $remoteAddr;
     }
 }

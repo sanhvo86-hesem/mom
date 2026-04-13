@@ -96,9 +96,9 @@ class AuthMiddleware
                 $self->deny('unauthorized', 401);
             }
 
-            // Validate idle session timeout
+            // Validate idle session timeout (skip for API key auth)
             $now = time();
-            if (isset($_SESSION['last_active'])) {
+            if (isset($_SESSION['last_active']) && (($_SESSION['auth_method'] ?? 'session') === 'session')) {
                 $last = (int)$_SESSION['last_active'];
                 if ($last > 0 && ($now - $last) > $self->idleTimeoutSeconds) {
                     destroy_auth_session();

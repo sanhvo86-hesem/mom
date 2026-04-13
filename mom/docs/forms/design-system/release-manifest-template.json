@@ -24,6 +24,34 @@
     "attachment_policy": "mom/docs/forms/.htaccess",
     "impact_note": "Update all affected system documents before release closure."
   },
+  "graphics_release_link": {
+    "graphicsAuthorityRefs": [
+      "mom/design/template-registry.json",
+      "mom/data/registry/graphics-governance-registry.json",
+      "mom/docs/module-layout-template-design-system-v4.html",
+      "standards/36-frontend-module-layout-template-standard.md"
+    ],
+    "templateRegistryVersion": "",
+    "templateRegistryChecksum": "",
+    "complianceMatrixRef": "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+    "impactAnalysisRef": "mom/data/graphics-governance/state.json#/pendingImpact",
+    "waiversRef": "mom/data/graphics-governance/waivers.json#/waivers",
+    "runtimeBeaconRef": "mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+    "debtObservatoryRef": "mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory",
+    "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
+    "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
+    "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
+    "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+    "evidenceBundleRequirements": [
+      "affectedModulesSnapshot",
+      "complianceMatrixSnapshot",
+      "debtDriftSnapshot",
+      "runtimeBeaconSnapshot",
+      "rolloutDecision",
+      "rollbackPlan",
+      "waiverRegisterSnapshot"
+    ]
+  },
   "owner_signoff": {
     "functional_owner": "",
     "qa_qms_owner": "",

@@ -235,7 +235,24 @@ final class CacheService
             }
         }
 
-        // File fallback with locking
+        // File fallback with proper locking
+        $fullKey = $this->prefix . $key;
+        $filePath = $this->filePath($fullKey);
+        $lockPath = $filePath . '.lock';
+        $lockHandle = @fopen($lockPath, 'c+');
+        if ($lockHandle && @flock($lockHandle, LOCK_EX)) {
+            try {
+                $current = (int)($this->fileGet($key) ?? 0);
+                $new = $current + $amount;
+                $this->fileSet($key, $new, $ttl > 0 ? $ttl : 3600);
+                $this->l1[$fullKey] = $new;
+                return $new;
+            } finally {
+                @flock($lockHandle, LOCK_UN);
+                @fclose($lockHandle);
+            }
+        }
+        // Lock acquisition failed - still attempt non-locked for availability
         $current = (int)($this->get($key) ?? 0);
         $new = $current + $amount;
         $this->set($key, $new, $ttl);

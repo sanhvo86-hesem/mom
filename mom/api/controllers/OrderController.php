@@ -617,8 +617,15 @@ class OrderController extends BaseController
             $this->error('missing_so_number', 400);
         }
 
-        $changes = $body['changes'] ?? $body;
-        unset($changes['so_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+        // IDOR validation: verify sales order exists and is accessible
+        $so = $this->orderService()->getSalesOrder($soNumber);
+        if ($so === null) {
+            $this->error('not_found', 404, 'Sales order not found');
+        }
+
+        // Mass assignment protection: whitelist allowed fields
+        $allowedFields = ['customer_id', 'customer_name', 'due_date', 'priority', 'special_requirements', 'notes', 'shipping_address', 'payment_terms', 'currency', 'revision', 'po_number'];
+        $changes = array_intersect_key(($body['changes'] ?? $body), array_flip($allowedFields));
 
         $uid = $this->userId($user);
         $reason = trim((string)($body['reason'] ?? 'Field update'));

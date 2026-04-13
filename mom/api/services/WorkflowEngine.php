@@ -651,7 +651,9 @@ final class WorkflowEngine
         }
 
         $requiredCount = (int) ($record['required_approvals'] ?? 1);
-        $complete = ($approvedCount >= $requiredCount) || ($rejectedCount > 0);
+        $complete = ($approvedCount >= $requiredCount);
+        $rejected = ($rejectedCount > 0 && ($approvedCount + $rejectedCount) >= $requiredCount);
+        $complete = $complete || $rejected;
 
         $this->saveRecordState($recordId, $record);
 

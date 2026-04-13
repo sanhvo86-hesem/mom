@@ -540,6 +540,7 @@ class GraphicsGovernanceService
                 'privateCssDebt' => $usesPrivateCssShell ? 1 : 0,
                 'hardcodedStyleDebt' => $usesPrivateCssShell ? 1 : 0,
                 'driftStatus' => $hasBlocker ? 'blocked' : ($findings === [] ? 'clean' : 'warning'),
+                'runtimeBeaconStatus' => $linkageStatus === 'blocked' || $linkageStatus === 'legacy-private-css' ? 'release-blocking' : 'reported',
                 'blockerReason' => $linkageStatus === 'blocked' ? $reason : '',
                 'consumesHmComponents' => $consumesHmComponents,
                 'consumesSharedTokens' => $consumesSharedTokens,
@@ -764,11 +765,23 @@ class GraphicsGovernanceService
         $state = $this->pruneExpiredImpacts($this->repo->readState());
         $waivers = $this->activeWaivers();
         $approvedWaiverTargets = [];
+        $approvedWaiverReleaseGates = [];
+        $approvedWaiverBlockers = [];
         foreach ((array)($waivers['waivers'] ?? []) as $waiver) {
             if (!is_array($waiver)) {
                 continue;
             }
-            $approvedWaiverTargets[(string)($waiver['targetId'] ?? '')] = true;
+            $targetId = (string)($waiver['targetId'] ?? '');
+            $approvedWaiverTargets[$targetId] = true;
+            if ((string)($waiver['scope'] ?? '') === 'release_gate') {
+                $approvedWaiverReleaseGates[$targetId] = true;
+                if ($targetId === 'graphics-governance') {
+                    $approvedWaiverReleaseGates['G19-graphics-governance'] = true;
+                }
+            }
+            if (str_starts_with($targetId, 'graphics_')) {
+                $approvedWaiverBlockers[$targetId] = true;
+            }
         }
 
         $blockers = [];
@@ -781,15 +794,19 @@ class GraphicsGovernanceService
                 static fn($finding): string => is_array($finding) ? (string)($finding['code'] ?? '') : '',
                 (array)($row['findings'] ?? [])
             )));
-            $waived = isset($approvedWaiverTargets[$moduleId]);
+            $blockerId = 'graphics_module_' . $moduleId;
+            $releaseGate = 'G19-graphics-governance';
+            $waived = isset($approvedWaiverTargets[$moduleId])
+                || isset($approvedWaiverBlockers[$blockerId])
+                || isset($approvedWaiverReleaseGates[$releaseGate]);
             $blockers[] = [
-                'blockerId' => 'graphics_module_' . $moduleId,
+                'blockerId' => $blockerId,
                 'scope' => 'module',
                 'targetId' => $moduleId,
                 'severity' => $waived ? 'waived' : 'blocker',
                 'status' => $waived ? 'waived' : 'active',
                 'reason' => $findingCodes === [] ? 'module_graphics_non_compliant' : implode(',', $findingCodes),
-                'releaseGate' => 'G19-graphics-governance',
+                'releaseGate' => $releaseGate,
                 'waiverAllowed' => true,
             ];
         }
@@ -802,15 +819,19 @@ class GraphicsGovernanceService
                 continue;
             }
             $targetId = (string)($row['id'] ?? $row['targetId'] ?? $row['scope'] ?? 'graphics');
-            $waived = isset($approvedWaiverTargets[$targetId]);
+            $blockerId = 'graphics_drift_' . $targetId;
+            $releaseGate = 'G19-graphics-governance';
+            $waived = isset($approvedWaiverTargets[$targetId])
+                || isset($approvedWaiverBlockers[$blockerId])
+                || isset($approvedWaiverReleaseGates[$releaseGate]);
             $blockers[] = [
-                'blockerId' => 'graphics_drift_' . $targetId,
+                'blockerId' => $blockerId,
                 'scope' => (string)($row['scope'] ?? 'graphics'),
                 'targetId' => $targetId,
                 'severity' => $waived ? 'waived' : 'blocker',
                 'status' => $waived ? 'waived' : 'active',
                 'reason' => (string)($row['code'] ?? 'graphics_drift_blocker'),
-                'releaseGate' => 'G19-graphics-governance',
+                'releaseGate' => $releaseGate,
                 'waiverAllowed' => true,
             ];
         }
@@ -820,14 +841,19 @@ class GraphicsGovernanceService
                 continue;
             }
             $hasBlockers = (bool)($impact['hasBlockers'] ?? false);
+            $blockerId = 'graphics_pending_impact_' . (string)$impactId;
+            $releaseGate = 'G19-graphics-governance';
+            $waived = isset($approvedWaiverTargets[(string)$impactId])
+                || isset($approvedWaiverBlockers[$blockerId])
+                || isset($approvedWaiverReleaseGates[$releaseGate]);
             $blockers[] = [
-                'blockerId' => 'graphics_pending_impact_' . (string)$impactId,
+                'blockerId' => $blockerId,
                 'scope' => 'impact-analysis',
                 'targetId' => (string)$impactId,
-                'severity' => $hasBlockers ? 'blocker' : 'warning',
-                'status' => $hasBlockers ? 'active' : 'pending-review',
+                'severity' => $waived ? 'waived' : ($hasBlockers ? 'blocker' : 'warning'),
+                'status' => $waived ? 'waived' : ($hasBlockers ? 'active' : 'pending-review'),
                 'reason' => $hasBlockers ? 'impact_blockers_unresolved' : 'impact_analysis_not_consumed_by_publish_or_rollout',
-                'releaseGate' => 'G19-graphics-governance',
+                'releaseGate' => $releaseGate,
                 'waiverAllowed' => $hasBlockers,
             ];
         }
@@ -1005,6 +1031,20 @@ class GraphicsGovernanceService
                 'sharedTokenProbe' => (bool)($row['consumesSharedTokens'] ?? false),
                 'hmComponentProbe' => (bool)($row['consumesHmComponents'] ?? false),
                 'privateCssProbe' => (bool)($row['usesPrivateCssShell'] ?? false),
+                'bridgeAliasState' => (int)($row['bridgeAliasDebt'] ?? 0) > 0 ? 'debt-open' : 'clean',
+                'driftHash' => substr($this->hash(json_encode([
+                    'moduleId' => (string)($row['moduleId'] ?? ''),
+                    'status' => (string)($row['linkageStatus'] ?? 'blocked'),
+                    'token' => (bool)($row['consumesSharedTokens'] ?? false),
+                    'component' => (bool)($row['consumesHmComponents'] ?? false),
+                    'privateCss' => (bool)($row['usesPrivateCssShell'] ?? false),
+                    'debt' => [
+                        (int)($row['bridgeAliasDebt'] ?? 0),
+                        (int)($row['privateCssDebt'] ?? 0),
+                        (int)($row['hardcodedStyleDebt'] ?? 0),
+                    ],
+                ]) ?: ''), 0, 16),
+                'complianceState' => (string)($row['status'] ?? $row['linkageStatus'] ?? 'blocked'),
                 'beaconStatus' => (string)($row['linkageStatus'] ?? '') === 'blocked' ? 'release-blocking' : 'reported',
                 'reportedAt' => gmdate('c'),
             ];
@@ -1040,17 +1080,20 @@ class GraphicsGovernanceService
     public function environmentPolicyPacks(): array
     {
         $packs = [
-            ['environment' => 'office', 'tokenOverrides' => ['density' => 'default', 'contrast' => 'standard'], 'evidenceObligations' => ['visual-regression']],
-            ['environment' => 'review', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'standard'], 'evidenceObligations' => ['screenshot-diff', 'keyboard-path']],
-            ['environment' => 'admin', 'tokenOverrides' => ['density' => 'compact', 'contrast' => 'standard'], 'evidenceObligations' => ['audit-trail', 'permission-review']],
-            ['environment' => 'shopfloor', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'evidenceObligations' => ['shopfloor-kiosk-smoke', 'touch-target-proof']],
-            ['environment' => 'kiosk', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'evidenceObligations' => ['kiosk-viewport-proof', 'timeout-proof']],
-            ['environment' => 'tv', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'high'], 'evidenceObligations' => ['distance-legibility-proof']],
-            ['environment' => 'night-shift', 'tokenOverrides' => ['mode' => 'dark', 'contrast' => 'high'], 'evidenceObligations' => ['dark-mode-contrast', 'fatigue-review']],
+            ['environment' => 'office', 'tokenOverrides' => ['density' => 'default', 'contrast' => 'standard'], 'componentPolicy' => ['standard-toolbar', 'data-table'], 'evidenceObligations' => ['visual-regression']],
+            ['environment' => 'review', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'standard'], 'componentPolicy' => ['evidence-panel', 'keyboard-path'], 'evidenceObligations' => ['screenshot-diff', 'keyboard-path']],
+            ['environment' => 'admin', 'tokenOverrides' => ['density' => 'compact', 'contrast' => 'standard'], 'componentPolicy' => ['audit-console', 'permission-editor'], 'evidenceObligations' => ['audit-trail', 'permission-review']],
+            ['environment' => 'shopfloor', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'componentPolicy' => ['large-action-button', 'scanner-input'], 'evidenceObligations' => ['shopfloor-kiosk-smoke', 'touch-target-proof']],
+            ['environment' => 'kiosk', 'tokenOverrides' => ['density' => 'shopfloor', 'contrast' => 'high'], 'componentPolicy' => ['timeout-banner', 'large-action-button'], 'evidenceObligations' => ['kiosk-viewport-proof', 'timeout-proof']],
+            ['environment' => 'tv', 'tokenOverrides' => ['density' => 'comfortable', 'contrast' => 'high'], 'componentPolicy' => ['andon-tile', 'distance-kpi'], 'evidenceObligations' => ['distance-legibility-proof']],
+            ['environment' => 'night-shift', 'tokenOverrides' => ['mode' => 'dark', 'contrast' => 'high'], 'componentPolicy' => ['low-glare-surface', 'fatigue-safe-focus'], 'evidenceObligations' => ['dark-mode-contrast', 'fatigue-review']],
+            ['environment' => 'glare-dirty-screen', 'tokenOverrides' => ['contrast' => 'max', 'borderWeight' => 'strong'], 'componentPolicy' => ['high-contrast-status', 'large-touch-target'], 'evidenceObligations' => ['glare-photo-proof', 'dirty-screen-readability']],
+            ['environment' => 'glove-mode', 'tokenOverrides' => ['density' => 'shopfloor', 'targetSize' => 'large'], 'componentPolicy' => ['large-action-button', 'stepper-control'], 'evidenceObligations' => ['glove-touch-proof', 'mis-tap-review']],
         ];
         return [
             'policyPacks' => [
                 'packs' => $packs,
+                'multiSitePlantBranding' => $this->multiSitePlantBrandingGovernance(),
                 'summary' => [
                     'packCount' => count($packs),
                     'authority' => 'backend_graphics_environment_policy_pack',
@@ -1070,6 +1113,12 @@ class GraphicsGovernanceService
         $debt = $this->debtReport();
         $waivers = $this->activeWaivers();
         $rollouts = $this->repo->readRolloutsDocument();
+        $observatory = $this->buildVisualDebtObservatory(
+            $this->bridgeAliasDebt(),
+            $this->privateCssDebt(),
+            $this->tokenAdoptionCoverage(),
+            $matrix
+        );
         return [
             'releaseDashboard' => [
                 'readiness' => (bool)($blockers['summary']['releaseBlocked'] ?? false) ? 'blocked' : 'ready',
@@ -1077,9 +1126,12 @@ class GraphicsGovernanceService
                 'waivers' => $waivers,
                 'complianceSummary' => $matrix['summary'],
                 'debtSummary' => $debt['summary'],
+                'trendDashboard' => $this->graphicsReleaseTrendDashboard($observatory, $blockers),
+                'emergencyOverridePath' => $this->controlledEmergencyOverridePath(),
                 'rolloutSummary' => [
                     'rolloutCount' => count((array)($rollouts['rollouts'] ?? [])),
                     'stagedCount' => count(array_filter((array)($rollouts['rollouts'] ?? []), static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'staged')),
+                    'canaryAppliedCount' => count(array_filter((array)($rollouts['rollouts'] ?? []), static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'canary_applied')),
                     'appliedCount' => count(array_filter((array)($rollouts['rollouts'] ?? []), static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'applied')),
                 ],
                 'postApplyVerification' => [
@@ -1166,6 +1218,55 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function analyzePolicyPackImpact(array $input): array
+    {
+        $policyPack = trim((string)($input['policyPack'] ?? $input['environment'] ?? $input['environmentPolicyPack'] ?? ''));
+        if ($policyPack === '') {
+            throw new GraphicsGovernanceException(422, 'policy_pack_required', 'policyPack or environment is required for environment policy impact analysis');
+        }
+        $policy = $this->resolveEnvironmentPolicyPack($policyPack);
+        $affected = [];
+        foreach ($this->moduleRecords() as $record) {
+            $module = $record['module'];
+            $packet = $record['packet'];
+            $row = $this->impactModuleRow($module, $packet);
+            $isShopfloor = (bool)($row['shopfloor'] ?? false);
+            $isRegulated = (bool)($row['regulated'] ?? false);
+            $haystack = strtolower(implode(' ', [
+                (string)($packet['domain'] ?? $module['domain'] ?? ''),
+                (string)($packet['criticality'] ?? $module['criticality'] ?? ''),
+                implode(' ', (array)($row['blockFamilies'] ?? [])),
+                implode(' ', (array)($row['screens'] ?? [])),
+            ]));
+            $touches = in_array($policyPack, ['office', 'review', 'admin'], true);
+            if (in_array($policyPack, ['shopfloor', 'kiosk', 'glove-mode', 'glare-dirty-screen'], true)) {
+                $touches = $isShopfloor || preg_match('/shopfloor|mes|operator|scanner|dispatch|machine|kiosk/', $haystack) === 1;
+            }
+            if (in_array($policyPack, ['tv', 'andon'], true)) {
+                $touches = preg_match('/andon|tv|kpi|dashboard|machine|shopfloor/', $haystack) === 1;
+            }
+            if ($policyPack === 'night-shift') {
+                $touches = $isShopfloor || $isRegulated || preg_match('/night|shift|operator|production/', $haystack) === 1;
+            }
+            if ($touches) {
+                $row['policyPack'] = $policyPack;
+                $affected[] = $row;
+            }
+        }
+        $report = $this->impactReport('environment-policy', [
+            'policyPack' => $policyPack,
+            'tokenOverrides' => (array)($policy['tokenOverrides'] ?? []),
+            'componentPolicy' => (array)($policy['componentPolicy'] ?? []),
+        ], $affected);
+        $report['blastRadius'] = $this->blastRadiusEstimate($report);
+        $report['policyPack'] = $policy;
+        return $report;
+    }
+
+    /**
      * @param array<string, mixed> $report
      * @return array<string, mixed>
      */
@@ -1218,6 +1319,9 @@ class GraphicsGovernanceService
             ]);
         }
         $scope['mode'] = $scopeMode;
+        if ($scopeMode === 'environment-stage' && trim((string)($scope['policyPack'] ?? $input['policyPack'] ?? '')) === '') {
+            throw new GraphicsGovernanceException(422, 'policy_pack_required', 'Environment-stage rollout requires a policyPack');
+        }
 
         $doc = $this->repo->readRolloutsDocument();
         $rolloutId = (string)($input['rolloutId'] ?? ('gr_' . gmdate('YmdHis') . '_' . substr($this->hash(json_encode($input) ?: ''), 0, 8)));
@@ -1239,7 +1343,63 @@ class GraphicsGovernanceService
         $doc['_meta']['version'] = (int)($doc['_meta']['version'] ?? 1) + 1;
         $doc['_meta']['updatedAt'] = gmdate('c');
         $this->repo->writeRolloutsDocument($doc);
+        $this->publishRuntimeRegistry();
         return ['rollout' => $rollout];
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function canaryApplyRollout(array $input, ?string $expectedVersion, string $username): array
+    {
+        $registry = $this->normalizedTemplateRegistry();
+        $this->requireExpectedVersion($expectedVersion, $registry);
+        $rolloutId = trim((string)($input['rolloutId'] ?? ''));
+        $doc = $this->repo->readRolloutsDocument();
+        $rollout = is_array($doc['rollouts'][$rolloutId] ?? null) ? (array)$doc['rollouts'][$rolloutId] : null;
+        if ($rollout === null) {
+            throw new GraphicsGovernanceException(404, 'rollout_not_found', 'Rollout not found: ' . $rolloutId);
+        }
+        if ((string)($rollout['status'] ?? '') !== 'staged') {
+            throw new GraphicsGovernanceException(409, 'rollout_not_staged', 'Only staged rollouts can enter canary');
+        }
+        $scopeMode = (string)($rollout['scopeMode'] ?? $rollout['scope']['mode'] ?? '');
+        if (!in_array($scopeMode, ['canary-module-group', 'canary-domain'], true)) {
+            throw new GraphicsGovernanceException(422, 'canary_scope_required', 'Canary apply requires canary-module-group or canary-domain scope');
+        }
+        if ($this->normalizeReleaseManifestRefs((array)($rollout['releaseManifestRefs'] ?? [])) === []) {
+            throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Canary apply requires releaseManifestRefs captured at rollout stage');
+        }
+        if ($this->normalizeExpected((string)($rollout['baseRegistryEtag'] ?? '')) !== $this->etag($registry)) {
+            throw new GraphicsGovernanceException(412, 'registry_changed_since_stage', 'Registry changed after rollout was staged', [], [
+                'current_version' => $this->documentVersion($registry),
+                'current_etag' => $this->etag($registry),
+            ]);
+        }
+        $scopedBlockers = $this->activeReleaseBlockersForScope((array)($rollout['scope'] ?? []), $this->releaseBlockers());
+        if ($scopedBlockers !== []) {
+            throw new GraphicsGovernanceException(422, 'release_blockers_active', 'Canary rollout cannot be applied while scoped graphics blockers are active', [], [
+                'releaseBlockers' => $scopedBlockers,
+            ]);
+        }
+
+        $snapshotId = $this->snapshotRegistry('before_canary_rollout_' . $rolloutId, $registry, $username);
+        $rollout['status'] = 'canary_applied';
+        $rollout['canaryAppliedAt'] = gmdate('c');
+        $rollout['canaryAppliedBy'] = $username;
+        $rollout['rollbackSnapshotId'] = $snapshotId;
+        $rollout['postCanaryVerification'] = [
+            'runtimeBeaconRequired' => true,
+            'driftReportRequired' => true,
+            'moduleOwnerSignoffRequired' => true,
+        ];
+        $doc['rollouts'][$rolloutId] = $rollout;
+        $doc['_meta']['version'] = (int)($doc['_meta']['version'] ?? 1) + 1;
+        $doc['_meta']['updatedAt'] = gmdate('c');
+        $this->repo->writeRolloutsDocument($doc);
+        $this->publishRuntimeRegistry();
+        return ['rollout' => $rollout, 'registryVersion' => $this->documentVersion($registry), 'registryEtag' => $this->etag($registry)];
     }
 
     /**
@@ -1256,8 +1416,8 @@ class GraphicsGovernanceService
         if ($rollout === null) {
             throw new GraphicsGovernanceException(404, 'rollout_not_found', 'Rollout not found: ' . $rolloutId);
         }
-        if ((string)($rollout['status'] ?? '') !== 'staged') {
-            throw new GraphicsGovernanceException(409, 'rollout_not_staged', 'Only staged rollouts can be applied');
+        if (!in_array((string)($rollout['status'] ?? ''), ['staged', 'canary_applied'], true)) {
+            throw new GraphicsGovernanceException(409, 'rollout_not_staged_or_canary', 'Only staged or canary-applied rollouts can be applied globally');
         }
         if ($this->normalizeReleaseManifestRefs((array)($rollout['releaseManifestRefs'] ?? [])) === []) {
             throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Apply requires releaseManifestRefs captured at rollout stage');
@@ -1303,8 +1463,8 @@ class GraphicsGovernanceService
         if ($rollout === null) {
             throw new GraphicsGovernanceException(404, 'rollout_not_found', 'Rollout not found: ' . $rolloutId);
         }
-        if ((string)($rollout['status'] ?? '') !== 'applied') {
-            throw new GraphicsGovernanceException(409, 'rollout_not_applied', 'Only applied rollouts can be rolled back');
+        if (!in_array((string)($rollout['status'] ?? ''), ['applied', 'canary_applied'], true)) {
+            throw new GraphicsGovernanceException(409, 'rollout_not_applied', 'Only applied or canary-applied rollouts can be rolled back');
         }
         if ($targetSnapshotId === '') {
             $targetSnapshotId = (string)($rollout['rollbackSnapshotId'] ?? '');
@@ -1322,7 +1482,6 @@ class GraphicsGovernanceService
         $this->snapshotRegistry('before_rollback_' . $rolloutId, $registry, $username);
         $targetRegistry = $this->bumpRegistry($targetRegistry, $username);
         $this->repo->writeTemplateRegistry($targetRegistry);
-        $this->publishRuntimeRegistry();
 
         $rollout['status'] = 'rolled_back';
         $rollout['rolledBackAt'] = gmdate('c');
@@ -1332,6 +1491,7 @@ class GraphicsGovernanceService
         $doc['_meta']['version'] = (int)($doc['_meta']['version'] ?? 1) + 1;
         $doc['_meta']['updatedAt'] = gmdate('c');
         $this->repo->writeRolloutsDocument($doc);
+        $this->publishRuntimeRegistry();
 
         return [
             'rollout' => $rollout,
@@ -1365,9 +1525,9 @@ class GraphicsGovernanceService
             ]);
         }
         $riskClass = (string)($input['riskClass'] ?? 'medium');
-        if (!in_array($riskClass, ['low', 'medium', 'high', 'regulated'], true)) {
+        if (!in_array($riskClass, ['low', 'medium', 'high', 'regulated', 'shopfloor-critical'], true)) {
             throw new GraphicsGovernanceException(422, 'invalid_waiver_risk_class', 'Waiver riskClass is not allowed', [
-                ['field' => 'riskClass', 'message' => 'riskClass must be low, medium, high, or regulated', 'code' => 'invalid_risk_class'],
+                ['field' => 'riskClass', 'message' => 'riskClass must be low, medium, high, regulated, or shopfloor-critical', 'code' => 'invalid_risk_class'],
             ]);
         }
         $expiresAt = $this->parseTime((string)$input['expiresAt']);
@@ -1382,6 +1542,10 @@ class GraphicsGovernanceService
             'scope' => $scope,
             'targetId' => (string)$input['targetId'],
             'reason' => (string)$input['reason'],
+            'risk' => (string)($input['risk'] ?? $riskClass),
+            'compensatingControl' => (string)($input['compensatingControl'] ?? ''),
+            'owner' => (string)($input['owner'] ?? $username),
+            'approver' => (string)($input['approver'] ?? ''),
             'riskClass' => $riskClass,
             'status' => 'draft',
             'documentControlRefs' => array_values(array_map('strval', (array)($input['documentControlRefs'] ?? []))),
@@ -1440,6 +1604,7 @@ class GraphicsGovernanceService
         $designConfig = $this->repo->readDesignConfig();
         $componentRegistry = $this->getComponentContractRegistry()['componentContractRegistry'];
         $matrix = $this->complianceMatrix();
+        $releaseLink = $this->graphicsReleaseLink();
         $payload = [
             '_meta' => [
                 'generatedAt' => gmdate('c'),
@@ -1463,6 +1628,8 @@ class GraphicsGovernanceService
             ],
             'componentContractRegistry' => $componentRegistry,
             'moduleGraphicsCompliance' => $matrix,
+            'graphicsDebtReport' => $this->debtReport(),
+            'graphicsDriftReport' => $this->driftReport(),
             'releaseBlockers' => $this->releaseBlockers(),
             'changeSetModel' => $this->graphicsChangeSetModel()['changeSet'],
             'moduleGraphicsLineageGraph' => $this->lineageGraph()['lineageGraph'],
@@ -1470,10 +1637,60 @@ class GraphicsGovernanceService
             'visualDebtObservatory' => $this->visualDebtObservatory()['observatory'],
             'environmentPolicyPacks' => $this->environmentPolicyPacks()['policyPacks'],
             'graphicsReleaseDashboard' => $this->graphicsReleaseDashboard()['releaseDashboard'],
+            'graphicsReleaseLink' => $releaseLink['releaseLink'],
+            'multiSitePlantBrandingGovernance' => $this->multiSitePlantBrandingGovernance(),
+            'controlledEmergencyOverridePath' => $this->controlledEmergencyOverridePath(),
             'persistence' => $this->persistenceModel(),
         ];
         $this->repo->writeRuntimeGraphicsRegistry($payload);
         return $payload;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function graphicsReleaseLink(): array
+    {
+        $registry = $this->normalizedTemplateRegistry();
+        $matrix = $this->complianceMatrix();
+        $blockers = $this->releaseBlockers();
+        $runtimeBeacon = $this->runtimeComplianceBeacon();
+        $observatory = $this->visualDebtObservatory();
+        return [
+            'releaseLink' => [
+                'graphicsAuthorityRefs' => [
+                    'mom/design/template-registry.json',
+                    'mom/data/registry/graphics-governance-registry.json',
+                    'mom/docs/module-layout-template-design-system-v4.html',
+                    'standards/36-frontend-module-layout-template-standard.md',
+                ],
+                'templateRegistryVersion' => $this->documentVersion($registry),
+                'templateRegistryChecksum' => $this->etag($registry),
+                'complianceMatrixRef' => 'mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance',
+                'impactAnalysisRef' => 'mom/data/graphics-governance/state.json#/pendingImpact',
+                'waiversRef' => 'mom/data/graphics-governance/waivers.json#/waivers',
+                'runtimeBeaconRef' => 'mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon',
+                'debtObservatoryRef' => 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory',
+                'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
+                'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
+                'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
+                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots',
+                'releaseBlocked' => (bool)($blockers['summary']['releaseBlocked'] ?? false),
+                'blockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
+                'runtimeBeaconSummary' => (array)($runtimeBeacon['runtimeBeacon']['summary'] ?? []),
+                'debtSummary' => (array)($observatory['observatory']['summary'] ?? []),
+                'evidenceBundleRequirements' => [
+                    'affectedModulesSnapshot',
+                    'complianceMatrixSnapshot',
+                    'debtDriftSnapshot',
+                    'runtimeBeaconSnapshot',
+                    'rolloutDecision',
+                    'rollbackPlan',
+                    'waiverRegisterSnapshot',
+                ],
+                'generatedAt' => gmdate('c'),
+            ],
+        ];
     }
 
     /**
@@ -2177,6 +2394,9 @@ class GraphicsGovernanceService
         if ($kind === 'component') {
             return $this->analyzeComponentImpact($input);
         }
+        if ($kind === 'policy-pack' || $kind === 'environment-policy' || isset($input['policyPack']) || isset($input['environmentPolicyPack'])) {
+            return $this->analyzePolicyPackImpact($input);
+        }
         if ($kind === 'template' || isset($input['templateId'])) {
             return $this->analyzeTemplateImpact($input);
         }
@@ -2288,6 +2508,156 @@ class GraphicsGovernanceService
             unset($scope);
         }
         return $scopeModes;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolveEnvironmentPolicyPack(string $policyPack): array
+    {
+        $packs = (array)($this->environmentPolicyPacks()['policyPacks']['packs'] ?? []);
+        foreach ($packs as $pack) {
+            if (is_array($pack) && (string)($pack['environment'] ?? '') === $policyPack) {
+                return $pack;
+            }
+        }
+        throw new GraphicsGovernanceException(422, 'unknown_policy_pack', 'Unknown graphics environment policy pack: ' . $policyPack, [
+            ['field' => 'policyPack', 'message' => 'Policy pack is not defined by backend graphics authority', 'code' => 'unknown_policy_pack'],
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $impact
+     * @return array<string, mixed>
+     */
+    private function blastRadiusEstimate(array $impact): array
+    {
+        $modules = (array)($impact['affectedModules'] ?? []);
+        $regulated = (array)($impact['regulatedModulesTouched'] ?? []);
+        $shopfloor = (array)($impact['shopfloorModulesTouched'] ?? []);
+        $routes = (array)($impact['affectedRoutes'] ?? []);
+        $screens = (array)($impact['affectedScreens'] ?? []);
+        $families = (array)($impact['affectedBlockFamilies'] ?? []);
+        $score = count($modules) * 10 + count($routes) * 4 + count($screens) * 2 + count($families);
+        $score += count($regulated) * 20 + count($shopfloor) * 25 + count((array)($impact['blockers'] ?? [])) * 30;
+        $class = 'low';
+        if ($score >= 120 || $shopfloor !== []) {
+            $class = 'shopfloor-critical';
+        } elseif ($score >= 90 || $regulated !== []) {
+            $class = 'regulated';
+        } elseif ($score >= 60) {
+            $class = 'high';
+        } elseif ($score >= 30) {
+            $class = 'medium';
+        }
+        return [
+            'score' => $score,
+            'class' => $class,
+            'moduleCount' => count($modules),
+            'routeCount' => count($routes),
+            'screenCount' => count($screens),
+            'blockFamilyCount' => count($families),
+            'regulatedCount' => count($regulated),
+            'shopfloorCount' => count($shopfloor),
+            'releaseCondition' => $class === 'low'
+                ? 'standard evidence'
+                : 'impact snapshot, screenshot diff, compliance snapshot and rollback plan required',
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $scope
+     * @param array<string, mixed> $releaseBlockers
+     * @return array<int, array<string, mixed>>
+     */
+    private function activeReleaseBlockersForScope(array $scope, array $releaseBlockers): array
+    {
+        $active = array_values(array_filter(
+            (array)($releaseBlockers['blockers'] ?? []),
+            static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'active'
+        ));
+        $mode = (string)($scope['mode'] ?? '');
+        if (!in_array($mode, ['canary-module-group', 'canary-domain'], true)) {
+            return $active;
+        }
+
+        $targetModules = array_values(array_filter(array_map('strval', (array)($scope['modules'] ?? $scope['moduleIds'] ?? []))));
+        $targetDomain = trim((string)($scope['domain'] ?? ''));
+        if ($targetDomain !== '') {
+            foreach ($this->moduleRecords() as $record) {
+                $module = $record['module'];
+                $packet = $record['packet'];
+                if ((string)($packet['domain'] ?? $module['domain'] ?? '') === $targetDomain) {
+                    $targetModules[] = (string)($module['moduleId'] ?? $packet['moduleId'] ?? '');
+                }
+            }
+        }
+        $targetModules = array_values(array_unique(array_filter($targetModules)));
+        if ($targetModules === []) {
+            return $active;
+        }
+
+        return array_values(array_filter($active, static function (array $blocker) use ($targetModules): bool {
+            $target = (string)($blocker['targetId'] ?? $blocker['moduleId'] ?? '');
+            return $target === '' || in_array($target, $targetModules, true);
+        }));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function multiSitePlantBrandingGovernance(): array
+    {
+        return [
+            'authority' => 'backend_graphics_policy_pack',
+            'levels' => ['enterprise', 'site', 'plant', 'area', 'line', 'cell'],
+            'allowedOverrideTypes' => ['logoLockup', 'locale', 'shiftPalette', 'contrastPack', 'densityPack'],
+            'prohibitedOverrideTypes' => ['semanticStatusColor', 'auditEvidenceColor', 'safetyMeaning', 'componentContractBypass'],
+            'requiredFields' => ['siteId', 'plantId', 'policyPack', 'owner', 'approver', 'effectiveFrom', 'expiresAt', 'evidenceRefs'],
+            'releaseRule' => 'Plant branding may change identity and environment tokens only; semantic status and shared component contracts remain global authority.',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function controlledEmergencyOverridePath(): array
+    {
+        return [
+            'status' => 'exception-only',
+            'authority' => 'graphics_governance_waiver_register',
+            'requiredFields' => ['overrideId', 'scope', 'reason', 'owner', 'approver', 'expiresAt', 'rollbackPlanRef', 'retrospectiveDueAt'],
+            'allowedUse' => ['temporary accessibility rescue', 'production readability emergency', 'critical release-blocker workaround with approved waiver'],
+            'prohibitedUse' => ['new design preference', 'semantic status color change', 'regulated/shopfloor critical waiver without documentControlRefs and releaseManifestRefs'],
+            'maxDurationDays' => 14,
+            'releaseCondition' => 'Emergency override requires approved waiver, expiry, evidence refs, post-incident retrospective and migration path back to shared tokens/components.',
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $observatory
+     * @param array<string, mixed> $blockers
+     * @return array<string, mixed>
+     */
+    private function graphicsReleaseTrendDashboard(array $observatory, array $blockers): array
+    {
+        $byModule = (array)($observatory['byModule'] ?? []);
+        $totalDebt = array_sum(array_map(static fn($row): int => is_array($row) ? (int)($row['debtScore'] ?? 0) : 0, $byModule));
+        $activeBlockerCount = (int)($blockers['summary']['blockerCount'] ?? 0);
+        return [
+            'currentDebtScore' => $totalDebt,
+            'activeBlockerCount' => $activeBlockerCount,
+            'trendWindow' => 'current-release',
+            'signals' => [
+                'blockedModules' => array_values(array_map(
+                    static fn($row): string => (string)($row['moduleId'] ?? ''),
+                    array_filter($byModule, static fn($row): bool => is_array($row) && (string)($row['linkageStatus'] ?? '') === 'blocked')
+                )),
+                'topDebtModules' => array_slice($byModule, 0, 5),
+            ],
+            'releaseReadinessTrend' => $activeBlockerCount === 0 ? 'improving-or-ready' : 'blocked-until-evidence-or-waiver',
+            'nextReview' => gmdate('c', time() + 7 * 86400),
+        ];
     }
 
     /**
@@ -2497,15 +2867,20 @@ class GraphicsGovernanceService
                 ]);
             }
             $riskClass = (string)($waiver['riskClass'] ?? 'medium');
-            if (in_array($riskClass, ['high', 'regulated'], true)) {
+            if (in_array($riskClass, ['high', 'regulated', 'shopfloor-critical'], true)) {
                 if ((array)($waiver['documentControlRefs'] ?? []) === []) {
                     throw new GraphicsGovernanceException(422, 'document_control_ref_required', 'High-risk waivers require documentControlRefs', [
-                        ['field' => 'documentControlRefs', 'message' => 'Required for high or regulated waiver approval', 'code' => 'required'],
+                        ['field' => 'documentControlRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
                     ]);
                 }
                 if ($this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) === []) {
                     throw new GraphicsGovernanceException(422, 'release_manifest_required', 'High-risk waivers require releaseManifestRefs', [
-                        ['field' => 'releaseManifestRefs', 'message' => 'Required for high or regulated waiver approval', 'code' => 'required'],
+                        ['field' => 'releaseManifestRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
+                    ]);
+                }
+                if (trim((string)($waiver['compensatingControl'] ?? '')) === '') {
+                    throw new GraphicsGovernanceException(422, 'compensating_control_required', 'High-risk waivers require compensatingControl', [
+                        ['field' => 'compensatingControl', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
                     ]);
                 }
             }
@@ -2513,6 +2888,9 @@ class GraphicsGovernanceService
         $waiver['status'] = $status;
         $waiver[$status === 'approved' ? 'approvedAt' : 'expiredAt'] = gmdate('c');
         $waiver[$status === 'approved' ? 'approvedBy' : 'expiredBy'] = $username;
+        if ($status === 'approved' && trim((string)($waiver['approver'] ?? '')) === '') {
+            $waiver['approver'] = $username;
+        }
         $doc['waivers'][$waiverId] = $waiver;
         $doc = $this->bumpLooseDocument($doc, $username);
         $this->repo->writeWaiversDocument($doc);

@@ -28,6 +28,7 @@ The runtime/API/frontend contract must be generated from registry authority, not
 | `data/registry/system-contract-diagnostics.json` | Release gate diagnostics for the published system contract | registry authority artifacts and global capability audit |
 | `data/registry/system-contract-manifest.json` | Single read-only manifest for the full backend contract layer | generated system-contract artifacts |
 | `data/registry/graphics-governance-registry.json` | Machine-readable graphics authority projection for runtime, builder, release and evidence tooling | backend graphics authority, controlled template registry, module compliance, drift/debt diagnostics |
+| `data/registry/system-contract-manifest.json#/graphicsReleaseLink` | Machine-readable linkage from graphics authority to release manifest, evidence bundle and rollback references | `graphics-governance-registry.json`, release manifest template, builder manifest projection |
 | `data/registry/graphics-template-registry.json` | Runtime template registry projection consumed by frontend and module builder | `design/template-registry.json` through graphics governance publication |
 
 `schema-studio-*` artifacts remain valid only as workspace/design outputs. With the active blank workspace they should compile to zero design projections and must not be used as the source of truth for runtime release decisions.
@@ -46,7 +47,7 @@ Graphics governance follows the same authority rule as schema governance: runtim
 
 Any registry, builder or release tool that reads `hesem_layout_templates` or a browser-only template cache as production authority is invalid. The controlled path is backend graphics authority -> registry artifact/projection -> runtime/module builder -> release evidence.
 
-The graphics authority projection must also include `changeSetModel`, `moduleGraphicsLineageGraph`, `runtimeGraphicsComplianceBeacon`, `visualDebtObservatory`, `environmentPolicyPacks` and `graphicsReleaseDashboard`. These artifacts are generated from backend authority and registry/build-packet evidence; they are not editable workspace drafts and are not browser-cache state.
+The graphics authority projection must also include `changeSetModel`, `moduleGraphicsLineageGraph`, `runtimeGraphicsComplianceBeacon`, `visualDebtObservatory`, `environmentPolicyPacks`, `graphicsReleaseDashboard`, `multiSitePlantBrandingGovernance`, `controlledEmergencyOverridePath` and `graphicsReleaseLink`. These artifacts are generated from backend authority and registry/build-packet evidence; they are not editable workspace drafts and are not browser-cache state.
 
 ## Workspace Deletion Impact
 

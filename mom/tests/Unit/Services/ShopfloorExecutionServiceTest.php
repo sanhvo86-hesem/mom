@@ -39,6 +39,9 @@ final class ShopfloorExecutionServiceTest extends TestCase
                     ['defect_code' => 'DEF-FOD', 'defect_name' => 'FOD', 'defect_group' => 'fod', 'status' => 'active'],
                     ['defect_code' => 'DEF-OTHER', 'defect_name' => 'Other', 'defect_group' => 'other', 'status' => 'active'],
                 ],
+                'inspection_plans' => [
+                    ['inspection_plan_id' => 'IP-714-OP20', 'inspection_plan_name' => 'IP 714 OP20', 'status' => 'released'],
+                ],
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
     }
@@ -138,9 +141,108 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('invalid_cycle_time_minutes');
 
-        $this->service()->applyTargetUpdates($this->target(), [
+        $target = $this->target();
+        $target['status'] = 'planned';
+
+        $this->service()->applyTargetUpdates($target, [
             'cycle_time_minutes' => 0,
         ], '2026-04-13T01:00:00Z');
+    }
+
+    public function testTargetUpdateLocksIdentityFieldsAfterDispatchWithoutOverride(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('target_update_requires_supervisor_override:machine_id');
+
+        $this->service()->applyTargetUpdates($target, [
+            'machine_id' => 'MC-5AX-99',
+        ], '2026-04-13T10:00:00Z');
+    }
+
+    public function testLegacyIdentityAliasesAreLockedAfterDispatchWithoutOverride(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('target_update_requires_supervisor_override:part_revision');
+
+        $this->service()->applyTargetUpdates($target, [
+            'revision' => 'REV-D',
+        ], '2026-04-13T10:00:00Z');
+    }
+
+    public function testConflictingCanonicalAndAliasUpdatesCannotBypassDispatchLock(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('conflicting_target_alias:program_id');
+
+        $this->service()->applyTargetUpdates($target, [
+            'cnc_program_id' => 'NC-714-1101-OP20',
+            'program_id' => 'NC-UNAPPROVED',
+        ], '2026-04-13T10:00:00Z');
+    }
+
+    public function testDueDateIsLockedAfterDispatchWithoutOverride(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+        $target['due_at'] = '2026-04-13T17:00:00Z';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('target_update_requires_supervisor_override:due_at');
+
+        $this->service()->applyTargetUpdates($target, [
+            'due_at' => '2026-04-14T17:00:00Z',
+        ], '2026-04-13T10:00:00Z');
+    }
+
+    public function testTargetUpdateWithSupervisorOverrideRecordsReason(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+
+        $updated = $this->service()->applyTargetUpdates($target, [
+            'machine_id' => 'MC-5AX-99',
+            'supervisor_override_reason' => 'Machine reassigned after spindle alarm.',
+        ], '2026-04-13T10:00:00Z');
+
+        $this->assertSame('MC-5AX-99', $updated['machine_id']);
+        $this->assertSame('MC-5AX-99', $updated['equipment_id']);
+        $this->assertSame('Machine reassigned after spindle alarm.', $updated['last_target_override_reason']);
+    }
+
+    public function testCompletedTargetRejectsNormalEditsWithoutSupervisorOverride(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'completed';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('target_locked_after_completion');
+
+        $this->service()->applyTargetUpdates($target, [
+            'priority' => 5,
+        ], '2026-04-13T10:00:00Z');
+    }
+
+    public function testCompletedTargetRejectsLockedEditsEvenWithOverrideReason(): void
+    {
+        $target = $this->target();
+        $target['status'] = 'completed';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('target_locked_after_completion');
+
+        $this->service()->applyTargetUpdates($target, [
+            'machine_id' => 'MC-5AX-99',
+            'supervisor_override_reason' => 'Late dispatch correction should use correction workflow.',
+        ], '2026-04-13T10:00:00Z');
     }
 
     public function testReportValidationRejectsMissingReasonCodesForBadOutputAndDowntime(): void
@@ -381,6 +483,52 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testReportValidationRejectsContradictoryOrEmptyPayloads(): void
+    {
+        $service = $this->service();
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 1,
+                'actual_start' => '2026-04-13T09:00:00Z',
+                'actual_end' => '2026-04-13T08:59:59Z',
+            ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+            $this->fail('Actual end before actual start should be rejected.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('actual_end_before_actual_start', $e->getMessage());
+        }
+
+        try {
+            $service->buildProductionLog([], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+            $this->fail('Empty execution reports should be rejected.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('empty_production_report', $e->getMessage());
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('invalid_execution_event_type');
+        $service->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'machine_control',
+            'notes' => 'Not a supported manual execution event.',
+        ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+    }
+
+    public function testBlockingIssuesCarrySeparateReasonDomain(): void
+    {
+        $log = $this->service()->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'blocked',
+            'blocking_issues' => [
+                ['reason_code' => 'DT-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
+            ],
+        ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $this->assertSame('blocked', $log['execution_event_type']);
+        $this->assertSame('blocking', $log['blocking_issues'][0]['reason_domain']);
+        $this->assertSame('blocked', $log['blocking_issues'][0]['loss_class']);
+    }
+
     public function testPauseResumeAndOfflineReportSemanticsAreStructured(): void
     {
         $service = $this->service();
@@ -492,6 +640,26 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertIsArray($replayed);
         $this->assertSame($existing['log_id'], $replayed['log_id']);
         $this->assertSame($existing['report_fingerprint'], $replayed['report_fingerprint']);
+    }
+
+    public function testOnlineReportWithoutClientIdempotencyKeyGetsReplaySafeServerKey(): void
+    {
+        $service = $this->service();
+        $body = [
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'actual_start' => '2026-04-13T08:00:00Z',
+        ];
+
+        $existing = $service->buildProductionLog($body, $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+        $candidate = $service->buildProductionLog($body, $this->target(), $existing, 'operator-1', '2026-04-13T09:00:00Z');
+
+        $this->assertStringStartsWith('server:', $existing['idempotency_key']);
+        $this->assertSame($existing['idempotency_key'], $candidate['idempotency_key']);
+
+        $replayed = $service->replayProductionLogForIdempotency($candidate, [$existing]);
+        $this->assertIsArray($replayed);
+        $this->assertSame($existing['log_id'], $replayed['log_id']);
     }
 
     public function testProductionReportIdempotencyRejectsPayloadConflict(): void
@@ -655,6 +823,214 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('warning', $target['reference_validation']['status']);
         $this->assertContains('unverified_cnc_program_reference', $target['reference_validation']['warnings']);
         $this->assertContains('missing_inspection_plan_reference', $target['reference_validation']['warnings']);
+    }
+
+    public function testStrictReferencePolicyBlocksDispatchUntilCncAndInspectionLinksAreValid(): void
+    {
+        mkdir($this->dataDir . '/cnc-programs', 0775, true);
+        file_put_contents($this->dataDir . '/cnc-programs/programs.json', json_encode([
+            ['id' => 'NC-DRAFT', 'program_number' => 'NC-DRAFT', 'status' => 'draft'],
+            ['id' => 'NC-REL', 'program_number' => 'NC-REL', 'status' => 'released'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $blocked = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-STRICT-1',
+            'machine_id' => 'MC-5AX-01',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+            'cnc_program_id' => 'NC-DRAFT',
+            'reference_policy' => 'enforce_dispatch',
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('blocked', $blocked['reference_validation']['status']);
+        $this->assertContains('cnc_program_not_released', $blocked['reference_validation']['blockers']);
+        $this->assertContains('missing_inspection_plan_reference', $blocked['reference_validation']['blockers']);
+
+        try {
+            $this->service()->assertTargetDispatchable($blocked);
+            $this->fail('Strict reference policy should block dispatch.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringStartsWith('dispatch_reference_blocked', $e->getMessage());
+        }
+
+        $staleStrictTarget = $blocked;
+        unset($staleStrictTarget['reference_validation']);
+        try {
+            $this->service()->assertTargetDispatchable($staleStrictTarget);
+            $this->fail('Strict reference policy should be recalculated at dispatch time.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('cnc_program_not_released', $e->getMessage());
+        }
+
+        $ready = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-STRICT-2',
+            'machine_id' => 'MC-5AX-01',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+            'cnc_program_id' => 'NC-REL',
+            'inspection_plan_id' => 'IP-714-OP20',
+            'reference_policy' => 'enforce_dispatch',
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('ok', $ready['reference_validation']['status']);
+        $this->service()->assertTargetDispatchable($ready);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testExecutionStateTracksPauseResumeAndCompletionWithoutNewStatusModel(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+        $target['status'] = 'in_progress';
+
+        $pause = $service->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'pause',
+            'downtime_events' => [
+                ['reason_code' => 'DT-TOOL-LIFE', 'minutes' => 10],
+            ],
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        $pausedTarget = $service->applyExecutionStateFromReport($target, $pause, '2026-04-13T08:00:00Z');
+        $this->assertSame('paused', $pausedTarget['execution_state']);
+
+        $resume = $service->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'resume',
+            'resumed_from_event_id' => 'PRE-PAUSE-1',
+        ], $pausedTarget, $pause, 'operator-1', '2026-04-13T08:15:00Z');
+        $resumedTarget = $service->applyExecutionStateFromReport($pausedTarget, $resume, '2026-04-13T08:15:00Z');
+        $this->assertSame('running', $resumedTarget['execution_state']);
+        $this->assertSame('PRE-PAUSE-1', $resumedTarget['resumed_from_event_id']);
+    }
+
+    public function testFirstPieceGateBlocksProductionUntilPassingInspectionExists(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+        $target['first_piece_required'] = true;
+        $target['quality_gate_policy'] = 'enforce_first_piece';
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 5,
+                'actual_run_minutes' => 25,
+            ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('Production output should wait for a passing first-piece capture.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('first_piece_inspection_required', $e->getMessage());
+        }
+
+        mkdir($this->dataDir . '/mobile', 0775, true);
+        file_put_contents($this->dataDir . '/mobile/inspections.json', json_encode([
+            [
+                'capture_id' => 'FP-1',
+                'capture_type' => 'first_piece',
+                'overall_result' => 'pass',
+                'wo_number' => 'WO-1001',
+                'operation_seq' => 20,
+                'inspection_plan_id' => 'IP-714-OP20',
+                'captured_at' => '2026-04-13T07:45:00Z',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $log = $service->buildProductionLog([
+            'quantity_good' => 5,
+            'actual_run_minutes' => 25,
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertSame('passed', $log['quality_gate']['status']);
+        $this->assertSame('FP-1', $log['quality_gate']['capture_id']);
+    }
+
+    public function testFirstPieceGateDoesNotAcceptWrongOperationOrInspectionPlan(): void
+    {
+        mkdir($this->dataDir . '/mobile', 0775, true);
+        file_put_contents($this->dataDir . '/mobile/inspections.json', json_encode([
+            [
+                'capture_id' => 'FP-WRONG-OP',
+                'capture_type' => 'first_piece',
+                'overall_result' => 'pass',
+                'wo_number' => 'WO-1001',
+                'operation_seq' => 10,
+                'inspection_plan_id' => 'IP-714-OP20',
+            ],
+            [
+                'capture_id' => 'FP-WRONG-PLAN',
+                'capture_type' => 'first_piece',
+                'overall_result' => 'pass',
+                'wo_number' => 'WO-1001',
+                'operation_seq' => 20,
+                'inspection_plan_id' => 'IP-OTHER',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $target = $this->target();
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+        $target['first_piece_required'] = true;
+        $target['quality_gate_policy'] = 'enforce_first_piece';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('first_piece_inspection_required');
+
+        $this->service()->buildProductionLog([
+            'quantity_good' => 5,
+            'actual_run_minutes' => 25,
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+    }
+
+    public function testFirstPieceGateWarnPolicyStaysAdvisoryWhenNotRequired(): void
+    {
+        $target = $this->target();
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+        $target['first_piece_required'] = false;
+        $target['quality_gate_policy'] = 'warn';
+
+        $log = $this->service()->buildProductionLog([
+            'quantity_good' => 5,
+            'actual_run_minutes' => 25,
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertSame('warning', $log['quality_gate']['status']);
+        $this->assertContains('first_piece_inspection_not_captured', $log['advisory_projection']['data_quality_flags']);
+    }
+
+    public function testFirstPieceGateAllowsAuditedSupervisorOverrideWithReason(): void
+    {
+        $target = $this->target();
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+        $target['first_piece_required'] = true;
+        $target['quality_gate_policy'] = 'enforce_first_piece';
+
+        $log = $this->service()->buildProductionLog([
+            'quantity_good' => 5,
+            'actual_run_minutes' => 25,
+            'quality_override_reason' => 'QA approved paper first-piece record during tablet outage.',
+        ], $target, null, 'shift-lead-1', '2026-04-13T08:00:00Z', true);
+
+        $this->assertSame('overridden', $log['quality_gate']['status']);
+        $this->assertSame('first_piece_inspection_overridden', $log['advisory_projection']['data_quality_flags'][0]);
+    }
+
+    public function testLifecycleEventCarriesDigitalThreadAndOrgScope(): void
+    {
+        $target = $this->target();
+        $target['org_company_code'] = 'HESEM';
+        $target['org_plant_id'] = 'P01';
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+
+        $event = $this->service()->buildTargetLifecycleEvent($target, 'dispatch.target_dispatched', 'planner-1', '2026-04-13T06:30:00Z', [
+            'previous_status' => 'planned',
+        ]);
+
+        $this->assertSame('dispatch.target_dispatched', $event['event_type']);
+        $this->assertSame('TGT-1001', $event['target_id']);
+        $this->assertTrue($event['operational_truth']);
+        $this->assertSame('HESEM', $event['digital_thread']['org_company_code']);
+        $this->assertSame('P01', $event['digital_thread']['org_plant_id']);
+        $this->assertSame('NC-714-1101-OP20', $event['digital_thread']['cnc_program_id']);
     }
 
     /**

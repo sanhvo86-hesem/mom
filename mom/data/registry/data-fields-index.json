@@ -1,15 +1,15 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-13T13:52:34.065Z",
+    "generatedAt": "2026-04-13T15:11:17.936Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
-    "generatedEndpointCount": 3976,
-    "uniqueFieldKeys": 4950,
-    "uniqueDbColumnNamesCovered": 4496,
-    "totalDbTableColumnsCovered": 13727,
-    "baselineUniqueColumnCoverage": 4496,
-    "migrationCount": 106,
+    "generatedEndpointCount": 4125,
+    "uniqueFieldKeys": 5096,
+    "uniqueDbColumnNamesCovered": 4630,
+    "totalDbTableColumnsCovered": 14125,
+    "baselineUniqueColumnCoverage": 4630,
+    "migrationCount": 108,
     "researchReferences": [
       {
         "key": "sap_inspection_lot",
@@ -183,11 +183,11 @@
     ]
   },
   "split": true,
-  "lineCount": 809251,
+  "lineCount": 831663,
   "parts": [
     {
       "file": "data-fields-part1.json",
-      "endpointCount": 2267,
+      "endpointCount": 2302,
       "domains": [
         "core_system",
         "foundation_governance",
@@ -218,7 +218,7 @@
     },
     {
       "file": "data-fields-part2.json",
-      "endpointCount": 1709,
+      "endpointCount": 1823,
       "domains": [
         "supplier_relationship",
         "tooling_lifecycle",

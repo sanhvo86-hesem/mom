@@ -7270,6 +7270,7 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     var route = (schema && schema.route) || '';
     var blockers = [];
     var compliance = [];
+    var releaseLink = _ngGraphicsReleaseLinkInfo();
     if(svc && typeof svc.getGraphicsReleaseBlockers === 'function') blockers = svc.getGraphicsReleaseBlockers() || [];
     else if(svc && typeof svc.getReleaseBlockers === 'function') blockers = svc.getReleaseBlockers() || [];
     if(svc && typeof svc.getGraphicsComplianceMatrix === 'function') compliance = svc.getGraphicsComplianceMatrix() || [];
@@ -7282,13 +7283,49 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     });
     var status = row && row.linkageStatus ? row.linkageStatus : (moduleId ? 'pending-graphics-beacon' : 'missing-module-id');
     var acceptable = status === 'full-admin-controlled' || status === 'bridged-to-shared-tokens';
+    var releaseLinkComplete = !!(releaseLink && releaseLink.complianceMatrixRef && releaseLink.runtimeBeaconRef && releaseLink.rollbackPlanRef);
+    var releaseBlocked = !!(releaseLink && releaseLink.releaseBlocked);
     return {
       status: status,
-      acceptable: acceptable && relevantBlockers.length === 0,
+      acceptable: acceptable && relevantBlockers.length === 0 && releaseLinkComplete && !releaseBlocked,
       blockerCount: relevantBlockers.length,
       blockers: relevantBlockers,
+      releaseLinkComplete: releaseLinkComplete,
+      releaseBlocked: releaseBlocked,
+      releaseLink: releaseLink,
       reason: row && row.reason ? row.reason : _t('Graphics compliance beacon chưa xác nhận module này.', 'Graphics compliance beacon has not attested this module yet.')
     };
+  }
+
+  function _ngGraphicsReleaseLinkInfo(){
+    var svc = window.HmGraphicsGovernance || null;
+    var link = null;
+    if(svc && typeof svc.getGraphicsReleaseLink === 'function') link = svc.getGraphicsReleaseLink() || null;
+    if(!link || typeof link !== 'object'){
+      link = {
+        graphicsAuthorityRefs: [],
+        templateRegistryVersion: '',
+        templateRegistryChecksum: '',
+        complianceMatrixRef: '',
+        impactAnalysisRef: '',
+        waiversRef: '',
+        runtimeBeaconRef: '',
+        debtObservatoryRef: '',
+        rolloutDecisionRef: '',
+        rollbackPlanRef: '',
+        releaseBlocked: true,
+        evidenceBundleRequirements: [
+          'affectedModulesSnapshot',
+          'complianceMatrixSnapshot',
+          'debtDriftSnapshot',
+          'runtimeBeaconSnapshot',
+          'rolloutDecision',
+          'rollbackPlan',
+          'waiverRegisterSnapshot'
+        ]
+      };
+    }
+    return link;
   }
 
   function _ngComputeModuleStudioReadiness(schema){
@@ -7343,6 +7380,29 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     schema.builderManifest.blockCount = _ngCountBlocks(schema);
     schema.builderManifest.readinessScore = readiness.score;
     schema.builderManifest.graphicsGovernance = readiness.graphicsGate;
+    var graphicsReleaseLink = _ngGraphicsReleaseLinkInfo();
+    schema.builderManifest.graphicsReleaseLink = graphicsReleaseLink;
+    schema.builderManifest.graphicsEvidenceBundle = {
+      evidenceBundleRequirements: graphicsReleaseLink.evidenceBundleRequirements || [
+        'affectedModulesSnapshot',
+        'complianceMatrixSnapshot',
+        'debtDriftSnapshot',
+        'runtimeBeaconSnapshot',
+        'rolloutDecision',
+        'rollbackPlan',
+        'waiverRegisterSnapshot'
+      ],
+      graphicsAuthorityRefs: graphicsReleaseLink.graphicsAuthorityRefs || [],
+      templateRegistryVersion: graphicsReleaseLink.templateRegistryVersion || '',
+      templateRegistryChecksum: graphicsReleaseLink.templateRegistryChecksum || '',
+      complianceMatrixRef: graphicsReleaseLink.complianceMatrixRef || '',
+      impactAnalysisRef: graphicsReleaseLink.impactAnalysisRef || '',
+      waiversRef: graphicsReleaseLink.waiversRef || '',
+      runtimeBeaconRef: graphicsReleaseLink.runtimeBeaconRef || '',
+      debtObservatoryRef: graphicsReleaseLink.debtObservatoryRef || '',
+      rolloutDecisionRef: graphicsReleaseLink.rolloutDecisionRef || '',
+      rollbackPlanRef: graphicsReleaseLink.rollbackPlanRef || ''
+    };
     schema.builderManifest.updatedAt = _ngNowIso();
     schema.builderManifest.updatedBy = _ngCurrentUser();
     return schema.builderManifest;

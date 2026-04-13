@@ -2,26 +2,26 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-13T13:52:46.332Z",
+    "generatedAt": "2026-04-13T15:11:25.146Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "7a0cef97-c7d2-4cb3-986f-cb41e1ee55c9"
+    "publication_run_id": "5cb008bb-9c26-4b28-ae49-4fb011aec016"
   },
   "summary": {
-    "endpoint_count": 3983,
-    "pack_count": 4344,
-    "relation_edge_count": 3225,
-    "workflow_count": 311,
-    "status_set_count": 819,
-    "validation_rule_count": 46820,
-    "formula_count": 1286,
-    "formula_reference_count": 1286,
-    "field_context_count": 52961,
-    "row_version_tables": 593,
-    "org_scoped_tables": 557,
-    "composite_pk_tables": 20,
+    "endpoint_count": 4132,
+    "pack_count": 4500,
+    "relation_edge_count": 3257,
+    "workflow_count": 326,
+    "status_set_count": 856,
+    "validation_rule_count": 47886,
+    "formula_count": 1331,
+    "formula_reference_count": 1331,
+    "field_context_count": 54472,
+    "row_version_tables": 609,
+    "org_scoped_tables": 570,
+    "composite_pk_tables": 21,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
     "optimistic_concurrency_issues": 0,
@@ -29,29 +29,29 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 294,
-    "workflow_engine_bridge_ready": 295,
+    "transition_runtime_warnings": 309,
+    "workflow_engine_bridge_ready": 310,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 724,
+    "archive_only_tables": 750,
     "soft_delete_tables": 0,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 359,
-      "generic_status_only": 40,
+      "stateless": 366,
+      "generic_status_only": 44,
       "guarded_transition_runtime": 31,
-      "persisted": 294,
+      "persisted": 309,
       "unknown": 0
     },
-    "frontend_foundation_entities": 735,
-    "frontend_ready_entities": 735,
+    "frontend_foundation_entities": 761,
+    "frontend_ready_entities": 761,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 5,
-    "frontend_publishable_entities": 719,
+    "frontend_publishable_entities": 745,
     "frontend_unpublishable_entities": 0,
-    "attachment_contract_entities": 723,
-    "comment_contract_entities": 723,
-    "activity_contract_entities": 565,
+    "attachment_contract_entities": 748,
+    "comment_contract_entities": 748,
+    "activity_contract_entities": 579,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -74,44 +74,44 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 724,
-      "target": 724
+      "actual": 750,
+      "target": 750
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 724,
-      "target": 724
+      "actual": 750,
+      "target": 750
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 724,
-      "target": 724
+      "actual": 750,
+      "target": 750
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3225,
-      "target": 3225
+      "actual": 3257,
+      "target": 3257
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 445,
-      "target": 445
+      "actual": 465,
+      "target": 465
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 352,
-      "target": 352
+      "actual": 371,
+      "target": 371
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 704,
-      "target": 692
+      "actual": 729,
+      "target": 718
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -140,8 +140,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 724,
-      "target": 724
+      "actual": 750,
+      "target": 750
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -164,7 +164,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 311,
+      "actual": 326,
       "target": 60
     },
     {
@@ -176,26 +176,26 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 819,
+      "actual": 856,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 46820,
+      "actual": 47886,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1286,
+      "actual": 1331,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1286,
-      "target": 1286
+      "actual": 1331,
+      "target": 1331
     }
   ],
   "warnings": {
@@ -286,6 +286,10 @@
       },
       {
         "table": "aps_setup_matrices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "as_manufactured_snapshots",
         "concurrency_field": "row_version"
       },
       {
@@ -434,10 +438,6 @@
       },
       {
         "table": "comments",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "commercial_accounts",
         "concurrency_field": "row_version"
       }
     ],
@@ -632,6 +632,15 @@
         ]
       },
       {
+        "table": "as_manufactured_snapshots",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
         "table": "attachment",
         "scope_fields": [
           "org_company_code",
@@ -972,15 +981,6 @@
           "org_plant_id",
           "org_site_id"
         ]
-      },
-      {
-        "table": "competency",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
       }
     ],
     "composite_pk_tables": [
@@ -998,6 +998,14 @@
         "primary_key_fields": [
           "bom_id",
           "bom_revision"
+        ]
+      },
+      {
+        "table": "control_plane_object_registry",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "object_type",
+          "object_id"
         ]
       },
       {
@@ -1233,6 +1241,13 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "audit_pack_exports",
+        "workflowId": "wf_audit_pack_export",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "background_jobs",
         "workflowId": "wf_background_job",
         "lifecycle_mode": "persisted",
@@ -1401,6 +1416,13 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
+        "table": "control_plane_object_registry",
+        "workflowId": "wf_control_plane_object_registry",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
         "table": "control_plans",
         "workflowId": "wf_fmea",
         "lifecycle_mode": "persisted",
@@ -1417,20 +1439,6 @@
       {
         "table": "crm_activities",
         "workflowId": "wf_crm_activity",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "crm_campaigns",
-        "workflowId": "wf_crm_campaign",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "crm_forecasts",
-        "workflowId": "wf_crm_forecast",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
@@ -1601,6 +1609,12 @@
         "governance_level": "default_no_data_loss"
       },
       {
+        "table": "as_manufactured_snapshots",
+        "domain": "traceability_serialization",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
         "table": "attachment",
         "domain": "foundation_governance",
         "mode": "archive_only",
@@ -1627,6 +1641,12 @@
       {
         "table": "audit_findings",
         "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_pack_exports",
+        "domain": "record_system",
         "mode": "archive_only",
         "governance_level": "governed"
       },
@@ -1785,18 +1805,6 @@
         "domain": "commercial_contracts",
         "mode": "archive_only",
         "governance_level": "support"
-      },
-      {
-        "table": "com_contracts",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_credit_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
       }
     ],
     "frontend_foundation": []

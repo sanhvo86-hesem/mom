@@ -205,6 +205,8 @@ return static function (Router $router, string $dataDir): void {
         'dispatch_send'              => [DispatchController::class, 'dispatchTarget'],
         'dispatch_operator_tasks'    => [DispatchController::class, 'getOperatorDispatch'],
         'dispatch_report_production' => [DispatchController::class, 'reportProduction'],
+        'dispatch_pause_target'      => [DispatchController::class, 'pauseTarget'],
+        'dispatch_resume_target'     => [DispatchController::class, 'resumeTarget'],
     ]);
     
     // Logistics: Subcontract, OQC, Packing, Delivery

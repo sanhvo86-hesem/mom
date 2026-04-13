@@ -39,6 +39,25 @@ final class ShopfloorExecutionService
     /** @var list<string> */
     private const EXECUTION_EVENT_TYPES = ['progress', 'downtime', 'blocked', 'pause', 'resume', 'correction', 'completion'];
 
+    /** @var list<string> */
+    private const REFERENCE_POLICIES = ['warn', 'enforce_dispatch'];
+
+    /** @var list<string> */
+    private const QUALITY_GATE_POLICIES = ['warn', 'enforce_first_piece'];
+
+    /** @var list<string> */
+    private const DISPATCH_EXECUTION_EVENT_TYPES = [
+        'dispatch.target_created',
+        'dispatch.target_updated',
+        'dispatch.target_dispatched',
+        'dispatch.production_reported',
+        'dispatch.downtime_reported',
+        'dispatch.production_blocked',
+        'dispatch.target_paused',
+        'dispatch.target_resumed',
+        'dispatch.target_completed',
+    ];
+
     private const BACKDATE_GRACE_DAYS = 2;
     private const FUTURE_TIMESTAMP_TOLERANCE_SECONDS = 900;
 
@@ -72,6 +91,8 @@ final class ShopfloorExecutionService
         $itemId = $this->stringValue($body['item_id'] ?? $body['part_number'] ?? '');
         $partNumber = $this->stringValue($body['part_number'] ?? $itemId);
         $shiftCode = $this->normalizeShiftCode($body['shift_code'] ?? 'morning');
+        $firstPieceRequired = $this->truthy($body['first_piece_required'] ?? false);
+        $qualityGatePolicy = $this->normalizeQualityGatePolicy($body['quality_gate_policy'] ?? null, $firstPieceRequired);
 
         $target = [
             'target_id' => 'TGT-' . bin2hex(random_bytes(8)),
@@ -89,6 +110,10 @@ final class ShopfloorExecutionService
             'machine_id' => $machineId,
             'equipment_id' => $equipmentId,
             'work_center_id' => $this->stringValue($body['work_center_id'] ?? ''),
+            'org_company_code' => $this->stringValue($body['org_company_code'] ?? $body['company_code'] ?? $body['company_id'] ?? ''),
+            'org_legal_entity_code' => $this->stringValue($body['org_legal_entity_code'] ?? $body['legal_entity_code'] ?? ''),
+            'org_plant_id' => $this->stringValue($body['org_plant_id'] ?? $body['plant_id'] ?? ''),
+            'org_site_id' => $this->stringValue($body['org_site_id'] ?? $body['site_id'] ?? ''),
             'operator_id' => $this->stringValue($body['operator_id'] ?? ''),
             'shift_date' => $this->normalizeDate($body['shift_date'] ?? null, 'shift_date'),
             'shift_code' => $shiftCode,
@@ -109,6 +134,9 @@ final class ShopfloorExecutionService
             'setup_sheet_id' => $this->stringValue($body['setup_sheet_id'] ?? ''),
             'setup_sheet_revision' => $this->stringValue($body['setup_sheet_revision'] ?? ''),
             'inspection_plan_id' => $this->stringValue($body['inspection_plan_id'] ?? ''),
+            'first_piece_required' => $firstPieceRequired,
+            'quality_gate_policy' => $qualityGatePolicy,
+            'reference_policy' => $this->normalizeReferencePolicy($body['reference_policy'] ?? null),
             'material_lot_number' => $this->stringValue($body['material_lot_number'] ?? $body['lot_number'] ?? ''),
             'heat_number' => $this->stringValue($body['heat_number'] ?? ''),
             'traveler_number' => $this->stringValue($body['traveler_number'] ?? ''),
@@ -131,7 +159,7 @@ final class ShopfloorExecutionService
      */
     public function applyTargetUpdates(array $target, array $updates, string $now): array
     {
-        $updates = $this->withTargetAliases($updates);
+        $updates = $this->withTargetAliases($updates, true);
         $machineProvided = array_key_exists('machine_id', $updates);
         $equipmentProvided = array_key_exists('equipment_id', $updates);
         $editable = [
@@ -150,6 +178,10 @@ final class ShopfloorExecutionService
             'machine_id',
             'equipment_id',
             'work_center_id',
+            'org_company_code',
+            'org_legal_entity_code',
+            'org_plant_id',
+            'org_site_id',
             'item_id',
             'part_number',
             'part_revision',
@@ -164,6 +196,9 @@ final class ShopfloorExecutionService
             'setup_sheet_id',
             'setup_sheet_revision',
             'inspection_plan_id',
+            'first_piece_required',
+            'quality_gate_policy',
+            'reference_policy',
             'material_lot_number',
             'heat_number',
             'traveler_number',
@@ -171,25 +206,12 @@ final class ShopfloorExecutionService
             'metadata',
         ];
 
+        $this->assertTargetUpdateAllowed($target, $updates, $editable);
+
         foreach ($editable as $field) {
             if (array_key_exists($field, $updates)) {
                 $target[$field] = $updates[$field];
             }
-        }
-        if (array_key_exists('program_id', $updates)) {
-            $target['cnc_program_id'] = $updates['program_id'];
-        }
-        if (array_key_exists('program_revision', $updates)) {
-            $target['cnc_program_revision'] = $updates['program_revision'];
-        }
-        if (array_key_exists('revision', $updates)) {
-            $target['part_revision'] = $updates['revision'];
-        }
-        if (array_key_exists('part_description', $updates)) {
-            $target['item_description'] = $updates['part_description'];
-        }
-        if (array_key_exists('operation', $updates)) {
-            $target['operation_name'] = $updates['operation'];
         }
         if ($machineProvided && !$equipmentProvided) {
             $target['equipment_id'] = $target['machine_id'] ?? '';
@@ -219,9 +241,171 @@ final class ShopfloorExecutionService
         $target['dispatch_sequence'] = $this->positiveInt($target['dispatch_sequence'] ?? 1, 'dispatch_sequence');
         $target['due_at'] = $this->optionalTimestampString($target['due_at'] ?? null, 'due_at');
         $target['metadata'] = is_array($target['metadata'] ?? null) ? (array)$target['metadata'] : new \stdClass();
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $target[$field] = $this->stringValue($target[$field] ?? '');
+        }
+        $firstPieceRequired = $this->truthy($target['first_piece_required'] ?? false);
+        $target['first_piece_required'] = $firstPieceRequired;
+        $target['quality_gate_policy'] = $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $firstPieceRequired);
+        $target['reference_policy'] = $this->normalizeReferencePolicy($target['reference_policy'] ?? null);
+        $overrideReason = $this->stringValue($updates['supervisor_override_reason'] ?? $updates['override_reason'] ?? '');
+        if ($overrideReason !== '') {
+            $target['last_target_override_reason'] = $overrideReason;
+            $target['last_target_override_at'] = $now;
+        }
         $target['updated_at'] = $now;
 
         return $this->finalizeTarget($this->enrichTargetFromOrderStore($target));
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @param array<string, mixed> $updates
+     * @param list<string> $editableFields
+     */
+    private function assertTargetUpdateAllowed(array $target, array $updates, array $editableFields): void
+    {
+        $status = strtolower($this->stringValue($target['status'] ?? 'planned'));
+        if ($status === 'planned') {
+            return;
+        }
+
+        $overrideReason = $this->stringValue($updates['supervisor_override_reason'] ?? $updates['override_reason'] ?? '');
+        $lockedFields = [
+            'machine_id',
+            'equipment_id',
+            'work_center_id',
+            'org_company_code',
+            'org_legal_entity_code',
+            'org_plant_id',
+            'org_site_id',
+            'item_id',
+            'part_number',
+            'part_revision',
+            'item_description',
+            'operation_seq',
+            'operation_id',
+            'operation_revision',
+            'routing_id',
+            'operation_name',
+            'cnc_program_id',
+            'cnc_program_revision',
+            'setup_sheet_id',
+            'setup_sheet_revision',
+            'inspection_plan_id',
+            'first_piece_required',
+            'quality_gate_policy',
+            'reference_policy',
+            'material_lot_number',
+            'heat_number',
+            'traveler_number',
+            'cycle_time_minutes',
+            'setup_time_minutes',
+            'standard_setup_minutes',
+            'standard_run_minutes',
+            'expected_run_minutes',
+            'shift_duration_minutes',
+            'target_quantity',
+            'shift_code',
+            'due_at',
+        ];
+
+        if (in_array($status, ['completed', 'cancelled'], true)) {
+            $lockedFields = array_values(array_diff($editableFields, ['notes', 'metadata']));
+        }
+
+        $changedLockedFields = [];
+        foreach ($lockedFields as $field) {
+            if (!array_key_exists($field, $updates)) {
+                continue;
+            }
+            if ($this->targetFieldValuesEquivalent($field, $target[$field] ?? null, $updates[$field])) {
+                continue;
+            }
+            $changedLockedFields[] = $field;
+        }
+
+        if ($status === 'completed') {
+            if ($changedLockedFields !== []) {
+                throw new InvalidArgumentException('target_locked_after_completion');
+            }
+            return;
+        }
+        if ($status === 'cancelled') {
+            if ($changedLockedFields !== []) {
+                throw new InvalidArgumentException('target_locked_after_cancellation');
+            }
+            return;
+        }
+        if ($changedLockedFields === []) {
+            return;
+        }
+        if ($overrideReason !== '') {
+            return;
+        }
+
+        throw new InvalidArgumentException('target_update_requires_supervisor_override:' . implode(',', $changedLockedFields));
+    }
+
+    private function targetFieldValuesEquivalent(string $field, mixed $current, mixed $candidate): bool
+    {
+        if ($field === 'first_piece_required') {
+            return $this->truthy($current) === $this->truthy($candidate);
+        }
+        if (is_array($current) || is_array($candidate) || is_object($current) || is_object($candidate)) {
+            return $this->canonicalJson($current) === $this->canonicalJson($candidate);
+        }
+
+        return $this->stringValue($current) === $this->stringValue($candidate);
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    public function assertTargetDispatchable(array $target): void
+    {
+        $policy = $this->normalizeReferencePolicy($target['reference_policy'] ?? null);
+        if ($policy !== 'enforce_dispatch') {
+            return;
+        }
+
+        $blockers = $this->digitalThreadReferenceBlockers($target);
+        if ($blockers === []) {
+            return;
+        }
+
+        throw new InvalidArgumentException('dispatch_reference_blocked:' . implode(',', $blockers));
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @param array<string, mixed> $log
+     * @return array<string, mixed>
+     */
+    public function applyExecutionStateFromReport(array $target, array $log, string $now): array
+    {
+        $eventType = (string)($log['execution_event_type'] ?? 'progress');
+        $target['last_execution_event_type'] = $eventType;
+        $target['last_execution_event_at'] = (string)(($log['actual_end'] ?? '') ?: ($log['updated_at'] ?? $now));
+
+        if ($eventType === 'pause') {
+            $target['execution_state'] = 'paused';
+            $target['paused_at'] = $target['last_execution_event_at'];
+        } elseif ($eventType === 'resume') {
+            $target['execution_state'] = 'running';
+            $target['resumed_at'] = $target['last_execution_event_at'];
+            $target['resumed_from_event_id'] = (string)($log['resumed_from_event_id'] ?? '');
+        } elseif ($eventType === 'blocked') {
+            $target['execution_state'] = 'blocked';
+            $target['blocked_at'] = $target['last_execution_event_at'];
+        } elseif ($eventType === 'completion') {
+            $target['execution_state'] = 'completed';
+        } elseif (($target['status'] ?? '') === 'in_progress') {
+            $target['execution_state'] = 'running';
+        }
+
+        $target['updated_at'] = $now;
+        return $target;
     }
 
     /**
@@ -280,8 +464,14 @@ final class ShopfloorExecutionService
      * @param array<string, mixed>|null $existingLog
      * @return array<string, mixed>
      */
-    public function buildProductionLog(array $body, array $target, ?array $existingLog, string $operatorId, string $now): array
-    {
+    public function buildProductionLog(
+        array $body,
+        array $target,
+        ?array $existingLog,
+        string $operatorId,
+        string $now,
+        bool $hasPlannerOverride = false,
+    ): array {
         if (($target['status'] ?? '') === 'cancelled') {
             throw new InvalidArgumentException('target_cancelled');
         }
@@ -357,6 +547,7 @@ final class ShopfloorExecutionService
         if ($quantityTotal > 0 && $actualRun > 0.0) {
             $actualCycleTimeAvg = round($actualRun / $quantityTotal, 2);
         }
+        $qualityGate = $this->evaluateQualityGate($body, $target, $executionEventType, $quantityTotal, $actualRun, $hasPlannerOverride, $now);
 
         $log = [
             'log_id' => is_array($existingLog) ? (string)($existingLog['log_id'] ?? '') : '',
@@ -374,6 +565,10 @@ final class ShopfloorExecutionService
             'machine_id' => (string)($target['machine_id'] ?? ''),
             'equipment_id' => (string)($target['equipment_id'] ?? $target['machine_id'] ?? ''),
             'work_center_id' => (string)($target['work_center_id'] ?? ''),
+            'org_company_code' => (string)($target['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($target['org_legal_entity_code'] ?? ''),
+            'org_plant_id' => (string)($target['org_plant_id'] ?? ''),
+            'org_site_id' => (string)($target['org_site_id'] ?? ''),
             'operator_id' => $operatorId,
             'shift_date' => (string)($target['shift_date'] ?? ''),
             'shift_code' => (string)($target['shift_code'] ?? ''),
@@ -382,6 +577,10 @@ final class ShopfloorExecutionService
             'setup_sheet_id' => (string)($target['setup_sheet_id'] ?? ''),
             'setup_sheet_revision' => (string)($target['setup_sheet_revision'] ?? ''),
             'inspection_plan_id' => (string)($target['inspection_plan_id'] ?? ''),
+            'first_piece_required' => $this->truthy($target['first_piece_required'] ?? false),
+            'quality_gate_policy' => $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $this->truthy($target['first_piece_required'] ?? false)),
+            'quality_gate' => $qualityGate,
+            'quality_override_reason' => $this->stringValue($body['quality_override_reason'] ?? ''),
             'material_lot_number' => (string)($target['material_lot_number'] ?? ''),
             'heat_number' => (string)($target['heat_number'] ?? ''),
             'traveler_number' => (string)($target['traveler_number'] ?? ''),
@@ -437,9 +636,79 @@ final class ShopfloorExecutionService
         }
         $log['created_at'] = is_array($existingLog) ? (string)($existingLog['created_at'] ?? $now) : $now;
         $log['report_fingerprint'] = $this->productionReportFingerprint($log);
+        if ((string)$log['idempotency_key'] === '') {
+            $log['idempotency_key'] = $this->serverDerivedIdempotencyKey($log);
+        }
         $log['advisory_projection'] = $this->buildAdvisoryProjection($log, $target);
 
         return $log;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function evaluateQualityGate(
+        array $body,
+        array $target,
+        string $executionEventType,
+        int $quantityTotal,
+        float $actualRun,
+        bool $hasPlannerOverride,
+        string $now,
+    ): array {
+        $firstPieceRequired = $this->truthy($target['first_piece_required'] ?? false);
+        $policy = $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $firstPieceRequired);
+        $productionRelevant = $quantityTotal > 0 || $actualRun > 0.0;
+        if (!$productionRelevant || in_array($executionEventType, ['pause', 'resume', 'blocked'], true)) {
+            return [
+                'status' => 'not_applicable',
+                'policy' => $policy,
+                'first_piece_required' => $firstPieceRequired,
+                'source' => 'phase1_quality_gate',
+            ];
+        }
+
+        $inspection = $this->passingFirstPieceInspection($target);
+        if ($inspection !== null) {
+            return [
+                'status' => 'passed',
+                'policy' => $policy,
+                'first_piece_required' => $firstPieceRequired,
+                'capture_id' => (string)($inspection['capture_id'] ?? $inspection['inspection_id'] ?? ''),
+                'inspection_plan_id' => (string)($inspection['inspection_plan_id'] ?? ''),
+                'captured_at' => (string)($inspection['captured_at'] ?? $inspection['created_at'] ?? ''),
+                'checked_at' => $now,
+                'source' => 'mobile_inspection_capture',
+            ];
+        }
+
+        $required = $firstPieceRequired || $policy === 'enforce_first_piece';
+        if (!$required) {
+            return [
+                'status' => $this->stringValue($target['inspection_plan_id'] ?? '') !== '' ? 'warning' : 'not_required',
+                'policy' => $policy,
+                'first_piece_required' => false,
+                'checked_at' => $now,
+                'source' => 'phase1_quality_gate',
+                'message' => 'first_piece_inspection_not_captured',
+            ];
+        }
+
+        $overrideReason = $this->stringValue($body['quality_override_reason'] ?? $body['supervisor_override_reason'] ?? '');
+        if ($hasPlannerOverride && $overrideReason !== '') {
+            return [
+                'status' => 'overridden',
+                'policy' => $policy,
+                'first_piece_required' => true,
+                'override_reason' => $overrideReason,
+                'checked_at' => $now,
+                'source' => 'supervisor_quality_override',
+            ];
+        }
+
+        throw new InvalidArgumentException('first_piece_inspection_required');
     }
 
     /**
@@ -548,31 +817,8 @@ final class ShopfloorExecutionService
             'source_controller' => 'DispatchController',
             'source_store' => 'dispatch/production_report_events.json',
             'operational_truth' => true,
-            'digital_thread' => [
-                'wo_number' => (string)($log['wo_number'] ?? ''),
-                'jo_number' => (string)($log['jo_number'] ?? ''),
-                'item_id' => (string)($log['item_id'] ?? ''),
-                'part_number' => (string)($log['part_number'] ?? ''),
-                'part_revision' => (string)($log['part_revision'] ?? ''),
-                'routing_id' => (string)($log['routing_id'] ?? ''),
-                'operation_seq' => $log['operation_seq'] ?? null,
-                'operation_id' => (string)($log['operation_id'] ?? ''),
-                'operation_revision' => (string)($log['operation_revision'] ?? ''),
-                'machine_id' => (string)($log['machine_id'] ?? ''),
-                'equipment_id' => (string)($log['equipment_id'] ?? ''),
-                'work_center_id' => (string)($log['work_center_id'] ?? ''),
-                'operator_id' => (string)($log['operator_id'] ?? ''),
-                'shift_date' => (string)($log['shift_date'] ?? ''),
-                'shift_code' => (string)($log['shift_code'] ?? ''),
-                'cnc_program_id' => (string)($log['cnc_program_id'] ?? ''),
-                'cnc_program_revision' => (string)($log['cnc_program_revision'] ?? ''),
-                'setup_sheet_id' => (string)($log['setup_sheet_id'] ?? ''),
-                'setup_sheet_revision' => (string)($log['setup_sheet_revision'] ?? ''),
-                'inspection_plan_id' => (string)($log['inspection_plan_id'] ?? ''),
-                'material_lot_number' => (string)($log['material_lot_number'] ?? ''),
-                'heat_number' => (string)($log['heat_number'] ?? ''),
-                'traveler_number' => (string)($log['traveler_number'] ?? ''),
-            ],
+            'digital_thread' => $this->digitalThreadPayload($log),
+            'quality_gate' => is_array($log['quality_gate'] ?? null) ? $log['quality_gate'] : null,
             'quantity_delta' => [
                 'good' => (int)($log['quantity_good'] ?? 0) - $previousGood,
                 'ng' => (int)($log['quantity_ng'] ?? 0) - $previousNg,
@@ -584,6 +830,72 @@ final class ShopfloorExecutionService
                 'idle' => round((float)($log['actual_idle_minutes'] ?? 0) - $previousIdle, 2),
             ],
             'production_log' => $log,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    public function buildTargetLifecycleEvent(array $target, string $eventType, string $actorId, string $now, array $context = []): array
+    {
+        if (!in_array($eventType, self::DISPATCH_EXECUTION_EVENT_TYPES, true)) {
+            throw new InvalidArgumentException('invalid_dispatch_execution_event_type');
+        }
+
+        return [
+            'event_id' => 'DTE-' . bin2hex(random_bytes(8)),
+            'event_type' => $eventType,
+            'event_schema_version' => 'phase1_dispatch_execution_event.v1',
+            'target_id' => (string)($target['target_id'] ?? ''),
+            'status' => (string)($target['status'] ?? ''),
+            'execution_state' => (string)($target['execution_state'] ?? ''),
+            'actor_id' => $actorId,
+            'occurred_at' => $this->stringValue($context['occurred_at'] ?? '') !== '' ? $this->stringValue($context['occurred_at'] ?? '') : $now,
+            'recorded_at' => $now,
+            'source_controller' => 'DispatchController',
+            'source_store' => 'dispatch/execution_events.json',
+            'operational_truth' => true,
+            'digital_thread' => $this->digitalThreadPayload($target),
+            'context' => $context,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     * @return array<string, mixed>
+     */
+    private function digitalThreadPayload(array $record): array
+    {
+        return [
+            'org_company_code' => (string)($record['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($record['org_legal_entity_code'] ?? ''),
+            'org_plant_id' => (string)($record['org_plant_id'] ?? ''),
+            'org_site_id' => (string)($record['org_site_id'] ?? ''),
+            'wo_number' => (string)($record['wo_number'] ?? ''),
+            'jo_number' => (string)($record['jo_number'] ?? ''),
+            'item_id' => (string)($record['item_id'] ?? ''),
+            'part_number' => (string)($record['part_number'] ?? ''),
+            'part_revision' => (string)($record['part_revision'] ?? ''),
+            'routing_id' => (string)($record['routing_id'] ?? ''),
+            'operation_seq' => $record['operation_seq'] ?? null,
+            'operation_id' => (string)($record['operation_id'] ?? ''),
+            'operation_revision' => (string)($record['operation_revision'] ?? ''),
+            'machine_id' => (string)($record['machine_id'] ?? ''),
+            'equipment_id' => (string)($record['equipment_id'] ?? $record['machine_id'] ?? ''),
+            'work_center_id' => (string)($record['work_center_id'] ?? ''),
+            'operator_id' => (string)($record['operator_id'] ?? ''),
+            'shift_date' => (string)($record['shift_date'] ?? ''),
+            'shift_code' => (string)($record['shift_code'] ?? ''),
+            'cnc_program_id' => (string)($record['cnc_program_id'] ?? ''),
+            'cnc_program_revision' => (string)($record['cnc_program_revision'] ?? ''),
+            'setup_sheet_id' => (string)($record['setup_sheet_id'] ?? ''),
+            'setup_sheet_revision' => (string)($record['setup_sheet_revision'] ?? ''),
+            'inspection_plan_id' => (string)($record['inspection_plan_id'] ?? ''),
+            'material_lot_number' => (string)($record['material_lot_number'] ?? ''),
+            'heat_number' => (string)($record['heat_number'] ?? ''),
+            'traveler_number' => (string)($record['traveler_number'] ?? ''),
         ];
     }
 
@@ -630,6 +942,8 @@ final class ShopfloorExecutionService
             'setup_time' => (float)($target['setup_time_minutes'] ?? $target['setup_time'] ?? 0),
             'shift_duration' => (float)($target['shift_duration_minutes'] ?? $target['shift_duration'] ?? 0),
             'target_qty' => (int)($target['target_quantity'] ?? $target['target_qty'] ?? 0),
+            'first_piece_required' => $this->truthy($target['first_piece_required'] ?? false),
+            'quality_gate_policy' => $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $this->truthy($target['first_piece_required'] ?? false)),
         ]);
     }
 
@@ -664,6 +978,10 @@ final class ShopfloorExecutionService
             'machine_id' => (string)($target['machine_id'] ?? ''),
             'equipment_id' => (string)($target['equipment_id'] ?? $target['machine_id'] ?? ''),
             'work_center_id' => (string)($target['work_center_id'] ?? ''),
+            'org_company_code' => (string)($target['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($target['org_legal_entity_code'] ?? ''),
+            'org_plant_id' => (string)($target['org_plant_id'] ?? ''),
+            'org_site_id' => (string)($target['org_site_id'] ?? ''),
             'wo_number' => (string)($target['wo_number'] ?? ''),
             'jo_number' => (string)($target['jo_number'] ?? ''),
             'part_number' => (string)($target['part_number'] ?? $target['item_id'] ?? ''),
@@ -683,6 +1001,8 @@ final class ShopfloorExecutionService
             'setup_sheet_id' => (string)($target['setup_sheet_id'] ?? ''),
             'setup_sheet_revision' => (string)($target['setup_sheet_revision'] ?? ''),
             'inspection_plan_id' => (string)($target['inspection_plan_id'] ?? ''),
+            'first_piece_required' => $this->truthy($target['first_piece_required'] ?? false),
+            'quality_gate_policy' => $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $this->truthy($target['first_piece_required'] ?? false)),
             'reference_validation' => is_array($target['reference_validation'] ?? null) ? $target['reference_validation'] : null,
             'report_count' => (int)($log['report_count'] ?? 0),
             'notes' => (string)($target['notes'] ?? ''),
@@ -701,7 +1021,10 @@ final class ShopfloorExecutionService
             'downtime_resolution' => $this->activeRows((array)($master['downtime_resolution_codes'] ?? []), 'resolution_code'),
             'ng' => $this->activeRows((array)($master['defect_catalog'] ?? []), 'defect_code'),
             'rework' => $this->activeRows((array)($master['defect_catalog'] ?? []), 'defect_code'),
-            'blocking' => $this->activeRows((array)($master['downtime_reason_codes'] ?? []), 'reason_code'),
+            'blocking' => $this->activeRows(
+                (array)($master['blocking_reason_codes'] ?? $master['downtime_reason_codes'] ?? []),
+                'reason_code',
+            ),
         ];
     }
 
@@ -780,10 +1103,21 @@ final class ShopfloorExecutionService
         if (($target['item_id'] ?? '') === '' && ($target['part_number'] ?? '') !== '') {
             $target['item_id'] = (string)$target['part_number'];
         }
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $target[$field] = $this->stringValue($target[$field] ?? '');
+        }
+        $firstPieceRequired = $this->truthy($target['first_piece_required'] ?? false);
+        $target['first_piece_required'] = $firstPieceRequired;
+        $target['quality_gate_policy'] = $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $firstPieceRequired);
+        $referencePolicy = $this->normalizeReferencePolicy($target['reference_policy'] ?? null);
+        $target['reference_policy'] = $referencePolicy;
         $warnings = $this->digitalThreadReferenceWarnings($target);
+        $blockers = $referencePolicy === 'enforce_dispatch' ? $this->digitalThreadReferenceBlockers($target) : [];
         $target['reference_validation'] = [
-            'status' => $warnings === [] ? 'ok' : 'warning',
+            'status' => $blockers !== [] ? 'blocked' : ($warnings === [] ? 'ok' : 'warning'),
             'warnings' => $warnings,
+            'blockers' => $blockers,
+            'policy' => $referencePolicy,
             'source' => 'phase1_dispatch_reference_guard',
         ];
 
@@ -1007,6 +1341,8 @@ final class ShopfloorExecutionService
             }
             $issues[] = [
                 'reason_code' => $reasonCode,
+                'reason_domain' => 'blocking',
+                'loss_class' => $this->stringValue($row['loss_class'] ?? 'blocked'),
                 'severity' => $severity,
                 'blocked_minutes' => $this->nonNegativeFloat($row['blocked_minutes'] ?? 0, 'blocking_issues.blocked_minutes'),
                 'notes' => $this->stringValue($row['notes'] ?? ''),
@@ -1041,6 +1377,13 @@ final class ShopfloorExecutionService
             if (is_string($warning) && $warning !== '') {
                 $flags[] = $warning;
             }
+        }
+        $qualityGate = is_array($log['quality_gate'] ?? null) ? $log['quality_gate'] : [];
+        $qualityGateStatus = strtolower($this->stringValue($qualityGate['status'] ?? ''));
+        if ($qualityGateStatus === 'warning') {
+            $flags[] = 'first_piece_inspection_not_captured';
+        } elseif ($qualityGateStatus === 'overridden') {
+            $flags[] = 'first_piece_inspection_overridden';
         }
 
         $achievement = (float)($log['achievement_pct'] ?? 0.0);
@@ -1078,6 +1421,9 @@ final class ShopfloorExecutionService
                 'actual_setup_minutes' => (float)($log['actual_setup_minutes'] ?? 0.0),
                 'actual_run_minutes' => (float)($log['actual_run_minutes'] ?? 0.0),
                 'actual_idle_minutes' => $idle,
+                'first_piece_required' => $this->truthy($log['first_piece_required'] ?? false),
+                'quality_gate_policy' => (string)($log['quality_gate_policy'] ?? 'warn'),
+                'quality_gate_status' => $qualityGateStatus,
             ],
         ];
     }
@@ -1093,6 +1439,23 @@ final class ShopfloorExecutionService
         }
 
         return hash('sha256', $this->canonicalJson($fingerprint));
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     */
+    private function serverDerivedIdempotencyKey(array $log): string
+    {
+        $seed = [
+            'target_id' => $log['target_id'] ?? '',
+            'operator_id' => $log['operator_id'] ?? '',
+            'actual_start' => $log['actual_start'] ?? '',
+            'actual_end' => $log['actual_end'] ?? '',
+            'client_report_id' => $log['client_report_id'] ?? '',
+            'report_fingerprint' => $log['report_fingerprint'] ?? '',
+        ];
+
+        return 'server:' . hash('sha256', $this->canonicalJson($seed));
     }
 
     /**
@@ -1129,6 +1492,10 @@ final class ShopfloorExecutionService
             'machine_id',
             'equipment_id',
             'work_center_id',
+            'org_company_code',
+            'org_legal_entity_code',
+            'org_plant_id',
+            'org_site_id',
             'operator_id',
             'shift_date',
             'shift_code',
@@ -1137,6 +1504,9 @@ final class ShopfloorExecutionService
             'setup_sheet_id',
             'setup_sheet_revision',
             'inspection_plan_id',
+            'first_piece_required',
+            'quality_gate_policy',
+            'quality_override_reason',
             'material_lot_number',
             'heat_number',
             'traveler_number',
@@ -1222,6 +1592,100 @@ final class ShopfloorExecutionService
         }
 
         return $intent;
+    }
+
+    private function normalizeReferencePolicy(mixed $value): string
+    {
+        $policy = strtolower($this->stringValue($value));
+        if ($policy === '') {
+            $master = $this->masterData();
+            $policy = strtolower($this->stringValue($master['shopfloor_reference_policy'] ?? 'warn'));
+        }
+        if ($policy === '') {
+            $policy = 'warn';
+        }
+        if (!in_array($policy, self::REFERENCE_POLICIES, true)) {
+            throw new InvalidArgumentException('invalid_reference_policy');
+        }
+
+        return $policy;
+    }
+
+    private function normalizeQualityGatePolicy(mixed $value, bool $firstPieceRequired = false): string
+    {
+        $policy = strtolower($this->stringValue($value));
+        if ($policy === '') {
+            $master = $this->masterData();
+            $policy = strtolower($this->stringValue($master['shopfloor_quality_gate_policy'] ?? 'warn'));
+        }
+        if ($policy === '') {
+            $policy = $firstPieceRequired ? 'enforce_first_piece' : 'warn';
+        }
+        if ($firstPieceRequired && $policy === 'warn') {
+            $policy = 'enforce_first_piece';
+        }
+        if (!in_array($policy, self::QUALITY_GATE_POLICIES, true)) {
+            throw new InvalidArgumentException('invalid_quality_gate_policy');
+        }
+
+        return $policy;
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>|null
+     */
+    private function passingFirstPieceInspection(array $target): ?array
+    {
+        $file = $this->dataDir . '/mobile/inspections.json';
+        if (!is_file($file)) {
+            return null;
+        }
+        $raw = @file_get_contents($file);
+        if (!is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $rows = $decoded;
+        if (isset($decoded['inspections']) && is_array($decoded['inspections'])) {
+            $rows = $decoded['inspections'];
+        }
+
+        $targetWo = $this->stringValue($target['wo_number'] ?? '');
+        $targetOperation = $this->stringValue($target['operation_seq'] ?? '');
+        $targetPlan = $this->stringValue($target['inspection_plan_id'] ?? '');
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $captureType = strtolower($this->stringValue($row['capture_type'] ?? $row['inspection_type'] ?? ''));
+            if ($captureType !== 'first_piece') {
+                continue;
+            }
+            if (!in_array(strtolower($this->stringValue($row['overall_result'] ?? $row['result'] ?? '')), ['pass', 'passed', 'ok', 'accepted', 'approved'], true)) {
+                continue;
+            }
+            if ($targetWo !== '' && $this->stringValue($row['wo_number'] ?? $row['work_order_id'] ?? '') !== $targetWo) {
+                continue;
+            }
+            $rowOperation = $this->stringValue($row['operation_seq'] ?? $row['operation_id'] ?? '');
+            if ($targetOperation !== '' && $rowOperation !== $targetOperation) {
+                continue;
+            }
+            $rowPlan = $this->stringValue($row['inspection_plan_id'] ?? $row['plan_id'] ?? '');
+            if ($targetPlan !== '' && $rowPlan !== $targetPlan) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $row */
+            return $row;
+        }
+
+        return null;
     }
 
     /**
@@ -1347,6 +1811,10 @@ final class ShopfloorExecutionService
             'machine_id' => ['machine_id'],
             'equipment_id' => ['equipment_id', 'machine_id'],
             'work_center_id' => ['work_center_id'],
+            'org_company_code' => ['org_company_code', 'company_code', 'company_id'],
+            'org_legal_entity_code' => ['org_legal_entity_code', 'legal_entity_code'],
+            'org_plant_id' => ['org_plant_id', 'plant_id'],
+            'org_site_id' => ['org_site_id', 'site_id'],
             'operator_id' => ['operator_id'],
             'cnc_program_id' => ['cnc_program_id', 'nc_program_id', 'program_id'],
             'cnc_program_revision' => ['cnc_program_revision', 'program_revision'],
@@ -1435,37 +1903,111 @@ final class ShopfloorExecutionService
         if ($cncProgramId !== '' && !$this->cncProgramKnown($cncProgramId)) {
             $warnings[] = 'unverified_cnc_program_reference';
         }
+        if ($cncProgramId !== '' && $this->cncProgramKnown($cncProgramId) && !$this->cncProgramReleased($cncProgramId)) {
+            $warnings[] = 'cnc_program_not_released';
+        }
         if ($this->stringValue($target['inspection_plan_id'] ?? '') === '') {
             $warnings[] = 'missing_inspection_plan_reference';
+        } elseif (!$this->inspectionPlanKnown($this->stringValue($target['inspection_plan_id'] ?? ''))) {
+            $warnings[] = 'unverified_inspection_plan_reference';
         }
 
         return $warnings;
     }
 
+    /**
+     * @param array<string, mixed> $target
+     * @return list<string>
+     */
+    private function digitalThreadReferenceBlockers(array $target): array
+    {
+        $blockers = [];
+        $cncProgramId = $this->stringValue($target['cnc_program_id'] ?? '');
+        if ($cncProgramId === '') {
+            $blockers[] = 'missing_cnc_program_reference';
+        } elseif (!$this->cncProgramKnown($cncProgramId)) {
+            $blockers[] = 'unverified_cnc_program_reference';
+        } elseif (!$this->cncProgramReleased($cncProgramId)) {
+            $blockers[] = 'cnc_program_not_released';
+        }
+
+        $inspectionPlanId = $this->stringValue($target['inspection_plan_id'] ?? '');
+        if ($inspectionPlanId === '') {
+            $blockers[] = 'missing_inspection_plan_reference';
+        } elseif (!$this->inspectionPlanKnown($inspectionPlanId)) {
+            $blockers[] = 'unverified_inspection_plan_reference';
+        }
+
+        return $blockers;
+    }
+
     private function cncProgramKnown(string $programId): bool
+    {
+        return $this->cncProgramRecord($programId) !== null;
+    }
+
+    private function cncProgramReleased(string $programId): bool
+    {
+        $program = $this->cncProgramRecord($programId);
+        if ($program === null) {
+            return false;
+        }
+        $status = strtolower($this->stringValue($program['status'] ?? $program['approval_status'] ?? 'released'));
+
+        return in_array($status, ['released', 'approved', 'active'], true);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function cncProgramRecord(string $programId): ?array
     {
         $file = $this->dataDir . '/cnc-programs/programs.json';
         if (!is_file($file)) {
-            return true;
+            return ['status' => 'released'];
         }
 
         $raw = @file_get_contents($file);
         if (!is_string($raw) || trim($raw) === '') {
-            return true;
+            return ['status' => 'released'];
         }
 
         $programs = json_decode($raw, true);
         if (!is_array($programs) || $programs === []) {
-            return true;
+            return ['status' => 'released'];
         }
 
         foreach ($programs as $program) {
             if (!is_array($program)) {
                 continue;
             }
-            foreach (['id', 'program_id', 'cnc_program_id', 'nc_program_id', 'name'] as $field) {
+            foreach (['id', 'program_id', 'cnc_program_id', 'nc_program_id', 'program_number', 'name'] as $field) {
                 if ($this->stringValue($program[$field] ?? '') === $programId) {
-                    return true;
+                    /** @var array<string, mixed> $program */
+                    return $program;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function inspectionPlanKnown(string $inspectionPlanId): bool
+    {
+        $master = $this->masterData();
+        $plans = (array)($master['inspection_plans'] ?? []);
+        if ($plans === []) {
+            return true;
+        }
+
+        foreach ($plans as $plan) {
+            if (!is_array($plan)) {
+                continue;
+            }
+            foreach (['inspection_plan_id', 'plan_id', 'id', 'name', 'inspection_plan_name'] as $field) {
+                if ($this->stringValue($plan[$field] ?? '') === $inspectionPlanId) {
+                    $status = strtolower($this->stringValue($plan['status'] ?? 'released'));
+                    return in_array($status, ['released', 'active', 'approved'], true);
                 }
             }
         }
@@ -1555,7 +2097,7 @@ final class ShopfloorExecutionService
      * @param array<string, mixed> $data
      * @return array<string, mixed>
      */
-    private function withTargetAliases(array $data): array
+    private function withTargetAliases(array $data, bool $rejectConflicts = false): array
     {
         $aliases = [
             'wo_id' => 'wo_number',
@@ -1568,10 +2110,32 @@ final class ShopfloorExecutionService
             'shift_duration' => 'shift_duration_minutes',
             'target_qty' => 'target_quantity',
             'qty_target' => 'target_quantity',
+            'company_code' => 'org_company_code',
+            'company_id' => 'org_company_code',
+            'legal_entity_code' => 'org_legal_entity_code',
+            'plant_id' => 'org_plant_id',
+            'site_id' => 'org_site_id',
+            'program_id' => 'cnc_program_id',
+            'program_revision' => 'cnc_program_revision',
+            'revision' => 'part_revision',
+            'part_description' => 'item_description',
+            'operation' => 'operation_name',
         ];
 
         foreach ($aliases as $alias => $canonical) {
-            if (!array_key_exists($canonical, $data) && array_key_exists($alias, $data)) {
+            if (!array_key_exists($alias, $data)) {
+                continue;
+            }
+            if (array_key_exists($canonical, $data)) {
+                if (
+                    $rejectConflicts
+                    && !$this->targetFieldValuesEquivalent($canonical, $data[$canonical], $data[$alias])
+                ) {
+                    throw new InvalidArgumentException('conflicting_target_alias:' . $alias);
+                }
+                continue;
+            }
+            if (array_key_exists($alias, $data)) {
                 $data[$canonical] = $data[$alias];
             }
         }

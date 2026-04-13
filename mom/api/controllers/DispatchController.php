@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use MOM\Api\Services\ConnectedGovernanceException;
 use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Services\ShopfloorExecutionService;
+use MOM\Services\ShopfloorExecutionPersistenceService;
 use RuntimeException;
 use Throwable;
 
@@ -20,6 +21,7 @@ use Throwable;
 class DispatchController extends BaseController
 {
     private ?ShopfloorExecutionService $shopfloorSvc = null;
+    private ?ShopfloorExecutionPersistenceService $persistenceSvc = null;
 
     private function dispatchDir(): string
     {
@@ -41,6 +43,15 @@ class DispatchController extends BaseController
         return $this->shopfloorSvc;
     }
 
+    private function persistence(): ShopfloorExecutionPersistenceService
+    {
+        if ($this->persistenceSvc === null) {
+            $this->persistenceSvc = new ShopfloorExecutionPersistenceService($this->data);
+        }
+
+        return $this->persistenceSvc;
+    }
+
     /**
      * @return resource
      */
@@ -58,6 +69,11 @@ class DispatchController extends BaseController
         }
 
         return $lockHandle;
+    }
+
+    private function dispatchExecutionEventFile(): string
+    {
+        return $this->dispatchDir() . '/execution_events.json';
     }
 
     private function releaseExecutionStateLock(mixed $lockHandle): void
@@ -88,18 +104,55 @@ class DispatchController extends BaseController
         array $originalLogs,
         array $originalTargets,
         array $originalEvents,
+        ?string $dispatchEventFile = null,
+        ?array $dispatchEvents = null,
+        ?array $originalDispatchEvents = null,
     ): void {
         try {
             $this->writeJsonFile($logFile, $logs);
             $this->writeJsonFile($targetFile, $targets);
             $this->writeJsonFile($eventFile, $events);
+            if ($dispatchEventFile !== null && is_array($dispatchEvents)) {
+                $this->writeJsonFile($dispatchEventFile, $dispatchEvents);
+            }
         } catch (Throwable $e) {
             try {
                 $this->writeJsonFile($logFile, $originalLogs);
                 $this->writeJsonFile($targetFile, $originalTargets);
                 $this->writeJsonFile($eventFile, $originalEvents);
+                if ($dispatchEventFile !== null && is_array($originalDispatchEvents)) {
+                    $this->writeJsonFile($dispatchEventFile, $originalDispatchEvents);
+                }
             } catch (Throwable $rollback) {
                 @error_log('[DispatchController] dispatch state rollback failed: ' . $rollback->getMessage());
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * @param array<int|string, mixed> $targets
+     * @param array<int|string, mixed> $events
+     * @param array<int|string, mixed> $originalTargets
+     * @param array<int|string, mixed> $originalEvents
+     */
+    private function writeTargetState(
+        string $targetFile,
+        array $targets,
+        string $eventFile,
+        array $events,
+        array $originalTargets,
+        array $originalEvents,
+    ): void {
+        try {
+            $this->writeJsonFile($targetFile, $targets);
+            $this->writeJsonFile($eventFile, $events);
+        } catch (Throwable $e) {
+            try {
+                $this->writeJsonFile($targetFile, $originalTargets);
+                $this->writeJsonFile($eventFile, $originalEvents);
+            } catch (Throwable $rollback) {
+                @error_log('[DispatchController] dispatch target rollback failed: ' . $rollback->getMessage());
             }
             throw $e;
         }
@@ -108,6 +161,32 @@ class DispatchController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    /**
+     * @param array<string, mixed> $before
+     * @param array<string, mixed> $after
+     * @return list<string>
+     */
+    private function changedTargetFields(array $before, array $after): array
+    {
+        $fields = array_values(array_unique(array_merge(array_keys($before), array_keys($after))));
+        $changed = [];
+        foreach ($fields as $field) {
+            if (in_array($field, ['updated_at', 'reference_validation'], true)) {
+                continue;
+            }
+            $beforeValue = $before[$field] ?? null;
+            $afterValue = $after[$field] ?? null;
+            $beforeJson = json_encode($beforeValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $afterJson = json_encode($afterValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($beforeJson !== $afterJson) {
+                $changed[] = (string)$field;
+            }
+        }
+
+        sort($changed);
+        return $changed;
     }
 
     private function dispatchReadRoles(): array
@@ -264,9 +343,19 @@ class DispatchController extends BaseController
 
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $originalTargets = $targets;
+            $eventFile = $this->dispatchExecutionEventFile();
+            $events = $this->readJsonFile($eventFile) ?? [];
+            $originalEvents = $events;
 
             $targets[] = $target;
-            $this->writeJsonFile($file, $targets);
+            $dispatchEvent = $this->shopfloor()->buildTargetLifecycleEvent($target, 'dispatch.target_created', $uid, $now, [
+                'source_action' => 'dispatch_create_target',
+            ]);
+            $events[] = $dispatchEvent;
+            $this->writeTargetState($file, $targets, $eventFile, $events, $originalTargets, $originalEvents);
+            $bridge = $this->persistence()->shadowTarget($target);
+            $eventBridge = $this->persistence()->shadowExecutionEvent($dispatchEvent);
 
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
@@ -279,7 +368,12 @@ class DispatchController extends BaseController
                 'target_qty' => $target['target_quantity'],
             ], $uid);
 
-            $this->success(['target' => $this->shopfloor()->targetResponse($target)], 201);
+            $this->success([
+                'target' => $this->shopfloor()->targetResponse($target),
+                'storage_bridge' => $bridge,
+                'execution_event' => $dispatchEvent,
+                'execution_event_bridge' => $eventBridge,
+            ], 201);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
@@ -312,10 +406,17 @@ class DispatchController extends BaseController
 
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $originalTargets = $targets;
+            $eventFile = $this->dispatchExecutionEventFile();
+            $events = $this->readJsonFile($eventFile) ?? [];
+            $originalEvents = $events;
             $found   = false;
+            $previousStatus = '';
 
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === $targetId) {
+                    $this->shopfloor()->assertTargetDispatchable($t);
+                    $previousStatus = (string)($t['status'] ?? '');
                     $t['status']        = 'dispatched';
                     $t['dispatched_at'] = $now;
                     $t['updated_at']    = $now;
@@ -327,13 +428,31 @@ class DispatchController extends BaseController
 
             if (!$found) $this->error('target_not_found', 404);
 
-            $this->writeJsonFile($file, $targets);
+            $updatedTarget = null;
+            foreach ($targets as $candidate) {
+                if (is_array($candidate) && ($candidate['target_id'] ?? '') === $targetId) {
+                    $updatedTarget = $candidate;
+                    break;
+                }
+            }
+            $dispatchEvent = is_array($updatedTarget) ? $this->shopfloor()->buildTargetLifecycleEvent($updatedTarget, 'dispatch.target_dispatched', $uid, $now, [
+                'source_action' => 'dispatch_target',
+                'previous_status' => $previousStatus,
+            ]) : null;
+            if (is_array($dispatchEvent)) {
+                $events[] = $dispatchEvent;
+            }
+            $this->writeTargetState($file, $targets, $eventFile, $events, $originalTargets, $originalEvents);
+            $bridge = is_array($updatedTarget) ? $this->persistence()->shadowTarget($updatedTarget) : ['backend' => 'json_only', 'status' => 'skipped'];
+            $eventBridge = is_array($dispatchEvent) ? $this->persistence()->shadowExecutionEvent($dispatchEvent) : ['backend' => 'json_only', 'status' => 'skipped'];
 
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
 
             $this->auditLog('dispatch_target', ['target_id' => $targetId], $uid);
-            $this->success(['dispatched' => true]);
+            $this->success(['dispatched' => true, 'storage_bridge' => $bridge, 'execution_event' => $dispatchEvent, 'execution_event_bridge' => $eventBridge]);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('dispatch_failed', 500, $e->getMessage());
@@ -435,8 +554,7 @@ class DispatchController extends BaseController
     }
 
     /**
-     * POST reportProduction â€” Operator reports shift output (qty good, NG, rework).
-     * Appends report history and updates the latest per-target snapshot.
+     * POST reportProduction - Operator reports shift output.
      */
     public function reportProduction(): never
     {
@@ -446,7 +564,65 @@ class DispatchController extends BaseController
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['target_id', 'quantity_good']);
+        $this->recordProductionReport($body, $user);
+    }
 
+    /**
+     * POST pauseTarget - Command-level pause capture using the same report ledger.
+     */
+    public function pauseTarget(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireDispatchOperatorAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['target_id', 'idempotency_key']);
+        if (!isset($body['quantity_good'])) {
+            $body['quantity_good'] = 0;
+        }
+        $body['execution_event_type'] = 'pause';
+        $body['completion_intent'] = 'none';
+
+        $reasonCode = trim((string)($body['downtime_reason_code'] ?? $body['reason_code'] ?? ''));
+        $minutes = (float)($body['actual_idle_minutes'] ?? $body['downtime_minutes'] ?? $body['minutes'] ?? 0);
+        if (!isset($body['downtime_events']) && $reasonCode !== '') {
+            $body['downtime_events'] = [[
+                'reason_code' => $reasonCode,
+                'minutes' => $minutes,
+                'notes' => trim((string)($body['notes'] ?? '')),
+            ]];
+        }
+
+        $this->recordProductionReport($body, $user);
+    }
+
+    /**
+     * POST resumeTarget - Command-level resume capture using the same report ledger.
+     */
+    public function resumeTarget(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireDispatchOperatorAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['target_id', 'idempotency_key', 'resumed_from_event_id']);
+        if (!isset($body['quantity_good'])) {
+            $body['quantity_good'] = 0;
+        }
+        $body['execution_event_type'] = 'resume';
+        $body['completion_intent'] = 'none';
+
+        $this->recordProductionReport($body, $user);
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $user
+     */
+    private function recordProductionReport(array $body, array $user): never
+    {
         $uid = $this->userId($user);
         $now = $this->nowIso();
         $lockHandle = null;
@@ -454,7 +630,6 @@ class DispatchController extends BaseController
         try {
             $lockHandle = $this->acquireExecutionStateLock();
 
-            // Update target status
             $tFile   = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($tFile) ?? [];
             $originalTargets = $targets;
@@ -493,13 +668,15 @@ class DispatchController extends BaseController
                 $target['execution_entitlement'] = $entitlement;
             }
 
-            // Create or update production log
             $logFile = $this->dispatchDir() . '/production_logs.json';
             $logs    = $this->readJsonFile($logFile) ?? [];
             $originalLogs = $logs;
             $eventFile = $this->dispatchDir() . '/production_report_events.json';
             $events = $this->readJsonFile($eventFile) ?? [];
             $originalEvents = $events;
+            $dispatchEventFile = $this->dispatchExecutionEventFile();
+            $dispatchEvents = $this->readJsonFile($dispatchEventFile) ?? [];
+            $originalDispatchEvents = $dispatchEvents;
 
             $existingIdx = -1;
             $previousLog = null;
@@ -511,25 +688,32 @@ class DispatchController extends BaseController
                 }
             }
 
-            $log = $this->shopfloor()->buildProductionLog(
-                $body,
-                $target,
-                $previousLog,
-                $uid,
-                $now,
-            );
+            $log = $this->shopfloor()->buildProductionLog($body, $target, $previousLog, $uid, $now, $hasPlannerOverride);
 
             $replayedLog = $this->shopfloor()->replayProductionLogForIdempotency($log, $logs, $events);
             if ($replayedLog !== null) {
+                $replayedEvent = $this->findProductionReportEventForReplay($events, $log);
+                $replayedDispatchEvent = $this->findDispatchExecutionEventForReplay(
+                    $dispatchEvents,
+                    $replayedLog,
+                    is_array($replayedEvent) ? $replayedEvent : [],
+                );
                 $this->auditLog('dispatch_report_production_replay', [
                     'target_id' => (string)($replayedLog['target_id'] ?? ''),
                     'idempotency_key' => (string)($log['idempotency_key'] ?? ''),
                 ], $uid);
-                $this->success(['production_log' => $replayedLog, 'replayed' => true]);
+                $this->success([
+                    'production_log' => $replayedLog,
+                    'production_event' => $replayedEvent,
+                    'dispatch_execution_event' => $replayedDispatchEvent,
+                    'storage_bridge' => ['backend' => 'json_only', 'status' => 'replayed'],
+                    'execution_event_bridge' => ['backend' => 'json_only', 'status' => 'replayed'],
+                    'replayed' => true,
+                ]);
             }
 
             if ($existingIdx >= 0) {
-                $logs[$existingIdx]     = $log;
+                $logs[$existingIdx] = $log;
             } else {
                 $logs[] = $log;
             }
@@ -537,17 +721,41 @@ class DispatchController extends BaseController
             $event = $this->shopfloor()->buildProductionReportEvent($log, $target, $previousLog, $uid, $now);
             $events[] = $event;
 
-            if ($this->shopfloor()->shouldCompleteTarget($log, $body)) {
+            if ($targetIdx !== null && is_array($targets[$targetIdx] ?? null)) {
+                $targets[$targetIdx] = $this->shopfloor()->applyExecutionStateFromReport($targets[$targetIdx], $log, $now);
+                $target = $targets[$targetIdx];
+            }
+
+            $shouldCompleteTarget = $this->shopfloor()->shouldCompleteTarget($log, $body);
+            if ($shouldCompleteTarget) {
                 foreach ($targets as &$t2) {
                     if (($t2['target_id'] ?? '') === $target['target_id']) {
-                        $t2['status']       = 'completed';
+                        $t2['status'] = 'completed';
                         $t2['completed_at'] = $now;
-                        $t2['updated_at']   = $now;
+                        $t2['execution_state'] = 'completed';
+                        $t2['updated_at'] = $now;
+                        $target = $t2;
                         break;
                     }
                 }
                 unset($t2);
             }
+            $dispatchEventType = match ((string)($log['execution_event_type'] ?? 'progress')) {
+                'pause' => 'dispatch.target_paused',
+                'resume' => 'dispatch.target_resumed',
+                'downtime' => 'dispatch.downtime_reported',
+                'blocked' => 'dispatch.production_blocked',
+                default => $shouldCompleteTarget ? 'dispatch.target_completed' : 'dispatch.production_reported',
+            };
+            $dispatchEvent = $this->shopfloor()->buildTargetLifecycleEvent($target, $dispatchEventType, $uid, $now, [
+                'source_action' => 'dispatch_report_production',
+                'source_report_event_id' => (string)($event['event_id'] ?? ''),
+                'source_log_id' => (string)($log['log_id'] ?? ''),
+                'execution_event_type' => (string)($log['execution_event_type'] ?? 'progress'),
+                'report_mode' => (string)($log['report_mode'] ?? 'snapshot'),
+                'quality_gate_status' => is_array($log['quality_gate'] ?? null) ? (string)($log['quality_gate']['status'] ?? '') : '',
+            ]);
+            $dispatchEvents[] = $dispatchEvent;
 
             $this->writeExecutionState(
                 $logFile,
@@ -559,7 +767,12 @@ class DispatchController extends BaseController
                 $originalLogs,
                 $originalTargets,
                 $originalEvents,
+                $dispatchEventFile,
+                $dispatchEvents,
+                $originalDispatchEvents,
             );
+            $bridge = $this->persistence()->shadowProductionReport($target, $log, $event);
+            $eventBridge = $this->persistence()->shadowExecutionEvent($dispatchEvent);
 
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
@@ -571,9 +784,16 @@ class DispatchController extends BaseController
                 'qty_good'  => $log['quantity_good'],
                 'qty_ng'    => $log['quantity_ng'],
                 'achieve'   => $log['achievement_pct'] . '%',
+                'execution_event_type' => $log['execution_event_type'],
             ], $uid);
 
-            $this->success(['production_log' => $log, 'production_event' => $event]);
+            $this->success([
+                'production_log' => $log,
+                'production_event' => $event,
+                'dispatch_execution_event' => $dispatchEvent,
+                'storage_bridge' => $bridge,
+                'execution_event_bridge' => $eventBridge,
+            ]);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
         } catch (ConnectedGovernanceException $e) {
@@ -599,6 +819,65 @@ class DispatchController extends BaseController
         } finally {
             $this->releaseExecutionStateLock($lockHandle);
         }
+    }
+
+    /**
+     * @param array<int|string, mixed> $events
+     * @param array<string, mixed> $log
+     * @return array<string, mixed>|null
+     */
+    private function findProductionReportEventForReplay(array $events, array $log): ?array
+    {
+        $idempotencyKey = trim((string)($log['idempotency_key'] ?? ''));
+        $targetId = trim((string)($log['target_id'] ?? ''));
+        $fingerprint = trim((string)($log['report_fingerprint'] ?? ''));
+        foreach ($events as $event) {
+            if (!is_array($event)) {
+                continue;
+            }
+            if (
+                trim((string)($event['idempotency_key'] ?? '')) === $idempotencyKey
+                && trim((string)($event['target_id'] ?? '')) === $targetId
+                && trim((string)($event['report_fingerprint'] ?? '')) === $fingerprint
+            ) {
+                /** @var array<string, mixed> $event */
+                return $event;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int|string, mixed> $dispatchEvents
+     * @param array<string, mixed> $log
+     * @param array<string, mixed> $productionEvent
+     * @return array<string, mixed>|null
+     */
+    private function findDispatchExecutionEventForReplay(array $dispatchEvents, array $log, array $productionEvent): ?array
+    {
+        $targetId = trim((string)($log['target_id'] ?? ''));
+        $eventId = trim((string)($productionEvent['event_id'] ?? ''));
+        $logId = trim((string)($log['log_id'] ?? ''));
+        foreach ($dispatchEvents as $event) {
+            if (!is_array($event)) {
+                continue;
+            }
+            $context = is_array($event['context'] ?? null) ? $event['context'] : [];
+            if (trim((string)($event['target_id'] ?? '')) !== $targetId) {
+                continue;
+            }
+            if ($eventId !== '' && trim((string)($context['source_report_event_id'] ?? '')) === $eventId) {
+                /** @var array<string, mixed> $event */
+                return $event;
+            }
+            if ($logId !== '' && trim((string)($context['source_log_id'] ?? '')) === $logId) {
+                /** @var array<string, mixed> $event */
+                return $event;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -694,10 +973,14 @@ class DispatchController extends BaseController
         $machineId  = $this->query('machine_id');
         $operatorId = $this->query('operator_id');
         $status     = $this->query('status');
+        $lockHandle = null;
 
         try {
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
 
             $filtered = array_filter($targets, function ($t) use ($startDate, $endDate, $machineId, $operatorId, $status) {
                 if ($startDate && ($t['shift_date'] ?? '') < $startDate) return false;
@@ -726,6 +1009,8 @@ class DispatchController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('list_targets_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
         }
     }
 
@@ -751,10 +1036,16 @@ class DispatchController extends BaseController
 
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $originalTargets = $targets;
+            $eventFile = $this->dispatchExecutionEventFile();
+            $events = $this->readJsonFile($eventFile) ?? [];
+            $originalEvents = $events;
             $updated = null;
+            $previousTarget = null;
 
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === $targetId) {
+                    $previousTarget = is_array($t) ? $t : null;
                     $t = $this->shopfloor()->applyTargetUpdates($t, $body, $now);
                     $updated = $t;
                     break;
@@ -764,13 +1055,27 @@ class DispatchController extends BaseController
 
             if (!$updated) $this->error('target_not_found', 404);
 
-            $this->writeJsonFile($file, $targets);
+            $dispatchEvent = $this->shopfloor()->buildTargetLifecycleEvent($updated, 'dispatch.target_updated', $uid, $now, [
+                'source_action' => 'dispatch_update_target',
+                'previous_status' => is_array($previousTarget) ? (string)($previousTarget['status'] ?? '') : '',
+                'changed_fields' => $this->changedTargetFields(is_array($previousTarget) ? $previousTarget : [], $updated),
+                'supervisor_override_reason' => trim((string)($body['supervisor_override_reason'] ?? $body['override_reason'] ?? '')),
+            ]);
+            $events[] = $dispatchEvent;
+            $this->writeTargetState($file, $targets, $eventFile, $events, $originalTargets, $originalEvents);
+            $bridge = $this->persistence()->shadowTarget($updated);
+            $eventBridge = $this->persistence()->shadowExecutionEvent($dispatchEvent);
 
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
 
             $this->auditLog('dispatch_update_target', ['target_id' => $targetId], $uid);
-            $this->success(['target' => $this->shopfloor()->targetResponse($updated)]);
+            $this->success([
+                'target' => $this->shopfloor()->targetResponse($updated),
+                'storage_bridge' => $bridge,
+                'execution_event' => $dispatchEvent,
+                'execution_event_bridge' => $eventBridge,
+            ]);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {

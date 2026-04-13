@@ -38,6 +38,7 @@ var _adminConfig = null;
 var _adminConfigVersion = '';
 var _adminConfigEtag = '';
 var _userPrefs = null;
+var _previewPrefs = null;
 var _templateStore = null;
 var _listeners = [];
 var _scheduleTimer = null;
@@ -104,8 +105,15 @@ function _loadAdminConfig(callback){
   xhr.send();
 }
 
-/* ── Resolve: user → admin → default ────────────────────────────────────── */
+function _loadPreviewPrefs(){
+  if(!_previewPrefs) _previewPrefs = {};
+  return _previewPrefs;
+}
+
+/* ── Resolve: preview → user → admin → default ──────────────────────────── */
 function _resolve(key){
+  var previewPrefs = _loadPreviewPrefs();
+  if(previewPrefs[key] !== undefined && previewPrefs[key] !== null && previewPrefs[key] !== '') return previewPrefs[key];
   var userPrefs = _loadUserPrefs();
   if(userPrefs[key] !== undefined && userPrefs[key] !== null && userPrefs[key] !== '') return userPrefs[key];
   if(_adminConfig && _adminConfig[key] !== undefined) return _adminConfig[key];
@@ -115,9 +123,17 @@ function _resolve(key){
 /** Deep resolve for nested keys like 'typography.heading.family' */
 function _resolveDeep(path){
   var parts = path.split('.');
+  var previewPrefs = _loadPreviewPrefs();
   var userPrefs = _loadUserPrefs();
+  /* Check in-memory preview overrides first. These never write localStorage. */
+  var val = previewPrefs;
+  for(var p = 0; p < parts.length; p++){
+    if(val && typeof val === 'object') val = val[parts[p]];
+    else { val = undefined; break; }
+  }
+  if(val !== undefined && val !== null && val !== '') return val;
   /* Check user prefs */
-  var val = userPrefs;
+  val = userPrefs;
   for(var i = 0; i < parts.length; i++){
     if(val && typeof val === 'object') val = val[parts[i]];
     else { val = undefined; break; }
@@ -484,6 +500,7 @@ function _mergedConfig(){
   var merged = {};
   _deepMerge(merged, _adminConfig || {});
   _deepMerge(merged, _loadUserPrefs() || {});
+  _deepMerge(merged, _loadPreviewPrefs() || {});
   return merged;
 }
 
@@ -655,6 +672,32 @@ function setDeep(path, value){
   _apply();
 }
 
+/** Set a nested value for Admin preview only.
+    This is the path used by Appearance/Template Studio editors. It updates the
+    runtime token preview and getFullConfig(), but it does not persist to
+    localStorage and does not become authority until saveAdminConfig() succeeds
+    against backend Admin/graphics governance. */
+function setPreviewDeep(path, value){
+  var parts = path.split('.');
+  var obj = _loadPreviewPrefs();
+  for(var i = 0; i < parts.length - 1; i++){
+    if(!obj[parts[i]] || typeof obj[parts[i]] !== 'object') obj[parts[i]] = {};
+    obj = obj[parts[i]];
+  }
+  obj[parts[parts.length - 1]] = value;
+  _apply();
+}
+
+function setPreviewAll(prefs){
+  _deepMerge(_loadPreviewPrefs(), prefs || {});
+  _apply();
+}
+
+function clearPreviewOverrides(){
+  _previewPrefs = {};
+  _apply();
+}
+
 /** Set a CSS variable directly for real-time preview only.
     Modules must not use this as a bypass around Admin/shared token authority. */
 function setVar(varName, value){
@@ -734,6 +777,7 @@ function saveAdminConfig(config, callback){
         _adminConfig = nextConfig || config;
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
         _adminConfigEtag = String((resp && resp.etag) || _adminConfigEtag || '');
+        _previewPrefs = {};
       } catch(e){}
     }
     _apply();
@@ -888,8 +932,11 @@ function deleteTemplatePreview(templateId){
   return true;
 }
 
-function resolveWithTemplate(templateId){
+function resolveWithTemplate(templateId, options){
   var base = getFullConfig();
+  if(!options || options.preview !== true){
+    return base;
+  }
   var templates = _loadTemplatePreviewCache();
   var tpl = templates[String(templateId || '')];
   if(!tpl || !tpl.tokenOverrides || typeof tpl.tokenOverrides !== 'object') return base;
@@ -955,7 +1002,7 @@ function applyVisualTheme(themeId){
       bgHover: theme.colorsDark.bgHover || theme.colorsDark.bgSurfaceAlt || theme.colorsDark.bgPage
     }
   };
-  setAll(patch);
+  setPreviewAll(patch);
   _emit('theme-preset', { themeId: String(themeId || ''), patch: patch });
   return true;
 }
@@ -967,6 +1014,9 @@ window.HmTheme = {
   getDeep: getDeep,
   set: set,
   setDeep: setDeep,
+  setPreviewDeep: setPreviewDeep,
+  setPreviewAll: setPreviewAll,
+  clearPreviewOverrides: clearPreviewOverrides,
   setVar: setVar,
   setAll: setAll,
   getAll: getAll,

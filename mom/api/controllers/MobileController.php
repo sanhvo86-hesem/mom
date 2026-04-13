@@ -200,9 +200,6 @@ class MobileController extends BaseController
 
         try {
             $task = $this->mobileService()->startTask($queueId, $employeeId);
-            if ($task === null) {
-                $this->error('not_found', 404, "Queue entry {$queueId} not found.");
-            }
 
             $this->auditLog('mobile_start_task', [
                 'queue_id'    => $queueId,
@@ -252,10 +249,6 @@ class MobileController extends BaseController
                 'qty_scrap'     => (int)($body['qty_scrap'] ?? 0),
                 'notes'         => trim((string)($body['notes'] ?? '')),
             ]);
-
-            if ($task === null) {
-                $this->error('not_found', 404, "Queue entry {$queueId} not found.");
-            }
 
             $this->auditLog('mobile_complete_task', [
                 'queue_id'    => $queueId,
@@ -341,14 +334,12 @@ class MobileController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $entry = $this->mobileService()->clockOut($entryId, $employeeId, [
-                'qty_completed' => (int)($body['qty_completed'] ?? 0),
-                'qty_scrap'     => (int)($body['qty_scrap'] ?? 0),
-            ]);
-
-            if ($entry === null) {
-                $this->error('not_found', 404, "Time entry {$entryId} not found.");
-            }
+            $entry = $this->mobileService()->clockOut(
+                $entryId,
+                (int)($body['qty_completed'] ?? 0),
+                (int)($body['qty_scrap'] ?? 0),
+                $employeeId,
+            );
 
             $this->auditLog('mobile_clock_out', [
                 'entry_id'      => $entryId,
@@ -391,14 +382,28 @@ class MobileController extends BaseController
         try {
             $capture = $this->mobileService()->captureInspection($employeeId, [
                 'wo_number'    => trim((string)($body['wo_number'] ?? '')),
+                'jo_number'    => trim((string)($body['jo_number'] ?? '')),
+                'operation_seq' => $body['operation_seq'] ?? null,
+                'inspection_plan_id' => trim((string)($body['inspection_plan_id'] ?? '')),
+                'machine_id' => trim((string)($body['machine_id'] ?? $body['equipment_id'] ?? '')),
+                'equipment_id' => trim((string)($body['equipment_id'] ?? $body['machine_id'] ?? '')),
+                'work_center_id' => trim((string)($body['work_center_id'] ?? '')),
                 'capture_type' => strtolower(trim((string)($body['capture_type'] ?? ''))),
                 'measurements' => (array)($body['measurements'] ?? []),
+                'overall_result' => array_key_exists('overall_result', $body) || array_key_exists('result', $body)
+                    ? strtolower(trim((string)($body['overall_result'] ?? $body['result'] ?? '')))
+                    : null,
+                'inspector_id' => trim((string)($body['inspector_id'] ?? $employeeId)),
                 'photos'       => (array)($body['photos'] ?? []),
                 'notes'        => trim((string)($body['notes'] ?? '')),
+                'offline_created' => $body['offline_created'] ?? false,
+                'sync_status' => trim((string)($body['sync_status'] ?? 'synced')),
+                'device_id' => trim((string)($body['device_id'] ?? '')),
+                'metadata' => is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
             ]);
 
             $this->auditLog('mobile_capture_inspection', [
-                'capture_id'   => $capture['id'],
+                'capture_id'   => $capture['capture_id'] ?? '',
                 'employee_id'  => $employeeId,
                 'wo_number'    => $body['wo_number'],
                 'capture_type' => $body['capture_type'],
@@ -439,7 +444,7 @@ class MobileController extends BaseController
         }
 
         try {
-            $result = $this->mobileService()->submitOfflineBatch($employeeId, $entries);
+            $result = $this->mobileService()->submitOfflineBatch($entries, $employeeId);
 
             $this->auditLog('mobile_offline_sync', [
                 'employee_id'   => $employeeId,
@@ -501,14 +506,7 @@ class MobileController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $result = $this->mobileService()->resolveConflict($entryId, $employeeId, [
-                'resolution' => $resolution,
-                'merge_data' => (array)($body['merge_data'] ?? []),
-            ]);
-
-            if ($result === null) {
-                $this->error('not_found', 404, "Conflict entry {$entryId} not found.");
-            }
+            $result = $this->mobileService()->resolveConflict($entryId, $resolution);
 
             $this->auditLog('mobile_resolve_conflict', [
                 'entry_id'    => $entryId,

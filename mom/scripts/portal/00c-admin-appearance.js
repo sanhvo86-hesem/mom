@@ -125,13 +125,14 @@ function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; 
 function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? parseFloat(v) : def; }
 
 /**
- * _hmSet applies preview CSS variables and user preference cache only.
+ * _hmSet applies preview CSS variables and in-memory preview config only.
  * Backend graphics authority is promoted through HmGraphicsGovernance contracts,
  * never through this local runtime preview path.
  */
 window._hmSet = function(cssVar, path, value){
-  HmTheme.setVar(cssVar, value);          /* instant CSS update */
-  HmTheme.setDeep(path, value);           /* persist to localStorage */
+  if(cssVar) HmTheme.setVar(cssVar, value);          /* instant CSS update */
+  if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep(path, value);
+  else HmTheme.setDeep(path, value);
   if(typeof window._admGraphicsMarkChange === 'function'){
     window._admGraphicsMarkChange(
       /^components\./.test(String(path || '')) ? 'component-contract' : 'token',
@@ -145,6 +146,31 @@ window._hmSetWithUnit = function(cssVar, path, value, unit){
   var applied = raw;
   if(unit && /^-?\d*\.?\d+$/.test(raw)) applied = raw + unit;
   window._hmSet(cssVar, path, applied);
+};
+
+window._admAppearanceSetTab = function(key){
+  _subTab = normalizeSubTab(key || _subTab);
+  window._appSubTab = _subTab;
+  renderAdminAppearance();
+};
+
+window._admAppearanceTabKeydown = function(event){
+  var keys = ['templates','tokens','components','effects','governance','advanced'];
+  var idx = keys.indexOf(_subTab);
+  if(idx < 0) idx = 0;
+  var next = null;
+  if(event.key === 'ArrowRight') next = keys[(idx + 1) % keys.length];
+  if(event.key === 'ArrowLeft') next = keys[(idx + keys.length - 1) % keys.length];
+  if(event.key === 'Home') next = keys[0];
+  if(event.key === 'End') next = keys[keys.length - 1];
+  if(next){
+    event.preventDefault();
+    window._admAppearanceSetTab(next);
+    setTimeout(function(){
+      var btn = document.getElementById('adm-appearance-tab-' + next);
+      if(btn && btn.focus) btn.focus();
+    }, 0);
+  }
 };
 
 /* ── Helper: slider + number input ──────────────────────────────────────── */
@@ -684,7 +710,8 @@ window._hmApplyAdminLayoutTemplate = function(template){
   if(ADMIN_LAYOUT_PRESETS[next]){
     payload.layout.admin = Object.assign({ template: next }, ADMIN_LAYOUT_PRESETS[next]);
   }
-  HmTheme.setAll(payload);
+  if(HmTheme.setPreviewAll) HmTheme.setPreviewAll(payload);
+  else HmTheme.setAll(payload);
   if(typeof renderAdminAppearance === 'function') renderAdminAppearance();
 };
 
@@ -1332,6 +1359,7 @@ function graphicsSnapshot(){
 	    debt:null,
 	    drift:null,
 	    runtimeDiagnostics:null,
+	    releaseLink:null,
 	    releaseBlockers:[],
 	    audit:[],
 	    waivers:[],
@@ -1562,6 +1590,17 @@ window._admGraphicsRunImpact = function(kind, target){
   renderAdminAppearance();
 };
 
+window._admGraphicsRunPolicyPackImpact = function(policyPack){
+  var svc = graphicsSvc();
+  var pack = String(policyPack || '');
+  if(svc && typeof svc.analyzePolicyPackImpact === 'function'){
+    svc.analyzePolicyPackImpact(pack, { policyPack:pack }).then(function(){ renderAdminAppearance(); });
+    refreshImpactPanel();
+    return;
+  }
+  window._admGraphicsRunImpact('environment-policy', pack);
+};
+
 window._admGraphicsTemplateAction = function(action, id){
   var tpl = getTemplateById(id);
   if(!tpl) return;
@@ -1584,6 +1623,35 @@ window._admGraphicsTemplateAction = function(action, id){
   });
 };
 
+window._admGraphicsStageCanary = function(id){
+  var tpl = getTemplateById(id);
+  if(!tpl) return;
+  var svc = graphicsSvc();
+  if(!svc || typeof svc.stageGraphicsRollout !== 'function'){
+    if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng', 'Graphics governance service is not ready'), 'error');
+    return;
+  }
+  svc.stageGraphicsRollout({
+    templateId: tpl.templateId || tpl.id,
+    impactType:'template',
+    scope:{
+      mode:'canary-module-group',
+      templates:[tpl.templateId || tpl.id],
+      modules:tpl.governedModules || tpl.modules || []
+    },
+    releaseManifestRefs:[{
+      refType:'release_manifest',
+      refId:'admin-appearance-canary-shell',
+      uri:'mom/data/registry/graphics-governance-registry.json'
+    }]
+  }).then(function(result){
+    if(typeof showToast === 'function'){
+      showToast(result && result.message ? result.message : L('Đã stage canary rollout', 'Canary rollout staged'), result && result.ok === false ? 'warning' : 'success');
+    }
+    renderAdminAppearance();
+  });
+};
+
 window._admGraphicsSetWaiver = function(field, value){
   if(field === 'subject') _waiverSubject = value || '';
   if(field === 'reason') _waiverReason = value || '';
@@ -1597,6 +1665,11 @@ window._admGraphicsRequestWaiver = function(){
     targetId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
     reason: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
     reasonText: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
+    risk: 'medium graphics governance exception',
+    riskClass: 'medium',
+    compensatingControl: L('Giữ rollback plan và evidence snapshot cho đến khi quay lại shared token/component authority.', 'Keep rollback plan and evidence snapshot until the change returns to shared token/component authority.'),
+    owner: 'Admin Appearance',
+    approver: '',
     expiresAt: (function(){ var d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString(); })(),
     requestedBy: 'Admin Appearance',
     scope: 'graphics-governance'
@@ -1666,6 +1739,7 @@ function renderImpactAnalysisPanel(wrap){
     + infoCard(L('Block families', 'Block families'), String((impact.affectedBlockFamilies || []).length), 'admin')
     + infoCard(L('Affected templates', 'Affected templates'), String((impact.affectedTemplates || []).length), 'admin')
     + infoCard(L('Severity', 'Severity'), impact.severityClass || 'low', (impact.severityClass === 'regulated' || impact.severityClass === 'shopfloor-critical' || impact.severityClass === 'high') ? 'partial' : 'full')
+    + infoCard(L('Blast radius', 'Blast radius'), String((impact.blastRadius && impact.blastRadius.score) || 0), (impact.blastRadius && impact.blastRadius.score > 60) ? 'partial' : 'full')
     + infoCard(L('Regulated touched', 'Regulated touched'), String((impact.regulatedModules || []).length), (impact.regulatedModules || []).length ? 'partial' : 'full')
     + infoCard(L('Shopfloor touched', 'Shopfloor touched'), String((impact.shopfloorModules || []).length), (impact.shopfloorModules || []).length ? 'partial' : 'full')
     + '</div>'
@@ -1709,6 +1783,8 @@ function renderRolloutControls(tpl){
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsRunImpact(\'template-zone\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Run impact analysis', 'Run impact analysis'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'publish\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Publish template', 'Publish template'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'stage\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Stage rollout', 'Stage rollout'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsStageCanary(\''+esc(id)+'\')"'+disabled+'>'+esc(L('Stage canary', 'Stage canary'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'canaryApply\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Apply canary', 'Apply canary'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-primary" onclick="_admGraphicsTemplateAction(\'apply\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Apply globally', 'Apply globally'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'rollback\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Rollback', 'Rollback'))+'</button>'
       + '</div>'
@@ -1981,20 +2057,32 @@ function renderDebtObservatoryPanel(){
 function renderPolicyPacksPanel(){
   var snap = graphicsSnapshot();
   var packs = (snap.environmentPolicyPacks && snap.environmentPolicyPacks.packs) || [];
+  var multiSite = (snap.environmentPolicyPacks && snap.environmentPolicyPacks.multiSitePlantBranding) || {};
   var rows = packs.map(function(pack){
     return '<tr>'
       + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(pack.environment || '-')+'</td>'
       + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+esc(JSON.stringify(pack.tokenOverrides || {}))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+joinList(pack.componentPolicy || [])+'</td>'
       + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+joinList(pack.evidenceObligations || [])+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)"><button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" onclick="_admGraphicsRunPolicyPackImpact(\''+esc(pack.environment || '')+'\')">'+esc(L('Analyze', 'Analyze'))+'</button></td>'
       + '</tr>';
   }).join('');
   return sect(
     L('Environment policy packs', 'Environment policy packs'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Policy packs', 'Policy packs'), String(packs.length), 'admin')
+      + infoCard(L('Branding levels', 'Branding levels'), joinList(multiSite.levels || [], '-'), 'preview')
+      + infoCard(L('Prohibited overrides', 'Prohibited overrides'), joinList(multiSite.prohibitedOverrideTypes || [], '-'), 'partial')
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px">'+esc(multiSite.releaseRule || L('Multi-site branding may vary identity tokens only; semantic status and component contracts stay controlled by shared authority.', 'Multi-site branding may vary identity tokens only; semantic status and component contracts stay controlled by shared authority.'))+'</div>'
+      +
     '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Environment</th>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Token policy</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Component policy</th>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Evidence obligations</th>'
-      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No policy packs</td></tr>')+'</tbody></table>',
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Impact</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="5" style="padding:12px;color:var(--text-secondary)">No policy packs</td></tr>')+'</tbody></table>',
     false,
     statusChip('admin', L('Environment scoped rollout', 'Environment scoped rollout'))
   );
@@ -2005,6 +2093,8 @@ function renderReleaseDashboardPanel(){
   var dash = snap.releaseDashboard || {};
   var summary = dash.complianceSummary || {};
   var debt = dash.debtSummary || {};
+  var trend = dash.trendDashboard || {};
+  var override = dash.emergencyOverridePath || {};
   return sect(
     L('Graphics release dashboard', 'Graphics release dashboard'),
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
@@ -2012,12 +2102,37 @@ function renderReleaseDashboardPanel(){
       + infoCard(L('Blocked modules', 'Blocked modules'), String(summary.blockedCount || summary.nonCompliantCount || 0), (summary.blockedCount || summary.nonCompliantCount) ? 'partial' : 'full')
       + infoCard(L('Legacy shell debt', 'Legacy shell debt'), String(debt.uncontrolledLegacyShellDebt || 0), debt.uncontrolledLegacyShellDebt ? 'partial' : 'full')
       + infoCard(L('Rollouts', 'Rollouts'), String((dash.rolloutSummary && dash.rolloutSummary.rolloutCount) || 0), 'admin')
+      + infoCard(L('Debt trend score', 'Debt trend score'), String(trend.currentDebtScore || 0), trend.currentDebtScore ? 'partial' : 'full')
+      + infoCard(L('Emergency override', 'Emergency override'), override.status || 'exception-only', 'partial')
       + '</div>'
       + '<div style="font-size:11px;line-height:1.7;color:var(--text-secondary)">'
       + esc(L('Release dashboard buộc release manifest/evidence bundle phải chứa graphics authority refs, compliance snapshot, impact report ref, waiver refs và rollback plan ref.', 'Release dashboard requires release manifest/evidence bundle to carry graphics authority refs, compliance snapshot, impact report ref, waiver refs, and rollback plan ref.'))
+      + '<br><strong>'+esc(L('Trend', 'Trend'))+':</strong> '+esc(trend.releaseReadinessTrend || '-')+'; <strong>'+esc(L('Override rule', 'Override rule'))+':</strong> '+esc(override.releaseCondition || L('Approved waiver, expiry, rollback plan and retrospective required.', 'Approved waiver, expiry, rollback plan and retrospective required.'))
       + '</div>',
     true,
     statusChip(dash.readiness === 'ready' ? 'full' : 'partial', dash.readiness || 'pending')
+  );
+}
+
+function renderReleaseLinkagePanel(){
+  var snap = graphicsSnapshot();
+  var link = snap.releaseLink || {};
+  var refs = link.graphicsAuthorityRefs || [];
+  var evidence = link.evidenceBundleRequirements || [];
+  return sect(
+    L('Release evidence linkage', 'Release evidence linkage'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Registry version', 'Registry version'), link.templateRegistryVersion || snap.registryVersion || '-', 'admin')
+      + infoCard(L('Registry checksum', 'Registry checksum'), link.templateRegistryChecksum || snap.registryEtag || '-', 'preview')
+      + infoCard(L('Release blocked', 'Release blocked'), link.releaseBlocked ? L('Yes', 'Yes') : L('No', 'No'), link.releaseBlocked ? 'partial' : 'full')
+      + infoCard(L('Blocker count', 'Blocker count'), String(link.blockerCount || 0), link.blockerCount ? 'partial' : 'full')
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:10px">'
+      + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)"><div style="font-size:11px;font-weight:800;margin-bottom:8px">'+esc(L('Authority refs', 'Authority refs'))+'</div><div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'+joinList(refs, '-')+'</div></div>'
+      + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)"><div style="font-size:11px;font-weight:800;margin-bottom:8px">'+esc(L('Evidence bundle', 'Evidence bundle'))+'</div><div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'+joinList(evidence, '-')+'</div></div>'
+      + '</div>',
+    false,
+    statusChip(link.releaseBlocked ? 'partial' : 'full', L('Release manifest refs', 'Release manifest refs'))
   );
 }
 
@@ -2238,7 +2353,8 @@ window._admTplApplyTheme = function(themeId){
     window._hmSet('--accent', 'brand.accent', theme.colors.accent);
     window._hmSet('--bg-page-light', 'colorsLight.bgPage', theme.colors.bgPage);
     window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
-    HmTheme.setDeep('appearance.visualThemePreset', themeId);
+    if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep('appearance.visualThemePreset', themeId);
+    else HmTheme.setDeep('appearance.visualThemePreset', themeId);
   }
   if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
   window._admGraphicsMarkChange('theme-preset', themeId, themeId);
@@ -2492,23 +2608,25 @@ function render(el, subTab, currentLang){
   h += '</div>';
 
   /* Sub-tab bar */
-  h += '<div class="hm-tabs" role="tablist" aria-label="'+esc(L('Admin Appearance sections', 'Admin Appearance sections'))+'" style="margin-bottom:16px">';
+  h += '<div class="hm-tabs" role="tablist" aria-label="'+esc(L('Admin Appearance sections', 'Admin Appearance sections'))+'" onkeydown="_admAppearanceTabKeydown(event)" style="margin-bottom:16px">';
   tabs.forEach(function(t){
     var active = _subTab===t.key;
-    h += '<button type="button" role="tab" aria-selected="'+(active?'true':'false')+'" class="hm-tab'+(active?' active':'')+'" onclick="_appSubTab=\''+t.key+'\';renderAdminAppearance()"><span class="hm-tab-icon">'+t.icon+'</span><span class="hm-tab-label">'+esc(t.label)+'</span></button>';
+    h += '<button type="button" id="adm-appearance-tab-'+t.key+'" role="tab" aria-controls="adm-appearance-panel-'+t.key+'" aria-selected="'+(active?'true':'false')+'" tabindex="'+(active?'0':'-1')+'" class="hm-tab'+(active?' active':'')+'" onclick="_admAppearanceSetTab(\''+t.key+'\')"><span class="hm-tab-icon">'+t.icon+'</span><span class="hm-tab-label">'+esc(t.label)+'</span></button>';
   });
   h += '</div>';
 
   /* Sub-tab content */
+  var body = '';
   switch(_subTab){
-    case 'templates': h += renderTemplates(); break;
-    case 'tokens': h += renderTokens(); break;
-    case 'components': h += renderComponents(); break;
-    case 'effects': h += renderEffects(); break;
-    case 'governance': h += renderGovernance(); break;
-    case 'advanced': h += renderAdvanced(); break;
-    default: h += renderTemplates();
+    case 'templates': body += renderTemplates(); break;
+    case 'tokens': body += renderTokens(); break;
+    case 'components': body += renderComponents(); break;
+    case 'effects': body += renderEffects(); break;
+    case 'governance': body += renderGovernance(); break;
+    case 'advanced': body += renderAdvanced(); break;
+    default: body += renderTemplates();
   }
+  h += '<div id="adm-appearance-panel-'+esc(_subTab)+'" role="tabpanel" aria-labelledby="adm-appearance-tab-'+esc(_subTab)+'" tabindex="0">'+body+'</div>';
 
   /* Global actions */
   h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">';
@@ -2595,9 +2713,9 @@ function renderOverview(){
       {value:'schedule',icon:'🕐',label:T('schedule')}
     ], cur.colorMode, "HmTheme.set('colorMode',this.value);renderAdminAppearance()")
     + (cur.colorMode==='schedule' ? '<div style="display:flex;gap:8px;align-items:center;margin-top:8px"><span style="font-size:12px">'+T('darkFrom')+'</span>'
-      +'<input type="time" value="'+(cfg('colorSchedule.darkFrom')||'18:00')+'" onchange="HmTheme.setDeep(\'colorSchedule.darkFrom\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
+      +'<input type="time" value="'+(cfg('colorSchedule.darkFrom')||'18:00')+'" onchange="if(HmTheme.setPreviewDeep)HmTheme.setPreviewDeep(\'colorSchedule.darkFrom\',this.value);else HmTheme.setDeep(\'colorSchedule.darkFrom\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
       +'<span style="font-size:12px">'+T('darkTo')+'</span>'
-      +'<input type="time" value="'+(cfg('colorSchedule.darkTo')||'06:00')+'" onchange="HmTheme.setDeep(\'colorSchedule.darkTo\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
+      +'<input type="time" value="'+(cfg('colorSchedule.darkTo')||'06:00')+'" onchange="if(HmTheme.setPreviewDeep)HmTheme.setPreviewDeep(\'colorSchedule.darkTo\',this.value);else HmTheme.setDeep(\'colorSchedule.darkTo\',this.value)" style="height:28px;border:1px solid var(--border);border-radius:4px;font-size:12px">'
       +'</div>' : '')
     + '<div style="margin-top:12px"><strong style="font-size:12px;color:var(--text-secondary)">'+T('radiusScale')+'</strong></div>'
     + radioRow('adm_radius', [
@@ -3259,6 +3377,7 @@ function renderGovernance(){
 	  h += renderRuntimeGraphicsDiagnosticsPanel();
 	  h += renderRuntimeBeaconPanel();
 	  h += renderReleaseDashboardPanel();
+	  h += renderReleaseLinkagePanel();
 	  h += renderPolicyPacksPanel();
 	  h += renderAuditHistoryPanel(10);
 	  h += renderWaiverGovernancePanel();
@@ -3428,6 +3547,7 @@ function renderAdvanced(){
   var h = renderRolloutControls(selected);
   h += renderChangeSetPanel();
   h += renderReleaseDashboardPanel();
+  h += renderReleaseLinkagePanel();
   h += renderPolicyPacksPanel();
   h += renderReleaseBlockersPanel(8);
   h += renderWaiverGovernancePanel();
@@ -3446,7 +3566,7 @@ function renderAdvanced(){
 
 	  h += sect('🖊️ '+T('customCSS'),
 	    '<textarea id="adm_custom_css" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary);resize:vertical"'
-	    +' oninput="HmTheme.setDeep(\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
+	    +' oninput="_hmSet(\'\',\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
 	    +'<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6">'+esc(L('Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.', 'Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.'))+'</div>'
 	  , false, statusChip('partial', L('Exception only', 'Exception only')));
 
@@ -3487,7 +3607,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260413b';
+window._renderAdminAppearanceFullVersion = '20260413c';
 window._renderAdminAppearanceFull = render;
 
 })();
