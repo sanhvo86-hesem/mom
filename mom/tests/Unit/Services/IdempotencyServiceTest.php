@@ -36,6 +36,7 @@ final class IdempotencyServiceTest extends TestCase
     {
         $service = new IdempotencyService(
             $this->tmpDir,
+            repository: new FileIdempotencyReplayRepository($this->tmpDir),
             databaseConfig: ['use_postgres' => false],
         );
         $executions = 0;
@@ -161,6 +162,7 @@ final class IdempotencyServiceTest extends TestCase
         $key = $this->rowKey($descriptor);
         $db->rows[$key] = [
             'scope_key' => $descriptor['scope_key'],
+            'scope_key_hash' => hash('sha256', (string)$descriptor['scope_key']),
             'idempotency_key' => $descriptor['key'],
             'fingerprint_hash' => $this->fingerprintForDescriptor($descriptor),
             'status' => 'in_progress',
@@ -193,6 +195,7 @@ final class IdempotencyServiceTest extends TestCase
         $key = $this->rowKey($descriptor);
         $db->rows[$key] = [
             'scope_key' => $descriptor['scope_key'],
+            'scope_key_hash' => hash('sha256', (string)$descriptor['scope_key']),
             'idempotency_key' => $descriptor['key'],
             'fingerprint_hash' => $this->fingerprintForDescriptor($descriptor),
             'status' => 'in_progress',
@@ -211,6 +214,63 @@ final class IdempotencyServiceTest extends TestCase
             'status_code' => 200,
             'payload' => ['ok' => true],
         ]);
+    }
+
+    public function testDbBackedRepositoryRejectsExpiredInProgressDuplicate(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-expired-in-progress-key');
+        $key = $this->rowKey($descriptor);
+        $db->rows[$key] = [
+            'scope_key' => $descriptor['scope_key'],
+            'scope_key_hash' => hash('sha256', (string)$descriptor['scope_key']),
+            'idempotency_key' => $descriptor['key'],
+            'fingerprint_hash' => $this->fingerprintForDescriptor($descriptor),
+            'status' => 'in_progress',
+            'status_code' => null,
+            'response_payload' => '{}',
+            'metadata' => '{}',
+            'lock_owner' => 'slow-worker',
+            'created_at' => gmdate('c', time() - 1000),
+            'updated_at' => gmdate('c', time() - 1000),
+            'completed_at' => null,
+            'expires_at' => gmdate('c', time() - 300),
+        ];
+
+        $this->expectException(RecordConflictException::class);
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
+    }
+
+    public function testDbBackedRepositoryUsesHashAuthorityForLongScopeKey(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-long-scope-key');
+        $descriptor['scope_key'] = 'generic_crud|update|quality_management|ncr_records|' . str_repeat('scope-segment-', 30);
+
+        $result = $service->execute($descriptor, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
+
+        $row = $db->rows[$this->rowKey($descriptor)] ?? null;
+        $this->assertFalse($result['replayed']);
+        $this->assertIsArray($row);
+        $this->assertGreaterThan(255, strlen((string)$row['scope_key']));
+        $this->assertSame(hash('sha256', (string)$descriptor['scope_key']), $row['scope_key_hash'] ?? null);
+        $this->assertSame('completed', $row['status'] ?? null);
     }
 
     public function testDbBackedRepositoryDoesNotReexecuteWhenCompletionPersistenceFails(): void
@@ -375,7 +435,7 @@ final class IdempotencyServiceTest extends TestCase
      */
     private function rowKey(array $descriptor): string
     {
-        return (string)$descriptor['scope_key'] . '|' . (string)$descriptor['key'];
+        return hash('sha256', (string)$descriptor['scope_key']) . '|' . (string)$descriptor['key'];
     }
 
     /**
@@ -454,6 +514,7 @@ final class IdempotencyFakeConnection extends Connection
         $this->rows[$key] = [
             'ledger_id' => 'fake-ledger-' . count($this->rows),
             'scope_key' => (string)$params[':scope_key'],
+            'scope_key_hash' => (string)$params[':scope_key_hash'],
             'idempotency_key' => (string)$params[':idempotency_key'],
             'fingerprint_hash' => (string)$params[':fingerprint_hash'],
             'status' => 'in_progress',
@@ -520,6 +581,8 @@ final class IdempotencyFakeConnection extends Connection
         }
 
         if (str_contains($sql, "status = 'in_progress'")) {
+            $this->rows[$key]['scope_key'] = (string)$params[':scope_key'];
+            $this->rows[$key]['scope_key_hash'] = (string)$params[':scope_key_hash'];
             $this->rows[$key]['fingerprint_hash'] = (string)$params[':fingerprint_hash'];
             $this->rows[$key]['status'] = 'in_progress';
             $this->rows[$key]['status_code'] = null;
@@ -542,7 +605,8 @@ final class IdempotencyFakeConnection extends Connection
      */
     private function key(array $params): string
     {
-        return (string)$params[':scope_key'] . '|' . (string)$params[':idempotency_key'];
+        $scopeHash = (string)($params[':scope_key_hash'] ?? hash('sha256', (string)($params[':scope_key'] ?? '')));
+        return $scopeHash . '|' . (string)$params[':idempotency_key'];
     }
 
     /**

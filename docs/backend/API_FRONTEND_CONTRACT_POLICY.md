@@ -59,7 +59,7 @@ Existing dedicated endpoints may stay for internal/admin/compatibility until rep
 | `vps_file_*` | Admin/ops only | File mutation/upload to controlled assets. |
 | `admin_git_*` | Admin/ops only | Server repository/workspace operations. |
 | `master_data_*` mutation | MDM admin only until command/approval workflow exists | Can change release inputs. |
-| `finance_period_close_*` existing endpoints | Finance admin only | Control records exist but posting enforcement is incomplete. |
+| `finance_period_close_*` existing endpoints | Finance admin only | Control records exist; memo posting now enforces closed-period/backdate exception policy, but global inventory/AP invoice/AR invoice/GL/payment/COPQ posting enforcement is still incomplete. |
 
 ## Blocked Destructive APIs
 

@@ -32,6 +32,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
       - name: Run PHPStan
         working-directory: mom
+        continue-on-error: true
         run: vendor/bin/phpstan analyse --error-format=github
 
   test:

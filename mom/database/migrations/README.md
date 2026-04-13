@@ -77,7 +77,7 @@ The script auto-discovers all `*.sql` files in `migrations/` and executes them i
 
 ### Regenerating the schema snapshot
 
-The checked-in [schema.sql](/C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/schema.sql) is now generated from the migration directory instead of being maintained manually.
+The checked-in [schema.sql](../schema.sql) is now generated from the migration directory instead of being maintained manually.
 
 ```bash
 php database/build_schema_snapshot.php

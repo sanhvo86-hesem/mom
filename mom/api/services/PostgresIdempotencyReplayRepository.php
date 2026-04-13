@@ -70,6 +70,10 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
     private function reserve(array $state, string $idempotencyKey, string $fingerprintHash): array
     {
         $scopeKey = (string)($state['scope_key'] ?? '');
+        $scopeKeyHash = trim((string)($state['scope_key_hash'] ?? ''));
+        if ($scopeKeyHash === '') {
+            $scopeKeyHash = hash('sha256', $scopeKey);
+        }
         $lockOwner = bin2hex(random_bytes(16));
         $now = $this->nowIso();
         $expiresAt = (string)($state['expires_at'] ?? gmdate('c', time() + 86400));
@@ -77,6 +81,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
 
         return $this->db->transactional(function () use (
             $scopeKey,
+            $scopeKeyHash,
             $idempotencyKey,
             $fingerprintHash,
             $lockOwner,
@@ -87,6 +92,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
             $inserted = $this->db->insertReturning(
                 "INSERT INTO idempotency_replay_ledger (
                     scope_key,
+                    scope_key_hash,
                     idempotency_key,
                     fingerprint_hash,
                     status,
@@ -98,6 +104,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                     expires_at
                 ) VALUES (
                     :scope_key,
+                    :scope_key_hash,
                     :idempotency_key,
                     :fingerprint_hash,
                     'in_progress',
@@ -108,10 +115,11 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                     :updated_at::timestamptz,
                     :expires_at::timestamptz
                 )
-                ON CONFLICT (scope_key, idempotency_key) DO NOTHING
+                ON CONFLICT (scope_key_hash, idempotency_key) DO NOTHING
                 RETURNING ledger_id",
                 [
                     ':scope_key' => $scopeKey,
+                    ':scope_key_hash' => $scopeKeyHash,
                     ':idempotency_key' => $idempotencyKey,
                     ':fingerprint_hash' => $fingerprintHash,
                     ':metadata' => $metadata,
@@ -132,6 +140,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
             $existing = $this->db->queryOne(
                 "SELECT
                     scope_key,
+                    scope_key_hash,
                     idempotency_key,
                     fingerprint_hash,
                     status,
@@ -146,11 +155,11 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                     completed_at,
                     expires_at
                 FROM idempotency_replay_ledger
-                WHERE scope_key = :scope_key
+                WHERE scope_key_hash = :scope_key_hash
                   AND idempotency_key = :idempotency_key
                 FOR UPDATE",
                 [
-                    ':scope_key' => $scopeKey,
+                    ':scope_key_hash' => $scopeKeyHash,
                     ':idempotency_key' => $idempotencyKey,
                 ],
             );
@@ -159,30 +168,29 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                 throw new RuntimeException('Unable to claim idempotency ledger row.');
             }
 
+            $storedFingerprint = trim((string)($existing['fingerprint_hash'] ?? ''));
+            if ($storedFingerprint !== '' && !hash_equals($storedFingerprint, $fingerprintHash)) {
+                throw new RecordConflictException('Idempotency key was already used for a different request fingerprint.');
+            }
+
+            if (($existing['status'] ?? '') === 'in_progress') {
+                throw new RecordConflictException('Idempotency request is already in progress.');
+            }
+
             $expired = $this->isExpired($existing);
-            if (!$expired) {
-                $storedFingerprint = trim((string)($existing['fingerprint_hash'] ?? ''));
-                if ($storedFingerprint !== '' && !hash_equals($storedFingerprint, $fingerprintHash)) {
-                    throw new RecordConflictException('Idempotency key was already used for a different request fingerprint.');
-                }
-
-                if (($existing['status'] ?? '') === 'completed') {
-                    return [
-                        'replay' => true,
-                        'status_code' => max(200, (int)($existing['status_code'] ?? 200)),
-                        'payload' => $this->decodeJsonArray($existing['response_payload'] ?? null),
-                        'stored_at' => (string)($existing['completed_at'] ?? $existing['updated_at'] ?? ''),
-                    ];
-                }
-
-                if (($existing['status'] ?? '') === 'in_progress') {
-                    throw new RecordConflictException('Idempotency request is already in progress.');
-                }
+            if (!$expired && ($existing['status'] ?? '') === 'completed') {
+                return [
+                    'replay' => true,
+                    'status_code' => max(200, (int)($existing['status_code'] ?? 200)),
+                    'payload' => $this->decodeJsonArray($existing['response_payload'] ?? null),
+                    'stored_at' => (string)($existing['completed_at'] ?? $existing['updated_at'] ?? ''),
+                ];
             }
 
             $affected = $this->db->execute(
                 "UPDATE idempotency_replay_ledger
-                SET fingerprint_hash = :fingerprint_hash,
+                SET scope_key = :scope_key,
+                    fingerprint_hash = :fingerprint_hash,
                     status = 'in_progress',
                     status_code = NULL,
                     response_payload = '{}'::jsonb,
@@ -193,10 +201,11 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                     completed_at = NULL,
                     updated_at = :updated_at::timestamptz,
                     expires_at = :expires_at::timestamptz
-                WHERE scope_key = :scope_key
+                WHERE scope_key_hash = :scope_key_hash
                   AND idempotency_key = :idempotency_key",
                 [
                     ':scope_key' => $scopeKey,
+                    ':scope_key_hash' => $scopeKeyHash,
                     ':idempotency_key' => $idempotencyKey,
                     ':fingerprint_hash' => $fingerprintHash,
                     ':metadata' => $metadata,
@@ -241,11 +250,13 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                 completed_at = :completed_at::timestamptz,
                 updated_at = :updated_at::timestamptz
             WHERE scope_key = :scope_key
+              AND scope_key_hash = :scope_key_hash
               AND idempotency_key = :idempotency_key
               AND fingerprint_hash = :fingerprint_hash
               AND lock_owner = :lock_owner",
             [
                 ':scope_key' => (string)($state['scope_key'] ?? ''),
+                ':scope_key_hash' => (string)($state['scope_key_hash'] ?? hash('sha256', (string)($state['scope_key'] ?? ''))),
                 ':idempotency_key' => $idempotencyKey,
                 ':fingerprint_hash' => $fingerprintHash,
                 ':lock_owner' => $lockOwner,
@@ -279,11 +290,13 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                 error_message = :error_message,
                 updated_at = :updated_at::timestamptz
             WHERE scope_key = :scope_key
+              AND scope_key_hash = :scope_key_hash
               AND idempotency_key = :idempotency_key
               AND fingerprint_hash = :fingerprint_hash
               AND lock_owner = :lock_owner",
             [
                 ':scope_key' => (string)($state['scope_key'] ?? ''),
+                ':scope_key_hash' => (string)($state['scope_key_hash'] ?? hash('sha256', (string)($state['scope_key'] ?? ''))),
                 ':idempotency_key' => $idempotencyKey,
                 ':fingerprint_hash' => $fingerprintHash,
                 ':lock_owner' => $lockOwner,

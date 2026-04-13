@@ -29,7 +29,9 @@ final class CacheIdempotencyReplayRepository implements IdempotencyReplayReposit
         $scopeKey = (string)($state['scope_key'] ?? '');
         $stateKey = $this->stateKey($scopeKey, $idempotencyKey);
         $lockKey = $stateKey . ':lock';
-        $lockTtl = max(5, min(60, $retryWindowSeconds));
+        $stateTtl = max(15, (int)($state['ttl_seconds'] ?? 86400));
+        $inProgressTtl = max($stateTtl, 86400);
+        $lockTtl = max(5, $inProgressTtl, $retryWindowSeconds);
 
         $existing = $this->cacheState($stateKey);
         $replay = $this->replayExistingState($existing, $fingerprintHash);
@@ -47,6 +49,9 @@ final class CacheIdempotencyReplayRepository implements IdempotencyReplayReposit
             if ($replay !== null) {
                 return $replay;
             }
+            if ($existing !== null && ($existing['status'] ?? '') === 'in_progress') {
+                throw new RecordConflictException('Idempotency request is already in progress.');
+            }
             throw new RecordConflictException('Idempotency request is already in progress.');
         }
 
@@ -56,8 +61,11 @@ final class CacheIdempotencyReplayRepository implements IdempotencyReplayReposit
             if ($replay !== null) {
                 return $replay;
             }
+            if ($existing !== null && ($existing['status'] ?? '') === 'in_progress') {
+                throw new RecordConflictException('Idempotency request is already in progress.');
+            }
 
-            $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
+            $this->cacheService->set($stateKey, $state, $inProgressTtl);
 
             try {
                 $result = $operation();
@@ -67,7 +75,7 @@ final class CacheIdempotencyReplayRepository implements IdempotencyReplayReposit
                 $state['error_class'] = $e::class;
                 $state['error_message'] = $e->getMessage();
                 try {
-                    $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
+                    $this->cacheService->set($stateKey, $state, $stateTtl);
                 } catch (Throwable $ledgerFailure) {
                     @error_log('[Idempotency] cache failure marker write failed: ' . $ledgerFailure->getMessage());
                 }
@@ -84,7 +92,7 @@ final class CacheIdempotencyReplayRepository implements IdempotencyReplayReposit
             $state['status_code'] = $statusCode;
             $state['response_payload'] = $payload;
             unset($state['error_class'], $state['error_message']);
-            $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
+            $this->cacheService->set($stateKey, $state, $stateTtl);
 
             return [
                 'status_code' => $statusCode,

@@ -7,7 +7,7 @@ This specification replaces fragmented status authority across PHP constants, JS
 | Entity | Runtime PHP/JSON | Registry/status-options | Workflow-library | Database/migration evidence | Finding |
 | --- | --- | --- | --- | --- | --- |
 | Quote | `draft, internal_review, sent, accepted, rejected, expired, revised, converted` | `draft, review, sent, won, lost, expired` | `draft, review, sent, won, lost, expired` | Quote migration enum includes runtime-like values | documentation-runtime mismatch |
-| SO | `draft, quoted, confirmed, in_production, shipped, closed, cancelled` | `sales_order_status`: `draft, confirmed, engineering_ready, in_production, shipped, closed`; `sales_order_status_code`: `draft, released, in_progress, completed, closed, cancelled` | `wf_sales_order` states `draft, confirmed, engineering_ready, in_production, shipped, closed` but statusSet `sales_order_status_code` | Multiple SO table variants | P0 mismatch; `engineering_ready` orphan until enforced |
+| SO | Runtime config/service now includes `draft, quoted, confirmed, engineering_ready, in_production, shipped, closed, cancelled`; JO creation rejects parent SO unless SO is `engineering_ready` or `in_production` | `sales_order_status`: `draft, confirmed, engineering_ready, in_production, shipped, closed`; `sales_order_status_code`: `draft, released, in_progress, completed, closed, cancelled` | `wf_sales_order` states `draft, confirmed, engineering_ready, in_production, shipped, closed` but statusSet `sales_order_status_code` | Multiple SO table variants | P0 mismatch; `engineering_ready` is partially runtime-enforced, but still not one generated authority across registry/DB/OpenAPI |
 | JO | `planned, released, active, on_hold, completed, closed, cancelled` | `draft, planned, released, active, completed, closed` | `draft, planned, released, active, completed, closed` | `job_orders` schema exists | `cancelled/on_hold` mismatch; `draft` registry not runtime |
 | WO | `scheduled, setup, running, inspection, completed, on_hold, cancelled` | `draft, planned, released, in_production, quality_hold, closed, cancelled` | same as registry for `wf_work_order_execution` | `work_order` and `work_orders` both exist | Production WO lifecycle conflated with service/maintenance WO |
 | NCR | Exception JSON + JSONL use `open` in automation | `draft, submitted, under_review, disposition_set, containment_active, close_requested, closed` | `wf_ncr` | `ncr_records` exists | unregistered runtime states |
@@ -54,7 +54,7 @@ Alternate terminal/exception:
 
 Rules:
 
-- `engineering_ready` is mandatory before JO creation and production release.
+- `engineering_ready` is mandatory before JO creation and production release. Current runtime enforces field-presence release package checks and JO blocking; target command must verify released BOM/routing/control plan/inspection plan rows in PostgreSQL.
 - `confirmed` requires linked contract review and customer PO evidence.
 - `shipped` can only be reached through `ConfirmDelivery`, not through raw logistics update.
 - `closed` requires shipment, invoice policy, AR evidence, and no open quality/finance exceptions.
@@ -174,9 +174,9 @@ CI must fail if a generated artifact is edited manually or if any runtime state 
    - `won -> accepted`
    - `lost -> rejected`
 6. Migrate SO statuses:
-   - Keep `draft/quoted/confirmed/in_production/shipped/closed/cancelled`.
+   - Keep `draft/quoted/confirmed/engineering_ready/in_production/shipped/closed/cancelled`.
    - If registry/PG has `released/in_progress/completed`, map only with evidence. Otherwise set `migration_hold` and require manual remediation.
-   - Insert `engineering_ready` only when release package evidence exists; otherwise keep `confirmed`.
+   - Keep or insert `engineering_ready` only when release package evidence exists; otherwise keep `confirmed` and block JO/WO creation.
 7. Migrate JO/WO statuses:
    - Add `cancelled` to config/registry.
    - Map registry WO `in_production -> running`; `quality_hold -> on_hold`; `closed -> completed|closed` depending table semantics.
@@ -199,4 +199,3 @@ CI must fail if a generated artifact is edited manually or if any runtime state 
 | WF-006 | Quality JSONL `open` NCR import | Creates canonical NCR `submitted` or `containment_active`. |
 | WF-007 | CAPA `pending_review` trigger | Creates CAPA `initiated` with trigger review metadata. |
 | WF-008 | CI diff detects manual edit to generated `status-options.json` | CI fails with source-of-truth violation. |
-

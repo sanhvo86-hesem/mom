@@ -55,11 +55,7 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
                 return $replay;
             }
 
-            if (
-                $existing !== null
-                && !$this->isExpired($existing)
-                && ($existing['status'] ?? '') === 'in_progress'
-            ) {
+            if ($existing !== null && ($existing['status'] ?? '') === 'in_progress') {
                 throw new RecordConflictException('Idempotency request is already in progress.');
             }
 

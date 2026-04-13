@@ -26108,9 +26108,12 @@ ALTER TABLE mes_shift_handover
 
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS idempotency_replay_ledger (
     ledger_id          UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    scope_key          VARCHAR(255) NOT NULL,
+    scope_key          TEXT         NOT NULL,
+    scope_key_hash     CHAR(64)     NOT NULL,
     idempotency_key    VARCHAR(255) NOT NULL,
     fingerprint_hash   CHAR(64)     NOT NULL,
     status             VARCHAR(32)  NOT NULL DEFAULT 'in_progress'
@@ -26124,9 +26127,27 @@ CREATE TABLE IF NOT EXISTS idempotency_replay_ledger (
     created_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
     completed_at       TIMESTAMPTZ,
-    expires_at         TIMESTAMPTZ  NOT NULL,
-    UNIQUE (scope_key, idempotency_key)
+    expires_at         TIMESTAMPTZ  NOT NULL
 );
+
+ALTER TABLE idempotency_replay_ledger
+    ALTER COLUMN scope_key TYPE TEXT;
+
+ALTER TABLE idempotency_replay_ledger
+    ADD COLUMN IF NOT EXISTS scope_key_hash CHAR(64);
+
+UPDATE idempotency_replay_ledger
+SET scope_key_hash = encode(digest(scope_key, 'sha256'), 'hex')
+WHERE scope_key_hash IS NULL;
+
+ALTER TABLE idempotency_replay_ledger
+    ALTER COLUMN scope_key_hash SET NOT NULL;
+
+ALTER TABLE idempotency_replay_ledger
+    DROP CONSTRAINT IF EXISTS idempotency_replay_ledger_scope_key_idempotency_key_key;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_idempotency_replay_scope_hash_key
+    ON idempotency_replay_ledger (scope_key_hash, idempotency_key);
 
 CREATE INDEX IF NOT EXISTS idx_idempotency_replay_status
     ON idempotency_replay_ledger (status, updated_at);
@@ -26142,6 +26163,9 @@ COMMENT ON TABLE idempotency_replay_ledger IS
 
 COMMENT ON COLUMN idempotency_replay_ledger.scope_key IS
     'Mutation scope, normally domain/table/action/business identity.';
+
+COMMENT ON COLUMN idempotency_replay_ledger.scope_key_hash IS
+    'SHA-256 hash of scope_key; this is the unique authority for long process-scope keys.';
 
 COMMENT ON COLUMN idempotency_replay_ledger.idempotency_key IS
     'Client key or derived retry-window key supplied by the API idempotency resolver.';

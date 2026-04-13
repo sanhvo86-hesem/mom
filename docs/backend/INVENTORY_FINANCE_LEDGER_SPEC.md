@@ -8,7 +8,7 @@ This spec defines the runtime ledger and finance controls required before invent
 | --- | --- | --- |
 | Material issue can be recorded in MES/mobile-style stores without enforced inventory/WIP posting | P0 ledger gap | Stock and WIP are not reliable. |
 | Inventory tables and valuation migrations exist, but no dedicated posting command engine was found | schema-only/decorative control | Generic CRUD can create records without accounting logic. |
-| Period close records exist but posting paths do not check them | decorative finance control | Closed period is not enforceable. |
+| Period close is only partially enforced | AP/AR debit-credit memo posting now checks closed-period controls and consumes approved backdate exceptions; inventory, WIP, AP invoice, AR invoice, GL, payment, valuation, and COPQ posting paths still do not share one central policy. | Closed-period control is enforceable only for memo posting today; all other posting paths remain unsafe until command-owned. |
 | P2P schema exists for receipt/AP/3-way match, but command engine is missing | schema-heavy | AP liability/payment controls are incomplete. |
 
 ## Inventory Transaction Ledger
@@ -140,6 +140,8 @@ Acceptance:
 
 ## Period Close Enforcement
 
+Current runtime boundary: `FinanceControlService::createMemo()` enforces closed-period policy for AP/AR debit and credit memos and consumes a matching approved backdate exception. This is a real mitigation, but it is not global ledger control.
+
 Every posting command must call:
 
 `PeriodControlPolicy::assertPostingAllowed(ledger_scope, posting_date, command, actor, backdate_exception_id?)`
@@ -215,4 +217,6 @@ For every ledger posting:
 | LEDGER-008 | 3-way match variance over tolerance | AP invoice status `disputed`, payment blocked. |
 | LEDGER-009 | MRB scrap | Stock/WIP reduced and COPQ ledger posted. |
 | LEDGER-010 | Ledger-balance reconciliation | Report has zero unexplained variance. |
-
+| LEDGER-011 | Close AP/AR period then create debit/credit memo without exception | Fails `period_closed`; runtime mitigation already covers this path. |
+| LEDGER-012 | Create debit/credit memo with matching approved exception | Memo posts once and exception status changes to consumed/closed; runtime mitigation already covers this path. |
+| LEDGER-013 | Reuse consumed backdate exception | Fails `backdate_exception_not_approved` or equivalent deterministic policy error. |

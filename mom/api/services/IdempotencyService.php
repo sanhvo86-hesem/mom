@@ -119,6 +119,7 @@ final class IdempotencyService
             'version' => '2.0',
             'status' => 'in_progress',
             'scope_key' => $scopeKey,
+            'scope_key_hash' => hash('sha256', $scopeKey),
             'idempotency_key' => $idempotencyKey,
             'fingerprint_hash' => $fingerprintHash,
             'fingerprint' => $fingerprintHash,

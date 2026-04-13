@@ -572,16 +572,7 @@ final class QuoteService
     {
         $year        = date('Y');
         $counterFile = $this->dataDir . '/counters/quote_' . $year . '.json';
-
-        $counter = 0;
-        if (file_exists($counterFile)) {
-            $raw  = @file_get_contents($counterFile);
-            $data = json_decode($raw ?: '', true);
-            $counter = (int)($data['counter'] ?? 0);
-        }
-        $counter++;
-
-        $this->writeJson($counterFile, ['counter' => $counter, 'updated' => $this->nowIso()]);
+        $counter = $this->nextCounter($counterFile);
 
         return 'QT-' . $year . '-' . str_pad((string)$counter, 4, '0', STR_PAD_LEFT);
     }
@@ -590,18 +581,26 @@ final class QuoteService
     {
         $year        = date('Y');
         $counterFile = $this->dataDir . '/counters/order_so_' . $year . '.json';
-
-        $counter = 0;
-        if (file_exists($counterFile)) {
-            $raw  = @file_get_contents($counterFile);
-            $data = json_decode($raw ?: '', true);
-            $counter = (int)($data['counter'] ?? 0);
-        }
-        $counter++;
-
-        $this->writeJson($counterFile, ['counter' => $counter, 'updated' => $this->nowIso()]);
+        $counter = $this->nextCounter($counterFile);
 
         return 'SO-' . $year . '-' . str_pad((string)$counter, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function nextCounter(string $counterFile): int
+    {
+        return (int)$this->withFileLock($counterFile . '.lock', function () use ($counterFile): int {
+            $counter = 0;
+            if (file_exists($counterFile)) {
+                $raw  = @file_get_contents($counterFile);
+                $data = json_decode($raw ?: '', true);
+                $counter = (int)($data['counter'] ?? 0);
+            }
+            $counter++;
+
+            $this->writeJson($counterFile, ['counter' => $counter, 'updated' => $this->nowIso()]);
+
+            return $counter;
+        });
     }
 
     private function loadQuotes(): array
@@ -622,14 +621,29 @@ final class QuoteService
      */
     private function withConversionLock(callable $operation): array
     {
-        $handle = @fopen($this->conversionLockFile, 'c');
+        return $this->withFileLock($this->conversionLockFile, $operation);
+    }
+
+    /**
+     * @template T
+     * @param callable():T $operation
+     * @return T
+     */
+    private function withFileLock(string $lockFile, callable $operation): mixed
+    {
+        $dir = dirname($lockFile);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to initialize lock directory.');
+        }
+
+        $handle = @fopen($lockFile, 'c');
         if ($handle === false) {
-            throw new RuntimeException('Unable to open quote conversion lock.');
+            throw new RuntimeException('Unable to open quote service lock.');
         }
 
         try {
             if (!@flock($handle, LOCK_EX)) {
-                throw new RuntimeException('Unable to lock quote conversion authority.');
+                throw new RuntimeException('Unable to lock quote service authority.');
             }
 
             return $operation();
