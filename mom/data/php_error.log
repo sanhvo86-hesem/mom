@@ -392,3 +392,17 @@ Stack trace:
 [13-Apr-2026 05:13:01 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 05:13:01 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
 [13-Apr-2026 05:13:01 UTC] [EventBus] Listener error for error.test: Listener error
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:40 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:42 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:42 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:42 UTC] [CacheService] Redis unavailable (127.0.0.1:1): Connection refused [tcp://127.0.0.1:1]
+[13-Apr-2026 06:47:42 UTC] [EventBus] Listener error for error.test: Listener error

@@ -25,6 +25,11 @@ The tables below are the reviewed baseline. Implementation tickets must expand e
 | --- | --- | --- |
 | `GenericCrudControllerRuntimeSafetyTest` | Governed Generic CRUD mutation is rejected with `409 domain_command_required` even for admin; read remains allowed; internal override requires env+header. | Replace legacy mutation surfaces with command APIs and generated OpenAPI deny markers. |
 | `LogisticsControllerQualityGateTest` | OQC fail creates a legacy JSONL NCR and active SO hold; shipment gate config accepts `gate_items` by normalizing to `gates`. | Move OQC/NCR/hold to canonical PostgreSQL command transaction and dashboard projection. |
+| `QuoteServiceConversionTest` | Quote conversion retry returns the same SO and repairs stale accepted/converted quote state instead of creating duplicates. | Move conversion to PostgreSQL transaction with unique `source_quote_id` and command idempotency table. |
+| `OrderWorkflowEngineeringReadinessTest` / `OrderServiceEngineeringGateTest` | SO transition to `engineering_ready` requires release package fields; JO creation rejects confirmed-only SO. | Replace field-presence checks with released BOM/routing/control plan/inspection plan version locks. |
+| `FinanceControlServicePeriodPolicyTest` | AP/AR memo posting into a closed period fails unless a matching approved backdate exception is supplied and consumed. | Apply the same period policy to every inventory/AP/AR/GL/COPQ/payment posting command. |
+| `SupplierQualityServiceScorecardTest` | Supplier scorecard includes PPM, OTD, SCAR severity/open/overdue, supplier audit, and ASL/cert expiry risk. | Compute scorecard from canonical PO receipt/IQC/SCAR/audit/cert/COPQ tables and enforce supplier release gates. |
+| `WorkflowEngineEventBusTest` plus full suite load order | `OrderWorkflowService` and `WorkflowEngine` can now load in the same PHP process without redeclaring `MOM\Services\TransitionResult`. | Move result DTOs to explicit files/namespaces when command framework is introduced. |
 | Backend smoke | Registry manifest now registers governance wave assets required by smoke tests. | Keep registry manifest generated from source artifacts and fail CI on missing entries. |
 | Runtime authority audit | Drift tool now runs without fatal error in `JSON_ONLY` mode. | Expand drift coverage to quality, supplier-quality, finance controls, status authority, and readiness master data. |
 
@@ -36,12 +41,12 @@ The tables below are the reviewed baseline. Implementation tickets must expand e
 | Internal review | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Registry uses `review`, runtime uses `internal_review` | QTC-002 |
 | Send quote | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Align status source | QTC-003 |
 | Accept quote | `quote_transition` | quote JSON | Runtime transition | Partial | No command idempotency | Audit log | Registry `won` vs runtime `accepted` | QTC-004 |
-| Convert quote to SO | `quote_convert_to_so`, `/api/quotes/{id}/convert` | quote JSON, orders JSON, customer PO JSON | Quote must be accepted | Enforced but incomplete | Not atomic; no idempotency | Partial audit | Implement `ConvertQuoteToSalesOrder` with unique source quote | QTC-005 |
+| Convert quote to SO | `quote_convert_to_so`, `/api/quotes/{id}/convert` | quote JSON, orders JSON, customer PO JSON | Quote must be accepted | JSON-level retry mitigation | Idempotency + conversion lock; no DB transaction | Partial audit | Implement `ConvertQuoteToSalesOrder` with unique source quote | QTC-005 |
 | Link customer PO | conversion/customer PO service | customer PO JSON | PO status partial | Partial | Separate write | Partial | Include in conversion transaction | QTC-006 |
 | Contract review | `order_contract_review` | `data/orders/reviews/{SO}.json` | Separate checklist | Decorative for shipment gate | No SO transaction | Audit log | Gate expects embedded SO `contract_review` | QTC-007 |
 | Confirm SO | `order_transition` to `confirmed` or update | orders JSON | Role transition | Partial | No idempotency | Order transition hash-chain | Must require contract review + PO | QTC-008 |
-| Engineering readiness | Not enforced in runtime SO | Registry/workflow only | None | Decorative/orphan | N/A | N/A | Implement `ReleaseSalesOrderToProduction` | QTC-009 |
-| Create JO | `order_jo_create`, `/api/orders/jobs` | orders JSON | Parent SO exists only | Incomplete | No transaction | Audit log | Must require SO `engineering_ready` and release package | QTC-010 |
+| Engineering readiness | SO transition to `engineering_ready` | orders JSON + release package fields | Engineering release/BOM/routing/CP/IP fields required | Partial runtime enforcement | No DB transaction | Hash-chain order transition audit | Implement `ReleaseSalesOrderToProduction` with released master-data version locks | QTC-009 |
+| Create JO | `order_jo_create`, `/api/orders/jobs` | orders JSON | Parent SO must be `engineering_ready` or `in_production` | Partial runtime enforcement | No transaction | Audit log | Add release package snapshot and PG transaction | QTC-010 |
 | Create WO | `order_wo_create`, `/api/orders/work` | orders JSON | Parent JO exists only | Incomplete | No transaction | Audit log | Must require JO released and routing operation | QTC-011 |
 | Release WO | `order_transition` | orders JSON | Role transition | Partial | No idempotency | Hash-chain | Must check material/tool/gage/operator/NC program | QTC-012 |
 | Issue material | Generic/MES stores possible | `mes_material_consumption`, inventory schema | None found | Decorative | Not transactional | Not sufficient | Implement `IssueMaterialToWorkOrder` | QTC-013 |
@@ -55,8 +60,8 @@ The tables below are the reviewed baseline. Implementation tickets must expand e
 
 Negative tests:
 
-- QTC-N01: retry conversion after simulated crash between SO create and quote update returns same SO, no duplicate.
-- QTC-N02: SO confirmed cannot create JO until `engineering_ready`.
+- QTC-N01: retry conversion after simulated crash between SO create and quote update returns same SO, no duplicate. Covered by `QuoteServiceConversionTest`; repeat at API/DB command level.
+- QTC-N02: SO confirmed cannot create JO until `engineering_ready`. Covered by `OrderServiceEngineeringGateTest`; repeat at API/DB command level.
 - QTC-N03: `delivery_confirm` with failed OQC is rejected.
 - QTC-N04: `/api/runtime/sales/sales_orders` mutation rejected for frontend role.
 
@@ -92,7 +97,7 @@ Negative tests:
 | AP invoice | Finance/generic | `ap_invoices` | Period not enforced | Decorative | `PostApInvoice` | P2P-008 |
 | 3-way match | Schema fields | AP/PO/receipt tables | None found | Decorative | `RunThreeWayMatch` | P2P-009 |
 | Payment | Schema/generic | finance tables | SoD/period missing | Decorative | `PostPayment` | P2P-010 |
-| Scorecard | `supplier_scorecard` | supplier-quality JSON | Incoming only | Incomplete | Canonical scorecard formula | P2P-011 |
+| Scorecard | supplier scorecard API/service | supplier-quality JSON | PPM/OTD/SCAR/audit/ASL/cert formula now enforced in JSON service | Partial runtime enforcement | Canonical scorecard projection and supplier release gates | P2P-011 |
 
 Negative tests:
 
@@ -100,6 +105,7 @@ Negative tests:
 - P2P-N02: Putaway fails for rejected IQC lot.
 - P2P-N03: AP invoice post fails in closed period.
 - P2P-N04: 3-way match over tolerance creates dispute and blocks payment.
+- P2P-N05: severe/open/overdue SCAR or expired cert lowers scorecard and blocks new PO approval by supplier policy.
 
 ### Procure To Pay Target State Before/After
 
@@ -162,8 +168,8 @@ Negative tests:
 | Post inventory transaction | Generic/schema | no period check | FIN-002 open period allowed |
 | Post AP invoice | finance/generic | no period check | FIN-003 open period allowed |
 | Close period | `finance_period_close_create/transition` | creates control only | FIN-004 close locks scope |
-| Try posting closed period | Not blocked by posting services | P0 | FIN-005 all posting commands reject |
-| Backdate exception | `finance_backdate_exception_create/transition` | not consumed by postings | FIN-006 single-use exception consumed |
+| Try posting closed period | Debit/credit memo posting now rejects closed periods; other postings still bypass | P0 partial | FIN-005 all posting commands reject |
+| Backdate exception | `finance_backdate_exception_create/transition` | consumed by memo posting only | FIN-006 single-use exception consumed by every posting policy |
 | Audit evidence | Finance controller idempotency/audit partial | not linked to ledgers | FIN-007 audit/e-sign package |
 
 ### Finance Target State Before/After
@@ -235,13 +241,13 @@ Negative tests:
 - Status artifacts generated from one source.
 - No unknown runtime state in JSON or PG.
 - Generic CRUD mutation default-deny for governed tables.
-- Quote conversion atomic and idempotent.
-- Engineering readiness enforced before JO/WO.
-- OQC/IQC fail creates canonical NCR/hold.
+- Quote conversion JSON runtime is retry-safe/idempotent; command/PG version is atomic.
+- Engineering readiness enforced before JO/WO, with command/PG version verifying released master-data rows.
+- OQC fail creates legacy NCR/hold and blocks shipment; command/PG version creates canonical NCR/hold. IQC canonical hold remains required.
 - Packing/delivery cannot bypass shipment gate.
 - Material issue posts inventory/WIP ledger.
-- Period close blocks all posting commands.
-- Backdate exception is consumed atomically.
+- Period close blocks memo posting now; all posting commands must call the same policy.
+- Backdate exception is consumed atomically for memos now; all posting commands must consume through the same policy.
 - Drift tool runs without fatal error.
 - Master-data sync includes BOM/routing/control plan/inspection plan.
 - E-signature requires re-auth and rejects TOTP replay.

@@ -1274,6 +1274,18 @@ $backdateException = $financeControlService->createBackdateException([
 ], 'finance-user');
 smoke_assert(($backdateException['exception_status'] ?? null) === 'approved', 'Finance backdate exception must create an approved governed exception record.');
 smoke_assert((($backdateException['e_signature'] ?? [])['signature_status'] ?? null) === 'applied', 'Finance backdate exception must carry signature evidence.');
+$apDebitMemoBackdateException = $financeControlService->createBackdateException([
+    'ledger_scope' => 'AP',
+    'subject_type' => 'invoice',
+    'subject_ref' => 'INV-AP-001',
+    'reason_code' => 'closed_period_adjustment',
+    'reason' => 'Approved supplier debit memo after AP close.',
+    'approval_reference' => 'APR-AP-001',
+    'original_event_at' => '2026-04-03T08:15:00+07:00',
+    'requested_posting_date' => '2026-04-04',
+    'expires_at' => $futureBackdateExceptionExpiry,
+], 'finance-user');
+smoke_assert(($apDebitMemoBackdateException['exception_status'] ?? null) === 'approved', 'Finance AP backdate exception must create an approved governed exception record.');
 $creditMemo = $financeControlService->createCreditMemo([
     'invoice_scope' => 'AR',
     'original_invoice_ref' => 'INV-AR-001',
@@ -1290,8 +1302,11 @@ $debitMemo = $financeControlService->createDebitMemo([
     'reason' => 'Supplier under-billed freight adjustment.',
     'amount' => 350000,
     'currency_code' => 'VND',
+    'posting_date' => '2026-04-04',
+    'backdate_exception_id' => $apDebitMemoBackdateException['backdate_exception_id'] ?? '',
 ], 'finance-user');
 smoke_assert(($debitMemo['memo_status'] ?? null) === 'approved', 'Finance debit memo control must create an approved memo record.');
+smoke_assert((($debitMemo['posting_control'] ?? [])['policy'] ?? null) === 'closed_period_backdate_exception_consumed', 'Finance debit memo must consume approved backdate exception when AP period is closed.');
 $reopenedPeriodClose = $financeControlService->transitionPeriodClose((string)($periodClose['period_close_id'] ?? ''), 'reopen', 'finance-user', [
     'reason' => 'Late approved adjustment requires temporary reopen.',
 ]);
@@ -1309,7 +1324,7 @@ $closedBackdateException = $financeControlService->transitionBackdateException((
 ]);
 smoke_assert(($closedBackdateException['exception_status'] ?? null) === 'closed', 'Finance backdate exception transition must support auditable closure.');
 smoke_assert(count($financeControlService->listPeriodCloses()) === 1, 'Finance period close listing must expose created close controls.');
-smoke_assert(count($financeControlService->listBackdateExceptions()) === 1, 'Finance backdate exception listing must expose created temporal controls.');
+smoke_assert(count($financeControlService->listBackdateExceptions()) === 2, 'Finance backdate exception listing must expose created temporal controls.');
 smoke_assert(count($financeControlService->listCreditMemos()) === 1, 'Finance credit memo listing must expose created correction controls.');
 smoke_assert(count($financeControlService->listDebitMemos()) === 1, 'Finance debit memo listing must expose created correction controls.');
 smoke_assert(($financeControlService->getPeriodClose((string)($periodClose['period_close_id'] ?? ''))['period_close_id'] ?? null) === ($periodClose['period_close_id'] ?? null), 'Finance period close detail lookup must resolve the created close control.');

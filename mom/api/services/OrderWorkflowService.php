@@ -9,7 +9,7 @@ use RuntimeException;
 /**
  * Result object for status-transition operations.
  */
-final class TransitionResult
+final class OrderTransitionResult
 {
     public function __construct(
         public readonly bool    $ok,
@@ -102,9 +102,9 @@ final class OrderWorkflowService
     private const FIELD_EDIT_RULES = [
         'so' => [
             'total_qty'   => ['draft', 'quoted'],
-            'due_date'    => ['draft', 'quoted', 'confirmed', 'in_production'],
+            'due_date'    => ['draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production'],
             'total_value' => ['draft', 'quoted'],
-            'priority'    => ['draft', 'quoted', 'confirmed', 'in_production'],
+            'priority'    => ['draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production'],
         ],
         'jo' => [
             'qty_ordered'     => ['planned', 'released'],
@@ -199,37 +199,37 @@ final class OrderWorkflowService
      * @param string $currentStatus Current status of the order.
      * @param string $targetStatus  Desired target status.
      * @param string $userRole      Role of the requesting user.
-     * @return TransitionResult
+     * @return OrderTransitionResult
      */
     public function validateTransition(
         string $orderType,
         string $currentStatus,
         string $targetStatus,
         string $userRole,
-    ): TransitionResult {
+    ): OrderTransitionResult {
         $meta = self::ORDER_META[$orderType] ?? null;
         if ($meta === null) {
-            return new TransitionResult(false, 'Invalid order type.', errorCode: 'invalid_order_type');
+            return new OrderTransitionResult(false, 'Invalid order type.', errorCode: 'invalid_order_type');
         }
 
         $role = $this->migrateRole($userRole);
 
         // Role-based guard: must have edit permission
         if (!$this->hasRolePermission($orderType, 'edit', $role)) {
-            return new TransitionResult(false, 'Insufficient role for this order type.', errorCode: 'forbidden');
+            return new OrderTransitionResult(false, 'Insufficient role for this order type.', errorCode: 'forbidden');
         }
 
         // Cancel guard
         if ($targetStatus === 'cancelled') {
             if (!$this->isRoleInList($role, self::CANCEL_ROLES)) {
-                return new TransitionResult(false, 'Cancel requires manager or director role.', errorCode: 'cancel_forbidden');
+                return new OrderTransitionResult(false, 'Cancel requires manager or director role.', errorCode: 'cancel_forbidden');
             }
         }
 
         // Reopen guard (closed -> any active state)
         if ($currentStatus === 'closed' && $targetStatus !== 'cancelled') {
             if (!$this->isRoleInList($role, self::REOPEN_ROLES)) {
-                return new TransitionResult(false, 'Reopen from closed requires director approval.', errorCode: 'reopen_forbidden');
+                return new OrderTransitionResult(false, 'Reopen from closed requires director approval.', errorCode: 'reopen_forbidden');
             }
         }
 
@@ -241,14 +241,14 @@ final class OrderWorkflowService
 
         // Allow cancel from any non-terminal status (if role check passed)
         if ($targetStatus === 'cancelled' && !in_array($currentStatus, ['cancelled', 'closed'], true)) {
-            return new TransitionResult(true, 'Transition allowed.', data: [
+            return new OrderTransitionResult(true, 'Transition allowed.', data: [
                 'from' => $currentStatus,
                 'to'   => $targetStatus,
             ]);
         }
 
         if (!in_array($targetStatus, $allowed, true)) {
-            return new TransitionResult(
+            return new OrderTransitionResult(
                 false,
                 "Transition from '{$currentStatus}' to '{$targetStatus}' is not allowed.",
                 errorCode: 'invalid_transition',
@@ -260,7 +260,7 @@ final class OrderWorkflowService
             );
         }
 
-        return new TransitionResult(true, 'Transition allowed.', data: [
+        return new OrderTransitionResult(true, 'Transition allowed.', data: [
             'from' => $currentStatus,
             'to'   => $targetStatus,
         ]);
@@ -277,7 +277,7 @@ final class OrderWorkflowService
      * @param string      $targetStatus Desired target status.
      * @param string      $userId       Requesting user identifier.
      * @param string|null $reason       Required for cancel; optional otherwise.
-     * @return TransitionResult
+     * @return OrderTransitionResult
      */
     public function executeTransition(
         string  $orderType,
@@ -285,15 +285,15 @@ final class OrderWorkflowService
         string  $targetStatus,
         string  $userId,
         ?string $reason = null,
-    ): TransitionResult {
+    ): OrderTransitionResult {
         $meta = self::ORDER_META[$orderType] ?? null;
         if ($meta === null) {
-            return new TransitionResult(false, 'Invalid order type.', errorCode: 'invalid_order_type');
+            return new OrderTransitionResult(false, 'Invalid order type.', errorCode: 'invalid_order_type');
         }
 
         // Cancel requires reason
         if ($targetStatus === 'cancelled' && ($reason === null || trim($reason) === '')) {
-            return new TransitionResult(false, 'Cancel requires a reason.', errorCode: 'reason_required');
+            return new OrderTransitionResult(false, 'Cancel requires a reason.', errorCode: 'reason_required');
         }
 
         $orders   = $this->loadOrders();
@@ -313,7 +313,7 @@ final class OrderWorkflowService
         }
 
         if ($record === null) {
-            return new TransitionResult(false, 'Order not found.', errorCode: 'not_found');
+            return new OrderTransitionResult(false, 'Order not found.', errorCode: 'not_found');
         }
 
         $currentStatus = strtolower((string)($record['status'] ?? ''));
@@ -332,6 +332,14 @@ final class OrderWorkflowService
             $gateResult = $this->enforceShipmentGate($orderId, $userId, $userRole);
             if ($gateResult !== null) {
                 return $gateResult;
+            }
+        }
+
+        // Engineering release gate: block SO -> engineering_ready without a released package.
+        if ($orderType === 'so' && $targetStatus === 'engineering_ready') {
+            $engineeringGate = $this->validateEngineeringReadiness($record);
+            if ($engineeringGate !== null) {
+                return $engineeringGate;
             }
         }
 
@@ -410,7 +418,7 @@ final class OrderWorkflowService
         // ── Notification dispatch ───────────────────────────────────────
         $this->dispatchTransitionNotification($orderType, $orderId, $currentStatus, $targetStatus, $userId);
 
-        return new TransitionResult(true, "Transitioned to '{$targetStatus}'.", data: $orders[$storeKey][$recordIdx]);
+        return new OrderTransitionResult(true, "Transitioned to '{$targetStatus}'.", data: $orders[$storeKey][$recordIdx]);
     }
 
     /**
@@ -943,9 +951,9 @@ final class OrderWorkflowService
 
     /**
      * Enforce shipment readiness gate before allowing SO -> shipped.
-     * Returns a failure TransitionResult if gate is NOT READY, null if OK.
+     * Returns a failure OrderTransitionResult if gate is NOT READY, null if OK.
      */
-    private function enforceShipmentGate(string $soNumber, string $userId, string $userRole): ?TransitionResult
+    private function enforceShipmentGate(string $soNumber, string $userId, string $userRole): ?OrderTransitionResult
     {
         $base    = rtrim(str_replace('\\', '/', $this->dataDir), '/');
         $confDir = $base . '/config';
@@ -955,7 +963,7 @@ final class OrderWorkflowService
         try {
             $result = $gateService->checkReadiness($soNumber, $userId, $userRole);
         } catch (RuntimeException $e) {
-            return new TransitionResult(
+            return new OrderTransitionResult(
                 false,
                 'Shipment gate check failed: ' . $e->getMessage(),
                 errorCode: 'shipment_gate_error',
@@ -964,7 +972,7 @@ final class OrderWorkflowService
 
         if (!$result['ready']) {
             $failedCodes = implode(', ', $result['failed_gates'] ?? []);
-            return new TransitionResult(
+            return new OrderTransitionResult(
                 false,
                 "Cannot ship: shipment readiness gate NOT READY. Failed gates: {$failedCodes}. " .
                 "Resolve all required gate failures or request an override from QA Manager.",
@@ -979,20 +987,60 @@ final class OrderWorkflowService
         return null; // Gate passed
     }
 
+    // ── Engineering readiness enforcement ──────────────────────────────────
+
+    /**
+     * @param array<string, mixed> $salesOrder
+     */
+    private function validateEngineeringReadiness(array $salesOrder): ?OrderTransitionResult
+    {
+        $requiredFields = [
+            'engineering_release_id',
+            'bom_id',
+            'routing_id',
+            'control_plan_id',
+            'inspection_plan_id',
+        ];
+
+        $missing = [];
+        foreach ($requiredFields as $field) {
+            if (trim((string)($salesOrder[$field] ?? '')) === '') {
+                $missing[] = $field;
+            }
+        }
+
+        $releaseStatus = strtolower(trim((string)($salesOrder['engineering_release_status'] ?? 'released')));
+        $released = in_array($releaseStatus, ['released', 'approved', 'complete', 'completed'], true);
+
+        if ($missing === [] && $released) {
+            return null;
+        }
+
+        return new OrderTransitionResult(
+            false,
+            'Engineering readiness gate failed. SO requires released engineering package before production release.',
+            data: [
+                'missing_fields' => $missing,
+                'engineering_release_status' => $releaseStatus,
+            ],
+            errorCode: 'engineering_release_incomplete',
+        );
+    }
+
     // ── Quantity validation ─────────────────────────────────────────────────
 
     /**
      * Validate that completion quantity is reasonable before WO -> completed.
-     * Returns a failure TransitionResult if invalid, null if OK.
+     * Returns a failure OrderTransitionResult if invalid, null if OK.
      */
-    private function validateCompletionQuantity(array $record): ?TransitionResult
+    private function validateCompletionQuantity(array $record): ?OrderTransitionResult
     {
         $qtyOrdered   = (int)($record['qty_ordered'] ?? 0);
         $qtyCompleted = (int)($record['qty_completed'] ?? 0);
         $qtyScrap     = (int)($record['qty_scrap'] ?? 0);
 
         if ($qtyOrdered > 0 && ($qtyCompleted + $qtyScrap) === 0) {
-            return new TransitionResult(
+            return new OrderTransitionResult(
                 false,
                 "Cannot complete WO: qty_completed and qty_scrap are both zero. " .
                 "Report progress before completing.",

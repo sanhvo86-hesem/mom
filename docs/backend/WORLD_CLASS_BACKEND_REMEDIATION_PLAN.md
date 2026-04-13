@@ -22,30 +22,35 @@ These fixes reduce the most dangerous P0 bypasses, but they do not complete the 
 | Area | Runtime change | Remaining gap |
 | --- | --- | --- |
 | Generic CRUD governed mutations | `GenericCrudController` now rejects create/update/delete/transition for governed domains/tables with `409 domain_command_required` even for admin unless an internal backfill override env+header is present. | Command APIs and generated endpoint quarantine/OpenAPI policy are still required. |
+| Quote conversion retry safety | `QuoteController::convertToSo()` now uses idempotency, and `QuoteService::convertToSalesOrder()` takes a file lock and repairs stale accepted/converted quote state by returning the already-created SO instead of creating a duplicate. | This is JSON-level atomicity mitigation; canonical `ConvertQuoteToSalesOrder` still needs one PostgreSQL transaction and unique `source_quote_id`. |
+| SO engineering readiness | `so_jo_wo_config.json`, `OrderWorkflowService`, and `OrderService::createJobOrder()` now include/enforce `engineering_ready`; transition to `engineering_ready` requires engineering release, BOM, routing, control plan, and inspection plan references. | Release package validation still checks field presence/status only; canonical release must verify released master-data versions in PostgreSQL. |
 | OQC fail containment | `LogisticsController::oqc_update` now creates/reuses an OQC-sourced JSONL NCR, writes `ncr_reference`, and creates an active SO quality hold in `data/orders/holds.json`. | This is legacy JSON/JSONL containment, not canonical `ncr_records`/`quality_holds` in one PostgreSQL transaction. |
 | Shipment bypass closure | `packing_update(status=shipped)` and `delivery_confirm` now call `ShipmentGateService::checkReadiness()` before writing shipment/delivery state. | `ConfirmPacking` and `ConfirmDelivery` command APIs must still own the transaction, audit, evidence, and SO state transition. |
 | Shipment gate config drift | `ShipmentGateService` now normalizes config key `gate_items` into runtime `gates`. | Contract review, NCR/CAPA, and quality stores remain fragmented until canonical quality/order records exist. |
+| Finance closed-period memo posting | `FinanceControlService::createMemo()` now checks closed period controls and consumes a matching approved backdate exception before writing AP/AR debit/credit memos. | Other posting paths still need the same central period policy in inventory/AP/AR/GL commands. |
+| Supplier scorecard formula | `SupplierQualityService::calculateScorecard()` now includes rejected quantity/defect PPM, OTD evidence, SCAR count/open/overdue/severity penalty, supplier audit penalty, and ASL/cert expiry penalty. | Scorecard remains JSON primary and is not yet linked to PO approval/payment release gates or canonical receipt/IQC/COPQ ledgers. |
+| Workflow result class collision | `OrderWorkflowService` now uses `OrderTransitionResult`, avoiding the fatal namespace collision with `WorkflowEngine::TransitionResult` when both workflow services load in one runtime. | Workflow result classes should still move to separate files/namespaces or shared value-object contracts during command framework cleanup. |
 | Drift audit fatal | `mom/tools/audit_runtime_authority_consistency.php` now calls `audit_collection($domain, $collection, ...)` correctly and runs in current `JSON_ONLY` mode. | Coverage must expand to quality, supplier-quality, finance controls, status authority, and required master-data keys before cutover. |
 
 ## Current State Confirmed From Runtime
 
 | Area | Current runtime finding | Classification | Immediate impact |
 | --- | --- | --- | --- |
-| Quote conversion | `QuoteService::convertToSalesOrder()` creates SO, customer PO sync, then marks quote converted across separate JSON writes with no transaction or idempotency. | P0 atomicity defect | Retry/failure can create duplicate SO. |
-| SO/JO/WO status | `OrderService` constants, `so_jo_wo_config.json`, `status-options.json`, and `workflow-library.json` disagree. | P0 documentation-runtime mismatch | Frontend/backend can transition to states not registered or miss required states. |
-| SO engineering readiness | `engineering_ready` exists in registry/workflow but runtime SO config/service does not enforce it. | P0 schema-only/decorative control | SO can move to production before engineering release. |
+| Quote conversion | Runtime now has idempotency and a conversion lock that recovers an existing SO for stale accepted/converted quote state. | P0 mitigated in JSON runtime; command/PG transaction gap remains | Retry no longer duplicates through this service path, but DB unique constraint/transaction authority is still missing. |
+| SO/JO/WO status | `engineering_ready` is now present in runtime SO config/service, but PHP/config/registry/workflow/DB still disagree on other SO/JO/WO states such as `quoted`, `cancelled`, `released`, `in_progress`, and WO `quality_hold`. | P0 documentation-runtime mismatch | Frontend/backend can still transition/report using wrong status vocabulary outside patched paths. |
+| SO engineering readiness | Runtime SO transition to `engineering_ready` now requires release package fields, and JO creation requires SO `engineering_ready` or `in_production`. | P0 partial runtime enforcement; master-data authority gap remains | Production release is blocked on missing release package fields, but released BOM/routing/CP/IP versions are not yet transactionally verified. |
 | JO/WO cancelled | Runtime constants/transition support `cancelled`; JO/WO config states do not include it. | P0 unregistered runtime state | Reporting and workflow registry cannot trust terminal state. |
 | `wf_sales_order` | Workflow states use `draft, confirmed, engineering_ready, in_production, shipped, closed`; statusSet points to `sales_order_status_code` with different values. | P0 workflow mismatch | Generic transition validation can validate against the wrong vocabulary. |
 | Shipment gate | Legacy `delivery_confirm` and `packing_update(status=shipped)` now call `ShipmentGateService`; SO transition gate also exists. | P0 bypass mitigated; command gap remains | Shipment route is now blocked by readiness failure, but no command transaction/evidence package owns shipment. |
 | Shipment gate inputs | Gate now normalizes `gate_items` to `gates` and OQC-created holds use `so_number/status=active`; contract review and NCR/CAPA stores remain separate. | P0 partial fix; documentation-runtime mismatch remains | Gate can block OQC holds, but cannot prove all quality/contract evidence from one authority. |
 | OQC fail | `LogisticsController::oqc_update` now sets `ncr_required`, writes an OQC-sourced JSONL NCR, stores `ncr_reference`, and creates an active SO quality hold. | P0 partial runtime enforcement; canonical quality command gap | Failed OQC now blocks shipment via hold, but NCR/MRB/CAPA/COPQ are not canonical or transactional. |
 | Material issue | MES/mobile can record time/inspection/consumption-like events; no enforced inventory transaction, stock balance, WIP ledger posting found on material issue. | P0 ledger gap | Inventory and WIP are not financially reliable. |
-| Period close | `FinanceControlService` creates period close/backdate control records; posting services do not check them. | P0 decorative finance control | Closed periods do not block AP/inventory/GL posting. |
+| Period close | `FinanceControlService` creates period close/backdate control records; debit/credit memo posting now checks closed periods and consumes approved exceptions. | P0 partial runtime enforcement | Inventory, AP invoice, AR invoice, GL, COPQ, and payment posting paths still need the same policy. |
 | Master-data sync | JSON has BOM/routing/control plan/inspection plan; `DataLayer::loadRuntimeMasterDataFromPg()` omits these from PG rebuild. | P0 sync incompleteness | Runtime can lose engineering/quality readiness inputs during PG cutover. |
 | Drift audit tool | Fatal TypeError fixed; tool now emits JSON report in current `JSON_ONLY` mode. | P0 fatal fixed; coverage gap remains | Report is runnable but not yet sufficient for governed cutover. |
 | NCR/CAPA/MRB/SCAR stores | Exception JSON, supplier-quality JSON, quality JSONL, registry tables, and workflow library all store state independently. | P0 multi-authority quality | Quality gates cannot prove complete containment. |
 | Auto NCR/CAPA/COPQ | `QualityIntegrationService` appends JSONL events, including unregistered states such as `open` and `pending_review`. | P1 orphan/unconsumed automation | Dashboards/gates do not consume quality triggers consistently. |
-| Supplier scorecard | `SupplierQualityService::calculateScorecard()` uses incoming inspections only; not SCAR severity/count, PPM, OTD, audit/cert risk. | P1 business logic gap | Supplier performance is materially incomplete. |
+| Supplier scorecard | `SupplierQualityService::calculateScorecard()` now computes PPM, OTD, SCAR severity/count/open/overdue, audit, and ASL/cert risk. | P1 partial runtime enforcement | Scorecard still does not block PO/payment or consume canonical PG receipt/IQC/COPQ sources. |
 | Purchasing/receiving/IQC/AP | PostgreSQL schema exists; no dedicated command engine found for PO receipt, IQC, putaway, AP invoice, 3-way match, payment. | P0 schema-only/decorative control | P2P cannot be runtime-safe. |
 | Generic CRUD | 658 table-registry tables, 297 workflow-bound tables, generic REST/action mutations exist; governed create/update/delete/transition are now blocked by runtime guard. | P0 mitigation in code; registry/API policy gap remains | UI cannot use guarded governed mutations, but endpoint catalog/quarantine/OpenAPI still need generated deny markers. |
 | Hard delete quarantine | `destructive-endpoint-quarantine.json` has `endpointCount: 0` despite many destructive routes. | P0 API policy gap | Builders/tools lack a machine-readable denylist. |
@@ -75,7 +80,7 @@ These fixes reduce the most dangerous P0 bypasses, but they do not complete the 
 
 | ID | Remediation | Acceptance criteria |
 | --- | --- | --- |
-| P1-01 Supplier quality scorecard | Scorecards calculate SCAR severity/count, PPM from rejected quantity, OTD from PO receipt dates, audit/cert expiry, special-process approval risk. |
+| P1-01 Supplier quality scorecard | Runtime formula now includes PPM, OTD, SCAR count/open/overdue/severity, audit findings/status, and ASL/cert expiry. Remaining acceptance: compute from canonical PO receipt/IQC/SCAR/audit/COPQ tables and block ASL/PO/payment release by policy. |
 | P1-02 Quality automation ingestion | JSONL auto NCR/CAPA/COPQ becomes canonical records/events consumed by dashboards and gates; no unregistered runtime state remains. |
 | P1-03 MES event spine | MTConnect/OPC-UA raw events stored immutably with source timestamp, quality code, adapter identity, replay key, and derived production events. |
 | P1-04 Mobile MES hardening | Fix controller/service signature mismatches; inspection fail creates NCR/hold; offline sync has idempotency and conflict policy. |
@@ -113,13 +118,13 @@ Each P0 item is implementable only when the package below is satisfied. This sec
 
 | Domain | Runtime authority today | Dedicated service | Generic CRUD present | Major missing gate | Runtime-safe today |
 | --- | --- | --- | --- | --- | --- |
-| Sales/Quote/SO | JSON primary for quote/order, PG schema/projection also exists | Yes, but non-atomic and status-mismatched | Yes | quote conversion transaction, engineering readiness, contract review binding | No |
+| Sales/Quote/SO | JSON primary for quote/order, PG schema/projection also exists | Yes, JSON-level conversion and engineering mitigations now present | Yes | PostgreSQL quote conversion transaction, complete status unification, contract review binding | Partial/no |
 | JO/WO/MES execution | JSON primary order store + mobile/MES JSON | Partial | Yes | release readiness, material ledger, operation completion, inspection plan | No |
 | Inventory/WMS | Mostly PostgreSQL schema/generic | No complete command engine found | Yes | stock/WIP ledger, negative stock, period close | No |
 | Purchasing/Receiving/IQC | PG schema + supplier-quality JSON | Partial supplier-quality only | Yes | receive/IQC/putaway/AP/3-way match | No |
-| Supplier Quality/SCAR/ASL | Supplier-quality JSON + PG tables | Partial | Yes | scorecard formula, SCAR->ASL/PO block | Partial/no |
+| Supplier Quality/SCAR/ASL | Supplier-quality JSON + PG tables | Partial; scorecard formula now includes PPM/SCAR/audit/cert risk | Yes | SCAR/audit/cert risk must block ASL/PO/payment release from canonical tables | Partial/no |
 | NCR/MRB/CAPA/COPQ/OQC | Multiple JSON, JSONL, PG tables | Partial fragmented | Yes | unified quality hold and canonical state | No |
-| Finance/AP/AR/GL/period close | Finance controls JSON + PG schema | Partial finance controls | Yes | posting control and ledger close | No |
+| Finance/AP/AR/GL/period close | Finance controls JSON + PG schema | Partial finance controls; memo posting checks closed period | Yes | central policy across inventory/AP/AR/GL/COPQ/payment posting | Partial/no |
 | Master Data/BOM/Routing/CP/IP | JSON has broad data, PG rebuild omits key readiness sets | Partial | Yes | complete sync and runtime release freeze | No |
 | Traceability/Lot/Serial/Genealogy/DPP | DPP JSON + trace schema | Partial DPP | Yes | canonical genealogy, split/merge, recall | No |
 | Maintenance/Calibration | PG schema + scheduled alert logic | Partial alerts | Yes | release gate for gage/equipment/tool validity | Partial/no |
@@ -140,7 +145,7 @@ Each P0 item is implementable only when the package below is satisfied. This sec
 | `mes_material_consumption` | schema/projection | Material issue command consumes stock and posts WIP. |
 | `mes_oee_snapshots`, `mes_oee_loss_events` | partial OEE service | Event spine replay can regenerate OEE and reconcile with snapshots. |
 | `dpp_passports`, `mes_part_genealogy` | partial/ad hoc | DPP auto-created from genealogy and shipment events. |
-| `period_closes`, `backdate_exceptions` | service-backed control record but not enforced | Period policy is called by every posting command. |
+| `period_closes`, `backdate_exceptions` | partially service-backed; debit/credit memo posting enforces and consumes exceptions, other postings still decorative | Period policy is called by every posting command. |
 
 ## Generic CRUD Exposure Risk
 
@@ -164,7 +169,7 @@ Frontend policy:
 | AS9100 / IATF 16949 | Contract review, traceability, nonconformance, supplier quality, production control. | Contract review not bound to SO gate; traceability/genealogy incomplete. |
 | NIST SP 800-82 / ISA/IEC 62443 | OT zones/conduits, machine identity, event integrity. | Machine adapter identity exists; zone/conduit and immutable raw stream incomplete. |
 | OPC UA / MTConnect | Source timestamp, quality code, immutable raw event stream. | MTConnect parser stores latest signal; raw immutable stream and quality codes incomplete. |
-| ERP best practice | Period close, inventory/WIP ledger, 3-way match, approval segregation. | Period close not enforced; inventory/P2P mostly schema-heavy. |
+| ERP best practice | Period close, inventory/WIP ledger, 3-way match, approval segregation. | Closed-period policy is enforced only for AP/AR memos; inventory/AP invoice/AR invoice/GL/payment/P2P remain schema-heavy. |
 
 ## Acceptance Criteria
 

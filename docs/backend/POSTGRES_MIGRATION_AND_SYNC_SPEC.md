@@ -21,6 +21,7 @@ Current code supports these modes in `DataLayer`, but runtime services do not co
 | Orders | `OrderController`/`QuoteService` often writes JSON stores through dedicated services, not always DB-backed `DataLayer`. | Commands must use PG transaction authority. |
 | MES | `MtconnectPollingService` syncs master/orders/MES stores to PG when not JSON-only; raw event stream is not canonical. | Add raw event table and idempotent replay. |
 | Quality | Exception JSON, logistics OQC JSON, supplier-quality JSON, quality JSONL, and PG quality tables diverge. | Canonical quality importer and single command authority. |
+| Supplier quality shadow write | `SupplierQualityService` now maps SCAR shadow writes to `scar_records` instead of the wrong `supplier_scorecards` target; scorecard remains JSON primary with PG shadow best-effort only. | Add deterministic upsert keys, table-specific column mapping, reconciliation, and failure reporting before trusting supplier quality PG projections. |
 | Drift tool | `audit_runtime_authority_consistency.php` now runs in current `JSON_ONLY` mode after the `audit_collection()` argument fix. | Expand coverage and fail conditions before trusting cutover reports. |
 
 ## Missing Sync Keys

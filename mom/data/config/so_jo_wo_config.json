@@ -446,6 +446,7 @@
         "draft",
         "quoted",
         "confirmed",
+        "engineering_ready",
         "in_production",
         "shipped",
         "closed",
@@ -462,6 +463,10 @@
           "cancelled"
         ],
         "confirmed": [
+          "engineering_ready",
+          "cancelled"
+        ],
+        "engineering_ready": [
           "in_production",
           "cancelled"
         ],
@@ -490,6 +495,11 @@
           "label": "Confirmed",
           "label_vi": "Đã xác nhận",
           "color": "#8b5cf6"
+        },
+        "engineering_ready": {
+          "label": "Engineering Ready",
+          "label_vi": "Sẵn sàng kỹ thuật",
+          "color": "#14b8a6"
         },
         "in_production": {
           "label": "In Production",

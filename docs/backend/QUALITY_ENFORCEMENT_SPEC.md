@@ -11,7 +11,7 @@ This spec unifies NCR, CAPA, MRB, SCAR, OQC, IQC, holds, quarantine, COPQ, and s
 | NCR/CAPA/MRB/SCAR multi-authority | Exceptions JSON, supplier-quality JSON, quality JSONL, and PG registry tables all store quality state. | P0 multi-authority |
 | Auto quality events are unconsumed | `QualityIntegrationService` writes JSONL NCR/CAPA/COPQ triggers; not canonical records/gates. | orphan automation |
 | IQC does not block putaway | Supplier incoming inspection records are separate from PO receipt/lot availability. | decorative IQC |
-| Supplier scorecard incomplete | Scorecard uses incoming inspection records only. | business logic gap |
+| Supplier scorecard formula is now partial | `SupplierQualityService::calculateScorecard()` now computes PPM, OTD, SCAR severity/count/open/overdue, supplier audit, and ASL/cert expiry risk from JSON stores. | P1 runtime formula improved; still not canonical PO/IQC/COPQ authority |
 
 ## Target Unified Model
 
@@ -46,6 +46,7 @@ The 2026-04-13 runtime patch intentionally closes the immediate OQC-to-shipment 
 2. OQC fail creates or reuses an OQC-sourced record in `data/quality/ncr/ncr_log.jsonl`.
 3. `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`.
 4. `ShipmentGateService` blocks shipment when the SO has an active hold.
+5. Supplier scorecard calculation includes quantity PPM, delivery timeliness, SCAR severity/open/overdue, supplier audit findings/status, and ASL/cert expiry penalties.
 
 This mitigation is not sufficient for regulated release because it does not create canonical PostgreSQL `quality_events`, `ncr_records`, `quality_holds`, `mrb_records`, `capa_records`, or `copq_ledger` in one transaction. The command model below remains mandatory.
 
@@ -157,17 +158,23 @@ Period close policy applies to COPQ postings.
 
 ## Supplier SCAR Scorecard Impact
 
-Scorecard formula must include:
+The legacy runtime formula now includes:
 
 - Incoming lots received/rejected.
 - Defect PPM = rejected quantity or defect count per million received quantity.
-- OTD from PO promised/receipt dates.
+- OTD from explicit `on_time` evidence or actual receipt/inspection date compared to promised/due date.
 - SCAR count and severity weighting.
 - Open overdue SCAR penalty.
-- Supplier audit status and expiry.
-- Certification expiry and special process approval.
+- Supplier audit failed/overdue status and major/minor/critical findings.
+- ASL approval and certification expiry.
+
+The canonical command/projection formula must additionally include:
+
+- OTD from PO promised/receipt dates, not free-form inspection fields.
+- Certification expiry and special process approval from canonical ASL/supplier approval tables.
 - Counterfeit/material-cert risk.
 - Cost impact from COPQ/supplier chargebacks.
+- Policy actions: score below threshold or critical SCAR blocks new PO approval/release or payment release according to supplier governance policy.
 
 Acceptance: a severe SCAR reduces supplier score even if incoming inspection count is low.
 

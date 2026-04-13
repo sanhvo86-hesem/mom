@@ -1,33 +1,63 @@
 # Domain: mes-execution
 
-> **Auto-generated stub** — edit freely. Re-running `generate.php` will NOT overwrite this file.
+> **Human-maintained.** Re-running `generate.php` will NOT overwrite this file.
 
 ## Purpose
-<!-- Describe what this domain is responsible for in the business context -->
+Captures machine execution events, operator work queues, time tracking, in-process inspections, CNC program management, and alarms so shopfloor activities remain auditable and linked to jobs/orders. Provides offline-first mobile support with conflict resolution.
 
 ## Canonical Objects (Contracts)
-- **Machine Alarms** (`mes_execution.machine-alarms`): primary table `mes_machine_alarms`, workflow: `mes_machine_alarms_escalation_status`
+- **Machine Alarm** (`mes_execution--machine-alarms`): primary table `mes_machine_alarms`
 
 ## Controllers
 - `MobileController` → `mom/api/controllers/MobileController.php`
 - `CncProgramController` → `mom/api/controllers/CncProgramController.php`
+- `DispatchController` → `mom/api/controllers/DispatchController.php` *(shared with planning_production)*
 
 ## Key Services
-<!-- List 3–5 most important services for this domain and what they do -->
+- **MobileWorkQueueService** — Work queue state management; task assignments; in-process inspection records
+- **MesAdapterService** — Normalizes adapter config (adapter_id, machine_id, adapter_type, transport_protocol, `heartbeat_sla_seconds`, `stale_after_seconds`, `store_and_forward_enabled`) and event payloads
+- **MesAlarmService** — Alarm catalog normalization; playbooks with `response_steps`; runtime alarm normalization with lockout/maintenance flags
+- **MtconnectPollingService** — Polls MTConnect machines per adapter config; updates shadow state
 
 ## Key Tables
-<!-- List the 3–5 most critical database tables with a one-line description each -->
+- `mobile_work_queue` — Queue entries (`queue_id`, `employee_id`, `wo_number`, `operation_seq`, `status`: pending/started/completed, `result`: pass/fail/partial)
+- `mes_time_entries` — Clock records (`entry_id`, `employee_id`, `wo_number`, `machine_id`, `labor_type`: setup/run/rework/inspection, `clock_in`, `clock_out`)
+- `mes_inspections` — Inspection captures (`capture_type`: first_piece/in_process/final, `measurements[]`, `photos[]` as base64)
+- `mes_machine_alarms` — Machine alarm events (`alarm_event_id`, `equipment_id`, `alarm_code`, `severity`, `escalation_status`, `playbook_id`)
+- `mes_runtime.json` *(file-backed)* — Runtime shadow state for machines, operations, adapters
 
 ## Workflow States
-<!-- List lifecycle states for the main records (e.g., Draft → Submitted → Approved → Released → Closed) -->
+
+**Work queue task:** pending → started → completed | partial | fail
+
+**Time entry:** open (clock_in recorded) → closed (clock_out recorded)
+
+**Machine alarm:** (machine-originated) → acknowledged → escalated | cleared *(by operator)*
+
+**CNC Program:** draft → under_review → approved → released | superseded
 
 ## Common Tasks & Entry Points
-<!-- e.g., "To add a field to an NCR: edit migration + contract.json + ExceptionController" -->
-<!-- e.g., "To trace an order: start at OrderController::detail, then OrderService::get" -->
+- **Get operator queue:** `MobileController::getMyQueue()` → `MobileWorkQueueService::getOperatorQueue(employee_id)` → `mobile_work_queue`
+- **Start task:** `MobileController::startTask(queue_id)` → status = `started`, `start_time` recorded
+- **Complete task:** `MobileController::completeTask(queue_id, result, qty_completed, qty_scrap)` → status = `completed`
+- **Clock in:** `MobileController::clockIn(wo_number, operation_seq, machine_id, labor_type)` → `mes_time_entries`, records `clock_in`
+- **Clock out:** `MobileController::clockOut(time_entry_id, qty_completed)` → records `clock_out`, calculates duration
+- **Capture inspection:** `MobileController::captureInspection(wo_number, capture_type, measurements[], photos[])` → `mes_inspections`
+- **Sync offline batch:** `MobileController::submitOfflineBatch(entries[])` → processes queued records, detects conflicts, applies resolution strategy
+- **Poll MTConnect:** `MtconnectPollingService::pollAll()` → queries adapters with `adapter_type='mtconnect'` and `status='active'`
 
 ## Business Rules
-<!-- Non-obvious rules that would trip up AI without context -->
-<!-- e.g., "JO number = plant_code + year + 4-digit sequence — changing this breaks traveler lookup" -->
+- **Employee identification**: lookup `user['employee_id']` in `users.json` by username; fallback to username if `employee_id` not set
+- **Clock-in requires**: `wo_number`, `operation_seq`, `machine_id`, `labor_type` (setup/run/rework/inspection)
+- **Clock-out requires**: `qty_completed`; `qty_scrap` is optional
+- **First-piece inspection required** before production run; in-process inspections are sampling-based
+- **Offline batch conflict types**: depend on entry type (time_entry, inspection, queue_task); `merge` strategy requires `merge_data` payload; must specify `resolution`: keep_local | keep_server | merge
+- **Machine alarms must have source**: source must be machine/adapter/edge — manual alarm creation is blocked
+- **Inspection photos as base64**: stored directly in JSON; no separate file storage abstraction
+- **MTConnect filter**: `adapter_type='mtconnect'` AND `status='active'` — only matching adapters are polled
 
 ## Notes / Gotchas
-<!-- Architecture quirks, legacy compatibility concerns, known edge cases -->
+- **Employee resolution can fail silently**: `user['employee_id']` may not exist; system falls back to username as employee identifier — ensure users have `employee_id` set in `users.json`
+- **Offline sync conflicts require explicit resolution payload**: the `merge` strategy needs `merge_data`; sending empty merge_data silently drops the update
+- **Inspection photos are base64 blobs in the JSON records** — no file storage; large photos significantly increase record size; no size cap currently enforced
+- **MES runtime is file-backed**: `mes_runtime.json` is not in PostgreSQL; changes by concurrent processes can cause write conflicts

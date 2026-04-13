@@ -1,37 +1,67 @@
 # Domain: procurement
 
-> **Auto-generated stub** — edit freely. Re-running `generate.php` will NOT overwrite this file.
+> **Human-maintained.** Re-running `generate.php` will NOT overwrite this file.
 
 ## Purpose
-<!-- Describe what this domain is responsible for in the business context -->
+Gates inbound material quality, manages supplier scorecards, incoming inspections (IQC), Approved Supplier List (ASL), Purchase Orders/Receipts, and Supplier Corrective Action Requests (SCAR) so supplier quality signals integrate with purchasing, receiving, and finance. Enforces 8D methodology for SCAR closure.
 
 ## Canonical Objects (Contracts)
-- **IQC Inspections** (`procurement_supplier_quality.iqc-inspections`): primary table `incoming_inspections`, workflow: `incoming_inspections_status`
-- **Purchase Receipt Corrections** (`procurement_supplier_quality.purchase-receipt-corrections`): primary table `purchase_receipt_corrections`, workflow: `purchase_receipt_corrections_correction_status`
-- **Purchase Receipts** (`procurement_supplier_quality.purchase-receipts`): primary table `purchase_receipts`, workflow: `purchase_receipts_receipt_status`
-- **Purchase Requisitions** (`procurement_supplier_quality.purchase-requisitions`): primary table `purchase_requisitions`, workflow: `purchase_requisitions_requisition_status`
-- **Supplier ASNs** (`procurement_supplier_quality.supplier-asns`): primary table `supplier_asns`, workflow: `supplier_asns_asn_status`
-- **Supplier Purchase Orders** (`procurement_supplier_quality.supplier-purchase-orders`): primary table `supplier_purchase_orders`, workflow: `supplier_purchase_orders_po_status_purchasing_runtime`
+- **Purchase Requisition** (`procurement_supplier_quality--purchase-requisitions`)
+- **Purchase Order** (`procurement_supplier_quality--purchase-orders`): primary table `purchase_orders`
+- **Supplier ASN** (`procurement_supplier_quality--supplier-asns`)
+- **Purchase Receipt** (`procurement_supplier_quality--purchase-receipts`): primary table `purchase_receipts`
+- **Purchase Receipt Correction** (`procurement_supplier_quality--purchase-receipt-corrections`)
+- **IQC Inspection** (`procurement_supplier_quality--iqc-inspections`): primary table `incoming_inspections`
 
 ## Controllers
 - `SupplierController` → `mom/api/controllers/SupplierController.php`
 
 ## Key Services
-<!-- List 3–5 most important services for this domain and what they do -->
+- **SupplierQualityService** — Supplier scorecards (quality 40%, delivery 30%, cost 20%, compliance 10%); skip-lot ANSI Z1.4 management; ASL maintenance; SCAR 8D lifecycle
+- **ShipmentGateService** — Used in reverse direction: incoming receipt gate checks
 
 ## Key Tables
-<!-- List the 3–5 most critical database tables with a one-line description each -->
+- `supplier_scorecards` — Vendor performance by period (YYYY-MM) with weighted score and grades (A/B/C/D/F)
+- `incoming_inspections` — IQC records (`status`: pending/pass/fail/conditional)
+- `incoming_inspection_results` — Detail test results (test_name, specification, actual_value, pass/fail)
+- `purchase_receipts` — Inbound receipts (`receipt_status`: received/under_iqc/accepted/quarantined/putaway/closed/reversed)
+- `purchase_receipt_lines` — Line items (item_id, quantity_received, quantity_accepted, lot/serial)
+- `supplier_asl` — Approved Supplier List (vendor_id, product_category, approval_status, expiration_date)
+- `supplier_scar` — SCAR records with 8D fields (d1_team_members through d7_preventive_actions)
+- `supplier_audits` — Planned/completed audits per vendor
 
 ## Workflow States
-<!-- List lifecycle states for the main records (e.g., Draft → Submitted → Approved → Released → Closed) -->
+
+**IQC Inspection:** pending → {pass | fail | conditional}
+
+**Purchase Receipt:** received → under_iqc → {accepted → putaway | quarantined} → {closed | reversed}
+
+**SCAR (8D):** issued → acknowledged → root_cause_analysis → corrective_action → verification → closed
 
 ## Common Tasks & Entry Points
-<!-- e.g., "To add a field to an NCR: edit migration + contract.json + ExceptionController" -->
-<!-- e.g., "To trace an order: start at OrderController::detail, then OrderService::get" -->
+- **Calculate scorecard:** `SupplierController::calculateScorecard(vendor_id, period)` → `SupplierQualityService::calculateScorecard()` → `supplier_scorecards`
+- **Queue IQC:** `SupplierController::createIncoming(receipt_id, items[])` → `incoming_inspections` (status = `pending`)
+- **Complete IQC + accept:** `SupplierController::updateIncoming(inspection_id, {result_lines[], decision})` → pass/fail/conditional
+- **Update skip-lot level:** `SupplierController::updateSkipLot(vendor_id, new_level)` → `SupplierQualityService::updateSkipLot()`
+- **Manage ASL:** `SupplierController::upsertAsl(vendor_id, category, approval_status)` → `supplier_asl`
+- **Create SCAR:** `SupplierController::createScar(vendor_id, description)` → `supplier_scar` (status = `issued`)
+- **Advance SCAR:** `SupplierController::scarTransition(scar_id, target_state, 8d_payload)` → validates required 8D fields per state
 
 ## Business Rules
-<!-- Non-obvious rules that would trip up AI without context -->
-<!-- e.g., "JO number = plant_code + year + 4-digit sequence — changing this breaks traveler lookup" -->
+- **Scorecard weights**: quality=0.40, delivery=0.30, cost=0.20, compliance=0.10; grades: A/B/C/D/F
+- **IQC acceptance requires result evidence**: `result_evidence_complete` precondition; cannot accept without result_lines array
+- **Quarantined receipts cannot reach free stock**: status stays `quarantined` until disposition resolved; `putaway` requires `accepted` precondition
+- **Skip-lot ANSI Z1.4 switching**: levels = `['tightened', 'normal', 'reduced', 'skip']`; any failed lot moves supplier back to `tightened`
+- **SCAR 8D fields are state-gated**:
+  - `acknowledged` requires `d1_team_members` + `d2_problem_description`
+  - `root_cause_analysis` requires `d3_containment_actions` + `d4_root_cause`
+  - `corrective_action` requires `d5_corrective_actions` + `d6_implementation_plan`
+  - `verification` requires `d7_preventive_actions`
+- **Receipt reversal preserves AP trace**: `reversed` command requires `correction_reason_recorded`; reversal invalidates downstream AP invoice posting
+- **Conditional IQC requires waiver approval**: `waive` command moves to `conditional`; requires `waiver_approval_recorded`
 
 ## Notes / Gotchas
-<!-- Architecture quirks, legacy compatibility concerns, known edge cases -->
+- **SCAR 8D fields cannot be skipped** — each state enforces its required fields; cannot jump states; no backward steps in the standard path
+- **IQC result_lines are mandatory for acceptance** — empty or missing results block the accept transition; `test_name`, `specification`, `actual_value`, `pass/fail` all required
+- **ASL expiration is NOT auto-enforced** — `expiration_date` is recorded but does not block PO creation automatically; purchasing must check ASL status separately
+- **Receipt reversal is a lifecycle state, not a soft delete** — `reversed` state is final; downstream AP invoice and stock balance must both be corrected

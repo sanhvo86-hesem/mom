@@ -74,6 +74,20 @@ final class SupplierQualityService
     /** Skip-lot inspection levels. */
     private const SKIP_LOT_LEVELS = ['tightened', 'normal', 'reduced', 'skip'];
 
+    /** SCAR severity penalty used by supplier scorecards. */
+    private const SCAR_SEVERITY_PENALTY = [
+        'critical' => 25.0,
+        'high'     => 20.0,
+        'major'    => 15.0,
+        'medium'   => 8.0,
+        'moderate' => 8.0,
+        'low'      => 3.0,
+        'minor'    => 3.0,
+    ];
+
+    /** Statuses considered closed for supplier quality risk rollups. */
+    private const CLOSED_STATUSES = ['closed', 'completed', 'cancelled', 'canceled', 'void', 'rejected'];
+
     /** Optional database connection for PostgreSQL dual-write. */
     private ?object $db = null;
 
@@ -112,7 +126,7 @@ final class SupplierQualityService
      * @param string $period   Format "YYYY-MM".
      * @return array Calculated scorecard.
      */
-    public function calculateScorecard(string $vendorId, string $period): array
+    public function calculateScorecard(string $vendorId, string $period, ?string $userId = null): array
     {
         $incoming = $this->loadFile('incoming');
         $now      = $this->nowIso();
@@ -121,6 +135,8 @@ final class SupplierQualityService
         $lotsRejected  = 0;
         $onTimeCount   = 0;
         $totalDeliveries = 0;
+        $qtyReceived = 0.0;
+        $qtyRejected = 0.0;
 
         foreach ($incoming as $insp) {
             if (!is_array($insp)) {
@@ -138,22 +154,56 @@ final class SupplierQualityService
             $totalDeliveries++;
 
             $result = strtolower($insp['result'] ?? '');
-            if ($result === 'rejected' || $result === 'fail') {
+            $isRejected = in_array($result, ['rejected', 'reject', 'fail', 'failed'], true);
+            if ($isRejected) {
                 $lotsRejected++;
             }
 
-            if (!empty($insp['on_time'])) {
+            $receivedQty = $this->firstPositiveFloat($insp, [
+                'qty_received',
+                'received_qty',
+                'quantity_received',
+                'qty',
+                'lot_qty',
+            ]);
+            $rejectedQty = $this->firstPositiveFloat($insp, [
+                'qty_rejected',
+                'rejected_qty',
+                'quantity_rejected',
+                'defect_qty',
+                'defects_found',
+            ]);
+            if ($isRejected && $receivedQty > 0.0 && $rejectedQty <= 0.0) {
+                $rejectedQty = 1.0;
+            }
+            $qtyReceived += $receivedQty;
+            $qtyRejected += min($receivedQty > 0.0 ? $receivedQty : $rejectedQty, $rejectedQty);
+
+            if ($this->isDeliveryOnTime($insp)) {
                 $onTimeCount++;
             }
         }
 
-        $qualityScore   = $lotsReceived > 0
-            ? round((1 - $lotsRejected / $lotsReceived) * 100, 1)
-            : 100.0;
+        $incomingQualityScore = $qtyReceived > 0.0
+            ? round((1 - min(1.0, $qtyRejected / $qtyReceived)) * 100, 1)
+            : ($lotsReceived > 0
+                ? round((1 - $lotsRejected / $lotsReceived) * 100, 1)
+                : 100.0);
+        $ppm = $qtyReceived > 0.0
+            ? round(($qtyRejected / $qtyReceived) * 1000000, 1)
+            : ($lotsReceived > 0 ? round(($lotsRejected / $lotsReceived) * 1000000, 1) : 0.0);
+
+        $risk = $this->calculateSupplierRiskAdjustments($vendorId, $period);
+
+        $qualityScore   = round(max(0.0, $incomingQualityScore - $risk['scar_severity_penalty']), 1);
 
         $deliveryScore  = $totalDeliveries > 0
             ? round(($onTimeCount / $totalDeliveries) * 100, 1)
             : 100.0;
+
+        $compliancePenalty = $risk['audit_risk_penalty']
+            + $risk['cert_risk_penalty']
+            + min(20.0, ($risk['open_scar_count'] * 3.0) + ($risk['overdue_scar_count'] * 5.0));
 
         // Cost and compliance scores come from stored data or default to 100
         $scorecards    = $this->loadFile('scorecards');
@@ -166,7 +216,8 @@ final class SupplierQualityService
         }
 
         $costScore       = (float)($existing['cost_score'] ?? 100.0);
-        $complianceScore = (float)($existing['compliance_score'] ?? 100.0);
+        $baseComplianceScore = (float)($existing['compliance_score'] ?? 100.0);
+        $complianceScore = round(max(0.0, $baseComplianceScore - $compliancePenalty), 1);
 
         $overallScore = round(
             $qualityScore   * self::WEIGHT_QUALITY +
@@ -186,9 +237,29 @@ final class SupplierQualityService
             'overall_score'    => $overallScore,
             'lots_received'    => $lotsReceived,
             'lots_rejected'    => $lotsRejected,
+            'qty_received'     => round($qtyReceived, 3),
+            'qty_rejected'     => round($qtyRejected, 3),
+            'ppm'              => $ppm,
             'on_time_count'    => $onTimeCount,
+            'on_time_deliveries' => $onTimeCount,
             'total_deliveries' => $totalDeliveries,
+            'incoming_quality_score' => $incomingQualityScore,
+            'scar_count'       => $risk['scar_count'],
+            'open_scar_count'  => $risk['open_scar_count'],
+            'overdue_scar_count' => $risk['overdue_scar_count'],
+            'scar_severity_penalty' => $risk['scar_severity_penalty'],
+            'audit_count'      => $risk['audit_count'],
+            'audit_risk_penalty' => $risk['audit_risk_penalty'],
+            'cert_risk_penalty' => $risk['cert_risk_penalty'],
+            'compliance_penalty' => round($compliancePenalty, 1),
+            'asl_approved'     => $risk['asl_approved'],
+            'scorecard_basis'  => [
+                'quality' => 'qty_rejected / qty_received PPM with SCAR severity penalty',
+                'delivery' => 'on_time flag or actual receipt date <= promised/due date',
+                'compliance' => 'stored compliance score minus open/overdue SCAR, supplier audit, and ASL/cert risk',
+            ],
             'calculated_at'    => $now,
+            'calculated_by'    => $userId,
         ];
 
         // Upsert into scorecards store
@@ -208,6 +279,121 @@ final class SupplierQualityService
         $this->saveFile('scorecards', $scorecards);
 
         return $scorecard;
+    }
+
+    /**
+     * Calculate SCAR, supplier-audit, and ASL/certification risk adjustments for a scorecard period.
+     *
+     * @return array<string, mixed>
+     */
+    private function calculateSupplierRiskAdjustments(string $vendorId, string $period): array
+    {
+        $periodEnd = $this->periodEndDate($period);
+        $scars = $this->loadFile('scar');
+        $audits = $this->loadFile('audits');
+        $asl = $this->loadFile('asl');
+
+        $scarCount = 0;
+        $openScarCount = 0;
+        $overdueScarCount = 0;
+        $scarPenalty = 0.0;
+
+        foreach ($scars as $scar) {
+            if (!is_array($scar) || ($scar['vendor_id'] ?? '') !== $vendorId) {
+                continue;
+            }
+            $scarPeriod = substr((string)($scar['issue_date'] ?? $scar['created_at'] ?? $scar['updated_at'] ?? ''), 0, 7);
+            if ($scarPeriod !== $period) {
+                continue;
+            }
+
+            $scarCount++;
+            $status = strtolower((string)($scar['status'] ?? 'issued'));
+            if (!in_array($status, self::CLOSED_STATUSES, true)) {
+                $openScarCount++;
+                if ($this->isPastDue($scar, [
+                    'verification_due_date',
+                    'corrective_due_date',
+                    'root_cause_due_date',
+                    'acknowledge_due_date',
+                    'due_date',
+                ], $periodEnd)) {
+                    $overdueScarCount++;
+                }
+            }
+
+            $severity = strtolower((string)($scar['severity'] ?? $scar['priority'] ?? 'medium'));
+            $scarPenalty += self::SCAR_SEVERITY_PENALTY[$severity] ?? self::SCAR_SEVERITY_PENALTY['medium'];
+        }
+
+        $auditCount = 0;
+        $auditPenalty = 0.0;
+        foreach ($audits as $audit) {
+            if (!is_array($audit) || ($audit['vendor_id'] ?? '') !== $vendorId) {
+                continue;
+            }
+            $auditPeriod = substr((string)(
+                $audit['actual_date']
+                ?? $audit['audit_date']
+                ?? $audit['planned_date']
+                ?? $audit['created_at']
+                ?? ''
+            ), 0, 7);
+            if ($auditPeriod !== $period && !$this->isPastDue($audit, ['next_audit_date', 'next_due_date', 'planned_date'], $periodEnd)) {
+                continue;
+            }
+
+            $auditCount++;
+            $status = strtolower((string)($audit['status'] ?? $audit['overall_result'] ?? ''));
+            $result = strtolower((string)($audit['overall_result'] ?? ''));
+            if (in_array($status, ['failed', 'fail', 'rejected'], true) || in_array($result, ['failed', 'fail', 'unsatisfactory'], true)) {
+                $auditPenalty += 20.0;
+            }
+            if (!in_array($status, self::CLOSED_STATUSES, true)
+                && $this->isPastDue($audit, ['next_audit_date', 'next_due_date', 'planned_date'], $periodEnd)) {
+                $auditPenalty += 10.0;
+            }
+            $auditPenalty += min(20.0, ((float)($audit['findings_count_critical'] ?? 0) * 8.0)
+                + ((float)($audit['findings_count_major'] ?? 0) * 5.0)
+                + ((float)($audit['findings_count_minor'] ?? 0) * 1.0));
+        }
+
+        $aslApproved = false;
+        $certPenalty = 0.0;
+        $vendorAslEntries = 0;
+        foreach ($asl as $entry) {
+            if (!is_array($entry) || ($entry['vendor_id'] ?? '') !== $vendorId) {
+                continue;
+            }
+            $vendorAslEntries++;
+            $status = strtolower((string)($entry['status'] ?? $entry['asl_status'] ?? ''));
+            if ($status === 'approved') {
+                $aslApproved = true;
+            }
+            if ($this->isDateOnOrBefore($entry['expiry_date'] ?? $entry['cert_expiry'] ?? $entry['cert_expires_at'] ?? null, $periodEnd)) {
+                $certPenalty += 15.0;
+            }
+            foreach ((array)($entry['certifications'] ?? []) as $cert) {
+                if (is_array($cert)
+                    && $this->isDateOnOrBefore($cert['expiry_date'] ?? $cert['expires_at'] ?? null, $periodEnd)) {
+                    $certPenalty += 5.0;
+                }
+            }
+        }
+        if ($vendorAslEntries === 0 || !$aslApproved) {
+            $certPenalty += 20.0;
+        }
+
+        return [
+            'scar_count' => $scarCount,
+            'open_scar_count' => $openScarCount,
+            'overdue_scar_count' => $overdueScarCount,
+            'scar_severity_penalty' => round(min(40.0, $scarPenalty + ($openScarCount * 2.0) + ($overdueScarCount * 5.0)), 1),
+            'audit_count' => $auditCount,
+            'audit_risk_penalty' => round(min(30.0, $auditPenalty), 1),
+            'cert_risk_penalty' => round(min(25.0, $certPenalty), 1),
+            'asl_approved' => $aslApproved,
+        ];
     }
 
     /**
@@ -923,6 +1109,95 @@ final class SupplierQualityService
         return $prefix . '-' . $year . '-' . str_pad((string)$counter, $digits, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * @param array<string, mixed> $row
+     * @param array<int, string>   $keys
+     */
+    private function firstPositiveFloat(array $row, array $keys): float
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $row)) {
+                continue;
+            }
+            $value = (float)$row[$key];
+            if ($value > 0.0) {
+                return $value;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * @param array<string, mixed> $inspection
+     */
+    private function isDeliveryOnTime(array $inspection): bool
+    {
+        if (array_key_exists('on_time', $inspection)) {
+            return filter_var($inspection['on_time'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $actual = $inspection['received_date']
+            ?? $inspection['receipt_date']
+            ?? $inspection['inspection_date']
+            ?? $inspection['created_at']
+            ?? null;
+        $committed = $inspection['promise_date']
+            ?? $inspection['promised_date']
+            ?? $inspection['due_date']
+            ?? $inspection['required_date']
+            ?? null;
+
+        if ($actual === null || $committed === null) {
+            return false;
+        }
+
+        return strtotime(substr((string)$actual, 0, 10)) <= strtotime(substr((string)$committed, 0, 10));
+    }
+
+    private function periodEndDate(string $period): string
+    {
+        if (preg_match('/^\d{4}-\d{2}$/', $period) !== 1) {
+            return date('Y-m-t');
+        }
+
+        $timestamp = strtotime($period . '-01');
+        if ($timestamp === false) {
+            return date('Y-m-t');
+        }
+
+        return date('Y-m-t', $timestamp);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<int, string>   $dateKeys
+     */
+    private function isPastDue(array $row, array $dateKeys, string $periodEnd): bool
+    {
+        foreach ($dateKeys as $key) {
+            if (empty($row[$key])) {
+                continue;
+            }
+            return $this->isDateOnOrBefore($row[$key], $periodEnd);
+        }
+
+        return false;
+    }
+
+    private function isDateOnOrBefore(mixed $date, string $cutoff): bool
+    {
+        if ($date === null || $date === '') {
+            return false;
+        }
+        $dateTs = strtotime(substr((string)$date, 0, 10));
+        $cutoffTs = strtotime($cutoff);
+        if ($dateTs === false || $cutoffTs === false) {
+            return false;
+        }
+
+        return $dateTs <= $cutoffTs;
+    }
+
     private function loadFile(string $name): array
     {
         $file = $this->sqDir . '/' . $name . '.json';
@@ -957,7 +1232,7 @@ final class SupplierQualityService
         }
 
         $tableMap = [
-            'scar'       => 'supplier_scorecards',
+            'scar'       => 'scar_records',
             'incoming'   => 'incoming_inspections',
             'scorecards' => 'supplier_scorecards',
             'asl'        => 'approved_supplier_list',

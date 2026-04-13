@@ -1,36 +1,58 @@
 # Domain: analytics
 
-> **Auto-generated stub** — edit freely. Re-running `generate.php` will NOT overwrite this file.
+> **Human-maintained.** Re-running `generate.php` will NOT overwrite this file.
 
 ## Purpose
-<!-- Describe what this domain is responsible for in the business context -->
+Provides KPI calculation, trend analysis, SPC capability studies, OEE computation, and predictive quality insights so operational decision-making uses stable, auditable analytics truth. All analytics outputs are read-only projections — they must not become execution authority.
 
 ## Canonical Objects (Contracts)
-- **Inventory Balance Snapshots** (`analytics.inventory-balance-snapshots`): primary table `inventory_balance_snapshot`
-- **MES OEE Snapshots** (`analytics.mes-oee-snapshots`): primary table `mes_oee_snapshots`
-- **Plant Performance Snapshots** (`analytics.plant-performance-snapshots`): primary table `plant_performance_snapshots`
-- **Production BOM Snapshots** (`analytics.production-bom-snapshots`): primary table `production_order_bom_snapshot`
-- **Production Route Snapshots** (`analytics.production-route-snapshots`): primary table `production_order_route_snapshot`
+- **Plant Performance Snapshot** (`analytics--plant-performance-snapshots`)
+- **Production BOM Snapshot** (`analytics--production-bom-snapshots`)
+- **Production Route Snapshot** (`analytics--production-route-snapshots`)
+- **Inventory Balance Snapshot** (`analytics--inventory-balance-snapshots`)
+- **MES OEE Snapshot** (`analytics--mes-oee-snapshots`): primary table `mes_oee_snapshots`
 
 ## Controllers
 - `DashboardController` → `mom/api/controllers/DashboardController.php`
+- `AiSchedulingController` → `mom/api/controllers/AiSchedulingController.php`
 
 ## Key Services
-<!-- List 3–5 most important services for this domain and what they do -->
+- **KpiEngine** — KPI values with traffic-light status (GREEN/YELLOW/RED/GREY); `DateRange` for period queries; `KpiResult` with breakdown
+- **SpcEngine** — `CapabilityResult` (Cp, Cpk, Pp, Ppk, processSigma); `ControlLimits` for chart visualization; detects out-of-control violations (Western Electric + Nelson rules)
+- **OeeService** — OEE = Availability × Performance × Quality; Six Big Losses tracking; thresholds: world-class ≥85%, acceptable ≥60%, critical ≥40%
+- **PredictiveQualityEngine** — SPC anomaly detection, tool-wear prediction, defect probability scoring, process drift detection
+- **DashboardService** — Dashboard aggregation; executive/quality/production/supplier views
 
 ## Key Tables
-<!-- List the 3–5 most critical database tables with a one-line description each -->
+- `mes_oee_snapshots` — Per-machine OEE snapshots (`oee_pct`, `availability_pct`, `performance_pct`, `quality_pct`, `snapshot_date`)
+- `analytics_plant_performance` — Aggregated plant-level KPIs from equipment snapshots
+- `predictions.json` *(file-backed)* — Prediction records (`status`: active/acknowledged/resolved/false_positive/expired, `type`: tool_wear/defect_probability/spc_anomaly/process_drift, `severity`)
+- SPC measurement data — Indexed by `part_number` + `characteristic` for trend analysis
 
 ## Workflow States
-<!-- List lifecycle states for the main records (e.g., Draft → Submitted → Approved → Released → Closed) -->
+
+**Predictions:** active → {acknowledged | resolved | false_positive | expired}
+
+**OEE / SPC:** stateless read-only calculations (no lifecycle state)
 
 ## Common Tasks & Entry Points
-<!-- e.g., "To add a field to an NCR: edit migration + contract.json + ExceptionController" -->
-<!-- e.g., "To trace an order: start at OrderController::detail, then OrderService::get" -->
+- **Calculate OEE:** `DashboardController::production()` → `KpiEngine::calculateKpi('OEE', period, filters)` → `OeeService::calculateOee()` → returns `oee_pct`
+- **SPC capability analysis:** `DashboardController::spcCapability()` → `SpcEngine::calculateCapability(measurements, usl, lsl)` → `CapabilityResult` (Cp, Cpk)
+- **Detect SPC anomalies:** `AiSchedulingController::getSpcAnomalies()` → loads `spc-anomalies.json` → filters by severity + date
+- **Suggest promise date:** `AiSchedulingController::suggestPromiseDate(part_id, quantity)` → heuristic lead_time + schedule occupancy
+- **Get capacity heatmap:** `AiSchedulingController::getCapacityHeatmap()` → machine utilization per time slot
 
 ## Business Rules
-<!-- Non-obvious rules that would trip up AI without context -->
-<!-- e.g., "JO number = plant_code + year + 4-digit sequence — changing this breaks traveler lookup" -->
+- **OEE < 40%** triggers auto-escalation to operations leadership
+- **Cpk < 1.33** flags process as inadequate; **Cpk ≥ 1.67** signals excellent control
+- **KPI alerts auto-trigger** when actual falls below target threshold by predefined margin
+- **Predictions auto-expire** after set period if unresolved
+- **Snapshot projections are read-only** — analytics data must never become an execution source of truth; all writes go through operational domains (planning, MES, quality)
+- **Six Big Losses tracked independently**: equipment_failure, setup_adjustment, idling_minor_stops, reduced_speed, process_defects, startup_rejects
 
 ## Notes / Gotchas
-<!-- Architecture quirks, legacy compatibility concerns, known edge cases -->
+- **KPI trend granularity must be normalized**: daily/weekly/monthly — date boundary normalization required per granularity
+- **SPC chart type must be specified**: Xbar-R, Xbar-S, or I-MR; `subgroup_size` defaults to 5; wrong type produces invalid control limits
+- **OEE components improve independently** — a high Availability alone does not lift OEE if Performance or Quality is low
+- **Predictions are file-backed** (`predictions.json`), not DB-backed in current wave — reading/writing bypasses DataLayer; file must be writable
+- **`AiSchedulingController` reads from multiple JSON files**: `spc-anomalies.json`, `tool-wear-alerts.json`, `quality-predictions.json`; ensure these are populated by MES/SPC writers

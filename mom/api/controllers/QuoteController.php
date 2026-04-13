@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\IdempotencyService;
+use MOM\Api\Services\RecordConflictException;
 use MOM\Services\QuoteService;
 use Throwable;
 
@@ -26,6 +28,8 @@ class QuoteController extends BaseController
     /** @var QuoteService|null Lazy-loaded quote service. */
     private ?QuoteService $quoteSvc = null;
 
+    private ?IdempotencyService $idempotencyService = null;
+
     /** @var array|null Cached quote access-control config. */
     private ?array $quoteConfig = null;
 
@@ -42,6 +46,15 @@ class QuoteController extends BaseController
             $this->quoteSvc = new QuoteService($this->dataDir);
         }
         return $this->quoteSvc;
+    }
+
+    private function idempotency(): IdempotencyService
+    {
+        if ($this->idempotencyService === null) {
+            $this->idempotencyService = new IdempotencyService($this->dataDir);
+        }
+
+        return $this->idempotencyService;
     }
 
     /**
@@ -113,6 +126,73 @@ class QuoteController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    private function parseIdempotencyKey(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            $this->error('invalid_idempotency_key', 400);
+        }
+
+        $text = trim((string)$value);
+        if ($text === '') {
+            return null;
+        }
+        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+            $this->error('invalid_idempotency_key', 400);
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function quoteConversionIdempotency(string $quoteId, string $poNumber, array $body, string $actorId): array
+    {
+        $explicitKey = $this->parseIdempotencyKey($this->requestHeader('Idempotency-Key'))
+            ?? $this->parseIdempotencyKey($this->query('idempotency_key'))
+            ?? $this->parseIdempotencyKey($this->query('request_id'))
+            ?? $this->parseIdempotencyKey($body['idempotency_key'] ?? null)
+            ?? $this->parseIdempotencyKey($body['request_id'] ?? null);
+
+        $fingerprint = [
+            'command' => 'ConvertQuoteToSalesOrder',
+            'quote_id' => $quoteId,
+            'po_number' => $poNumber,
+            'actor_id' => $actorId,
+        ];
+
+        if ($explicitKey !== null) {
+            return [
+                'scope_key' => implode('|', ['quote_conversion', $quoteId, $actorId]),
+                'key' => $explicitKey,
+                'key_source' => 'header_or_body',
+                'mode' => 'client_token',
+                'kind' => 'convert',
+                'domain' => 'sales',
+                'table' => 'quotes',
+                'user_id' => $actorId,
+                'fingerprint' => $fingerprint,
+            ];
+        }
+
+        return [
+            'scope_key' => implode('|', ['quote_conversion', $quoteId, $actorId]),
+            'key' => 'drv-quote-convert-' . hash('sha256', json_encode($fingerprint, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''),
+            'key_source' => 'derived:quote_conversion_retry_window',
+            'mode' => 'derived_identity_window',
+            'kind' => 'convert',
+            'domain' => 'sales',
+            'table' => 'quotes',
+            'user_id' => $actorId,
+            'ttl_seconds' => $this->idempotency()->retryWindowSeconds(),
+            'fingerprint' => $fingerprint,
+        ];
     }
 
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -370,20 +450,37 @@ class QuoteController extends BaseController
         $userId   = $this->userId($user);
 
         try {
-            $result = $this->quoteService()->convertToSalesOrder($id, $poNumber, $userId);
-            if ($result === null) {
-                $this->error('convert_failed', 400, "Quote {$id} cannot be converted. Must be in 'accepted' status.");
-            }
+            $idempotency = $this->quoteConversionIdempotency($id, $poNumber, $body, $userId);
+            $execution = $this->idempotency()->execute($idempotency, function () use ($id, $poNumber, $userId): array {
+                $result = $this->quoteService()->convertToSalesOrder($id, $poNumber, $userId);
 
-            $this->auditLog('quote_convert_to_so', [
-                'quote_id'  => $id,
-                'so_number' => $result['so_number'] ?? '',
-            ], $userId);
+                $this->auditLog('quote_convert_to_so', [
+                    'quote_id'  => $id,
+                    'so_number' => $result['so_number'] ?? '',
+                    'recovered_existing_sales_order' => $result['recovered_existing_sales_order'] ?? false,
+                ], $userId);
 
-            $this->success([
-                'quote'     => $result['quote'],
-                'so_number' => $result['so_number'],
-            ]);
+                return [
+                    'status_code' => 200,
+                    'payload' => [
+                        'quote' => $result['quote'],
+                        'so_number' => $result['so_number'],
+                        'sales_order' => $result['sales_order'] ?? $result['so_record'] ?? [],
+                    ],
+                ];
+            });
+
+            $payload = $execution['payload'];
+            $payload['idempotency'] = [
+                'replayed' => $execution['replayed'],
+                'stored_at' => $execution['stored_at'],
+                'key_source' => (string)($idempotency['key_source'] ?? ''),
+                'mode' => (string)($idempotency['mode'] ?? ''),
+            ];
+
+            $this->success($payload, $execution['status_code']);
+        } catch (RecordConflictException $e) {
+            $this->error('quote_conversion_idempotency_conflict', 409, $e->getMessage());
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('convert_failed', 500, $e->getMessage());

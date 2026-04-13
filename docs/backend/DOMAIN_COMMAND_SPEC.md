@@ -29,9 +29,13 @@ These runtime guards exist only to stop known P0 bypasses while the command laye
 | Guard | Current behavior | Required command replacement |
 | --- | --- | --- |
 | Governed Generic CRUD mutation | `GenericCrudController` rejects governed create/update/delete/transition with `409 domain_command_required`; internal backfill requires env+header override. | All commands in this spec. |
+| Quote conversion retry safety | Legacy quote conversion now uses idempotency plus a conversion lock and repairs stale quote state by returning the already-created SO. | `ConvertQuoteToSalesOrder` in one PostgreSQL transaction with unique `source_quote_id`. |
+| Engineering readiness before JO | Legacy SO transition to `engineering_ready` requires release package fields, and legacy JO creation rejects confirmed-only SOs. | `ReleaseSalesOrderToProduction` and `CreateJobOrder` with released master-data version locks. |
 | OQC fail containment | Legacy `oqc_update(result=fail)` creates/reuses an OQC-sourced JSONL NCR and active SO hold. | `RecordOqcResult` plus `CreateNcrFromQualityFailure` in one transaction. |
 | Shipment gate on logistics routes | Legacy `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`. | `ConfirmPacking` and `ConfirmDelivery`. |
 | Shipment gate config normalization | `ShipmentGateService` accepts `gate_items` by normalizing it to `gates`. | Generated shipment gate policy from canonical quality/order authority. |
+| Finance closed-period memo posting | Legacy AP/AR debit/credit memo creation rejects closed periods unless a matching approved backdate exception exists and is consumed. | All posting commands call one period policy before ledger/AP/AR/GL/COPQ/payment writes. |
+| Supplier scorecard formula | Legacy scorecard now computes PPM, OTD, SCAR severity/open/overdue, audit, and ASL/cert risk from supplier-quality JSON stores. | Canonical scorecard projection from PO receipt, IQC, SCAR, audit/cert, COPQ, OTD, and payment/release gates. |
 
 None of these guards changes the acceptance rule: a domain is not runtime-complete until its command has PostgreSQL transaction authority, idempotency, audit/evidence, outbox, and tests.
 

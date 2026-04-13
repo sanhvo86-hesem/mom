@@ -19,6 +19,7 @@ final class QuoteService
 {
     private readonly string $dataDir;
     private readonly string $quotesDir;
+    private readonly string $conversionLockFile;
     private ?object $db = null;
 
     /** Quote status transitions. */
@@ -60,6 +61,7 @@ final class QuoteService
     {
         $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->quotesDir = $this->dataDir . '/quotes';
+        $this->conversionLockFile = $this->quotesDir . '/quote_conversion.lock';
         $this->db        = $db;
 
         if (!is_dir($this->quotesDir)) {
@@ -371,6 +373,16 @@ final class QuoteService
      */
     public function convertToSalesOrder(string $quoteId, string $customerPo = '', string $userId = ''): array
     {
+        return $this->withConversionLock(function () use ($quoteId, $customerPo, $userId): array {
+            return $this->convertToSalesOrderLocked($quoteId, $customerPo, $userId);
+        });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function convertToSalesOrderLocked(string $quoteId, string $customerPo = '', string $userId = ''): array
+    {
         $quotes = $this->loadQuotes();
         $now    = $this->nowIso();
         $quote  = null;
@@ -388,17 +400,42 @@ final class QuoteService
             throw new RuntimeException("Quote {$quoteId} not found.");
         }
 
-        if (strtolower($quote['status'] ?? '') !== 'accepted') {
-            throw new RuntimeException("Only accepted quotes can be converted. Current status: " . ($quote['status'] ?? ''));
-        }
-
+        $orderService = new OrderService($this->dataDir);
         $actingUser = trim($userId) !== '' ? trim($userId) : 'system';
         $resolvedCustomerPo = trim($customerPo);
         if ($resolvedCustomerPo === '') {
             $resolvedCustomerPo = trim((string)($quote['customer_po'] ?? $quote['customer_po_number'] ?? $quote['po_number'] ?? ''));
         }
 
-        $orderService = new OrderService($this->dataDir);
+        $existingSo = $this->findSalesOrderForQuote($orderService, $quoteId);
+        if ($existingSo !== null) {
+            $quotes[$qIdx] = $this->markQuoteConverted(
+                $quote,
+                (string)($existingSo['so_number'] ?? ''),
+                $resolvedCustomerPo,
+                $actingUser,
+                $now,
+                'Recovered existing SO during quote conversion retry'
+            );
+            $this->saveQuotes($quotes);
+
+            return $this->quoteConversionResult($quoteId, $quotes[$qIdx], $existingSo, true);
+        }
+
+        if (strtolower($quote['status'] ?? '') === 'converted') {
+            $convertedTo = trim((string)($quote['converted_to'] ?? ''));
+            $convertedSo = $convertedTo !== '' ? $orderService->getSalesOrder($convertedTo) : null;
+            if ($convertedSo !== null) {
+                return $this->quoteConversionResult($quoteId, $quote, $convertedSo, true);
+            }
+
+            throw new RuntimeException("Quote {$quoteId} is already converted but the linked Sales Order was not found.");
+        }
+
+        if (strtolower($quote['status'] ?? '') !== 'accepted') {
+            throw new RuntimeException("Only accepted quotes can be converted. Current status: " . ($quote['status'] ?? ''));
+        }
+
         $soNumber = $orderService->generateOrderNumber('so');
 
         $soRecord = [
@@ -446,35 +483,17 @@ final class QuoteService
             );
         }
 
-        // Transition quote to converted
-        $quotes[$qIdx]['status']         = 'converted';
-        $quotes[$qIdx]['converted_at']   = $now;
-        $quotes[$qIdx]['converted_to']   = $soNumber;
-        $quotes[$qIdx]['updated_at']     = $now;
-        $quotes[$qIdx]['updated_by']     = $actingUser;
-        if ($resolvedCustomerPo !== '') {
-            $quotes[$qIdx]['customer_po'] = $resolvedCustomerPo;
-        }
-
-        $history   = (array)($quotes[$qIdx]['status_history'] ?? []);
-        $history[] = [
-            'from'      => 'accepted',
-            'to'        => 'converted',
-            'timestamp' => $now,
-            'user'      => $actingUser,
-            'reason'    => "Converted to SO {$soNumber}",
-        ];
-        $quotes[$qIdx]['status_history'] = $history;
-
+        $quotes[$qIdx] = $this->markQuoteConverted(
+            $quote,
+            $soNumber,
+            $resolvedCustomerPo,
+            $actingUser,
+            $now,
+            "Converted to SO {$soNumber}"
+        );
         $this->saveQuotes($quotes);
 
-        return [
-            'quote_id'  => $quoteId,
-            'so_number' => $soNumber,
-            'quote'     => $quotes[$qIdx],
-            'so_record' => $createdSo,
-            'sales_order' => $createdSo,
-        ];
+        return $this->quoteConversionResult($quoteId, $quotes[$qIdx], $createdSo, false);
     }
 
     /**
@@ -595,6 +614,110 @@ final class QuoteService
     {
         $file = $this->quotesDir . '/quotes.json';
         $this->writeJson($file, array_values($data));
+    }
+
+    /**
+     * @param callable():array<string, mixed> $operation
+     * @return array<string, mixed>
+     */
+    private function withConversionLock(callable $operation): array
+    {
+        $handle = @fopen($this->conversionLockFile, 'c');
+        if ($handle === false) {
+            throw new RuntimeException('Unable to open quote conversion lock.');
+        }
+
+        try {
+            if (!@flock($handle, LOCK_EX)) {
+                throw new RuntimeException('Unable to lock quote conversion authority.');
+            }
+
+            return $operation();
+        } finally {
+            @flock($handle, LOCK_UN);
+            @fclose($handle);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function findSalesOrderForQuote(OrderService $orderService, string $quoteId): ?array
+    {
+        foreach ($orderService->listSalesOrders() as $salesOrder) {
+            $sourceQuote = trim((string)($salesOrder['quote_id'] ?? $salesOrder['source_quote_id'] ?? $salesOrder['source_record_id'] ?? ''));
+            if ($sourceQuote === $quoteId) {
+                return $salesOrder;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $quote
+     * @return array<string, mixed>
+     */
+    private function markQuoteConverted(
+        array $quote,
+        string $soNumber,
+        string $customerPo,
+        string $userId,
+        string $timestamp,
+        string $reason
+    ): array {
+        $previousStatus = strtolower((string)($quote['status'] ?? ''));
+
+        $quote['status'] = 'converted';
+        $quote['converted_at'] = $quote['converted_at'] ?? $timestamp;
+        $quote['converted_to'] = $soNumber;
+        $quote['updated_at'] = $timestamp;
+        $quote['updated_by'] = $userId;
+        if ($customerPo !== '') {
+            $quote['customer_po'] = $customerPo;
+        }
+
+        $history = (array)($quote['status_history'] ?? []);
+        $alreadyRecorded = false;
+        foreach ($history as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            if (($entry['to'] ?? '') === 'converted' && str_contains((string)($entry['reason'] ?? ''), $soNumber)) {
+                $alreadyRecorded = true;
+                break;
+            }
+        }
+
+        if (!$alreadyRecorded) {
+            $history[] = [
+                'from' => $previousStatus !== '' ? $previousStatus : 'accepted',
+                'to' => 'converted',
+                'timestamp' => $timestamp,
+                'user' => $userId,
+                'reason' => $reason,
+            ];
+        }
+        $quote['status_history'] = $history;
+
+        return $quote;
+    }
+
+    /**
+     * @param array<string, mixed> $quote
+     * @param array<string, mixed> $salesOrder
+     * @return array<string, mixed>
+     */
+    private function quoteConversionResult(string $quoteId, array $quote, array $salesOrder, bool $recovered): array
+    {
+        return [
+            'quote_id' => $quoteId,
+            'so_number' => (string)($salesOrder['so_number'] ?? $quote['converted_to'] ?? ''),
+            'quote' => $quote,
+            'so_record' => $salesOrder,
+            'sales_order' => $salesOrder,
+            'recovered_existing_sales_order' => $recovered,
+        ];
     }
 
     private function loadMaterialTemplates(): array

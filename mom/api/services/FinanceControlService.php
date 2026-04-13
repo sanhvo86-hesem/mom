@@ -415,6 +415,9 @@ final class FinanceControlService
         $reasonText = trim((string)($payload['reason'] ?? ''));
         $currencyCode = strtoupper(trim((string)($payload['currency_code'] ?? 'VND')));
         $amount = (float)($payload['amount'] ?? 0);
+        $postingDate = $this->normalizeDate((string)($payload['posting_date'] ?? date('Y-m-d')), 'posting_date');
+        $periodCode = substr($postingDate, 0, 7);
+        $backdateExceptionId = trim((string)($payload['backdate_exception_id'] ?? ''));
 
         if (!in_array($invoiceScope, ['AP', 'AR'], true)) {
             throw new RuntimeException('Invalid invoice_scope.');
@@ -422,6 +425,15 @@ final class FinanceControlService
         if ($originalInvoiceRef === '' || $reasonText === '' || $amount <= 0) {
             throw new RuntimeException('Memo requires original invoice reference, reason, and positive amount.');
         }
+
+        $backdateEvidence = $this->assertPostingAllowed(
+            $invoiceScope,
+            $postingDate,
+            $kind . '_memo',
+            $originalInvoiceRef,
+            $userId,
+            $backdateExceptionId
+        );
 
         $collection = $kind === 'credit' ? 'credit_memos' : 'debit_memos';
         $idField = $kind === 'credit' ? 'credit_memo_id' : 'debit_memo_id';
@@ -436,6 +448,10 @@ final class FinanceControlService
             'reason' => $reasonText,
             'amount' => round($amount, 2),
             'currency_code' => $currencyCode,
+            'posting_date' => $postingDate,
+            'period_code' => $periodCode,
+            'backdate_exception_id' => $backdateEvidence['backdate_exception_id'] ?? '',
+            'posting_control' => $backdateEvidence,
             'approved_by' => $userId,
             'approved_at' => $now,
             'created_at' => $now,
@@ -446,6 +462,97 @@ final class FinanceControlService
         $rows[] = $row;
         $this->writeCollection($collection, $rows);
         return $row;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assertPostingAllowed(
+        string $ledgerScope,
+        string $postingDate,
+        string $subjectType,
+        string $subjectRef,
+        string $userId,
+        string $backdateExceptionId = ''
+    ): array {
+        $periodCode = substr($postingDate, 0, 7);
+        $closedControl = null;
+        foreach ($this->readCollection('period_closes') as $periodClose) {
+            if (($periodClose['ledger_scope'] ?? '') !== $ledgerScope || ($periodClose['period_code'] ?? '') !== $periodCode) {
+                continue;
+            }
+            if (($periodClose['close_status'] ?? 'closed') === 'closed') {
+                $closedControl = $periodClose;
+                break;
+            }
+        }
+
+        if ($closedControl === null) {
+            return [
+                'policy' => 'period_open_or_uncontrolled',
+                'ledger_scope' => $ledgerScope,
+                'period_code' => $periodCode,
+                'posting_date' => $postingDate,
+            ];
+        }
+
+        if ($backdateExceptionId === '') {
+            throw new RuntimeException("Posting period {$periodCode} for {$ledgerScope} is closed.");
+        }
+
+        $exceptions = $this->readCollection('backdate_exceptions');
+        $index = $this->findIndexById($exceptions, 'backdate_exception_id', $backdateExceptionId);
+        if ($index === null) {
+            throw new RuntimeException('Backdate exception not found.');
+        }
+
+        $exception = (array)$exceptions[$index];
+        if ($this->effectiveBackdateStatus($exception) !== 'approved') {
+            throw new RuntimeException('Backdate exception is not approved or is no longer active.');
+        }
+        if (($exception['ledger_scope'] ?? '') !== $ledgerScope) {
+            throw new RuntimeException('Backdate exception ledger_scope does not match posting scope.');
+        }
+        if (($exception['requested_posting_date'] ?? '') !== $postingDate) {
+            throw new RuntimeException('Backdate exception posting date does not match.');
+        }
+
+        $exceptionSubjectRef = trim((string)($exception['subject_ref'] ?? ''));
+        if ($exceptionSubjectRef !== $subjectRef) {
+            throw new RuntimeException('Backdate exception subject does not match posting subject.');
+        }
+
+        $now = $this->nowIso();
+        $exception['exception_status'] = 'closed';
+        $exception['used_at'] = $now;
+        $exception['used_by'] = $userId;
+        $exception['used_for'] = [
+            'subject_type' => $subjectType,
+            'subject_ref' => $subjectRef,
+            'posting_date' => $postingDate,
+        ];
+        $exception['updated_at'] = $now;
+        $exception['updated_by'] = $userId;
+        $exception['status_history'] = is_array($exception['status_history'] ?? null) ? $exception['status_history'] : [];
+        $exception['status_history'][] = [
+            'from' => 'approved',
+            'to' => 'closed',
+            'transition' => 'consume_for_posting',
+            'timestamp' => $now,
+            'user' => $userId,
+            'reason' => "Consumed by {$subjectType} {$subjectRef}",
+        ];
+        $exceptions[$index] = $exception;
+        $this->writeCollection('backdate_exceptions', $exceptions);
+
+        return [
+            'policy' => 'closed_period_backdate_exception_consumed',
+            'ledger_scope' => $ledgerScope,
+            'period_code' => $periodCode,
+            'posting_date' => $postingDate,
+            'period_close_id' => $closedControl['period_close_id'] ?? '',
+            'backdate_exception_id' => $backdateExceptionId,
+        ];
     }
 
     /**

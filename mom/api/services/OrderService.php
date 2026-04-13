@@ -17,7 +17,7 @@ use RuntimeException;
 final class OrderService
 {
     /** Valid SO statuses (aligned with workflow/runtime config). */
-    private const SO_STATUSES = ['draft', 'quoted', 'confirmed', 'in_production', 'shipped', 'closed', 'cancelled'];
+    private const SO_STATUSES = ['draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production', 'shipped', 'closed', 'cancelled'];
 
     /** Valid JO statuses (aligned with workflow/runtime config). */
     private const JO_STATUSES = ['planned', 'released', 'active', 'on_hold', 'completed', 'closed', 'cancelled'];
@@ -533,8 +533,16 @@ final class OrderService
         if ($this->findOrderRecord($store, 'jo', $joNumber) !== null) {
             throw new RuntimeException("Job Order {$joNumber} already exists.");
         }
-        if ($this->findOrderRecord($store, 'so', $soNumber) === null) {
+        $parentSo = $this->findOrderRecord($store, 'so', $soNumber);
+        if ($parentSo === null) {
             throw new RuntimeException("Parent Sales Order {$soNumber} not found.");
+        }
+        $parentStatus = strtolower(trim((string)($parentSo['status'] ?? '')));
+        if (!in_array($parentStatus, ['engineering_ready', 'in_production'], true)) {
+            throw new RuntimeException(
+                "Sales Order {$soNumber} is not released to production. " .
+                "CreateJobOrder requires SO status engineering_ready or in_production; current status: {$parentStatus}."
+            );
         }
 
         $this->syncCounterWithNumber($store, 'jo', $joNumber);
