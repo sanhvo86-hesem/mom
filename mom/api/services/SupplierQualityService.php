@@ -302,14 +302,25 @@ final class SupplierQualityService
             if (!is_array($scar) || ($scar['vendor_id'] ?? '') !== $vendorId) {
                 continue;
             }
-            $scarPeriod = substr((string)($scar['issue_date'] ?? $scar['created_at'] ?? $scar['updated_at'] ?? ''), 0, 7);
-            if ($scarPeriod !== $period) {
+
+            $issueDate = (string)($scar['issue_date'] ?? $scar['created_at'] ?? $scar['updated_at'] ?? '');
+            $scarPeriod = substr($issueDate, 0, 7);
+            $status = strtolower((string)($scar['status'] ?? 'issued'));
+            $isClosed = in_array($status, self::CLOSED_STATUSES, true);
+            $openedOnOrBeforePeriodEnd = $issueDate === '' || $this->isDateOnOrBefore($issueDate, $periodEnd);
+            $closedAt = $scar['closed_at'] ?? $scar['completed_at'] ?? $scar['cancelled_at'] ?? $scar['updated_at'] ?? null;
+            $closedByPeriodEnd = $isClosed && ($closedAt === null || $closedAt === '' || $this->isDateOnOrBefore($closedAt, $periodEnd));
+            $activeAtPeriodEnd = $openedOnOrBeforePeriodEnd && (!$isClosed || !$closedByPeriodEnd);
+            $issuedInPeriod = $scarPeriod === $period;
+
+            if (!$issuedInPeriod && !$activeAtPeriodEnd) {
                 continue;
             }
 
-            $scarCount++;
-            $status = strtolower((string)($scar['status'] ?? 'issued'));
-            if (!in_array($status, self::CLOSED_STATUSES, true)) {
+            if ($issuedInPeriod) {
+                $scarCount++;
+            }
+            if ($activeAtPeriodEnd) {
                 $openScarCount++;
                 if ($this->isPastDue($scar, [
                     'verification_due_date',

@@ -426,42 +426,68 @@ final class FinanceControlService
             throw new RuntimeException('Memo requires original invoice reference, reason, and positive amount.');
         }
 
-        $backdateEvidence = $this->assertPostingAllowed(
+        return $this->withFinanceControlLock(function () use (
+            $kind,
             $invoiceScope,
-            $postingDate,
-            $kind . '_memo',
             $originalInvoiceRef,
-            $userId,
-            $backdateExceptionId
-        );
+            $reasonCode,
+            $reasonText,
+            $currencyCode,
+            $amount,
+            $postingDate,
+            $periodCode,
+            $backdateExceptionId,
+            $userId
+        ): array {
+            $preConsumptionException = $backdateExceptionId !== ''
+                ? $this->findById('backdate_exceptions', 'backdate_exception_id', $backdateExceptionId)
+                : null;
 
-        $collection = $kind === 'credit' ? 'credit_memos' : 'debit_memos';
-        $idField = $kind === 'credit' ? 'credit_memo_id' : 'debit_memo_id';
-        $now = $this->nowIso();
-        $row = [
-            $idField => $this->uuid(strtoupper(substr($kind, 0, 1)) . 'M'),
-            'memo_type' => $kind,
-            'memo_status' => 'approved',
-            'invoice_scope' => $invoiceScope,
-            'original_invoice_ref' => $originalInvoiceRef,
-            'reason_code' => $reasonCode,
-            'reason' => $reasonText,
-            'amount' => round($amount, 2),
-            'currency_code' => $currencyCode,
-            'posting_date' => $postingDate,
-            'period_code' => $periodCode,
-            'backdate_exception_id' => $backdateEvidence['backdate_exception_id'] ?? '',
-            'posting_control' => $backdateEvidence,
-            'approved_by' => $userId,
-            'approved_at' => $now,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
+            $backdateEvidence = $this->assertPostingAllowed(
+                $invoiceScope,
+                $postingDate,
+                $kind . '_memo',
+                $originalInvoiceRef,
+                $userId,
+                $backdateExceptionId
+            );
 
-        $rows = $this->readCollection($collection);
-        $rows[] = $row;
-        $this->writeCollection($collection, $rows);
-        return $row;
+            $collection = $kind === 'credit' ? 'credit_memos' : 'debit_memos';
+            $idField = $kind === 'credit' ? 'credit_memo_id' : 'debit_memo_id';
+            $now = $this->nowIso();
+            $row = [
+                $idField => $this->uuid(strtoupper(substr($kind, 0, 1)) . 'M'),
+                'memo_type' => $kind,
+                'memo_status' => 'approved',
+                'invoice_scope' => $invoiceScope,
+                'original_invoice_ref' => $originalInvoiceRef,
+                'reason_code' => $reasonCode,
+                'reason' => $reasonText,
+                'amount' => round($amount, 2),
+                'currency_code' => $currencyCode,
+                'posting_date' => $postingDate,
+                'period_code' => $periodCode,
+                'backdate_exception_id' => $backdateEvidence['backdate_exception_id'] ?? '',
+                'posting_control' => $backdateEvidence,
+                'approved_by' => $userId,
+                'approved_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            $rows = $this->readCollection($collection);
+            $rows[] = $row;
+            try {
+                $this->writeCollection($collection, $rows);
+            } catch (\Throwable $e) {
+                if (($backdateEvidence['policy'] ?? '') === 'closed_period_backdate_exception_consumed' && is_array($preConsumptionException)) {
+                    $this->restoreBackdateException($preConsumptionException);
+                }
+                throw $e;
+            }
+
+            return $row;
+        });
     }
 
     /**
@@ -595,6 +621,55 @@ final class FinanceControlService
             @unlink($tmp);
             throw new RuntimeException('Unable to finalize finance control storage.');
         }
+    }
+
+    /**
+     * @template T
+     * @param callable():T $operation
+     * @return T
+     */
+    private function withFinanceControlLock(callable $operation): mixed
+    {
+        $dir = $this->dataDir . '/finance';
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to initialize finance control storage.');
+        }
+
+        $handle = @fopen($dir . '/finance_control.lock', 'c');
+        if ($handle === false) {
+            throw new RuntimeException('Unable to open finance control lock.');
+        }
+
+        try {
+            if (!@flock($handle, LOCK_EX)) {
+                throw new RuntimeException('Unable to lock finance control authority.');
+            }
+
+            return $operation();
+        } finally {
+            @flock($handle, LOCK_UN);
+            @fclose($handle);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $original
+     */
+    private function restoreBackdateException(array $original): void
+    {
+        $id = trim((string)($original['backdate_exception_id'] ?? ''));
+        if ($id === '') {
+            return;
+        }
+
+        $rows = $this->readCollection('backdate_exceptions');
+        $index = $this->findIndexById($rows, 'backdate_exception_id', $id);
+        if ($index === null) {
+            $rows[] = $original;
+        } else {
+            $rows[$index] = $original;
+        }
+        $this->writeCollection('backdate_exceptions', $rows);
     }
 
     /**

@@ -155,49 +155,51 @@ class LogisticsController extends BaseController
 
     private function createQualityHoldForOqcFailure(array $oqc, string $userId, string $now): ?array
     {
-        $soNumber = trim((string)($oqc['so_number'] ?? ''));
-        if ($soNumber === '') {
-            return null;
-        }
-
-        $sourceId = trim((string)($oqc['oqc_number'] ?? $oqc['id'] ?? ''));
-        $file = $this->dataDir . '/orders/holds.json';
-        $holds = $this->readJsonFile($file) ?? [];
-        foreach ($holds as $hold) {
-            if (!is_array($hold)) {
-                continue;
+        return $this->withFileLock($this->dataDir . '/orders/holds.lock', function () use ($oqc, $userId, $now): ?array {
+            $soNumber = trim((string)($oqc['so_number'] ?? ''));
+            if ($soNumber === '') {
+                return null;
             }
-            if (($hold['so_number'] ?? '') === $soNumber
-                && strtolower(trim((string)($hold['status'] ?? ''))) === 'active'
-                && ($hold['source_type'] ?? '') === 'oqc_failure'
-                && ($hold['source_id'] ?? '') === $sourceId) {
-                return $hold;
+
+            $sourceId = trim((string)($oqc['oqc_number'] ?? $oqc['id'] ?? ''));
+            $file = $this->dataDir . '/orders/holds.json';
+            $holds = $this->readJsonFile($file) ?? [];
+            foreach ($holds as $hold) {
+                if (!is_array($hold)) {
+                    continue;
+                }
+                if (($hold['so_number'] ?? '') === $soNumber
+                    && strtolower(trim((string)($hold['status'] ?? ''))) === 'active'
+                    && ($hold['source_type'] ?? '') === 'oqc_failure'
+                    && ($hold['source_id'] ?? '') === $sourceId) {
+                    return $hold;
+                }
             }
-        }
 
-        $hold = [
-            'hold_id' => 'HOLD-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $soNumber . '|' . $sourceId), 0, 8),
-            'so_number' => $soNumber,
-            'status' => 'active',
-            'hold_type' => 'quality',
-            'hold_reason' => 'oqc_failure',
-            'source_type' => 'oqc_failure',
-            'source_id' => $sourceId,
-            'source_record' => [
-                'oqc_number' => $oqc['oqc_number'] ?? '',
-                'item_id' => $oqc['item_id'] ?? '',
-                'lot_number' => $oqc['lot_number'] ?? '',
-                'qty_rejected' => $oqc['qty_rejected'] ?? 0,
-            ],
-            'created_by' => $userId,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
+            $hold = [
+                'hold_id' => 'HOLD-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $soNumber . '|' . $sourceId), 0, 8),
+                'so_number' => $soNumber,
+                'status' => 'active',
+                'hold_type' => 'quality',
+                'hold_reason' => 'oqc_failure',
+                'source_type' => 'oqc_failure',
+                'source_id' => $sourceId,
+                'source_record' => [
+                    'oqc_number' => $oqc['oqc_number'] ?? '',
+                    'item_id' => $oqc['item_id'] ?? '',
+                    'lot_number' => $oqc['lot_number'] ?? '',
+                    'qty_rejected' => $oqc['qty_rejected'] ?? 0,
+                ],
+                'created_by' => $userId,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
 
-        $holds[] = $hold;
-        $this->writeJsonFile($file, $holds);
+            $holds[] = $hold;
+            $this->writeJsonFile($file, $holds);
 
-        return $hold;
+            return $hold;
+        });
     }
 
     private function createNcrForOqcFailure(array $oqc, string $userId, string $now): ?array
@@ -213,42 +215,44 @@ class LogisticsController extends BaseController
         }
         $path = $dir . '/ncr_log.jsonl';
 
-        if (is_file($path)) {
-            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-            foreach ($lines as $line) {
-                $existing = json_decode($line, true);
-                if (is_array($existing)
-                    && ($existing['source'] ?? '') === 'oqc_failure'
-                    && ($existing['source_id'] ?? '') === $sourceId) {
-                    return $existing;
+        return $this->withFileLock($dir . '/ncr_log.lock', function () use ($oqc, $userId, $now, $path, $sourceId): ?array {
+            if (is_file($path)) {
+                $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+                foreach ($lines as $line) {
+                    $existing = json_decode($line, true);
+                    if (is_array($existing)
+                        && ($existing['source'] ?? '') === 'oqc_failure'
+                        && ($existing['source_id'] ?? '') === $sourceId) {
+                        return $existing;
+                    }
                 }
             }
-        }
 
-        $ncr = [
-            'ncr_id' => 'NCR-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $sourceId), 0, 8),
-            'source' => 'oqc_failure',
-            'source_id' => $sourceId,
-            'so_number' => trim((string)($oqc['so_number'] ?? '')),
-            'jo_number' => trim((string)($oqc['jo_number'] ?? '')),
-            'wo_number' => trim((string)($oqc['wo_number'] ?? '')),
-            'part_number' => trim((string)($oqc['item_id'] ?? '')),
-            'lot_number' => trim((string)($oqc['lot_number'] ?? '')),
-            'defect_type' => 'oqc_failure',
-            'severity' => ((int)($oqc['qty_rejected'] ?? 0) > 0) ? 'major' : 'minor',
-            'status' => 'open',
-            'containment_status' => 'quality_hold_created',
-            'description' => 'OQC failed for SO ' . trim((string)($oqc['so_number'] ?? '')) . ' / item ' . trim((string)($oqc['item_id'] ?? '')) . '. Shipment is blocked until NCR/MRB disposition releases the hold.',
-            'created_at' => $now,
-            'created_by' => $userId,
-        ];
+            $ncr = [
+                'ncr_id' => 'NCR-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $sourceId), 0, 8),
+                'source' => 'oqc_failure',
+                'source_id' => $sourceId,
+                'so_number' => trim((string)($oqc['so_number'] ?? '')),
+                'jo_number' => trim((string)($oqc['jo_number'] ?? '')),
+                'wo_number' => trim((string)($oqc['wo_number'] ?? '')),
+                'part_number' => trim((string)($oqc['item_id'] ?? '')),
+                'lot_number' => trim((string)($oqc['lot_number'] ?? '')),
+                'defect_type' => 'oqc_failure',
+                'severity' => ((int)($oqc['qty_rejected'] ?? 0) > 0) ? 'major' : 'minor',
+                'status' => 'open',
+                'containment_status' => 'quality_hold_created',
+                'description' => 'OQC failed for SO ' . trim((string)($oqc['so_number'] ?? '')) . ' / item ' . trim((string)($oqc['item_id'] ?? '')) . '. Shipment is blocked until NCR/MRB disposition releases the hold.',
+                'created_at' => $now,
+                'created_by' => $userId,
+            ];
 
-        $encoded = json_encode($ncr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if ($encoded === false || @file_put_contents($path, $encoded . "\n", FILE_APPEND | LOCK_EX) === false) {
-            throw new RuntimeException('Unable to create OQC failure NCR.');
-        }
+            $encoded = json_encode($ncr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($encoded === false || @file_put_contents($path, $encoded . "\n", FILE_APPEND | LOCK_EX) === false) {
+                throw new RuntimeException('Unable to create OQC failure NCR.');
+            }
 
-        return $ncr;
+            return $ncr;
+        });
     }
 
     /**
@@ -267,11 +271,44 @@ class LogisticsController extends BaseController
         if (!is_dir($counterDir)) @mkdir($counterDir, 0775, true);
 
         $counterFile = $counterDir . '/logistics_' . $type . '_' . $year . '.json';
-        $counter     = $this->readJsonFile($counterFile) ?? ['seq' => 0];
-        $counter['seq'] = ((int)($counter['seq'] ?? 0)) + 1;
-        $this->writeJsonFile($counterFile, $counter);
+        $seq = $this->withFileLock($counterFile . '.lock', function () use ($counterFile): int {
+            $counter = $this->readJsonFile($counterFile) ?? ['seq' => 0];
+            $counter['seq'] = ((int)($counter['seq'] ?? 0)) + 1;
+            $this->writeJsonFile($counterFile, $counter);
 
-        return $prefix . '-' . $year . '-' . str_pad((string)$counter['seq'], 4, '0', STR_PAD_LEFT);
+            return (int)$counter['seq'];
+        });
+
+        return $prefix . '-' . $year . '-' . str_pad((string)$seq, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * @template T
+     * @param callable():T $operation
+     * @return T
+     */
+    private function withFileLock(string $lockFile, callable $operation): mixed
+    {
+        $dir = dirname($lockFile);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to initialize logistics lock directory.');
+        }
+
+        $handle = @fopen($lockFile, 'c');
+        if ($handle === false) {
+            throw new RuntimeException('Unable to open logistics lock.');
+        }
+
+        try {
+            if (!@flock($handle, LOCK_EX)) {
+                throw new RuntimeException('Unable to lock logistics authority.');
+            }
+
+            return $operation();
+        } finally {
+            @flock($handle, LOCK_UN);
+            @fclose($handle);
+        }
     }
 
     // â”€â”€ SUBCONTRACT ENDPOINTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -630,50 +667,55 @@ class LogisticsController extends BaseController
         $now = $this->nowIso();
 
         try {
-            $file    = $this->logisticsDir() . '/oqc.json';
-            $items   = $this->readJsonFile($file) ?? [];
-            $updated = null;
+            $updated = $this->withFileLock($this->logisticsDir() . '/oqc_update.lock', function () use ($body, $id, $uid, $now): ?array {
+                $file    = $this->logisticsDir() . '/oqc.json';
+                $items   = $this->readJsonFile($file) ?? [];
+                $updated = null;
 
-            foreach ($items as &$r) {
-                if (($r['id'] ?? '') === $id || ($r['oqc_number'] ?? '') === $id) {
-                    if (array_key_exists('qty_accepted', $body))  $r['qty_accepted']  = (int)$body['qty_accepted'];
-                    if (array_key_exists('qty_rejected', $body))  $r['qty_rejected']  = (int)$body['qty_rejected'];
-                    if (array_key_exists('measurements', $body) && is_array($body['measurements'])) {
-                        $r['measurements'] = $body['measurements'];
-                    }
-                    if (array_key_exists('ncr_reference', $body)) $r['ncr_reference'] = trim((string)$body['ncr_reference']);
-                    if (array_key_exists('approved_by', $body))   $r['approved_by']   = trim((string)$body['approved_by']);
-                    if (array_key_exists('notes', $body))         $r['notes']         = trim((string)$body['notes']);
+                foreach ($items as &$r) {
+                    if (($r['id'] ?? '') === $id || ($r['oqc_number'] ?? '') === $id) {
+                        if (array_key_exists('qty_accepted', $body))  $r['qty_accepted']  = (int)$body['qty_accepted'];
+                        if (array_key_exists('qty_rejected', $body))  $r['qty_rejected']  = (int)$body['qty_rejected'];
+                        if (array_key_exists('measurements', $body) && is_array($body['measurements'])) {
+                            $r['measurements'] = $body['measurements'];
+                        }
+                        if (array_key_exists('approved_by', $body))   $r['approved_by']   = trim((string)$body['approved_by']);
+                        if (array_key_exists('notes', $body))         $r['notes']         = trim((string)$body['notes']);
 
-                    // Result transition
-                    if (isset($body['result'])) {
-                        $newResult = (string)$body['result'];
-                        if (in_array($newResult, self::OQC_RESULTS, true)) {
-                            $r['result'] = $newResult;
+                        // Result transition
+                        if (isset($body['result'])) {
+                            $newResult = (string)$body['result'];
+                            if (in_array($newResult, self::OQC_RESULTS, true)) {
+                                $r['result'] = $newResult;
 
-                            // If fail, flag for NCR creation
-                            if ($newResult === 'fail' && empty($r['ncr_reference'])) {
-                                $r['ncr_required'] = true;
-                                $autoNcr = $this->createNcrForOqcFailure($r, $uid, $now);
-                                if (is_array($autoNcr)) {
-                                    $r['ncr_reference'] = (string)($autoNcr['ncr_id'] ?? '');
+                                // OQC failure owns NCR/hold creation. Client-supplied NCR refs cannot bypass the gate.
+                                if ($newResult === 'fail') {
+                                    $r['ncr_required'] = true;
+                                    $autoNcr = $this->createNcrForOqcFailure($r, $uid, $now);
+                                    if (!is_array($autoNcr) || trim((string)($autoNcr['ncr_id'] ?? '')) === '') {
+                                        throw new RuntimeException('OQC failure must create or resolve a governed NCR.');
+                                    }
+                                    $r['ncr_reference'] = (string)$autoNcr['ncr_id'];
                                     $r['auto_ncr'] = $autoNcr;
+                                    $r['quality_hold'] = $this->createQualityHoldForOqcFailure($r, $uid, $now);
                                 }
-                                $r['quality_hold'] = $this->createQualityHoldForOqcFailure($r, $uid, $now);
                             }
                         }
-                    }
 
-                    $r['updated_at'] = $now;
-                    $updated = $r;
-                    break;
+                        $r['updated_at'] = $now;
+                        $updated = $r;
+                        break;
+                    }
                 }
-            }
-            unset($r);
+                unset($r);
+
+                if (!$updated) $this->error('oqc_not_found', 404);
+
+                $this->writeJsonFile($file, $items);
+                return $updated;
+            });
 
             if (!$updated) $this->error('oqc_not_found', 404);
-
-            $this->writeJsonFile($file, $items);
 
             $this->auditLog('oqc_update', [
                 'id'     => $id,

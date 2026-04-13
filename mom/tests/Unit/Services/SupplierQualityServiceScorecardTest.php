@@ -50,6 +50,12 @@ final class SupplierQualityServiceScorecardTest extends TestCase
             'status' => 'corrective_action',
             'severity' => 'major',
             'corrective_due_date' => '2026-04-05',
+        ], [
+            'vendor_id' => 'V-100',
+            'issue_date' => '2026-03-20',
+            'status' => 'verification',
+            'severity' => 'low',
+            'verification_due_date' => '2026-04-25',
         ]]);
         $this->writeSupplierQuality('audits', [[
             'vendor_id' => 'V-100',
@@ -69,15 +75,15 @@ final class SupplierQualityServiceScorecardTest extends TestCase
         $this->assertSame(5.0, $scorecard['qty_rejected']);
         $this->assertSame(3333.3, $scorecard['ppm']);
         $this->assertSame(1, $scorecard['scar_count']);
-        $this->assertSame(1, $scorecard['open_scar_count']);
-        $this->assertSame(1, $scorecard['overdue_scar_count']);
-        $this->assertSame(22.0, $scorecard['scar_severity_penalty']);
+        $this->assertSame(2, $scorecard['open_scar_count']);
+        $this->assertSame(2, $scorecard['overdue_scar_count']);
+        $this->assertSame(32.0, $scorecard['scar_severity_penalty']);
         $this->assertSame(30.0, $scorecard['audit_risk_penalty']);
         $this->assertSame(15.0, $scorecard['cert_risk_penalty']);
-        $this->assertSame(77.7, $scorecard['quality_score']);
+        $this->assertSame(67.7, $scorecard['quality_score']);
         $this->assertSame(50.0, $scorecard['delivery_score']);
-        $this->assertSame(47.0, $scorecard['compliance_score']);
-        $this->assertSame(70.8, $scorecard['overall_score']);
+        $this->assertSame(39.0, $scorecard['compliance_score']);
+        $this->assertSame(66.0, $scorecard['overall_score']);
         $this->assertTrue($scorecard['asl_approved']);
         $this->assertSame('qa-user', $scorecard['calculated_by']);
     }

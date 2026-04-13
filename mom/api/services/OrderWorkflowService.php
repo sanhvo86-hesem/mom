@@ -239,14 +239,6 @@ final class OrderWorkflowService
         $transitions = $config['status_flow'][$flowKey]['transitions'] ?? [];
         $allowed     = $transitions[$currentStatus] ?? [];
 
-        // Allow cancel from any non-terminal status (if role check passed)
-        if ($targetStatus === 'cancelled' && !in_array($currentStatus, ['cancelled', 'closed'], true)) {
-            return new OrderTransitionResult(true, 'Transition allowed.', data: [
-                'from' => $currentStatus,
-                'to'   => $targetStatus,
-            ]);
-        }
-
         if (!in_array($targetStatus, $allowed, true)) {
             return new OrderTransitionResult(
                 false,
@@ -649,15 +641,6 @@ final class OrderWorkflowService
             return [];
         }
 
-        // Add cancel option if not already terminal and role allows
-        if (
-            !in_array('cancelled', $allowed, true)
-            && !in_array($currentStatus, ['cancelled', 'closed'], true)
-            && $this->isRoleInList($role, self::CANCEL_ROLES)
-        ) {
-            $allowed[] = 'cancelled';
-        }
-
         // Filter out reopen targets unless role is director+
         if ($currentStatus === 'closed' && !$this->isRoleInList($role, self::REOPEN_ROLES)) {
             $allowed = [];
@@ -1009,7 +992,7 @@ final class OrderWorkflowService
             }
         }
 
-        $releaseStatus = strtolower(trim((string)($salesOrder['engineering_release_status'] ?? 'released')));
+        $releaseStatus = strtolower(trim((string)($salesOrder['engineering_release_status'] ?? '')));
         $released = in_array($releaseStatus, ['released', 'approved', 'complete', 'completed'], true);
 
         if ($missing === [] && $released) {

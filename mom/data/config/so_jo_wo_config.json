@@ -530,28 +530,35 @@
         "active",
         "on_hold",
         "completed",
-        "closed"
+        "closed",
+        "cancelled"
       ],
       "transitions": {
         "planned": [
-          "released"
+          "released",
+          "cancelled"
         ],
         "released": [
           "active",
-          "on_hold"
+          "on_hold",
+          "cancelled"
         ],
         "active": [
           "on_hold",
-          "completed"
+          "completed",
+          "cancelled"
         ],
         "on_hold": [
           "active",
-          "released"
+          "released",
+          "cancelled"
         ],
         "completed": [
-          "closed"
+          "closed",
+          "cancelled"
         ],
-        "closed": []
+        "closed": [],
+        "cancelled": []
       },
       "labels": {
         "planned": {
@@ -583,6 +590,11 @@
           "label": "Closed",
           "label_vi": "Đóng",
           "color": "#6b7280"
+        },
+        "cancelled": {
+          "label": "Cancelled",
+          "label_vi": "Đã hủy",
+          "color": "#ef4444"
         }
       }
     },
@@ -593,32 +605,41 @@
         "running",
         "inspection",
         "completed",
-        "on_hold"
+        "on_hold",
+        "cancelled"
       ],
       "transitions": {
         "scheduled": [
           "setup",
-          "on_hold"
+          "on_hold",
+          "cancelled"
         ],
         "setup": [
           "running",
-          "on_hold"
+          "on_hold",
+          "cancelled"
         ],
         "running": [
           "inspection",
           "completed",
-          "on_hold"
+          "on_hold",
+          "cancelled"
         ],
         "inspection": [
           "completed",
-          "running"
+          "running",
+          "cancelled"
         ],
-        "completed": [],
+        "completed": [
+          "cancelled"
+        ],
         "on_hold": [
           "scheduled",
           "setup",
-          "running"
-        ]
+          "running",
+          "cancelled"
+        ],
+        "cancelled": []
       },
       "labels": {
         "scheduled": {
@@ -649,6 +670,11 @@
         "on_hold": {
           "label": "On Hold",
           "label_vi": "Tạm dừng",
+          "color": "#ef4444"
+        },
+        "cancelled": {
+          "label": "Cancelled",
+          "label_vi": "Đã hủy",
           "color": "#ef4444"
         }
       }
