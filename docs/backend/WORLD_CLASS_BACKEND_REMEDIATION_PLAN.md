@@ -15,6 +15,18 @@ The main architectural gap is authority fragmentation:
 
 Target state: one command layer per business transaction, one status/workflow source generated into PHP/registry/OpenAPI/frontend options/DB constraints, PostgreSQL as the transactional authority for governed records, JSON only as cache/import/export where explicitly classified, and Generic CRUD limited to admin/read-only support surfaces.
 
+## Runtime Mitigations Applied On 2026-04-13
+
+These fixes reduce the most dangerous P0 bypasses, but they do not complete the target architecture because the canonical command layer, PostgreSQL transaction boundary, e-signature policy, ledger posting, and full migration authority are still required.
+
+| Area | Runtime change | Remaining gap |
+| --- | --- | --- |
+| Generic CRUD governed mutations | `GenericCrudController` now rejects create/update/delete/transition for governed domains/tables with `409 domain_command_required` even for admin unless an internal backfill override env+header is present. | Command APIs and generated endpoint quarantine/OpenAPI policy are still required. |
+| OQC fail containment | `LogisticsController::oqc_update` now creates/reuses an OQC-sourced JSONL NCR, writes `ncr_reference`, and creates an active SO quality hold in `data/orders/holds.json`. | This is legacy JSON/JSONL containment, not canonical `ncr_records`/`quality_holds` in one PostgreSQL transaction. |
+| Shipment bypass closure | `packing_update(status=shipped)` and `delivery_confirm` now call `ShipmentGateService::checkReadiness()` before writing shipment/delivery state. | `ConfirmPacking` and `ConfirmDelivery` command APIs must still own the transaction, audit, evidence, and SO state transition. |
+| Shipment gate config drift | `ShipmentGateService` now normalizes config key `gate_items` into runtime `gates`. | Contract review, NCR/CAPA, and quality stores remain fragmented until canonical quality/order records exist. |
+| Drift audit fatal | `mom/tools/audit_runtime_authority_consistency.php` now calls `audit_collection($domain, $collection, ...)` correctly and runs in current `JSON_ONLY` mode. | Coverage must expand to quality, supplier-quality, finance controls, status authority, and required master-data keys before cutover. |
+
 ## Current State Confirmed From Runtime
 
 | Area | Current runtime finding | Classification | Immediate impact |
@@ -24,18 +36,18 @@ Target state: one command layer per business transaction, one status/workflow so
 | SO engineering readiness | `engineering_ready` exists in registry/workflow but runtime SO config/service does not enforce it. | P0 schema-only/decorative control | SO can move to production before engineering release. |
 | JO/WO cancelled | Runtime constants/transition support `cancelled`; JO/WO config states do not include it. | P0 unregistered runtime state | Reporting and workflow registry cannot trust terminal state. |
 | `wf_sales_order` | Workflow states use `draft, confirmed, engineering_ready, in_production, shipped, closed`; statusSet points to `sales_order_status_code` with different values. | P0 workflow mismatch | Generic transition validation can validate against the wrong vocabulary. |
-| Shipment gate | Enforced only when SO transitions to `shipped`; `delivery_confirm` and packing endpoints write logistics JSON without gate call. | P0 gate bypass | Shipment can be recorded despite failed OQC/open hold/open NCR. |
-| Shipment gate inputs | Gate expects `gates`, embedded SO `contract_review`, hold records with `so_number/status=active`; runtime config uses `gate_items`, contract review file is separate, holds use `order_type/order_id/released`. | P0 documentation-runtime mismatch | Even the guarded SO transition can read the wrong evidence. |
-| OQC fail | `LogisticsController::oqc_update` sets `ncr_required=true` only. | P0 decorative quality control | No NCR, no quarantine, no hold, no shipment block. |
+| Shipment gate | Legacy `delivery_confirm` and `packing_update(status=shipped)` now call `ShipmentGateService`; SO transition gate also exists. | P0 bypass mitigated; command gap remains | Shipment route is now blocked by readiness failure, but no command transaction/evidence package owns shipment. |
+| Shipment gate inputs | Gate now normalizes `gate_items` to `gates` and OQC-created holds use `so_number/status=active`; contract review and NCR/CAPA stores remain separate. | P0 partial fix; documentation-runtime mismatch remains | Gate can block OQC holds, but cannot prove all quality/contract evidence from one authority. |
+| OQC fail | `LogisticsController::oqc_update` now sets `ncr_required`, writes an OQC-sourced JSONL NCR, stores `ncr_reference`, and creates an active SO quality hold. | P0 partial runtime enforcement; canonical quality command gap | Failed OQC now blocks shipment via hold, but NCR/MRB/CAPA/COPQ are not canonical or transactional. |
 | Material issue | MES/mobile can record time/inspection/consumption-like events; no enforced inventory transaction, stock balance, WIP ledger posting found on material issue. | P0 ledger gap | Inventory and WIP are not financially reliable. |
 | Period close | `FinanceControlService` creates period close/backdate control records; posting services do not check them. | P0 decorative finance control | Closed periods do not block AP/inventory/GL posting. |
 | Master-data sync | JSON has BOM/routing/control plan/inspection plan; `DataLayer::loadRuntimeMasterDataFromPg()` omits these from PG rebuild. | P0 sync incompleteness | Runtime can lose engineering/quality readiness inputs during PG cutover. |
-| Drift audit tool | `mom/tools/audit_runtime_authority_consistency.php` fatal TypeError: wrong `audit_collection()` argument order. | P0 tool invalid | Drift reports are not trustworthy. |
+| Drift audit tool | Fatal TypeError fixed; tool now emits JSON report in current `JSON_ONLY` mode. | P0 fatal fixed; coverage gap remains | Report is runnable but not yet sufficient for governed cutover. |
 | NCR/CAPA/MRB/SCAR stores | Exception JSON, supplier-quality JSON, quality JSONL, registry tables, and workflow library all store state independently. | P0 multi-authority quality | Quality gates cannot prove complete containment. |
 | Auto NCR/CAPA/COPQ | `QualityIntegrationService` appends JSONL events, including unregistered states such as `open` and `pending_review`. | P1 orphan/unconsumed automation | Dashboards/gates do not consume quality triggers consistently. |
 | Supplier scorecard | `SupplierQualityService::calculateScorecard()` uses incoming inspections only; not SCAR severity/count, PPM, OTD, audit/cert risk. | P1 business logic gap | Supplier performance is materially incomplete. |
 | Purchasing/receiving/IQC/AP | PostgreSQL schema exists; no dedicated command engine found for PO receipt, IQC, putaway, AP invoice, 3-way match, payment. | P0 schema-only/decorative control | P2P cannot be runtime-safe. |
-| Generic CRUD | 658 table-registry tables, 297 workflow-bound tables, generic REST/action mutations exposed. | P0 frontend unsafe | UI can bypass domain services if allowed. |
+| Generic CRUD | 658 table-registry tables, 297 workflow-bound tables, generic REST/action mutations exist; governed create/update/delete/transition are now blocked by runtime guard. | P0 mitigation in code; registry/API policy gap remains | UI cannot use guarded governed mutations, but endpoint catalog/quarantine/OpenAPI still need generated deny markers. |
 | Hard delete quarantine | `destructive-endpoint-quarantine.json` has `endpointCount: 0` despite many destructive routes. | P0 API policy gap | Builders/tools lack a machine-readable denylist. |
 | E-signature | Audit/evidence hash chains exist; no unified e-signature service with re-auth, meaning, signer identity, record binding, and TOTP replay protection. | P0 Part 11 gap | Regulated approvals are not enforceable evidence. |
 | Notification | Notification queues exist; no actual email sender found. Epicor outbox worker exists, but notification email queue is not dispatched. | P2 operational gap | Alerts may remain queued only. |

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\ShipmentGateService;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -14,6 +16,8 @@ use Throwable;
  */
 class LogisticsController extends BaseController
 {
+    private ?ShipmentGateService $shipmentGateService = null;
+
     private function logisticsDir(): string
     {
         $dir = $this->dataDir . '/logistics';
@@ -99,6 +103,152 @@ class LogisticsController extends BaseController
     private function requirePackingWriteAccess(array $user): void
     {
         $this->requireAnyRole($user, $this->packingWriteRoles());
+    }
+
+    private function shipmentGateService(): ShipmentGateService
+    {
+        if ($this->shipmentGateService === null) {
+            $this->shipmentGateService = new ShipmentGateService($this->dataDir, $this->confDir);
+        }
+
+        return $this->shipmentGateService;
+    }
+
+    private function primaryRole(array $user): string
+    {
+        $roles = is_array($user['roles'] ?? null) ? (array)$user['roles'] : [];
+        $roles[] = (string)($user['role'] ?? '');
+        foreach ($roles as $role) {
+            $normalized = migrate_role(strtolower(trim((string)$role)));
+            if ($normalized !== '') {
+                return $normalized;
+            }
+        }
+
+        return 'unknown';
+    }
+
+    private function assertShipmentReady(string $soNumber, array $user, string $action): array
+    {
+        $soNumber = trim($soNumber);
+        if ($soNumber === '') {
+            throw new RuntimeException('Shipment gate requires so_number.');
+        }
+
+        $readiness = $this->shipmentGateService()->checkReadiness(
+            $soNumber,
+            $this->userId($user),
+            $this->primaryRole($user)
+        );
+
+        if ($readiness['ready'] !== true) {
+            $this->error('shipment_gate_blocked', 409, 'Shipment readiness gate failed. Packing/shipping cannot proceed until blocking gates pass or a governed override is approved.', [
+                'action' => $action,
+                'so_number' => $soNumber,
+                'failed_gates' => $readiness['failed_gates'],
+                'gate' => $readiness,
+            ]);
+        }
+
+        return $readiness;
+    }
+
+    private function createQualityHoldForOqcFailure(array $oqc, string $userId, string $now): ?array
+    {
+        $soNumber = trim((string)($oqc['so_number'] ?? ''));
+        if ($soNumber === '') {
+            return null;
+        }
+
+        $sourceId = trim((string)($oqc['oqc_number'] ?? $oqc['id'] ?? ''));
+        $file = $this->dataDir . '/orders/holds.json';
+        $holds = $this->readJsonFile($file) ?? [];
+        foreach ($holds as $hold) {
+            if (!is_array($hold)) {
+                continue;
+            }
+            if (($hold['so_number'] ?? '') === $soNumber
+                && strtolower(trim((string)($hold['status'] ?? ''))) === 'active'
+                && ($hold['source_type'] ?? '') === 'oqc_failure'
+                && ($hold['source_id'] ?? '') === $sourceId) {
+                return $hold;
+            }
+        }
+
+        $hold = [
+            'hold_id' => 'HOLD-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $soNumber . '|' . $sourceId), 0, 8),
+            'so_number' => $soNumber,
+            'status' => 'active',
+            'hold_type' => 'quality',
+            'hold_reason' => 'oqc_failure',
+            'source_type' => 'oqc_failure',
+            'source_id' => $sourceId,
+            'source_record' => [
+                'oqc_number' => $oqc['oqc_number'] ?? '',
+                'item_id' => $oqc['item_id'] ?? '',
+                'lot_number' => $oqc['lot_number'] ?? '',
+                'qty_rejected' => $oqc['qty_rejected'] ?? 0,
+            ],
+            'created_by' => $userId,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        $holds[] = $hold;
+        $this->writeJsonFile($file, $holds);
+
+        return $hold;
+    }
+
+    private function createNcrForOqcFailure(array $oqc, string $userId, string $now): ?array
+    {
+        $sourceId = trim((string)($oqc['oqc_number'] ?? $oqc['id'] ?? ''));
+        if ($sourceId === '') {
+            return null;
+        }
+
+        $dir = $this->dataDir . '/quality/ncr';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $path = $dir . '/ncr_log.jsonl';
+
+        if (is_file($path)) {
+            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+            foreach ($lines as $line) {
+                $existing = json_decode($line, true);
+                if (is_array($existing)
+                    && ($existing['source'] ?? '') === 'oqc_failure'
+                    && ($existing['source_id'] ?? '') === $sourceId) {
+                    return $existing;
+                }
+            }
+        }
+
+        $ncr = [
+            'ncr_id' => 'NCR-OQC-' . date('YmdHis') . '-' . substr(hash('sha256', $sourceId), 0, 8),
+            'source' => 'oqc_failure',
+            'source_id' => $sourceId,
+            'so_number' => trim((string)($oqc['so_number'] ?? '')),
+            'jo_number' => trim((string)($oqc['jo_number'] ?? '')),
+            'wo_number' => trim((string)($oqc['wo_number'] ?? '')),
+            'part_number' => trim((string)($oqc['item_id'] ?? '')),
+            'lot_number' => trim((string)($oqc['lot_number'] ?? '')),
+            'defect_type' => 'oqc_failure',
+            'severity' => ((int)($oqc['qty_rejected'] ?? 0) > 0) ? 'major' : 'minor',
+            'status' => 'open',
+            'containment_status' => 'quality_hold_created',
+            'description' => 'OQC failed for SO ' . trim((string)($oqc['so_number'] ?? '')) . ' / item ' . trim((string)($oqc['item_id'] ?? '')) . '. Shipment is blocked until NCR/MRB disposition releases the hold.',
+            'created_at' => $now,
+            'created_by' => $userId,
+        ];
+
+        $encoded = json_encode($ncr, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($encoded === false || @file_put_contents($path, $encoded . "\n", FILE_APPEND | LOCK_EX) === false) {
+            throw new RuntimeException('Unable to create OQC failure NCR.');
+        }
+
+        return $ncr;
     }
 
     /**
@@ -504,6 +654,12 @@ class LogisticsController extends BaseController
                             // If fail, flag for NCR creation
                             if ($newResult === 'fail' && empty($r['ncr_reference'])) {
                                 $r['ncr_required'] = true;
+                                $autoNcr = $this->createNcrForOqcFailure($r, $uid, $now);
+                                if (is_array($autoNcr)) {
+                                    $r['ncr_reference'] = (string)($autoNcr['ncr_id'] ?? '');
+                                    $r['auto_ncr'] = $autoNcr;
+                                }
+                                $r['quality_hold'] = $this->createQualityHoldForOqcFailure($r, $uid, $now);
                             }
                         }
                     }
@@ -631,6 +787,9 @@ class LogisticsController extends BaseController
                     if (isset($body['status'])) {
                         $newStatus = (string)$body['status'];
                         if (in_array($newStatus, self::PACKING_STATUSES, true)) {
+                            if ($newStatus === 'shipped') {
+                                $this->assertShipmentReady((string)($r['so_number'] ?? $body['so_number'] ?? ''), $user, 'packing_update');
+                            }
                             $r['status'] = $newStatus;
                         }
                     }
@@ -708,6 +867,8 @@ class LogisticsController extends BaseController
         $now = $this->nowIso();
 
         try {
+            $this->assertShipmentReady((string)($body['so_number'] ?? ''), $user, 'delivery_confirm');
+
             // Record delivery confirmation
             $file       = $this->logisticsDir() . '/deliveries.json';
             $deliveries = $this->readJsonFile($file) ?? [];

@@ -16,6 +16,8 @@ Frontend must not consume raw endpoint catalog directly for business mutation. F
 
 Generic CRUD is not a frontend business API.
 
+Current runtime guard: `GenericCrudController` rejects governed create/update/delete/transition requests with `409 domain_command_required` after normal permission checks. This applies to core sales, production, MES, inventory, purchasing, supplier, quality, finance, master-data, traceability, maintenance/calibration, shipping/compliance, document/evidence/audit domains and high-risk tables such as `sales_orders`, `quotes`, `job_orders`, `work_orders`, `inventory_transactions`, `stock_balances`, `ncr_records`, `capa_records`, `scar`, `ap_invoices`, `period_closes`, and `electronic_signature`. The guard is a runtime safety net; frontend must still rely only on approved process APIs.
+
 ## Allowed Process APIs
 
 Allowed only after implementation and runtime-safe review:
@@ -81,7 +83,7 @@ Current finding: `mom/data/registry/destructive-endpoint-quarantine.json` has `e
 
 ## Generic CRUD Allowlist/Denylist
 
-Default: deny all mutation.
+Default: deny all mutation. The runtime now enforces this for governed domains/tables with `409 domain_command_required` when the caller otherwise passes RBAC. If the caller lacks permission, the response remains the normal `403 forbidden`. Internal one-time data backfill requires both `HESEM_ALLOW_GOVERNED_GENERIC_MUTATION` and `X-HESEM-Internal-Generic-Override: domain-command-backfill`; product frontend must never send that header.
 
 Read-only allowlist can include:
 
@@ -116,7 +118,11 @@ An endpoint is runtime-unsafe if any of these are true:
 - Can hard-delete or hide business records.
 - Can bypass command path by writing status directly.
 
-Runtime-unsafe endpoints must return `403 forbidden_runtime_unsafe` to product frontend roles.
+Runtime-unsafe endpoints must return one of:
+
+- `403 forbidden_runtime_unsafe` or ordinary `403 forbidden` when the actor is not allowed to use the surface.
+- `409 domain_command_required` when the actor is otherwise authorized but the target table/domain is governed and must use a command API.
+- `410 gone` after a legacy endpoint is formally sunset and has a replacement command link.
 
 ## Versioning
 
@@ -188,4 +194,3 @@ Read projections must support:
 | `X-CSRF-Token` | Browser session mutation | Existing CSRF continues. |
 | `If-Match` or `X-Row-Version` | Record update where applicable | Optimistic concurrency. |
 | `X-Actor-Reason` | Overrides/destructive/admin repair | Must be audited. |
-

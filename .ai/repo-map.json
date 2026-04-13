@@ -1,0 +1,87 @@
+{
+    "_meta": {
+        "generated_at": "2026-04-13T05:40:10+00:00",
+        "generator": "tools/scripts/ai-index/generate.php",
+        "description": "High-level project topology. Read this first to orient."
+    },
+    "project": {
+        "name": "HESEM MOM ERP Portal",
+        "stack": [
+            "PHP 8.2+",
+            "PostgreSQL",
+            "Redis",
+            "RabbitMQ"
+        ],
+        "entry_point": "mom/api/index.php",
+        "composer": "mom/composer.json"
+    },
+    "namespaces": {
+        "MOM\\Api\\Controllers\\": "mom/api/controllers/",
+        "MOM\\Api\\Services\\": "mom/api/services/",
+        "MOM\\Services\\": "mom/api/services/",
+        "MOM\\Api\\Middleware\\": "mom/api/middleware/",
+        "MOM\\Database\\": "mom/database/"
+    },
+    "counts": {
+        "controllers": 43,
+        "services": 80,
+        "middleware": 5,
+        "migrations": 96,
+        "db_tables": 658,
+        "contracts": 67,
+        "action_routes": 451,
+        "rest_routes": 153
+    },
+    "domains": [
+        "analytics",
+        "commercial_customer",
+        "finance",
+        "integration_resilience",
+        "inventory_logistics",
+        "maintenance_ehs",
+        "master_data",
+        "mes_execution",
+        "planning_production",
+        "procurement_supplier_quality",
+        "quality_improvement",
+        "traceability_serialization"
+    ],
+    "key_files": {
+        "router": "mom/api/index.php",
+        "router_class": "mom/api/Router.php",
+        "base_controller": "mom/api/controllers/BaseController.php",
+        "data_layer": "mom/database/DataLayer.php",
+        "db_connection": "mom/database/Connection.php",
+        "migrations_dir": "mom/database/migrations/",
+        "contracts_dir": "mom/contracts/objects/",
+        "composer": "mom/composer.json"
+    },
+    "infrastructure_services": {
+        "CacheService": "mom/api/services/CacheService.php",
+        "QueueService": "mom/api/services/QueueService.php",
+        "EventBus": "mom/api/services/EventBus.php",
+        "EventBroadcaster": "mom/api/services/EventBroadcaster.php",
+        "WorkflowEngine": "mom/api/services/WorkflowEngine.php",
+        "AuthGuard": "mom/api/services/AuthGuard.php",
+        "CsrfService": "mom/api/services/CsrfService.php",
+        "InputSanitizer": "mom/api/services/InputSanitizer.php",
+        "CircuitBreaker": "mom/api/services/CircuitBreaker.php",
+        "IdempotencyService": "mom/api/services/IdempotencyService.php",
+        "StorageService": "mom/api/services/StorageService.php",
+        "LogTransport": "mom/api/services/LogTransport.php",
+        "ResponseHelper": "mom/api/services/ResponseHelper.php"
+    },
+    "middleware_pipeline": {
+        "1_cors": "mom/api/middleware/CorsMiddleware.php",
+        "2_api_key": "mom/api/middleware/ApiKeyMiddleware.php",
+        "3_auth": "mom/api/middleware/AuthMiddleware.php",
+        "4_rate_limit": "mom/api/middleware/RateLimitMiddleware.php",
+        "5_audit": "mom/api/middleware/AuditMiddleware.php"
+    },
+    "data_layer_modes": {
+        "1_JSON_ONLY": "legacy JSON files only",
+        "2_SHADOW_WRITE": "write to both JSON + PostgreSQL",
+        "3_POSTGRES_PRIMARY": "read from PostgreSQL, fallback to JSON",
+        "4_POSTGRES_ONLY": "PostgreSQL only (final state)"
+    }
+}

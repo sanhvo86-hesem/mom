@@ -6,8 +6,8 @@ This spec unifies NCR, CAPA, MRB, SCAR, OQC, IQC, holds, quarantine, COPQ, and s
 
 | Finding | Runtime evidence | Classification |
 | --- | --- | --- |
-| OQC fail only sets `ncr_required` | `LogisticsController::oqc_update` writes logistics JSON and sets flag when result is `fail`. | schema-only/decorative control |
-| Quality gate reads wrong stores | `ShipmentGateService` expects SO-embedded review/holds and `orders['ncrs']`; actual records are separate JSON/JSONL/exception stores. | documentation-runtime mismatch |
+| OQC fail containment is now partial | `LogisticsController::oqc_update` writes logistics JSON, sets `ncr_required`, creates/reuses an OQC-sourced JSONL NCR, writes `ncr_reference`, and creates an active SO quality hold. | P0 runtime bypass mitigated; canonical command gap remains |
+| Quality gate store coverage is partial | `ShipmentGateService` now reads active SO holds and normalizes `gate_items`; it still expects SO-embedded contract review and `orders['ncrs']` for some quality evidence while actual records are separate JSON/JSONL/exception stores. | documentation-runtime mismatch remains |
 | NCR/CAPA/MRB/SCAR multi-authority | Exceptions JSON, supplier-quality JSON, quality JSONL, and PG registry tables all store quality state. | P0 multi-authority |
 | Auto quality events are unconsumed | `QualityIntegrationService` writes JSONL NCR/CAPA/COPQ triggers; not canonical records/gates. | orphan automation |
 | IQC does not block putaway | Supplier incoming inspection records are separate from PO receipt/lot availability. | decorative IQC |
@@ -37,6 +37,17 @@ Command owners:
 - `ApplyQualityHold`
 - `ReleaseQualityHold`
 - `PostCopqEntry`
+
+## Legacy Runtime Mitigation Boundary
+
+The 2026-04-13 runtime patch intentionally closes the immediate OQC-to-shipment bypass before the canonical quality model exists:
+
+1. OQC fail creates an active SO hold in `data/orders/holds.json`.
+2. OQC fail creates or reuses an OQC-sourced record in `data/quality/ncr/ncr_log.jsonl`.
+3. `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`.
+4. `ShipmentGateService` blocks shipment when the SO has an active hold.
+
+This mitigation is not sufficient for regulated release because it does not create canonical PostgreSQL `quality_events`, `ncr_records`, `quality_holds`, `mrb_records`, `capa_records`, or `copq_ledger` in one transaction. The command model below remains mandatory.
 
 ## Quality Hold And Quarantine Rules
 
@@ -192,4 +203,3 @@ If any link is missing, release fails with `engineering_quality_plan_incomplete`
 | ISO 13485/QMSR | NCR/CAPA linkage, supplier control, process validation evidence. |
 | AS9100/IATF | Traceability, nonconformance, production control, supplier quality, contract/quality release evidence. |
 | Record retention | Evidence vault link and retention class for all regulated quality records. |
-

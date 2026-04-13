@@ -22,6 +22,19 @@ Common rules:
 - Every error response includes `error.code`, `error.message`, `correlation_id`, `command`, `retryable`, and `violations[]`.
 - Generic CRUD may not call these command internals.
 
+## Compatibility Guards Already Applied
+
+These runtime guards exist only to stop known P0 bypasses while the command layer is being built:
+
+| Guard | Current behavior | Required command replacement |
+| --- | --- | --- |
+| Governed Generic CRUD mutation | `GenericCrudController` rejects governed create/update/delete/transition with `409 domain_command_required`; internal backfill requires env+header override. | All commands in this spec. |
+| OQC fail containment | Legacy `oqc_update(result=fail)` creates/reuses an OQC-sourced JSONL NCR and active SO hold. | `RecordOqcResult` plus `CreateNcrFromQualityFailure` in one transaction. |
+| Shipment gate on logistics routes | Legacy `packing_update(status=shipped)` and `delivery_confirm` call `ShipmentGateService`. | `ConfirmPacking` and `ConfirmDelivery`. |
+| Shipment gate config normalization | `ShipmentGateService` accepts `gate_items` by normalizing it to `gates`. | Generated shipment gate policy from canonical quality/order authority. |
+
+None of these guards changes the acceptance rule: a domain is not runtime-complete until its command has PostgreSQL transaction authority, idempotency, audit/evidence, outbox, and tests.
+
 ## Command Matrix
 
 | Command | Input DTO | Idempotency key | Permission/role | Preconditions/gates | Transaction boundary and tables | Workflow transitions | Audit/evidence/outbox | Error cases | Acceptance tests |

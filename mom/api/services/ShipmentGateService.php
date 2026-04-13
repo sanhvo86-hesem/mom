@@ -25,7 +25,8 @@ final class ShipmentGateService
 
     /** Roles permitted to invoke shipment readiness checks. */
     private const ALLOWED_ROLES = [
-        'shipping_coordinator', 'logistics_manager', 'qa_manager',
+        'admin', 'shipping_coordinator', 'logistics_coordinator', 'logistics_manager',
+        'warehouse_clerk', 'customer_service', 'qa_manager',
         'production_director', 'ceo', 'it_admin', 'qms_engineer',
         'supply_chain_manager', 'sales_manager',
     ];
@@ -99,7 +100,7 @@ final class ShipmentGateService
      * @param string      $soNumber Sales Order number.
      * @param string|null $userId   User performing the check (required for audit).
      * @param string|null $userRole Role of the user (required for RBAC).
-     * @return array{ready: bool, so_number: string, checked_at: string, checked_by: string, items: array, overrides: array}
+     * @return array{ready: bool, so_number: string, checked_at: string, checked_by: string, checked_role: string, items: array, failed_gates: array<int, string>, overrides: array}
      */
     public function checkReadiness(string $soNumber, ?string $userId = null, ?string $userRole = null): array
     {
@@ -299,6 +300,16 @@ final class ShipmentGateService
 
         if ($config === null) {
             return ['gates' => self::DEFAULT_GATES];
+        }
+
+        if (!is_array($config['gates'] ?? null) && is_array($config['gate_items'] ?? null)) {
+            $config['gates'] = array_values(array_map(static function (array $gate): array {
+                if (!array_key_exists('required', $gate)) {
+                    $severity = strtolower(trim((string)($gate['severity'] ?? 'blocking')));
+                    $gate['required'] = $severity !== 'warning';
+                }
+                return $gate;
+            }, array_filter($config['gate_items'], 'is_array')));
         }
 
         return $config;

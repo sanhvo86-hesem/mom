@@ -21,7 +21,7 @@ Current code supports these modes in `DataLayer`, but runtime services do not co
 | Orders | `OrderController`/`QuoteService` often writes JSON stores through dedicated services, not always DB-backed `DataLayer`. | Commands must use PG transaction authority. |
 | MES | `MtconnectPollingService` syncs master/orders/MES stores to PG when not JSON-only; raw event stream is not canonical. | Add raw event table and idempotent replay. |
 | Quality | Exception JSON, logistics OQC JSON, supplier-quality JSON, quality JSONL, and PG quality tables diverge. | Canonical quality importer and single command authority. |
-| Drift tool | `audit_runtime_authority_consistency.php` fatals with `audit_collection()` wrong arguments. | Fix tool before trusting reports. |
+| Drift tool | `audit_runtime_authority_consistency.php` now runs in current `JSON_ONLY` mode after the `audit_collection()` argument fix. | Expand coverage and fail conditions before trusting cutover reports. |
 
 ## Missing Sync Keys
 
@@ -78,9 +78,13 @@ Acceptance: `bom_library`, `routing_library`, `control_plans`, and `inspection_p
 
 ## Drift Detection Tool Requirements
 
-Fix `mom/tools/audit_runtime_authority_consistency.php`:
+`mom/tools/audit_runtime_authority_consistency.php` has passed the first runtime repair:
 
-- `audit_domain()` must call `audit_collection($domain, $collection, $jsonRows, $pgRows)`.
+- `audit_domain()` calls `audit_collection($domain, $collection, $jsonRows, $pgRows)`.
+- The tool can emit a JSON report in the current `JSON_ONLY` environment.
+
+The tool is still not complete. It must next:
+
 - The script must exit non-zero on fatal drift or unknown governed state.
 - Output JSON and human summary.
 - Include master_data, orders, MES, Epicor, quality, supplier-quality, finance controls after canonicalization.
@@ -141,11 +145,10 @@ Rollback is not allowed from `POSTGRES_ONLY` unless a tested restore procedure r
 
 | Test ID | Scenario | Expected result |
 | --- | --- | --- |
-| PG-001 | Run drift tool | No fatal error; includes master/orders/MES collections. |
+| PG-001 | Run drift tool | No fatal error; includes master/orders/MES collections. Baseline repaired on 2026-04-13. |
 | PG-002 | Omit `bom_library` from PG rebuild | CI fails. |
 | PG-003 | JSON SO status unknown to workflow authority | CI fails with unknown state report. |
 | PG-004 | Duplicate converted quote mapping | Migration fails before cutover. |
 | PG-005 | Ledger balance mismatch | Cutover blocked. |
 | PG-006 | PG primary read falls back to JSON | Observability report records fallback and reason. |
 | PG-007 | Rollback snapshot restore | Command-created record remains consistent in JSON and PG. |
-

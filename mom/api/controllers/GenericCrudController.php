@@ -18,6 +18,78 @@ use Throwable;
  */
 class GenericCrudController extends BaseController
 {
+    private const MUTATION_KINDS = ['create', 'update', 'delete', 'transition'];
+
+    private const DOMAIN_COMMAND_REQUIRED_DOMAINS = [
+        'sales',
+        'commercial_contracts',
+        'production',
+        'mes_execution',
+        'inventory',
+        'warehouse_management',
+        'purchasing',
+        'supplier_relationship',
+        'quality_management',
+        'quality_lab',
+        'finance',
+        'finance_extended',
+        'finance_treasury',
+        'master_data',
+        'master_data_governance',
+        'mfg_engineering',
+        'traceability_serialization',
+        'digital_product_passport',
+        'plant_maintenance',
+        'calibration_equipment',
+        'shipping_compliance',
+        'trade_compliance',
+        'document_control',
+        'evidence_vault',
+        'record_system',
+        'audit_risk',
+    ];
+
+    private const DOMAIN_COMMAND_REQUIRED_TABLES = [
+        'sales_orders',
+        'sales_order',
+        'sales_order_line',
+        'quotes',
+        'quote',
+        'job_orders',
+        'job_order',
+        'work_orders',
+        'work_order',
+        'purchase_orders',
+        'purchase_order',
+        'purchase_order_lines',
+        'ap_invoices',
+        'ap_invoice_lines',
+        'inventory_transactions',
+        'inventory_ledger',
+        'stock_balances',
+        'material_consumption',
+        'mes_material_consumption',
+        'inspection_lot',
+        'inspection_result',
+        'incoming_inspections',
+        'ncr_records',
+        'nonconformance',
+        'ncr',
+        'capa',
+        'capa_records',
+        'scar',
+        'approved_supplier_list',
+        'supplier_scorecards',
+        'lot',
+        'serial',
+        'genealogy_link',
+        'dpp_passports',
+        'period_closes',
+        'backdate_exceptions',
+        'electronic_signature',
+        'audit_trail',
+    ];
+
     private ?GenericCrudService $service = null;
     private ?IdempotencyService $idempotencyService = null;
     private ?array $endpointCatalog = null;
@@ -946,6 +1018,92 @@ class GenericCrudController extends BaseController
 
     /**
      * @param array<string, mixed> $ctx
+     * @return array<string, mixed>
+     */
+    private function runtimePolicyScope(array $ctx): array
+    {
+        $policy = $this->runtimeAccessPolicy();
+        $table = strtolower(trim((string)($ctx['table'] ?? '')));
+        $domain = strtolower(trim((string)($ctx['domain'] ?? '')));
+
+        foreach ([
+            is_array($policy['tables'][$table] ?? null) ? $policy['tables'][$table] : null,
+            is_array($policy['domains'][$domain] ?? null) ? $policy['domains'][$domain] : null,
+            is_array($policy['defaults'] ?? null) ? $policy['defaults'] : null,
+        ] as $scope) {
+            if (is_array($scope)) {
+                return $scope;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     */
+    private function requiresDomainCommand(array $ctx): bool
+    {
+        $kind = strtolower(trim((string)($ctx['kind'] ?? '')));
+        if (!in_array($kind, self::MUTATION_KINDS, true)) {
+            return false;
+        }
+
+        $scope = $this->runtimePolicyScope($ctx);
+        $genericMutation = strtolower(trim((string)($scope['genericMutation'] ?? $scope['generic_mutation'] ?? '')));
+        if (in_array($genericMutation, ['allow', 'allowed', 'generic_allowed'], true)) {
+            return false;
+        }
+        if (in_array($genericMutation, ['deny', 'blocked', 'domain_command_required'], true)) {
+            return true;
+        }
+
+        $domain = strtolower(trim((string)($ctx['domain'] ?? '')));
+        $table = strtolower(trim((string)($ctx['table'] ?? '')));
+        if (in_array($domain, self::DOMAIN_COMMAND_REQUIRED_DOMAINS, true)) {
+            return true;
+        }
+        if (in_array($table, self::DOMAIN_COMMAND_REQUIRED_TABLES, true)) {
+            return true;
+        }
+
+        $tableMeta = is_array($ctx['tableMeta'] ?? null) ? (array)$ctx['tableMeta'] : [];
+        $statusColumn = trim((string)($tableMeta['statusColumn'] ?? ''));
+        $workflowId = trim((string)($tableMeta['workflowId'] ?? ''));
+
+        return $statusColumn !== '' || $workflowId !== '';
+    }
+
+    private function governedGenericMutationOverrideEnabled(): bool
+    {
+        $configured = strtolower(trim((string)(getenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION') ?: '')));
+        if (!in_array($configured, ['1', 'true', 'yes', 'on'], true)) {
+            return false;
+        }
+
+        $token = trim((string)($this->requestHeader('X-HESEM-Internal-Generic-Override') ?? ''));
+        return hash_equals('domain-command-backfill', $token);
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     */
+    private function enforceDomainCommandBoundary(array $ctx): void
+    {
+        if (!$this->requiresDomainCommand($ctx) || $this->governedGenericMutationOverrideEnabled()) {
+            return;
+        }
+
+        $this->error('domain_command_required', 409, 'Generic CRUD mutation is disabled for governed runtime domains. Use a dedicated process command API so business gates, transaction boundaries, idempotency, ledger posting, audit, and evidence are enforced.', [
+            'domain' => (string)($ctx['domain'] ?? ''),
+            'table' => (string)($ctx['table'] ?? ''),
+            'kind' => (string)($ctx['kind'] ?? ''),
+            'policy' => 'frontend_must_not_call_raw_runtime_mutations_for_governed_domains',
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
      */
     private function enforceRuntimePermission(array $user, array $ctx): void
     {
@@ -959,6 +1117,7 @@ class GenericCrudController extends BaseController
         }
 
         if (user_is_admin($user)) {
+            $this->enforceDomainCommandBoundary($ctx);
             return;
         }
 
@@ -968,14 +1127,17 @@ class GenericCrudController extends BaseController
 
         if ($this->userPermissionMatrixConfigured($user)) {
             $this->requireAnyPermission($user, $permissions, false);
+            $this->enforceDomainCommandBoundary($ctx);
             return;
         }
 
         if ($policyRoles !== null) {
             if (in_array('authenticated', $policyRoles, true)) {
+                $this->enforceDomainCommandBoundary($ctx);
                 return;
             }
             if ($policyRoles !== [] && $this->userHasAnyRole($user, $policyRoles)) {
+                $this->enforceDomainCommandBoundary($ctx);
                 return;
             }
             $this->error('forbidden', 403, 'Denied by runtime access policy', [

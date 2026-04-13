@@ -1,0 +1,2202 @@
+{
+    "_meta": {
+        "generated_at": "2026-04-13T05:40:10+00:00",
+        "description": "All PHP classes with public methods and file paths. Search by class or method name to find the right file.",
+        "usage": "grep this file for a class or method name to get its file path."
+    },
+    "symbols": [
+        {
+            "class": "AdminController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/AdminController.php",
+            "methods": [
+                "gitSync",
+                "gitPull",
+                "gitStatus",
+                "gitDiscardLocal",
+                "clearCache",
+                "getSettings",
+                "saveSettings",
+                "getPortalConfig",
+                "savePortalConfig",
+                "getModuleAccessConfig",
+                "saveModuleAccessConfig",
+                "getAuditTrail",
+                "getUserDocumentOverrides",
+                "saveUserDocumentOverrides",
+                "getMfaSettings",
+                "saveMfaSettings",
+                "getDesignConfig",
+                "saveDesignConfig"
+            ]
+        },
+        {
+            "class": "AdminMetadataStudioController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/AdminMetadataStudioController.php",
+            "methods": [
+                "__construct",
+                "getSummary",
+                "getDetail",
+                "saveDetail"
+            ]
+        },
+        {
+            "class": "AiSchedulingController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/AiSchedulingController.php",
+            "methods": [
+                "listPredictions",
+                "acknowledgePrediction",
+                "resolvePrediction",
+                "getSpcAnomalies",
+                "getToolWearPredictions",
+                "getDashboard",
+                "getSchedule",
+                "createSlot",
+                "updateSlot",
+                "getConflicts",
+                "getCapacityHeatmap",
+                "suggestPromiseDate"
+            ]
+        },
+        {
+            "class": "AllocationController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/AllocationController.php",
+            "methods": [
+                "allocate",
+                "getHistory",
+                "void",
+                "checkDuplicate",
+                "getStatus",
+                "downloadTxt",
+                "getExpandedTypes",
+                "preview"
+            ]
+        },
+        {
+            "class": "ApiKeyController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ApiKeyController.php",
+            "methods": [
+                "__construct",
+                "create",
+                "list",
+                "revoke",
+                "generateJwt"
+            ]
+        },
+        {
+            "class": "ApprovalGroupController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ApprovalGroupController.php",
+            "methods": [
+                "listApprovalGroups",
+                "getApprovalGroup",
+                "decideApprovalGroup",
+                "listApprovalGroupTimeline",
+                "requestApproval"
+            ]
+        },
+        {
+            "class": "ApqpController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ApqpController.php",
+            "methods": [
+                "listProjects",
+                "getProjectDetail",
+                "createProject",
+                "updateProject",
+                "advancePhase",
+                "submitGateReview",
+                "approveGate",
+                "rejectGate",
+                "createPpapSubmission",
+                "updatePpapElement",
+                "recordCustomerResponse",
+                "getPhaseDeliverables",
+                "getDashboard"
+            ]
+        },
+        {
+            "class": "AuthController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/AuthController.php",
+            "methods": [
+                "status",
+                "login",
+                "mfaVerify",
+                "enrollVerify",
+                "logout"
+            ]
+        },
+        {
+            "class": "BaseController",
+            "type": "abstract class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/BaseController.php",
+            "methods": [
+                "__construct",
+                "setStore"
+            ]
+        },
+        {
+            "class": "CiController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/CiController.php",
+            "methods": [
+                "dashboard",
+                "listSuggestions",
+                "createSuggestion",
+                "listProjects",
+                "createProject",
+                "updateProject",
+                "transitionProject",
+                "getRoiSummary"
+            ]
+        },
+        {
+            "class": "CncProgramController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/CncProgramController.php",
+            "methods": [
+                "listPrograms",
+                "getDetail",
+                "create",
+                "update",
+                "addVersion",
+                "listApprovals",
+                "approve",
+                "listSetupSheets",
+                "createSetupSheet",
+                "updateSetupSheet"
+            ]
+        },
+        {
+            "class": "ComplianceReportController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ComplianceReportController.php",
+            "methods": [
+                "listReportTypes",
+                "generateReport",
+                "getHistory",
+                "getManagementReviewData",
+                "getCustomerQualityData",
+                "getSupplierReviewData",
+                "getCopqData",
+                "getEvidencePackage"
+            ]
+        },
+        {
+            "class": "CustomerPortalController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/CustomerPortalController.php",
+            "methods": [
+                "listUsers",
+                "createUser",
+                "updateUser",
+                "listAccessGrants",
+                "grantAccess",
+                "revokeAccess",
+                "listComplaints",
+                "linkComplaint",
+                "listDocAccess",
+                "getAdminData",
+                "updateComplaintStatus",
+                "resendVerification",
+                "revokeDocument",
+                "getAnalytics"
+            ]
+        },
+        {
+            "class": "CustomerPurchaseOrderController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/CustomerPurchaseOrderController.php",
+            "methods": [
+                "listPurchaseOrders",
+                "getPurchaseOrder",
+                "createPurchaseOrder",
+                "transitionPurchaseOrder"
+            ]
+        },
+        {
+            "class": "DashboardController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/DashboardController.php",
+            "methods": [
+                "__construct",
+                "handleAction",
+                "handleRest",
+                "executive",
+                "quality",
+                "production",
+                "supplier",
+                "department",
+                "widget",
+                "kpiGet",
+                "kpiTrend",
+                "kpiAlerts",
+                "spcCapability",
+                "spcChart",
+                "spcSummary",
+                "spcAlerts"
+            ]
+        },
+        {
+            "class": "DictController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/DictController.php",
+            "methods": [
+                "list",
+                "upsert",
+                "delete"
+            ]
+        },
+        {
+            "class": "DispatchController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/DispatchController.php",
+            "methods": [
+                "getTimeline",
+                "createTarget",
+                "dispatchTarget",
+                "getOperatorDispatch",
+                "reportProduction",
+                "getDashboard",
+                "listTargets",
+                "updateTarget"
+            ]
+        },
+        {
+            "class": "DocumentController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/DocumentController.php",
+            "methods": [
+                "create",
+                "saveDraft",
+                "submitReview",
+                "approve",
+                "reject",
+                "updateMeta",
+                "deleteDrafts",
+                "deleteVersion",
+                "listVersions",
+                "startNewRevision",
+                "stream",
+                "listCustom",
+                "getDescriptions",
+                "saveDescription",
+                "getVisibility",
+                "saveVisibility",
+                "docsSnapshot"
+            ]
+        },
+        {
+            "class": "EnergyController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/EnergyController.php",
+            "methods": [
+                "getOverview",
+                "getMachineDetail",
+                "getPerPartEnergy",
+                "getCostTrend"
+            ]
+        },
+        {
+            "class": "EventStreamController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/EventStreamController.php",
+            "methods": [
+                "stream"
+            ]
+        },
+        {
+            "class": "EvidenceController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/EvidenceController.php",
+            "methods": [
+                "listEvidence",
+                "detail",
+                "upload",
+                "link",
+                "chainOfCustody",
+                "verifyChain",
+                "listApprovalGroupAttachments",
+                "getGovernanceAttachment",
+                "createGovernanceAttachment",
+                "search"
+            ]
+        },
+        {
+            "class": "ExceptionController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ExceptionController.php",
+            "methods": [
+                "dashboard",
+                "listAll",
+                "detail",
+                "createComplaint",
+                "updateComplaint",
+                "createMrb",
+                "updateMrb",
+                "createDeviation",
+                "updateDeviation",
+                "createConcession",
+                "updateConcession",
+                "transition",
+                "copqSummary",
+                "trends",
+                "escalate"
+            ]
+        },
+        {
+            "class": "ExitException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ExitException.php",
+            "methods": [
+                "__construct",
+                "json [static]",
+                "empty [static]",
+                "raw [static]",
+                "getStatusCode",
+                "getPayload",
+                "getHeaders",
+                "getBody"
+            ]
+        },
+        {
+            "class": "FileController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/FileController.php",
+            "methods": [
+                "scanFolders",
+                "createFolder",
+                "renameFolder",
+                "deleteFolder",
+                "moveDoc",
+                "deleteDoc",
+                "renameDoc",
+                "getFolderDescriptions"
+            ]
+        },
+        {
+            "class": "FinanceController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/FinanceController.php",
+            "methods": [
+                "listPeriodCloses",
+                "getPeriodClose",
+                "listBackdateExceptions",
+                "getBackdateException",
+                "createBackdateException",
+                "transitionBackdateException",
+                "createPeriodClose",
+                "transitionPeriodClose",
+                "listCreditMemos",
+                "getCreditMemo",
+                "createCreditMemo",
+                "listDebitMemos",
+                "getDebitMemo",
+                "createDebitMemo"
+            ]
+        },
+        {
+            "class": "FmeaController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/FmeaController.php",
+            "methods": [
+                "listFmeas",
+                "getFmeaDetail",
+                "createFmea",
+                "updateFmea",
+                "addFailureMode",
+                "updateFailureMode",
+                "addAction",
+                "completeAction",
+                "generateControlPlan",
+                "listControlPlans",
+                "getControlPlanDetail",
+                "getRpnTrend",
+                "linkNcrToFmea"
+            ]
+        },
+        {
+            "class": "FormController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/FormController.php",
+            "methods": [
+                "list",
+                "getSchema",
+                "submit",
+                "getEntries",
+                "getIdRegistry",
+                "configRecordTypes",
+                "getNextId",
+                "peekNextId",
+                "streamVersion",
+                "uploadDraft",
+                "saveDraft",
+                "getDraft",
+                "listDrafts"
+            ]
+        },
+        {
+            "class": "GenericCrudController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/GenericCrudController.php",
+            "methods": [
+                "listRecords",
+                "getDetail",
+                "createRecord",
+                "updateRecord",
+                "deleteRecord",
+                "transitionRecord"
+            ]
+        },
+        {
+            "class": "HealthController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/HealthController.php",
+            "methods": [
+                "live",
+                "ready",
+                "status"
+            ]
+        },
+        {
+            "class": "KnowledgeController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/KnowledgeController.php",
+            "methods": [
+                "listTips",
+                "getDetail",
+                "create",
+                "update",
+                "vote",
+                "addComment"
+            ]
+        },
+        {
+            "class": "LogisticsController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/LogisticsController.php",
+            "methods": [
+                "subcontract_list",
+                "subcontract_create",
+                "subcontract_update",
+                "subcontract_receive",
+                "oqc_list",
+                "oqc_create",
+                "oqc_update",
+                "packing_create",
+                "packing_update",
+                "packing_list",
+                "delivery_confirm"
+            ]
+        },
+        {
+            "class": "MasterDataController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/MasterDataController.php",
+            "methods": [
+                "listRecords",
+                "getDetail",
+                "createRecord",
+                "updateRecord",
+                "deleteRecord",
+                "changeStatus",
+                "getHistory",
+                "listEntities",
+                "listShifts",
+                "saveShift",
+                "listShiftAssignments",
+                "saveShiftAssignment",
+                "listHolidays",
+                "saveHoliday",
+                "listFoundationOrganizations",
+                "listFoundationParties",
+                "listFoundationCalendars",
+                "registerOrganizationNode",
+                "amendOrganizationNode",
+                "reparentOrganizationNode",
+                "deactivateOrganizationNode",
+                "registerParty",
+                "amendPartyIdentity",
+                "assignPartyRole",
+                "registerPartySite",
+                "registerPartyContact",
+                "registerCalendar",
+                "registerShiftEntry"
+            ]
+        },
+        {
+            "class": "MobileController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/MobileController.php",
+            "methods": [
+                "getMyQueue",
+                "startTask",
+                "completeTask",
+                "clockIn",
+                "clockOut",
+                "captureInspection",
+                "submitOfflineBatch",
+                "getSyncStatus",
+                "resolveConflict",
+                "getShopFloorOverview",
+                "getOperatorDashboard"
+            ]
+        },
+        {
+            "class": "ModuleSchemaController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ModuleSchemaController.php",
+            "methods": [
+                "listSchemas",
+                "getSchema",
+                "saveSchema",
+                "deleteSchema",
+                "resetSchema",
+                "apiCatalog"
+            ]
+        },
+        {
+            "class": "OperationalOverrideController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/OperationalOverrideController.php",
+            "methods": [
+                "listOverrides",
+                "getOverride",
+                "createOverride",
+                "transitionOverride"
+            ]
+        },
+        {
+            "class": "OrderController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/OrderController.php",
+            "methods": [
+                "listSalesOrders",
+                "getSalesOrderDetail",
+                "listJobOrders",
+                "getJobOrderDetail",
+                "getHierarchy",
+                "linkForm",
+                "getDashboardStats",
+                "createSalesOrder",
+                "updateSalesOrder",
+                "createJobOrder",
+                "updateJobOrder",
+                "createWorkOrder",
+                "updateWorkOrder",
+                "transition",
+                "contractReview",
+                "setHold",
+                "releaseHold",
+                "addNote",
+                "getTimeline",
+                "getDashboardKpi",
+                "search",
+                "checkShipmentReadiness",
+                "overrideShipmentGate",
+                "listShipmentGateOverrides"
+            ]
+        },
+        {
+            "class": "ProductPassportController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/ProductPassportController.php",
+            "methods": [
+                "listPassports",
+                "getDetail",
+                "create",
+                "addEvent",
+                "trace",
+                "getQrData"
+            ]
+        },
+        {
+            "class": "QuoteController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/QuoteController.php",
+            "methods": [
+                "listQuotes",
+                "detail",
+                "create",
+                "update",
+                "transition",
+                "convertToSo",
+                "estimateCycleTime",
+                "estimateMaterial",
+                "dashboard"
+            ]
+        },
+        {
+            "class": "RegistryController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/RegistryController.php",
+            "methods": [
+                "getDataFields",
+                "getApiParams",
+                "getFieldTypes",
+                "getStatusOptions",
+                "getComputedFormulas",
+                "getValidationRules",
+                "getWorkflowLibrary",
+                "getDomainFieldPacks",
+                "getRelationMap",
+                "getEndpointCatalog",
+                "getTableRegistry",
+                "getRegistryManifest",
+                "getComplianceCrosswalk",
+                "getGlobalCapabilityAudit",
+                "getSystemContract",
+                "getIotConnectors",
+                "getFull",
+                "updateRegistry"
+            ]
+        },
+        {
+            "class": "SchemaStudioController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/SchemaStudioController.php",
+            "methods": [
+                "__construct",
+                "listDesigns",
+                "getDesign",
+                "saveDesign",
+                "deleteDesign",
+                "setBaseline",
+                "loadFromRegistry",
+                "reverseEngineer",
+                "validateSchema",
+                "applyMigration",
+                "previewTableData",
+                "saveTableRow",
+                "listReleaseBundles",
+                "compileRegistryBundle",
+                "createReleaseBundle",
+                "diagnoseSchema",
+                "getOperationsReport",
+                "getCommandCenterReport",
+                "getRound6Report",
+                "getRound7Report",
+                "getRound9Report",
+                "getRound10Report",
+                "getRound11Report",
+                "getRound12Report",
+                "export"
+            ]
+        },
+        {
+            "class": "SupplierController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/SupplierController.php",
+            "methods": [
+                "dashboard",
+                "listScorecards",
+                "scorecardDetail",
+                "calculateScorecard",
+                "listIncoming",
+                "createIncoming",
+                "updateIncoming",
+                "skipLotStatus",
+                "updateSkipLot",
+                "listAsl",
+                "upsertAsl",
+                "listScar",
+                "createScar",
+                "updateScar",
+                "scarTransition",
+                "listAudits",
+                "upsertAudit"
+            ]
+        },
+        {
+            "class": "UserController",
+            "type": "class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/UserController.php",
+            "methods": [
+                "list",
+                "upsert",
+                "delete",
+                "resetPassword",
+                "getPermissions",
+                "savePermissions"
+            ]
+        },
+        {
+            "class": "VpsController",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Controllers",
+            "file": "mom/api/controllers/VpsController.php",
+            "methods": [
+                "__construct",
+                "overview",
+                "host",
+                "runAction",
+                "terminalAuth",
+                "observabilityAuth",
+                "fileList",
+                "fileSearch",
+                "fileRead",
+                "fileMutate",
+                "fileUpload",
+                "asset"
+            ]
+        },
+        {
+            "class": "AllocationService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/AllocationService.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "createAllocation",
+                "updateStatus",
+                "getHistory",
+                "checkDuplicate",
+                "voidAllocation",
+                "getByRecordId",
+                "generateTxtFile",
+                "autoVoidExpired",
+                "getAllocationStats"
+            ]
+        },
+        {
+            "class": "ApprovalGroupService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ApprovalGroupService.php",
+            "methods": [
+                "__construct",
+                "computeStrongETag",
+                "parseIfMatch",
+                "listApprovalGroups",
+                "getApprovalGroup",
+                "decide",
+                "listTimeline",
+                "requestApproval"
+            ]
+        },
+        {
+            "class": "ApprovalWorkflowAdapter",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ApprovalWorkflowAdapter.php",
+            "methods": [
+                "__construct",
+                "validateTransition",
+                "executeDecision",
+                "getTargetState"
+            ]
+        },
+        {
+            "class": "ApqpPpapService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ApqpPpapService.php",
+            "methods": [
+                "__construct",
+                "createProject",
+                "updateProject",
+                "advancePhase",
+                "submitGateReview",
+                "approveGate",
+                "rejectGate",
+                "createPpapSubmission",
+                "updatePpapElement",
+                "recordCustomerResponse",
+                "getPhaseDeliverables",
+                "getPpapElements",
+                "listProjects",
+                "getDetail",
+                "getDashboard"
+            ]
+        },
+        {
+            "class": "AuditTrail",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/AuditTrail.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "logEvent",
+                "getEvents",
+                "getEntityHistory",
+                "getEntitySnapshot",
+                "verifyIntegrity",
+                "exportToCsv"
+            ]
+        },
+        {
+            "class": "AuthGuard",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/AuthGuard.php",
+            "methods": [
+                "requireLoggedIn [static]"
+            ]
+        },
+        {
+            "class": "AuthUserShadowSyncService",
+            "type": "class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/AuthUserShadowSyncService.php",
+            "methods": [
+                "__construct",
+                "canonicalEmployeeIdForUser [static]",
+                "normalizeUserLinkage",
+                "syncUser",
+                "deactivateUser"
+            ]
+        },
+        {
+            "class": "CacheService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/CacheService.php",
+            "methods": [
+                "__construct",
+                "get",
+                "set",
+                "delete",
+                "invalidatePrefix",
+                "increment",
+                "setNx",
+                "publish",
+                "isRedisAvailable",
+                "getHealth"
+            ]
+        },
+        {
+            "class": "CascadingDropdownService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/CascadingDropdownService.php",
+            "methods": [
+                "__construct",
+                "getConfig",
+                "resolveOptions",
+                "getDepartments",
+                "getRecordTypes",
+                "getFormSeries",
+                "getForms"
+            ]
+        },
+        {
+            "class": "CircuitBreaker",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/CircuitBreaker.php",
+            "methods": [
+                "__construct",
+                "allowRequest",
+                "recordSuccess",
+                "recordFailure",
+                "getStatus"
+            ]
+        },
+        {
+            "class": "ComplianceReportService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ComplianceReportService.php",
+            "methods": [
+                "__construct",
+                "generateManagementReview",
+                "generateQualityReport",
+                "generateSupplierReview",
+                "generateAuditPackage",
+                "generateCopqReport",
+                "generateEvidencePackage",
+                "listAvailableReports",
+                "getReportHistory"
+            ]
+        },
+        {
+            "class": "CopqEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/CopqEngine.php",
+            "methods": [
+                "__construct",
+                "calculateScrapCost",
+                "calculateReworkCost",
+                "calculateWarrantyCost",
+                "calculateInspectionCost",
+                "getBreakdown",
+                "getTrend",
+                "getCategoryDetails",
+                "estimateMaterialCostPerUnit"
+            ]
+        },
+        {
+            "class": "CsrfService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/CsrfService.php",
+            "methods": [
+                "token [static]",
+                "validate [static]"
+            ]
+        },
+        {
+            "class": "CustomerPurchaseOrderService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/CustomerPurchaseOrderService.php",
+            "methods": [
+                "__construct",
+                "listPurchaseOrders",
+                "getPurchaseOrder",
+                "createPurchaseOrder",
+                "transitionPurchaseOrder",
+                "synchronizeSalesOrder"
+            ]
+        },
+        {
+            "class": "DashboardService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/DashboardService.php",
+            "methods": [
+                "__construct",
+                "getExecutiveDashboard",
+                "getQualityDashboard",
+                "getProductionDashboard",
+                "getSupplierDashboard",
+                "getDepartmentDashboard",
+                "getWidgetData"
+            ]
+        },
+        {
+            "class": "DataSchemaService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/DataSchemaService.php",
+            "methods": [
+                "__construct",
+                "getWorkspace"
+            ]
+        },
+        {
+            "class": "DomainEvent",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/DomainEvent.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "workflowTransitioned [static]",
+                "recordCreated [static]",
+                "recordUpdated [static]",
+                "recordDeleted [static]"
+            ]
+        },
+        {
+            "class": "EdgeConnectorService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/EdgeConnectorService.php",
+            "methods": [
+                "normalize"
+            ]
+        },
+        {
+            "class": "EpicorInboundWorker",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/EpicorInboundWorker.php",
+            "methods": [
+                "__construct",
+                "processInbound"
+            ]
+        },
+        {
+            "class": "EpicorIntegrationService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/EpicorIntegrationService.php",
+            "methods": [
+                "normalizeStore",
+                "normalizeSyncRun",
+                "normalizeReconciliationException",
+                "normalizeOutboxEvent",
+                "buildSnapshot"
+            ]
+        },
+        {
+            "class": "EpicorTransportAdapter",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/EpicorTransportAdapter.php",
+            "methods": [
+                "__construct",
+                "healthSnapshot",
+                "pullSalesOrders",
+                "pullJobOrders",
+                "pullWorkOrders",
+                "pullMasterData",
+                "pushLabor",
+                "pushMaterial",
+                "pushCompletion",
+                "pushQualityResult",
+                "isConfigured"
+            ]
+        },
+        {
+            "class": "EventBroadcaster",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/EventBroadcaster.php",
+            "methods": [
+                "__construct",
+                "workflowTransitioned",
+                "notificationSent",
+                "mesStateChanged",
+                "dashboardUpdated",
+                "dispatchUpdated",
+                "broadcast"
+            ]
+        },
+        {
+            "class": "EventBus",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/EventBus.php",
+            "methods": [
+                "__construct",
+                "getInstance [static]",
+                "setInstance [static]",
+                "publish",
+                "emit",
+                "startBuffering",
+                "flush",
+                "discard",
+                "on",
+                "onAny",
+                "registerDefaultRules"
+            ]
+        },
+        {
+            "class": "EvidenceVaultService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/EvidenceVaultService.php",
+            "methods": [
+                "__construct",
+                "store",
+                "getAll",
+                "getDetail",
+                "link",
+                "unlink",
+                "getLinkedEvidence",
+                "recordCustody",
+                "getCustodyLog",
+                "listGovernanceAttachments",
+                "getGovernanceAttachment",
+                "createGovernanceAttachment",
+                "computeAttachmentETag",
+                "verifyChain",
+                "search",
+                "getChainHead"
+            ]
+        },
+        {
+            "class": "ExcelVerificationService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ExcelVerificationService.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "generateVerifiedExcel",
+                "verifyUpload",
+                "readHiddenSheet",
+                "computeHash",
+                "getServerSalt",
+                "getSpec"
+            ]
+        },
+        {
+            "class": "ExceptionService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ExceptionService.php",
+            "methods": [
+                "__construct",
+                "listAllExceptions",
+                "createComplaint",
+                "createMrb",
+                "createDeviation",
+                "createConcession",
+                "transitionException",
+                "getDetail",
+                "quarantineOnNcr",
+                "detectRepeatPatterns",
+                "getDashboardKpis"
+            ]
+        },
+        {
+            "class": "FileHelper",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/FileHelper.php",
+            "methods": [
+                "ensureDir [static]",
+                "readJson [static]",
+                "writeJson [static]",
+                "tsCompact [static]",
+                "humanDt [static]",
+                "nowIso [static]"
+            ]
+        },
+        {
+            "class": "FinanceControlService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/FinanceControlService.php",
+            "methods": [
+                "__construct",
+                "listPeriodCloses",
+                "getPeriodClose",
+                "createPeriodClose",
+                "transitionPeriodClose",
+                "listBackdateExceptions",
+                "getBackdateException",
+                "createBackdateException",
+                "transitionBackdateException",
+                "listCreditMemos",
+                "getCreditMemo",
+                "createCreditMemo",
+                "listDebitMemos",
+                "getDebitMemo",
+                "createDebitMemo"
+            ]
+        },
+        {
+            "class": "FmeaService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/FmeaService.php",
+            "methods": [
+                "__construct",
+                "createFmea",
+                "updateFmea",
+                "listFmeas",
+                "getDetail",
+                "addFailureMode",
+                "updateFailureMode",
+                "addAction",
+                "completeAction",
+                "calculateActionPriority",
+                "getRpnTrend",
+                "linkToControlPlan",
+                "linkToNcr",
+                "generateControlPlanFromFmea",
+                "createRevision"
+            ]
+        },
+        {
+            "class": "FormEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/FormEngine.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "validateSubmission",
+                "processSubmission",
+                "enrichFormData",
+                "getFormSchema",
+                "calculateDecisionScore",
+                "listForms",
+                "getEntries",
+                "resolveReference"
+            ]
+        },
+        {
+            "class": "FormulaEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/FormulaEngine.php",
+            "methods": [
+                "__construct",
+                "evaluate",
+                "evaluateFormFormulas",
+                "evaluateInterFormReference"
+            ]
+        },
+        {
+            "class": "FoundationGovernanceService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/FoundationGovernanceService.php",
+            "methods": [
+                "__construct",
+                "decodeCursor",
+                "encodeCursor",
+                "buildPageInfo",
+                "listOrganizations",
+                "listParties",
+                "listCalendars",
+                "registerOrganizationNode",
+                "registerParty",
+                "registerCalendar",
+                "assignPartyRole",
+                "registerShift",
+                "amendOrganizationNode",
+                "reparentOrganizationNode",
+                "deactivateOrganizationNode",
+                "amendPartyIdentity",
+                "registerPartySite",
+                "registerPartyContact"
+            ]
+        },
+        {
+            "class": "GenericCrudService",
+            "type": "class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/GenericCrudService.php",
+            "methods": [
+                "__construct",
+                "resolveTable",
+                "list",
+                "detail",
+                "create",
+                "update",
+                "delete",
+                "transition"
+            ]
+        },
+        {
+            "class": "IdempotencyService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/IdempotencyService.php",
+            "methods": [
+                "__construct",
+                "isEnabled",
+                "retryWindowSeconds",
+                "execute"
+            ]
+        },
+        {
+            "class": "InputSanitizer",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/InputSanitizer.php",
+            "methods": [
+                "code [static]",
+                "normalizePermissionList [static]",
+                "rolePermissionRow [static]",
+                "userForClient [static]"
+            ]
+        },
+        {
+            "class": "KpiEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/KpiEngine.php",
+            "methods": [
+                "__construct",
+                "days",
+                "lastDays [static]",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "calculateKpi",
+                "calculateAllKpis",
+                "getKpiTrend",
+                "getKpiTarget",
+                "saveSnapshot",
+                "getDashboardData",
+                "getKpiAlerts"
+            ]
+        },
+        {
+            "class": "LogTransport",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/LogTransport.php",
+            "methods": [
+                "__construct",
+                "audit",
+                "slowQuery",
+                "error",
+                "observability",
+                "info",
+                "flush",
+                "__destruct",
+                "getHealth"
+            ]
+        },
+        {
+            "class": "MasterDataService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MasterDataService.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "create",
+                "update",
+                "delete",
+                "changeStatus",
+                "getHistory",
+                "checkDuplicate",
+                "checkReferentialIntegrity",
+                "approvePendingChange",
+                "rejectPendingChange"
+            ]
+        },
+        {
+            "class": "MesAdapterService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MesAdapterService.php",
+            "methods": [
+                "normalizeConfig",
+                "normalizeEvent"
+            ]
+        },
+        {
+            "class": "MesAlarmService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MesAlarmService.php",
+            "methods": [
+                "normalizeCatalogItem",
+                "normalizePlaybookItem",
+                "normalizeRuntimeAlarm"
+            ]
+        },
+        {
+            "class": "MesEvidenceBridge",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MesEvidenceBridge.php",
+            "methods": [
+                "__construct",
+                "captureOnOperationComplete",
+                "captureOnAlarmResolved",
+                "captureOnFirstPieceApproved",
+                "captureOnIncomingInspection"
+            ]
+        },
+        {
+            "class": "MesNcReleaseService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MesNcReleaseService.php",
+            "methods": [
+                "normalizeDownloadReceipt"
+            ]
+        },
+        {
+            "class": "MesToolOffsetService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MesToolOffsetService.php",
+            "methods": [
+                "normalizeOffsetSnapshot"
+            ]
+        },
+        {
+            "class": "MissingScopeContextException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/MissingScopeContextException.php",
+            "methods": []
+        },
+        {
+            "class": "MobileWorkQueueService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MobileWorkQueueService.php",
+            "methods": [
+                "__construct",
+                "getOperatorQueue",
+                "assignTask",
+                "startTask",
+                "completeTask",
+                "clockIn",
+                "clockOut",
+                "captureInspection",
+                "submitOfflineBatch",
+                "resolveConflict",
+                "getPendingSyncItems",
+                "getOperatorDashboard",
+                "getShopFloorOverview"
+            ]
+        },
+        {
+            "class": "MtconnectPollingService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/MtconnectPollingService.php",
+            "methods": [
+                "__construct",
+                "pollMachine",
+                "pollAll"
+            ]
+        },
+        {
+            "class": "NotificationGateway",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/NotificationGateway.php",
+            "methods": [
+                "__construct",
+                "send",
+                "notifyTransition",
+                "notifySlaAlert",
+                "notifyApprovalRequired",
+                "notifyQualityEvent",
+                "getPendingCount"
+            ]
+        },
+        {
+            "class": "NotificationService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/NotificationService.php",
+            "methods": [
+                "__construct",
+                "notify",
+                "notifyMany",
+                "getNotifications",
+                "getUnreadCount",
+                "markAsRead",
+                "markAllAsRead",
+                "purgeExpired",
+                "buildDigest",
+                "getPendingEmails",
+                "markEmailSent"
+            ]
+        },
+        {
+            "class": "OeeService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/OeeService.php",
+            "methods": [
+                "__construct",
+                "calculateOee",
+                "recordDowntimeEvent",
+                "getSummary",
+                "getDowntimePareto"
+            ]
+        },
+        {
+            "class": "OperationalOverrideService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/OperationalOverrideService.php",
+            "methods": [
+                "__construct",
+                "getPolicy",
+                "createOverride",
+                "listOverrides",
+                "getOverride",
+                "transitionOverride",
+                "activeOverridesForSubject"
+            ]
+        },
+        {
+            "class": "OrderService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/OrderService.php",
+            "methods": [
+                "__construct",
+                "listSalesOrders",
+                "getSalesOrder",
+                "listJobOrders",
+                "getJobOrder",
+                "getHierarchy",
+                "linkFormToJob",
+                "getLinkedForms",
+                "getDashboardStats",
+                "generateOrderNumber",
+                "createSalesOrder",
+                "linkCustomerPurchaseOrderToSalesOrder",
+                "createJobOrder",
+                "createWorkOrder"
+            ]
+        },
+        {
+            "class": "OrderWorkflowService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/OrderWorkflowService.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "validateTransition",
+                "executeTransition",
+                "validateFieldEdit",
+                "executeFieldEdit",
+                "getChangeHistory",
+                "getAvailableTransitions"
+            ]
+        },
+        {
+            "class": "OutboxWorker",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/OutboxWorker.php",
+            "methods": [
+                "__construct",
+                "processPending"
+            ]
+        },
+        {
+            "class": "PluginManifest",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/PluginManager.php",
+            "methods": [
+                "__construct",
+                "getInstance [static]",
+                "setInstance [static]",
+                "discover",
+                "loadAll",
+                "deactivate",
+                "deactivateAll",
+                "getStatus",
+                "getPlugin",
+                "collectRoutes",
+                "onActivate",
+                "onDeactivate",
+                "onEvent",
+                "__construct",
+                "__construct"
+            ]
+        },
+        {
+            "class": "PreconditionRequiredException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/PreconditionRequiredException.php",
+            "methods": []
+        },
+        {
+            "class": "PredictiveQualityEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/PredictiveQualityEngine.php",
+            "methods": [
+                "__construct",
+                "analyzeSpcData",
+                "predictToolWear",
+                "scoreDefectProbability",
+                "detectProcessDrift",
+                "getActivePredictions",
+                "createPrediction",
+                "acknowledgePrediction",
+                "resolvePrediction",
+                "getDashboardKpis"
+            ]
+        },
+        {
+            "class": "QualityIntegrationService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/QualityIntegrationService.php",
+            "methods": [
+                "__construct",
+                "analyzeNcrTrends",
+                "processJidokaReject",
+                "processCalibrationOot",
+                "evaluateFaiTrigger",
+                "determineMrbRouting",
+                "recordCopq"
+            ]
+        },
+        {
+            "class": "QueueService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/QueueService.php",
+            "methods": [
+                "__construct",
+                "publish",
+                "publishNotification",
+                "publishCommand",
+                "consume",
+                "getPendingCount",
+                "isAmqpAvailable",
+                "getHealth",
+                "close",
+                "__destruct"
+            ]
+        },
+        {
+            "class": "QuoteService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/QuoteService.php",
+            "methods": [
+                "__construct",
+                "create",
+                "update",
+                "getDetail",
+                "listQuotes",
+                "transition",
+                "calculateLineTotal",
+                "estimateCycleTime",
+                "estimateMaterialCost",
+                "convertToSalesOrder",
+                "getDashboardKpis"
+            ]
+        },
+        {
+            "class": "RecordConflictException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/RecordConflictException.php",
+            "methods": []
+        },
+        {
+            "class": "RecordIdGenerator",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/RecordIdGenerator.php",
+            "methods": [
+                "__construct",
+                "generateId",
+                "generateBatch",
+                "peekNextId",
+                "getCurrentCounter",
+                "getSupportedTypes",
+                "getRecordTypeMeta"
+            ]
+        },
+        {
+            "class": "RecordNotFoundException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/RecordNotFoundException.php",
+            "methods": []
+        },
+        {
+            "class": "RegistryService",
+            "type": "class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/RegistryService.php",
+            "methods": [
+                "__construct",
+                "flush",
+                "raw",
+                "status",
+                "statusSet",
+                "statusSetKeys",
+                "fields",
+                "field",
+                "fieldTypes",
+                "workflow",
+                "workflowById",
+                "workflowStates",
+                "canTransition",
+                "availableTransitions",
+                "validate",
+                "formula",
+                "formulas",
+                "endpointCatalog",
+                "endpoint",
+                "transitionRuntime",
+                "frontendFoundation",
+                "frontendFoundationEntity",
+                "runtimeAccessPolicy",
+                "qualityReport",
+                "packs",
+                "relations"
+            ]
+        },
+        {
+            "class": "ReportGenerator",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ReportGenerator.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "generateReport",
+                "clearCache"
+            ]
+        },
+        {
+            "class": "ResponseHelper",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/ResponseHelper.php",
+            "methods": [
+                "json [static]",
+                "streamEvent [static]"
+            ]
+        },
+        {
+            "class": "ScheduledJobs",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ScheduledJobs.php",
+            "methods": [
+                "__construct",
+                "runDailyKpiSnapshot",
+                "runWeeklyReport",
+                "runCalibrationAlerts",
+                "runTrainingAlerts",
+                "runCapaEscalation",
+                "runNcrAging",
+                "runSupplierScoring",
+                "runNotificationDigest",
+                "runEvidenceReviewSlaNotifications",
+                "runEpicorOutboxWorker",
+                "runEpicorInboundSync",
+                "runDataPurge",
+                "runMtconnectPollingCycle"
+            ]
+        },
+        {
+            "class": "SchedulingService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/SchedulingService.php",
+            "methods": [
+                "__construct",
+                "getSchedule",
+                "createSlot",
+                "updateSlot",
+                "deleteSlot",
+                "detectConflicts",
+                "resolveConflict",
+                "getCapacityHeatmap",
+                "snapshotCapacity",
+                "suggestPromiseDate",
+                "getAvailableSlots"
+            ]
+        },
+        {
+            "class": "SessionService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/SessionService.php",
+            "methods": [
+                "init [static]",
+                "destroy [static]",
+                "clearAuthState [static]",
+                "clearPreauthState [static]",
+                "clearEnrollState [static]",
+                "clearPendingState [static]",
+                "setPreauth [static]",
+                "setAuthenticated [static]",
+                "extractUserScope [static]",
+                "requiresCompletedMfa [static]",
+                "regenerateIdSafe [static]",
+                "passwordPolicy [static]"
+            ]
+        },
+        {
+            "class": "ShipmentGateService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/ShipmentGateService.php",
+            "methods": [
+                "__construct",
+                "checkReadiness",
+                "overrideGate",
+                "listOverrides",
+                "getAuditLog",
+                "getGateConfig",
+                "getDocumentReadiness",
+                "getQualityReadiness"
+            ]
+        },
+        {
+            "class": "SliceObservability",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/SliceObservability.php",
+            "methods": [
+                "getInstance [static]",
+                "reset [static]",
+                "setActorContext",
+                "setOrgContext",
+                "getTraceId",
+                "getCorrelationId",
+                "getRequestId",
+                "getTraceAttributes",
+                "emitEvent",
+                "logApprovalDecision",
+                "logSignatureApplication",
+                "logAttachmentVerification",
+                "logPolicyDenial",
+                "logCommandExecution",
+                "startTimer",
+                "recordLatency",
+                "enrichProblem"
+            ]
+        },
+        {
+            "class": "SpcEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/SpcEngine.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "toArray",
+                "__construct",
+                "calculateCapability",
+                "generateControlChart",
+                "detectOutOfControl",
+                "calculateGageRR",
+                "getSpcSummary",
+                "getSpcAlerts"
+            ]
+        },
+        {
+            "class": "S3StorageDriver",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/StorageService.php",
+            "methods": [
+                "__construct",
+                "create [static]",
+                "put",
+                "putStream",
+                "get",
+                "getStream",
+                "delete",
+                "exists",
+                "size",
+                "lastModified",
+                "move",
+                "copy",
+                "list",
+                "temporaryUrl",
+                "driverName",
+                "getHealth",
+                "put",
+                "putStream",
+                "get",
+                "getStream",
+                "delete",
+                "exists",
+                "size",
+                "lastModified",
+                "move",
+                "copy",
+                "list",
+                "temporaryUrl",
+                "name",
+                "health",
+                "__construct",
+                "put",
+                "putStream",
+                "get",
+                "getStream",
+                "delete",
+                "exists",
+                "size",
+                "lastModified",
+                "move",
+                "copy",
+                "list",
+                "temporaryUrl",
+                "name",
+                "health",
+                "__construct",
+                "put",
+                "putStream",
+                "get",
+                "getStream",
+                "delete",
+                "exists",
+                "size",
+                "lastModified",
+                "move",
+                "copy",
+                "list",
+                "temporaryUrl",
+                "name",
+                "health"
+            ]
+        },
+        {
+            "class": "SupplierQualityService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/SupplierQualityService.php",
+            "methods": [
+                "__construct",
+                "calculateScorecard",
+                "listScorecards",
+                "getScorecardDetail",
+                "createIncoming",
+                "updateIncoming",
+                "getSkipLotStatus",
+                "updateSkipLotLevel",
+                "listAsl",
+                "upsertAsl",
+                "createScar",
+                "updateScar",
+                "transitionScar",
+                "listAudits",
+                "upsertAudit",
+                "getDashboardKpis",
+                "evaluateScorecardEscalation"
+            ]
+        },
+        {
+            "class": "TranslationService",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/TranslationService.php",
+            "methods": [
+                "__construct",
+                "getInstance [static]",
+                "setInstance [static]",
+                "get",
+                "getBilingual",
+                "has",
+                "all",
+                "getLocale",
+                "setLocale",
+                "detectLocale [static]"
+            ]
+        },
+        {
+            "class": "UploadHardeningService",
+            "type": "class",
+            "namespace": "",
+            "file": "mom/api/services/UploadHardeningService.php",
+            "methods": [
+                "__construct",
+                "__construct",
+                "__construct",
+                "quarantineFile",
+                "verifyQuarantinedFile",
+                "acceptFile",
+                "rejectFile",
+                "getExceptionQueue",
+                "cleanupExpired"
+            ]
+        },
+        {
+            "class": "UserRepository",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/UserRepository.php",
+            "methods": [
+                "__construct",
+                "loadStore",
+                "saveStore",
+                "findByUsername",
+                "updateUser",
+                "listUsers",
+                "getSettings",
+                "userHasRole",
+                "isActive"
+            ]
+        },
+        {
+            "class": "VpsService",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/VpsService.php",
+            "methods": [
+                "__construct",
+                "getOverview",
+                "getHostSnapshot",
+                "actionRequiresWrite",
+                "terminalRequiresWrite",
+                "getTerminal",
+                "observabilityRequiresWrite",
+                "getObservabilityPanel",
+                "listFiles",
+                "searchFiles",
+                "readFile",
+                "mutateFile",
+                "uploadFile",
+                "runAction",
+                "listControlAssets",
+                "resolveAsset"
+            ]
+        },
+        {
+            "class": "WorkflowBridgeRequiredException",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/WorkflowBridgeRequiredException.php",
+            "methods": []
+        },
+        {
+            "class": "WorkflowDefinitionRegistry",
+            "type": "final class",
+            "namespace": "MOM\\Api\\Services",
+            "file": "mom/api/services/WorkflowDefinitionRegistry.php",
+            "methods": [
+                "all [static]",
+                "get [static]",
+                "types [static]",
+                "stepRequirements [static]",
+                "validateStepData [static]",
+                "reset [static]",
+                "register [static]",
+                "registerStepRequirements [static]"
+            ]
+        },
+        {
+            "class": "WorkflowEngine",
+            "type": "final class",
+            "namespace": "MOM\\Services",
+            "file": "mom/api/services/WorkflowEngine.php",
+            "methods": [
+                "__construct",
+                "toArray",
+                "__construct",
+                "transition",
+                "getAvailableTransitions",
+                "canTransition",
+                "getWorkflowHistory",
+                "getRecordState",
+                "initializeRecord",
+                "getWorkflowConfig",
+                "getDefinedWorkflowTypes",
+                "processEscalations",
+                "addDelegation",
+                "recordParallelApproval",
+                "getStepDataRequirements",
+                "validateStepData"
+            ]
+        },
+        {
+            "class": "ApiKeyMiddleware",
+            "type": "class",
+            "namespace": "MOM\\Api\\Middleware",
+            "file": "mom/api/middleware/ApiKeyMiddleware.php",
+            "methods": [
+                "__construct",
+                "handler",
+                "hasScope [static]",
+                "authMethod [static]"
+            ]
+        },
+        {
+            "class": "AuditMiddleware",
+            "type": "class",
+            "namespace": "MOM\\Api\\Middleware",
+            "file": "mom/api/middleware/AuditMiddleware.php",
+            "methods": [
+                "__construct",
+                "handler",
+                "summarizeRequest",
+                "writeEntry"
+            ]
+        },
+        {
+            "class": "AuthMiddleware",
+            "type": "class",
+            "namespace": "MOM\\Api\\Middleware",
+            "file": "mom/api/middleware/AuthMiddleware.php",
+            "methods": [
+                "__construct",
+                "handler",
+                "currentUser [static]",
+                "isMfaVerified [static]"
+            ]
+        },
+        {
+            "class": "CorsMiddleware",
+            "type": "class",
+            "namespace": "MOM\\Api\\Middleware",
+            "file": "mom/api/middleware/CorsMiddleware.php",
+            "methods": [
+                "__construct",
+                "handler",
+                "isOriginAllowed"
+            ]
+        },
+        {
+            "class": "RateLimitMiddleware",
+            "type": "class",
+            "namespace": "MOM\\Api\\Middleware",
+            "file": "mom/api/middleware/RateLimitMiddleware.php",
+            "methods": [
+                "__construct",
+                "handler",
+                "check"
+            ]
+        }
+    ]
+}

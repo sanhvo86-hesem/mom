@@ -300,7 +300,7 @@ function audit_domain(string $domain, array $jsonStore, array $pgStore): array
         }
         $jsonRows = is_array($jsonStore[$collection] ?? null) ? $jsonStore[$collection] : [];
         $pgRows = is_array($pgStore[$collection] ?? null) ? $pgStore[$collection] : [];
-        $results[$collection] = audit_collection($collection, $jsonRows, $pgRows);
+        $results[$collection] = audit_collection($domain, $collection, $jsonRows, $pgRows);
     }
 
     return [

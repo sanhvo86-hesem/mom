@@ -45,6 +45,7 @@
         "check": [
             "@analyse",
             "@test"
-        ]
+        ],
+        "ai:index": "php ../tools/scripts/ai-index/generate.php"
     }
 }

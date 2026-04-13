@@ -70,6 +70,68 @@
         "frontend_surface_not_explicit": 1,
         "missing_command_or_state_model": 3
       }
+    },
+    "wave0_governance": {
+      "status": "ok",
+      "core_value_stream_entities": 69,
+      "critical_split_path_risks": 0,
+      "planned_canonical_resources": 0
+    },
+    "operational_blind_spots": {
+      "status": "watch",
+      "scenario_count": 15,
+      "critical": 0,
+      "high": 0,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_ratio": 1.0
+    },
+    "wave1_lifecycle_governance": {
+      "status": "ok",
+      "normalized_target_entities": 39,
+      "normalized_target_entities_failed": 0,
+      "remaining_generic_status_only_core_entities": 0
+    },
+    "wave2_canonical_governance": {
+      "status": "ok",
+      "canonical_resources": 64,
+      "canonical_catalog_meta_mismatch": 0,
+      "service_backed_resource_gaps": 0,
+      "remaining_unused_candidate_entities": 0
+    },
+    "wave3_process_governance": {
+      "status": "ok",
+      "must_introduce_first_class_failed": 0,
+      "duplicate_guard_failed": 0,
+      "remaining_wave3_gaps": 0
+    },
+    "wave4_production_quality_governance": {
+      "status": "ok",
+      "quality_execution_failed": 0,
+      "inspection_backbone_failed": 0,
+      "reaction_loop_failed": 0,
+      "remaining_wave4_gaps": 0
+    },
+    "wave5_maintenance_ehs_governance": {
+      "status": "ok",
+      "execution_failed": 0,
+      "practical_state_failed": 0,
+      "workflow_role_guard_failed": 0,
+      "remaining_wave5_gaps": 0
+    },
+    "wave6_finance_projection_governance": {
+      "status": "ok",
+      "service_finance_gate_failed": 0,
+      "projection_read_model_failed": 0,
+      "projection_lineage_failed": 0,
+      "remaining_wave6_gaps": 0
+    },
+    "operational_stress_governance": {
+      "status": "watch",
+      "scenario_count": 12,
+      "critical": 0,
+      "high": 0,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_ratio": 1.0
     }
   },
   "assets": {
@@ -168,6 +230,106 @@
     "enterprise-frontend-simulation-report.md": {
       "kind": "enterprise-frontend-simulation-markdown",
       "records": 10
+    },
+    "wave0-governance-policy.json": {
+      "kind": "wave0-governance-policy",
+      "records": 10
+    },
+    "wave0-governance-report.json": {
+      "kind": "wave0-governance-report",
+      "records": 64
+    },
+    "operational-blind-spot-catalog.json": {
+      "kind": "operational-blind-spot-catalog",
+      "records": 15
+    },
+    "operational-blind-spot-report.json": {
+      "kind": "operational-blind-spot-report",
+      "records": 15
+    },
+    "wave1-lifecycle-governance-policy.json": {
+      "kind": "wave1-lifecycle-governance-policy",
+      "records": 1
+    },
+    "wave1-lifecycle-normalization.json": {
+      "kind": "wave1-lifecycle-normalization",
+      "records": 39
+    },
+    "wave1-lifecycle-report.json": {
+      "kind": "wave1-lifecycle-report",
+      "records": 39
+    },
+    "wave2-canonical-governance-policy.json": {
+      "kind": "wave2-canonical-governance-policy",
+      "records": 8
+    },
+    "wave2-canonical-normalization.json": {
+      "kind": "wave2-canonical-normalization",
+      "records": 12
+    },
+    "wave2-canonical-report.json": {
+      "kind": "wave2-canonical-report",
+      "records": 64
+    },
+    "wave3-process-governance-policy.json": {
+      "kind": "wave3-process-governance-policy",
+      "records": 8
+    },
+    "wave3-process-normalization.json": {
+      "kind": "wave3-process-normalization",
+      "records": 1
+    },
+    "wave3-process-report.json": {
+      "kind": "wave3-process-report",
+      "records": 1
+    },
+    "wave4-production-quality-governance-policy.json": {
+      "kind": "wave4-production-quality-governance-policy",
+      "records": 8
+    },
+    "wave4-production-quality-normalization.json": {
+      "kind": "wave4-production-quality-normalization",
+      "records": 3
+    },
+    "wave4-production-quality-report.json": {
+      "kind": "wave4-production-quality-report",
+      "records": 3
+    },
+    "wave5-maintenance-ehs-governance-policy.json": {
+      "kind": "wave5-maintenance-ehs-governance-policy",
+      "records": 8
+    },
+    "wave5-maintenance-ehs-normalization.json": {
+      "kind": "wave5-maintenance-ehs-normalization",
+      "records": 7
+    },
+    "wave5-maintenance-ehs-report.json": {
+      "kind": "wave5-maintenance-ehs-report",
+      "records": 7
+    },
+    "wave6-finance-projection-governance-policy.json": {
+      "kind": "wave6-finance-projection-governance-policy",
+      "records": 9
+    },
+    "wave6-finance-projection-normalization.json": {
+      "kind": "wave6-finance-projection-normalization",
+      "records": 4
+    },
+    "wave6-finance-projection-report.json": {
+      "kind": "wave6-finance-projection-report",
+      "records": 4
+    },
+    "operational-stress-governance-policy.json": {
+      "kind": "operational-stress-governance-policy",
+      "records": 12
+    },
+    "operational-stress-catalog.json": {
+      "kind": "operational-stress-catalog",
+      "records": 12
+    },
+    "operational-stress-report.json": {
+      "kind": "operational-stress-report",
+      "records": 12
     }
   }
 }

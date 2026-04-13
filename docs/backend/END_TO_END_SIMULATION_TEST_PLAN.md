@@ -19,6 +19,15 @@ Every implementation test derived from this plan must record:
 
 The tables below are the reviewed baseline. Implementation tickets must expand each row into executable API/DB tests using this contract.
 
+## Runtime Mitigation Evidence Added On 2026-04-13
+
+| Evidence | Verified behavior | Remaining simulation requirement |
+| --- | --- | --- |
+| `GenericCrudControllerRuntimeSafetyTest` | Governed Generic CRUD mutation is rejected with `409 domain_command_required` even for admin; read remains allowed; internal override requires env+header. | Replace legacy mutation surfaces with command APIs and generated OpenAPI deny markers. |
+| `LogisticsControllerQualityGateTest` | OQC fail creates a legacy JSONL NCR and active SO hold; shipment gate config accepts `gate_items` by normalizing to `gates`. | Move OQC/NCR/hold to canonical PostgreSQL command transaction and dashboard projection. |
+| Backend smoke | Registry manifest now registers governance wave assets required by smoke tests. | Keep registry manifest generated from source artifacts and fail CI on missing entries. |
+| Runtime authority audit | Drift tool now runs without fatal error in `JSON_ONLY` mode. | Expand drift coverage to quality, supplier-quality, finance controls, status authority, and readiness master data. |
+
 ## Simulation A - Quote To Cash
 
 | Step | Current API/endpoint | Current store/table | Current gate | Enforced or decorative | Transaction/idempotency | Audit/evidence | Mismatch/remediation | Test ID |
@@ -38,9 +47,9 @@ The tables below are the reviewed baseline. Implementation tickets must expand e
 | Issue material | Generic/MES stores possible | `mes_material_consumption`, inventory schema | None found | Decorative | Not transactional | Not sufficient | Implement `IssueMaterialToWorkOrder` | QTC-013 |
 | Start operation | mobile clock-in/start task | mobile JSON | Assigned operator only partial | Partial | No command idempotency | Audit log | Mobile signature mismatch for clock-out path discovered | QTC-014 |
 | Complete operation | mobile complete/clock-out | mobile JSON/orders maybe | Qty checks partial | Decorative for ledger/quality | No transaction | Audit log | Implement `CompleteOperation` with WIP/inspection | QTC-015 |
-| OQC | `oqc_create`, `oqc_update` | `data/logistics/oqc.json` | Result flag | Decorative on fail | No transaction | Audit log | Implement `RecordOqcResult` auto NCR/hold | QTC-016 |
-| Pack | `packing_create/update` | `data/logistics/packing.json` | None | Bypass | No | Audit log | Implement `ConfirmPacking` gate | QTC-017 |
-| Ship | `delivery_confirm` or SO transition | logistics JSON/orders JSON | Gate only on SO->shipped | Bypass via delivery | No | Audit log | Implement `ConfirmDelivery` gate | QTC-018 |
+| OQC | `oqc_create`, `oqc_update` | `data/logistics/oqc.json`, `data/quality/ncr/ncr_log.jsonl`, `data/orders/holds.json` | Result fail creates legacy NCR/hold | Partial runtime mitigation | No DB transaction or command idempotency | Audit log + JSONL/hold evidence | Implement canonical `RecordOqcResult` auto NCR/hold in one transaction | QTC-016 |
+| Pack | `packing_create/update` | `data/logistics/packing.json` | `packing_update(status=shipped)` calls shipment gate | Partial runtime mitigation | No command transaction | Audit log | Implement `ConfirmPacking` gate/evidence transaction | QTC-017 |
+| Ship | `delivery_confirm` or SO transition | logistics JSON/orders JSON | `delivery_confirm` and SO ship path call shipment gate | Partial runtime mitigation | No command transaction | Audit log | Implement `ConfirmDelivery` gate/evidence/SO transition | QTC-018 |
 | Invoice | Finance/AP/AR schema/generic | finance schema | Period close not enforced | Decorative | No posting engine | Partial | Add AR invoice/posting command | QTC-019 |
 | Close SO | order transition | orders JSON | Role only | Partial | No | Hash-chain | Require shipment/invoice/no open quality/ledger recon | QTC-020 |
 
@@ -108,7 +117,7 @@ Negative tests:
 
 | Step | Current API/endpoint | Current store/table | Gate | Current issue | Target command/test |
 | --- | --- | --- | --- | --- | --- |
-| OQC fail | `oqc_update` | logistics OQC JSON | Flag only | No NCR/hold | QNC-001 `RecordOqcResult` creates NCR/hold |
+| OQC fail | `oqc_update` | logistics OQC JSON + quality JSONL + holds JSON | Legacy NCR/hold | Not canonical, not transactional | QNC-001 `RecordOqcResult` creates canonical NCR/hold |
 | NCR creation | exception/quality JSONL/generic | exceptions JSON, quality JSONL, `ncr_records` | Multiple | Multi-authority | QNC-002 canonical NCR |
 | Containment/quarantine | `ExceptionService::quarantineOnNcr()` exists | holds JSON | Not auto-called | Store shape mismatch | QNC-003 auto hold canonical |
 | MRB disposition | exception MRB | exceptions JSON | Partial transitions | No ledger | QNC-004 `ApproveMrbDisposition` posts ledger |
@@ -141,7 +150,7 @@ Negative tests:
 | Issue to WO | MES/inventory schema | no ledger command | INV-004 issue posts inventory/WIP |
 | Produce output lot/serial | MES/DPP schemas | no completion command | INV-005 output links inputs/WO/inspection |
 | Genealogy chain | DPP trace by same lot/SO only | incomplete | INV-006 canonical forward/backward genealogy |
-| Shipment | logistics JSON | gate bypass | INV-007 shipment links lot/serial |
+| Shipment | logistics JSON | legacy gate now blocks active SO hold, but no trace shipment ledger | INV-007 shipment links lot/serial |
 | Recall simulation | no authoritative recall command found | incomplete | INV-008 affected shipments returned |
 | DPP/passport | manual JSON controller | not auto-created | INV-009 shipment/production generates DPP |
 
@@ -192,11 +201,11 @@ Negative tests:
 
 | Test ID | Bypass attempt | Expected result after remediation |
 | --- | --- | --- |
-| BYPASS-001 | `delivery_confirm` after OQC fail | Rejected by `ConfirmDelivery` gate; legacy route disabled. |
-| BYPASS-002 | `packing_update` to shipped without SO transition | Rejected; packing cannot ship. |
-| BYPASS-003 | Generic CRUD update `sales_orders.so_status=shipped` | Rejected for frontend/governed table. |
-| BYPASS-004 | Generic CRUD insert `inventory_transactions` | Rejected; use posting command. |
-| BYPASS-005 | Generic CRUD close `ncr_records` | Rejected; use quality command/e-sign. |
+| BYPASS-001 | `delivery_confirm` after OQC fail | Legacy route now rejects through `ShipmentGateService`; target `ConfirmDelivery` also rejects. |
+| BYPASS-002 | `packing_update` to shipped without SO transition | Legacy route now rejects through `ShipmentGateService`; target `ConfirmPacking` also rejects. |
+| BYPASS-003 | Generic CRUD update `sales_orders.so_status=shipped` | Rejected with `409 domain_command_required` for authorized/admin caller; unprivileged product role remains `403`. |
+| BYPASS-004 | Generic CRUD insert `inventory_transactions` | Rejected with `409 domain_command_required`; use posting command. |
+| BYPASS-005 | Generic CRUD close `ncr_records` | Rejected with `409 domain_command_required`; use quality command/e-sign. |
 | BYPASS-006 | `schema_studio_table_row_save` used by product role | Rejected; admin-only. |
 
 ## Race/Retry/Idempotency Tests
@@ -214,10 +223,10 @@ Negative tests:
 
 | Test ID | Endpoint | Expected result for product frontend role |
 | --- | --- | --- |
-| FE-001 | `POST /api/runtime/sales/sales_orders` | `403 forbidden_runtime_unsafe`. |
-| FE-002 | `PUT /api/runtime/inventory/inventory_transactions/{id}` | `403 forbidden_runtime_unsafe`. |
-| FE-003 | `DELETE /api/runtime/quality_management/ncr_records/{id}` | `403 forbidden_runtime_unsafe`. |
-| FE-004 | `POST /api/runtime/finance/ap_invoices/{id}/transition` | `403 forbidden_runtime_unsafe`. |
+| FE-001 | `POST /api/runtime/sales/sales_orders` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
+| FE-002 | `PUT /api/runtime/inventory/inventory_transactions/{id}` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
+| FE-003 | `DELETE /api/runtime/quality_management/ncr_records/{id}` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
+| FE-004 | `POST /api/runtime/finance/ap_invoices/{id}/transition` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
 | FE-005 | `schema_studio_apply_migration` | `403 admin_only` for product role. |
 | FE-006 | `admin_git_discard_local` | `403 admin_only` and requires re-auth for admin. |
 
@@ -253,3 +262,4 @@ Negative tests:
 | RR-008 | PostgreSQL constraints may initially be `NOT VALID` during migration. | Medium | Cutover checklist blocks `POSTGRES_ONLY` until validated. |
 | RR-009 | Part 11 scope may vary by customer/regulatory product. | Medium | Record retention/e-sign policy matrix by product/customer. |
 | RR-010 | Existing OpenAPI may advertise endpoints that policy now blocks. | Medium | Regenerate OpenAPI with runtime-safe tags and deprecation markers. |
+| RR-011 | P0 legacy mitigations use JSON/JSONL stores, not canonical PostgreSQL command transactions. | High | Implement command APIs and import legacy mitigation records into canonical quality/hold tables before regulated release. |
