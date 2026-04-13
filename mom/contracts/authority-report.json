@@ -1,18 +1,18 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Authored business-contract authority coverage report for ERP+MOM canonical resources."
   },
   "summary": {
-    "totalCanonicalObjects": 64,
-    "authoredPackageCount": 64,
+    "totalCanonicalObjects": 67,
+    "authoredPackageCount": 67,
     "authoredCoverageRatio": 1.0,
-    "lifecycleLikeObjectCount": 53,
-    "authoredLifecycleLikeCount": 53,
+    "lifecycleLikeObjectCount": 54,
+    "authoredLifecycleLikeCount": 54,
     "lifecycleLikeCoverageRatio": 1.0,
-    "coreValueStreamObjectCount": 44,
-    "authoredCoreValueStreamCount": 44,
+    "coreValueStreamObjectCount": 46,
+    "authoredCoreValueStreamCount": 46,
     "coreValueStreamCoverageRatio": 1.0,
     "priorityGapCount": 0
   },
@@ -28,10 +28,10 @@
     },
     {
       "domain": "quality_improvement",
-      "totalObjects": 11,
-      "authoredPackages": 11,
-      "coreValueStreamObjects": 6,
-      "authoredCoreValueStreamObjects": 6,
+      "totalObjects": 12,
+      "authoredPackages": 12,
+      "coreValueStreamObjects": 7,
+      "authoredCoreValueStreamObjects": 7,
       "authoredCoverageRatio": 1.0,
       "authoredCoreValueCoverageRatio": 1.0
     },
@@ -90,6 +90,15 @@
       "authoredCoreValueCoverageRatio": 1.0
     },
     {
+      "domain": "traceability_serialization",
+      "totalObjects": 1,
+      "authoredPackages": 1,
+      "coreValueStreamObjects": 1,
+      "authoredCoreValueStreamObjects": 1,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": 1.0
+    },
+    {
       "domain": "analytics",
       "totalObjects": 5,
       "authoredPackages": 5,
@@ -100,6 +109,15 @@
     },
     {
       "domain": "integration_resilience",
+      "totalObjects": 1,
+      "authoredPackages": 1,
+      "coreValueStreamObjects": 0,
+      "authoredCoreValueStreamObjects": 0,
+      "authoredCoverageRatio": 1.0,
+      "authoredCoreValueCoverageRatio": null
+    },
+    {
+      "domain": "mes_execution",
       "totalObjects": 1,
       "authoredPackages": 1,
       "coreValueStreamObjects": 0,

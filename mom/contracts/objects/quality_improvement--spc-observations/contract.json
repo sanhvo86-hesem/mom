@@ -45,12 +45,16 @@
     ]
   },
   "workflow": {
-    "implemented": false,
+    "implemented": true,
     "truthStatus": "implemented_runtime",
     "source": "quality_management.spc_data persisted assessment record",
     "lifecycleMode": "assessment_record_runtime",
     "disableGeneratedCommands": true,
-    "commands": [],
+    "commands": [
+      { "command": "record_sample", "description": "Record a governed SPC sample with process, job, operator, timestamp and measurement context.", "idempotencyScope": "sample+process+timestamp", "preconditions": ["sampling_plan_active", "measurement_system_acceptable"] },
+      { "command": "evaluate_rule", "description": "Evaluate SPC rules and capability signals against the recorded sample stream.", "idempotencyScope": "resource+rule_set", "preconditions": ["sample_recorded"] },
+      { "command": "escalate_ncr", "description": "Escalate an out-of-control or capability breach into NCR/CAPA follow-up.", "idempotencyScope": "resource+command", "preconditions": ["out_of_control_or_capability_breach"] }
+    ],
     "states": []
   },
   "integration": {

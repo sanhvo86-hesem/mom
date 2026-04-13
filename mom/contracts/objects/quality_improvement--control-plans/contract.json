@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.control-plans",
+  "canonicalName": "control_plans",
+  "displayName": "Control Plans",
+  "purpose": "Govern APQP/FMEA-linked control plans so product and process characteristics, control methods, reaction plans, approvals, revisions, and shop-floor inspection execution stay traceable.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_engineering",
+  "storage": {
+    "primaryTable": "control_plans",
+    "primaryKey": "control_plan_id",
+    "statusField": "status",
+    "childTables": [
+      "control_plan_characteristics",
+      "fmea_records",
+      "apqp_gate_reviews"
+    ],
+    "legacyTables": [
+      "fmea_control_plans"
+    ]
+  },
+  "identity": {
+    "strategy": "plan_number+revision",
+    "naturalKeys": [
+      "plan_number",
+      "revision"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "quality_planning_gate",
+    "auditClass": "workflow_audit_trail",
+    "continuousImprovementLoop": "apqp_fmea_control_plan",
+    "retentionClass": "quality_record_7y_or_customer_specific",
+    "evidenceRequirements": [
+      "linked_fmea_id",
+      "control_plan_characteristics",
+      "reaction_plan",
+      "approval_evidence"
+    ],
+    "kpiSignals": [
+      "control_plan_activation_cycle_time",
+      "characteristic_coverage_ratio",
+      "reaction_plan_completeness"
+    ],
+    "autoAuditChecks": [
+      "active_control_plan_requires_linked_fmea",
+      "active_control_plan_requires_characteristics",
+      "archived_control_plan_must_keep_revision_history"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "workflow-library wf_fmea bridged through GenericCrud workflow-engine runtime",
+    "stateModelKey": "control_plan_status",
+    "lifecycleMode": "workflow_engine",
+    "storageTables": [
+      "control_plans"
+    ],
+    "states": [
+      { "value": "draft", "label": "Draft", "labelEn": "Draft", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Active", "labelEn": "Active", "allowedTransitionsFrom": ["draft"] },
+      { "value": "archived", "label": "Archived", "labelEn": "Archived", "allowedTransitionsFrom": ["active"] }
+    ],
+    "commands": [
+      { "command": "activate", "targetState": "active", "description": "Activate a reviewed control plan for production or inspection use.", "idempotencyScope": "resource+transition", "preconditions": ["linked_fmea_exists", "characteristics_defined", "approval_evidence_present"] },
+      { "command": "archive", "targetState": "archived", "description": "Archive a superseded control plan while preserving revision and approval evidence.", "idempotencyScope": "resource+transition", "preconditions": ["replacement_or_obsolete_reason_recorded"] },
+      { "command": "revise", "description": "Revise control-plan content without deleting the approved historical record.", "idempotencyScope": "resource+payload", "preconditions": ["revision_reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "quality_improvement.nonconformances",
+      "quality_improvement.spc-observations",
+      "planning_production.work-orders"
+    ],
+    "downstreamObjects": [
+      "planning_production.ipqc-inspections",
+      "quality_improvement.oqc-inspections",
+      "quality_improvement.corrective-actions"
+    ],
+    "keyRelationships": [
+      "linked_fmea_id -> fmea_records.fmea_id",
+      "item_id -> items.item_id",
+      "approved_by -> users.user_id"
+    ],
+    "events": [
+      { "eventName": "activated", "description": "Control plan became effective for production or inspection execution." },
+      { "eventName": "revised", "description": "Control plan revision was created under governed change control." },
+      { "eventName": "archived", "description": "Control plan was archived after replacement or obsolescence." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "workflow_engine_runtime",
+    "notes": [
+      "Live runtime surface is fmea_apqp.control_plans.* through GenericCrud workflow-engine bridge; direct status mutation is not authoritative."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "fmea_control_plans"
+    ],
+    "notes": [
+      "Legacy FMEA/APQP names remain compatibility aliases; control_plans is the PostgreSQL authority."
+    ]
+  },
+  "invariants": [
+    "An active control plan must have linked FMEA or approved reason for standalone use.",
+    "Control characteristics must exist before activation.",
+    "Archiving never deletes historical control-plan revisions or inspection linkage."
+  ]
+}

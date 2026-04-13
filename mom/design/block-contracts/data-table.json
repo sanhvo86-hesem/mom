@@ -1,0 +1,89 @@
+{
+  "blockType": "data-table",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["primary"],
+  "propsSchema": {
+    "required": ["dataSource", "columns"],
+    "optional": ["rowActions", "selection", "pagination", "emptyState", "stickyColumns"]
+  },
+  "dataSourceContract": {
+    "mode": "required",
+    "allowedMethods": ["GET"],
+    "requiredBindings": ["dataSource.api", "dataSource.dataKey"]
+  },
+  "eventContract": {
+    "emits": ["row-select", "row-action", "sort-change", "page-change"],
+    "consumes": ["filters-changed", "refresh-requested"]
+  },
+  "stateContract": {
+    "loading": "Show skeleton rows, keep header visible and set aria-busy.",
+    "empty": "Show empty state with optional create action.",
+    "error": "Show table-level error and retry.",
+    "readonly": "Hide mutating row actions.",
+    "disabled": "Disable selection and row actions.",
+    "permissionDenied": "Hide table data and show permission-safe message."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "list"
+  },
+  "a11yContract": {
+    "role": "grid",
+    "apgPattern": "grid",
+    "wcagCriteria": ["1.3.1", "1.4.10", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "4.1.2", "4.1.3"],
+    "accessibleName": "Use table title or module entity name.",
+    "keyboard": {
+      "tab": "Enter table controls and leave grid.",
+      "arrowKeys": "Move between cells when grid navigation is enabled.",
+      "enter": "Select row or activate focused row action.",
+      "homeEnd": "Move to first or last cell in row."
+    },
+    "focus": {
+      "entry": "First row or first table control.",
+      "restore": "Return to selected row after detail panel closes.",
+      "visibleIndicator": "Cell and row focus indicator must meet 3:1 non-text contrast."
+    },
+    "announcements": {
+      "sort": "Announce column sort direction.",
+      "filter": "Debounce result-count announcements by 500ms.",
+      "selection": "Announce selected row count."
+    },
+    "errorAssociation": {
+      "required": true,
+      "pattern": "Editable grid cells must use aria-invalid and aria-errormessage."
+    },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for row actions and selection controls" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedRowInsert": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "JAWS/Chrome", "VoiceOver/Safari"],
+    "automatedRules": ["aria-required-children", "aria-required-parent", "color-contrast", "button-name"],
+    "manualTestScript": ["Keyboard sort column", "Select row and open detail", "Verify result-count live region after filter"]
+  },
+  "responsiveContract": {
+    "compact": "Preserve key columns, expose remaining fields through row detail.",
+    "desktop": "Allow pinned columns and horizontal scroll with visible affordance.",
+    "overflow": "Horizontal scroll region must be keyboard reachable and labelled."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--table-header-bg", "--table-row-hover", "--border", "--focus-ring", "--text-primary"]
+  },
+  "printExportContract": {
+    "print": "Print current filters, visible columns and record count.",
+    "export": ["visible_columns", "sort", "filters", "selected_rows"]
+  },
+  "testIds": {
+    "root": "block-data-table",
+    "row": "data-table-row",
+    "sortButton": "data-table-sort",
+    "liveRegion": "data-table-live-region"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G08", "G10"]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "version": "2026.04.11-p0",
+    "authority": "standards/36-frontend-module-layout-template-standard.md",
+    "implementationBlueprint": "mom/docs/module-layout-template-design-system-v4.html#section-83",
+    "generatedAt": "2026-04-11T00:00:00+07:00",
+    "statusModel": {
+      "SPECIFIED": "Defined in documentation.",
+      "IMPLEMENTED": "Implemented as local artifact or command.",
+      "GATED": "Executed as blocking release/CI evidence.",
+      "TARGET": "Required but not implemented yet."
+    }
+  },
+  "gates": [
+    {
+      "gateId": "G01",
+      "name": "Schema Validation",
+      "priority": "P0",
+      "status": "IMPLEMENTED",
+      "command": "node mom/tools/design/validate-frontend-contracts.mjs",
+      "blocksProduction": true,
+      "evidence": "Validator checks template registry, block contracts, build packets, module bindings and endpoint catalog."
+    },
+    {
+      "gateId": "G02",
+      "name": "Template Match",
+      "priority": "P0",
+      "status": "IMPLEMENTED",
+      "command": "node mom/tools/design/validate-frontend-contracts.mjs",
+      "blocksProduction": true,
+      "evidence": "Module templateId and templateVersion must resolve to template-registry.json."
+    },
+    {
+      "gateId": "G03",
+      "name": "Zone Compliance",
+      "priority": "P0",
+      "status": "IMPLEMENTED",
+      "command": "node mom/tools/design/validate-frontend-contracts.mjs",
+      "blocksProduction": true,
+      "evidence": "Each build-packet block zone must be supported by template and block contract."
+    },
+    {
+      "gateId": "G04",
+      "name": "Token Lint",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Raw color, spacing, shadow, radius and typography lint is not yet implemented."
+    },
+    {
+      "gateId": "G05",
+      "name": "Inline Style Scan",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Inline style usage is known to exist and must be quarantined by an allowlist before production."
+    },
+    {
+      "gateId": "G06",
+      "name": "Runtime Governance Smoke",
+      "priority": "P0",
+      "status": "GATED",
+      "command": "php mom/tests/runtime_assurance_suite.php",
+      "blocksProduction": true,
+      "evidence": "Existing PHP assurance suite covers registry and runtime governance baselines."
+    },
+    {
+      "gateId": "G07",
+      "name": "WCAG Automated",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "No axe/Playwright route gate is present in this repository baseline."
+    },
+    {
+      "gateId": "G08",
+      "name": "Keyboard Navigation",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Keyboard paths are specified in block contracts but not executed yet."
+    },
+    {
+      "gateId": "G09",
+      "name": "Screen Reader Contract",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Screen reader matrix is now required in contracts, but manual evidence is not attached."
+    },
+    {
+      "gateId": "G10",
+      "name": "Zoom Reflow",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Responsive policy exists, but no screenshot/reflow gate runs at 200% and 400%."
+    },
+    {
+      "gateId": "G11",
+      "name": "Density Matrix",
+      "priority": "P1",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": false,
+      "evidence": "Density modes are declared in template registry; visual proof is not automated."
+    },
+    {
+      "gateId": "G12",
+      "name": "Dark Mode Smoke",
+      "priority": "P1",
+      "status": "GATED",
+      "command": "php mom/tests/runtime_assurance_suite.php",
+      "blocksProduction": false,
+      "evidence": "Runtime assurance covers theme registry presence; route-level screenshot evidence remains future work."
+    },
+    {
+      "gateId": "G13",
+      "name": "Permission Negative Test",
+      "priority": "P0",
+      "status": "GATED",
+      "command": "php mom/tests/module_access_smoke.php",
+      "blocksProduction": true,
+      "evidence": "Existing module access smoke validates role policy behavior."
+    },
+    {
+      "gateId": "G14",
+      "name": "Audit Trail",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Build packets declare audit events; no end-to-end audit evidence gate is attached."
+    },
+    {
+      "gateId": "G15",
+      "name": "ESignature Regulated Flow",
+      "priority": "P1",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": false,
+      "evidence": "Regulated e-sign flows are not yet bound to frontend module packets."
+    },
+    {
+      "gateId": "G16",
+      "name": "Performance Budget",
+      "priority": "P1",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": false,
+      "evidence": "Budgets are specified in build packets but not measured."
+    },
+    {
+      "gateId": "G17",
+      "name": "Traceability",
+      "priority": "P0",
+      "status": "IMPLEMENTED",
+      "command": "node mom/tools/design/validate-frontend-contracts.mjs",
+      "blocksProduction": true,
+      "evidence": "Build packets require traceability section and contract references."
+    },
+    {
+      "gateId": "G18",
+      "name": "Release Manifest",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Release evidence bundle is specified in backlog but not generated yet."
+    },
+    {
+      "gateId": "G19",
+      "name": "Document Control",
+      "priority": "P0",
+      "status": "TARGET",
+      "command": null,
+      "blocksProduction": true,
+      "evidence": "Authority-role discipline is defined; DCR/approval manifest is still pending."
+    }
+  ]
+}

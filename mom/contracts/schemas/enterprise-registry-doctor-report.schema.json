@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesemeng.com/mom/contracts/schemas/enterprise-registry-doctor-report.schema.json",
+  "title": "HESEM Enterprise Registry Doctor Report",
+  "type": "object",
+  "required": [
+    "_meta",
+    "status",
+    "scorecard",
+    "findings",
+    "roadmap"
+  ],
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "required": [
+        "version",
+        "generatedAt",
+        "standardVersion",
+        "inputs"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "standardVersion": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "watch",
+        "blocked"
+      ]
+    },
+    "scorecard": {
+      "type": "object",
+      "required": [
+        "tables",
+        "endpoints",
+        "businessContracts",
+        "events",
+        "governance"
+      ],
+      "additionalProperties": true
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "title",
+          "evidence",
+          "recommendation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_\\-]+$"
+          },
+          "severity": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 8
+          },
+          "evidence": {
+            "type": "object"
+          },
+          "recommendation": {
+            "type": "string",
+            "minLength": 20
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "roadmap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "wave",
+          "objective",
+          "tasks"
+        ],
+        "properties": {
+          "wave": {
+            "type": "string"
+          },
+          "objective": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

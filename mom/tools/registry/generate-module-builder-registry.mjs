@@ -937,18 +937,6 @@ function workflowRuntimeContract(tableName, table, workflowLibrary) {
 }
 
 function deleteContract(tableName, table) {
-  if (table?.supportTable) {
-    return {
-      mode: 'hard_delete',
-      governance_level: 'support',
-      hard_delete_allowed: true,
-      soft_delete_fields: [],
-      frontend_affordance: 'danger_delete',
-      runtime_enforced: false,
-      advisory: '',
-    };
-  }
-
   const softDeleteFields = ['deleted_at', 'is_deleted', 'archived_at'].filter((field) => hasColumn(table, field));
   if (softDeleteFields.length > 0) {
     return {
@@ -959,6 +947,18 @@ function deleteContract(tableName, table) {
       frontend_affordance: 'archive',
       runtime_enforced: true,
       advisory: 'Delete requests should map to a soft-delete update using the available lifecycle columns.',
+    };
+  }
+
+  if (table?.supportTable) {
+    return {
+      mode: 'archive_only',
+      governance_level: 'support',
+      hard_delete_allowed: false,
+      soft_delete_fields: [],
+      frontend_affordance: 'archive',
+      runtime_enforced: true,
+      advisory: 'Support data is governed by archive/rebuild or seeded replacement; hard delete is not advertised to frontend.',
     };
   }
 
@@ -984,13 +984,13 @@ function deleteContract(tableName, table) {
   }
 
   return {
-    mode: 'hard_delete',
-    governance_level: 'standard',
-    hard_delete_allowed: true,
+    mode: 'archive_only',
+    governance_level: 'default_no_data_loss',
+    hard_delete_allowed: false,
     soft_delete_fields: [],
-    frontend_affordance: 'danger_delete',
-    runtime_enforced: false,
-    advisory: '',
+    frontend_affordance: 'archive',
+    runtime_enforced: true,
+    advisory: 'Enterprise no-data-loss default: expose archive, correction, reversal, supersession, or projection rebuild instead of hard delete.',
   };
 }
 

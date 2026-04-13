@@ -1,0 +1,122 @@
+{
+  "version": "1.0",
+  "canonicalResource": "mes_execution.machine-alarms",
+  "canonicalName": "machine_alarms",
+  "displayName": "Machine Alarms",
+  "purpose": "Capture machine-originated alarm and fault events with operator acknowledgement, escalation, downtime linkage, and maintenance follow-up without manually inventing machine data.",
+  "ownerDomain": "mes_execution",
+  "objectRole": "machine_runtime_event",
+  "ownerTeam": "production_operations",
+  "storage": {
+    "primaryTable": "mes_machine_alarms",
+    "primaryKey": [
+      "alarm_id",
+      "alarm_time"
+    ],
+    "statusField": "escalation_status",
+    "childTables": [
+      "downtime_event",
+      "maintenance_work_orders"
+    ],
+    "legacyTables": [
+      "machine_alarm_events"
+    ]
+  },
+  "identity": {
+    "strategy": "equipment_id+alarm_code+alarm_time+source_record_id",
+    "naturalKeys": [
+      "equipment_id",
+      "alarm_code",
+      "alarm_time",
+      "source_record_id"
+    ]
+  },
+  "governance": {
+    "usageZone": "machine_runtime",
+    "gateType": "operator_response_gate",
+    "auditClass": "machine_trace_audit",
+    "continuousImprovementLoop": "downtime_and_maintenance_feedback",
+    "retentionClass": "machine_trace_record_3y_or_customer_specific",
+    "evidenceRequirements": [
+      "machine_timestamp",
+      "equipment_id",
+      "alarm_code",
+      "operator_acknowledgement",
+      "clear_or_escalation_reason"
+    ],
+    "kpiSignals": [
+      "alarm_frequency",
+      "mean_time_to_acknowledge",
+      "alarm_downtime_seconds",
+      "repeat_alarm_rate"
+    ],
+    "autoAuditChecks": [
+      "machine_alarm_requires_machine_or_edge_source",
+      "manual_acknowledgement_must_reference_admin_operator",
+      "cleared_alarm_must_preserve_clear_time_and_actor"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "workflow-library wf_mes_machine_alarm bridged through GenericCrud workflow-engine runtime",
+    "stateModelKey": "mes_machine_alarms_escalation_status",
+    "lifecycleMode": "workflow_engine",
+    "storageTables": [
+      "mes_machine_alarms"
+    ],
+    "states": [
+      { "value": "complete", "label": "Complete", "labelEn": "Complete", "allowedTransitionsFrom": [] },
+      { "value": "partial", "label": "Partial", "labelEn": "Partial", "allowedTransitionsFrom": ["complete"] },
+      { "value": "broken", "label": "Broken", "labelEn": "Broken", "allowedTransitionsFrom": ["partial"] },
+      { "value": "pending", "label": "Pending", "labelEn": "Pending", "allowedTransitionsFrom": ["broken"] }
+    ],
+    "commands": [
+      { "command": "acknowledge", "targetState": "partial", "description": "Record operator acknowledgement against a machine-originated alarm.", "idempotencyScope": "resource+transition", "preconditions": ["operator_identity_from_admin"] },
+      { "command": "escalate", "targetState": "broken", "description": "Escalate an alarm to supervisor, maintenance, or quality when it affects production or safety.", "idempotencyScope": "resource+transition", "preconditions": ["escalation_reason_recorded"] },
+      { "command": "clear", "targetState": "complete", "description": "Close the alarm response while preserving machine source, operator, and downtime evidence.", "idempotencyScope": "resource+transition", "preconditions": ["clear_reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "master_data.equipment",
+      "master_data.employees",
+      "planning_production.job-orders"
+    ],
+    "downstreamObjects": [
+      "maintenance_ehs.maintenance-work-orders",
+      "analytics.mes-oee-snapshots",
+      "quality_improvement.improvement-actions"
+    ],
+    "keyRelationships": [
+      "equipment_id -> equipment.equipment_id",
+      "operator_id -> users.username",
+      "job_number -> job_orders.job_number"
+    ],
+    "events": [
+      { "eventName": "raised", "description": "Machine or edge source raised an alarm." },
+      { "eventName": "acknowledged", "description": "Operator acknowledged the alarm." },
+      { "eventName": "escalated", "description": "Alarm was escalated for response." },
+      { "eventName": "cleared", "description": "Alarm response was cleared with evidence." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "machine_runtime_api",
+    "notes": [
+      "Live runtime surface is mes_execution.mes_machine_alarms.*. Frontend may display and acknowledge only machine-originated records; it must not manually create fake machine alarms."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "machine_alarm_events"
+    ],
+    "notes": [
+      "Legacy alarm event names are aliases; mes_machine_alarms is the PostgreSQL machine runtime authority."
+    ]
+  },
+  "invariants": [
+    "Alarm creation must carry machine, adapter, or edge-gateway source evidence.",
+    "Operator acknowledgement must link to the admin user/operator identity model.",
+    "Clearing or escalation must preserve reason and actor; alarm rows are never hard-deleted."
+  ]
+}

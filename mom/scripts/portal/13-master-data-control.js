@@ -11,6 +11,7 @@ var _mdCache = null;
 var _mdPromise = null;
 var _mdState = {
   entity: 'customers',
+  scope: 'all',
   entitySearch: '',
   search: '',
   selectedId: '',
@@ -264,7 +265,7 @@ var ENTITY_CONFIG = {
       { key:'heartbeat_sla_seconds', type:'number', label:'Heartbeat SLA (giây)' },
       { key:'connector_required_for_release', type:'select', label:'Yêu cầu connector để release', optionSet:'yes_no' },
       { key:'manual_bridge_allowed', type:'select', label:'Cho phép manual bridge', optionSet:'yes_no' },
-      { key:'preferred_operator_id', type:'lookup', entity:'operators', label:'Người vận hành ưu tiên' },
+      { key:'preferred_operator_id', type:'lookup', entity:'operators', label:'Người vận hành ưu tiên', helper:'Nguồn operator lấy từ Admin > Người dùng / Sơ đồ tổ chức; không tạo operator trong editor này.' },
       { key:'status', type:'select', required:true, label:'Trạng thái', optionSet:'machine_runtime_status' },
       { key:'last_pm_date', type:'date', label:'Ngày PM gần nhất' },
       { key:'next_pm_date', type:'date', label:'Ngày PM tiếp theo' }
@@ -274,6 +275,8 @@ var ENTITY_CONFIG = {
     key: 'operator_id',
     labelVi: 'Nhân lực vận hành',
     labelEn: 'Operators',
+    externalAuthority: 'admin_users',
+    hiddenFromMasterData: true,
     emptyVi: 'Chưa có nhân lực vận hành nào.',
     listColumns: [
       { key:'operator_id', label:'Mã' },
@@ -732,6 +735,63 @@ var ENTITY_DEFAULTS = {
   defect_catalog: { status:'active', severity_default:'major' }
 };
 
+var MASTER_DATA_SCOPES = {
+  all: {
+    titleVi: 'Quản lý dữ liệu nền',
+    titleEn: 'Master Data Control',
+    subtitleVi: 'Quản trị dữ liệu dùng chung cho biểu mẫu, đơn hàng và tra cứu runtime.',
+    subtitleEn: 'Governed shared data for forms, orders, and runtime lookups.',
+    railTitleVi: 'Thực thể dữ liệu',
+    railTitleEn: 'Data entities',
+    searchVi: 'Tìm kiếm dữ liệu nền...',
+    searchEn: 'Search master data...',
+    entitySearchVi: 'Tìm loại dữ liệu nền...',
+    entitySearchEn: 'Search entity types...',
+    entities: null
+  },
+  machine_runtime: {
+    titleVi: 'Quản lý dữ liệu máy / MES',
+    titleEn: 'Machine / MES Runtime Data',
+    subtitleVi: 'Chỉ chỉnh các bảng có authority từ máy, adapter, alarm, downtime và tooling. Dữ liệu PO/SO/JO/WO đi qua endpoint nghiệp vụ riêng.',
+    subtitleEn: 'Only machine, adapter, alarm, downtime and tooling authority tables are editable here. PO/SO/JO/WO process data uses dedicated frontend endpoints.',
+    railTitleVi: 'Bảng máy / MES',
+    railTitleEn: 'Machine / MES tables',
+    searchVi: 'Tìm dữ liệu máy / MES...',
+    searchEn: 'Search machine / MES data...',
+    entitySearchVi: 'Tìm bảng máy / MES...',
+    entitySearchEn: 'Search machine / MES tables...',
+    entities: [
+      'work_centers',
+      'machines',
+      'mes_connectivity_adapters',
+      'mes_alarm_catalog',
+      'mes_alarm_playbooks',
+      'downtime_reason_codes',
+      'downtime_resolution_codes',
+      'tooling_assets'
+    ]
+  },
+  order_foundation: {
+    titleVi: 'Dữ liệu nền đơn hàng',
+    titleEn: 'Order Foundation Data',
+    subtitleVi: 'Chỉ quản trị dữ liệu nền dùng để chọn trong báo giá, PO khách hàng, SO, JO và WO. Dữ liệu quy trình phải đi qua endpoint nghiệp vụ riêng.',
+    subtitleEn: 'Only foundation lookup data for quotation, customer PO, SO, JO and WO is editable here. Process records must use dedicated business endpoints.',
+    railTitleVi: 'Nền đơn hàng',
+    railTitleEn: 'Order foundation',
+    searchVi: 'Tìm dữ liệu nền đơn hàng...',
+    searchEn: 'Search order foundation data...',
+    entitySearchVi: 'Tìm bảng nền đơn hàng...',
+    entitySearchEn: 'Search order foundation tables...',
+    entities: [
+      'customers',
+      'suppliers',
+      'parts',
+      'revisions',
+      'nc_program_releases'
+    ]
+  }
+};
+
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function _escHtml(value){ var d = document.createElement('div'); d.appendChild(document.createTextNode(String(value || ''))); return d.innerHTML; }
 function _clone(obj){ return JSON.parse(JSON.stringify(obj || {})); }
@@ -821,6 +881,19 @@ function _upsertEntityRow(entity, row){
 }
 function _normalizeText(value){ return String(value || '').toLowerCase(); }
 function _matchesSearch(item, query){ if(!query) return true; var hay = Object.keys(item || {}).map(function(key){ return _normalizeText(item[key]); }).join(' '); return hay.indexOf(query) >= 0; }
+function _isExternalAuthorityEntity(entity){ return !!(ENTITY_CONFIG[entity] && ENTITY_CONFIG[entity].externalAuthority); }
+function _isRailEntity(entity){ return !!(ENTITY_CONFIG[entity] && !ENTITY_CONFIG[entity].hiddenFromMasterData); }
+function _scopeConfig(scope){ return MASTER_DATA_SCOPES[scope] || MASTER_DATA_SCOPES.all; }
+function _scopeEntityList(scope){
+  var cfg = _scopeConfig(scope || _mdState.scope);
+  return Array.isArray(cfg.entities) ? cfg.entities : null;
+}
+function _isEntityAllowedInScope(entity, scope){
+  if(!_isRailEntity(entity)) return false;
+  var entities = _scopeEntityList(scope || _mdState.scope);
+  return !entities || entities.indexOf(entity) >= 0;
+}
+function _firstRailEntity(scope){ return Object.keys(ENTITY_CONFIG).find(function(entity){ return _isEntityAllowedInScope(entity, scope || _mdState.scope); }) || 'customers'; }
 
 function _optionLabel(entity, row){
   if(!row) return '';
@@ -905,18 +978,19 @@ function _removeModal(){ var existing = document.getElementById('mdc-overlay'); 
 
 function _renderModal(){
   _removeModal();
+  var scope = _scopeConfig(_mdState.scope);
   var overlay = document.createElement('div');
   overlay.className = 'mdc-overlay';
   overlay.id = 'mdc-overlay';
   overlay.innerHTML = '' +
     '<div class="mdc-shell">' +
       '<div class="mdc-header">' +
-        '<div><div class="mdc-title">' + _escHtml(_t('Quản lý dữ liệu nền', 'Master Data Control')) + '</div><div class="mdc-subtitle">' + _escHtml(_t('Quản trị dữ liệu dùng chung cho biểu mẫu, đơn hàng và tra cứu runtime.', 'Governed shared data for forms, orders, and runtime lookups.')) + '</div></div>' +
+        '<div><div class="mdc-title">' + _escHtml(_t(scope.titleVi, scope.titleEn)) + '</div><div class="mdc-subtitle">' + _escHtml(_t(scope.subtitleVi, scope.subtitleEn)) + '</div></div>' +
         '<button type="button" class="mdc-close" id="mdc-close">×</button>' +
       '</div>' +
       '<div class="mdc-body">' +
         '<aside class="mdc-rail" id="mdc-rail"></aside>' +
-        '<section class="mdc-list"><div class="mdc-toolbar"><input type="search" class="mdc-search" id="mdc-search" placeholder="' + _escHtml(_t('Tìm kiếm dữ liệu nền...', 'Search master data...')) + '"><button type="button" class="mdc-btn mdc-btn-primary" id="mdc-create">' + _escHtml(_t('Tạo mới', 'Create')) + '</button></div><div id="mdc-grid"></div></section>' +
+        '<section class="mdc-list"><div class="mdc-toolbar"><input type="search" class="mdc-search" id="mdc-search" placeholder="' + _escHtml(_t(scope.searchVi, scope.searchEn)) + '"><button type="button" class="mdc-btn mdc-btn-primary" id="mdc-create">' + _escHtml(_t('Tạo mới', 'Create')) + '</button></div><div id="mdc-grid"></div></section>' +
         '<section class="mdc-editor" id="mdc-editor"></section>' +
       '</div>' +
     '</div>';
@@ -930,7 +1004,16 @@ function _renderModal(){
       _renderRail();
     }
   });
-  document.getElementById('mdc-create').addEventListener('click', function(){ _mdState.selectedId = ''; _mdState.draft = _defaultDraft(_mdState.entity); _renderList(); _renderEditor(); });
+  document.getElementById('mdc-create').addEventListener('click', function(){
+    if(_isExternalAuthorityEntity(_mdState.entity)){
+      _toast(_t('Thực thể này được quản trị trong Admin, không nhập tại Dữ liệu nền.', 'This entity is governed in Admin, not edited in Master Data.'), 'warn');
+      return;
+    }
+    _mdState.selectedId = '';
+    _mdState.draft = _defaultDraft(_mdState.entity);
+    _renderList();
+    _renderEditor();
+  });
   _renderRail();
   _renderList();
   _renderEditor();
@@ -939,10 +1022,12 @@ function _renderModal(){
 function _renderRail(){
   var rail = document.getElementById('mdc-rail');
   if(!rail) return;
-  var html = '<div class="mdc-rail-title">' + _escHtml(_t('Thực thể dữ liệu', 'Data entities')) + '</div>' +
-    '<input type="search" class="mdc-entity-search" id="mdc-entity-search" placeholder="' + _escHtml(_t('Tìm loại dữ liệu nền...', 'Search entity types...')) + '" value="' + _escHtml(_mdState.entitySearch || '') + '">';
+  var scope = _scopeConfig(_mdState.scope);
+  var html = '<div class="mdc-rail-title">' + _escHtml(_t(scope.railTitleVi, scope.railTitleEn)) + '</div>' +
+    '<input type="search" class="mdc-entity-search" id="mdc-entity-search" placeholder="' + _escHtml(_t(scope.entitySearchVi, scope.entitySearchEn)) + '" value="' + _escHtml(_mdState.entitySearch || '') + '">';
   Object.keys(ENTITY_CONFIG).forEach(function(entity){
     var cfg = ENTITY_CONFIG[entity];
+    if(!_isEntityAllowedInScope(entity)) return;
     var hay = _normalizeText([cfg.labelEn || '', cfg.labelVi || '', entity].join(' '));
     if(_mdState.entitySearch && hay.indexOf(_mdState.entitySearch) < 0) return;
     var active = entity === _mdState.entity ? ' active' : '';
@@ -1023,6 +1108,10 @@ function _renderEditor(){
   var editor = document.getElementById('mdc-editor');
   if(!editor) return;
   var cfg = ENTITY_CONFIG[_mdState.entity];
+  if(_isExternalAuthorityEntity(_mdState.entity)){
+    editor.innerHTML = '<div class="mdc-editor-head"><div class="mdc-editor-title">' + _escHtml(_t('Dữ liệu được quản trị bên ngoài', 'Externally governed data')) + '</div><div class="mdc-editor-sub">' + _escHtml(_t('Người vận hành được lấy từ Admin > Người dùng / Sơ đồ tổ chức để tránh tạo hai nguồn sự thật.', 'Operators are sourced from Admin > Users / Org chart to avoid two sources of truth.')) + '</div></div>';
+    return;
+  }
   var draft = _mdState.draft || _defaultDraft(_mdState.entity);
   _mdState.draft = draft;
   var isUpdate = !!_mdState.selectedId;
@@ -1041,6 +1130,14 @@ function _renderEditor(){
   editor.innerHTML = html;
 
   var form = document.getElementById('mdc-form');
+  if(form && isUpdate){
+    var keyInput = form.querySelector('[name="' + cfg.key + '"]');
+    if(keyInput){
+      keyInput.setAttribute('readonly', 'readonly');
+      keyInput.setAttribute('aria-readonly', 'true');
+      keyInput.title = _t('Khóa chính không đổi trong luồng cập nhật. Hãy tạo bản ghi mới nếu cần mã mới.', 'Primary keys are immutable during update. Create a new record if a new code is needed.');
+    }
+  }
   var reset = document.getElementById('mdc-reset');
   if(reset) reset.onclick = function(){
     _mdState.draft = _mdState.selectedId ? _clone(_getEntityRows(_mdState.entity).find(function(row){ return String(row[cfg.key] || '') === _mdState.selectedId; }) || _defaultDraft(_mdState.entity)) : _defaultDraft(_mdState.entity);
@@ -1058,8 +1155,8 @@ function _renderEditor(){
     });
     payload = _normalizeEntityRow(_mdState.entity, payload);
     if(invalidEl){ invalidEl.focus(); _toast(_t('Vui lòng điền đủ các trường bắt buộc.', 'Please complete the required fields.'), 'warn'); return; }
-    _api('master_data_upsert', { entity:_mdState.entity, item:payload }, 'POST').then(function(res){
-      if(!res || !res.ok){ _toast(_t('Không thể lưu dữ liệu nền.', 'Could not save master data.'), 'error'); return; }
+    _api('master_data_upsert', { entity:_mdState.entity, scope:_mdState.scope || 'all', record_id:_mdState.selectedId || '', item:payload }, 'POST').then(function(res){
+      if(!res || !res.ok){ _toast((res && (res.message || res.error)) ? (res.message || res.error) : _t('Không thể lưu dữ liệu nền.', 'Could not save master data.'), 'error'); return; }
       var key = cfg.key;
       var currentRows = _getEntityRows(_mdState.entity);
       var currentItem = currentRows.find(function(row){ return String(row[key] || '') === String(payload[key] || ''); }) || null;
@@ -1094,12 +1191,27 @@ window._mdEnsureSnapshot = function(force){
 
 window._mdGetSnapshot = function(){ return _mdCache ? _clone(_mdCache) : null; };
 window._mdLookupOptions = function(entity){ return _lookupOptions(entity); };
-window._mdOpenControl = function(entity){
+window._mdOpenControl = function(entity, options){
   _injectStyles();
-  if(entity && ENTITY_CONFIG[entity]) _mdState.entity = entity;
+  options = options || {};
+  var requestedScope = options.scope || 'all';
+  _mdState.scope = MASTER_DATA_SCOPES[requestedScope] ? requestedScope : 'all';
+  if(entity && _isExternalAuthorityEntity(entity)){
+    _toast(_t('Người vận hành được quản trị trong Admin > Người dùng / Sơ đồ tổ chức.', 'Operators are governed in Admin > Users / Org chart.'), 'warn');
+    return Promise.resolve(false);
+  }
+  if(entity && ENTITY_CONFIG[entity] && _isEntityAllowedInScope(entity, _mdState.scope)){
+    _mdState.entity = entity;
+  } else {
+    if(entity && ENTITY_CONFIG[entity] && !_isEntityAllowedInScope(entity, _mdState.scope)){
+      _toast(_t('Thực thể này không thuộc scope dữ liệu máy/MES. Hãy dùng endpoint nghiệp vụ hoặc module chuyên trách.', 'This entity is outside the machine/MES data scope. Use its process endpoint or owning module.'), 'warn');
+    }
+    _mdState.entity = _firstRailEntity(_mdState.scope);
+  }
   return window._mdEnsureSnapshot(true).then(function(){
     _mdState.selectedId = '';
     _mdState.search = '';
+    _mdState.entitySearch = '';
     _mdState.draft = _defaultDraft(_mdState.entity);
     _renderModal();
   });

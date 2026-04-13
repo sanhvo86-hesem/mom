@@ -84,6 +84,29 @@ function smoke_exit_payload(callable $callback): array
     throw new RuntimeException('Expected controller call to terminate via ExitException.');
 }
 
+function smoke_remove_dir(string $dir): void
+{
+    if (!is_dir($dir)) {
+        return;
+    }
+    $items = scandir($dir);
+    if (!is_array($items)) {
+        return;
+    }
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+        $path = $dir . '/' . $item;
+        if (is_dir($path)) {
+            smoke_remove_dir($path);
+            continue;
+        }
+        @unlink($path);
+    }
+    @rmdir($dir);
+}
+
 smoke_reset_request_state();
 
 // api_json should unwind through the structured response exception in router mode.
@@ -232,6 +255,86 @@ smoke_assert(($manualRuntimeSummary['master_counts']['customers'] ?? null) === 1
 smoke_assert(($manualRuntimeSummary['order_counts']['wo'] ?? null) === 1, 'Manual runtime summary should count work orders.');
 smoke_assert((($manualRuntimeSummary['recent_rows'][0] ?? [])['type'] ?? null) === 'WO', 'Manual runtime summary should sort recent rows by updated_at desc.');
 smoke_assert(($manualRuntimeSummary['orders_updated_at'] ?? null) === '2026-04-10T10:03:00+07:00', 'Manual runtime summary should expose orders updated timestamp.');
+smoke_assert(in_array('machines', $manualRuntimeSummary['machine_runtime_entities'] ?? [], true), 'Manual runtime should expose machine runtime entity scope.');
+smoke_assert(!in_array('customers', $manualRuntimeSummary['machine_runtime_entities'] ?? [], true), 'Manual runtime machine scope must not include business master entities.');
+smoke_assert(($manualRuntimeSummary['machine_runtime_counts']['machines'] ?? null) === 1, 'Manual runtime should count machine runtime tables separately.');
+smoke_assert(
+    count(array_filter($manualRuntimeSummary['frontend_endpoint_contracts'] ?? [], static fn($row) => ($row['area'] ?? '') === 'order_process')) === 0,
+    'Manual runtime endpoint contract list must not mix SO/JO/WO process contracts into the machine editor.'
+);
+smoke_assert(
+    count(array_filter($manualRuntimeSummary['process_endpoint_contracts'] ?? [], static fn($row) => ($row['action'] ?? '') === 'order_so_create')) === 1,
+    'Manual runtime summary should expose SO/JO/WO process endpoint contracts separately for frontend routing.'
+);
+
+$manualRuntimeSummaryWithAdminOperators = build_manual_runtime_summary(
+    [
+        'operators' => [['operator_id' => 'LEGACY-OP']],
+        '_meta' => ['updated' => '2026-04-10T10:00:00+07:00'],
+    ],
+    ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []],
+    [
+        'users' => [
+            ['username' => 'cnc.one', 'name' => 'CNC One', 'role' => 'cnc_operator', 'active' => true, 'employee_id' => 'EMP-CNC-01'],
+            ['username' => 'buyer.one', 'name' => 'Buyer One', 'role' => 'buyer', 'active' => true, 'employee_id' => 'EMP-BUY-01'],
+            ['username' => 'qc.off', 'name' => 'QC Off', 'role' => 'qc_inspector', 'active' => false, 'employee_id' => 'EMP-QC-00'],
+        ],
+    ]
+);
+smoke_assert(($manualRuntimeSummaryWithAdminOperators['master_counts']['operators'] ?? null) === 1, 'Manual runtime operators should come from active Admin operator users.');
+smoke_assert(($manualRuntimeSummaryWithAdminOperators['operator_authority']['source'] ?? null) === 'admin_users', 'Manual runtime should expose Admin users as operator authority.');
+smoke_assert(($manualRuntimeSummaryWithAdminOperators['operator_authority']['legacy_master_data_operator_count'] ?? null) === 1, 'Manual runtime should retain legacy operator count for audit without using it as authority.');
+
+$previousDataDir = $GLOBALS['DATA_DIR'] ?? '';
+$observabilityFixtureDir = sys_get_temp_dir() . '/qms-runtime-observability-smoke-' . bin2hex(random_bytes(6));
+@mkdir($observabilityFixtureDir, 0775, true);
+file_put_contents($observabilityFixtureDir . '/runtime-shadow', 'not-a-directory');
+try {
+    $GLOBALS['DATA_DIR'] = $observabilityFixtureDir;
+    observe_primary_read('orders', [
+        'source' => 'postgres',
+        'fallback' => false,
+        'error' => '',
+        'mode' => 'POSTGRES_ONLY',
+        'timestamp' => '2026-04-10T10:04:00+07:00',
+    ], ['scope' => 'manual_runtime_summary']);
+    smoke_assert(true, 'Runtime observability write failures should not block manual runtime reads.');
+} finally {
+    $GLOBALS['DATA_DIR'] = $previousDataDir;
+    @unlink($observabilityFixtureDir . '/runtime-shadow');
+    smoke_remove_dir($observabilityFixtureDir);
+}
+
+$portalShellSource = file_get_contents(QMS_TEST_ROOT_DIR . '/mom/scripts/portal/02-state-auth-ui.js');
+smoke_assert(
+    is_string($portalShellSource) && str_contains($portalShellSource, '!adminManualRuntimeState.error'),
+    'Manual runtime renderer should not retry forever after a failed summary load.'
+);
+smoke_assert(
+    is_string($portalShellSource) && str_contains($portalShellSource, "String(entity || '') === 'operators'"),
+    'Manual runtime operator card should route to Admin authority instead of Master Data.'
+);
+smoke_assert(
+    is_string($portalShellSource) && str_contains($portalShellSource, 'ADMIN_MANUAL_MACHINE_ENTITIES'),
+    'Manual runtime UI should restrict editable cards to machine/MES entities.'
+);
+$masterDataControlSource = file_get_contents(QMS_TEST_ROOT_DIR . '/mom/scripts/portal/13-master-data-control.js');
+smoke_assert(
+    is_string($masterDataControlSource) && str_contains($masterDataControlSource, "record_id:_mdState.selectedId || ''"),
+    'Master Data Control should send the selected record id during edits.'
+);
+smoke_assert(
+    is_string($masterDataControlSource) && str_contains($masterDataControlSource, "machine_runtime"),
+    'Master Data Control should support a machine-runtime scope instead of exposing all master data in manual runtime.'
+);
+smoke_assert(
+    is_string($masterDataControlSource) && str_contains($masterDataControlSource, "scope:_mdState.scope || 'all'"),
+    'Master Data Control saves should send their active authority scope to the backend.'
+);
+smoke_assert(
+    is_string($masterDataControlSource) && str_contains($masterDataControlSource, "hiddenFromMasterData: true"),
+    'Master Data Control should hide Admin-governed operators from editable master-data entities.'
+);
 
 $masterDataFixtureDir = sys_get_temp_dir() . '/qms-master-data-smoke-' . bin2hex(random_bytes(6));
 @mkdir($masterDataFixtureDir . '/master-data', 0775, true);

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/schemas/frontend-qa-gates.schema.json",
+  "title": "HESEM Frontend QA Gate Catalog",
+  "type": "object",
+  "required": ["_meta", "gates"],
+  "additionalProperties": false,
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "required": ["version", "authority", "status", "updatedAt"],
+      "additionalProperties": true,
+      "properties": {
+        "version": { "type": "string" },
+        "authority": { "type": "string" },
+        "status": { "enum": ["pilot", "approved", "deprecated"] },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["gateId", "name", "blocking", "status", "owner", "evidenceRequired", "validator"],
+        "additionalProperties": true,
+        "properties": {
+          "gateId": { "type": "string" },
+          "name": { "type": "string" },
+          "blocking": { "type": "boolean" },
+          "status": { "enum": ["enforced-now", "partial", "target", "deprecated"] },
+          "owner": { "type": "string" },
+          "evidenceRequired": { "type": "array", "items": { "type": "string" } },
+          "validator": { "type": "string" }
+        }
+      }
+    }
+  }
+}
+

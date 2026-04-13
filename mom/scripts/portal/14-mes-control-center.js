@@ -1436,7 +1436,7 @@ function bind(){
   var openOrders = document.getElementById('mes-open-orders');
   if(openOrders) openOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var openMaster = document.getElementById('mes-open-master');
-  if(openMaster) openMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
+  if(openMaster) openMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl('work_centers', {scope:'machine_runtime'}); };
   var openForms = document.getElementById('mes-open-forms');
   if(openForms) openForms.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
   var openFormsReview = document.getElementById('mes-open-forms-review');
@@ -1444,7 +1444,7 @@ function bind(){
   var sideOrders = document.getElementById('mes-side-orders');
   if(sideOrders) sideOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var sideMaster = document.getElementById('mes-side-master');
-  if(sideMaster) sideMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
+  if(sideMaster) sideMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl('work_centers', {scope:'machine_runtime'}); };
   var sideForms = document.getElementById('mes-side-forms');
   if(sideForms) sideForms.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
   var blankDowntime = document.getElementById('mes-new-downtime-blank');
@@ -2454,4 +2454,3 @@ window._renderMesControlCenter = function(container){
 };
 
 })();
-

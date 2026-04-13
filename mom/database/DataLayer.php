@@ -2135,7 +2135,7 @@ class DataLayer
         $machineRows = $this->db->query('SELECT metadata, updated_at FROM equipment ORDER BY equipment_id');
         $toolingRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime' ORDER BY tool_id");
         $capaRows = $this->db->query("SELECT data, updated_at FROM records WHERE record_type = 'CAPA' ORDER BY record_id");
-        $employeeRows = $this->db->query('SELECT metadata, updated_at FROM employees ORDER BY employee_id');
+        $employeeRows = $this->db->query('SELECT employee_id, employee_name, user_id_code, role_code, role_label, dept_code, shift, is_active, metadata, updated_at FROM employees ORDER BY employee_id');
         $programRows = $this->db->query('SELECT metadata, updated_at FROM mes_nc_release_packages ORDER BY package_id');
         $adapterRows = $this->db->query('SELECT metadata, updated_at FROM mes_connectivity_adapters ORDER BY adapter_id');
         $alarmCatalogRows = $this->db->query('SELECT metadata, updated_at FROM mes_alarm_catalog ORDER BY alarm_code');
@@ -2169,7 +2169,7 @@ class DataLayer
             'machines' => $this->extractMetadataRows($machineRows),
             'tooling_assets' => $this->extractMetadataRows($toolingRows),
             'capas' => $this->extractMetadataRows($capaRows, 'data'),
-            'operators' => $this->extractMetadataRows($employeeRows),
+            'operators' => $this->extractEmployeeOperatorRows($employeeRows),
             'nc_program_releases' => $this->extractMetadataRows($programRows),
             'downtime_reason_codes' => $this->extractVariableMirrorRows($reasonRows, 'reason_code', 'reason_name', 'reason_name_vi'),
             'downtime_resolution_codes' => $this->extractVariableMirrorRows($resolutionRows, 'resolution_code', 'resolution_name', 'resolution_name_vi'),
@@ -2391,6 +2391,77 @@ class DataLayer
             }
         }
         return $items;
+    }
+
+    /**
+     * Build the runtime operator lookup from the governed employee table.
+     *
+     * Operators are not an editable master-data bucket; they are an operational
+     * projection of Admin/HCM employees that can execute or supervise shop-floor
+     * work. Legacy metadata rows are still honoured to avoid data loss during
+     * migration.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractEmployeeOperatorRows(array $rows): array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            $meta = $this->decodeJsonArray($row['metadata'] ?? null);
+            $role = strtolower(trim((string)($meta['role'] ?? $row['role_code'] ?? '')));
+            $title = strtolower(trim((string)($meta['role_label'] ?? $meta['operator_name'] ?? $row['role_label'] ?? $row['employee_name'] ?? '')));
+            $legacyOperatorId = trim((string)($meta['operator_id'] ?? ''));
+            if ($legacyOperatorId === '' && !$this->isExecutionOperatorRole($role, $title)) {
+                continue;
+            }
+
+            $employeeId = trim((string)($row['employee_id'] ?? ''));
+            $operatorId = $legacyOperatorId !== '' ? $legacyOperatorId : $employeeId;
+            if ($operatorId === '') {
+                continue;
+            }
+
+            $base = [
+                'operator_id' => $operatorId,
+                'operator_name' => trim((string)($meta['operator_name'] ?? $meta['name'] ?? $row['employee_name'] ?? $operatorId)),
+                'role' => $role,
+                'role_code' => $role,
+                'role_label' => trim((string)($meta['role_label'] ?? $row['role_label'] ?? $role)),
+                'department' => strtoupper(trim((string)($meta['department'] ?? $row['dept_code'] ?? ''))),
+                'department_code' => strtoupper(trim((string)($meta['department_code'] ?? $row['dept_code'] ?? ''))),
+                'user_id' => trim((string)($meta['user_id'] ?? $row['user_id_code'] ?? '')),
+                'username' => trim((string)($meta['username'] ?? $row['user_id_code'] ?? '')),
+                'status' => ((bool)($row['is_active'] ?? true)) ? 'active' : 'inactive',
+                'source_system' => trim((string)($meta['source_system'] ?? 'employees')),
+                'authority' => 'employees',
+                'editable_in' => 'admin.users_orgchart',
+                'qualification_status' => trim((string)($meta['qualification_status'] ?? 'active')),
+                'shift' => trim((string)($meta['shift'] ?? $row['shift'] ?? '')),
+                'updated_at' => trim((string)($row['updated_at'] ?? $meta['updated_at'] ?? '')),
+            ];
+            $items[] = array_merge($base, $meta);
+        }
+        return $items;
+    }
+
+    private function isExecutionOperatorRole(string $role, string $title = ''): bool
+    {
+        $executionRoles = [
+            'cnc_operator',
+            'setup_technician',
+            'deburr_technician',
+            'cleaning_packaging_technician',
+            'cleaning_packaging_supervisor',
+            'qc_inspector',
+            'maintenance_technician',
+            'shift_leader',
+            'cnc_workshop_manager',
+        ];
+        if (in_array($role, $executionRoles, true)) {
+            return true;
+        }
+        return $title !== '' && (str_contains($title, 'operator') || str_contains($title, 'technician') || str_contains($title, 'inspector'));
     }
 
     /**

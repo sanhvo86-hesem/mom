@@ -1,0 +1,86 @@
+{
+  "blockType": "action-toolbar",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["actions"],
+  "propsSchema": {
+    "required": ["buttons"],
+    "optional": ["alignment", "overflow", "sticky", "density"]
+  },
+  "dataSourceContract": {
+    "mode": "none",
+    "allowedMethods": [],
+    "requiredBindings": []
+  },
+  "eventContract": {
+    "emits": ["action-click", "navigate-tab", "command-submitted"],
+    "consumes": ["selection-changed", "permission-changed"]
+  },
+  "stateContract": {
+    "loading": "Disable mutating buttons and preserve navigation buttons if safe.",
+    "empty": "Show only create/navigation actions.",
+    "error": "Keep safe actions available and expose retry where configured.",
+    "readonly": "Hide or disable mutating actions.",
+    "disabled": "Disable all actions with visible reason.",
+    "permissionDenied": "Remove disallowed actions from tab order."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "button.action or binding action"
+  },
+  "a11yContract": {
+    "role": "toolbar",
+    "apgPattern": "toolbar",
+    "wcagCriteria": ["1.3.1", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "4.1.2"],
+    "accessibleName": "Toolbar label from block title or module title.",
+    "keyboard": {
+      "tab": "Enter and leave toolbar.",
+      "arrowKeys": "Move between toolbar buttons when roving tabindex is enabled.",
+      "enterSpace": "Activate focused command."
+    },
+    "focus": {
+      "entry": "First enabled visible button.",
+      "restore": "Return to invoking button after dialogs or navigation failure.",
+      "visibleIndicator": "Tokenized focus ring visible in light, dark and forced-colors."
+    },
+    "announcements": {
+      "actionStarted": "Announce async action start only for long-running operations.",
+      "actionCompleted": "Announce success/failure through shared live region."
+    },
+    "errorAssociation": {
+      "required": false,
+      "pattern": "If a command opens a form, form contract owns field errors."
+    },
+    "targetSize": { "minimum": "1.5rem by 1.5rem in compact density" },
+    "contrast": { "nonTextMinimum": "3:1", "textMinimum": "4.5:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedOverflow": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["button-name", "aria-allowed-attr", "color-contrast"],
+    "manualTestScript": ["Tab into toolbar", "Activate primary action", "Verify hidden permission action is not focusable"]
+  },
+  "responsiveContract": {
+    "compact": "Collapse low-priority commands into accessible overflow menu.",
+    "desktop": "Show primary and secondary actions inline.",
+    "overflow": "Overflow menu must be keyboard reachable."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--brand", "--brand-2", "--button-bg", "--button-text", "--focus-ring"]
+  },
+  "printExportContract": {
+    "print": "Toolbar is omitted from print unless configured as evidence actions.",
+    "export": []
+  },
+  "testIds": {
+    "root": "block-action-toolbar",
+    "button": "toolbar-action",
+    "overflow": "toolbar-overflow"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G08", "G13"]
+  }
+}

@@ -9,6 +9,7 @@ and AI tooling do not have to infer semantics from table-registry alone.
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,7 @@ PORTAL_ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_DIR = PORTAL_ROOT / "data" / "registry"
 CONTRACTS_DIR = PORTAL_ROOT / "contracts"
 OBJECTS_DIR = CONTRACTS_DIR / "objects"
+API_INDEX_PATH = PORTAL_ROOT / "api" / "index.php"
 
 
 def read_json(path: Path) -> Any:
@@ -47,6 +49,11 @@ def canonical_object_path(domain_key: str, resource_key: str) -> str:
 
 def canonical_api_path(domain_key: str, resource_key: str) -> str:
     return f"/api/v1/{domain_key.replace('_', '-')}/{resource_key}"
+
+
+def normalize_api_path(path: str) -> str:
+    normalized = "/" + path.strip().strip("/")
+    return "/" if normalized == "/" else normalized
 
 
 def canonical_resource_keys(catalog: dict[str, Any]) -> set[str]:
@@ -294,6 +301,112 @@ def build_endpoint_lookup(endpoint_catalog: dict[str, Any]) -> dict[str, list[di
     return lookup
 
 
+def infer_route_kind(method: str, path: str, handler: str) -> str:
+    handler_lc = handler.lower()
+    if ":transition" in path or "transition" in handler_lc:
+        return "transition"
+    if method == "GET" and "{" in path:
+        return "detail"
+    if method == "GET":
+        return "list"
+    if method == "POST" and "{" not in path:
+        return "create"
+    if method in {"PUT", "PATCH"}:
+        return "update"
+    if method == "DELETE":
+        return "delete"
+    return "command"
+
+
+def load_router_routes(api_index_path: Path) -> list[dict[str, Any]]:
+    if not api_index_path.exists():
+        return []
+    source = api_index_path.read_text(encoding="utf-8", errors="ignore")
+    route_pattern = re.compile(
+        r"\$router->(get|post|put|patch|delete)\('([^']+)',\s*([A-Za-z0-9_\\\\]+)::class,\s*'([^']+)'\);"
+    )
+    routes: list[dict[str, Any]] = []
+    for match in route_pattern.finditer(source):
+        method = match.group(1).upper()
+        path = normalize_api_path(match.group(2))
+        handler = match.group(4)
+        routes.append(
+            {
+                "method": method,
+                "path": path,
+                "kind": infer_route_kind(method, path, handler),
+                "controller": match.group(3),
+                "handler": handler,
+                "source": "api-router",
+            }
+        )
+    routes.sort(key=lambda item: (str(item["path"]), str(item["method"]), str(item["handler"])))
+    return routes
+
+
+def route_matches_api_base(route_path: str, api_base: str) -> bool:
+    base = normalize_api_path(api_base)
+    path = normalize_api_path(route_path)
+    return path == base or path.startswith(base + "/")
+
+
+def action_prefix_for(canonical_key: str) -> str:
+    return canonical_key.replace("-", "_")
+
+
+def router_endpoint_rows(
+    canonical_key: str,
+    canonical_path: str,
+    storage_table: str,
+    router_routes: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if canonical_path.strip() == "":
+        return []
+    rows: list[dict[str, Any]] = []
+    seen_actions: Counter[str] = Counter()
+    for route in router_routes:
+        path = str(route.get("path") or "")
+        if not route_matches_api_base(path, canonical_path):
+            continue
+        kind = str(route.get("kind") or "command")
+        action_base = f"{action_prefix_for(canonical_key)}.{kind}"
+        seen_actions[action_base] += 1
+        action = action_base if seen_actions[action_base] == 1 else f"{action_base}_{seen_actions[action_base]}"
+        rows.append(
+            {
+                "action": action,
+                "kind": kind,
+                "method": route.get("method"),
+                "path": path,
+                "source": "api-router",
+                "controller": route.get("controller"),
+                "handler": route.get("handler"),
+                "storageTable": storage_table,
+            }
+        )
+    return rows
+
+
+def merge_endpoint_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for group in groups:
+        for row in group:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                str(row.get("method") or ""),
+                str(row.get("path") or ""),
+                str(row.get("kind") or ""),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(dict(row))
+    merged.sort(key=lambda item: (str(item.get("kind") or ""), str(item.get("method") or ""), str(item.get("path") or "")))
+    return merged
+
+
 def build_base_state_lookup(wave1: dict[str, Any]) -> dict[str, dict[str, Any]]:
     lookup: dict[str, dict[str, Any]] = {}
     for table_name, state_def in (wave1.get("normalized_entities") or {}).items():
@@ -411,6 +524,7 @@ def validate_package_targets(
 def build_object_index(
     catalog: dict[str, Any],
     endpoint_lookup: dict[str, list[dict[str, Any]]],
+    router_routes: list[dict[str, Any]],
     state_lookup: dict[str, dict[str, Any]],
     packages: dict[str, dict[str, Any]],
     timestamp: str,
@@ -433,7 +547,14 @@ def build_object_index(
             compatibility = package.get("compatibility") if isinstance(package, dict) and isinstance(package.get("compatibility"), dict) else {}
             workflow = package.get("workflow") if isinstance(package, dict) and isinstance(package.get("workflow"), dict) else {}
             resolved_storage_table = str(storage.get("primaryTable") or table_name)
-            endpoint_rows = endpoint_lookup.get(resolved_storage_table, [])
+            canonical_path = str(
+                runtime_exposure.get("canonicalApiPath")
+                or canonical_api_path(domain_key, resource_key)
+            )
+            endpoint_rows = merge_endpoint_rows(
+                endpoint_lookup.get(resolved_storage_table, []),
+                router_endpoint_rows(canonical_key, canonical_path, resolved_storage_table, router_routes),
+            )
 
             if package is not None:
                 authored_count += 1
@@ -444,10 +565,7 @@ def build_object_index(
                     "domain": domain_key,
                     "resource": resource_key,
                     "label": str((package or {}).get("displayName") or titleize(resource_key)),
-                    "canonicalApiPath": str(
-                        runtime_exposure.get("canonicalApiPath")
-                        or canonical_api_path(domain_key, resource_key)
-                    ),
+                    "canonicalApiPath": canonical_path,
                     "classification": str((package or {}).get("objectRole") or resource_def.get("pattern")),
                     "storageTable": resolved_storage_table,
                     "primaryKey": storage.get("primaryKey") or resource_def.get("primary_key"),
@@ -641,6 +759,44 @@ def build_state_model_index(state_lookup: dict[str, dict[str, Any]], timestamp: 
     }
 
 
+def preferred_endpoint_kinds_for_command(command_name: str, target_state: Any) -> list[str]:
+    command = command_name.lower().strip()
+    if target_state is not None and str(target_state).strip() != "":
+        return ["transition", "update"]
+    if command in {"create", "capture", "ingest", "record", "record_sample", "receive", "post"}:
+        return ["create", "update"]
+    if command in {
+        "update",
+        "edit",
+        "amend",
+        "revise",
+        "review",
+        "recalculate",
+        "evaluate",
+        "evaluate_rule",
+        "update_evidence",
+        "escalate",
+        "escalate_follow_up",
+        "escalate_ncr",
+    }:
+        return ["update", "transition"]
+    return ["transition", "update", "create"]
+
+
+def executable_endpoint_path_for_command(row: dict[str, Any], command_name: str, target_state: Any) -> tuple[str | None, str | None]:
+    endpoint_rows = row.get("currentRuntimeEndpoints") if isinstance(row.get("currentRuntimeEndpoints"), list) else []
+    by_kind: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for endpoint in endpoint_rows:
+        if not isinstance(endpoint, dict):
+            continue
+        by_kind[str(endpoint.get("kind") or "")].append(endpoint)
+    for kind in preferred_endpoint_kinds_for_command(command_name, target_state):
+        candidates = by_kind.get(kind) or []
+        if candidates:
+            return str(candidates[0].get("path") or ""), kind
+    return None, None
+
+
 def build_command_index(
     object_index: dict[str, Any],
     packages: dict[str, dict[str, Any]],
@@ -659,6 +815,11 @@ def build_command_index(
                 command_name = str(command.get("command") or "").strip()
                 if command_name == "":
                     continue
+                executable_path, runtime_endpoint_kind = executable_endpoint_path_for_command(
+                    row,
+                    command_name,
+                    command.get("targetState"),
+                )
                 commands.append(
                     {
                         "key": f"{canonical_key}:{command_name}",
@@ -667,8 +828,10 @@ def build_command_index(
                         "purpose": str(command.get("description") or f"Business command `{command_name}` for `{canonical_key}`."),
                         "targetApiPath": str(
                             command.get("targetApiPath")
+                            or executable_path
                             or row["canonicalApiPath"] + "/{id}:" + command_name
                         ),
+                        "runtimeEndpointKind": runtime_endpoint_kind,
                         "classification": row.get("classification"),
                         "storageTable": row.get("storageTable"),
                         "targetState": command.get("targetState"),
@@ -686,13 +849,15 @@ def build_command_index(
             continue
 
         for action in row.get("recommendedActions") or []:
+            executable_path, runtime_endpoint_kind = executable_endpoint_path_for_command(row, str(action), None)
             commands.append(
                 {
                     "key": f"{canonical_key}:{action}",
                     "canonicalResource": canonical_key,
                     "command": action,
                     "purpose": f"Business command `{action}` for `{canonical_key}`.",
-                    "targetApiPath": row["canonicalApiPath"] + "/{id}:" + action,
+                    "targetApiPath": executable_path or row["canonicalApiPath"] + "/{id}:" + action,
+                    "runtimeEndpointKind": runtime_endpoint_kind,
                     "classification": row.get("classification"),
                     "storageTable": row.get("storageTable"),
                     "targetState": None,
@@ -880,12 +1045,13 @@ def main() -> None:
     validate_package_targets(catalog, packages)
 
     endpoint_lookup = build_endpoint_lookup(endpoint_catalog)
+    router_routes = load_router_routes(API_INDEX_PATH)
     state_lookup = build_base_state_lookup(wave1)
     state_lookup = merge_package_state_lookup(state_lookup, packages)
 
     glossary = build_glossary(timestamp)
     domain_map = build_domain_map(catalog, packages, timestamp)
-    object_index = build_object_index(catalog, endpoint_lookup, state_lookup, packages, timestamp)
+    object_index = build_object_index(catalog, endpoint_lookup, router_routes, state_lookup, packages, timestamp)
     authority_report = build_authority_report(object_index, package_index, timestamp)
     state_model_index = build_state_model_index(state_lookup, timestamp)
     command_index = build_command_index(object_index, packages, timestamp)

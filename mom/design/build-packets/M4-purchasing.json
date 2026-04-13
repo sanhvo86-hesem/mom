@@ -1,0 +1,133 @@
+{
+  "moduleId": "M4-purchasing",
+  "moduleName": { "vi": "Mua hàng", "en": "Purchasing" },
+  "route": "/purchasing",
+  "domain": "procurement_supplier_quality",
+  "criticality": "critical",
+  "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform",
+  "processOwner": "Purchasing / Supplier Quality / Receiving",
+  "primaryEntity": "purchasing.purchase_orders",
+  "contractRefs": [
+    "mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json",
+    "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json",
+    "mom/contracts/objects/procurement_supplier_quality--iqc-inspections/contract.json"
+  ],
+  "moduleArchetype": "list-report-workspace",
+  "version": "1.0.0",
+  "templateId": "T29",
+  "templateVersion": "1.0.0",
+  "zones": {
+    "notice": ["blk-purchasing-standard", "blk-purchasing-context", "blk-po-selection-hint", "blk-po-create-banner", "blk-po-lines-context", "blk-receiving-context"],
+    "summary": [],
+    "filter": ["blk-po-filters"],
+    "primary": ["blk-po-table", "blk-po-line-table", "blk-iqc-table"],
+    "form": ["blk-po-create-form", "blk-po-line-form", "blk-iqc-form"],
+    "detail": ["blk-po-detail", "blk-iqc-detail"],
+    "workflow": ["blk-po-status-flow", "blk-iqc-status-flow"],
+    "actions": ["blk-po-actions"],
+    "timeline": []
+  },
+  "screens": [
+    { "screenId": "overview", "title": { "vi": "Tổng quan PO", "en": "PO Overview" }, "purpose": "Control purchase order register, selected PO detail and lifecycle." },
+    { "screenId": "create-po", "title": { "vi": "Tạo PO", "en": "Create PO" }, "purpose": "Issue supplier purchase orders with source traceability." },
+    { "screenId": "po-lines", "title": { "vi": "PO line", "en": "PO Lines" }, "purpose": "Manage purchase order line records for selected PO." },
+    { "screenId": "receiving", "title": { "vi": "Receiving / IQC", "en": "Receiving / IQC" }, "purpose": "Control incoming inspection records and lifecycle." }
+  ],
+  "blocks": [
+    { "blockId": "blk-purchasing-standard", "screenId": "overview", "type": "info-banner", "zone": "notice", "order": 1, "intent": "Supplier PO data standard." },
+    { "blockId": "blk-purchasing-context", "screenId": "overview", "type": "info-banner", "zone": "notice", "order": 2, "intent": "Selected source context." },
+    { "blockId": "blk-po-filters", "screenId": "overview", "type": "filter-bar", "zone": "filter", "order": 3, "intent": "PO search and status filter." },
+    { "blockId": "blk-po-table", "screenId": "overview", "type": "data-table", "zone": "primary", "order": 4, "intent": "Purchase order register." },
+    { "blockId": "blk-po-selection-hint", "screenId": "overview", "type": "info-banner", "zone": "notice", "order": 5, "intent": "Selection guidance." },
+    { "blockId": "blk-po-detail", "screenId": "overview", "type": "data-detail", "zone": "detail", "order": 6, "intent": "Selected PO header." },
+    { "blockId": "blk-po-status-flow", "screenId": "overview", "type": "action-status-flow", "zone": "workflow", "order": 7, "intent": "PO lifecycle." },
+    { "blockId": "blk-po-actions", "screenId": "overview", "type": "action-toolbar", "zone": "actions", "order": 8, "intent": "PO navigation and commands." },
+    { "blockId": "blk-po-create-banner", "screenId": "create-po", "type": "info-banner", "zone": "notice", "order": 1, "intent": "PO creation guidance." },
+    { "blockId": "blk-po-create-form", "screenId": "create-po", "type": "form-standard", "zone": "form", "order": 2, "intent": "Create supplier PO." },
+    { "blockId": "blk-po-lines-context", "screenId": "po-lines", "type": "info-banner", "zone": "notice", "order": 1, "intent": "PO line context." },
+    { "blockId": "blk-po-line-table", "screenId": "po-lines", "type": "data-table", "zone": "primary", "order": 2, "intent": "PO line register." },
+    { "blockId": "blk-po-line-form", "screenId": "po-lines", "type": "form-standard", "zone": "form", "order": 3, "intent": "Add PO line." },
+    { "blockId": "blk-receiving-context", "screenId": "receiving", "type": "info-banner", "zone": "notice", "order": 1, "intent": "Receiving/IQC context." },
+    { "blockId": "blk-iqc-table", "screenId": "receiving", "type": "data-table", "zone": "primary", "order": 2, "intent": "Incoming inspection register." },
+    { "blockId": "blk-iqc-detail", "screenId": "receiving", "type": "data-detail", "zone": "detail", "order": 3, "intent": "Incoming inspection detail." },
+    { "blockId": "blk-iqc-status-flow", "screenId": "receiving", "type": "action-status-flow", "zone": "workflow", "order": 4, "intent": "IQC lifecycle." },
+    { "blockId": "blk-iqc-form", "screenId": "receiving", "type": "form-standard", "zone": "form", "order": 5, "intent": "Create incoming inspection." }
+  ],
+  "apiBindings": [
+    { "moduleApi": "purchasing.purchase_orders.list", "registryEndpointId": "purchasing.purchase_orders.list", "type": "registry-endpoint", "method": "GET", "usedBy": ["blk-po-table"] },
+    { "moduleApi": "purchasing.purchase_orders.detail", "registryEndpointId": "purchasing.purchase_orders.detail", "type": "registry-endpoint", "method": "GET", "usedBy": ["blk-po-detail", "blk-po-status-flow"] },
+    { "moduleApi": "purchasing.purchase_orders.create", "registryEndpointId": "purchasing.purchase_orders.create", "type": "registry-endpoint", "method": "POST", "usedBy": ["blk-po-create-form"] },
+    { "moduleApi": "purchasing.purchase_orders.transition", "registryEndpointId": "purchasing.purchase_orders.transition", "type": "registry-endpoint", "method": "POST", "usedBy": ["blk-po-status-flow"] },
+    { "moduleApi": "purchasing.purchase_order_lines.list", "registryEndpointId": "purchasing.purchase_order_lines.list", "type": "registry-endpoint", "method": "GET", "usedBy": ["blk-po-line-table"] },
+    { "moduleApi": "purchasing.purchase_order_lines.create", "registryEndpointId": "purchasing.purchase_order_lines.create", "type": "registry-endpoint", "method": "POST", "usedBy": ["blk-po-line-form"] },
+    { "moduleApi": "quality_management.incoming_inspections.list", "registryEndpointId": "quality_management.incoming_inspections.list", "type": "registry-endpoint", "method": "GET", "usedBy": ["blk-iqc-table"] },
+    { "moduleApi": "quality_management.incoming_inspections.detail", "registryEndpointId": "quality_management.incoming_inspections.detail", "type": "registry-endpoint", "method": "GET", "usedBy": ["blk-iqc-detail", "blk-iqc-status-flow"] },
+    { "moduleApi": "quality_management.incoming_inspections.create", "registryEndpointId": "quality_management.incoming_inspections.create", "type": "registry-endpoint", "method": "POST", "usedBy": ["blk-iqc-form"] },
+    { "moduleApi": "quality_management.incoming_inspections.transition", "registryEndpointId": "quality_management.incoming_inspections.transition", "type": "registry-endpoint", "method": "POST", "usedBy": ["blk-iqc-status-flow"] },
+    { "moduleApi": "navigate-tab", "type": "local-action", "usedBy": ["blk-po-actions"] }
+  ],
+  "workflows": [
+    { "workflowId": "purchase-order-lifecycle", "entity": "purchasing.purchase_orders", "stateField": "po_status", "transitionEndpoint": "purchasing.purchase_orders.transition" },
+    { "workflowId": "incoming-inspection-lifecycle", "entity": "quality_management.incoming_inspections", "stateField": "inspection_status", "transitionEndpoint": "quality_management.incoming_inspections.transition" }
+  ],
+  "permissions": {
+    "roles": ["admin", "it_admin", "ceo", "qa_manager", "quality_manager", "qms_engineer", "quality_engineer", "qc_inspector", "supply_chain_manager", "buyer", "warehouse_clerk", "tool_storekeeper", "logistics_coordinator", "production_planner"],
+    "actions": ["list", "detail", "create", "update", "transition"],
+    "policyRef": "mom/data/registry/runtime-access-policy.json"
+  },
+  "regulatoryScope": ["ISO-9001", "supplier-quality", "incoming-inspection", "traceable-purchasing"],
+  "audit": {
+    "requiredEvents": ["purchase_order_created", "purchase_order_transitioned", "purchase_order_line_created", "incoming_inspection_created", "incoming_inspection_transitioned"],
+    "actorField": "updated_by",
+    "timestampField": "updated_at"
+  },
+  "i18n": {
+    "locales": ["vi", "en"],
+    "defaultLocale": "vi",
+    "diacriticsRequired": true,
+    "fallbackPolicy": "English fallback allowed only when Vietnamese source is absent in controlled schema."
+  },
+  "densityModes": ["compact", "default", "comfortable", "shopfloor"],
+  "responsive": {
+    "breakpoints": ["320", "390", "768", "1024", "1440", "1920"],
+    "zoomLevels": ["100", "200", "400"],
+    "primaryRisk": "PO table, detail panel and lifecycle controls on scanner/tablet widths."
+  },
+  "offlineSupport": {
+    "mode": "draft-create-queue",
+    "draftQueue": ["blk-po-create-form", "blk-po-line-form", "blk-iqc-form"],
+    "syncConflictPolicy": "server-wins-with-user-review"
+  },
+  "printSupport": {
+    "enabled": true,
+    "surfaces": ["purchase-order", "po-lines", "incoming-inspection"]
+  },
+  "accessibility": {
+    "target": "WCAG 2.2 AA",
+    "apgPatterns": ["grid", "toolbar", "form", "status"],
+    "manualEvidenceRequired": ["keyboard-create-po", "screen-reader-form-errors", "zoom-400-reflow"]
+  },
+  "performance": {
+    "budgetName": "ERP critical module",
+    "maxInitialJsKb": 350,
+    "maxBlockingMs": 200,
+    "maxTableRowsInitial": 100
+  },
+  "performanceBudget": {
+    "lcpMs": 2500,
+    "inpMs": 200,
+    "cls": 0.1,
+    "routeReadyMs": 1800
+  },
+  "qa": {
+    "gateSet": "mom/design/qa-gates.json",
+    "requiredNow": ["G01", "G02", "G03", "G06", "G13", "G17"],
+    "knownOpen": ["G04", "G05", "G07", "G08", "G09", "G10", "G14", "G18", "G19"]
+  },
+  "traceability": {
+    "sourceEntities": ["sales.sales_order", "production.job_orders", "production.work_orders", "direct_purchase_demand"],
+    "downstreamEntities": ["purchasing.purchase_orders", "purchasing.purchase_order_lines", "quality_management.incoming_inspections"],
+    "requiredThreadFields": ["source_record_id", "purchase_order_id", "purchase_order_line_id", "incoming_inspection_id"]
+  },
+  "releaseDate": "2026-04-11"
+}

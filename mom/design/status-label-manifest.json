@@ -1,0 +1,556 @@
+{
+  "_meta": {
+    "version": "2026.04.11-v4.8-evidence-first",
+    "generatedAt": "2026-04-11T00:00:00+07:00",
+    "authorityRole": "generated_truth",
+    "source": "mom/docs/module-layout-template-design-system-v4.html",
+    "sourceCounts": {
+      "parseableSectionElements": 89,
+      "rawSectionTagsIncludingComments": 89,
+      "sectionTitleMarkers": 89
+    },
+    "rule": "Generated from current HTML section headers. Do not hand-edit counts in HTML."
+  },
+  "summary": {
+    "REFERENCE": 40,
+    "PARTIAL": 31,
+    "ENFORCED NOW": 6,
+    "TARGET": 12
+  },
+  "sections": [
+    {
+      "number": 1,
+      "id": "summary",
+      "title": "Tóm Tắt Thực Thi",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 2,
+      "id": "architecture",
+      "title": "Kiến trúc hệ thống",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 3,
+      "id": "standards",
+      "title": "Quy chuẩn đồ họa",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 4,
+      "id": "component-states",
+      "title": "Ma trận trạng thái thành phần",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 5,
+      "id": "density-modes",
+      "title": "Chế độ mật độ dữ liệu",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 6,
+      "id": "dark-mode-mapping",
+      "title": "Dark mode token mapping",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 7,
+      "id": "accessibility",
+      "title": "Accessibility và ARIA patterns",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 8,
+      "id": "error-patterns",
+      "title": "Mẫu trạng thái lỗi",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 9,
+      "id": "loading-patterns",
+      "title": "Mẫu tải dữ liệu",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 10,
+      "id": "empty-states",
+      "title": "Trạng thái trống",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 11,
+      "id": "notification-patterns",
+      "title": "Mẫu thông báo và toast",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 12,
+      "id": "data-viz",
+      "title": "Hướng dẫn trực quan hóa dữ liệu",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 13,
+      "id": "content-guidelines",
+      "title": "Hướng dẫn nội dung",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 14,
+      "id": "shop-floor-mode",
+      "title": "Chế độ xưởng sản xuất",
+      "status": "TARGET"
+    },
+    {
+      "number": 15,
+      "id": "compliance-forms",
+      "title": "Mẫu biểu mẫu tuân thủ 21 CFR Part 11",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 16,
+      "id": "shift-themes",
+      "title": "Chuyển đổi giao diện theo ca",
+      "status": "TARGET"
+    },
+    {
+      "number": 17,
+      "id": "print-layouts",
+      "title": "Bố cục tối ưu cho in ấn",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 18,
+      "id": "operator-interface",
+      "title": "Giao diện vận hành máy",
+      "status": "TARGET"
+    },
+    {
+      "number": 19,
+      "id": "realtime-dashboard",
+      "title": "Mẫu dashboard thời gian thực",
+      "status": "TARGET"
+    },
+    {
+      "number": 20,
+      "id": "token-reference",
+      "title": "Hệ thống Design Token chính xác",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 21,
+      "id": "form-rules",
+      "title": "Quy chuẩn Form Layout",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 22,
+      "id": "table-rules",
+      "title": "Quy chuẩn Table tương tác",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 23,
+      "id": "modal-rules",
+      "title": "Quy chuẩn Modal & Dialog",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 24,
+      "id": "nav-rules",
+      "title": "Navigation thích ứng",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 25,
+      "id": "dataviz-rules",
+      "title": "Quy chuẩn Data Visualization chính xác",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 26,
+      "id": "keyboard-rules",
+      "title": "Ma trận phím tắt",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 27,
+      "id": "icon-rules",
+      "title": "Hệ thống Icon",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 28,
+      "id": "responsive-rules",
+      "title": "Quy chuẩn Responsive Layout",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 29,
+      "id": "block-schema",
+      "title": "Block JSON Schema — 10 blocks quan trọng nhất",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 30,
+      "id": "toast-precise",
+      "title": "Quy chuẩn Toast & Notification chính xác",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 31,
+      "id": "interaction-patterns",
+      "title": "Quy chuẩn Tương tác Chuyên sâu",
+      "status": "TARGET"
+    },
+    {
+      "number": 32,
+      "id": "manufacturing-precision",
+      "title": "Manufacturing Domain Precision",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 33,
+      "id": "regulatory-precision",
+      "title": "Quy chuẩn Tuân thủ và Bảo mật Dữ liệu",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 34,
+      "id": "a11y-i18n-precision",
+      "title": "Accessibility & Internationalization Precision",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 35,
+      "id": "runtime-api-spec",
+      "title": "Block Engine Runtime & API Specification",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 36,
+      "id": "visual-themes",
+      "title": "20 Visual Theme Presets",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 37,
+      "id": "block-engine",
+      "title": "Block Engine",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 38,
+      "id": "zone-system",
+      "title": "Zone System",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 39,
+      "id": "scroll-ux",
+      "title": "Smart Scroll UX",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 40,
+      "id": "cat-overview",
+      "title": "TỔNG QUAN",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 41,
+      "id": "cat-sales",
+      "title": "BÁN HÀNG & CRM",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 42,
+      "id": "cat-engineering",
+      "title": "KỸ THUẬT & NPI",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 43,
+      "id": "cat-purchasing",
+      "title": "MUA HÀNG & CUNG ỨNG",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 44,
+      "id": "cat-production",
+      "title": "SẢN XUẤT & MES",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 45,
+      "id": "cat-quality",
+      "title": "CHẤT LƯỢNG & eQMS",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 46,
+      "id": "cat-warehouse",
+      "title": "KHO VẬN",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 47,
+      "id": "cat-shipping",
+      "title": "GIAO HÀNG",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 48,
+      "id": "cat-finance",
+      "title": "TÀI CHÍNH",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 49,
+      "id": "cat-hr",
+      "title": "NHÂN SỰ",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 50,
+      "id": "cat-documents",
+      "title": "TÀI LIỆU",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 51,
+      "id": "cat-admin",
+      "title": "QUẢN TRỊ",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 52,
+      "id": "cat-cross",
+      "title": "CROSS-MODULE",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 53,
+      "id": "component-presets",
+      "title": "Component Preset Library",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 54,
+      "id": "module-editor",
+      "title": "Module Editor Tools",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 55,
+      "id": "token-cascade",
+      "title": "Token Cascade",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 56,
+      "id": "governance",
+      "title": "Governance & Roadmap",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 57,
+      "id": "inline-edit-interaction-pattern",
+      "title": "Pattern 12 — Inline Edit Interaction Pattern",
+      "status": "TARGET"
+    },
+    {
+      "number": 58,
+      "id": "command-palette-pattern",
+      "title": "Pattern 13 — Command Palette Pattern",
+      "status": "TARGET"
+    },
+    {
+      "number": 59,
+      "id": "work-order-lifecycle",
+      "title": "Work Order Lifecycle State Machine",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 60,
+      "id": "tool-management-life",
+      "title": "Tool Management & Tool Life",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 61,
+      "id": "document-control-lifecycle",
+      "title": "Document Control Lifecycle",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 62,
+      "id": "fai-as9102",
+      "title": "First Article Inspection (FAI) — AS9102",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 63,
+      "id": "wcag-22-compliance-checklist",
+      "title": "WCAG 2.2 Compliance Checklist",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 64,
+      "id": "print-compliance-templates",
+      "title": "Print Templates Bổ Sung — CoC, CoA, MTR",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 65,
+      "id": "ncr-disposition-workflow",
+      "title": "NCR Disposition Workflow",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 66,
+      "id": "customer-complaint-handling",
+      "title": "Customer Complaint Handling",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 67,
+      "id": "container-queries-preview",
+      "title": "Container Queries & Zone Responsiveness",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 68,
+      "id": "error-boundary-fallback-ui",
+      "title": "Error Boundary & Fallback UI",
+      "status": "TARGET"
+    },
+    {
+      "number": 69,
+      "id": "reduced-motion-global-contract",
+      "title": "Reduced-Motion Global Contract",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 70,
+      "id": "oee-calculation-contract",
+      "title": "OEE Calculation Contract",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 71,
+      "id": "receiving-iqc-workflow",
+      "title": "Receiving Inspection IQC Workflow",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 72,
+      "id": "preventive-maintenance-workflow",
+      "title": "Preventive Maintenance Workflow",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 73,
+      "id": "material-lot-genealogy",
+      "title": "Material Traceability Lot Genealogy",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 74,
+      "id": "training-effectiveness-verification",
+      "title": "Training Effectiveness Verification",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 75,
+      "id": "gauge-rr-msa-pattern",
+      "title": "Gauge R&R / MSA Pattern",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 76,
+      "id": "supplier-quality-management",
+      "title": "Supplier Quality Management",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 77,
+      "id": "standard-36-alignment-overview",
+      "title": "Standard 36 Alignment Overview",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 78,
+      "id": "detailed-toc",
+      "title": "Mục lục chi tiết",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 79,
+      "id": "module-archetypes-standard-36",
+      "title": "Module Archetypes — Phân loại màn hình theo Standard 36",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": 80,
+      "id": "template-naming-standard-archetype",
+      "title": "Quy ước đặt tên Template theo Archetype",
+      "status": "TARGET"
+    },
+    {
+      "number": 81,
+      "id": "module-build-packet-standard-36",
+      "title": "Module Build Packet — 30 trường bắt buộc khi build module",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 82,
+      "id": "block-contract-standard-36",
+      "title": "Block Contract — 14 trường bắt buộc theo Standard 36",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 83,
+      "id": "qa-gate-matrix-standard-36",
+      "title": "QA Gate Matrix — 19 cổng kiểm tra bắt buộc trước khi release module",
+      "status": "PARTIAL"
+    },
+    {
+      "number": 84,
+      "id": "definition-of-done-standard-36",
+      "title": "Definition of Done — Checklist trước khi release module",
+      "status": "TARGET"
+    },
+    {
+      "number": 85,
+      "id": "shift-handover-production",
+      "title": "Shift Handover — Giao ca sản xuất",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 86,
+      "id": "offline-pwa-shop-floor",
+      "title": "Hỗ trợ Offline & PWA cho Shop Floor",
+      "status": "TARGET"
+    },
+    {
+      "number": 87,
+      "id": "machine-readable-release-manifests",
+      "title": "Machine-Readable Release Manifests",
+      "status": "TARGET"
+    },
+    {
+      "number": 88,
+      "id": "copq-dashboard-contract",
+      "title": "COPQ (Cost of Poor Quality) Dashboard Contract",
+      "status": "REFERENCE"
+    },
+    {
+      "number": 89,
+      "id": "changelog",
+      "title": "Changelog",
+      "status": "REFERENCE"
+    }
+  ]
+}

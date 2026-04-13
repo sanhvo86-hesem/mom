@@ -157,3 +157,61 @@ Stack trace:
   thrown in /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php on line 62
 [11-Apr-2026 07:55:57 UTC] FATAL: {"type":1,"message":"Uncaught RuntimeException: Workspace operational risks should not flag source-vs-artifact drift once only non-blocking reference artifacts remain outdated. in /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php:62\nStack trace:\n#0 /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/data_schema_admin_smoke.php(173): smoke_assert(false, 'Workspace opera...')\n#1 {main}\n  thrown","file":"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php","line":62}
 [11-Apr-2026 09:01:29 UTC] [API] Uncaught: Runtime access policy must allow buyer to create purchasing records. in /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php:62
+[11-Apr-2026 09:40:26 UTC] [API] Uncaught: Runtime access policy must allow buyer to create purchasing records. in /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php:62
+[11-Apr-2026 09:42:18 UTC] [API] Uncaught: Portal shell must expose purchasing navigation. in /Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/bootstrap.php:62
+[11-Apr-2026 10:03:16 UTC] [runtime-observability] bootstrap store write skipped: Cannot write json
+[11-Apr-2026 10:03:16 UTC] [runtime-observability] store write skipped: Cannot write json
+[11-Apr-2026 10:03:20 UTC] FATAL: {"type":2,"message":"rmdir(/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-9a7e0ed81b81): Directory not empty","file":"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/tests/backend_smoke.php","line":253}
+[11-Apr-2026 10:05:45 UTC] [runtime-observability] bootstrap store write skipped: Cannot write json
+[11-Apr-2026 10:05:45 UTC] [runtime-observability] store write skipped: Cannot write json
+[11-Apr-2026 10:05:49 UTC] FATAL: {"type":2,"message":"file_put_contents(/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-e5c289acab6e/runtime-shadow/primary-reads.jsonl): Failed to open stream: No such file or directory","file":"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/api.php","line":4157}
+[11-Apr-2026 10:06:50 UTC] [runtime-observability] bootstrap store write skipped: Cannot write json
+[11-Apr-2026 10:06:50 UTC] [runtime-observability] store write skipped: Cannot write json
+[11-Apr-2026 10:06:50 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-86dd79828be7/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:06:54 UTC] FATAL: {"type":2,"message":"mkdir(): File exists","file":"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/api.php","line":203}
+[11-Apr-2026 10:07:55 UTC] [runtime-observability] bootstrap store write skipped: Cannot write json
+[11-Apr-2026 10:07:55 UTC] [runtime-observability] store write skipped: Cannot write json
+[11-Apr-2026 10:07:55 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-eeba39f19ed7/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:07:58 UTC] FATAL: {"type":2,"message":"file_put_contents(/var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-eeba39f19ed7/runtime-shadow/runtime-observability.json): Failed to open stream: No such file or directory","file":"/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/api.php","line":671}
+[11-Apr-2026 10:09:04 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 10:09:04 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 10:09:04 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-572a4a354de4/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:43:20 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 10:43:20 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 10:43:20 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-8d38b6bb02fa/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:44:32 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 10:44:32 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 10:44:32 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-9491ad127d0a/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:47:43 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 10:47:43 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 10:47:43 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-78c732a835eb/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 10:51:55 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 10:51:55 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 10:51:55 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-401863546da1/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 11:26:57 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 11:26:57 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 11:26:57 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-a06d97494a22/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 11:28:42 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 11:28:42 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 11:28:42 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-16a388b258cd/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 11:32:39 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 11:32:39 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 11:32:39 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-c2fb514281c5/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 12:33:16 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 12:33:16 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 12:33:16 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-d0fe4c95b6ac/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 12:58:28 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 12:58:28 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 12:58:28 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-9743b0e878e8/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 12:59:46 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 12:59:46 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 12:59:46 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-fea00e08eae8/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 13:01:22 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 13:01:22 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 13:01:22 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-c1d37e8e313e/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 13:08:10 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 13:08:10 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 13:08:10 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-bb15165979f5/runtime-shadow/primary-reads.jsonl
+[11-Apr-2026 13:16:57 UTC] [runtime-observability] bootstrap store write skipped: directory is not writable
+[11-Apr-2026 13:16:57 UTC] [runtime-observability] store write skipped: directory is not writable
+[11-Apr-2026 13:16:57 UTC] [runtime-observability] jsonl append skipped: /var/folders/qw/t3y_yhp55vn9rx6172_v5d240000gn/T/qms-runtime-observability-smoke-53457e41e78c/runtime-shadow/primary-reads.jsonl

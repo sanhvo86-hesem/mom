@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/schemas/block-contract.schema.json",
+  "title": "HESEM Frontend Block Contract",
+  "type": "object",
+  "required": [
+    "blockType",
+    "version",
+    "status",
+    "owner",
+    "allowedZones",
+    "propsSchema",
+    "dataSourceContract",
+    "eventContract",
+    "stateContract",
+    "permissionContract",
+    "a11yContract",
+    "responsiveContract",
+    "themeContract",
+    "printExportContract",
+    "testIds",
+    "qaEvidence"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "blockType": { "type": "string" },
+    "version": { "type": "string" },
+    "status": { "enum": ["pilot", "approved", "deprecated", "retired"] },
+    "owner": { "type": "string" },
+    "allowedZones": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "propsSchema": { "type": "object" },
+    "dataSourceContract": { "type": "object" },
+    "eventContract": { "type": "object" },
+    "stateContract": {
+      "type": "object",
+      "required": ["loading", "empty", "error", "readonly", "disabled", "permissionDenied"]
+    },
+    "permissionContract": { "type": "object" },
+    "a11yContract": {
+      "type": "object",
+      "required": [
+        "role",
+        "apgPattern",
+        "wcagCriteria",
+        "accessibleName",
+        "keyboard",
+        "focus",
+        "announcements",
+        "errorAssociation",
+        "targetSize",
+        "contrast",
+        "forcedColors",
+        "reducedMotion",
+        "screenReaderMatrix",
+        "automatedRules",
+        "manualTestScript"
+      ],
+      "properties": {
+        "role": { "type": "string" },
+        "apgPattern": { "type": "string" },
+        "wcagCriteria": { "type": "array", "items": { "type": "string" } },
+        "accessibleName": { "type": "string" },
+        "keyboard": { "type": "object" },
+        "focus": { "type": "object" },
+        "announcements": { "type": "object" },
+        "errorAssociation": { "type": "object" },
+        "targetSize": { "type": "object" },
+        "contrast": { "type": "object" },
+        "forcedColors": { "type": "object" },
+        "reducedMotion": { "type": "object" },
+        "screenReaderMatrix": { "type": "array" },
+        "automatedRules": { "type": "array" },
+        "manualTestScript": { "type": "array" }
+      }
+    },
+    "responsiveContract": { "type": "object" },
+    "themeContract": { "type": "object" },
+    "printExportContract": { "type": "object" },
+    "testIds": { "type": "object" },
+    "qaEvidence": { "type": "object" }
+  }
+}

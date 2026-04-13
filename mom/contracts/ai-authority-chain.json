@@ -1,0 +1,146 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-11T14:58:13.657848+00:00",
+    "standardVersion": "1.0.0",
+    "description": "AI authority chain and edit-boundary map. AI tools must read this before altering registry, schema, workflow, API, or frontend surfaces."
+  },
+  "authorityOrder": [
+    {
+      "rank": 1,
+      "authority": "physical_schema",
+      "source": "mom/database/migrations/*.sql -> mom/database/schema.sql -> schema-authority-summary.json",
+      "rule": "Defines executable DB truth. Never infer physical DB truth from Schema Studio draft."
+    },
+    {
+      "rank": 2,
+      "authority": "business_contract",
+      "source": "mom/contracts/objects/*/contract.json",
+      "rule": "Defines canonical business meaning, lifecycle owner, workflow, commands, events, retention and migration intent."
+    },
+    {
+      "rank": 3,
+      "authority": "runtime_registry",
+      "source": "mom/data/registry/table-registry.json, table-governance-overlay.json, endpoint-catalog-index.json, endpoint-governance-classification.json",
+      "rule": "Defines generated runtime catalog and frontend/API exposure after validation."
+    },
+    {
+      "rank": 4,
+      "authority": "workspace_design",
+      "source": "mom/data/schema-studio/designs/workspace.json",
+      "rule": "Draft-only design surface. Not allowed as runtime authority."
+    }
+  ],
+  "editableSurfaces": [
+    {
+      "surface": "manual_machine_runtime",
+      "allowedEntities": [
+        "work_centers",
+        "machines",
+        "mes_connectivity_adapters",
+        "mes_alarm_catalog",
+        "mes_alarm_playbooks",
+        "downtime_reason_codes",
+        "downtime_resolution_codes",
+        "tooling_assets"
+      ],
+      "forbiddenEntities": [
+        "customers",
+        "suppliers",
+        "parts",
+        "revisions",
+        "nc_program_releases",
+        "capas",
+        "sales_orders",
+        "job_orders",
+        "work_orders",
+        "operators"
+      ],
+      "rule": "Only machine/MES support data may be edited here. Operators come from Admin users and process objects use dedicated endpoints."
+    },
+    {
+      "surface": "frontend_process_endpoints",
+      "allowedActions": [
+        "order_hierarchy",
+        "order_detail",
+        "order_so_create",
+        "order_jo_create",
+        "order_wo_create",
+        "order_update_fields",
+        "order_so_update_status",
+        "order_jo_update_status",
+        "order_wo_update_status",
+        "mes_snapshot",
+        "mes_machine_signal_upsert",
+        "mes_connector_ingest",
+        "mes_downtime_create",
+        "mes_downtime_resolve",
+        "mes_tooling_upsert"
+      ],
+      "rule": "Frontend must use command/workflow endpoints for SO/JO/WO/MES runtime instead of editing process tables through generic master-data UI."
+    }
+  ],
+  "readOnlySurfaces": [
+    {
+      "surface": "system_contract_registry",
+      "source": "mom/data/registry/table-registry.json + mom/data/registry/table-governance-overlay.json",
+      "rule": "Read-only authority view for all DB/runtime objects."
+    },
+    {
+      "surface": "destructive_endpoint_quarantine",
+      "source": "mom/data/registry/destructive-endpoint-quarantine.json",
+      "rule": "Frontend and AI tools must not expose quarantined delete endpoints."
+    },
+    {
+      "surface": "command_runtime_bindings",
+      "source": "mom/data/registry/command-runtime-bindings.json",
+      "rule": "Frontend must execute business commands through bound runtime routes instead of guessing route names from canonical labels."
+    },
+    {
+      "surface": "schema_studio_workspace",
+      "source": "mom/data/schema-studio/designs/workspace.json",
+      "rule": "Blank or draft design only; do not derive live backend behavior from it."
+    }
+  ],
+  "forbiddenInferences": [
+    "Do not infer table usage from UI visibility alone.",
+    "Do not infer source of truth from dropdown labels.",
+    "Do not infer workflow legality from status column options alone.",
+    "Do not infer DB table existence from contract package existence.",
+    "Do not create duplicate operator master data when Admin users already define operator authority."
+  ],
+  "dataLossGuards": [
+    "Never hard delete regulated, financial, quality, production, inventory, shipment, HR, EHS, machine, or audit records.",
+    "Prefer archive, reversal, correction, supersession, or projection rebuild depending on object role.",
+    "Primary keys are immutable after creation unless a supersession workflow exists.",
+    "Every destructive endpoint must be classified and justified before frontend exposure."
+  ],
+  "currentEndpointClassificationSummary": {
+    "authorityClass": {
+      "admin_governance_contract": 227,
+      "canonical_process_contract": 2028,
+      "generic_runtime_contract": 454,
+      "machine_runtime_contract": 478,
+      "master_data_contract": 90,
+      "support_or_read_model_contract": 305
+    },
+    "exposure": {
+      "admin_governance": 221,
+      "admin_or_internal": 305,
+      "blocked_runtime_internal": 780,
+      "frontend_process": 1422,
+      "machine_or_operator_ui": 400,
+      "needs_owner_review": 454
+    },
+    "sideEffectLevel": {
+      "destructive": 651,
+      "none": 1319,
+      "transactional_write": 647,
+      "workflow_transition": 965
+    },
+    "gapCounts": {
+      "generic_runtime_classification": 454,
+      "runtime_safe_false": 780
+    }
+  }
+}

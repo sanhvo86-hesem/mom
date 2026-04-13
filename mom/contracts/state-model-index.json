@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Explicit lifecycle and state-contract index for canonical business objects.",
-    "stateModelCount": 62
+    "stateModelCount": 65
   },
   "stateModels": [
     {
@@ -2519,6 +2519,55 @@
       "truthStatus": "implemented_runtime"
     },
     {
+      "canonicalResource": "mes_execution.machine-alarms",
+      "storageTables": [
+        "mes_machine_alarms"
+      ],
+      "statusOptions": [
+        {
+          "value": "complete",
+          "label": "Complete",
+          "labelEn": "Complete",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "partial",
+          "label": "Partial",
+          "labelEn": "Partial",
+          "allowedTransitionsFrom": [
+            "complete"
+          ]
+        },
+        {
+          "value": "broken",
+          "label": "Broken",
+          "labelEn": "Broken",
+          "allowedTransitionsFrom": [
+            "partial"
+          ]
+        },
+        {
+          "value": "pending",
+          "label": "Pending",
+          "labelEn": "Pending",
+          "allowedTransitionsFrom": [
+            "broken"
+          ]
+        }
+      ],
+      "statusSetKey": "mes_machine_alarms_escalation_status",
+      "lifecycleMode": "workflow_engine",
+      "purpose": "Capture machine-originated alarm and fault events with operator acknowledgement, escalation, downtime linkage, and maintenance follow-up without manually inventing machine data.",
+      "usageZone": "machine_runtime",
+      "gateType": "operator_response_gate",
+      "auditClass": "machine_trace_audit",
+      "continuousImprovementLoop": "downtime_and_maintenance_feedback",
+      "workflowSource": "workflow-library wf_mes_machine_alarm bridged through GenericCrud workflow-engine runtime",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/mes_execution--machine-alarms/contract.json"
+    },
+    {
       "canonicalResource": "planning_production.dispatch-lists",
       "storageTables": [
         "mes_dispatch_queue"
@@ -3562,6 +3611,47 @@
       ]
     },
     {
+      "canonicalResource": "quality_improvement.control-plans",
+      "storageTables": [
+        "control_plans"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "active",
+          "label": "Active",
+          "labelEn": "Active",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "archived",
+          "label": "Archived",
+          "labelEn": "Archived",
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        }
+      ],
+      "statusSetKey": "control_plan_status",
+      "lifecycleMode": "workflow_engine",
+      "purpose": "Govern APQP/FMEA-linked control plans so product and process characteristics, control methods, reaction plans, approvals, revisions, and shop-floor inspection execution stay traceable.",
+      "usageZone": "core_value_stream",
+      "gateType": "quality_planning_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "apqp_fmea_control_plan",
+      "workflowSource": "workflow-library wf_fmea bridged through GenericCrud workflow-engine runtime",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--control-plans/contract.json"
+    },
+    {
       "canonicalResource": "quality_improvement.corrective-actions",
       "storageTables": [
         "capa_records"
@@ -3855,7 +3945,7 @@
       "auditClass": "assessment_audit_trail",
       "continuousImprovementLoop": "measurement_system_review",
       "workflowSource": "calibration_equipment.calibration_grr_studies persisted assessment record",
-      "implemented": false,
+      "implemented": true,
       "truthStatus": "implemented_runtime",
       "contractPackagePath": "contracts/objects/quality_improvement--msa-studies/contract.json"
     },
@@ -4099,9 +4189,30 @@
       "auditClass": "assessment_audit_trail",
       "continuousImprovementLoop": "process_capability_review",
       "workflowSource": "quality_management.spc_data persisted assessment record",
-      "implemented": false,
+      "implemented": true,
       "truthStatus": "implemented_runtime",
       "contractPackagePath": "contracts/objects/quality_improvement--spc-observations/contract.json"
+    },
+    {
+      "canonicalResource": "traceability_serialization.lot-genealogy",
+      "storageTables": [
+        "genealogy_link",
+        "mes_part_genealogy",
+        "trace_genealogy_batches",
+        "trace_genealogy_links"
+      ],
+      "statusOptions": [],
+      "statusSetKey": "stateless_genealogy_evidence",
+      "lifecycleMode": "stateless_evidence_thread",
+      "purpose": "Provide forward and backward genealogy for lot, serial, batch, and production-order relationships so containment, recall, NCR, and customer-return decisions can be traced to source records.",
+      "usageZone": "core_value_stream",
+      "gateType": "traceability_gate",
+      "auditClass": "traceability_audit_trail",
+      "continuousImprovementLoop": "containment_and_recall_feedback",
+      "workflowSource": "PostgreSQL traceability tables exposed through GenericCrud runtime",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/traceability_serialization--lot-genealogy/contract.json"
     }
   ]
 }

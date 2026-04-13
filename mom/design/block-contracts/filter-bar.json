@@ -1,0 +1,87 @@
+{
+  "blockType": "filter-bar",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["filter"],
+  "propsSchema": {
+    "required": ["filters"],
+    "optional": ["showApply", "showReset", "savedViews", "density"]
+  },
+  "dataSourceContract": {
+    "mode": "optional",
+    "allowedMethods": ["GET"],
+    "requiredBindings": []
+  },
+  "eventContract": {
+    "emits": ["filter-change", "filter-apply", "filter-reset", "filter-save"],
+    "consumes": ["saved-filter-selected"]
+  },
+  "stateContract": {
+    "loading": "Disable async option fields only.",
+    "empty": "Render configured filters; empty applies to downstream result.",
+    "error": "Show option-load error per field.",
+    "readonly": "Render selected filters as chips.",
+    "disabled": "Disable all filter controls.",
+    "permissionDenied": "Hide filters for fields user cannot query."
+  },
+  "permissionContract": {
+    "requiresPermission": false,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "list"
+  },
+  "a11yContract": {
+    "role": "search",
+    "apgPattern": "form",
+    "wcagCriteria": ["1.3.1", "2.1.1", "2.4.6", "2.5.8", "3.3.1", "4.1.2", "4.1.3"],
+    "accessibleName": "Filter controls for current module.",
+    "keyboard": {
+      "tab": "Move through controls in visual order.",
+      "enter": "Submit search only where expected.",
+      "escape": "Close dropdowns without clearing values."
+    },
+    "focus": {
+      "entry": "First filter only when user jumps to filter landmark.",
+      "restore": "Return to field after async option load.",
+      "visibleIndicator": "Field focus ring uses tokenized outline."
+    },
+    "announcements": {
+      "resultCount": "Debounce result-count live region by 500ms after filter changes.",
+      "reset": "Announce filters reset."
+    },
+    "errorAssociation": {
+      "required": true,
+      "pattern": "Field errors use aria-invalid and aria-errormessage."
+    },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for controls and clear buttons" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedDropdown": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["label", "form-field-multiple-labels", "color-contrast"],
+    "manualTestScript": ["Apply filter by keyboard", "Reset filters", "Verify live result-count debounce"]
+  },
+  "responsiveContract": {
+    "compact": "Collapse into filter drawer with labelled trigger.",
+    "desktop": "Inline controls with wrapping.",
+    "overflow": "No hidden active filter; active filters show as removable chips."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--input-bg", "--input-border", "--focus-ring", "--text-primary"]
+  },
+  "printExportContract": {
+    "print": "Print active filters above result set.",
+    "export": ["filter_key", "filter_value"]
+  },
+  "testIds": {
+    "root": "block-filter-bar",
+    "field": "filter-field",
+    "apply": "filter-apply",
+    "liveRegion": "filter-live-region"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G08"]
+  }
+}

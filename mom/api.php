@@ -199,6 +199,9 @@ function api_stream_event(string $event, array $payload): void {
 }
 
 function ensure_dir(string $dir): void {
+  if (file_exists($dir) && !is_dir($dir)) {
+    return;
+  }
   if (!is_dir($dir)) {
     @mkdir($dir, 0775, true);
   }
@@ -3632,6 +3635,94 @@ function master_data_normalize_item(string $entity, array $item): array {
   return $item;
 }
 
+function master_data_admin_operator_role_codes(): array {
+  return [
+    'cnc_operator',
+    'setup_technician',
+    'deburr_technician',
+    'cleaning_packaging_technician',
+    'cleaning_packaging_supervisor',
+    'qc_inspector',
+    'maintenance_technician',
+    'shift_leader',
+    'cnc_workshop_manager',
+  ];
+}
+
+function master_data_is_admin_operator_user(array $user): bool {
+  if (array_key_exists('active', $user) && !$user['active']) return false;
+  $role = migrate_role(strtolower(trim((string)($user['role'] ?? ''))));
+  if (in_array($role, master_data_admin_operator_role_codes(), true)) return true;
+  $title = strtolower(trim((string)($user['title'] ?? $user['jd_title'] ?? '')));
+  return $title !== '' && (str_contains($title, 'operator') || str_contains($title, 'technician') || str_contains($title, 'inspector'));
+}
+
+function master_data_admin_operator_rows(?array $userStore = null): array {
+  global $USERS_FILE;
+  if (!is_array($userStore)) {
+    $loaded = read_json_file($USERS_FILE);
+    $userStore = is_array($loaded) ? $loaded : ['users' => []];
+  }
+
+  $rows = [];
+  foreach ((array)($userStore['users'] ?? []) as $user) {
+    if (!is_array($user) || !master_data_is_admin_operator_user($user)) continue;
+    $username = strtolower(trim((string)($user['username'] ?? '')));
+    $employeeId = trim((string)($user['employee_id'] ?? ''));
+    $operatorId = $employeeId !== '' ? $employeeId : $username;
+    if ($operatorId === '') continue;
+    $role = migrate_role(strtolower(trim((string)($user['role'] ?? ''))));
+    $dept = strtoupper(trim((string)($user['dept'] ?? '')));
+    $name = trim((string)($user['name'] ?? $username));
+    $rows[$operatorId] = [
+      'operator_id' => $operatorId,
+      'operator_name' => $name !== '' ? $name : $operatorId,
+      'role' => $role,
+      'role_code' => $role,
+      'role_label' => trim((string)($user['title'] ?? $user['jd_title'] ?? $role)),
+      'department' => $dept,
+      'department_code' => $dept,
+      'user_id' => $username,
+      'username' => $username,
+      'admin_username' => $username,
+      'email' => trim((string)($user['personal_email'] ?? '')),
+      'status' => !empty($user['active']) ? 'active' : 'inactive',
+      'source_system' => 'admin_users',
+      'authority' => 'admin_users',
+      'editable_in' => 'admin.users_orgchart',
+      'qualification_status' => 'active',
+      'hcm_org_unit_id' => trim((string)($user['hcm_org_unit_id'] ?? '')),
+      'hcm_position_id' => trim((string)($user['hcm_position_id'] ?? '')),
+      'updated_at' => trim((string)($user['updated_at'] ?? '')),
+    ];
+  }
+
+  usort($rows, static function(array $a, array $b): int {
+    $roleCmp = strcmp((string)($a['role_code'] ?? ''), (string)($b['role_code'] ?? ''));
+    if ($roleCmp !== 0) return $roleCmp;
+    return strcmp((string)($a['operator_name'] ?? ''), (string)($b['operator_name'] ?? ''));
+  });
+  return array_values($rows);
+}
+
+function master_data_apply_admin_operator_projection(array $master, ?array $userStore = null): array {
+  if ((string)($master['_meta']['operator_authority']['source'] ?? '') === 'admin_users') {
+    return $master;
+  }
+  $legacyCount = count(array_values(is_array($master['operators'] ?? null) ? $master['operators'] : []));
+  $operators = master_data_admin_operator_rows($userStore);
+  $master['operators'] = $operators;
+  $master['_meta'] = is_array($master['_meta'] ?? null) ? $master['_meta'] : [];
+  $master['_meta']['operator_authority'] = [
+    'source' => 'admin_users',
+    'editable_in' => 'admin.users_orgchart',
+    'projection' => 'master_data_runtime_lookup',
+    'operator_count' => count($operators),
+    'legacy_master_data_operator_count' => $legacyCount,
+  ];
+  return $master;
+}
+
 function master_data_normalize_store(array $store): array {
   foreach ($store as $entity => $rows) {
     if ($entity === '_meta' || !is_array($rows)) {
@@ -4107,11 +4198,20 @@ function runtime_observability_log_file(string $name): string {
 
 function load_runtime_observability_store(): array {
   $file = runtime_observability_file();
-  ensure_dir(dirname($file));
+  $dir = dirname($file);
+  ensure_dir($dir);
   $data = read_json_file($file);
   if (!is_array($data)) {
     $data = runtime_observability_default();
-    write_json_file($file, $data);
+    if (is_dir($dir) && is_writable($dir)) {
+      try {
+        write_json_file($file, $data);
+      } catch (Throwable $e) {
+        @error_log('[runtime-observability] bootstrap store write skipped: ' . $e->getMessage());
+      }
+    } else {
+      @error_log('[runtime-observability] bootstrap store write skipped: directory is not writable');
+    }
   }
   $defaults = runtime_observability_default();
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
@@ -4138,14 +4238,28 @@ function load_runtime_observability_store(): array {
 
 function save_runtime_observability_store(array $data): void {
   $file = runtime_observability_file();
-  ensure_dir(dirname($file));
+  $dir = dirname($file);
+  ensure_dir($dir);
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
-  write_json_file($file, $data);
+  if (!is_dir($dir) || !is_writable($dir)) {
+    @error_log('[runtime-observability] store write skipped: directory is not writable');
+    return;
+  }
+  try {
+    write_json_file($file, $data);
+  } catch (Throwable $e) {
+    @error_log('[runtime-observability] store write skipped: ' . $e->getMessage());
+  }
 }
 
 function append_jsonl_line(string $file, array $entry): void {
-  ensure_dir(dirname($file));
+  $dir = dirname($file);
+  ensure_dir($dir);
+  if (!is_dir($dir) || !is_writable($dir)) {
+    @error_log('[runtime-observability] jsonl append skipped: ' . $file);
+    return;
+  }
   @file_put_contents(
     $file,
     json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n",
@@ -4447,6 +4561,11 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
   require_once __DIR__ . '/database/Connection.php';
   $connection = \MOM\Database\Connection::getInstance((array)(require __DIR__ . '/database/config.php'));
 
+  $operatorRolesSql = implode(',', array_map(
+    static fn(string $role): string => "'" . str_replace("'", "''", $role) . "'",
+    master_data_admin_operator_role_codes()
+  ));
+
   $sqlMap = [
     'master_data' => [
       'customers' => "SELECT COUNT(*) AS c FROM customers WHERE COALESCE(metadata->>'customer_id', '') <> ''",
@@ -4455,7 +4574,7 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
       'revisions' => "SELECT COUNT(*) AS c FROM item_revisions WHERE COALESCE(metadata->>'revision', '') <> ''",
       'work_centers' => "SELECT COUNT(*) AS c FROM work_centers WHERE COALESCE(metadata->>'work_center_id', '') <> ''",
       'machines' => "SELECT COUNT(*) AS c FROM equipment WHERE COALESCE(metadata->>'machine_id', '') <> ''",
-      'operators' => "SELECT COUNT(*) AS c FROM employees WHERE COALESCE(metadata->>'operator_id', '') <> ''",
+      'operators' => "SELECT COUNT(*) AS c FROM employees WHERE is_active IS TRUE AND (role_code IN ({$operatorRolesSql}) OR lower(COALESCE(role_label, '')) LIKE '%operator%' OR lower(COALESCE(role_label, '')) LIKE '%technician%' OR lower(COALESCE(role_label, '')) LIKE '%inspector%' OR COALESCE(metadata->>'operator_id', '') <> '')",
       'tooling_assets' => "SELECT COUNT(*) AS c FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime'",
       'capas' => "SELECT COUNT(*) AS c FROM records WHERE record_type = 'CAPA'",
     ],
@@ -4608,6 +4727,7 @@ function runtime_read_model_bundle(bool $includeMes = true): array {
   $layer = runtime_data_layer();
 
   $master = $layer->getRuntimeMasterDataStore();
+  $master = master_data_apply_admin_operator_projection($master);
   $masterRead = $layer->getLastReadMeta();
   observe_primary_read('master_data', $masterRead, [
     'item_count' => runtime_store_item_count($master),
@@ -4861,7 +4981,7 @@ function shadow_sync_orders_store(array $data): void {
     + count((array)($data['form_links'] ?? []));
   $mustSync = runtime_domain_requires_postgres_authority('orders');
   try {
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store());
     $layer = runtime_data_layer();
     $mode = $layer->getMode();
     if ($mode === \MOM\Database\DataLayer::MODE_JSON_ONLY) {
@@ -7140,10 +7260,185 @@ function compute_order_dashboard_stats(array $store, array $hierarchy = [], ?arr
   ];
 }
 
-function build_manual_runtime_summary(array $master, array $orders): array {
+function manual_runtime_machine_entity_keys(): array {
+  return [
+    'work_centers',
+    'machines',
+    'mes_connectivity_adapters',
+    'mes_alarm_catalog',
+    'mes_alarm_playbooks',
+    'downtime_reason_codes',
+    'downtime_resolution_codes',
+    'tooling_assets',
+  ];
+}
+
+function manual_runtime_frontend_endpoint_contracts(): array {
+  return [
+    [
+      'area' => 'machine_master',
+      'method' => 'GET',
+      'action' => 'master_data_snapshot',
+      'purpose' => 'Load machine/MES runtime lookup tables for manual forms.',
+      'authority' => 'machine_runtime_scope',
+      'frontend_use' => 'Render work center, machine, adapter, alarm, downtime and tooling selectors.',
+    ],
+    [
+      'area' => 'machine_master',
+      'method' => 'POST',
+      'action' => 'master_data_upsert',
+      'purpose' => 'Create or update governed machine/MES runtime reference rows.',
+      'authority' => 'machine_runtime_scope',
+      'frontend_use' => 'Save machine/MES table rows only; primary keys are immutable on update.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'GET',
+      'action' => 'mes_snapshot',
+      'purpose' => 'Read live MES dispatch, machine wall, downtime, alarm and tooling runtime.',
+      'authority' => 'mes_runtime',
+      'frontend_use' => 'Machine wall, dispatch board, KPI cards and operator runtime screens.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'POST',
+      'action' => 'mes_machine_signal_upsert',
+      'purpose' => 'Accept manual or connector-provided machine signal updates.',
+      'authority' => 'mes_runtime',
+      'frontend_use' => 'Manual bridge and machine connector heartbeat/status update.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'POST',
+      'action' => 'mes_connector_ingest',
+      'purpose' => 'Accept normalized machine connector payloads.',
+      'authority' => 'machine_connector',
+      'frontend_use' => 'Connector bridge or frontend gateway ingest path.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'POST',
+      'action' => 'mes_downtime_create',
+      'purpose' => 'Open governed downtime against a known machine and active reason code.',
+      'authority' => 'mes_runtime',
+      'frontend_use' => 'Downtime start form on operator and supervisor screens.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'POST',
+      'action' => 'mes_downtime_resolve',
+      'purpose' => 'Close governed downtime with active resolution code and corrective action.',
+      'authority' => 'mes_runtime',
+      'frontend_use' => 'Downtime recovery form and WO resume workflow.',
+    ],
+    [
+      'area' => 'machine_runtime',
+      'method' => 'POST',
+      'action' => 'mes_tooling_upsert',
+      'purpose' => 'Update runtime tool life and tooling readiness against a machine or WO.',
+      'authority' => 'mes_runtime',
+      'frontend_use' => 'Tooling life, reset and readiness update screens.',
+    ],
+    [
+      'area' => 'people_authority',
+      'method' => 'GET',
+      'action' => 'admin_users_list',
+      'purpose' => 'Load operators from Admin user and org-chart authority, not from manual runtime data.',
+      'authority' => 'admin_users',
+      'frontend_use' => 'Operator selection, qualification display and permission-aware assignment.',
+    ],
+  ];
+}
+
+function order_runtime_frontend_endpoint_contracts(): array {
+  return [
+    [
+      'area' => 'order_process',
+      'method' => 'GET',
+      'action' => 'order_hierarchy',
+      'purpose' => 'Read SO/JO/WO hierarchy and workflow status for frontend order screens.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'Build order tree, progress boards and drill-down navigation.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'GET',
+      'action' => 'order_detail',
+      'purpose' => 'Read one governed SO, JO or WO with linked forms, master references and MES KPIs.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'Open detail drawer or edit screen without duplicating process data in manual tables.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_so_create',
+      'purpose' => 'Create a governed sales order from frontend or manual admin flow.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'SO creation form; accepts manual SO number or automatic numbering.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_jo_create',
+      'purpose' => 'Create a governed job order linked to a valid SO.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'JO creation form and release preparation flow.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_wo_create',
+      'purpose' => 'Create a governed work order linked to a valid JO.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'WO creation form, dispatch preparation and machine assignment.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_update_fields',
+      'purpose' => 'Patch allowed fields on existing SO/JO/WO records with workflow validation.',
+      'authority' => 'order_runtime',
+      'frontend_use' => 'Inline edit forms and detail panels.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_so_update_status',
+      'purpose' => 'Transition a sales order through the governed SO state model.',
+      'authority' => 'order_workflow',
+      'frontend_use' => 'SO approve, hold, release and close actions.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_jo_update_status',
+      'purpose' => 'Transition a job order through the governed JO state model.',
+      'authority' => 'order_workflow',
+      'frontend_use' => 'JO release, hold, complete and close actions.',
+    ],
+    [
+      'area' => 'order_process',
+      'method' => 'POST',
+      'action' => 'order_wo_update_status',
+      'purpose' => 'Transition a work order through the governed WO state model.',
+      'authority' => 'order_workflow',
+      'frontend_use' => 'WO start, pause, resume, finish and quality gate actions.',
+    ],
+  ];
+}
+
+function build_manual_runtime_summary(array $master, array $orders, ?array $userStore = null): array {
+  $master = master_data_apply_admin_operator_projection($master, $userStore);
   $masterCounts = [];
-  foreach (['customers', 'parts', 'revisions', 'work_centers', 'machines', 'operators'] as $key) {
+  foreach (array_unique(array_merge(
+    ['customers', 'parts', 'revisions', 'operators'],
+    manual_runtime_machine_entity_keys()
+  )) as $key) {
     $masterCounts[$key] = count(array_values(is_array($master[$key] ?? null) ? $master[$key] : []));
+  }
+  $machineCounts = [];
+  foreach (manual_runtime_machine_entity_keys() as $key) {
+    $machineCounts[$key] = (int)($masterCounts[$key] ?? 0);
   }
 
   $salesOrders = array_values(is_array($orders['sales_orders'] ?? null) ? $orders['sales_orders'] : []);
@@ -7203,6 +7498,10 @@ function build_manual_runtime_summary(array $master, array $orders): array {
 
   return [
     'master_counts' => $masterCounts,
+    'machine_runtime_entities' => manual_runtime_machine_entity_keys(),
+    'machine_runtime_counts' => $machineCounts,
+    'frontend_endpoint_contracts' => manual_runtime_frontend_endpoint_contracts(),
+    'process_endpoint_contracts' => order_runtime_frontend_endpoint_contracts(),
     'order_counts' => [
       'so' => count($salesOrders),
       'jo' => count($jobOrders),
@@ -7212,6 +7511,7 @@ function build_manual_runtime_summary(array $master, array $orders): array {
     'last_event_at' => (string)($recentRows[0]['updated_at'] ?? ''),
     'master_updated_at' => (string)($master['_meta']['updated'] ?? ''),
     'orders_updated_at' => (string)($orders['_meta']['updated'] ?? ''),
+    'operator_authority' => is_array($master['_meta']['operator_authority'] ?? null) ? $master['_meta']['operator_authority'] : [],
   ];
 }
 
@@ -20470,7 +20770,7 @@ if ($username === '') {
   case 'master_data_snapshot': {
     require_logged_in($store);
     $bundle = runtime_read_model_bundle(false);
-    $data = $bundle['master'];
+    $data = master_data_apply_admin_operator_projection($bundle['master'], $store);
     api_json([
       'ok' => true,
       'data' => $data,
@@ -20512,6 +20812,7 @@ if ($username === '') {
         'mes_alarm_playbooks' => count($data['mes_alarm_playbooks'] ?? []),
         'tool_assemblies' => count($data['tool_assemblies'] ?? []),
       ],
+      'operator_authority' => is_array($data['_meta']['operator_authority'] ?? null) ? $data['_meta']['operator_authority'] : [],
     ]);
   }
 
@@ -20530,6 +20831,21 @@ if ($username === '') {
     $entity = trim((string)($body['entity'] ?? ''));
     $item = is_array($body['item'] ?? null) ? $body['item'] : null;
     if ($entity === '' || $item === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    $requestScope = trim((string)($body['scope'] ?? ''));
+    if ($requestScope === 'machine_runtime' && !in_array($entity, manual_runtime_machine_entity_keys(), true)) {
+      api_json([
+        'ok' => false,
+        'error' => 'entity_outside_machine_runtime_scope',
+        'message' => 'Module Nhập tay vận hành chỉ được lưu các bảng máy/MES. Dữ liệu quy trình phải đi qua endpoint nghiệp vụ riêng.',
+      ], 400);
+    }
+    if ($entity === 'operators') {
+      api_json([
+        'ok' => false,
+        'error' => 'admin_authority_entity',
+        'message' => 'Người vận hành được quản trị tại Admin > Người dùng / Sơ đồ tổ chức, không được nhập như dữ liệu nền độc lập.',
+      ], 409);
+    }
     $item = master_data_normalize_item($entity, $item);
     $idKey = master_data_entity_key($entity);
     if ($idKey === null) api_json(['ok' => false, 'error' => 'invalid_master_entity'], 400);
@@ -20538,7 +20854,20 @@ if ($username === '') {
       $username = (string)($_SESSION['user'] ?? 'system');
       $service = master_data_service();
       $currentStore = load_master_data_active_store();
-      $recordId = trim((string)($item[$idKey] ?? ''));
+      $requestedRecordId = trim((string)($body['record_id'] ?? ''));
+      $itemRecordId = trim((string)($item[$idKey] ?? ''));
+      if ($requestedRecordId !== '' && $itemRecordId !== '' && $requestedRecordId !== $itemRecordId) {
+        api_json([
+          'ok' => false,
+          'error' => 'immutable_master_key',
+          'message' => 'Không được đổi khóa chính của dữ liệu nền. Hãy tạo bản ghi mới hoặc archive bản ghi cũ theo đúng lifecycle.',
+          'key' => $idKey,
+        ], 409);
+      }
+      $recordId = $requestedRecordId !== '' ? $requestedRecordId : $itemRecordId;
+      if ($recordId !== '') {
+        $item[$idKey] = $recordId;
+      }
       if ($recordId === '') api_json(['ok' => false, 'error' => 'missing_master_key'], 400);
 
       $existing = null;
@@ -20584,9 +20913,17 @@ if ($username === '') {
         ]);
       }
 
-      $changes = $item;
-      unset($changes[$idKey], $changes['created_at'], $changes['created_by'], $changes['updated_at'], $changes['updated_by']);
-      unset($changes['status']);
+      $changes = [];
+      foreach ($item as $field => $value) {
+        if (in_array((string)$field, [$idKey, 'created_at', 'created_by', 'updated_at', 'updated_by', 'status'], true)) {
+          continue;
+        }
+        $oldValue = $existing[$field] ?? '';
+        if (json_encode($oldValue, JSON_UNESCAPED_UNICODE) === json_encode($value, JSON_UNESCAPED_UNICODE)) {
+          continue;
+        }
+        $changes[$field] = $value;
+      }
 
       $pending = false;
       $pendingMeta = [];
@@ -21203,7 +21540,7 @@ if ($username === '') {
     if ($machineId === '') api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
 
     $orders = load_orders_store();
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
@@ -21311,7 +21648,7 @@ if ($username === '') {
     }
 
     $orders = load_orders_store();
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
@@ -21395,6 +21732,7 @@ if ($username === '') {
     ]);
 
     $master = is_array($result['master'] ?? null) ? $result['master'] : load_master_data_store();
+    $master = master_data_apply_admin_operator_projection($master, $store);
     $orders = is_array($result['orders'] ?? null) ? $result['orders'] : load_orders_store();
     $mes = is_array($result['mes'] ?? null) ? $result['mes'] : load_mes_runtime_store();
 
@@ -21430,6 +21768,7 @@ if ($username === '') {
     ]);
 
     $master = is_array($result['master'] ?? null) ? $result['master'] : load_master_data_store();
+    $master = master_data_apply_admin_operator_projection($master, $store);
     $orders = is_array($result['orders'] ?? null) ? $result['orders'] : load_orders_store();
     $mes = is_array($result['mes'] ?? null) ? $result['mes'] : load_mes_runtime_store();
     $error = trim((string)($result['error'] ?? ''));
@@ -21474,7 +21813,7 @@ if ($username === '') {
     $me = require_logged_in($store);
     require_csrf();
     $body = read_json_body();
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $mes = load_mes_runtime_store();
     $adapterId = trim((string)($body['adapter_id'] ?? ''));
     $adapter = null;
@@ -21497,7 +21836,7 @@ if ($username === '') {
     $me = require_logged_in($store);
     require_csrf();
     $body = read_json_body();
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $mes = load_mes_runtime_store();
     $catalogIndex = master_index_by((array)($master['mes_alarm_catalog'] ?? []), 'alarm_code');
     $playbookIndex = mes_alarm_playbook_index((array)($master['mes_alarm_playbooks'] ?? []));
@@ -21528,7 +21867,7 @@ if ($username === '') {
     $alarmEventId = trim((string)($body['alarm_event_id'] ?? ''));
     if ($alarmEventId === '') api_json(['ok' => false, 'error' => 'missing_alarm_event_id'], 400);
 
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $orders = load_orders_store();
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
@@ -21557,7 +21896,7 @@ if ($username === '') {
     $alarmEventId = trim((string)($body['alarm_event_id'] ?? ''));
     if ($alarmEventId === '') api_json(['ok' => false, 'error' => 'missing_alarm_event_id'], 400);
 
-    $master = load_master_data_store();
+    $master = master_data_apply_admin_operator_projection(load_master_data_store(), $store);
     $orders = load_orders_store();
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
@@ -22538,12 +22877,27 @@ if ($username === '') {
       api_json(['ok' => false, 'error' => 'forbidden'], 403);
     }
     $bundle = runtime_read_model_bundle(false);
-    $summary = build_manual_runtime_summary((array)($bundle['master'] ?? []), (array)($bundle['orders'] ?? []));
+    $summary = build_manual_runtime_summary((array)($bundle['master'] ?? []), (array)($bundle['orders'] ?? []), $store);
     api_json([
       'ok' => true,
       'data' => $summary,
       'read_sources' => $bundle['sources'],
       'runtime_mode' => $bundle['runtime_mode'],
+    ]);
+  }
+
+  case 'manual_runtime_endpoint_contracts': {
+    $me = require_logged_in($store);
+    if (!user_has_any_role($me, admin_roles())) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+    api_json([
+      'ok' => true,
+      'data' => [
+        'machine_runtime_entities' => manual_runtime_machine_entity_keys(),
+        'frontend_endpoint_contracts' => manual_runtime_frontend_endpoint_contracts(),
+        'process_endpoint_contracts' => order_runtime_frontend_endpoint_contracts(),
+      ],
     ]);
   }
 

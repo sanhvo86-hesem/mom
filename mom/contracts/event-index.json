@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Canonical event inventory for ERP+MOM business objects using CloudEvents-compatible type naming.",
-    "eventCount": 219
+    "eventCount": 229
   },
   "events": [
     {
@@ -1307,6 +1307,46 @@
       "source": "authored_package"
     },
     {
+      "key": "mes_execution.machine-alarms.acknowledged",
+      "canonicalResource": "mes_execution.machine-alarms",
+      "eventName": "acknowledged",
+      "cloudeventType": "hesem.mes_execution.machine-alarms.acknowledged",
+      "classification": "machine_runtime_event",
+      "storageTable": "mes_machine_alarms",
+      "purpose": "Operator acknowledged the alarm.",
+      "source": "authored_package"
+    },
+    {
+      "key": "mes_execution.machine-alarms.cleared",
+      "canonicalResource": "mes_execution.machine-alarms",
+      "eventName": "cleared",
+      "cloudeventType": "hesem.mes_execution.machine-alarms.cleared",
+      "classification": "machine_runtime_event",
+      "storageTable": "mes_machine_alarms",
+      "purpose": "Alarm response was cleared with evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "mes_execution.machine-alarms.escalated",
+      "canonicalResource": "mes_execution.machine-alarms",
+      "eventName": "escalated",
+      "cloudeventType": "hesem.mes_execution.machine-alarms.escalated",
+      "classification": "machine_runtime_event",
+      "storageTable": "mes_machine_alarms",
+      "purpose": "Alarm was escalated for response.",
+      "source": "authored_package"
+    },
+    {
+      "key": "mes_execution.machine-alarms.raised",
+      "canonicalResource": "mes_execution.machine-alarms",
+      "eventName": "raised",
+      "cloudeventType": "hesem.mes_execution.machine-alarms.raised",
+      "classification": "machine_runtime_event",
+      "storageTable": "mes_machine_alarms",
+      "purpose": "Machine or edge source raised an alarm.",
+      "source": "authored_package"
+    },
+    {
       "key": "planning_production.dispatch-lists.closed",
       "canonicalResource": "planning_production.dispatch-lists",
       "eventName": "closed",
@@ -1877,6 +1917,36 @@
       "source": "authored_package"
     },
     {
+      "key": "quality_improvement.control-plans.activated",
+      "canonicalResource": "quality_improvement.control-plans",
+      "eventName": "activated",
+      "cloudeventType": "hesem.quality_improvement.control-plans.activated",
+      "classification": "lifecycle_owner",
+      "storageTable": "control_plans",
+      "purpose": "Control plan became effective for production or inspection execution.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.control-plans.archived",
+      "canonicalResource": "quality_improvement.control-plans",
+      "eventName": "archived",
+      "cloudeventType": "hesem.quality_improvement.control-plans.archived",
+      "classification": "lifecycle_owner",
+      "storageTable": "control_plans",
+      "purpose": "Control plan was archived after replacement or obsolescence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.control-plans.revised",
+      "canonicalResource": "quality_improvement.control-plans",
+      "eventName": "revised",
+      "cloudeventType": "hesem.quality_improvement.control-plans.revised",
+      "classification": "lifecycle_owner",
+      "storageTable": "control_plans",
+      "purpose": "Control plan revision was created under governed change control.",
+      "source": "authored_package"
+    },
+    {
       "key": "quality_improvement.corrective-actions.closed",
       "canonicalResource": "quality_improvement.corrective-actions",
       "eventName": "closed",
@@ -2194,6 +2264,36 @@
       "classification": "assessment_record",
       "storageTable": "spc_data",
       "purpose": "SPC observation was updated with rule-evaluation detail.",
+      "source": "authored_package"
+    },
+    {
+      "key": "traceability_serialization.lot-genealogy.corrected",
+      "canonicalResource": "traceability_serialization.lot-genealogy",
+      "eventName": "corrected",
+      "cloudeventType": "hesem.traceability_serialization.lot-genealogy.corrected",
+      "classification": "digital_thread_evidence",
+      "storageTable": "genealogy_link",
+      "purpose": "A genealogy link was corrected without deleting original evidence.",
+      "source": "authored_package"
+    },
+    {
+      "key": "traceability_serialization.lot-genealogy.linked",
+      "canonicalResource": "traceability_serialization.lot-genealogy",
+      "eventName": "linked",
+      "cloudeventType": "hesem.traceability_serialization.lot-genealogy.linked",
+      "classification": "digital_thread_evidence",
+      "storageTable": "genealogy_link",
+      "purpose": "A genealogy link was recorded.",
+      "source": "authored_package"
+    },
+    {
+      "key": "traceability_serialization.lot-genealogy.traced",
+      "canonicalResource": "traceability_serialization.lot-genealogy",
+      "eventName": "traced",
+      "cloudeventType": "hesem.traceability_serialization.lot-genealogy.traced",
+      "classification": "digital_thread_evidence",
+      "storageTable": "genealogy_link",
+      "purpose": "A forward or backward trace query resolved a containment path.",
       "source": "authored_package"
     }
   ]

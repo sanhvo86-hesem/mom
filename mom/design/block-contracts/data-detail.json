@@ -1,0 +1,84 @@
+{
+  "blockType": "data-detail",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["detail"],
+  "propsSchema": {
+    "required": ["dataSource", "fields"],
+    "optional": ["layout", "detail", "visibleWhen", "emptyMessage"]
+  },
+  "dataSourceContract": {
+    "mode": "required",
+    "allowedMethods": ["GET"],
+    "requiredBindings": ["dataSource.api", "dataSource.dataKey"]
+  },
+  "eventContract": {
+    "emits": ["detail-loaded", "detail-error"],
+    "consumes": ["record-selected", "refresh-requested"]
+  },
+  "stateContract": {
+    "loading": "Show skeleton rows with aria-busy.",
+    "empty": "Show select-record or no-record message.",
+    "error": "Show error summary with retry.",
+    "readonly": "Render values only.",
+    "disabled": "Keep values readable and disable embedded actions.",
+    "permissionDenied": "Show redacted state without leaking field values."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "detail"
+  },
+  "a11yContract": {
+    "role": "region",
+    "apgPattern": "description-list",
+    "wcagCriteria": ["1.3.1", "1.4.10", "2.4.6", "3.3.1", "4.1.2", "4.1.3"],
+    "accessibleName": "Detail title or selected record label.",
+    "keyboard": {
+      "tab": "Move through interactive detail fields and links.",
+      "shortcuts": "No custom shortcut without visible help."
+    },
+    "focus": {
+      "entry": "Do not steal focus after passive record selection.",
+      "restore": "Return focus to selected table row when detail closes.",
+      "visibleIndicator": "Visible on links and copy buttons."
+    },
+    "announcements": {
+      "loaded": "Announce selected record title when detail changes after user action."
+    },
+    "errorAssociation": {
+      "required": false,
+      "pattern": "Inline editable fields delegate to form-standard contract."
+    },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for copy/open controls" },
+    "contrast": { "textMinimum": "4.5:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedExpand": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["region", "color-contrast", "aria-valid-attr"],
+    "manualTestScript": ["Select record", "Read detail heading", "Verify no focus loss on refresh"]
+  },
+  "responsiveContract": {
+    "compact": "Single-column label/value stack.",
+    "desktop": "Grid layout allowed with logical reading order.",
+    "overflow": "Long values wrap unless explicitly marked as code."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--text-primary", "--text-secondary", "--border", "--bg-surface"]
+  },
+  "printExportContract": {
+    "print": "Print all visible fields with labels.",
+    "export": ["field_key", "field_label", "field_value"]
+  },
+  "testIds": {
+    "root": "block-data-detail",
+    "field": "detail-field",
+    "retry": "detail-retry"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G10"]
+  }
+}

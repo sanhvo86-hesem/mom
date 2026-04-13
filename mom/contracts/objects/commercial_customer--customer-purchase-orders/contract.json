@@ -93,6 +93,7 @@
   },
   "runtimeExposure": {
     "status": "native_canonical_api",
+    "canonicalApiPath": "/api/v1/commercial/customer-purchase-orders",
     "notes": [
       "Canonical create/list/detail/transition endpoints exist under commercial_customer.customer_purchase_orders.*."
     ]

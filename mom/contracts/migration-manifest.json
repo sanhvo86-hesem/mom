@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Non-destructive migration contract for ERP+MOM backend restructuring."
   },
   "storageAuthority": {
@@ -12,12 +12,12 @@
   },
   "businessContractAuthority": {
     "bundlePath": "mom/contracts",
-    "objectCount": 64,
-    "stateModelCount": 62,
-    "authoredPackageCount": 64
+    "objectCount": 67,
+    "stateModelCount": 65,
+    "authoredPackageCount": 67
   },
   "compatibility": {
-    "ledgerEntryCount": 208,
+    "ledgerEntryCount": 217,
     "rules": [
       "no_physical_drop_before_successor_mapping_and_retention_review",
       "no_dual_write_except_timeboxed_verified_migration_bridges",

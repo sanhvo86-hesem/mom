@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "authority": "standards/36-frontend-module-layout-template-standard.md",
+    "status": "pilot",
+    "updatedAt": "2026-04-11T00:00:00+07:00",
+    "scope": "Executable frontend layout SSOT gates for pilot enforcement"
+  },
+  "gates": [
+    {
+      "gateId": "G01",
+      "name": "Schema Validation",
+      "blocking": true,
+      "status": "enforced-now",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["validator-report"],
+      "validator": "mom/tools/design/validate-frontend-contracts.mjs"
+    },
+    {
+      "gateId": "G02",
+      "name": "Template Match",
+      "blocking": true,
+      "status": "enforced-now",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["template-registry-resolution"],
+      "validator": "mom/tools/design/validate-frontend-contracts.mjs"
+    },
+    {
+      "gateId": "G03",
+      "name": "Zone Compliance",
+      "blocking": true,
+      "status": "enforced-now",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["block-zone-report"],
+      "validator": "mom/tools/design/validate-frontend-contracts.mjs"
+    },
+    {
+      "gateId": "G16",
+      "name": "API Binding Verification",
+      "blocking": true,
+      "status": "enforced-now",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["endpoint-registry-diff"],
+      "validator": "mom/tools/design/validate-frontend-contracts.mjs"
+    },
+    {
+      "gateId": "G04",
+      "name": "Token Lint",
+      "blocking": true,
+      "status": "target",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["token-lint-report"],
+      "validator": "target: token scanner"
+    },
+    {
+      "gateId": "G05",
+      "name": "Inline Style Scan",
+      "blocking": true,
+      "status": "target",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["inline-style-scan"],
+      "validator": "target: inline style scanner"
+    },
+    {
+      "gateId": "G06",
+      "name": "Vietnamese Diacritic Scan",
+      "blocking": true,
+      "status": "partial",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["runtime-string-scan"],
+      "validator": "target: Vietnamese diacritic scanner"
+    },
+    {
+      "gateId": "G07",
+      "name": "WCAG AA Automated",
+      "blocking": true,
+      "status": "target",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["axe-report"],
+      "validator": "target: axe/playwright"
+    },
+    {
+      "gateId": "G08",
+      "name": "Keyboard Navigation",
+      "blocking": true,
+      "status": "target",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["keyboard-walkthrough"],
+      "validator": "target: playwright keyboard flow"
+    },
+    {
+      "gateId": "G19",
+      "name": "Release Manifest",
+      "blocking": true,
+      "status": "target",
+      "owner": "HESEM Platform Architecture",
+      "evidenceRequired": ["release-manifest"],
+      "validator": "target: release manifest validator"
+    }
+  ]
+}
+

@@ -487,7 +487,7 @@ function _showFoundations(){
   overlay.onclick=function(e){ if(e.target===overlay) close(); }; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
   var openBtn=modal.querySelector('#'+_id+'-foundation-open');
-  if(openBtn) openBtn.onclick=function(){ close(); window._mdOpenControl(); };
+  if(openBtn) openBtn.onclick=function(){ close(); window._mdOpenControl('customers', {scope:'order_foundation'}); };
 }
 
 function _showLinkModal(){
@@ -767,7 +767,7 @@ function _showEdit(type, data){
   };
 }
 function _bind(){
-  var md=document.getElementById(_id+'-md'); if(md) md.onclick=function(){ if(typeof window._mdOpenControl==='function') window._mdOpenControl(); };
+  var md=document.getElementById(_id+'-md'); if(md) md.onclick=function(){ if(typeof window._mdOpenControl==='function') window._mdOpenControl('customers', {scope:'order_foundation'}); };
   var foundations=document.getElementById(_id+'-foundations'); if(foundations) foundations.onclick=_showFoundations;
   var refresh=document.getElementById(_id+'-refresh'); if(refresh) refresh.onclick=_refresh;
   var openPo=document.getElementById(_id+'-open-po'); if(openPo) openPo.onclick=_openPurchasingFromSelection;

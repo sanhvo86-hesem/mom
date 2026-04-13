@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "version": "2026.04.11-p0",
+    "generatedAt": "2026-04-11T00:00:00+07:00",
+    "authorityRole": "generated_truth",
+    "sourceCommit": "f2a1892eb21108d078ee4710cab811d8efa75bce",
+    "statusModel": {
+      "draft_controlled": "Document is tracked with checksum but not formally approved.",
+      "approved": "Document has approval record, DCR and release evidence.",
+      "historical": "Document is retained but not current authority."
+    }
+  },
+  "documents": [
+    {
+      "docId": "STD-36-FRONTEND-MODULE-LAYOUT-TEMPLATE",
+      "path": "standards/36-frontend-module-layout-template-standard.md",
+      "title": "Frontend Module Layout Template Standard",
+      "authorityRole": "normative",
+      "version": "1.0",
+      "status": "draft_controlled",
+      "effectiveDate": "2026-04-11",
+      "owner": "Frontend Architecture Council",
+      "approvers": [],
+      "dcrId": "DCR-FE-SSOT-2026-04-11-P0",
+      "supersedes": [],
+      "sha256": "9a30f4cdcb9c948d7e532dd0378a86e33b44e79784802d72aa908978fbd91a38",
+      "evidenceBundleId": null,
+      "nextReviewDue": "2026-05-11"
+    },
+    {
+      "docId": "MOM-DESIGN-SYSTEM-V4",
+      "path": "mom/docs/module-layout-template-design-system-v4.html",
+      "title": "Module Layout Template Design System v4",
+      "authorityRole": "implementation_blueprint",
+      "version": "4.6-v4.7-sync-p0",
+      "status": "draft_controlled",
+      "effectiveDate": "2026-04-11",
+      "owner": "Frontend Architecture Council",
+      "approvers": [],
+      "dcrId": "DCR-FE-SSOT-2026-04-11-P0",
+      "supersedes": ["MOM-DESIGN-SYSTEM-V3"],
+      "sha256": "8641a988b79a64bdf2220b0c88a336cfb485eb7c8bab6e7805344ac3db90c77b",
+      "evidenceBundleId": null,
+      "nextReviewDue": "2026-05-11"
+    },
+    {
+      "docId": "MOM-FRONTEND-SSOT-REMEDIATION-BACKLOG-2026-04-11",
+      "path": "mom/docs/frontend-ssot-remediation-backlog-2026-04-11.md",
+      "title": "Frontend SSOT Remediation Backlog",
+      "authorityRole": "implementation_backlog",
+      "version": "2026.04.11-p0",
+      "status": "draft_controlled",
+      "effectiveDate": "2026-04-11",
+      "owner": "Frontend Architecture Council",
+      "approvers": [],
+      "dcrId": "DCR-FE-SSOT-2026-04-11-P0",
+      "supersedes": [],
+      "sha256": "1a78b7a0d75dc70e46f14b3a89fbd9409670066d946cf2d0c30ed747669dfdc9",
+      "evidenceBundleId": null,
+      "nextReviewDue": "2026-04-18"
+    },
+    {
+      "docId": "MOM-CODEX-PROMPT-DESIGN-SYSTEM-V4-7-UPGRADE",
+      "path": "mom/docs/codex-prompts-design-system-v4.7-upgrade.md",
+      "title": "Codex Prompts Design System v4.7 Upgrade",
+      "authorityRole": "historical_prompt_input",
+      "version": "2026.04.11",
+      "status": "historical",
+      "effectiveDate": null,
+      "owner": "External audit input",
+      "approvers": [],
+      "dcrId": null,
+      "supersedes": [],
+      "sha256": "e78d623f5ec64bb35e22926e953fc0bd31cfdf073dd0aa44e37aa0a69c2d4fbb",
+      "evidenceBundleId": null,
+      "nextReviewDue": null
+    }
+  ]
+}

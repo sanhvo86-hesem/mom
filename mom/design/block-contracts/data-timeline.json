@@ -1,0 +1,81 @@
+{
+  "blockType": "data-timeline",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["timeline"],
+  "propsSchema": {
+    "required": ["dataSource"],
+    "optional": ["title", "groupBy", "timeField", "actorField", "eventRenderer"]
+  },
+  "dataSourceContract": {
+    "mode": "required",
+    "allowedMethods": ["GET"],
+    "requiredBindings": ["dataSource.api", "dataSource.dataKey"]
+  },
+  "eventContract": {
+    "emits": ["timeline-event-click", "range-change"],
+    "consumes": ["record-selected", "refresh-requested"]
+  },
+  "stateContract": {
+    "loading": "Show timeline skeleton and aria-busy.",
+    "empty": "Show no activity message.",
+    "error": "Show error with retry.",
+    "readonly": "Default mode; no mutation controls.",
+    "disabled": "Render entries but disable interactive drill-down.",
+    "permissionDenied": "Hide restricted activity details."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "list"
+  },
+  "a11yContract": {
+    "role": "feed",
+    "apgPattern": "feed",
+    "wcagCriteria": ["1.1.1", "1.3.1", "1.4.10", "2.1.1", "2.4.6", "4.1.2"],
+    "accessibleName": "Timeline title.",
+    "keyboard": {
+      "tab": "Move through interactive events.",
+      "enterSpace": "Open event detail."
+    },
+    "focus": {
+      "entry": "Do not steal focus on passive refresh.",
+      "restore": "Return to event item after detail closes.",
+      "visibleIndicator": "Event focus ring uses tokenized outline."
+    },
+    "announcements": {
+      "newEvents": "Announce newly loaded events only when user requested refresh."
+    },
+    "errorAssociation": { "required": false, "pattern": "No field-level errors in read-only timeline." },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for event actions" },
+    "contrast": { "textMinimum": "4.5:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedConnectors": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["region", "color-contrast", "aria-valid-attr"],
+    "manualTestScript": ["Read event order", "Open event detail by keyboard", "Verify refresh announcement"]
+  },
+  "responsiveContract": {
+    "compact": "Single-column chronological list.",
+    "desktop": "Vertical timeline with labels; chronological order remains DOM order.",
+    "overflow": "Long notes wrap."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--text-primary", "--text-secondary", "--border", "--timeline-marker"]
+  },
+  "printExportContract": {
+    "print": "Print visible timeline events in chronological order.",
+    "export": ["event_at", "event_type", "actor", "description"]
+  },
+  "testIds": {
+    "root": "block-data-timeline",
+    "event": "timeline-event",
+    "retry": "timeline-retry"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07"]
+  }
+}

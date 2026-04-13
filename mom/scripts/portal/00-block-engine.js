@@ -2407,7 +2407,7 @@ var EVENT_TYPES = {
       return resp;
     }).catch(function(err){
       if(config.onError === 'toast' || !config.onError){
-        toast(_t('Loi: ','Error: ')+String(err), 'danger');
+        toast(_t('Lỗi: ','Error: ')+String(err), 'danger');
       }
       return null;
     });
@@ -2585,7 +2585,7 @@ function undo(moduleId){
   });
   // Restore previous state
   _applySchemaState(moduleId, entry.state);
-  toast(_t('Hoan tac: '+entry.action, 'Undo: '+entry.action), 'info');
+  toast(_t('Hoàn tác: '+entry.action, 'Undo: '+entry.action), 'info');
   return true;
 }
 
@@ -2610,7 +2610,7 @@ function redo(moduleId){
   });
   // Apply redo state
   _applySchemaState(moduleId, entry.state);
-  toast(_t('Lam lai: '+entry.action, 'Redo: '+entry.action), 'info');
+  toast(_t('Làm lại: '+entry.action, 'Redo: '+entry.action), 'info');
   return true;
 }
 
@@ -4116,7 +4116,7 @@ function _legacySaveModuleSchemaRaw(moduleId, schema){
     toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return resp;
   }).catch(function(err){
-    toast(_t('Luu that bai, da luu cuc bo','Save failed, saved locally'), 'warning');
+    toast(_t('Lưu thất bại, đã lưu cục bộ','Save failed, saved locally'), 'warning');
     return { ok:false, local:true };
   });
 }
@@ -4152,7 +4152,7 @@ function saveModuleSchema(moduleId, schema){
     toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return { ok:true, saved:true, version:savedSchema.version, updatedAt:savedSchema.updatedAt, updatedBy:savedSchema.updatedBy || '', schema:savedSchema };
   }).catch(function(err){
-    toast(_t('Luu that bai, da luu cuc bo','Save failed, saved locally'), 'warning');
+    toast(_t('Lưu thất bại, đã lưu cục bộ','Save failed, saved locally'), 'warning');
     return { ok:false, local:true, error: err && err.message ? err.message : '', schema:savedSchema };
   });
 }
@@ -4247,12 +4247,12 @@ function renderModuleFromSchema(container, schema, options){
   // Edit mode toggle + undo/redo controls
   html += '<div class="hm-page-actions">';
   if(state.editMode){
-    html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-undo" data-module="'+_esc(moduleId)+'" title="Ctrl+Z">&#8630; '+_t('Hoan tac','Undo')+'</button>';
-    html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-redo" data-module="'+_esc(moduleId)+'" title="Ctrl+Shift+Z">&#8631; '+_t('Lam lai','Redo')+'</button>';
-    html += '<button class="hm-btn hm-btn-primary hm-btn-sm" data-action="hm-save-schema" data-module="'+_esc(moduleId)+'" title="Ctrl+S">'+_t('Luu','Save')+'</button>';
+    html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-undo" data-module="'+_esc(moduleId)+'" title="Ctrl+Z">&#8630; '+_t('Hoàn tác','Undo')+'</button>';
+    html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-redo" data-module="'+_esc(moduleId)+'" title="Ctrl+Shift+Z">&#8631; '+_t('Làm lại','Redo')+'</button>';
+    html += '<button class="hm-btn hm-btn-primary hm-btn-sm" data-action="hm-save-schema" data-module="'+_esc(moduleId)+'" title="Ctrl+S">'+_t('Lưu','Save')+'</button>';
   }
   html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-toggle-edit" data-module="'+_esc(moduleId)+'">';
-  html += state.editMode ? _t('Thoat chinh sua','Exit Edit') : _t('Tuy chinh','Customize');
+  html += state.editMode ? _t('Thoát chỉnh sửa','Exit Edit') : _t('Tùy chỉnh','Customize');
   html += '</button>';
   html += '</div></div>';
 
@@ -6758,7 +6758,7 @@ function renderHeatmapChart(config, data, state, blockId){
   var cellWidth;
   var cellHeight;
   var svg = '';
-  if(!rows.length) return _chartEmpty(_t('Khong co du lieu', 'No data'));
+  if(!rows.length) return _chartEmpty(_t('Không có dữ liệu', 'No data'));
   rows.forEach(function(row){
     var xVal = row[xKey] == null ? _t('Unknown', 'Unknown') : String(row[xKey]);
     var yVal = row[yKey] == null ? _t('Unknown', 'Unknown') : String(row[yKey]);
@@ -6769,7 +6769,7 @@ function renderHeatmapChart(config, data, state, blockId){
     min = Math.min(min, value);
     max = Math.max(max, value);
   });
-  if(!xValues.length || !yValues.length) return _chartEmpty(_t('Khong du truong de ve heatmap', 'Heatmap fields are missing'));
+  if(!xValues.length || !yValues.length) return _chartEmpty(_t('Không đủ trường để vẽ heatmap', 'Heatmap fields are missing'));
   plotWidth = width - left - right;
   plotHeight = height - top - bottom;
   cellWidth = plotWidth / Math.max(xValues.length, 1);
@@ -6813,7 +6813,7 @@ function renderDistributionChart(config, data, state, blockId, block){
   var plotWidth;
   var plotHeight;
   var svg = '';
-  if(!rows.length) return _chartEmpty(_t('Khong co du lieu', 'No data'));
+  if(!rows.length) return _chartEmpty(_t('Không có dữ liệu', 'No data'));
   plotWidth = width - left - right;
   plotHeight = height - top - bottom;
   if(variant === 'chart-histogram'){
@@ -9431,7 +9431,7 @@ function renderFormStandard(config, data, reactiveCtx, block){
   if(config.showSubmit!==false){
     html += '<div class="hm-form-group" style="grid-column:1/-1;display:flex;gap:var(--space-2);justify-content:flex-end">';
     html += '<button type="reset" class="hm-btn hm-btn-ghost">'+_t('Huy','Cancel')+'</button>';
-    html += '<button type="submit" class="hm-btn hm-btn-primary" data-action="'+(config.submitAction||'form-submit')+'">'+_t(config.submitLabel||'Luu',config.submitLabelEn||'Save')+'</button>';
+    html += '<button type="submit" class="hm-btn hm-btn-primary" data-action="'+(config.submitAction||'form-submit')+'">'+_t(config.submitLabel||'Lưu',config.submitLabelEn||'Save')+'</button>';
     html += '</div>';
   }
   html += '</form>';
@@ -9797,7 +9797,7 @@ function renderPropertiesPanel(block, moduleId){
   // Save / Cancel
   html += '<div class="hm-props-footer">';
   html += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-select-block" data-block-id="">'+_t('Huy','Cancel')+'</button>';
-  html += '<button class="hm-btn hm-btn-primary hm-btn-sm" data-action="hm-save-schema">'+_t('Luu','Save')+'</button>';
+  html += '<button class="hm-btn hm-btn-primary hm-btn-sm" data-action="hm-save-schema">'+_t('Lưu','Save')+'</button>';
   html += '</div>';
   html += '</div>';
   return html;

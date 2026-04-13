@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/schemas/template-registry.schema.json",
+  "title": "HESEM Frontend Template Registry",
+  "type": "object",
+  "required": ["_meta", "templates"],
+  "additionalProperties": false,
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "required": ["version", "generatedAt", "authority", "status"],
+      "additionalProperties": true,
+      "properties": {
+        "version": { "type": "string" },
+        "generatedAt": { "type": "string" },
+        "authority": { "type": "string" },
+        "status": { "enum": ["pilot", "approved", "deprecated"] }
+      }
+    },
+    "templates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "templateId",
+          "canonicalId",
+          "version",
+          "status",
+          "owner",
+          "moduleArchetype",
+          "zones",
+          "allowedBlocksByZone",
+          "defaultDensity",
+          "supportedDensities",
+          "themePolicy",
+          "responsivePolicy",
+          "qaEvidence"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "templateId": { "type": "string" },
+          "canonicalId": { "type": "string" },
+          "legacyCode": { "type": "string" },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "version": { "type": "string" },
+          "status": { "enum": ["approved", "draft", "deprecated", "retired"] },
+          "owner": { "type": "string" },
+          "moduleArchetype": { "type": "string" },
+          "zones": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["zoneId", "type", "required"],
+              "properties": {
+                "zoneId": { "type": "string" },
+                "type": { "type": "string" },
+                "required": { "type": "boolean" }
+              }
+            }
+          },
+          "allowedBlocksByZone": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "defaultDensity": { "type": "string" },
+          "supportedDensities": { "type": "array", "items": { "type": "string" } },
+          "themePolicy": { "type": "object" },
+          "responsivePolicy": { "type": "object" },
+          "qaEvidence": { "type": "object" }
+        }
+      }
+    }
+  }
+}

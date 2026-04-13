@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Canonical ERP+MOM object inventory for the business contract authority layer.",
-    "objectCount": 64,
-    "authoredPackageCount": 64
+    "objectCount": 67,
+    "authoredPackageCount": 67
   },
   "objects": [
     {
@@ -571,7 +571,7 @@
       "domain": "commercial_customer",
       "resource": "customer-purchase-orders",
       "label": "Customer Purchase Orders",
-      "canonicalApiPath": "/api/v1/commercial-customer/customer-purchase-orders",
+      "canonicalApiPath": "/api/v1/commercial/customer-purchase-orders",
       "classification": "lifecycle_owner",
       "storageTable": "customer_purchase_orders",
       "primaryKey": "customer_po_id",
@@ -608,25 +608,41 @@
           "action": "commercial_customer.customer_purchase_orders.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/commercial/customer-purchase-orders"
+          "path": "/api/v1/commercial/customer-purchase-orders",
+          "source": "api-router",
+          "controller": "CustomerPurchaseOrderController",
+          "handler": "createPurchaseOrder",
+          "storageTable": "customer_purchase_orders"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}"
+          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}",
+          "source": "api-router",
+          "controller": "CustomerPurchaseOrderController",
+          "handler": "getPurchaseOrder",
+          "storageTable": "customer_purchase_orders"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/commercial/customer-purchase-orders"
+          "path": "/api/v1/commercial/customer-purchase-orders",
+          "source": "api-router",
+          "controller": "CustomerPurchaseOrderController",
+          "handler": "listPurchaseOrders",
+          "storageTable": "customer_purchase_orders"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition"
+          "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
+          "source": "api-router",
+          "controller": "CustomerPurchaseOrderController",
+          "handler": "transitionPurchaseOrder",
+          "storageTable": "customer_purchase_orders"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1281,25 +1297,41 @@
           "action": "finance.backdate_exceptions.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/backdate-exceptions"
+          "path": "/api/v1/finance/backdate-exceptions",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "createBackdateException",
+          "storageTable": "backdate_exceptions"
         },
         {
           "action": "finance.backdate_exceptions.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}"
+          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "getBackdateException",
+          "storageTable": "backdate_exceptions"
         },
         {
           "action": "finance.backdate_exceptions.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/backdate-exceptions"
+          "path": "/api/v1/finance/backdate-exceptions",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "listBackdateExceptions",
+          "storageTable": "backdate_exceptions"
         },
         {
           "action": "finance.backdate_exceptions.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition"
+          "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "transitionBackdateException",
+          "storageTable": "backdate_exceptions"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1391,19 +1423,31 @@
           "action": "finance.credit_memos.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/credit-memos"
+          "path": "/api/v1/finance/credit-memos",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "createCreditMemo",
+          "storageTable": "credit_memos"
         },
         {
           "action": "finance.credit_memos.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/credit-memos/{creditMemoId}"
+          "path": "/api/v1/finance/credit-memos/{creditMemoId}",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "getCreditMemo",
+          "storageTable": "credit_memos"
         },
         {
           "action": "finance.credit_memos.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/credit-memos"
+          "path": "/api/v1/finance/credit-memos",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "listCreditMemos",
+          "storageTable": "credit_memos"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1493,19 +1537,31 @@
           "action": "finance.debit_memos.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/debit-memos"
+          "path": "/api/v1/finance/debit-memos",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "createDebitMemo",
+          "storageTable": "debit_memos"
         },
         {
           "action": "finance.debit_memos.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/debit-memos/{debitMemoId}"
+          "path": "/api/v1/finance/debit-memos/{debitMemoId}",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "getDebitMemo",
+          "storageTable": "debit_memos"
         },
         {
           "action": "finance.debit_memos.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/debit-memos"
+          "path": "/api/v1/finance/debit-memos",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "listDebitMemos",
+          "storageTable": "debit_memos"
         }
       ],
       "contractAuthority": "authored_package",
@@ -1761,28 +1817,44 @@
       ],
       "currentRuntimeEndpoints": [
         {
-          "action": "finance.period_close_controls.create",
+          "action": "finance.period_closes.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/finance/period-closes"
+          "path": "/api/v1/finance/period-closes",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "createPeriodClose",
+          "storageTable": "period_close_controls"
         },
         {
-          "action": "finance.period_close_controls.detail",
+          "action": "finance.period_closes.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/finance/period-closes/{periodCloseId}"
+          "path": "/api/v1/finance/period-closes/{periodCloseId}",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "getPeriodClose",
+          "storageTable": "period_close_controls"
         },
         {
-          "action": "finance.period_close_controls.list",
+          "action": "finance.period_closes.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/finance/period-closes"
+          "path": "/api/v1/finance/period-closes",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "listPeriodCloses",
+          "storageTable": "period_close_controls"
         },
         {
-          "action": "finance.period_close_controls.transition",
+          "action": "finance.period_closes.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/finance/period-closes/{periodCloseId}:transition"
+          "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
+          "source": "api-router",
+          "controller": "FinanceController",
+          "handler": "transitionPeriodClose",
+          "storageTable": "period_close_controls"
         }
       ],
       "contractAuthority": "authored_package",
@@ -4402,6 +4474,138 @@
       ]
     },
     {
+      "key": "mes_execution.machine-alarms",
+      "domain": "mes_execution",
+      "resource": "machine-alarms",
+      "label": "Machine Alarms",
+      "canonicalApiPath": "/api/v1/mes-execution/machine-alarms",
+      "classification": "machine_runtime_event",
+      "storageTable": "mes_machine_alarms",
+      "primaryKey": [
+        "alarm_id",
+        "alarm_time"
+      ],
+      "statusColumn": "escalation_status",
+      "resultColumn": null,
+      "purpose": "Capture machine-originated alarm and fault events with operator acknowledgement, escalation, downtime linkage, and maintenance follow-up without manually inventing machine data.",
+      "usageZone": "machine_runtime",
+      "gateType": "operator_response_gate",
+      "auditClass": "machine_trace_audit",
+      "continuousImprovementLoop": "downtime_and_maintenance_feedback",
+      "storageTablesInStateModel": [
+        "mes_machine_alarms"
+      ],
+      "legacyTables": [
+        "machine_alarm_events"
+      ],
+      "legacyTablesToIsolate": [],
+      "childTables": [
+        "downtime_event",
+        "maintenance_work_orders"
+      ],
+      "recommendedActions": [
+        "acknowledge",
+        "escalate",
+        "clear"
+      ],
+      "keyRelationships": [
+        "equipment_id -> equipment.equipment_id",
+        "operator_id -> users.username",
+        "job_number -> job_orders.job_number"
+      ],
+      "currentRuntimeEndpoints": [
+        {
+          "action": "mes_execution.mes_machine_alarms.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms"
+        },
+        {
+          "action": "mes_execution.mes_machine_alarms.delete",
+          "kind": "delete",
+          "method": "DELETE",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms/{alarm_id}/{alarm_time}"
+        },
+        {
+          "action": "mes_execution.mes_machine_alarms.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms/{alarm_id}/{alarm_time}"
+        },
+        {
+          "action": "mes_execution.mes_machine_alarms.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms"
+        },
+        {
+          "action": "mes_execution.mes_machine_alarms.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms/{alarm_id}/{alarm_time}/transition"
+        },
+        {
+          "action": "mes_execution.mes_machine_alarms.update",
+          "kind": "update",
+          "method": "PUT",
+          "path": "/api/runtime/mes_execution/mes_machine_alarms/{alarm_id}/{alarm_time}"
+        }
+      ],
+      "contractAuthority": "authored_package",
+      "contractPackagePath": "contracts/objects/mes_execution--machine-alarms/contract.json",
+      "ownerTeam": "production_operations",
+      "identityStrategy": "equipment_id+alarm_code+alarm_time+source_record_id",
+      "identityNaturalKeys": [
+        "equipment_id",
+        "alarm_code",
+        "alarm_time",
+        "source_record_id"
+      ],
+      "retentionClass": "machine_trace_record_3y_or_customer_specific",
+      "evidenceRequirements": [
+        "machine_timestamp",
+        "equipment_id",
+        "alarm_code",
+        "operator_acknowledgement",
+        "clear_or_escalation_reason"
+      ],
+      "kpiSignals": [
+        "alarm_frequency",
+        "mean_time_to_acknowledge",
+        "alarm_downtime_seconds",
+        "repeat_alarm_rate"
+      ],
+      "autoAuditChecks": [
+        "machine_alarm_requires_machine_or_edge_source",
+        "manual_acknowledgement_must_reference_admin_operator",
+        "cleared_alarm_must_preserve_clear_time_and_actor"
+      ],
+      "invariants": [
+        "Alarm creation must carry machine, adapter, or edge-gateway source evidence.",
+        "Operator acknowledgement must link to the admin user/operator identity model.",
+        "Clearing or escalation must preserve reason and actor; alarm rows are never hard-deleted."
+      ],
+      "upstreamObjects": [
+        "master_data.equipment",
+        "master_data.employees",
+        "planning_production.job-orders"
+      ],
+      "downstreamObjects": [
+        "maintenance_ehs.maintenance-work-orders",
+        "analytics.mes-oee-snapshots",
+        "quality_improvement.improvement-actions"
+      ],
+      "workflowSource": "workflow-library wf_mes_machine_alarm bridged through GenericCrud workflow-engine runtime",
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "machine_runtime_api",
+      "runtimeExposureNotes": [
+        "Live runtime surface is mes_execution.mes_machine_alarms.*. Frontend may display and acknowledge only machine-originated records; it must not manually create fake machine alarms."
+      ],
+      "compatibilityNotes": [
+        "Legacy alarm event names are aliases; mes_machine_alarms is the PostgreSQL machine runtime authority."
+      ]
+    },
+    {
       "key": "planning_production.dispatch-lists",
       "domain": "planning_production",
       "resource": "dispatch-lists",
@@ -4876,6 +5080,9 @@
       ],
       "legacyTablesToIsolate": [],
       "childTables": [
+        "aps_capacity_buckets",
+        "aps_demand_forecasts",
+        "mrp_planned_orders",
         "production_plan_lines",
         "production_schedule_slots"
       ],
@@ -5723,10 +5930,13 @@
         "supplier_purchase_orders"
       ],
       "legacyTables": [
+        "purchase_order",
         "purchase_orders"
       ],
       "legacyTablesToIsolate": [],
       "childTables": [
+        "purchase_order_line",
+        "purchase_order_lines",
         "supplier_purchase_order_lines"
       ],
       "recommendedActions": [
@@ -6029,6 +6239,132 @@
       ],
       "compatibilityNotes": [
         "The storage name stays the same, but the canonical domain is quality_improvement so concession control is treated as part of the governed quality-improvement loop."
+      ]
+    },
+    {
+      "key": "quality_improvement.control-plans",
+      "domain": "quality_improvement",
+      "resource": "control-plans",
+      "label": "Control Plans",
+      "canonicalApiPath": "/api/v1/quality-improvement/control-plans",
+      "classification": "lifecycle_owner",
+      "storageTable": "control_plans",
+      "primaryKey": "control_plan_id",
+      "statusColumn": "status",
+      "resultColumn": null,
+      "purpose": "Govern APQP/FMEA-linked control plans so product and process characteristics, control methods, reaction plans, approvals, revisions, and shop-floor inspection execution stay traceable.",
+      "usageZone": "core_value_stream",
+      "gateType": "quality_planning_gate",
+      "auditClass": "workflow_audit_trail",
+      "continuousImprovementLoop": "apqp_fmea_control_plan",
+      "storageTablesInStateModel": [
+        "control_plans"
+      ],
+      "legacyTables": [
+        "fmea_control_plans"
+      ],
+      "legacyTablesToIsolate": [],
+      "childTables": [
+        "apqp_gate_reviews",
+        "control_plan_characteristics",
+        "fmea_records"
+      ],
+      "recommendedActions": [
+        "activate",
+        "archive",
+        "revise"
+      ],
+      "keyRelationships": [
+        "linked_fmea_id -> fmea_records.fmea_id",
+        "item_id -> items.item_id",
+        "approved_by -> users.user_id"
+      ],
+      "currentRuntimeEndpoints": [
+        {
+          "action": "fmea_apqp.control_plans.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/runtime/fmea_apqp/control_plans"
+        },
+        {
+          "action": "fmea_apqp.control_plans.delete",
+          "kind": "delete",
+          "method": "DELETE",
+          "path": "/api/runtime/fmea_apqp/control_plans/{id}"
+        },
+        {
+          "action": "fmea_apqp.control_plans.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/runtime/fmea_apqp/control_plans/{id}"
+        },
+        {
+          "action": "fmea_apqp.control_plans.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/runtime/fmea_apqp/control_plans"
+        },
+        {
+          "action": "fmea_apqp.control_plans.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/runtime/fmea_apqp/control_plans/{id}/transition"
+        },
+        {
+          "action": "fmea_apqp.control_plans.update",
+          "kind": "update",
+          "method": "PUT",
+          "path": "/api/runtime/fmea_apqp/control_plans/{id}"
+        }
+      ],
+      "contractAuthority": "authored_package",
+      "contractPackagePath": "contracts/objects/quality_improvement--control-plans/contract.json",
+      "ownerTeam": "quality_engineering",
+      "identityStrategy": "plan_number+revision",
+      "identityNaturalKeys": [
+        "plan_number",
+        "revision"
+      ],
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "evidenceRequirements": [
+        "linked_fmea_id",
+        "control_plan_characteristics",
+        "reaction_plan",
+        "approval_evidence"
+      ],
+      "kpiSignals": [
+        "control_plan_activation_cycle_time",
+        "characteristic_coverage_ratio",
+        "reaction_plan_completeness"
+      ],
+      "autoAuditChecks": [
+        "active_control_plan_requires_linked_fmea",
+        "active_control_plan_requires_characteristics",
+        "archived_control_plan_must_keep_revision_history"
+      ],
+      "invariants": [
+        "An active control plan must have linked FMEA or approved reason for standalone use.",
+        "Control characteristics must exist before activation.",
+        "Archiving never deletes historical control-plan revisions or inspection linkage."
+      ],
+      "upstreamObjects": [
+        "quality_improvement.nonconformances",
+        "quality_improvement.spc-observations",
+        "planning_production.work-orders"
+      ],
+      "downstreamObjects": [
+        "planning_production.ipqc-inspections",
+        "quality_improvement.oqc-inspections",
+        "quality_improvement.corrective-actions"
+      ],
+      "workflowSource": "workflow-library wf_fmea bridged through GenericCrud workflow-engine runtime",
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "workflow_engine_runtime",
+      "runtimeExposureNotes": [
+        "Live runtime surface is fmea_apqp.control_plans.* through GenericCrud workflow-engine bridge; direct status mutation is not authoritative."
+      ],
+      "compatibilityNotes": [
+        "Legacy FMEA/APQP names remain compatibility aliases; control_plans is the PostgreSQL authority."
       ]
     },
     {
@@ -6890,7 +7226,7 @@
       "domain": "quality_improvement",
       "resource": "override-controls",
       "label": "Override Controls",
-      "canonicalApiPath": "/api/v1/quality-improvement/override-controls",
+      "canonicalApiPath": "/api/v1/governance/override-controls",
       "classification": "lifecycle_owner",
       "storageTable": "operational_override_controls",
       "primaryKey": "override_id",
@@ -6921,28 +7257,44 @@
       ],
       "currentRuntimeEndpoints": [
         {
-          "action": "governance.override_controls.create",
+          "action": "quality_improvement.override_controls.create",
           "kind": "create",
           "method": "POST",
-          "path": "/api/v1/governance/override-controls"
+          "path": "/api/v1/governance/override-controls",
+          "source": "api-router",
+          "controller": "OperationalOverrideController",
+          "handler": "createOverride",
+          "storageTable": "operational_override_controls"
         },
         {
-          "action": "governance.override_controls.detail",
+          "action": "quality_improvement.override_controls.detail",
           "kind": "detail",
           "method": "GET",
-          "path": "/api/v1/governance/override-controls/{overrideId}"
+          "path": "/api/v1/governance/override-controls/{overrideId}",
+          "source": "api-router",
+          "controller": "OperationalOverrideController",
+          "handler": "getOverride",
+          "storageTable": "operational_override_controls"
         },
         {
-          "action": "governance.override_controls.list",
+          "action": "quality_improvement.override_controls.list",
           "kind": "list",
           "method": "GET",
-          "path": "/api/v1/governance/override-controls"
+          "path": "/api/v1/governance/override-controls",
+          "source": "api-router",
+          "controller": "OperationalOverrideController",
+          "handler": "listOverrides",
+          "storageTable": "operational_override_controls"
         },
         {
-          "action": "governance.override_controls.transition",
+          "action": "quality_improvement.override_controls.transition",
           "kind": "transition",
           "method": "POST",
-          "path": "/api/v1/governance/override-controls/{overrideId}:transition"
+          "path": "/api/v1/governance/override-controls/{overrideId}:transition",
+          "source": "api-router",
+          "controller": "OperationalOverrideController",
+          "handler": "transitionOverride",
+          "storageTable": "operational_override_controls"
         }
       ],
       "contractAuthority": "authored_package",
@@ -7103,6 +7455,132 @@
       ],
       "compatibilityNotes": [
         "The stored table name remains spc_data, but the canonical object clarifies that these rows are governed SPC observations in the quality loop."
+      ]
+    },
+    {
+      "key": "traceability_serialization.lot-genealogy",
+      "domain": "traceability_serialization",
+      "resource": "lot-genealogy",
+      "label": "Lot Genealogy",
+      "canonicalApiPath": "/api/v1/traceability-serialization/lot-genealogy",
+      "classification": "digital_thread_evidence",
+      "storageTable": "genealogy_link",
+      "primaryKey": "genealogy_link_id",
+      "statusColumn": null,
+      "resultColumn": null,
+      "purpose": "Provide forward and backward genealogy for lot, serial, batch, and production-order relationships so containment, recall, NCR, and customer-return decisions can be traced to source records.",
+      "usageZone": "core_value_stream",
+      "gateType": "traceability_gate",
+      "auditClass": "traceability_audit_trail",
+      "continuousImprovementLoop": "containment_and_recall_feedback",
+      "storageTablesInStateModel": [
+        "genealogy_link",
+        "mes_part_genealogy",
+        "trace_genealogy_batches",
+        "trace_genealogy_links"
+      ],
+      "legacyTables": [
+        "lot_genealogy",
+        "mes_part_genealogy"
+      ],
+      "legacyTablesToIsolate": [],
+      "childTables": [
+        "mes_part_genealogy",
+        "trace_genealogy_batches",
+        "trace_genealogy_links"
+      ],
+      "recommendedActions": [
+        "record_link",
+        "correct_link"
+      ],
+      "keyRelationships": [
+        "production_order_id -> production_order.production_order_id",
+        "parent_lot_no -> inventory_lots.lot_number",
+        "child_lot_no -> inventory_lots.lot_number"
+      ],
+      "currentRuntimeEndpoints": [
+        {
+          "action": "traceability_serialization.genealogy_link.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/runtime/traceability_serialization/genealogy_link"
+        },
+        {
+          "action": "traceability_serialization.genealogy_link.delete",
+          "kind": "delete",
+          "method": "DELETE",
+          "path": "/api/runtime/traceability_serialization/genealogy_link/{id}"
+        },
+        {
+          "action": "traceability_serialization.genealogy_link.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/runtime/traceability_serialization/genealogy_link/{id}"
+        },
+        {
+          "action": "traceability_serialization.genealogy_link.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/runtime/traceability_serialization/genealogy_link"
+        },
+        {
+          "action": "traceability_serialization.genealogy_link.update",
+          "kind": "update",
+          "method": "PUT",
+          "path": "/api/runtime/traceability_serialization/genealogy_link/{id}"
+        }
+      ],
+      "contractAuthority": "authored_package",
+      "contractPackagePath": "contracts/objects/traceability_serialization--lot-genealogy/contract.json",
+      "ownerTeam": "traceability_stewardship",
+      "identityStrategy": "production_order_id+parent_lot_no+child_lot_no+link_type",
+      "identityNaturalKeys": [
+        "production_order_id",
+        "parent_lot_no",
+        "child_lot_no",
+        "link_type"
+      ],
+      "retentionClass": "traceability_record_7y_or_customer_specific",
+      "evidenceRequirements": [
+        "parent_lot_or_serial",
+        "child_lot_or_serial",
+        "production_order_id",
+        "source_system",
+        "correction_reason_for_changes"
+      ],
+      "kpiSignals": [
+        "trace_completeness_ratio",
+        "forward_trace_latency",
+        "containment_scope_accuracy"
+      ],
+      "autoAuditChecks": [
+        "genealogy_link_requires_parent_or_child_identifier",
+        "genealogy_correction_must_not_delete_original_link",
+        "traceability_chain_must_resolve_to_source_work_order_or_receipt"
+      ],
+      "invariants": [
+        "Traceability corrections must be append-only or superseding, never destructive.",
+        "Forward and backward trace must use the same governed source tables.",
+        "Containment decisions must be able to cite the genealogy link evidence used."
+      ],
+      "upstreamObjects": [
+        "inventory_logistics.inventory-movements",
+        "planning_production.work-orders",
+        "procurement_supplier_quality.purchase-receipts"
+      ],
+      "downstreamObjects": [
+        "quality_improvement.nonconformances",
+        "inventory_logistics.customer-returns",
+        "inventory_logistics.shipments"
+      ],
+      "workflowSource": "PostgreSQL traceability tables exposed through GenericCrud runtime",
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "runtime_alias_api",
+      "runtimeExposureNotes": [
+        "Live storage surfaces are genealogy_link, trace_genealogy_batches, trace_genealogy_links and mes_part_genealogy; lot_genealogy is only the business-facing semantic name."
+      ],
+      "compatibilityNotes": [
+        "lot_genealogy is not a physical table in the current PostgreSQL registry; it resolves to genealogy_link and trace_genealogy_* runtime tables."
       ]
     }
   ]

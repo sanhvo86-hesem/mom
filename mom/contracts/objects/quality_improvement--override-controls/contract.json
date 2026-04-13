@@ -87,6 +87,7 @@
   },
   "runtimeExposure": {
     "status": "compatibility_alias_api",
+    "canonicalApiPath": "/api/v1/governance/override-controls",
     "notes": [
       "The live runtime surface is /api/v1/governance/override-controls while canonical naming remains quality_improvement.override-controls."
     ]

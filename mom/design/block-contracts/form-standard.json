@@ -1,0 +1,87 @@
+{
+  "blockType": "form-standard",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["form"],
+  "propsSchema": {
+    "required": ["fields"],
+    "optional": ["submit", "validation", "layout", "draftSave", "successAction"]
+  },
+  "dataSourceContract": {
+    "mode": "optional",
+    "allowedMethods": ["GET", "POST", "PUT", "PATCH"],
+    "requiredBindings": ["submit.api when submit is configured"]
+  },
+  "eventContract": {
+    "emits": ["form-submit", "form-success", "form-error", "field-change"],
+    "consumes": ["record-selected", "draft-loaded"]
+  },
+  "stateContract": {
+    "loading": "Disable submit and show busy state.",
+    "empty": "Render blank form with required field guidance.",
+    "error": "Show form summary and field-level errors.",
+    "readonly": "Render read-only values and hide submit.",
+    "disabled": "Disable controls while preserving values.",
+    "permissionDenied": "Hide form fields or render no-permission state."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "create or update"
+  },
+  "a11yContract": {
+    "role": "form",
+    "apgPattern": "form",
+    "wcagCriteria": ["1.3.1", "2.1.1", "2.4.3", "2.4.6", "2.5.8", "3.3.1", "3.3.2", "3.3.3", "4.1.2", "4.1.3"],
+    "accessibleName": "Form title.",
+    "keyboard": {
+      "tab": "Move through fields in logical order.",
+      "enter": "Submit only where form policy allows.",
+      "escape": "Close dropdowns or cancel dialog without losing data."
+    },
+    "focus": {
+      "entry": "First invalid field after validation, otherwise first editable field.",
+      "restore": "Return focus to submit after save success unless navigation is configured.",
+      "visibleIndicator": "Every interactive control has visible focus."
+    },
+    "announcements": {
+      "validation": "Announce error summary in assertive region.",
+      "success": "Announce save success in polite region."
+    },
+    "errorAssociation": {
+      "required": true,
+      "pattern": "Every invalid field uses aria-invalid and aria-errormessage pointing to role=alert error text."
+    },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for controls in compact density" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedValidation": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "JAWS/Chrome", "VoiceOver/Safari"],
+    "automatedRules": ["label", "aria-valid-attr", "aria-errormessage", "color-contrast"],
+    "manualTestScript": ["Submit empty form", "Navigate error summary", "Correct field and resubmit"]
+  },
+  "responsiveContract": {
+    "compact": "Single-column fields and sticky submit area only when it does not obscure content.",
+    "desktop": "Two-column layout allowed with DOM order matching reading order.",
+    "overflow": "Error text wraps and never clips."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--input-bg", "--input-border", "--focus-ring", "--state-danger", "--text-primary"]
+  },
+  "printExportContract": {
+    "print": "Print submitted values and audit metadata when configured.",
+    "export": ["field_key", "field_value", "validation_status"]
+  },
+  "testIds": {
+    "root": "block-form-standard",
+    "field": "form-field",
+    "error": "form-field-error",
+    "submit": "form-submit"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G08", "G13", "G14"]
+  }
+}

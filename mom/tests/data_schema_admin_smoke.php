@@ -268,6 +268,21 @@ foreach ((array)($workspace['operational']['freshness']['artifacts'] ?? []) as $
 }
 smoke_assert(!empty($artifactItemsById['system_contract_manifest']['requiredForRelease']), 'System contract manifest should be required for release decisions.');
 smoke_assert(empty($artifactItemsById['schema_manifest']['requiredForRelease']), 'Workspace design manifest should not be required for runtime release decisions.');
+foreach ($artifactItemsById as $artifactId => $artifactItem) {
+    if (empty($artifactItem['requiredForRelease'])) {
+        continue;
+    }
+    $dependencyStatus = (string)($artifactItem['dependencyStatus'] ?? '');
+    smoke_assert($dependencyStatus !== 'source_missing', "Release artifact {$artifactId} should not point at a missing source dependency.");
+    smoke_assert($dependencyStatus !== 'n/a', "Release artifact {$artifactId} should declare a real dependency chain or explicit source authority posture.");
+}
+foreach (['schema_authority', 'table_registry', 'endpoint_catalog', 'relation_map'] as $artifactId) {
+    smoke_assert(isset($artifactItemsById[$artifactId]), "Artifact inventory should include {$artifactId}.");
+    $dependencyStatus = (string)($artifactItemsById[$artifactId]['dependencyStatus'] ?? '');
+    smoke_assert($dependencyStatus !== 'source_missing', "{$artifactId} should resolve to real source files.");
+    smoke_assert($dependencyStatus !== 'n/a', "{$artifactId} should not expose ambiguous source drift.");
+}
+smoke_assert((string)($artifactItemsById['contract_glossary']['dependencyStatus'] ?? '') === 'source_authority', 'Contract glossary should be classified as an authored source authority instead of n/a.');
 smoke_assert(is_array(($workspace['artifacts']['business_contract_bundle'] ?? null)), 'Data Schema workspace should expose the business contract bundle summary.');
 smoke_assert(is_array(($workspace['artifacts']['global_capability_audit'] ?? null)), 'Data Schema workspace should expose the global ERP+MOM capability audit summary.');
 smoke_assert((int)($workspace['artifacts']['global_capability_audit']['summary']['capabilityCount'] ?? 0) >= 15, 'Global capability audit should cover the broad ERP+MOM process map.');

@@ -1,22 +1,25 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Authored object-contract package inventory for core ERP+MOM lifecycle owners.",
-    "packageCount": 64,
-    "authoredObjectCount": 64
+    "packageCount": 67,
+    "authoredObjectCount": 67
   },
   "summary": {
     "workflowTruthStatus": {
       "compatibility_alias_runtime": 2,
       "compatibility_bridge": 5,
-      "implemented_runtime": 50
+      "implemented_runtime": 53
     },
     "runtimeExposureStatus": {
       "compatibility_alias_api": 48,
       "compatibility_bridge_only": 4,
+      "machine_runtime_api": 1,
       "native_canonical_api": 5,
-      "native_runtime_api": 7
+      "native_runtime_api": 7,
+      "runtime_alias_api": 1,
+      "workflow_engine_runtime": 1
     }
   },
   "packages": [
@@ -595,6 +598,20 @@
       "evidenceRequirementCount": 3
     },
     {
+      "canonicalResource": "mes_execution.machine-alarms",
+      "packageId": "mes_execution--machine-alarms",
+      "contractPath": "contracts/objects/mes_execution--machine-alarms/contract.json",
+      "displayName": "Machine Alarms",
+      "ownerDomain": "mes_execution",
+      "objectRole": "machine_runtime_event",
+      "workflowImplemented": true,
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "machine_runtime_api",
+      "commandCount": 3,
+      "eventCount": 4,
+      "evidenceRequirementCount": 5
+    },
+    {
       "canonicalResource": "planning_production.dispatch-lists",
       "packageId": "planning_production--dispatch-lists",
       "contractPath": "contracts/objects/planning_production--dispatch-lists/contract.json",
@@ -791,6 +808,20 @@
       "evidenceRequirementCount": 3
     },
     {
+      "canonicalResource": "quality_improvement.control-plans",
+      "packageId": "quality_improvement--control-plans",
+      "contractPath": "contracts/objects/quality_improvement--control-plans/contract.json",
+      "displayName": "Control Plans",
+      "ownerDomain": "quality_improvement",
+      "objectRole": "lifecycle_owner",
+      "workflowImplemented": true,
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "workflow_engine_runtime",
+      "commandCount": 3,
+      "eventCount": 3,
+      "evidenceRequirementCount": 4
+    },
+    {
       "canonicalResource": "quality_improvement.corrective-actions",
       "packageId": "quality_improvement--corrective-actions",
       "contractPath": "contracts/objects/quality_improvement--corrective-actions/contract.json",
@@ -853,10 +884,10 @@
       "displayName": "MSA Studies",
       "ownerDomain": "quality_improvement",
       "objectRole": "assessment_record",
-      "workflowImplemented": false,
+      "workflowImplemented": true,
       "workflowTruthStatus": "implemented_runtime",
       "runtimeExposureStatus": "compatibility_alias_api",
-      "commandCount": 0,
+      "commandCount": 3,
       "eventCount": 2,
       "evidenceRequirementCount": 3
     },
@@ -909,12 +940,26 @@
       "displayName": "SPC Observations",
       "ownerDomain": "quality_improvement",
       "objectRole": "assessment_record",
-      "workflowImplemented": false,
+      "workflowImplemented": true,
       "workflowTruthStatus": "implemented_runtime",
       "runtimeExposureStatus": "compatibility_alias_api",
-      "commandCount": 0,
+      "commandCount": 3,
       "eventCount": 2,
       "evidenceRequirementCount": 3
+    },
+    {
+      "canonicalResource": "traceability_serialization.lot-genealogy",
+      "packageId": "traceability_serialization--lot-genealogy",
+      "contractPath": "contracts/objects/traceability_serialization--lot-genealogy/contract.json",
+      "displayName": "Lot Genealogy",
+      "ownerDomain": "traceability_serialization",
+      "objectRole": "digital_thread_evidence",
+      "workflowImplemented": true,
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": "runtime_alias_api",
+      "commandCount": 2,
+      "eventCount": 3,
+      "evidenceRequirementCount": 5
     }
   ]
 }

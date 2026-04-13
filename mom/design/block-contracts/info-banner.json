@@ -1,0 +1,81 @@
+{
+  "blockType": "info-banner",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["notice"],
+  "propsSchema": {
+    "required": ["text"],
+    "optional": ["type", "dismissable", "icon", "visibleWhen", "actions"]
+  },
+  "dataSourceContract": {
+    "mode": "none",
+    "allowedMethods": [],
+    "requiredBindings": []
+  },
+  "eventContract": {
+    "emits": ["banner-dismiss", "banner-action"],
+    "consumes": ["context-changed"]
+  },
+  "stateContract": {
+    "loading": "Render static content unless text binding depends on loading context.",
+    "empty": "Banner may be hidden when text resolves empty.",
+    "error": "Show safe fallback text.",
+    "readonly": "Default mode.",
+    "disabled": "Dismiss/action controls disabled.",
+    "permissionDenied": "Do not render restricted contextual data."
+  },
+  "permissionContract": {
+    "requiresPermission": false,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "view"
+  },
+  "a11yContract": {
+    "role": "note",
+    "apgPattern": "alert-or-status",
+    "wcagCriteria": ["1.1.1", "1.3.1", "1.4.3", "2.4.6", "4.1.2", "4.1.3"],
+    "accessibleName": "Banner type and first text sentence.",
+    "keyboard": {
+      "tab": "Only focus dismiss/action controls.",
+      "enterSpace": "Activate focused banner action."
+    },
+    "focus": {
+      "entry": "Banner never steals focus.",
+      "restore": "After dismiss, move focus to next logical control.",
+      "visibleIndicator": "Dismiss/action focus visible."
+    },
+    "announcements": {
+      "dynamic": "Use role=status for non-critical updates and role=alert only for urgent errors."
+    },
+    "errorAssociation": { "required": false, "pattern": "Banner may summarize form errors but fields own aria-errormessage." },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for dismiss/action controls" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedDismiss": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["color-contrast", "button-name", "aria-valid-attr"],
+    "manualTestScript": ["Read banner by screen reader", "Dismiss by keyboard", "Verify no unexpected focus jump"]
+  },
+  "responsiveContract": {
+    "compact": "Wrap text and keep actions below content.",
+    "desktop": "Inline icon, text and actions allowed.",
+    "overflow": "Never truncate warning or error text."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--state-info", "--state-success", "--state-warning", "--state-danger", "--text-primary"]
+  },
+  "printExportContract": {
+    "print": "Print non-dismissed warning/error banners.",
+    "export": ["banner_type", "text"]
+  },
+  "testIds": {
+    "root": "block-info-banner",
+    "dismiss": "info-banner-dismiss",
+    "action": "info-banner-action"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07"]
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "blockType": "action-status-flow",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["workflow"],
+  "propsSchema": {
+    "required": ["workflow", "dataSource"],
+    "optional": ["title", "visibleWhen", "confirmation", "diagram"]
+  },
+  "dataSourceContract": {
+    "mode": "required",
+    "allowedMethods": ["GET", "POST"],
+    "requiredBindings": ["dataSource.api", "workflow.transitionApi", "workflow.stateField"]
+  },
+  "eventContract": {
+    "emits": ["state-transition-requested", "state-transition-confirmed", "state-transition-rejected"],
+    "consumes": ["record-selected"]
+  },
+  "stateContract": {
+    "loading": "Show disabled transition buttons and busy status.",
+    "empty": "Show no selectable record message.",
+    "error": "Show transition error with retry affordance.",
+    "readonly": "Show current state and hide mutation actions.",
+    "disabled": "Disable transitions and preserve state labels.",
+    "permissionDenied": "Show permission-safe message without exposing hidden transitions."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "transition"
+  },
+  "a11yContract": {
+    "role": "region",
+    "apgPattern": "disclosure-or-toolbar",
+    "wcagCriteria": ["1.3.1", "2.1.1", "2.4.3", "2.4.7", "3.3.1", "4.1.2", "4.1.3"],
+    "accessibleName": "Use block title or workflow entity name.",
+    "keyboard": {
+      "tab": "Move through available transitions in DOM order.",
+      "enterSpace": "Open confirmation or submit transition.",
+      "escape": "Close confirmation and restore focus to originating action."
+    },
+    "focus": {
+      "entry": "Focus first enabled transition after record selection only when user requested the flow.",
+      "restore": "Return focus to triggering transition after confirmation closes.",
+      "visibleIndicator": "Use --brand-2 outline with at least 3:1 non-text contrast."
+    },
+    "announcements": {
+      "success": "Announce completed state change through polite live region.",
+      "failure": "Announce failed transition through assertive live region."
+    },
+    "errorAssociation": {
+      "required": true,
+      "pattern": "aria-errormessage on confirmation inputs when reason/comment validation fails."
+    },
+    "targetSize": {
+      "minimum": "1.5rem by 1.5rem in compact density; larger where space allows."
+    },
+    "contrast": { "nonTextMinimum": "3:1", "textMinimum": "4.5:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedConnectors": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["aria-valid-attr", "button-name", "color-contrast"],
+    "manualTestScript": ["Keyboard execute allowed transition", "Keyboard cancel confirmation", "Screen reader announces new state"]
+  },
+  "responsiveContract": {
+    "compact": "Stack state chips above actions.",
+    "desktop": "Show horizontal flow when width permits.",
+    "overflow": "Never hide a required transition without an overflow menu."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--brand-2", "--text-primary", "--border", "--state-success", "--state-warning", "--state-danger"]
+  },
+  "printExportContract": {
+    "print": "Print current state, transition history summary and approval evidence.",
+    "export": ["current_state", "last_transition_at", "last_transition_by"]
+  },
+  "testIds": {
+    "root": "block-action-status-flow",
+    "transitionButton": "status-transition-action",
+    "liveRegion": "status-flow-live-region"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G08", "G13", "G14"]
+  }
+}

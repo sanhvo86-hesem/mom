@@ -12,6 +12,7 @@
     "primaryKey": "quote_id",
     "statusField": "status",
     "childTables": [
+      "quote_lines",
       "quotation_lines"
     ],
     "legacyTables": [

@@ -1,6 +1,19 @@
 {
   "moduleId": "M4-purchasing",
   "templateId": "T29",
+  "templateVersion": "1.0.0",
+  "moduleArchetype": "list-report-workspace",
+  "buildPacket": "mom/design/build-packets/M4-purchasing.json",
+  "contractRefs": [
+    "mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json",
+    "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json",
+    "mom/contracts/objects/procurement_supplier_quality--iqc-inspections/contract.json"
+  ],
+  "qaProfile": {
+    "frontendSsotGate": "mom/tools/design/validate-frontend-contracts.mjs",
+    "qaGateSet": "mom/design/qa-gates.json",
+    "requiredGateLevel": "P0"
+  },
   "title": { "vi": "Mua hàng", "en": "Purchasing" },
   "subtitle": {
     "vi": "Chuẩn hóa supplier PO, PO line và receiving/IQC trên cùng một digital thread có truy xuất nguồn",

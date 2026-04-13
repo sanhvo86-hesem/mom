@@ -1,0 +1,147 @@
+{
+  "moduleId": "M2-orders",
+  "moduleName": { "vi": "Đơn hàng", "en": "Orders" },
+  "route": "/orders",
+  "domain": "commercial_customer",
+  "criticality": "critical",
+  "ownerTeam": "Commercial Operations + Frontend Platform",
+  "processOwner": "Sales / Planning / Production Control",
+  "primaryEntity": "sales.sales_order",
+  "contractRefs": [
+    "mom/contracts/objects/commercial_customer--sales-orders/contract.json",
+    "mom/contracts/objects/planning_production--job-orders/contract.json",
+    "mom/contracts/objects/planning_production--work-orders/contract.json",
+    "mom/contracts/objects/inventory_logistics--shipments/contract.json"
+  ],
+  "moduleArchetype": "list-report-workspace",
+  "version": "2.0.0",
+  "templateId": "T13",
+  "templateVersion": "1.0.0",
+  "zones": {
+    "notice": ["blk-info-jo-release", "blk-info-wo-release", "blk-info-cr", "blk-info-shipping"],
+    "summary": ["blk-kpi-orders", "blk-cr-progress"],
+    "filter": ["blk-filter-so"],
+    "primary": ["blk-table-so", "blk-wo-jo-picker", "blk-tree-hierarchy", "blk-shipment-gate", "blk-packing"],
+    "form": ["blk-form-so", "blk-form-jo", "blk-form-wo"],
+    "detail": ["blk-detail-so"],
+    "workflow": ["blk-status-flow"],
+    "actions": ["blk-toolbar-create", "blk-toolbar-packing", "blk-detail-toolbar"],
+    "timeline": ["blk-notes"]
+  },
+  "screens": [
+    { "screenId": "overview", "title": { "vi": "Tổng quan", "en": "Overview" }, "purpose": "Control active sales orders, KPIs and primary order register." },
+    { "screenId": "create-so", "title": { "vi": "Tạo SO", "en": "Create SO" }, "purpose": "Create governed sales order records." },
+    { "screenId": "release-jo", "title": { "vi": "Phát hành JO", "en": "Release JO" }, "purpose": "Release job orders from confirmed sales order context." },
+    { "screenId": "release-wo", "title": { "vi": "Phát hành WO", "en": "Release WO" }, "purpose": "Release work orders from selected job order context." },
+    { "screenId": "hierarchy", "title": { "vi": "Cây đơn hàng", "en": "Hierarchy" }, "purpose": "Show SO to JO to WO digital thread." },
+    { "screenId": "contract-review", "title": { "vi": "Xem xét hợp đồng", "en": "Contract Review" }, "purpose": "Surface contract review readiness and blockers." },
+    { "screenId": "shipping", "title": { "vi": "Giao hàng", "en": "Shipping" }, "purpose": "Control shipment readiness and packing list handoff." },
+    { "screenId": "detail", "title": { "vi": "Chi tiết", "en": "Detail" }, "purpose": "Review selected sales order detail, workflow and timeline." }
+  ],
+  "blocks": [
+    { "blockId": "blk-kpi-orders", "screenId": "overview", "type": "kpi-row", "zone": "summary", "order": 1, "intent": "Order control KPI summary." },
+    { "blockId": "blk-filter-so", "screenId": "overview", "type": "filter-bar", "zone": "filter", "order": 2, "intent": "Search and status/date filters." },
+    { "blockId": "blk-table-so", "screenId": "overview", "type": "data-table", "zone": "primary", "order": 3, "intent": "Sales order register." },
+    { "blockId": "blk-toolbar-create", "screenId": "overview", "type": "action-toolbar", "zone": "actions", "order": 4, "intent": "Create and navigation commands." },
+    { "blockId": "blk-form-so", "screenId": "create-so", "type": "form-standard", "zone": "form", "order": 1, "intent": "Sales order creation." },
+    { "blockId": "blk-info-jo-release", "screenId": "release-jo", "type": "info-banner", "zone": "notice", "order": 1, "intent": "JO release guidance." },
+    { "blockId": "blk-form-jo", "screenId": "release-jo", "type": "form-standard", "zone": "form", "order": 2, "intent": "Job order creation." },
+    { "blockId": "blk-info-wo-release", "screenId": "release-wo", "type": "info-banner", "zone": "notice", "order": 1, "intent": "WO release guidance." },
+    { "blockId": "blk-wo-jo-picker", "screenId": "release-wo", "type": "data-table", "zone": "primary", "order": 2, "intent": "Parent JO selection." },
+    { "blockId": "blk-form-wo", "screenId": "release-wo", "type": "form-standard", "zone": "form", "order": 3, "intent": "Work order creation." },
+    { "blockId": "blk-tree-hierarchy", "screenId": "hierarchy", "type": "data-tree", "zone": "primary", "order": 1, "intent": "SO to JO to WO hierarchy." },
+    { "blockId": "blk-info-cr", "screenId": "contract-review", "type": "info-banner", "zone": "notice", "order": 1, "intent": "Contract review governance note." },
+    { "blockId": "blk-cr-progress", "screenId": "contract-review", "type": "kpi-row", "zone": "summary", "order": 2, "intent": "Contract review progress." },
+    { "blockId": "blk-info-shipping", "screenId": "shipping", "type": "info-banner", "zone": "notice", "order": 1, "intent": "Shipment readiness guidance." },
+    { "blockId": "blk-shipment-gate", "screenId": "shipping", "type": "data-table", "zone": "primary", "order": 2, "intent": "Shipment release readiness." },
+    { "blockId": "blk-packing", "screenId": "shipping", "type": "data-table", "zone": "primary", "order": 3, "intent": "Packing list register." },
+    { "blockId": "blk-toolbar-packing", "screenId": "shipping", "type": "action-toolbar", "zone": "actions", "order": 4, "intent": "Packing list actions." },
+    { "blockId": "blk-detail-so", "screenId": "detail", "type": "data-detail", "zone": "detail", "order": 1, "intent": "Selected sales order detail." },
+    { "blockId": "blk-detail-toolbar", "screenId": "detail", "type": "action-toolbar", "zone": "actions", "order": 2, "intent": "Detail commands." },
+    { "blockId": "blk-status-flow", "screenId": "detail", "type": "action-status-flow", "zone": "workflow", "order": 3, "intent": "Sales order lifecycle transitions." },
+    { "blockId": "blk-notes", "screenId": "detail", "type": "data-timeline", "zone": "timeline", "order": 4, "intent": "Order notes and history." }
+  ],
+  "apiBindings": [
+    { "moduleApi": "order_dashboard_kpi", "registryEndpointId": "sales.sales_order.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-kpi-orders"], "migrationStatus": "adapter-required", "notes": "KPI aggregate currently uses legacy module API; registry source is sales order list until aggregate endpoint is published." },
+    { "moduleApi": "order_so_list", "registryEndpointId": "sales.sales_order.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-table-so"] },
+    { "moduleApi": "order_so_detail", "registryEndpointId": "sales.sales_order.detail", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-detail-so", "blk-status-flow"] },
+    { "moduleApi": "order_so_create", "registryEndpointId": "sales.sales_order.create", "type": "legacy-adapter", "method": "POST", "usedBy": ["blk-form-so"] },
+    { "moduleApi": "order_transition", "registryEndpointId": "sales.sales_order.transition", "type": "legacy-adapter", "method": "POST", "usedBy": ["blk-status-flow"] },
+    { "moduleApi": "order_jo_list", "registryEndpointId": "production.job_orders.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-wo-jo-picker"] },
+    { "moduleApi": "order_jo_create", "registryEndpointId": "production.job_orders.create", "type": "legacy-adapter", "method": "POST", "usedBy": ["blk-form-jo"] },
+    { "moduleApi": "order_wo_create", "registryEndpointId": "production.work_orders.create", "type": "legacy-adapter", "method": "POST", "usedBy": ["blk-form-wo"] },
+    { "moduleApi": "order_hierarchy", "registryEndpointId": "sales.sales_order.detail", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-tree-hierarchy"], "notes": "Digital-thread hierarchy needs dedicated endpoint in P1." },
+    { "moduleApi": "order_contract_review", "registryEndpointId": "sales.contract_review_items.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-cr-progress"] },
+    { "moduleApi": "order_shipment_gate", "registryEndpointId": "shipping_compliance.shipment_releases.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-shipment-gate"] },
+    { "moduleApi": "packing_list", "registryEndpointId": "shipping_compliance.packing_lists.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-packing"] },
+    { "moduleApi": "packing_create", "registryEndpointId": "shipping_compliance.packing_lists.create", "type": "legacy-adapter", "method": "POST", "usedBy": ["blk-toolbar-packing"] },
+    { "moduleApi": "order_timeline", "registryEndpointId": "sales.order_timeline_events.list", "type": "legacy-adapter", "method": "GET", "usedBy": ["blk-notes"] },
+    { "moduleApi": "navigate-tab", "type": "local-action", "usedBy": ["blk-toolbar-create", "blk-toolbar-packing", "blk-detail-toolbar"] },
+    { "moduleApi": "set-state", "type": "local-action", "usedBy": ["blk-detail-toolbar"] }
+  ],
+  "workflows": [
+    { "workflowId": "sales-order-lifecycle", "entity": "sales.sales_order", "stateField": "status", "transitionEndpoint": "sales.sales_order.transition" },
+    { "workflowId": "job-order-release", "entity": "production.job_orders", "stateField": "status", "transitionEndpoint": "production.job_orders.transition" },
+    { "workflowId": "shipment-release", "entity": "shipping_compliance.shipment_releases", "stateField": "status", "transitionEndpoint": "shipping_compliance.shipment_releases.transition" }
+  ],
+  "permissions": {
+    "roles": ["admin", "it_admin", "ceo", "production_director", "sales_manager", "estimator", "customer_service", "quality_manager", "planning_manager", "production_planner", "cnc_workshop_manager", "engineering_manager", "supply_chain_manager"],
+    "actions": ["list", "detail", "create", "update", "transition"],
+    "policyRef": "mom/data/registry/runtime-access-policy.json"
+  },
+  "regulatoryScope": ["ISO-9001", "AS9100-ready", "customer-contract-review", "shipment-readiness"],
+  "audit": {
+    "requiredEvents": ["sales_order_created", "sales_order_transitioned", "job_order_released", "work_order_released", "packing_list_created"],
+    "actorField": "updated_by",
+    "timestampField": "updated_at"
+  },
+  "i18n": {
+    "locales": ["vi", "en"],
+    "defaultLocale": "vi",
+    "diacriticsRequired": true,
+    "fallbackPolicy": "English fallback allowed only when Vietnamese source is absent in controlled schema."
+  },
+  "densityModes": ["compact", "default", "comfortable", "shopfloor"],
+  "responsive": {
+    "breakpoints": ["320", "390", "768", "1024", "1440", "1920"],
+    "zoomLevels": ["100", "200", "400"],
+    "primaryRisk": "Data table overflow and sticky action visibility."
+  },
+  "offlineSupport": {
+    "mode": "read-mostly",
+    "draftQueue": ["blk-form-so", "blk-form-jo", "blk-form-wo"],
+    "syncConflictPolicy": "server-wins-with-user-review"
+  },
+  "printSupport": {
+    "enabled": true,
+    "surfaces": ["sales-order-detail", "packing-list", "shipment-readiness"]
+  },
+  "accessibility": {
+    "target": "WCAG 2.2 AA",
+    "apgPatterns": ["grid", "treeview", "toolbar", "form", "feed"],
+    "manualEvidenceRequired": ["keyboard-primary-path", "screen-reader-detail-and-form", "zoom-400-reflow"]
+  },
+  "performance": {
+    "budgetName": "ERP critical module",
+    "maxInitialJsKb": 350,
+    "maxBlockingMs": 200,
+    "maxTableRowsInitial": 100
+  },
+  "performanceBudget": {
+    "lcpMs": 2500,
+    "inpMs": 200,
+    "cls": 0.1,
+    "routeReadyMs": 1800
+  },
+  "qa": {
+    "gateSet": "mom/design/qa-gates.json",
+    "requiredNow": ["G01", "G02", "G03", "G06", "G13", "G17"],
+    "knownOpen": ["G04", "G05", "G07", "G08", "G09", "G10", "G14", "G18", "G19"]
+  },
+  "traceability": {
+    "sourceEntities": ["sales.sales_order"],
+    "downstreamEntities": ["production.job_orders", "production.work_orders", "shipping_compliance.shipment_releases", "shipping_compliance.packing_lists"],
+    "requiredThreadFields": ["sales_order_id", "job_order_id", "work_order_id", "shipment_release_id"]
+  },
+  "releaseDate": "2026-04-11"
+}

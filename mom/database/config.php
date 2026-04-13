@@ -10,8 +10,8 @@ declare(strict_types=1);
  *
  * Feature Flags:
  *   USE_POSTGRES   - Enable PostgreSQL as a data backend (default: false)
- *   SHADOW_WRITE   - Write to both JSON and PostgreSQL simultaneously (default: true)
- *   JSON_FALLBACK  - Fall back to JSON on PostgreSQL errors (default: true)
+ *   SHADOW_WRITE   - Migration-only dual-write mode (default: false)
+ *   JSON_FALLBACK  - Break-glass JSON fallback on PostgreSQL errors (default: false)
  *
  * @package MOM\Database
  * @since   1.0.0
@@ -47,8 +47,8 @@ return [
 
     // Feature Flags
     'use_postgres'  => $envBool('USE_POSTGRES', false),
-    'shadow_write'  => $envBool('SHADOW_WRITE', true),
-    'json_fallback' => $envBool('JSON_FALLBACK', true),
+    'shadow_write'  => $envBool('SHADOW_WRITE', false),
+    'json_fallback' => $envBool('JSON_FALLBACK', false),
 
     // Logging
     'log_queries'  => $envBool('DB_LOG_QUERIES', false),

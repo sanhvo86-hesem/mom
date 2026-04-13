@@ -12,10 +12,13 @@
     "primaryKey": "supplier_purchase_order_id",
     "statusField": "po_status",
     "childTables": [
-      "supplier_purchase_order_lines"
+      "supplier_purchase_order_lines",
+      "purchase_order_lines",
+      "purchase_order_line"
     ],
     "legacyTables": [
-      "purchase_orders"
+      "purchase_orders",
+      "purchase_order"
     ]
   },
   "identity": {

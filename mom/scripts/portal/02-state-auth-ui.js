@@ -725,6 +725,14 @@ function canAccessPurchasingWorkspace(){
   return !!currentUser && canUserAccessModule('purchasing');
 }
 
+function openPurchasingWorkspaceFromShell(){
+  if(canAccessPurchasingWorkspace()){
+    navigateTo('purchasing');
+    return;
+  }
+  showToast(lang==='en' ? 'You do not have access to Purchasing & IQC.' : 'Bạn không có quyền truy cập Mua hàng & IQC.');
+}
+
 function isPortalSidebarSectionVisible(id){
   const key = String(id||'').toLowerCase();
   return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_sections || []).includes(key));
@@ -5107,7 +5115,27 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   activity:{search:'',actor:'',eventType:'',aggregateType:''}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
-const ADMIN_RUNTIME_ASSET_VERSION = '20260411f';
+const ADMIN_RUNTIME_ASSET_VERSION = '20260411l';
+const ADMIN_MANUAL_MACHINE_ENTITIES = Object.freeze([
+  'work_centers',
+  'machines',
+  'mes_connectivity_adapters',
+  'mes_alarm_catalog',
+  'mes_alarm_playbooks',
+  'downtime_reason_codes',
+  'downtime_resolution_codes',
+  'tooling_assets'
+]);
+const ADMIN_MANUAL_MACHINE_ENTITY_LABELS = Object.freeze({
+  work_centers:{vi:'Work center',en:'Work centers'},
+  machines:{vi:'Máy / thiết bị',en:'Machines'},
+  mes_connectivity_adapters:{vi:'Adapter kết nối MES',en:'MES connectivity adapters'},
+  mes_alarm_catalog:{vi:'Danh mục alarm MES',en:'MES alarm catalog'},
+  mes_alarm_playbooks:{vi:'Playbook alarm',en:'Alarm playbooks'},
+  downtime_reason_codes:{vi:'Mã lý do downtime',en:'Downtime reason codes'},
+  downtime_resolution_codes:{vi:'Mã khôi phục downtime',en:'Downtime resolution codes'},
+  tooling_assets:{vi:'Dao / tooling',en:'Tooling assets'}
+});
 
 function adminFilterState(tab){
   if(!ADMIN_TAB_FILTERS[tab]){
@@ -7039,6 +7067,23 @@ function renderAdminPortalDisplay(){
     </div>`;
 }
 
+function adminManualMachineEntityLabel(entity){
+  const meta = ADMIN_MANUAL_MACHINE_ENTITY_LABELS[String(entity || '')] || {};
+  return lang === 'en' ? (meta.en || entity) : (meta.vi || entity);
+}
+
+function adminManualMachineEntities(summary){
+  const fromBackend = Array.isArray(summary && summary.machine_runtime_entities) ? summary.machine_runtime_entities : [];
+  const valid = fromBackend.filter(entity => ADMIN_MANUAL_MACHINE_ENTITIES.includes(String(entity || '')));
+  return valid.length ? valid : Array.from(ADMIN_MANUAL_MACHINE_ENTITIES);
+}
+
+function adminManualEndpointContracts(summary){
+  return Array.isArray(summary && summary.frontend_endpoint_contracts)
+    ? summary.frontend_endpoint_contracts.filter(item => item && item.action && item.method)
+    : [];
+}
+
 function adminFormatRuntimeStamp(value){
   const raw = String(value || '').trim();
   if(!raw) return lang==='en' ? 'Not available' : 'Chưa có dữ liệu';
@@ -7074,9 +7119,23 @@ async function loadAdminManualRuntimeState(options={}){
   }
 }
 
-function adminOpenMasterEntity(entity){
+function adminOpenMasterEntity(entity, scope='machine_runtime'){
+  if(String(entity || '') === 'operators'){
+    adminTab = 'orgchart';
+    renderAdmin();
+    showToast(lang==='en'
+      ? 'Operators are governed in Admin > Users / Org chart.'
+      : 'Người vận hành được quản trị trong Admin > Người dùng / Sơ đồ tổ chức.');
+    return;
+  }
+  if(scope === 'machine_runtime' && !ADMIN_MANUAL_MACHINE_ENTITIES.includes(String(entity || ''))){
+    showToast(lang==='en'
+      ? 'This data belongs to a process endpoint or owning module, not Manual Machine Runtime.'
+      : 'Dữ liệu này thuộc endpoint nghiệp vụ hoặc module chủ quản, không nhập trong Nhập tay máy/MES.');
+    return;
+  }
   if(typeof window._mdOpenControl === 'function'){
-    window._mdOpenControl(entity);
+    window._mdOpenControl(entity, {scope});
     return;
   }
   showToast(lang==='en' ? '⚠ Master Data Control is not ready.' : '⚠ Chưa mở được màn hình Dữ liệu nền.');
@@ -7108,7 +7167,7 @@ function renderAdminManualRuntime(){
   const el = document.getElementById('admin-content');
   if(!el) return;
 
-  if(!adminManualRuntimeState.loaded && !adminManualRuntimeState.loading){
+  if(!adminManualRuntimeState.loaded && !adminManualRuntimeState.loading && !adminManualRuntimeState.error){
     loadAdminManualRuntimeState({force:true});
   }
 
@@ -7117,25 +7176,38 @@ function renderAdminManualRuntime(){
     return;
   }
 
+  if(adminManualRuntimeState.error && !adminManualRuntimeState.loaded){
+    el.innerHTML = `
+      <div style="display:grid;gap:14px">
+        <section style="padding:22px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:18px;background:color-mix(in srgb, var(--red) 8%, var(--bg-surface,#fff));color:var(--text-primary,#102a43)">
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">${lang==='en'?'Manual runtime failed to load':'Không tải được module nhập tay vận hành'}</div>
+          <div style="color:var(--text-secondary,#475569);line-height:1.6">${escapeHtml(adminManualRuntimeState.error)}</div>
+          <button class="btn-admin primary" type="button" style="margin-top:14px" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Retry':'Tải lại'}</button>
+        </section>
+      </div>`;
+    return;
+  }
+
   const summary = adminManualRuntimeState.summary || {};
   const masterCounts = summary.master_counts || {};
+  const machineCounts = summary.machine_runtime_counts || {};
   const orderCounts = summary.order_counts || { so:0, jo:0, wo:0 };
   const recentRows = Array.isArray(summary.recent_rows) ? summary.recent_rows : [];
   const runtimeMode = (summary.runtime_mode && summary.runtime_mode.mode) ? String(summary.runtime_mode.mode) : 'UNKNOWN';
   const readSources = summary.read_sources || {};
-  const checklist = [
-    { label:lang==='en'?'Customers':'Khách hàng', count:Number(masterCounts.customers || 0), entity:'customers' },
-    { label:'Part Number', count:Number(masterCounts.parts || 0), entity:'parts' },
-    { label:'Revision', count:Number(masterCounts.revisions || 0), entity:'revisions' },
-    { label:'Work center', count:Number(masterCounts.work_centers || 0), entity:'work_centers' },
-    { label:lang==='en'?'Machines':'Máy', count:Number(masterCounts.machines || 0), entity:'machines' },
-    { label:lang==='en'?'Operators':'Người vận hành', count:Number(masterCounts.operators || 0), entity:'operators' }
-  ];
+  const operatorAuthority = summary.operator_authority || {};
+  const endpointContracts = adminManualEndpointContracts(summary);
+  const checklist = adminManualMachineEntities(summary).map(entity => ({
+    label:adminManualMachineEntityLabel(entity),
+    count:Number(machineCounts[entity] ?? masterCounts[entity] ?? 0),
+    entity
+  }));
   const missing = checklist.filter(item => Number(item.count || 0) === 0);
   const stats = [
-    { label:lang==='en'?'Customers':'Khách hàng', value:Number(masterCounts.customers || 0) },
-    { label:'Part Number', value:Number(masterCounts.parts || 0) },
-    { label:'Revision', value:Number(masterCounts.revisions || 0) },
+    { label:lang==='en'?'Work centers':'Work center', value:Number(machineCounts.work_centers ?? masterCounts.work_centers ?? 0) },
+    { label:lang==='en'?'Machines':'Máy', value:Number(machineCounts.machines ?? masterCounts.machines ?? 0) },
+    { label:lang==='en'?'MES adapters':'MES adapter', value:Number(machineCounts.mes_connectivity_adapters ?? masterCounts.mes_connectivity_adapters ?? 0) },
+    { label:lang==='en'?'Alarm rules':'Alarm', value:Number(machineCounts.mes_alarm_catalog ?? masterCounts.mes_alarm_catalog ?? 0) },
     { label:'SO', value:orderCounts.so },
     { label:'JO', value:orderCounts.jo },
     { label:'WO', value:orderCounts.wo }
@@ -7146,14 +7218,14 @@ function renderAdminManualRuntime(){
       <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2) 6%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 48%,color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
           <div style="max-width:760px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Chế độ vận hành nhập tay'}</div>
-            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Operate while Epicor and CNC are offline':'Vẫn vận hành được khi Epicor và CNC chưa kết nối'}</h3>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual machine runtime':'Nhập tay vận hành máy'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Machine/MES input only, process data through endpoints':'Chỉ nhập dữ liệu máy/MES, dữ liệu quy trình đi qua endpoint'}</h3>
             <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
-              ? 'Use this area to seed master data, create SO / JO / WO manually, and keep the internal workflow moving before ERP and machine connectors are ready.'
-              : 'Dùng khu vực này để seed dữ liệu nền, tạo SO / JO / WO bằng tay, và giữ workflow nội bộ vận hành trước khi ERP và kết nối máy sẵn sàng.'}</p>
+              ? 'This workspace is limited to machine-origin and machine-support data: work centers, machines, adapters, alarms, downtime codes and tooling. Customer, supplier, part, PO/SO/JO/WO, CAPA and quality process data are intentionally kept out of this editor.'
+              : 'Workspace này chỉ giới hạn cho dữ liệu có nguồn hoặc vai trò trực tiếp với máy: work center, máy, adapter, alarm, mã downtime và tooling. Khách hàng, nhà cung cấp, part, PO/SO/JO/WO, CAPA và dữ liệu chất lượng được loại khỏi editor này có chủ đích.'}</p>
             <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
-              ? 'The order create forms now accept manual SO / JO / WO numbers. Leave the field blank if you still want automatic numbering.'
-              : 'Biểu mẫu tạo đơn hiện đã cho phép nhập số SO / JO / WO thủ công. Nếu để trống, hệ thống vẫn tự sinh mã như trước.'}</div>
+              ? 'Frontend process screens must call their own process endpoint contracts. This panel only exposes machine/MES endpoint contracts and operator authority references.'
+              : 'Frontend các màn hình quy trình phải gọi endpoint contract riêng. Panel này chỉ hiển thị contract máy/MES và tham chiếu authority operator.'}</div>
             <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
               <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Runtime':'Runtime'}: ${escapeHtml(runtimeMode)}</span>
               <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Master source':'Nguồn master'}: ${escapeHtml(String((readSources.master_data || {}).source || '-'))}</span>
@@ -7177,16 +7249,16 @@ function renderAdminManualRuntime(){
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dữ liệu nền tối thiểu'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Machine/MES runtime tables':'Bảng vận hành máy/MES'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
-            ? 'Create the reference set first so lookup fields in the order forms work without Epicor.'
-            : 'Tạo bộ dữ liệu tham chiếu trước để các trường lookup trong form đơn hàng hoạt động ngay cả khi chưa có Epicor.'}</p>
+            ? 'Only these tables open in this manual runtime editor. They feed machine dispatch, connector health, alarm handling, downtime and tooling readiness.'
+            : 'Chỉ các bảng này được mở trong editor nhập tay vận hành. Chúng phục vụ dispatch máy, trạng thái connector, xử lý alarm, downtime và tooling readiness.'}</p>
           <div style="display:grid;gap:10px">
             ${checklist.map(item => `
-              <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
+              <button type="button" onclick="adminOpenMasterEntity('${item.entity}','machine_runtime')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
                 <span>
                   <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
-                  <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'Đã có dữ liệu') : (lang==='en'?'Missing baseline':'Đang thiếu dữ liệu nền')}</small>
+                  <small style="color:#52667a">${escapeHtml(item.count > 0 ? (lang==='en'?'Runtime table linked':'Đã link runtime') : (lang==='en'?'Missing machine baseline':'Thiếu baseline máy/MES'))}</small>
                 </span>
                 <strong style="font-size:20px;color:#102a43">${escapeHtml(String(item.count))}</strong>
               </button>
@@ -7195,10 +7267,10 @@ function renderAdminManualRuntime(){
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nhập tay SO / JO / WO'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Machine/MES endpoint contracts':'Endpoint máy/MES'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
-            ? 'Open the governed order forms directly from Admin so operations can start before Epicor inbound is connected.'
-            : 'Mở trực tiếp các form đơn hàng có kiểm soát từ Admin để vận hành có thể bắt đầu trước khi Epicor inbound được kết nối.'}</p>
+            ? 'SO / JO / WO are process objects. Create them through their governed forms and API endpoints, not as machine runtime tables.'
+            : 'SO / JO / WO là object quy trình. Tạo chúng qua form và API có kiểm soát, không đưa vào bảng nhập tay máy/MES.'}</p>
           <div style="display:grid;gap:10px">
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('so')">+ SO</button>
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('jo')">+ JO</button>
@@ -7207,32 +7279,37 @@ function renderAdminManualRuntime(){
           </div>
           <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px dashed var(--border);color:var(--text-secondary,#475569);font-size:13px;line-height:1.6">
             ${lang==='en'
-              ? 'Suggested sequence: Customer -> Part Number -> Revision -> Work center / Machine / Operator -> SO -> JO -> WO.'
-              : 'Trình tự gợi ý: Khách hàng -> Part Number -> Revision -> Work center / Máy / Người vận hành -> SO -> JO -> WO.'}
+              ? 'Operator source: Admin users / org chart. Current projected operators: '
+              : 'Nguồn operator: Admin > Người dùng / Sơ đồ tổ chức. Số operator đang chiếu ra runtime: '}
+            ${escapeHtml(String(masterCounts.operators || 0))}
+            <br>${lang==='en'
+              ? 'Current authority: '
+              : 'Authority hiện tại: '}
+            ${escapeHtml(String(operatorAuthority.source || 'admin_users'))}
           </div>
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Độ sẵn sàng hiện tại'}</div>
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Frontend endpoint contracts':'Contract endpoint cho frontend'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
             ? (lang==='en'
-              ? ('Still missing baseline data for: ' + missing.map(item => item.label).join(', ') + '.')
-              : ('Hiện vẫn đang thiếu dữ liệu nền cho: ' + missing.map(item => item.label).join(', ') + '.'))
+              ? ('Machine baseline still missing for: ' + missing.map(item => item.label).join(', ') + '.')
+              : ('Baseline máy/MES còn thiếu cho: ' + missing.map(item => item.label).join(', ') + '.'))
             : (lang==='en'
-              ? 'The minimum baseline is already in place. You can start creating SO / JO / WO manually now.'
-              : 'Bộ dữ liệu nền tối thiểu đã sẵn sàng. Bạn có thể bắt đầu tạo SO / JO / WO thủ công ngay bây giờ.')}
+              ? 'Machine/MES baseline is available. Process objects are intentionally published outside this machine editor.'
+              : 'Baseline máy/MES đã có. Object quy trình được tách khỏi editor máy có chủ đích.')}
           </p>
-          <div style="display:grid;gap:10px">
-            <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.6">
-              ${lang==='en'
-                ? 'Manual mode keeps the workflow alive: users create orders, operators update progress manually, and evidence still links to WO as usual.'
-                : 'Chế độ thủ công vẫn giữ workflow sống: người dùng tạo đơn, người vận hành cập nhật tiến độ bằng tay, và hồ sơ chứng cứ vẫn liên kết về WO như bình thường.'}
-            </div>
-            <div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6">
-              ${lang==='en'
-                ? 'Security note: secrets for database and external connectors stay on the server, not in editable frontend fields.'
-                : 'Lưu ý an toàn: secret cho database và kết nối ngoài vẫn nằm ở server, không đặt trong các ô frontend có thể sửa.'}
-            </div>
+          <div style="display:grid;gap:10px;max-height:360px;overflow:auto;padding-right:4px">
+            ${endpointContracts.length ? endpointContracts.map(contract => `
+              <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.55">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+                  <strong style="color:#102a43">${escapeHtml(contract.action || '-')}</strong>
+                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--blue) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--blue) 24%, var(--border));font-size:11px;color:#0f4c81">${escapeHtml(contract.method || '-')}</span>
+                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 24%, var(--border));font-size:11px;color:#0f7a50">${escapeHtml(contract.authority || '-')}</span>
+                </div>
+                <div>${escapeHtml(contract.frontend_use || contract.purpose || '-')}</div>
+              </div>
+            `).join('') : `<div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber)">${lang==='en'?'Endpoint contract list is not loaded from backend.':'Chưa tải được danh sách endpoint contract từ backend.'}</div>`}
           </div>
         </article>
       </section>

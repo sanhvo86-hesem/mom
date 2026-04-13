@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "canonicalResource": "traceability_serialization.lot-genealogy",
+  "canonicalName": "lot_genealogy",
+  "displayName": "Lot Genealogy",
+  "purpose": "Provide forward and backward genealogy for lot, serial, batch, and production-order relationships so containment, recall, NCR, and customer-return decisions can be traced to source records.",
+  "ownerDomain": "traceability_serialization",
+  "objectRole": "digital_thread_evidence",
+  "ownerTeam": "traceability_stewardship",
+  "storage": {
+    "primaryTable": "genealogy_link",
+    "primaryKey": "genealogy_link_id",
+    "statusField": null,
+    "childTables": [
+      "trace_genealogy_batches",
+      "trace_genealogy_links",
+      "mes_part_genealogy"
+    ],
+    "legacyTables": [
+      "lot_genealogy",
+      "mes_part_genealogy"
+    ]
+  },
+  "identity": {
+    "strategy": "production_order_id+parent_lot_no+child_lot_no+link_type",
+    "naturalKeys": [
+      "production_order_id",
+      "parent_lot_no",
+      "child_lot_no",
+      "link_type"
+    ]
+  },
+  "governance": {
+    "usageZone": "core_value_stream",
+    "gateType": "traceability_gate",
+    "auditClass": "traceability_audit_trail",
+    "continuousImprovementLoop": "containment_and_recall_feedback",
+    "retentionClass": "traceability_record_7y_or_customer_specific",
+    "evidenceRequirements": [
+      "parent_lot_or_serial",
+      "child_lot_or_serial",
+      "production_order_id",
+      "source_system",
+      "correction_reason_for_changes"
+    ],
+    "kpiSignals": [
+      "trace_completeness_ratio",
+      "forward_trace_latency",
+      "containment_scope_accuracy"
+    ],
+    "autoAuditChecks": [
+      "genealogy_link_requires_parent_or_child_identifier",
+      "genealogy_correction_must_not_delete_original_link",
+      "traceability_chain_must_resolve_to_source_work_order_or_receipt"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "PostgreSQL traceability tables exposed through GenericCrud runtime",
+    "stateModelKey": "stateless_genealogy_evidence",
+    "lifecycleMode": "stateless_evidence_thread",
+    "storageTables": [
+      "genealogy_link",
+      "trace_genealogy_batches",
+      "trace_genealogy_links",
+      "mes_part_genealogy"
+    ],
+    "commands": [
+      { "command": "record_link", "description": "Record a parent-child genealogy link from production, receiving, or serialization evidence.", "idempotencyScope": "natural_key+payload", "preconditions": ["source_system_present", "parent_or_child_identifier_present"] },
+      { "command": "correct_link", "description": "Correct genealogy evidence by supersession or annotated correction without deleting the original trace.", "idempotencyScope": "resource+payload", "preconditions": ["correction_reason_recorded"] }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "inventory_logistics.inventory-movements",
+      "planning_production.work-orders",
+      "procurement_supplier_quality.purchase-receipts"
+    ],
+    "downstreamObjects": [
+      "quality_improvement.nonconformances",
+      "inventory_logistics.customer-returns",
+      "inventory_logistics.shipments"
+    ],
+    "keyRelationships": [
+      "production_order_id -> production_order.production_order_id",
+      "parent_lot_no -> inventory_lots.lot_number",
+      "child_lot_no -> inventory_lots.lot_number"
+    ],
+    "events": [
+      { "eventName": "linked", "description": "A genealogy link was recorded." },
+      { "eventName": "corrected", "description": "A genealogy link was corrected without deleting original evidence." },
+      { "eventName": "traced", "description": "A forward or backward trace query resolved a containment path." }
+    ]
+  },
+  "runtimeExposure": {
+    "status": "runtime_alias_api",
+    "notes": [
+      "Live storage surfaces are genealogy_link, trace_genealogy_batches, trace_genealogy_links and mes_part_genealogy; lot_genealogy is only the business-facing semantic name."
+    ]
+  },
+  "compatibility": {
+    "legacyNames": [
+      "lot_genealogy",
+      "part_genealogy"
+    ],
+    "notes": [
+      "lot_genealogy is not a physical table in the current PostgreSQL registry; it resolves to genealogy_link and trace_genealogy_* runtime tables."
+    ]
+  },
+  "invariants": [
+    "Traceability corrections must be append-only or superseding, never destructive.",
+    "Forward and backward trace must use the same governed source tables.",
+    "Containment decisions must be able to cite the genealogy link evidence used."
+  ]
+}

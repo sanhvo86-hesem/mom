@@ -1,0 +1,11 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-11T14:58:13.657848+00:00",
+    "sourceArtifact": "mom/data/registry/endpoint-governance-classification.json",
+    "description": "Release quarantine list for destructive runtime endpoints. Frontend builders and AI tools must not expose blocked endpoints.",
+    "endpointCount": 0
+  },
+  "summary": {},
+  "rows": []
+}

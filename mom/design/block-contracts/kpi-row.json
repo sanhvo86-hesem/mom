@@ -1,0 +1,81 @@
+{
+  "blockType": "kpi-row",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["summary"],
+  "propsSchema": {
+    "required": ["items"],
+    "optional": ["dataSource", "layout", "trend", "drilldown"]
+  },
+  "dataSourceContract": {
+    "mode": "optional",
+    "allowedMethods": ["GET"],
+    "requiredBindings": ["dataSource.api when dynamic"]
+  },
+  "eventContract": {
+    "emits": ["kpi-click", "drill-down"],
+    "consumes": ["filters-changed", "refresh-requested"]
+  },
+  "stateContract": {
+    "loading": "Show KPI skeleton cards and aria-busy.",
+    "empty": "Show no KPI data message or zero state where business-approved.",
+    "error": "Show KPI-level error and retry.",
+    "readonly": "Default mode.",
+    "disabled": "Disable drill-down actions.",
+    "permissionDenied": "Hide sensitive KPIs or show redacted card."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "list"
+  },
+  "a11yContract": {
+    "role": "region",
+    "apgPattern": "group",
+    "wcagCriteria": ["1.1.1", "1.3.1", "1.4.3", "1.4.10", "2.4.6", "2.5.8", "4.1.2", "4.1.3"],
+    "accessibleName": "KPI group title.",
+    "keyboard": {
+      "tab": "Focus only drillable KPI cards.",
+      "enterSpace": "Open KPI drilldown."
+    },
+    "focus": {
+      "entry": "First drillable KPI only on user navigation.",
+      "restore": "Return to KPI card after drilldown closes.",
+      "visibleIndicator": "KPI card focus outline visible."
+    },
+    "announcements": {
+      "refresh": "Announce changed KPI values only after user-triggered refresh."
+    },
+    "errorAssociation": { "required": false, "pattern": "No field-level errors." },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for drilldown actions" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedCounters": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["color-contrast", "button-name", "aria-valid-attr"],
+    "manualTestScript": ["Read KPI label/value/unit", "Open drilldown by keyboard", "Verify changed value announcement"]
+  },
+  "responsiveContract": {
+    "compact": "Two-column or single-column cards with stable height.",
+    "desktop": "Responsive row with equal card widths.",
+    "overflow": "Long labels wrap and values stay visible."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--text-primary", "--text-secondary", "--kpi-bg", "--state-success", "--state-warning", "--state-danger"]
+  },
+  "printExportContract": {
+    "print": "Print KPI label, value, unit, period and threshold state.",
+    "export": ["kpi_key", "value", "unit", "threshold_state"]
+  },
+  "testIds": {
+    "root": "block-kpi-row",
+    "item": "kpi-item",
+    "drilldown": "kpi-drilldown"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G10"]
+  }
+}

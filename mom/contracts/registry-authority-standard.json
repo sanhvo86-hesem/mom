@@ -1,0 +1,294 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "effectiveDate": "2026-04-11",
+    "status": "authoritative_policy",
+    "description": "Enterprise registry authority standard for HESEM ERP+MOM+MES+eQMS. This file defines the required machine-readable contract layers so backend, frontend, AI tools, and auditors do not infer system truth from labels or UI drafts."
+  },
+  "standardsProfile": {
+    "manufacturingOperations": {
+      "standard": "ISA-95 / IEC 62264",
+      "purpose": "Separate ERP level-4 business planning from MOM/MES level-3 operations and machine/control integration.",
+      "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard"
+    },
+    "httpApi": {
+      "standard": "OpenAPI",
+      "approvedVersions": [
+        "3.1.x",
+        "3.2.x"
+      ],
+      "purpose": "Every frontend-callable HTTP contract must be explicit and versioned.",
+      "url": "https://spec.openapis.org/oas/latest.html"
+    },
+    "jsonValidation": {
+      "standard": "JSON Schema 2020-12",
+      "purpose": "Registry, command, event, request, response, and data-quality rules must be validateable by tooling.",
+      "url": "https://json-schema.org/draft/2020-12/json-schema-core"
+    },
+    "eventApi": {
+      "standard": "AsyncAPI 3.1.0",
+      "purpose": "Machine, workflow, integration, and audit events must be documented as message-driven APIs.",
+      "url": "https://www.asyncapi.com/docs/reference/specification/v3.1.0"
+    },
+    "eventEnvelope": {
+      "standard": "CloudEvents",
+      "purpose": "Events must carry globally traceable envelope fields instead of ad hoc payloads.",
+      "url": "https://cloudevents.io/"
+    },
+    "machineModel": {
+      "standard": "OPC UA for Machinery",
+      "purpose": "Machine identity, status, job, energy, tool, and capability data must map to a structured machinery information model.",
+      "url": "https://opcfoundation.org/markets-collaboration/opc-ua-for-machinery/"
+    },
+    "masterDataQuality": {
+      "standard": "ISO 8000",
+      "purpose": "Master data quality must be checked at property-value level and at system interfaces.",
+      "url": "https://www.iso.org/standard/62392.html"
+    },
+    "assetLifecycle": {
+      "standard": "ISO 55000",
+      "purpose": "Assets, machines, tools, measuring devices, and maintenance evidence must preserve lifecycle value, risk, and assurance.",
+      "url": "https://www.iso.org/standard/83053.html"
+    }
+  },
+  "authorityLayers": [
+    {
+      "layer": "physical_schema",
+      "sourceOfTruth": [
+        "mom/database/migrations/*.sql",
+        "mom/database/schema.sql",
+        "mom/data/registry/schema-authority-summary.json"
+      ],
+      "mustProvide": [
+        "table",
+        "column",
+        "primaryKey",
+        "foreignKey",
+        "index",
+        "migrationSource",
+        "databaseSchema",
+        "runtimeExistence"
+      ],
+      "mustNotInferFrom": [
+        "Schema Studio workspace draft",
+        "frontend labels",
+        "generated screenshots"
+      ]
+    },
+    {
+      "layer": "semantic_contract",
+      "sourceOfTruth": [
+        "mom/contracts/objects/*/contract.json",
+        "mom/contracts/object-index.json",
+        "mom/contracts/state-model-index.json",
+        "mom/contracts/command-index.json",
+        "mom/contracts/event-index.json"
+      ],
+      "mustProvide": [
+        "purpose",
+        "ownerDomain",
+        "objectRole",
+        "storage",
+        "identity",
+        "governance",
+        "workflow",
+        "integration",
+        "runtimeExposure",
+        "invariants"
+      ]
+    },
+    {
+      "layer": "runtime_registry",
+      "sourceOfTruth": [
+        "mom/data/registry/table-registry.json",
+        "mom/data/registry/endpoint-catalog.json",
+        "mom/data/registry/relation-map.json",
+        "mom/data/registry/registry-manifest.json"
+      ],
+      "mustProvide": [
+        "domain",
+        "primaryKey",
+        "columns",
+        "foreignKeys",
+        "digitalThread",
+        "workflowId",
+        "statusColumn",
+        "supportTable"
+      ]
+    },
+    {
+      "layer": "frontend_api_contract",
+      "sourceOfTruth": [
+        "mom/data/registry/endpoint-catalog-index.json",
+        "mom/data/registry/endpoint-governance-classification.json"
+      ],
+      "mustProvide": [
+        "method",
+        "path",
+        "controller",
+        "handler",
+        "authorityClass",
+        "exposure",
+        "sideEffectLevel",
+        "auth_required",
+        "csrf_required",
+        "idempotencyRequired",
+        "auditRequired"
+      ]
+    },
+    {
+      "layer": "event_contract",
+      "sourceOfTruth": [
+        "mom/contracts/event-index.json",
+        "mom/data/registry/enterprise-event-contract-map.json"
+      ],
+      "mustProvide": [
+        "cloudeventType",
+        "source",
+        "subject",
+        "dataschema",
+        "producer",
+        "consumer",
+        "correlationId"
+      ]
+    },
+    {
+      "layer": "ai_authority_chain",
+      "sourceOfTruth": [
+        "mom/contracts/ai-authority-chain.json"
+      ],
+      "mustProvide": [
+        "editableSurfaces",
+        "readOnlySurfaces",
+        "forbiddenInferences",
+        "workflowBypassRules",
+        "dataLossGuards"
+      ]
+    }
+  ],
+  "tableGovernanceRequiredFields": [
+    "systemOfRecord",
+    "authorityMode",
+    "ownerRole",
+    "stewardRole",
+    "dataClassification",
+    "retentionClass",
+    "deletionMode",
+    "qualityProfile",
+    "apiContractRefs",
+    "eventContractRefs",
+    "workflowRefs",
+    "uiSurfaces"
+  ],
+  "endpointGovernanceRequiredFields": [
+    "authorityClass",
+    "exposure",
+    "sideEffectLevel",
+    "requestSchemaRef",
+    "responseSchemaRef",
+    "idempotencyRequired",
+    "auditRequired",
+    "eventRefs",
+    "permissionRefs",
+    "workflowRefs"
+  ],
+  "deletionPolicy": {
+    "defaultMode": "archive_only",
+    "hardDeleteDefaultRule": "forbidden_for_all_runtime_domains_without_explicit_waiver",
+    "hardDeleteAllowedOnlyWhen": [
+      "objectRole is transient_draft",
+      "objectRole is cache_projection and source can be regenerated",
+      "supportTable is true and no regulated, financial, quality, production, shipment, inventory, HR, EHS, or machine trace is stored"
+    ],
+    "hardDeleteAllowedDomainWaivers": [],
+    "hardDeleteForbiddenForDomains": [
+      "advanced_planning",
+      "ai_predictive",
+      "audit_risk",
+      "bi_datawarehouse",
+      "calibration_equipment",
+      "finance",
+      "finance_extended",
+      "finance_treasury",
+      "forms_system",
+      "foundation_governance",
+      "quality_improvement",
+      "quality_lab",
+      "quality_management",
+      "planning_production",
+      "plant_maintenance",
+      "production",
+      "project_management",
+      "mes_execution",
+      "inventory_logistics",
+      "inventory",
+      "warehouse_management",
+      "shipping_compliance",
+      "transportation",
+      "procurement_supplier_quality",
+      "purchasing",
+      "supplier_relationship",
+      "commercial_customer",
+      "commercial_contracts",
+      "crm",
+      "customer_portal",
+      "sales",
+      "service_warranty",
+      "maintenance_ehs",
+      "ehs_sustainability",
+      "master_data",
+      "master_data_governance",
+      "mfg_engineering",
+      "fmea_apqp",
+      "lean_manufacturing",
+      "cnc_programs",
+      "tooling_lifecycle",
+      "traceability_serialization",
+      "hcm_workforce",
+      "training_hr",
+      "document_control",
+      "evidence_vault",
+      "record_system",
+      "core_system",
+      "system_infrastructure",
+      "mobile_operations",
+      "digital_product_passport",
+      "outsource_execution",
+      "plm_change_control",
+      "trade_compliance"
+    ]
+  },
+  "aiOperatingRules": [
+    "Never treat Schema Studio workspace draft as backend truth.",
+    "Never create or edit process data through a machine-runtime editor.",
+    "Never infer authority from labels, screenshots, dropdown text, or table count alone.",
+    "Every new backend object must answer: purpose, owner, source of truth, workflow, API, event, deletion/retention, KPI, audit, and frontend surface.",
+    "If an object has no runtime/API/workflow/UI purpose, classify it as unused_candidate or archive_isolation before exposing it.",
+    "Primary keys and identity fields are immutable after creation unless a governed supersession workflow exists.",
+    "Regulated records use correction, reversal, archive, or supersession; not destructive deletion.",
+    "Machine-origin data must preserve machine_id, source connector, event time, receive time, unit, confidence/staleness, and correlation id."
+  ],
+  "qualityGates": {
+    "registryBuild": [
+      "schema_validation_passed",
+      "manifest_sources_exist",
+      "no_unknown_authority_layer",
+      "no_core_hard_delete_without_waiver",
+      "no_frontend_endpoint_without_auth_policy",
+      "no_command_without_event_or_audit_trace",
+      "no_machine_event_without_time_and_source"
+    ],
+    "frontendRelease": [
+      "all_visible_entities_have_api_contract",
+      "all_editable_fields_have_validation_rule",
+      "all_process_actions_use_command_or_workflow_endpoint",
+      "all_machine_runtime_tables_are scoped_to_machine_runtime"
+    ],
+    "aiChange": [
+      "authority_chain_checked",
+      "data_loss_guard_checked",
+      "workflow_bypass_checked",
+      "registry_doctor_rerun"
+    ]
+  }
+}

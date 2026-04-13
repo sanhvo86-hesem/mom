@@ -40,6 +40,8 @@ class GenericCrudService
 
     /** @var array<string, array<string, mixed>> */
     private array $tables = [];
+    /** @var array<string, array<string, mixed>>|null */
+    private ?array $tableGovernanceOverlay = null;
 
     public function __construct(string $dataDir)
     {
@@ -1247,14 +1249,32 @@ class GenericCrudService
      */
     private function deleteContract(string $tableName, array $table): array
     {
-        if ((bool)($table['supportTable'] ?? false)) {
+        $columns = (array)($table['columns'] ?? []);
+        $overlay = $this->tableGovernanceOverlayFor($tableName);
+        $overlayDeletionMode = strtolower(trim((string)($overlay['deletionMode'] ?? '')));
+        $waiverRequired = (bool)($overlay['hardDeleteWaiverRequired'] ?? false);
+
+        if ($overlayDeletionMode === 'archive_only' || $waiverRequired) {
+            if (array_key_exists('deleted_at', $columns) || array_key_exists('is_deleted', $columns) || array_key_exists('archived_at', $columns)) {
+                return [
+                    'mode' => 'soft_delete',
+                    'message' => '',
+                ];
+            }
+
+            return [
+                'mode' => 'archive_only',
+                'message' => 'Hard delete disabled by enterprise registry governance. Use archive, correction, reversal, or supersession flows instead.',
+            ];
+        }
+
+        if ((bool)($table['supportTable'] ?? false) && $overlayDeletionMode === 'hard_delete') {
             return [
                 'mode' => 'hard_delete',
                 'message' => '',
             ];
         }
 
-        $columns = (array)($table['columns'] ?? []);
         if (array_key_exists('deleted_at', $columns) || array_key_exists('is_deleted', $columns) || array_key_exists('archived_at', $columns)) {
             return [
                 'mode' => 'soft_delete',
@@ -1280,6 +1300,27 @@ class GenericCrudService
             'mode' => 'hard_delete',
             'message' => '',
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function tableGovernanceOverlayFor(string $tableName): array
+    {
+        if ($this->tableGovernanceOverlay === null) {
+            $path = rtrim($this->dataDir, '/\\') . '/registry/table-governance-overlay.json';
+            $payload = [];
+            if (is_file($path)) {
+                $decoded = json_decode((string)file_get_contents($path), true);
+                if (is_array($decoded)) {
+                    $payload = $decoded;
+                }
+            }
+            $this->tableGovernanceOverlay = is_array($payload['tables'] ?? null) ? $payload['tables'] : [];
+        }
+
+        $table = $this->tableGovernanceOverlay[$tableName] ?? [];
+        return is_array($table) ? $table : [];
     }
 
     private function assertIdentifier(string $value, string $label): string

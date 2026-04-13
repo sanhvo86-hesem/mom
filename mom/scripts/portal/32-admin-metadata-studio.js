@@ -76,7 +76,7 @@ function _fmtTime(value){
 }
 function _tone(status){
   var key = String(status || '').toLowerCase();
-  if(key === 'ok' || key === 'good' || key === 'pass' || key === 'ready' || key === 'reachable') return 'good';
+  if(key === 'ok' || key === 'good' || key === 'pass' || key === 'ready' || key === 'reachable' || key === 'fresh' || key === 'aligned' || key === 'tracked' || key === 'source_authority') return 'good';
   if(key === 'warn' || key === 'warning' || key === 'review_required' || key === 'partial' || key === 'medium') return 'warn';
   if(key === 'bad' || key === 'error' || key === 'failed' || key === 'unreachable' || key === 'blocked' || key === 'critical' || key === 'high') return 'bad';
   return 'neutral';
@@ -128,6 +128,7 @@ function _methodBadge(method){
 function _emptyState(title, text){
   return '<div class="ds-empty"><div class="ds-empty-icon">∅</div><div class="ds-empty-title">' + _esc(title) + '</div><p>' + _esc(text) + '</p></div>';
 }
+var API_LIST_RENDER_LIMIT = 250;
 function _humanizeKey(key){
   return String(key || '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -199,6 +200,7 @@ var state = {
   apiDomain: 'ALL',
   apiMethod: 'ALL',
   apiKind: 'ALL',
+  apiVisibleLimit: API_LIST_RENDER_LIMIT,
   tableSearch: '',
   tableDomain: 'ALL',
   libraryTab: 'schemas',
@@ -762,6 +764,33 @@ function _filteredApis(){
   });
 }
 
+function _cappedRowsKeepingSelected(rows, selectedKey, limit){
+  var max = Math.max(1, Number(limit || 1));
+  var selected = null;
+  var key = String(selectedKey || '');
+  var output = [];
+  var seen = {};
+  for(var i = 0; i < rows.length; i += 1){
+    var rowKey = String(rows[i] && rows[i].key || '');
+    if(key && rowKey === key){
+      selected = rows[i];
+      break;
+    }
+  }
+  if(selected){
+    output.push(selected);
+    seen[String(selected.key || '')] = true;
+  }
+  for(var j = 0; j < rows.length && output.length < max; j += 1){
+    var candidate = rows[j];
+    var candidateKey = String(candidate && candidate.key || '');
+    if(seen[candidateKey]) continue;
+    output.push(candidate);
+    seen[candidateKey] = true;
+  }
+  return output;
+}
+
 function _filteredTables(){
   var rows = _list('tables');
   return rows.filter(function(item){
@@ -1079,9 +1108,11 @@ function _renderArtifactFreshnessTable(rows){
     return _emptyState(_t('Chưa có artifact', 'No artifacts'), _t('Không có dữ liệu freshness cho artifacts.', 'No freshness data is available for artifacts.'));
   }
   return '<div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>' + _esc(_t('Artifact', 'Artifact')) + '</th><th>' + _esc(_t('Category', 'Category')) + '</th><th>' + _esc(_t('Status', 'Status')) + '</th><th>' + _esc(_t('Age', 'Age')) + '</th><th>' + _esc(_t('Source drift', 'Source drift')) + '</th><th>' + _esc(_t('Size', 'Size')) + '</th><th>' + _esc(_t('Source', 'Source')) + '</th></tr></thead><tbody>' + rows.map(function(row){
-    var sourceDrift = row.dependencyStatus === 'n/a'
-      ? _badge(_t('n/a', 'n/a'), 'neutral')
-      : _badge(row.dependencyStatus || 'aligned', _tone(row.dependencyStatus || 'neutral'));
+    var dependencyStatus = String(row.dependencyStatus || 'aligned');
+    var dependencyLabel = dependencyStatus === 'source_authority'
+      ? _t('source authority', 'source authority')
+      : dependencyStatus;
+    var sourceDrift = _badge(dependencyLabel, _tone(dependencyStatus || 'neutral'));
     var releaseBadge = row.requiredForRelease ? _badge(_t('release', 'release'), 'warn') : '';
     return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div><div class="ds-chip-row">' + releaseBadge + '</div></td><td>' + _badge(row.category || 'artifact', 'neutral') + '</td><td>' + _badge(row.status || 'unknown', _tone(row.status || 'neutral')) + '</td><td>' + _esc(row.ageLabel || '—') + '<div class="ds-table-note">' + _esc(_fmtTime(row.generatedAt || row.fileMtime)) + '</div></td><td>' + sourceDrift + '<div class="ds-table-note">' + _esc(row.sourceDriftLabel || '0s') + (row.latestDependencyAt ? ' · ' + _esc(_fmtTime(row.latestDependencyAt)) : '') + '</div>' + (row.latestDependencyPath ? '<div class="ds-table-note"><code>' + _esc(row.latestDependencyPath) + '</code></div>' : '') + '</td><td>' + _esc(row.sizeLabel || _fmtBytes(row.sizeBytes || 0)) + '</td><td><code>' + _esc(row.path || '') + '</code></td></tr>';
   }).join('') + '</tbody></table></div>';
@@ -1099,8 +1130,19 @@ function _renderDomainTable(rows){
 function _renderApiTab(){
   var rows = _filteredApis();
   var detail = state.apiDetail;
+  var hasDetail = !!(detail && detail.item);
+  var safeDetail = detail && typeof detail === 'object' ? detail : {};
   var summary = _selectedApiSummary();
   var current = detail && detail.item ? Object.assign({}, summary || {}, detail.item || {}) : (summary || null);
+  var apiParams = safeDetail.api_params && typeof safeDetail.api_params === 'object' ? safeDetail.api_params : {};
+  var detailFields = Array.isArray(safeDetail.fields) ? safeDetail.fields : [];
+  var requestCount = (apiParams.params && apiParams.params.length)
+    || (current && current.request && current.request.body_fields && current.request.body_fields.length)
+    || 0;
+  var fieldCount = hasDetail ? detailFields.length : (current ? current.field_count : 0);
+  var visibleLimit = Math.max(API_LIST_RENDER_LIMIT, Number(state.apiVisibleLimit || API_LIST_RENDER_LIMIT));
+  var visibleRows = _cappedRowsKeepingSelected(rows, state.selectedApiKey, visibleLimit);
+  var hiddenRows = Math.max(0, rows.length - visibleRows.length);
   var toolbar = [
     '<div class="ds-toolbar">',
       '<div class="ds-search"><input value="' + _esc(state.apiSearch) + '" placeholder="' + _esc(_t('Tìm action, path, entity...', 'Search action, path, entity...')) + '" oninput=\'DataSchemaAdmin.setApiSearch(this.value)\'></div>',
@@ -1109,10 +1151,14 @@ function _renderApiTab(){
         '<select onchange=\'DataSchemaAdmin.setApiMethod(this.value)\'><option value="ALL">All methods</option>' + ['GET','POST','PUT','PATCH','DELETE'].map(function(key){ return '<option value="' + _esc(key) + '"' + (state.apiMethod===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select>',
         '<select onchange=\'DataSchemaAdmin.setApiKind(this.value)\'><option value="ALL">All kinds</option>' + _apiKinds().map(function(key){ return '<option value="' + _esc(key) + '"' + (state.apiKind===key?' selected':'') + '>' + _esc(key) + '</option>'; }).join('') + '</select>',
       '</div>',
+      '<div class="ds-helper-text">' + _esc(_t('Đang hiển thị', 'Showing')) + ' ' + _esc(_fmtInt(visibleRows.length)) + ' / ' + _esc(_fmtInt(rows.length)) + ' ' + _esc(_t('endpoint. Dùng tìm kiếm/bộ lọc để mở đúng contract thay vì render toàn bộ registry một lần.', 'endpoints. Use search/filters to open the exact contract instead of rendering the whole registry at once.')) + '</div>',
     '</div>'
   ].join('');
 
-  var listHtml = rows.length ? rows.map(function(item){
+  var overflowHtml = hiddenRows > 0
+    ? '<div class="ds-inline-alert tone-neutral">' + _esc(_t('Danh mục API đã được giới hạn để tránh treo trình duyệt.', 'API catalog rendering is capped to prevent browser lockups.')) + ' ' + _esc(_t('Còn ẩn', 'Hidden')) + ': ' + _esc(_fmtInt(hiddenRows)) + '. <button class="ds-btn sm" type="button" onclick="DataSchemaAdmin.showMoreApis()">' + _esc(_t('Hiển thị thêm', 'Show more')) + '</button></div>'
+    : '';
+  var listHtml = rows.length ? overflowHtml + visibleRows.map(function(item){
     var active = String(item.key) === String(state.selectedApiKey);
     return '<button class="ds-list-item' + (active ? ' active' : '') + '" type="button" onclick=\'DataSchemaAdmin.selectApi(' + _js(item.key) + ')\'><div class="ds-list-head">' + _methodBadge(item.method) + '<strong>' + _esc(item.label || item.key) + '</strong></div><div class="ds-list-meta">' + _esc(item.key) + '</div><div class="ds-chip-row">' + _badge(item.domain || 'domain', 'neutral') + _badge(item.kind || 'kind', 'neutral') + _badge(item.implementation_linked ? 'CTRL LINKED' : 'UNLINKED', item.implementation_linked ? 'good' : 'bad') + _badge(item.truth_status || 'truth', _truthTone(item.truth_status)) + ((item.csrf_required) ? _badge('CSRF', 'warn') : '') + ((item.admin_only) ? _badge('ADMIN', 'bad') : '') + '</div></button>';
   }).join('') : _emptyState(_t('Không có API', 'No APIs'), _t('Không còn API phù hợp bộ lọc hiện tại.', 'No APIs match the current filters.'));
@@ -1147,12 +1193,12 @@ function _renderApiTab(){
         _badge(authRequired ? 'AUTH' : 'PUBLIC', _boolTone(authRequired)) +
         _badge(csrfRequired ? 'CSRF' : 'NO CSRF', csrfRequired ? 'warn' : 'neutral') +
         _badge(adminOnly ? 'ADMIN ONLY' : 'SHARED', adminOnly ? 'bad' : 'good') +
-        '</div><div class="ds-helper-text">' + _esc(_t('Dùng editor JSON bên dưới để chỉnh metadata endpoint, request/response và field packs.', 'Use the JSON editor below to update endpoint metadata, request/response and field packs.')) + '</div>' + _renderSaveGuard(detail, 'api') + '</section>',
+        '</div><div class="ds-helper-text">' + _esc(hasDetail ? _t('Dùng editor JSON bên dưới để chỉnh metadata endpoint, request/response và field packs.', 'Use the JSON editor below to update endpoint metadata, request/response and field packs.') : _t('Đang tải detail từ backend. Summary chỉ dùng để xem nhanh, chưa được phép lưu.', 'Loading detail from the backend. Summary data is read-only and cannot be saved yet.')) + '</div>' + _renderSaveGuard(detail, 'api') + '</section>',
       '<section class="ds-detail-section"><h4>' + _esc(_t('Request / response summary', 'Request / response summary')) + '</h4>' +
-        '<div class="ds-inline-grid"><article class="ds-mini-card"><small>Request</small><strong>' + _esc(_fmtInt((detail.api_params && detail.api_params.params && detail.api_params.params.length) || (current.request && current.request.body_fields && current.request.body_fields.length) || 0)) + '</strong><p>' + _esc(_t('tham số / field được khai báo', 'declared params / fields')) + '</p></article>' +
-        '<article class="ds-mini-card"><small>Fields</small><strong>' + _esc(_fmtInt((detail.fields || []).length)) + '</strong><p>' + _esc(_t('field definitions gắn với endpoint', 'field definitions bound to the endpoint')) + '</p></article>' +
+        '<div class="ds-inline-grid"><article class="ds-mini-card"><small>Request</small><strong>' + _esc(_fmtInt(requestCount)) + '</strong><p>' + _esc(_t('tham số / field được khai báo', 'declared params / fields')) + '</p></article>' +
+        '<article class="ds-mini-card"><small>Fields</small><strong>' + _esc(_fmtInt(fieldCount)) + '</strong><p>' + _esc(_t('field definitions gắn với endpoint', 'field definitions bound to the endpoint')) + '</p></article>' +
         '<article class="ds-mini-card"><small>Deletion</small><strong>' + _esc((current.capabilities && current.capabilities.deletion && current.capabilities.deletion.mode) || '—') + '</strong><p>' + _esc(_t('chính sách xóa hiện tại', 'current deletion posture')) + '</p></article></div></section>',
-      '<section class="ds-detail-section"><h4>JSON</h4><textarea class="ds-editor" oninput=\'DataSchemaAdmin.setApiEditor(this.value)\'>' + _esc(state.apiEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveApi()\'>' + _esc(_t('Lưu API metadata', 'Save API metadata')) + '</button><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.copyApiPath()\'>' + _esc(_t('Copy path', 'Copy path')) + '</button></div></section>',
+      '<section class="ds-detail-section"><h4>JSON</h4><textarea class="ds-editor" ' + (hasDetail ? '' : 'readonly ') + 'oninput=\'DataSchemaAdmin.setApiEditor(this.value)\'>' + _esc(state.apiEditor) + '</textarea><div class="ds-editor-actions"><button class="ds-btn primary" type="button" onclick=\'DataSchemaAdmin.saveApi()\' ' + (hasDetail ? '' : 'disabled') + '>' + _esc(_t('Lưu API metadata', 'Save API metadata')) + '</button><button class="ds-btn" type="button" onclick=\'DataSchemaAdmin.copyApiPath()\'>' + _esc(_t('Copy path', 'Copy path')) + '</button></div></section>',
     '</div>'
   ].join('') : _emptyState(_t('Chọn một API', 'Select an API'), _t('Chọn một endpoint bên trái để xem contract và chỉnh metadata.', 'Select an endpoint on the left to inspect its contract and edit metadata.'));
 
@@ -1457,10 +1503,11 @@ var DataSchemaAdmin = {
     if(state.tab === 'designs' && state.selectedDesignId && !state.designSchema) _loadDesign(state.selectedDesignId, false);
     _paint();
   },
-  setApiSearch: function(value){ state.apiSearch = String(value || ''); _paint(); },
-  setApiDomain: function(value){ state.apiDomain = String(value || 'ALL'); _paint(); },
-  setApiMethod: function(value){ state.apiMethod = String(value || 'ALL'); _paint(); },
-  setApiKind: function(value){ state.apiKind = String(value || 'ALL'); _paint(); },
+  setApiSearch: function(value){ state.apiSearch = String(value || ''); state.apiVisibleLimit = API_LIST_RENDER_LIMIT; _paint(); },
+  setApiDomain: function(value){ state.apiDomain = String(value || 'ALL'); state.apiVisibleLimit = API_LIST_RENDER_LIMIT; _paint(); },
+  setApiMethod: function(value){ state.apiMethod = String(value || 'ALL'); state.apiVisibleLimit = API_LIST_RENDER_LIMIT; _paint(); },
+  setApiKind: function(value){ state.apiKind = String(value || 'ALL'); state.apiVisibleLimit = API_LIST_RENDER_LIMIT; _paint(); },
+  showMoreApis: function(){ state.apiVisibleLimit = Math.max(API_LIST_RENDER_LIMIT, Number(state.apiVisibleLimit || API_LIST_RENDER_LIMIT)) + API_LIST_RENDER_LIMIT; _paint(); },
   selectApi: function(key){ _loadApiDetail(String(key || ''), false); },
   setApiEditor: function(value){ state.apiEditor = String(value || ''); },
   saveApi: function(){ _saveEditor('api'); },

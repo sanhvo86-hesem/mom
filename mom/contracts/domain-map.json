@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Major canonical ERP+MOM domains used by the business contract authority layer.",
-    "domainCount": 10
+    "domainCount": 12
   },
   "domains": [
     {
@@ -118,6 +118,17 @@
       "purpose": "Canonical ERP+MOM domain contract for Master Data."
     },
     {
+      "key": "mes_execution",
+      "label": "Mes Execution",
+      "canonicalPath": "mes-execution",
+      "resourceCount": 1,
+      "authoredPackageCount": 1,
+      "resourceKeys": [
+        "machine-alarms"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Mes Execution."
+    },
+    {
       "key": "planning_production",
       "label": "Planning Production",
       "canonicalPath": "planning-production",
@@ -153,11 +164,12 @@
       "key": "quality_improvement",
       "label": "Quality Improvement",
       "canonicalPath": "quality-improvement",
-      "resourceCount": 11,
-      "authoredPackageCount": 11,
+      "resourceCount": 12,
+      "authoredPackageCount": 12,
       "resourceKeys": [
         "audit-programs",
         "concessions",
+        "control-plans",
         "corrective-actions",
         "deviations",
         "fqc-inspections",
@@ -169,6 +181,17 @@
         "spc-observations"
       ],
       "purpose": "Canonical ERP+MOM domain contract for Quality Improvement."
+    },
+    {
+      "key": "traceability_serialization",
+      "label": "Traceability Serialization",
+      "canonicalPath": "traceability-serialization",
+      "resourceCount": 1,
+      "authoredPackageCount": 1,
+      "resourceKeys": [
+        "lot-genealogy"
+      ],
+      "purpose": "Canonical ERP+MOM domain contract for Traceability Serialization."
     }
   ]
 }

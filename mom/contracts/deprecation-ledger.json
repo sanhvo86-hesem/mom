@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-11T08:49:08.978371+00:00",
+    "generatedAt": "2026-04-11T14:57:57.559341+00:00",
     "description": "Ledger of legacy object names and tables retained for non-destructive migration and compatibility.",
-    "entryCount": 208
+    "entryCount": 217
   },
   "entries": [
     {
@@ -385,6 +385,18 @@
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
     },
     {
+      "legacyKey": "fmea_control_plans",
+      "successorCanonicalResource": "quality_improvement.control-plans",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "fmea_control_plans",
+      "successorCanonicalResource": "quality_improvement.control-plans",
+      "status": "compatibility_supported",
+      "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
       "legacyKey": "fqc_inspections",
       "successorCanonicalResource": "quality_improvement.fqc-inspections",
       "status": "compatibility_supported",
@@ -643,6 +655,30 @@
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
     },
     {
+      "legacyKey": "lot_genealogy",
+      "successorCanonicalResource": "traceability_serialization.lot-genealogy",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "lot_genealogy",
+      "successorCanonicalResource": "traceability_serialization.lot-genealogy",
+      "status": "compatibility_supported",
+      "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
+      "legacyKey": "machine_alarm_events",
+      "successorCanonicalResource": "mes_execution.machine-alarms",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "machine_alarm_events",
+      "successorCanonicalResource": "mes_execution.machine-alarms",
+      "status": "compatibility_supported",
+      "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
       "legacyKey": "maintenance_plans",
       "successorCanonicalResource": "maintenance_ehs.maintenance-plans",
       "status": "compatibility_supported",
@@ -695,6 +731,12 @@
       "successorCanonicalResource": "analytics.mes-oee-snapshots",
       "status": "compatibility_supported",
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
+      "legacyKey": "mes_part_genealogy",
+      "successorCanonicalResource": "traceability_serialization.lot-genealogy",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
     },
     {
       "legacyKey": "msa_studies",
@@ -765,6 +807,12 @@
     {
       "legacyKey": "oqc_result",
       "successorCanonicalResource": "quality_improvement.oqc-inspections",
+      "status": "compatibility_supported",
+      "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
+      "legacyKey": "part_genealogy",
+      "successorCanonicalResource": "traceability_serialization.lot-genealogy",
       "status": "compatibility_supported",
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
     },
@@ -911,6 +959,12 @@
       "successorCanonicalResource": "planning_production.production-plans",
       "status": "compatibility_supported",
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
+      "legacyKey": "purchase_order",
+      "successorCanonicalResource": "procurement_supplier_quality.supplier-purchase-orders",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
     },
     {
       "legacyKey": "purchase_orders",

@@ -1,0 +1,84 @@
+{
+  "blockType": "data-tree",
+  "version": "1.0.0",
+  "status": "approved",
+  "owner": "Frontend Architecture Council",
+  "allowedZones": ["primary"],
+  "propsSchema": {
+    "required": ["dataSource"],
+    "optional": ["nodeLabel", "nodeId", "childrenKey", "selectionMode", "expandDepth"]
+  },
+  "dataSourceContract": {
+    "mode": "required",
+    "allowedMethods": ["GET"],
+    "requiredBindings": ["dataSource.api", "dataSource.dataKey"]
+  },
+  "eventContract": {
+    "emits": ["node-expand", "node-collapse", "node-select"],
+    "consumes": ["record-selected", "refresh-requested"]
+  },
+  "stateContract": {
+    "loading": "Show tree skeleton and aria-busy.",
+    "empty": "Show no hierarchy message.",
+    "error": "Show error with retry.",
+    "readonly": "Allow navigation, disable mutation.",
+    "disabled": "Disable selection but keep hierarchy readable.",
+    "permissionDenied": "Hide restricted nodes and show redaction reason."
+  },
+  "permissionContract": {
+    "requiresPermission": true,
+    "permissionSource": "runtime-access-policy.json",
+    "action": "list"
+  },
+  "a11yContract": {
+    "role": "tree",
+    "apgPattern": "treeview",
+    "wcagCriteria": ["1.3.1", "2.1.1", "2.4.3", "2.4.7", "4.1.2", "4.1.3"],
+    "accessibleName": "Tree title or hierarchy name.",
+    "keyboard": {
+      "arrowRight": "Expand node or move to first child.",
+      "arrowLeft": "Collapse node or move to parent.",
+      "arrowUpDown": "Move between visible nodes.",
+      "enterSpace": "Select focused node."
+    },
+    "focus": {
+      "entry": "Selected node or first root node.",
+      "restore": "Return to selected node after detail closes.",
+      "visibleIndicator": "Node focus indicator visible in all themes."
+    },
+    "announcements": {
+      "selection": "Announce selected node and level.",
+      "expandCollapse": "Expose aria-expanded state."
+    },
+    "errorAssociation": { "required": false, "pattern": "No inline field errors." },
+    "targetSize": { "minimum": "1.5rem by 1.5rem for expand/collapse controls" },
+    "contrast": { "textMinimum": "4.5:1", "nonTextMinimum": "3:1" },
+    "forcedColors": { "required": true },
+    "reducedMotion": { "disableAnimatedExpand": true },
+    "screenReaderMatrix": ["NVDA/Firefox", "VoiceOver/Safari"],
+    "automatedRules": ["aria-required-children", "aria-required-parent", "color-contrast"],
+    "manualTestScript": ["Expand and collapse by keyboard", "Select child node", "Verify aria-level and aria-expanded"]
+  },
+  "responsiveContract": {
+    "compact": "Horizontal indent remains readable; provide detail drill-in for deep trees.",
+    "desktop": "Tree may sit beside detail panel.",
+    "overflow": "Do not truncate node labels without accessible full label."
+  },
+  "themeContract": {
+    "tokensOnly": true,
+    "requiredTokens": ["--tree-indent", "--focus-ring", "--text-primary", "--border"]
+  },
+  "printExportContract": {
+    "print": "Print expanded hierarchy path for selected record.",
+    "export": ["node_id", "parent_id", "level", "label"]
+  },
+  "testIds": {
+    "root": "block-data-tree",
+    "node": "tree-node",
+    "toggle": "tree-toggle"
+  },
+  "qaEvidence": {
+    "status": "IMPLEMENTED",
+    "requiredGates": ["G01", "G02", "G03", "G07", "G08"]
+  }
+}

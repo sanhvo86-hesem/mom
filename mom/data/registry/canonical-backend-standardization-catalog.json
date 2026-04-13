@@ -3,7 +3,7 @@
     "version": "1.0",
     "generatedAt": "2026-04-09T15:45:00+07:00",
     "description": "Machine-readable authority catalog for international-standard backend normalization across ERP, MES, QMS, EAM, EHS, CRM, SCM, and finance flows.",
-    "resourceCount": 64,
+    "resourceCount": 67,
     "authorityDocs": [
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/backend-readiness-gap-analysis-2026-04-09.md",
       "/Users/a10/Library/CloudStorage/GoogleDrive-n.uyenvo1911@gmail.com/My Drive/sanh/git/hesemeqms/mom/docs/global-backend-standardization-blueprint-2026-04-09.md",
@@ -1022,6 +1022,33 @@
             "source_record_id -> ncr_records.source_record_id"
           ]
         },
+        "control-plans": {
+          "pattern": "lifecycle_owner",
+          "table": "control_plans",
+          "primary_key": "control_plan_id",
+          "status_column": "status",
+          "legacy_tables": [
+            "fmea_control_plans"
+          ],
+          "child_tables": [
+            "control_plan_characteristics",
+            "fmea_records",
+            "apqp_gate_reviews"
+          ],
+          "recommended_actions": [
+            "activate",
+            "archive",
+            "revise"
+          ],
+          "key_relationships": [
+            "linked_fmea_id -> fmea_records.fmea_id",
+            "item_id -> items.item_id",
+            "approved_by -> users.user_id"
+          ],
+          "aiag_vda_fmea_link_required": true,
+          "control_characteristics_required": true,
+          "reaction_plan_required": true
+        },
         "msa-studies": {
           "pattern": "assessment_record",
           "table": "calibration_grr_studies",
@@ -1245,6 +1272,70 @@
           "timeboxed_expiry_required": true,
           "reason_code_field": "reason_code",
           "approval_reference_required": true
+        }
+      }
+    },
+    "mes_execution": {
+      "resources": {
+        "machine-alarms": {
+          "pattern": "machine_runtime_event",
+          "table": "mes_machine_alarms",
+          "primary_key": [
+            "alarm_id",
+            "alarm_time"
+          ],
+          "status_column": "escalation_status",
+          "legacy_tables": [
+            "machine_alarm_events"
+          ],
+          "child_tables": [
+            "downtime_event",
+            "maintenance_work_orders"
+          ],
+          "recommended_actions": [
+            "acknowledge",
+            "escalate",
+            "clear"
+          ],
+          "key_relationships": [
+            "equipment_id -> equipment.equipment_id",
+            "operator_id -> users.username",
+            "job_number -> job_orders.job_number"
+          ],
+          "machine_source_required": true,
+          "timestamp_source": "machine_or_edge_gateway",
+          "operator_resolution_trace_required": true
+        }
+      }
+    },
+    "traceability_serialization": {
+      "resources": {
+        "lot-genealogy": {
+          "pattern": "digital_thread_evidence",
+          "table": "genealogy_link",
+          "primary_key": "genealogy_link_id",
+          "status_column": null,
+          "legacy_tables": [
+            "lot_genealogy",
+            "mes_part_genealogy"
+          ],
+          "child_tables": [
+            "trace_genealogy_batches",
+            "trace_genealogy_links",
+            "mes_part_genealogy"
+          ],
+          "recommended_actions": [
+            "record_link",
+            "correct_link"
+          ],
+          "key_relationships": [
+            "production_order_id -> production_order.production_order_id",
+            "parent_lot_no -> inventory_lots.lot_number",
+            "child_lot_no -> inventory_lots.lot_number"
+          ],
+          "forward_trace_required": true,
+          "backward_trace_required": true,
+          "correction_not_delete": true
         }
       }
     },

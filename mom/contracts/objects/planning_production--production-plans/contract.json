@@ -13,7 +13,10 @@
     "statusField": "schedule_status",
     "childTables": [
       "production_plan_lines",
-      "production_schedule_slots"
+      "production_schedule_slots",
+      "aps_demand_forecasts",
+      "aps_capacity_buckets",
+      "mrp_planned_orders"
     ],
     "legacyTables": [
       "production_plans"

@@ -47,12 +47,16 @@
     ]
   },
   "workflow": {
-    "implemented": false,
+    "implemented": true,
     "truthStatus": "implemented_runtime",
     "source": "calibration_equipment.calibration_grr_studies persisted assessment record",
     "lifecycleMode": "assessment_record_runtime",
     "disableGeneratedCommands": true,
-    "commands": [],
+    "commands": [
+      { "command": "record", "description": "Record a new MSA/GRR study with device, operator, sample, trial and result evidence.", "idempotencyScope": "assessment+natural_key", "preconditions": ["measurement_device_identified", "study_protocol_defined"] },
+      { "command": "update_evidence", "description": "Append or correct MSA evidence without overwriting the original audit trail.", "idempotencyScope": "resource+evidence_revision", "preconditions": ["change_reason_recorded"] },
+      { "command": "escalate_follow_up", "description": "Escalate unacceptable GRR or NDC result to calibration, NCR or improvement action.", "idempotencyScope": "resource+command", "preconditions": ["unacceptable_result_or_revalidation_trigger"] }
+    ],
     "states": []
   },
   "integration": {

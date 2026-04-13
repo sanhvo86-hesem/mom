@@ -78,9 +78,18 @@ final class DataSchemaService
         $schemaAuthority = $this->readJson($this->registryPath('schema-authority-summary'));
         $migrationGap = $this->readJson($this->registryPath('migration-gap-report'));
         $dataFieldsIndex = $this->readJson($this->registryPath('data-fields-index'));
+        $endpointGovernanceClassification = $this->readJson($this->registryPath('endpoint-governance-classification'));
+        $tableGovernanceOverlay = $this->readJson($this->registryPath('table-governance-overlay'));
+        $enterpriseEventContractMap = $this->readJson($this->registryPath('enterprise-event-contract-map'));
+        $destructiveEndpointQuarantine = $this->readJson($this->registryPath('destructive-endpoint-quarantine'));
+        $commandRuntimeBindings = $this->readJson($this->registryPath('command-runtime-bindings'));
+        $enterpriseRegistryDoctorReport = $this->readJson($this->registryPath('enterprise-registry-doctor-report'));
+        $enterpriseFrontendSimulationReport = $this->readJson($this->registryPath('enterprise-frontend-simulation-report'));
         $blindSpotReport = $this->readJson($this->registryPath('operational-blind-spot-report'));
         $stressReport = $this->readJson($this->registryPath('operational-stress-report'));
         $globalCapabilityAudit = $this->readJson($this->registryPath('global-erp-mom-capability-audit'));
+        $registryAuthorityStandard = $this->readJson($this->contractsPath('registry-authority-standard.json'));
+        $aiAuthorityChain = $this->readJson($this->contractsPath('ai-authority-chain.json'));
         $contractGlossary = $this->readJson($this->contractsPath('glossary.json'));
         $contractDomainMap = $this->readJson($this->contractsPath('domain-map.json'));
         $contractAuthorityReport = $this->readJson($this->contractsPath('authority-report.json'));
@@ -128,6 +137,15 @@ final class DataSchemaService
             'schema_authority' => $schemaAuthority,
             'migration_gap' => $migrationGap,
             'data_fields_index' => $dataFieldsIndex,
+            'endpoint_governance_classification' => $endpointGovernanceClassification,
+            'table_governance_overlay' => $tableGovernanceOverlay,
+            'enterprise_event_contract_map' => $enterpriseEventContractMap,
+            'destructive_endpoint_quarantine' => $destructiveEndpointQuarantine,
+            'command_runtime_bindings' => $commandRuntimeBindings,
+            'enterprise_registry_doctor_report' => $enterpriseRegistryDoctorReport,
+            'enterprise_frontend_simulation_report' => $enterpriseFrontendSimulationReport,
+            'registry_authority_standard' => $registryAuthorityStandard,
+            'ai_authority_chain' => $aiAuthorityChain,
             'blind_spot_report' => $blindSpotReport,
             'stress_report' => $stressReport,
             'global_capability_audit' => $globalCapabilityAudit,
@@ -804,7 +822,12 @@ final class DataSchemaService
                 'path' => $this->registryPath('endpoint-catalog'),
                 'targetAgeSeconds' => 7200,
                 'requiredForRelease' => true,
-                'dependencyPaths' => [],
+                'dependencyPaths' => [
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('api-params'),
+                    $this->rootDir . '/mom/api/index.php',
+                    $this->rootDir . '/mom/api/controllers/*.php',
+                ],
             ],
             'endpoint_catalog_index' => [
                 'label' => 'Endpoint catalog index',
@@ -822,7 +845,9 @@ final class DataSchemaService
                 'path' => $this->registryPath('relation-map'),
                 'targetAgeSeconds' => 7200,
                 'requiredForRelease' => true,
-                'dependencyPaths' => [],
+                'dependencyPaths' => [
+                    $this->registryPath('table-registry'),
+                ],
             ],
             'registry_quality' => [
                 'label' => 'Registry quality report',
@@ -844,7 +869,130 @@ final class DataSchemaService
                 'path' => $this->registryPath('table-registry'),
                 'targetAgeSeconds' => 14400,
                 'requiredForRelease' => true,
-                'dependencyPaths' => [],
+                'dependencyPaths' => [
+                    $this->rootDir . '/mom/database/schema.sql',
+                    $this->rootDir . '/mom/database/migrations/*.sql',
+                ],
+            ],
+            'registry_authority_standard' => [
+                'label' => 'Enterprise registry authority standard',
+                'category' => 'authority',
+                'path' => $this->contractsPath('registry-authority-standard.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->contractsPath('schemas/registry-authority-standard.schema.json'),
+                ],
+            ],
+            'table_governance_overlay' => [
+                'label' => 'Table governance overlay',
+                'category' => 'authority',
+                'path' => $this->registryPath('table-governance-overlay'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('endpoint-governance-classification'),
+                    $this->contractsPath('object-index.json'),
+                    $this->contractsPath('state-model-index.json'),
+                    $this->contractsPath('event-index.json'),
+                    $this->contractsPath('registry-authority-standard.json'),
+                ],
+            ],
+            'endpoint_governance_classification' => [
+                'label' => 'Endpoint governance classification',
+                'category' => 'authority',
+                'path' => $this->registryPath('endpoint-governance-classification'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('endpoint-catalog-index'),
+                    $this->registryPath('table-registry'),
+                    $this->contractsPath('registry-authority-standard.json'),
+                ],
+            ],
+            'destructive_endpoint_quarantine' => [
+                'label' => 'Destructive endpoint quarantine',
+                'category' => 'authority',
+                'path' => $this->registryPath('destructive-endpoint-quarantine'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('endpoint-governance-classification'),
+                    $this->contractsPath('registry-authority-standard.json'),
+                ],
+            ],
+            'command_runtime_bindings' => [
+                'label' => 'Command runtime bindings',
+                'category' => 'authority',
+                'path' => $this->registryPath('command-runtime-bindings'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->contractsPath('command-index.json'),
+                    $this->contractsPath('object-index.json'),
+                    $this->registryPath('endpoint-catalog-index'),
+                ],
+            ],
+            'enterprise_event_contract_map' => [
+                'label' => 'Enterprise event contract map',
+                'category' => 'authority',
+                'path' => $this->registryPath('enterprise-event-contract-map'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->contractsPath('event-index.json'),
+                    $this->registryPath('table-registry'),
+                    $this->contractsPath('registry-authority-standard.json'),
+                ],
+            ],
+            'ai_authority_chain' => [
+                'label' => 'AI authority chain',
+                'category' => 'authority',
+                'path' => $this->contractsPath('ai-authority-chain.json'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->contractsPath('registry-authority-standard.json'),
+                    $this->registryPath('endpoint-governance-classification'),
+                    $this->registryPath('table-governance-overlay'),
+                    $this->registryPath('destructive-endpoint-quarantine'),
+                ],
+            ],
+            'enterprise_registry_doctor_report' => [
+                'label' => 'Enterprise registry doctor report',
+                'category' => 'quality',
+                'path' => $this->registryPath('enterprise-registry-doctor-report'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->contractsPath('registry-authority-standard.json'),
+                    $this->registryPath('table-registry'),
+                    $this->registryPath('table-governance-overlay'),
+                    $this->registryPath('endpoint-catalog-index'),
+                    $this->registryPath('endpoint-governance-classification'),
+                    $this->registryPath('destructive-endpoint-quarantine'),
+                    $this->registryPath('command-runtime-bindings'),
+                    $this->contractsPath('command-index.json'),
+                    $this->contractsPath('event-index.json'),
+                    $this->contractsPath('ai-authority-chain.json'),
+                ],
+            ],
+            'enterprise_frontend_simulation_report' => [
+                'label' => 'Enterprise frontend simulation report',
+                'category' => 'quality',
+                'path' => $this->registryPath('enterprise-frontend-simulation-report'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('enterprise-registry-doctor-report'),
+                    $this->registryPath('endpoint-governance-classification'),
+                    $this->registryPath('table-governance-overlay'),
+                    $this->registryPath('destructive-endpoint-quarantine'),
+                    $this->registryPath('command-runtime-bindings'),
+                    $this->contractsPath('command-index.json'),
+                    $this->contractsPath('event-index.json'),
+                ],
             ],
             'system_contract_runtime_projections' => [
                 'label' => 'System contract runtime projections',
@@ -1038,7 +1186,8 @@ final class DataSchemaService
                 'requiredForRelease' => true,
                 'dependencyPaths' => [
                     $this->registryPath('table-registry'),
-                    $this->rootDir . '/database/schema.sql',
+                    $this->rootDir . '/mom/database/schema.sql',
+                    $this->rootDir . '/mom/database/migrations/*.sql',
                 ],
             ],
             'migration_gap' => [
@@ -1222,26 +1371,25 @@ final class DataSchemaService
         $latestDependencyPath = '';
         $missingDependencyPaths = [];
         foreach ($dependencyPaths as $dependencyPath) {
-            if (!is_file($dependencyPath)) {
+            if (!$this->dependencyPathExists($dependencyPath)) {
                 $missingDependencyPaths[] = $this->relativePath($dependencyPath);
                 continue;
             }
-            $dependencyTimestamp = array_key_exists($dependencyPath, $knownDependencyTimestamps)
-                ? $knownDependencyTimestamps[$dependencyPath]
-                : $this->artifactTimestampForPath($dependencyPath);
-            if ($dependencyTimestamp === null) {
+            $dependencyTimestamp = $this->dependencyTimestampForPath($dependencyPath, $knownDependencyTimestamps);
+            $timestamp = $dependencyTimestamp['timestamp'];
+            if (!is_int($timestamp)) {
                 continue;
             }
-            if ($latestDependencyTimestamp === null || $dependencyTimestamp > $latestDependencyTimestamp) {
-                $latestDependencyTimestamp = $dependencyTimestamp;
-                $latestDependencyPath = $dependencyPath;
+            if ($latestDependencyTimestamp === null || $timestamp > $latestDependencyTimestamp) {
+                $latestDependencyTimestamp = $timestamp;
+                $latestDependencyPath = (string)($dependencyTimestamp['path'] ?? $dependencyPath);
             }
         }
         $sourceDriftSeconds = ($basisTimestamp !== null && $latestDependencyTimestamp !== null && $latestDependencyTimestamp > $basisTimestamp)
             ? max(0, $latestDependencyTimestamp - $basisTimestamp)
             : 0;
         $dependencyStatus = $dependencyPaths === []
-            ? 'n/a'
+            ? 'source_authority'
             : ($missingDependencyPaths !== [] ? 'source_missing' : ($sourceDriftSeconds > self::ARTIFACT_DEPENDENCY_GRACE_SECONDS ? 'outdated' : 'aligned'));
 
         $status = 'missing';
@@ -1290,6 +1438,118 @@ final class DataSchemaService
         $this->artifactTimestampCache[$path] = $basisTimestamp;
 
         return $basisTimestamp;
+    }
+
+    private function dependencyPathExists(string $path): bool
+    {
+        if ($this->isGlobPath($path)) {
+            return $this->globMatches($path) !== [];
+        }
+
+        clearstatcache(true, $path);
+        return is_file($path) || is_dir($path);
+    }
+
+    /**
+     * @param array<string, int|null> $knownDependencyTimestamps
+     * @return array{timestamp: int|null, path: string}
+     */
+    private function dependencyTimestampForPath(string $path, array $knownDependencyTimestamps): array
+    {
+        if (array_key_exists($path, $knownDependencyTimestamps)) {
+            return [
+                'timestamp' => $knownDependencyTimestamps[$path],
+                'path' => $path,
+            ];
+        }
+
+        if ($this->isGlobPath($path)) {
+            $latestTimestamp = null;
+            $latestPath = $path;
+            foreach ($this->globMatches($path) as $match) {
+                $candidate = $this->concreteDependencyTimestamp($match);
+                $timestamp = $candidate['timestamp'];
+                if (!is_int($timestamp)) {
+                    continue;
+                }
+                if ($latestTimestamp === null || $timestamp > $latestTimestamp) {
+                    $latestTimestamp = $timestamp;
+                    $latestPath = (string)$candidate['path'];
+                }
+            }
+
+            return [
+                'timestamp' => $latestTimestamp,
+                'path' => $latestPath,
+            ];
+        }
+
+        return $this->concreteDependencyTimestamp($path);
+    }
+
+    /**
+     * @return array{timestamp: int|null, path: string}
+     */
+    private function concreteDependencyTimestamp(string $path): array
+    {
+        clearstatcache(true, $path);
+        if (is_file($path)) {
+            return [
+                'timestamp' => $this->artifactTimestampForPath($path),
+                'path' => $path,
+            ];
+        }
+
+        if (!is_dir($path)) {
+            return [
+                'timestamp' => null,
+                'path' => $path,
+            ];
+        }
+
+        $latestTimestamp = (int)(filemtime($path) ?: 0);
+        $latestPath = $path;
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $fileInfo) {
+                if (!$fileInfo instanceof \SplFileInfo || !$fileInfo->isFile()) {
+                    continue;
+                }
+                $timestamp = (int)$fileInfo->getMTime();
+                if ($timestamp > $latestTimestamp) {
+                    $latestTimestamp = $timestamp;
+                    $latestPath = str_replace('\\', '/', $fileInfo->getPathname());
+                }
+            }
+        } catch (Throwable) {
+            // Directory dependency metadata is diagnostic only; artifact existence is validated separately.
+        }
+
+        return [
+            'timestamp' => $latestTimestamp > 0 ? $latestTimestamp : null,
+            'path' => $latestPath,
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function globMatches(string $path): array
+    {
+        $matches = glob($path, GLOB_NOSORT);
+        if (!is_array($matches)) {
+            return [];
+        }
+
+        return array_values(array_filter($matches, static fn(string $match): bool => is_file($match) || is_dir($match)));
+    }
+
+    private function isGlobPath(string $path): bool
+    {
+        return strpbrk($path, '*?[') !== false;
     }
 
     private function extractArtifactGeneratedAtFromPath(string $path): string

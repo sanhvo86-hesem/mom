@@ -1,6 +1,20 @@
 {
   "moduleId": "M2-orders",
   "templateId": "T13",
+  "templateVersion": "1.0.0",
+  "moduleArchetype": "list-report-workspace",
+  "buildPacket": "mom/design/build-packets/M2-orders.json",
+  "contractRefs": [
+    "mom/contracts/objects/commercial_customer--sales-orders/contract.json",
+    "mom/contracts/objects/planning_production--job-orders/contract.json",
+    "mom/contracts/objects/planning_production--work-orders/contract.json",
+    "mom/contracts/objects/inventory_logistics--shipments/contract.json"
+  ],
+  "qaProfile": {
+    "frontendSsotGate": "mom/tools/design/validate-frontend-contracts.mjs",
+    "qaGateSet": "mom/design/qa-gates.json",
+    "requiredGateLevel": "P0"
+  },
   "title": { "vi": "Đơn hàng", "en": "Orders" },
   "subtitle": {
     "vi": "Chuẩn hóa commercial promise, release JO/WO và shipment readiness trên một luồng thống nhất",

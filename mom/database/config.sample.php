@@ -4,10 +4,10 @@
  * Copy this file to config.php and fill in your PostgreSQL credentials.
  *
  * Operating Modes (migration ladder):
- *   JSON_ONLY        - Current production: JSON files only
- *   SHADOW_WRITE     - Recommended next step: JSON primary + PostgreSQL shadow
- *   POSTGRES_PRIMARY - Read from PostgreSQL, fallback to JSON
- *   POSTGRES_ONLY    - Final target: PostgreSQL only
+ *   JSON_ONLY        - Local/offline mode: JSON files only
+ *   SHADOW_WRITE     - Migration-only mode: JSON primary + PostgreSQL shadow
+ *   POSTGRES_PRIMARY - Break-glass mode: read PostgreSQL, fallback to JSON
+ *   POSTGRES_ONLY    - Production authority target: PostgreSQL only
  */
 return [
     // PostgreSQL connection
@@ -20,8 +20,8 @@ return [
 
     // Operating mode flags
     'use_postgres'   => false,   // Set true to enable PostgreSQL path
-    'shadow_write'   => true,    // When use_postgres=true: dual-write JSON+PG
-    'json_fallback'  => true,    // When use_postgres=true: fall back to JSON on PG error
+    'shadow_write'   => false,   // Opt in only during controlled JSON->PG migration
+    'json_fallback'  => false,   // Opt in only as a monitored break-glass recovery path
 
     // Performance
     'read_retry_count'    => 2,
