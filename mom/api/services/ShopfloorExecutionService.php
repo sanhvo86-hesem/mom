@@ -47,6 +47,7 @@ final class ShopfloorExecutionService
      */
     public function normalizeTargetForCreate(array $body, string $userId, string $now): array
     {
+        $body = $this->withTargetAliases($body);
         $machineId = $this->requiredString($body['machine_id'] ?? $body['equipment_id'] ?? null, 'missing_machine_id');
         $equipmentId = $this->stringValue($body['equipment_id'] ?? '');
         if ($equipmentId === '') {
@@ -73,7 +74,7 @@ final class ShopfloorExecutionService
             'operator_id' => $this->stringValue($body['operator_id'] ?? ''),
             'shift_date' => $this->normalizeDate($body['shift_date'] ?? null, 'shift_date'),
             'shift_code' => $shiftCode,
-            'cycle_time_minutes' => $this->nonNegativeFloat($body['cycle_time_minutes'] ?? 0, 'cycle_time_minutes'),
+            'cycle_time_minutes' => $this->positiveFloat($body['cycle_time_minutes'] ?? null, 'cycle_time_minutes'),
             'setup_time_minutes' => $this->nonNegativeFloat($body['setup_time_minutes'] ?? 0, 'setup_time_minutes'),
             'standard_setup_minutes' => $this->nonNegativeFloat(
                 $body['standard_setup_minutes'] ?? $body['setup_time_minutes'] ?? 0,
@@ -107,6 +108,7 @@ final class ShopfloorExecutionService
      */
     public function applyTargetUpdates(array $target, array $updates, string $now): array
     {
+        $updates = $this->withTargetAliases($updates);
         $machineProvided = array_key_exists('machine_id', $updates);
         $equipmentProvided = array_key_exists('equipment_id', $updates);
         $editable = [
@@ -313,6 +315,29 @@ final class ShopfloorExecutionService
         return $log;
     }
 
+    /**
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    public function targetResponse(array $target): array
+    {
+        $targetId = (string)($target['target_id'] ?? $target['id'] ?? '');
+        $woNumber = (string)($target['wo_number'] ?? $target['wo_id'] ?? '');
+        $shiftDate = (string)($target['shift_date'] ?? $target['target_date'] ?? '');
+        $shiftCode = (string)($target['shift_code'] ?? $target['shift'] ?? '');
+
+        return array_merge($target, [
+            'id' => $targetId,
+            'wo_id' => $woNumber,
+            'target_date' => $shiftDate,
+            'shift' => $shiftCode,
+            'cycle_time' => (float)($target['cycle_time_minutes'] ?? $target['cycle_time'] ?? 0),
+            'setup_time' => (float)($target['setup_time_minutes'] ?? $target['setup_time'] ?? 0),
+            'shift_duration' => (float)($target['shift_duration_minutes'] ?? $target['shift_duration'] ?? 0),
+            'target_qty' => (int)($target['target_quantity'] ?? $target['target_qty'] ?? 0),
+        ]);
+    }
+
     public function normalizeDateFilter(mixed $value, string $field = 'date'): string
     {
         return $this->normalizeDate($value, $field);
@@ -464,8 +489,8 @@ final class ShopfloorExecutionService
     {
         $catalog = $this->activeReasonCatalog();
         $downtimeEvents = $this->normalizeDowntimeEvents($body['downtime_events'] ?? []);
-        $ngDetails = $this->normalizeDefectDetails($body['ng_details'] ?? [], 'ng_details');
-        $reworkDetails = $this->normalizeDefectDetails($body['rework_details'] ?? [], 'rework_details');
+        $ngDetails = $this->normalizeDefectDetails($body['ng_details'] ?? [], 'ng_details', $catalog['ng']);
+        $reworkDetails = $this->normalizeDefectDetails($body['rework_details'] ?? [], 'rework_details', $catalog['rework']);
         $blockingIssues = $this->normalizeBlockingIssues($body['blocking_issues'] ?? []);
 
         $downtimeCodes = array_merge(
@@ -507,8 +532,8 @@ final class ShopfloorExecutionService
             throw new InvalidArgumentException('missing_downtime_reason_code');
         }
 
-        $this->assertDetailQuantityDoesNotExceed($ngDetails, $quantityNg, 'ng_detail_quantity_exceeds_quantity_ng');
-        $this->assertDetailQuantityDoesNotExceed($reworkDetails, $quantityRework, 'rework_detail_quantity_exceeds_quantity_rework');
+        $this->assertDetailQuantityMatches($ngDetails, $quantityNg, 'ng_detail_quantity_mismatch');
+        $this->assertDetailQuantityMatches($reworkDetails, $quantityRework, 'rework_detail_quantity_mismatch');
 
         $downtimeMinutes = 0.0;
         foreach ($downtimeEvents as $event) {
@@ -599,9 +624,10 @@ final class ShopfloorExecutionService
 
     /**
      * @param mixed $value
+     * @param list<array<string, mixed>> $catalog
      * @return list<array<string, mixed>>
      */
-    private function normalizeDefectDetails(mixed $value, string $field): array
+    private function normalizeDefectDetails(mixed $value, string $field, array $catalog): array
     {
         if ($value === null || $value === '') {
             return [];
@@ -615,11 +641,22 @@ final class ShopfloorExecutionService
             if (!is_array($row)) {
                 throw new InvalidArgumentException('invalid_' . $field . '_' . $idx);
             }
-            $quantity = null;
-            if (array_key_exists('quantity', $row) && $row['quantity'] !== null && $row['quantity'] !== '') {
-                $quantity = $this->nonNegativeInt($row['quantity'], $field . '.quantity');
+            $quantityValue = null;
+            if (array_key_exists('quantity', $row)) {
+                $quantityValue = $row['quantity'];
+            } elseif (array_key_exists('qty', $row)) {
+                $quantityValue = $row['qty'];
             }
-            $defectCode = $this->normalizeCode($row['defect_code'] ?? $row['reason_code'] ?? '');
+
+            $quantity = null;
+            if ($quantityValue !== null && $quantityValue !== '') {
+                $quantity = $this->nonNegativeInt($quantityValue, $field . '.quantity');
+            }
+            $defectCode = $this->resolveDefectCode(
+                $row['defect_code'] ?? $row['reason_code'] ?? '',
+                $row['type'] ?? $row['defect_type'] ?? '',
+                $catalog,
+            );
             if ($defectCode === '') {
                 throw new InvalidArgumentException('missing_defect_code');
             }
@@ -808,7 +845,7 @@ final class ShopfloorExecutionService
     /**
      * @param list<array<string, mixed>> $details
      */
-    private function assertDetailQuantityDoesNotExceed(array $details, int $limit, string $error): void
+    private function assertDetailQuantityMatches(array $details, int $expected, string $error): void
     {
         $sum = 0;
         $hasQuantity = false;
@@ -818,9 +855,70 @@ final class ShopfloorExecutionService
                 $sum += (int)$detail['quantity'];
             }
         }
-        if ($hasQuantity && $sum > $limit) {
+        if ($hasQuantity && $sum !== $expected) {
             throw new InvalidArgumentException($error);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function withTargetAliases(array $data): array
+    {
+        $aliases = [
+            'wo_id' => 'wo_number',
+            'work_order_id' => 'wo_number',
+            'target_date' => 'shift_date',
+            'date' => 'shift_date',
+            'shift' => 'shift_code',
+            'cycle_time' => 'cycle_time_minutes',
+            'setup_time' => 'setup_time_minutes',
+            'shift_duration' => 'shift_duration_minutes',
+            'target_qty' => 'target_quantity',
+            'qty_target' => 'target_quantity',
+        ];
+
+        foreach ($aliases as $alias => $canonical) {
+            if (!array_key_exists($canonical, $data) && array_key_exists($alias, $data)) {
+                $data[$canonical] = $data[$alias];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $catalog
+     */
+    private function resolveDefectCode(mixed $code, mixed $legacyType, array $catalog): string
+    {
+        $direct = $this->normalizeCode($code);
+        if ($direct !== '') {
+            return $direct;
+        }
+
+        $type = $this->normalizeCode($legacyType);
+        if ($type === '') {
+            return '';
+        }
+
+        foreach ($catalog as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $catalogCode = $this->normalizeCode($row['defect_code'] ?? '');
+            if ($catalogCode === '') {
+                continue;
+            }
+            foreach (['defect_code', 'defect_group', 'defect_name'] as $field) {
+                if ($this->normalizeCode($row[$field] ?? '') === $type) {
+                    return $catalogCode;
+                }
+            }
+        }
+
+        return $type;
     }
 
     /**

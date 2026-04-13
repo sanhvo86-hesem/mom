@@ -140,7 +140,7 @@ class DispatchController extends BaseController
                 if (!isset($timeline[$mid]['days'][$d])) {
                     $timeline[$mid]['days'][$d] = [];
                 }
-                $timeline[$mid]['days'][$d][] = $t;
+                $timeline[$mid]['days'][$d][] = $this->shopfloor()->targetResponse($t);
             }
 
             // Load production logs for actual data
@@ -174,10 +174,6 @@ class DispatchController extends BaseController
         $this->requireCsrf();
 
         $body = $this->jsonBody();
-        $this->requireFields($body, ['wo_number', 'shift_date', 'cycle_time_minutes', 'target_quantity']);
-        if (trim((string)($body['machine_id'] ?? $body['equipment_id'] ?? '')) === '') {
-            $this->error('missing_machine_id', 400);
-        }
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
@@ -199,7 +195,7 @@ class DispatchController extends BaseController
                 'target_qty' => $target['target_quantity'],
             ], $uid);
 
-            $this->success(['target' => $target], 201);
+            $this->success(['target' => $this->shopfloor()->targetResponse($target)], 201);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
@@ -292,8 +288,9 @@ class DispatchController extends BaseController
                         continue;
                     }
                     $log = $logMap[(string)($t['target_id'] ?? '')] ?? null;
-                    $t['production_log'] = $log;
-                    $myTasks[] = $t;
+                    $task = $this->shopfloor()->targetResponse($t);
+                    $task['production_log'] = $log;
+                    $myTasks[] = $task;
                 }
             }
 
@@ -491,7 +488,10 @@ class DispatchController extends BaseController
                 'total_rework'       => $totalRework,
                 'achievement_pct'    => $overallAchieve,
                 'ng_rate_pct'        => $overallNgRate,
-                'targets'            => array_values($today),
+                'targets'            => array_map(
+                    fn(array $target): array => $this->shopfloor()->targetResponse($target),
+                    array_values($today),
+                ),
                 'logs'               => $logMap,
             ]);
         } catch (Throwable $e) {
@@ -536,7 +536,12 @@ class DispatchController extends BaseController
             $offset = max(0, (int)($this->query('offset') ?? 0));
             $limit  = min(200, max(1, (int)($this->query('limit') ?? 50)));
 
-            $this->paginated('targets', array_slice(array_values($filtered), $offset, $limit), count($filtered), $offset, $limit);
+            $page = array_map(
+                fn(array $target): array => $this->shopfloor()->targetResponse($target),
+                array_slice(array_values($filtered), $offset, $limit),
+            );
+
+            $this->paginated('targets', $page, count($filtered), $offset, $limit);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('list_targets_failed', 500, $e->getMessage());
@@ -577,7 +582,7 @@ class DispatchController extends BaseController
 
             $this->writeJsonFile($file, $targets);
             $this->auditLog('dispatch_update_target', ['target_id' => $targetId], $uid);
-            $this->success(['target' => $updated]);
+            $this->success(['target' => $this->shopfloor()->targetResponse($updated)]);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {

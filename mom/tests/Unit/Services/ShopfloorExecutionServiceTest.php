@@ -99,6 +99,34 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('MC-5AX-03', $updatedByMachine['equipment_id']);
     }
 
+    public function testLegacyDispatchPayloadAliasesStayResponseOnlyCompatibility(): void
+    {
+        $service = $this->service();
+        $target = $service->normalizeTargetForCreate([
+            'wo_id' => 'WO-LEGACY-1',
+            'machine_id' => 'MC-5AX-01',
+            'target_date' => '2026-04-13',
+            'shift' => 'afternoon',
+            'cycle_time' => 4.5,
+            'setup_time' => 30,
+            'shift_duration' => 480,
+            'target_qty' => 100,
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('WO-LEGACY-1', $target['wo_number']);
+        $this->assertSame('2026-04-13', $target['shift_date']);
+        $this->assertSame('afternoon', $target['shift_code']);
+        $this->assertSame(4.5, $target['cycle_time_minutes']);
+        $this->assertArrayNotHasKey('target_qty', $target);
+
+        $response = $service->targetResponse($target);
+        $this->assertSame($target['target_id'], $response['id']);
+        $this->assertSame('WO-LEGACY-1', $response['wo_id']);
+        $this->assertSame('2026-04-13', $response['target_date']);
+        $this->assertSame('afternoon', $response['shift']);
+        $this->assertSame(100, $response['target_qty']);
+    }
+
     public function testReportValidationRejectsMissingReasonCodesForBadOutputAndDowntime(): void
     {
         $target = $this->target();
@@ -158,6 +186,36 @@ final class ShopfloorExecutionServiceTest extends TestCase
             $this->fail('Downtime reason code without downtime minutes should fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertSame('downtime_reason_without_minutes', $e->getMessage());
+        }
+    }
+
+    public function testLegacyNgDetailsMapToDefectCatalogButMustBalanceQuantity(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+
+        $log = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'quantity_ng' => 2,
+            'ng_details' => [
+                ['type' => 'dimensional', 'qty' => 2],
+            ],
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertSame(['DEF-DIM'], $log['reason_codes']['ng']);
+        $this->assertSame(2, $log['ng_details'][0]['quantity']);
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 8,
+                'quantity_ng' => 3,
+                'ng_details' => [
+                    ['type' => 'dimensional', 'qty' => 2],
+                ],
+            ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('Classified NG detail quantities must match reported NG quantity.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('ng_detail_quantity_mismatch', $e->getMessage());
         }
     }
 
