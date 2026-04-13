@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace MOM\Tests\Unit\Services;
 
-use MOM\Api\Services\CacheService;
 use MOM\Api\Services\IdempotencyService;
+use MOM\Api\Services\PostgresIdempotencyReplayRepository;
 use MOM\Api\Services\RecordConflictException;
+use MOM\Database\Connection;
 use PHPUnit\Framework\TestCase;
 
 final class IdempotencyServiceTest extends TestCase
@@ -24,9 +25,12 @@ final class IdempotencyServiceTest extends TestCase
         $this->removeDir($this->tmpDir);
     }
 
-    public function testFileFallbackReplaysMatchingRequest(): void
+    public function testFileFallbackReplaysMatchingRequestWhenPostgresDisabled(): void
     {
-        $service = new IdempotencyService($this->tmpDir, $this->fallbackCache());
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            databaseConfig: ['use_postgres' => false],
+        );
         $executions = 0;
         $descriptor = $this->descriptor();
 
@@ -45,12 +49,48 @@ final class IdempotencyServiceTest extends TestCase
         $this->assertFalse($first['replayed']);
         $this->assertTrue($second['replayed']);
         $this->assertSame('SO-001', $second['payload']['record']['id'] ?? null);
+        $this->assertDirectoryExists($this->tmpDir . '/idempotency');
     }
 
-    public function testConflictingFingerprintIsRejected(): void
+    public function testDbBackedRepositoryReplaysMatchingRequestWithoutFileStore(): void
     {
-        $service = new IdempotencyService($this->tmpDir, $this->fallbackCache());
-        $descriptor = $this->descriptor();
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-key-001');
+        $executions = 0;
+
+        $first = $service->execute($descriptor, static function () use (&$executions): array {
+            $executions++;
+            return [
+                'status_code' => 200,
+                'payload' => ['record' => ['id' => 'DB-001']],
+            ];
+        });
+        $second = $service->execute($descriptor, static function (): array {
+            throw new \RuntimeException('DB replay should not execute operation.');
+        });
+
+        $this->assertSame(1, $executions);
+        $this->assertFalse($first['replayed']);
+        $this->assertTrue($second['replayed']);
+        $this->assertSame('DB-001', $second['payload']['record']['id'] ?? null);
+        $this->assertSame('completed', $db->rows[$this->rowKey($descriptor)]['status'] ?? null);
+        $this->assertDirectoryDoesNotExist($this->tmpDir . '/idempotency');
+    }
+
+    public function testDbBackedRepositoryRejectsConflictingFingerprint(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-conflict-key');
 
         $service->execute($descriptor, static fn(): array => [
             'status_code' => 200,
@@ -67,30 +107,98 @@ final class IdempotencyServiceTest extends TestCase
         ]);
     }
 
-    public function testCachePathReplaysWithoutCreatingLegacyStateStore(): void
+    public function testDbBackedRepositoryRejectsActiveInProgressDuplicate(): void
     {
-        $cache = $this->fallbackCache();
-        $this->forceCachePrimaryPath($cache);
-        $service = new IdempotencyService($this->tmpDir, $cache);
-        $descriptor = $this->descriptor('cache-key-001');
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-in-progress-key');
+        $key = $this->rowKey($descriptor);
+        $db->rows[$key] = [
+            'scope_key' => $descriptor['scope_key'],
+            'idempotency_key' => $descriptor['key'],
+            'fingerprint_hash' => $this->fingerprintForDescriptor($descriptor),
+            'status' => 'in_progress',
+            'status_code' => null,
+            'response_payload' => '{}',
+            'metadata' => '{}',
+            'lock_owner' => 'other-worker',
+            'created_at' => gmdate('c'),
+            'updated_at' => gmdate('c'),
+            'completed_at' => null,
+            'expires_at' => gmdate('c', time() + 300),
+        ];
+
+        $this->expectException(RecordConflictException::class);
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
+    }
+
+    public function testDbBackedRepositoryPersistsFailureAndAllowsMatchingRetry(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-failure-key');
         $executions = 0;
 
-        $first = $service->execute($descriptor, static function () use (&$executions): array {
+        try {
+            $service->execute($descriptor, static function () use (&$executions): array {
+                $executions++;
+                throw new \RuntimeException('Deliberate failure.');
+            });
+            $this->fail('The failing operation should bubble its exception.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Deliberate failure.', $e->getMessage());
+        }
+
+        $failedRow = $db->rows[$this->rowKey($descriptor)] ?? [];
+        $this->assertSame('failed', $failedRow['status'] ?? null);
+        $this->assertSame(\RuntimeException::class, $failedRow['error_class'] ?? null);
+
+        $retry = $service->execute($descriptor, static function () use (&$executions): array {
             $executions++;
             return [
-                'status_code' => 200,
-                'payload' => ['record' => ['id' => 'CACHE-001']],
+                'status_code' => 202,
+                'payload' => ['ok' => true],
             ];
         });
-        $second = $service->execute($descriptor, static function (): array {
-            throw new \RuntimeException('Cache replay should not execute operation.');
-        });
 
-        $this->assertSame(1, $executions);
-        $this->assertFalse($first['replayed']);
-        $this->assertTrue($second['replayed']);
-        $this->assertSame('CACHE-001', $second['payload']['record']['id'] ?? null);
-        $this->assertDirectoryDoesNotExist($this->tmpDir . '/idempotency');
+        $this->assertSame(2, $executions);
+        $this->assertFalse($retry['replayed']);
+        $this->assertSame(202, $retry['status_code']);
+        $this->assertSame('completed', $db->rows[$this->rowKey($descriptor)]['status'] ?? null);
+    }
+
+    public function testFileFallbackRejectsConflictingFingerprint(): void
+    {
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            databaseConfig: ['use_postgres' => false],
+        );
+        $descriptor = $this->descriptor('file-conflict-key');
+
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
+
+        $conflicting = $descriptor;
+        $conflicting['fingerprint']['payload']['amount'] = 42;
+
+        $this->expectException(RecordConflictException::class);
+        $service->execute($conflicting, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
     }
 
     /**
@@ -117,19 +225,46 @@ final class IdempotencyServiceTest extends TestCase
         ];
     }
 
-    private function fallbackCache(): CacheService
+    /**
+     * @param array<string, mixed> $descriptor
+     */
+    private function rowKey(array $descriptor): string
     {
-        return new CacheService($this->tmpDir, 'mom:idempotency:', [
-            'host' => '127.0.0.1',
-            'port' => 1,
-            'timeout' => 0.1,
-        ]);
+        return (string)$descriptor['scope_key'] . '|' . (string)$descriptor['key'];
     }
 
-    private function forceCachePrimaryPath(CacheService $cache): void
+    /**
+     * @param array<string, mixed> $descriptor
+     */
+    private function fingerprintForDescriptor(array $descriptor): string
     {
-        $property = new \ReflectionProperty($cache, 'redisAvailable');
-        $property->setValue($cache, true);
+        $normalized = $this->normalizeForHash((array)($descriptor['fingerprint'] ?? []));
+        $encoded = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        self::assertIsString($encoded);
+        return hash('sha256', $encoded);
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function normalizeForHash(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        $isList = array_keys($value) === range(0, count($value) - 1);
+        if ($isList) {
+            return array_map(fn($item) => $this->normalizeForHash($item), $value);
+        }
+
+        ksort($value);
+        foreach ($value as $key => $item) {
+            $value[$key] = $this->normalizeForHash($item);
+        }
+
+        return $value;
     }
 
     private function removeDir(string $dir): void
@@ -145,5 +280,124 @@ final class IdempotencyServiceTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         rmdir($dir);
+    }
+}
+
+final class IdempotencyFakeConnection extends Connection
+{
+    /** @var array<string, array<string, mixed>> */
+    public array $rows = [];
+
+    public function __construct()
+    {
+    }
+
+    public function transactional(callable $callback): mixed
+    {
+        return $callback();
+    }
+
+    public function insertReturning(string $sql, array $params = []): ?array
+    {
+        $key = $this->key($params);
+        if (isset($this->rows[$key])) {
+            return null;
+        }
+
+        $this->rows[$key] = [
+            'ledger_id' => 'fake-ledger-' . count($this->rows),
+            'scope_key' => (string)$params[':scope_key'],
+            'idempotency_key' => (string)$params[':idempotency_key'],
+            'fingerprint_hash' => (string)$params[':fingerprint_hash'],
+            'status' => 'in_progress',
+            'status_code' => null,
+            'response_payload' => '{}',
+            'metadata' => (string)($params[':metadata'] ?? '{}'),
+            'lock_owner' => (string)$params[':lock_owner'],
+            'error_class' => null,
+            'error_message' => null,
+            'created_at' => (string)$params[':created_at'],
+            'updated_at' => (string)$params[':updated_at'],
+            'completed_at' => null,
+            'expires_at' => (string)$params[':expires_at'],
+        ];
+
+        return ['ledger_id' => $this->rows[$key]['ledger_id']];
+    }
+
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        return $this->rows[$this->key($params)] ?? null;
+    }
+
+    public function execute(string $sql, array $params = []): int
+    {
+        $key = $this->key($params);
+        if (!isset($this->rows[$key])) {
+            return 0;
+        }
+
+        if (str_contains($sql, "status = 'completed'")) {
+            if (!$this->matchesClaim($key, $params)) {
+                return 0;
+            }
+            $this->rows[$key]['status'] = 'completed';
+            $this->rows[$key]['status_code'] = (int)$params[':status_code'];
+            $this->rows[$key]['response_payload'] = (string)$params[':response_payload'];
+            $this->rows[$key]['lock_owner'] = null;
+            $this->rows[$key]['error_class'] = null;
+            $this->rows[$key]['error_message'] = null;
+            $this->rows[$key]['completed_at'] = (string)$params[':completed_at'];
+            $this->rows[$key]['updated_at'] = (string)$params[':updated_at'];
+            return 1;
+        }
+
+        if (str_contains($sql, "status = 'failed'")) {
+            if (!$this->matchesClaim($key, $params)) {
+                return 0;
+            }
+            $this->rows[$key]['status'] = 'failed';
+            $this->rows[$key]['status_code'] = null;
+            $this->rows[$key]['response_payload'] = '{}';
+            $this->rows[$key]['lock_owner'] = null;
+            $this->rows[$key]['error_class'] = (string)$params[':error_class'];
+            $this->rows[$key]['error_message'] = (string)$params[':error_message'];
+            $this->rows[$key]['updated_at'] = (string)$params[':updated_at'];
+            return 1;
+        }
+
+        if (str_contains($sql, "status = 'in_progress'")) {
+            $this->rows[$key]['fingerprint_hash'] = (string)$params[':fingerprint_hash'];
+            $this->rows[$key]['status'] = 'in_progress';
+            $this->rows[$key]['status_code'] = null;
+            $this->rows[$key]['response_payload'] = '{}';
+            $this->rows[$key]['metadata'] = (string)$params[':metadata'];
+            $this->rows[$key]['lock_owner'] = (string)$params[':lock_owner'];
+            $this->rows[$key]['error_class'] = null;
+            $this->rows[$key]['error_message'] = null;
+            $this->rows[$key]['completed_at'] = null;
+            $this->rows[$key]['updated_at'] = (string)$params[':updated_at'];
+            $this->rows[$key]['expires_at'] = (string)$params[':expires_at'];
+            return 1;
+        }
+
+        return 1;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function key(array $params): string
+    {
+        return (string)$params[':scope_key'] . '|' . (string)$params[':idempotency_key'];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function matchesClaim(string $key, array $params): bool
+    {
+        return ($this->rows[$key]['fingerprint_hash'] ?? null) === ($params[':fingerprint_hash'] ?? null)
+            && ($this->rows[$key]['lock_owner'] ?? null) === ($params[':lock_owner'] ?? null);
     }
 }
