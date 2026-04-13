@@ -81,7 +81,7 @@ function hasAmendmentAuthority(){
 }
 
 function isAmendmentEdit(){
-  return state.editOrigin === 'amendment' && hasAmendmentAuthority();
+  return !!state.editMode && state.editOrigin === 'amendment' && hasAmendmentAuthority();
 }
 
 function restoreEntryValues(entry, overwrite){
@@ -517,6 +517,8 @@ var state = {
   editOrigin: 'new',
   sourceEntryId: '',
   sourceSubmissionRevision: 0,
+  changeAuthorityId: '',
+  amendmentReason: '',
   fieldValues: {},
   signatures: {},
   editMode: false,
@@ -939,12 +941,19 @@ function renderForm(container){
 
   /* ── Status bar + progress ── */
   if(state.editMode){
+    var editingText = isAmendmentEdit()
+      ? t('Đang tạo amendment — bản final gốc vẫn bất biến, thay đổi sẽ thành phiên bản mới sau khi gửi', 'Creating amendment — the source final record remains immutable; changes become a new version after submission')
+      : t('Đang chỉnh sửa — mọi thay đổi được ghi nhật ký', 'Editing — all changes are audit-logged');
     html += '<div class="eqms-status-bar editing">' +
       '<span class="eqms-status-indicator"></span>' +
-      '<span>' + esc(t('Đang chỉnh sửa — mọi thay đổi được ghi nhật ký', 'Editing — all changes are audit-logged')) + '</span>' +
+      '<span>' + esc(editingText) + '</span>' +
       '<span class="eqms-autosave-indicator" id="eqms-autosave-indicator"></span>' +
-    '</div>' +
-    renderProgressBar(schema);
+    '</div>';
+    html += renderProgressBar(schema);
+  } else if(currentEntryIsLocked()){
+    html += '<div class="eqms-inline-alert">' +
+      esc(t('Hồ sơ đã vào trạng thái kiểm soát. Nội dung đang xem là authoritative và không được sửa trực tiếp; mọi thay đổi phải tạo amendment/version mới kèm change authority.', 'This record is in a controlled state. The displayed content is authoritative and cannot be edited directly; changes must create a new amendment/version with change authority.')) +
+    '</div>';
   }
 
   /* ── Form sections ── */
@@ -994,16 +1003,20 @@ function renderForm(container){
           '<button class="hm-btn hm-btn-primary" id="eqms-issue-code">' + esc(t('Cấp mã hồ sơ để bắt đầu', 'Issue record code to start')) + '</button>' +
         '</div>';
     } else {
+      var amendmentMode = isAmendmentEdit();
       html += '<div class="eqms-actions">' +
-        '<button class="hm-btn hm-btn-ghost" id="eqms-cancel-create">' + esc(t('Hủy tạo form', 'Cancel form creation')) + '</button>' +
-        '<button class="hm-btn hm-btn-secondary" id="eqms-save-draft">' + esc(t('Lưu nháp', 'Save draft')) + '</button>' +
-        '<button class="hm-btn hm-btn-primary" id="eqms-submit">' + esc(t('Gửi biểu mẫu', 'Submit form')) + '</button>' +
+        '<button class="hm-btn hm-btn-ghost" id="eqms-cancel-create">' + esc(amendmentMode ? t('Thoát amendment', 'Exit amendment') : t('Hủy tạo form', 'Cancel form creation')) + '</button>' +
+        '<button class="hm-btn hm-btn-secondary" id="eqms-save-draft">' + esc(amendmentMode ? t('Lưu nháp amendment', 'Save amendment draft') : t('Lưu nháp', 'Save draft')) + '</button>' +
+        '<button class="hm-btn hm-btn-primary" id="eqms-submit">' + esc(amendmentMode ? t('Gửi amendment', 'Submit amendment') : t('Gửi biểu mẫu', 'Submit form')) + '</button>' +
       '</div>';
     }
   } else if(state.entry || state.allocationId){
+    var locked = currentEntryIsLocked();
     html += '<div class="eqms-actions">' +
       '<button class="hm-btn hm-btn-ghost" id="eqms-edit-template">' + esc(t('Chỉnh sửa mẫu form', 'Edit form template')) + '</button>' +
-      '<button class="hm-btn hm-btn-secondary" id="eqms-enter-edit">' + esc(t('Chỉnh sửa có kiểm soát', 'Controlled edit')) + '</button>' +
+      (locked
+        ? '<button class="hm-btn hm-btn-secondary" id="eqms-start-amendment">' + esc(t('Tạo amendment / version mới', 'Create amendment / new version')) + '</button>'
+        : '<button class="hm-btn hm-btn-secondary" id="eqms-enter-edit">' + esc(t('Chỉnh sửa có kiểm soát', 'Controlled edit')) + '</button>') +
     '</div>';
   }
 
@@ -1284,7 +1297,10 @@ function bindFields(container){
         clearLocalDraft();
         toast(t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
         state.editMode = false;
-        state.editOrigin = 'controlled_edit';
+        state.editOrigin = 'readonly';
+        state.changeAuthorityId = '';
+        state.amendmentReason = '';
+        if(resp && resp.entry_id) state.entryId = resp.entry_id;
         loadEntry(state.formCode, state.allocationId, state.entryId).then(function(entry){
           if(entry){
             state.entry = entry;
@@ -1307,10 +1323,19 @@ function bindFields(container){
 
   var editBtn = document.getElementById('eqms-enter-edit');
   if(editBtn) editBtn.onclick = function(){
+    if(currentEntryIsLocked()){
+      startAmendmentFlow(container);
+      return;
+    }
     state.editMode = true;
     state.editOrigin = 'controlled_edit';
     state.originalValues = JSON.parse(JSON.stringify(state.fieldValues || {}));
     renderForm(container);
+  };
+
+  var amendmentBtn = document.getElementById('eqms-start-amendment');
+  if(amendmentBtn) amendmentBtn.onclick = function(){
+    startAmendmentFlow(container);
   };
 
   var editTemplateBtn = document.getElementById('eqms-edit-template');
@@ -1385,6 +1410,10 @@ function legacyDraftStorageKey(){
 }
 
 function saveDraft(){
+  if(currentEntryIsLocked() && !isAmendmentEdit()){
+    toast(t('Không thể lưu nháp lên hồ sơ đã khóa. Hãy tạo amendment/version mới và khai báo change authority trước.', 'Cannot save a draft over a locked record. Create an amendment/new version and provide change authority first.'), 'warn');
+    return Promise.resolve({ ok:false, error:'change_authority_required' });
+  }
   saveAuditLog();
   /* Always save to localStorage first (works without allocation) */
   var draftData = {
@@ -1395,6 +1424,8 @@ function saveDraft(){
     editOrigin: state.editOrigin || 'draft',
     sourceEntryId: state.sourceEntryId || '',
     sourceSubmissionRevision: state.sourceSubmissionRevision || 0,
+    changeAuthorityId: state.changeAuthorityId || '',
+    amendmentReason: state.amendmentReason || '',
     fieldValues: state.fieldValues,
     signatures: state.signatures,
     savedAt: new Date().toISOString(),
@@ -1412,9 +1443,23 @@ function saveDraft(){
       edit_origin: state.editOrigin || 'draft',
       source_entry_id: state.sourceEntryId || '',
       source_submission_revision: state.sourceSubmissionRevision || 0,
+      change_authority_id: state.changeAuthorityId || '',
+      amendment_reason: state.amendmentReason || '',
       data: { fieldValues: state.fieldValues, signatures: state.signatures }
-    }, 'POST').catch(function(){
-      /* Server save failed — localStorage draft is the backup */
+    }, 'POST').then(function(resp){
+      if(resp && resp.ok === false){
+        var serverErr = new Error(resp.message || resp.error || 'server_draft_rejected');
+        serverErr.payload = resp;
+        throw serverErr;
+      }
+      return resp;
+    }).catch(function(err){
+      /* For governed amendments, a server rejection must stay visible because
+         the server is authoritative for change authority and record lock state. */
+      if(currentEntryIsLocked() || isAmendmentEdit()){
+        return Promise.reject(err || new Error('server_draft_rejected'));
+      }
+      /* Server save failed — localStorage draft is the backup for pre-release drafts. */
       return { ok: true, source: 'local_only' };
     });
   }
@@ -1525,8 +1570,20 @@ function normalizeSchemaLookups(schema){
 
 function cancelFormCreation(){
   var workflowState = String((state.entry && state.entry.workflow_state) || '').trim().toLowerCase();
-  if(state.editOrigin === 'controlled_edit' || ['submitted','approved','closed','received'].indexOf(workflowState) >= 0){
-    toast('Hồ sơ này đã vào luồng kiểm soát chính thức. Muốn sửa tiếp phải dùng chỉnh sửa có kiểm soát, không được hủy tạo.', 'warn');
+  if(state.editOrigin === 'amendment'){
+    state.editMode = false;
+    state.editOrigin = 'readonly';
+    state.changeAuthorityId = '';
+    state.amendmentReason = '';
+    state.entryId = state.sourceEntryId || (state.entry && state.entry.entry_id) || state.entryId;
+    if(state.entry) restoreEntryValues(state.entry, true);
+    var amendContainer = document.querySelector('.eqms-runtime') || document.getElementById('eqms-form-container');
+    if(amendContainer) renderForm(amendContainer);
+    toast(t('Đã thoát amendment. Bản authoritative gốc vẫn được giữ nguyên.', 'Exited amendment. The authoritative source record remains unchanged.'), 'info');
+    return Promise.resolve(true);
+  }
+  if(state.editOrigin === 'controlled_edit' || isLockedWorkflowState(workflowState)){
+    toast(t('Hồ sơ này đã vào luồng kiểm soát chính thức. Không được hủy hoặc sửa trực tiếp; hãy tạo amendment/version mới kèm change authority.', 'This record is already in the controlled workflow. It cannot be cancelled or edited directly; create an amendment/new version with change authority.'), 'warn');
     return Promise.resolve(false);
   }
   return openPrompt({
@@ -1560,6 +1617,50 @@ function cancelFormCreation(){
   });
 }
 
+function startAmendmentFlow(container){
+  if(!state.entry || !currentEntryIsLocked()){
+    state.editMode = true;
+    state.editOrigin = 'controlled_edit';
+    state.originalValues = JSON.parse(JSON.stringify(state.fieldValues || {}));
+    renderForm(container);
+    return Promise.resolve(true);
+  }
+
+  return openPrompt({
+    title: t('Change authority bắt buộc', 'Change authority required'),
+    message: t('Nhập mã Change Request / Change Order đã được phê duyệt cho amendment này.', 'Enter the approved Change Request / Change Order for this amendment.'),
+    required: true,
+    confirmLabel: t('Tiếp tục', 'Continue'),
+    cancelLabel: t('Hủy', 'Cancel')
+  }).then(function(authority){
+    authority = String(authority || '').trim();
+    if(!authority) return false;
+    return openPrompt({
+      title: t('Lý do amendment', 'Amendment reason'),
+      message: t('Nhập lý do nghiệp vụ. Lý do này sẽ đi vào audit trail và phiên bản evidence mới.', 'Enter the business reason. It will be recorded in the audit trail and the new evidence version.'),
+      multiline: true,
+      required: true,
+      confirmLabel: t('Tạo amendment', 'Create amendment'),
+      cancelLabel: t('Hủy', 'Cancel')
+    }).then(function(reason){
+      reason = String(reason || '').trim();
+      if(!reason) return false;
+      state.editMode = true;
+      state.editOrigin = 'amendment';
+      state.changeAuthorityId = authority;
+      state.amendmentReason = reason;
+      state.sourceEntryId = (state.entry && state.entry.entry_id) || state.entryId || '';
+      state.sourceSubmissionRevision = Number((state.entry && state.entry.submission_revision) || state.sourceSubmissionRevision || 0) || 0;
+      state.entryId = '';
+      state.originalValues = JSON.parse(JSON.stringify(state.fieldValues || {}));
+      logFieldChange('_amendment_started', '', authority, reason);
+      toast(t('Đã tạo amendment draft. Bản final gốc không bị sửa trực tiếp.', 'Amendment draft created. The source final record is not edited directly.'), 'success');
+      renderForm(container);
+      return true;
+    });
+  });
+}
+
 function listUserDrafts(){
   var drafts = [];
   var owner = currentUserKey();
@@ -1581,6 +1682,10 @@ function listUserDrafts(){
 }
 
 function submitForm(){
+  if(currentEntryIsLocked() && !isAmendmentEdit()){
+    toast(t('Không thể gửi thay đổi trực tiếp lên hồ sơ đã khóa. Hãy tạo amendment/version mới kèm change authority.', 'Cannot submit direct changes to a locked record. Create an amendment/new version with change authority.'), 'warn');
+    return Promise.resolve({ ok:false, error:'change_authority_required' });
+  }
   saveAuditLog();
   var payload = {};
   Object.keys(state.fieldValues).forEach(function(k){ payload[k] = state.fieldValues[k]; });
@@ -1593,12 +1698,18 @@ function submitForm(){
   payload.edit_origin = state.editOrigin || 'new';
   payload.source_entry_id = state.sourceEntryId || '';
   payload.source_submission_revision = state.sourceSubmissionRevision || 0;
+  payload.change_authority_id = state.changeAuthorityId || '';
+  payload.amendment_reason = state.amendmentReason || '';
   payload.runtime_mode = 'eqms_web_form';
 
   if(window.AllocationTracker && state.allocationId){
     return window.AllocationTracker.submitOnline(state.allocationId, state.formCode, payload);
   }
-  return api('form_fill_submit_online', payload, 'POST');
+  return api('form_fill_submit_online', {
+    allocation_id: state.allocationId,
+    form_code: state.formCode,
+    form_data: payload
+  }, 'POST');
 }
 
 /* ── E-Signature Dialog ── */
@@ -1778,6 +1889,8 @@ window.openEqmsForm = function(formCode, container, options){
   state.editOrigin = options.editOrigin || 'new';
   state.sourceEntryId = options.sourceEntryId || '';
   state.sourceSubmissionRevision = Number(options.sourceSubmissionRevision || 0) || 0;
+  state.changeAuthorityId = options.changeAuthorityId || '';
+  state.amendmentReason = options.amendmentReason || '';
   state.editMode = !!options.editMode;
   state.fieldValues = {};
   state.signatures = {};
@@ -1854,6 +1967,8 @@ window.openEqmsForm = function(formCode, container, options){
       if(localDraft.editOrigin && state.editOrigin === 'new') state.editOrigin = localDraft.editOrigin;
       if(localDraft.sourceEntryId && !state.sourceEntryId) state.sourceEntryId = localDraft.sourceEntryId;
       if(localDraft.sourceSubmissionRevision && !state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(localDraft.sourceSubmissionRevision) || 0;
+      if(localDraft.changeAuthorityId) state.changeAuthorityId = String(localDraft.changeAuthorityId || '').trim();
+      if(localDraft.amendmentReason) state.amendmentReason = String(localDraft.amendmentReason || '').trim();
     }
 
     /* Load existing entry from server if available */
@@ -1865,17 +1980,18 @@ window.openEqmsForm = function(formCode, container, options){
           state.recordId = entry.record_id || state.recordId;
           if(!state.sourceEntryId) state.sourceEntryId = entry.entry_id || '';
           if(!state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(entry.submission_revision || 0) || 0;
-          /* Hydrate field values from entry */
-          Object.keys(entry).forEach(function(k){
-            if(['form_code','form_version','record_id','allocation_id','signatures','_status','_ip','_server_time','submitted_by','submitted_at','entry_id','master_context','history','workflow_state'].indexOf(k) < 0){
-              if(state.fieldValues[k] === undefined || state.fieldValues[k] === null || state.fieldValues[k] === ''){
-                state.fieldValues[k] = entry[k];
-              }
-            }
-          });
+          var lockedEntry = isLockedWorkflowState(workflowStateOf(entry));
+          if(lockedEntry && !isAmendmentEdit()){
+            state.editMode = false;
+            state.editOrigin = 'readonly';
+            state.entryId = entry.entry_id || state.entryId;
+            state.fieldValues = {};
+          }
+          /* Locked authoritative entries overwrite local drafts so stale browser data cannot masquerade as final content. */
+          restoreEntryValues(entry, lockedEntry && !isAmendmentEdit());
           if(entry.signatures && typeof entry.signatures === 'object') state.signatures = entry.signatures;
           /* If already submitted, force read-only unless explicitly in edit mode */
-          if(!options.editMode && (entry.workflow_state === 'submitted' || entry.workflow_state === 'approved' || entry.workflow_state === 'closed')){
+          if(!options.editMode && isLockedWorkflowState(entry.workflow_state || entry.approval_state || entry._status)){
             state.editMode = false;
           }
         }
@@ -1885,6 +2001,10 @@ window.openEqmsForm = function(formCode, container, options){
         }
         return loadServerDraft(state.allocationId).then(function(serverDraft){
           if(serverDraft && serverDraft.data){
+            if(currentEntryIsLocked() && !isAmendmentEdit()){
+              renderForm(runtime);
+              return null;
+            }
             var serverFields = serverDraft.data.fieldValues || {};
             Object.keys(serverFields).forEach(function(k){ state.fieldValues[k] = serverFields[k]; });
             if(serverDraft.data.signatures) state.signatures = serverDraft.data.signatures;
@@ -1893,6 +2013,8 @@ window.openEqmsForm = function(formCode, container, options){
             if(serverDraft.edit_origin && state.editOrigin === 'new') state.editOrigin = serverDraft.edit_origin;
             if(serverDraft.source_entry_id && !state.sourceEntryId) state.sourceEntryId = serverDraft.source_entry_id;
             if(serverDraft.source_submission_revision && !state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(serverDraft.source_submission_revision) || 0;
+            if(serverDraft.change_authority_id) state.changeAuthorityId = String(serverDraft.change_authority_id || '').trim();
+            if(serverDraft.amendment_reason) state.amendmentReason = String(serverDraft.amendment_reason || '').trim();
           }
           renderForm(runtime);
           return null;
@@ -1922,6 +2044,10 @@ window.openEqmsForm = function(formCode, container, options){
  * Toggle edit mode on an already-open form.
  */
 window.toggleEqmsEditMode = function(){
+  if(!state.editMode && currentEntryIsLocked() && !isAmendmentEdit()){
+    toast(t('Hồ sơ đã khóa. Dùng nút Tạo amendment/version mới để chỉnh sửa có kiểm soát.', 'The record is locked. Use Create amendment/new version for controlled changes.'), 'warn');
+    return false;
+  }
   state.editMode = !state.editMode;
   state.originalValues = JSON.parse(JSON.stringify(state.fieldValues));
   var container = document.querySelector('.eqms-runtime') || document.getElementById('eqms-form-container');

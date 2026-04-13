@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Services\ChangeControl\ChangeAuthorityService;
 use RuntimeException;
+
+require_once __DIR__ . '/ChangeControl/ChangeAuthorityService.php';
 
 /**
  * Result object for status-transition operations.
@@ -162,6 +165,8 @@ final class OrderWorkflowService
     // ── Dependencies ────────────────────────────────────────────────────────
 
     private readonly OrderWorkflowRepository $repository;
+    private readonly ?object $db;
+    private ?ChangeAuthorityService $changeAuthorityService = null;
 
     /** Cached config loaded from disk. */
     private ?array $configCache = null;
@@ -178,6 +183,7 @@ final class OrderWorkflowService
         ?OrderWorkflowRepository $repository = null,
     )
     {
+        $this->db = $db;
         $this->repository = $repository ?? new JsonOrderWorkflowRepository($dataDir, $db);
     }
 
@@ -464,6 +470,7 @@ final class OrderWorkflowService
         string $fieldName,
         mixed  $newValue,
         string $userRole,
+        array $context = [],
     ): EditResult {
         $meta = self::ORDER_META[$orderType] ?? null;
         if ($meta === null) {
@@ -494,6 +501,8 @@ final class OrderWorkflowService
         }
 
         $currentStatus = strtolower((string)($record['status'] ?? ''));
+        $isPostReleaseEcrField = in_array($fieldName, self::ECR_FIELDS, true)
+            && in_array($currentStatus, self::POST_RELEASE_STATUSES, true);
 
         // Terminal status -- no edits
         if (in_array($currentStatus, self::TERMINAL_STATUSES, true)) {
@@ -504,7 +513,7 @@ final class OrderWorkflowService
         $rules = self::FIELD_EDIT_RULES[$orderType] ?? [];
         if (isset($rules[$fieldName])) {
             $allowedStates = $rules[$fieldName];
-            if (!in_array($currentStatus, $allowedStates, true)) {
+            if (!in_array($currentStatus, $allowedStates, true) && !$isPostReleaseEcrField) {
                 return new EditResult(
                     false,
                     "Field '{$fieldName}' is locked in '{$currentStatus}' status.",
@@ -519,16 +528,37 @@ final class OrderWorkflowService
         }
 
         // ECR check for post-release edits
-        if (
-            in_array($fieldName, self::ECR_FIELDS, true)
-            && in_array($currentStatus, self::POST_RELEASE_STATUSES, true)
-        ) {
-            return new EditResult(
-                false,
-                "Field '{$fieldName}' requires an Engineering Change Request (ECR) after release.",
-                errorCode: 'ecr_required',
-                data: ['field' => $fieldName, 'current_status' => $currentStatus],
+        if ($isPostReleaseEcrField) {
+            $decision = $this->changeAuthority()->assertFieldEditAllowed(
+                $orderType,
+                $orderId,
+                $fieldName,
+                $record[$fieldName] ?? null,
+                $newValue,
+                $currentStatus,
+                array_merge($context, [
+                    'effectivity' => array_merge(
+                        is_array($context['effectivity'] ?? null) ? $context['effectivity'] : [],
+                        [
+                            'order_id' => $orderId,
+                            'order_type' => $orderType,
+                            'status' => $currentStatus,
+                        ],
+                    ),
+                ]),
             );
+
+            if (!$decision->allowed) {
+                return new EditResult(
+                    false,
+                    $decision->message,
+                    errorCode: $decision->errorCode !== '' ? $decision->errorCode : 'change_authority_required',
+                    data: array_merge([
+                        'field' => $fieldName,
+                        'current_status' => $currentStatus,
+                    ], $decision->data),
+                );
+            }
         }
 
         return new EditResult(true, 'Edit allowed.', data: [
@@ -555,6 +585,7 @@ final class OrderWorkflowService
         array  $changes,
         string $userId,
         string $reason,
+        array $context = [],
     ): EditResult {
         $meta = self::ORDER_META[$orderType] ?? null;
         if ($meta === null) {
@@ -566,7 +597,7 @@ final class OrderWorkflowService
         // Validate all fields first
         $errors = [];
         foreach ($changes as $field => $newValue) {
-            $result = $this->validateFieldEdit($orderType, $orderId, $field, $newValue, $userRole);
+            $result = $this->validateFieldEdit($orderType, $orderId, $field, $newValue, $userRole, $context);
             if (!$result->ok) {
                 $errors[$field] = $result->message;
             }
@@ -613,6 +644,15 @@ final class OrderWorkflowService
         $this->saveOrders($orders);
 
         return new EditResult(true, 'Fields updated.', data: $updated);
+    }
+
+    private function changeAuthority(): ChangeAuthorityService
+    {
+        if ($this->changeAuthorityService === null) {
+            $this->changeAuthorityService = new ChangeAuthorityService($this->db);
+        }
+
+        return $this->changeAuthorityService;
     }
 
     /**

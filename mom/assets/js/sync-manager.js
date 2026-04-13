@@ -6,7 +6,7 @@
  * Orchestrates background synchronization of offline form submissions:
  *   - Monitors online/offline transitions
  *   - Processes the IndexedDB submission queue
- *   - Handles conflict resolution (last-write-wins, user prompt, auto-merge)
+ *   - Parks conflicts for server-authoritative amendment/change-control review
  *   - Implements exponential backoff for transient failures
  *   - Provides a visual sync status indicator in the UI
  *   - Logs all sync operations for audit traceability
@@ -256,87 +256,32 @@ class SyncManager {
   }
 
   /**
-   * Handle a data conflict between the local offline submission and the
-   * server's current state.
+   * Handle a data conflict between a local offline submission and the server's
+   * current state.
    *
-   * Strategies:
-   *   1. Last-write-wins for simple scalar fields (timestamps compared).
-   *   2. Automatic merge for non-overlapping field changes.
-   *   3. User prompt for truly conflicting edits on the same fields.
+   * eQMS records are record-centric and immutable after finalization. The
+   * browser must never auto-merge, last-write-wins, or resubmit a conflict as a
+   * resolved record. Conflicts stay in the queue until the server or an
+   * authorized amendment/change-control flow resolves them.
    *
    * @param {Object} local       The offline queued submission.
    * @param {Object} server      The server's version of the same record.
    * @returns {Promise<boolean>}  True if the conflict was resolved automatically.
    */
   async handleConflict(local, server) {
-    if (!server || !server.data) {
-      // No server data to conflict with; local wins.
-      return true;
-    }
-
     const localData  = local.data || {};
-    const serverData = server.data || {};
-    const merged     = { ...serverData };
-    let hasConflict  = false;
-
-    // Walk through local fields and compare.
-    for (const [key, localVal] of Object.entries(localData)) {
-      const serverVal = serverData[key];
-
-      if (serverVal === undefined) {
-        // Field only exists locally: auto-merge (no overlap).
-        merged[key] = localVal;
-      } else if (JSON.stringify(localVal) === JSON.stringify(serverVal)) {
-        // Same value: no conflict.
-        continue;
-      } else {
-        // Both sides changed the same field.
-        // Simple strategy: compare timestamps. If local is newer, local wins.
-        const localTime  = new Date(local.queuedAt || 0).getTime();
-        const serverTime = new Date(server.updatedAt || server.updated_at || 0).getTime();
-
-        if (localTime >= serverTime) {
-          merged[key] = localVal;
-        } else {
-          // Server is newer for this field. Mark for potential user review.
-          hasConflict = true;
-        }
-      }
-    }
-
-    if (hasConflict) {
-      // Dispatch a custom event so the UI can prompt the user.
-      const event = new CustomEvent('qms:sync-conflict', {
-        detail: {
-          formCode: local.formCode,
-          localData: localData,
-          serverData: serverData,
-          mergedData: merged,
-          queueId: local.id,
-        },
-      });
-      window.dispatchEvent(event);
-
-      // Return false so the item stays in the queue until the user resolves it.
-      return false;
-    }
-
-    // Auto-merged successfully; resubmit the merged data.
-    try {
-      const response = await fetch(SyncManager.SUBMIT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'form_submit',
-          form_code: local.formCode,
-          data: merged,
-          merge_resolution: true,
-        }),
-      });
-      return response.ok;
-    } catch (e) {
-      return false;
-    }
+    const serverData = (server && server.data) ? server.data : {};
+    const event = new CustomEvent('qms:sync-conflict', {
+      detail: {
+        formCode: local.formCode,
+        localData: localData,
+        serverData: serverData,
+        queueId: local.id,
+        resolutionRequired: 'server_authoritative_amendment',
+      },
+    });
+    window.dispatchEvent(event);
+    return false;
   }
 
   /**

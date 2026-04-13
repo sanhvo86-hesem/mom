@@ -58,7 +58,7 @@ class OrderController extends BaseController
     private function workflowService(): OrderWorkflowService
     {
         if ($this->workflowService === null) {
-            $this->workflowService = new OrderWorkflowService($this->dataDir);
+            $this->workflowService = new OrderWorkflowService($this->dataDir, $this->data);
         }
         return $this->workflowService;
     }
@@ -90,6 +90,38 @@ class OrderController extends BaseController
         }
 
         return (string)($user['role'] ?? '');
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function changeAuthorityContext(array $body, string $actorId): array
+    {
+        $effectivity = is_array($body['effectivity'] ?? null) ? $body['effectivity'] : [];
+
+        return [
+            'actor_id' => $actorId,
+            'change_order_id' => trim((string)($body['change_order_id'] ?? $body['plm_change_order_id'] ?? '')),
+            'change_order_number' => trim((string)($body['change_order_number'] ?? $body['change_order_ref'] ?? '')),
+            'correlation_id' => trim((string)($this->requestHeader('X-Correlation-Id') ?? '')),
+            'effectivity' => $effectivity,
+        ];
+    }
+
+    private function orderEditStatusCode(?string $errorCode): int
+    {
+        return match ($errorCode) {
+            'not_found' => 404,
+            'forbidden' => 403,
+            'validation_failed',
+            'field_locked',
+            'ecr_required',
+            'change_authority_required',
+            'change_authority_unavailable',
+            'status_locked' => 409,
+            default => 400,
+        };
     }
 
     /**
@@ -592,9 +624,16 @@ class OrderController extends BaseController
         $reason = trim((string)($body['reason'] ?? 'Field update'));
 
         try {
-            $result = $this->workflowService()->executeFieldEdit('so', $soNumber, $changes, $uid, $reason);
+            $result = $this->workflowService()->executeFieldEdit(
+                'so',
+                $soNumber,
+                $changes,
+                $uid,
+                $reason,
+                $this->changeAuthorityContext($body, $uid),
+            );
             if (!$result->ok) {
-                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                $this->error($result->errorCode ?? 'update_failed', $this->orderEditStatusCode($result->errorCode), $result->message);
             }
             if (is_array($result->data ?? null)) {
                 $this->customerPurchaseOrders()->synchronizeSalesOrder((array)$result->data, $uid);
@@ -693,9 +732,16 @@ class OrderController extends BaseController
         $reason = trim((string)($body['reason'] ?? 'Field update'));
 
         try {
-            $result = $this->workflowService()->executeFieldEdit('jo', $joNumber, $changes, $uid, $reason);
+            $result = $this->workflowService()->executeFieldEdit(
+                'jo',
+                $joNumber,
+                $changes,
+                $uid,
+                $reason,
+                $this->changeAuthorityContext($body, $uid),
+            );
             if (!$result->ok) {
-                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                $this->error($result->errorCode ?? 'update_failed', $this->orderEditStatusCode($result->errorCode), $result->message);
             }
             $this->auditLog('order_jo_update', ['jo_number' => $joNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['job_order' => $result->data]);
@@ -789,9 +835,16 @@ class OrderController extends BaseController
         $reason = trim((string)($body['reason'] ?? 'Field update'));
 
         try {
-            $result = $this->workflowService()->executeFieldEdit('wo', $woNumber, $changes, $uid, $reason);
+            $result = $this->workflowService()->executeFieldEdit(
+                'wo',
+                $woNumber,
+                $changes,
+                $uid,
+                $reason,
+                $this->changeAuthorityContext($body, $uid),
+            );
             if (!$result->ok) {
-                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                $this->error($result->errorCode ?? 'update_failed', $this->orderEditStatusCode($result->errorCode), $result->message);
             }
             $this->auditLog('order_wo_update', ['wo_number' => $woNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['work_order' => $result->data]);

@@ -90,8 +90,9 @@ function main() {
   const gateManifest = readJson('mom/design/qa-gates.json');
   const statusManifest = readJson('mom/design/status-label-manifest.json');
   const endpointCatalog = readJson('mom/data/registry/endpoint-catalog.json');
+  const graphicsGovernance = readJson('mom/data/registry/graphics-governance-registry.json');
 
-  if (!templateSchema || !blockSchema || !packetSchema || !registry || !gateManifest || !statusManifest || !endpointCatalog) {
+  if (!templateSchema || !blockSchema || !packetSchema || !registry || !gateManifest || !statusManifest || !endpointCatalog || !graphicsGovernance) {
     reportAndExit();
   }
 
@@ -147,6 +148,8 @@ function main() {
     if (!moduleSchema || !moduleSchema.moduleId) continue;
     validateModule(moduleSchema, modulePath, packets, templateLookup);
   }
+
+  validateGraphicsGovernance(graphicsGovernance, packets);
 
   reportAndExit();
 }
@@ -306,6 +309,38 @@ function validateModule(moduleSchema, modulePath, packets, templateLookup) {
   }
 }
 
+function validateGraphicsGovernance(graphicsGovernance, packets) {
+  const registry = graphicsGovernance.templateRegistry || {};
+  const compliance = graphicsGovernance.moduleGraphicsCompliance || {};
+  const matrix = Array.isArray(compliance.matrix) ? compliance.matrix : [];
+  const releaseBlockers = Array.isArray(graphicsGovernance.releaseBlockers?.blockers)
+    ? graphicsGovernance.releaseBlockers.blockers
+    : [];
+
+  if (!Array.isArray(registry.templates) || registry.templates.length === 0) {
+    errors.push('mom/data/registry/graphics-governance-registry.json: templateRegistry.templates is empty or missing');
+  }
+  if (!matrix.length) {
+    errors.push('mom/data/registry/graphics-governance-registry.json: moduleGraphicsCompliance.matrix is empty or missing');
+  }
+
+  const complianceByModule = new Map(matrix.map((row) => [row.moduleId, row]));
+  for (const moduleId of packets.keys()) {
+    if (!complianceByModule.has(moduleId)) {
+      warnings.push(`graphics-governance: build packet module "${moduleId}" has no compliance matrix row`);
+    }
+  }
+
+  const nonCompliant = matrix.filter((row) => row && row.compliant !== true);
+  if (nonCompliant.length) {
+    warnings.push(`graphics-governance: ${nonCompliant.length} module(s) are not full-admin-controlled; release must resolve debt or attach approved waiver`);
+  }
+  const activeBlockers = releaseBlockers.filter((row) => row && row.status !== 'waived');
+  if (activeBlockers.length) {
+    warnings.push(`graphics-governance: ${activeBlockers.length} active release blocker(s) reported by graphics authority`);
+  }
+}
+
 function reportAndExit() {
   console.log('Frontend contract validation');
   console.log(`Root: ${root}`);
@@ -320,7 +355,7 @@ function reportAndExit() {
     for (const error of errors) console.log(`- ${error}`);
     process.exit(1);
   }
-  console.log('\nPASS: template registry, block contracts, build packets, module coverage and endpoint bindings are consistent.');
+  console.log('\nPASS: template registry, block contracts, build packets, module coverage, endpoint bindings and graphics governance registry are consistent.');
 }
 
 main();

@@ -1937,7 +1937,7 @@ function renderOfflineStepModern(form, allocation){
                   '<p>' + esc(t('Chỉ nhận .xlsx/.xlsm đã được hệ thống cấp phát và còn giữ nguyên metadata kiểm soát.','Only .xlsx/.xlsm files issued by the system with intact governed metadata are accepted.')) + '</p>' +
                 '</label>' +
                 '<div id="ec-upload-queue">' + renderUploadQueue() + '</div>' +
-                (ws.uploadFiles.length ? '<div class="ec-actions"><button class="ec-btn secondary" id="ec-clear-queue">' + esc(t('Xóa danh sách','Clear')) + '</button><button class="ec-btn success" id="ec-receive-all">' + esc(t('Tiếp nhận tệp hợp lệ','Receive valid files')) + '</button></div>' : '') +
+	                (ws.uploadFiles.length ? '<div class="ec-actions"><button class="ec-btn secondary" id="ec-clear-queue">' + esc(t('Xóa danh sách','Clear')) + '</button><button class="ec-btn success" id="ec-receive-all">' + esc(t('Tiếp nhận tệp đã xác minh','Receive verified files')) + '</button></div>' : '') +
               '</section>' +
             '</div>' +
             renderOfflineAside(form, allocation) +
@@ -2038,24 +2038,29 @@ function renderUploadQueue(){
   if(!ws.uploadFiles.length) return '';
   return ws.uploadFiles.map(function(item){
     var v = item.inspect && item.inspect.verification ? item.inspect.verification : {status:'pending'};
-    var status = v.status || item.status || 'pending';
-    var badgeClass = status==='verified'?'pass':status==='warning'?'warn':status==='rejected'?'fail':'neutral';
-    var alloc = item.inspect && item.inspect.allocation ? item.inspect.allocation : null;
-    var md = item.inspect && item.inspect.metadata ? item.inspect.metadata : {};
-    return '<div class="ec-file">' +
-      '<div class="ec-file-head"><div><div class="ec-file-name">'+esc(item.file.name)+'</div><div class="ec-file-meta">'+esc(formatFileSize(item.file.size))+'</div></div>' +
-        '<span class="ec-badge '+badgeClass+'">'+esc(status==='verified'?t('Hợp lệ','Valid'):status==='warning'?t('Cảnh báo','Warning'):status==='rejected'?t('Từ chối','Rejected'):t('Đang kiểm tra','Inspecting'))+'</span>' +
-      '</div>' +
+	    var status = v.status || item.status || 'pending';
+	    var badgeClass = status==='verified'?'pass':status==='warning'?'warn':status==='rejected'?'fail':'neutral';
+	    var alloc = item.inspect && item.inspect.allocation ? item.inspect.allocation : null;
+	    var md = item.inspect && item.inspect.metadata ? item.inspect.metadata : {};
+	    var duplicates = Array.isArray(v.duplicate_candidates) ? v.duplicate_candidates : [];
+	    var duplicateHtml = duplicates.length
+	      ? '<div class="ec-file-meta" style="color:var(--ec-danger);margin-top:4px"><strong>'+esc(t('Trùng nội dung đã tiếp nhận:','Duplicate content already received:'))+'</strong> '+esc(duplicates.map(function(d){return ['R'+(d.version||'?'),d.uploaded_at||'',d.stored_filename||''].filter(Boolean).join(' · ');}).join(' | '))+'</div>'
+	      : '';
+	    return '<div class="ec-file">' +
+	      '<div class="ec-file-head"><div><div class="ec-file-name">'+esc(item.file.name)+'</div><div class="ec-file-meta">'+esc(formatFileSize(item.file.size))+'</div></div>' +
+	        '<span class="ec-badge '+badgeClass+'">'+esc(status==='verified'?t('Hợp lệ','Valid'):status==='warning'?t('Cảnh báo cần QA xử lý','Warning requires QA resolution'):status==='rejected'?t('Từ chối','Rejected'):t('Đang kiểm tra','Inspecting'))+'</span>' +
+	      '</div>' +
       '<div class="ec-file-grid">' +
         '<div class="ec-file-cell"><small>'+esc(t('Mã hồ sơ','Record ID'))+'</small><strong>'+esc((alloc&&alloc.record_id)||md.issued_record_id||'—')+'</strong></div>' +
         '<div class="ec-file-cell"><small>'+esc(t('Biểu mẫu','Form'))+'</small><strong>'+esc(md.form_code||(alloc&&alloc.form_code)||'—')+'</strong></div>' +
         '<div class="ec-file-cell"><small>'+esc(t('Phiên bản','Version'))+'</small><strong>'+esc(md.form_version||'—')+'</strong></div>' +
-      '</div>' +
-      ((v.warnings||[]).length?'<div class="ec-file-meta" style="color:var(--ec-warning);margin-top:6px">'+esc(v.warnings.join(', '))+'</div>':'') +
-      ((v.issues||[]).length?'<div class="ec-file-meta" style="color:var(--ec-danger);margin-top:4px">'+esc(v.issues.join(', '))+'</div>':'') +
-    '</div>';
-  }).join('');
-}
+	      '</div>' +
+	      ((v.warnings||[]).length?'<div class="ec-file-meta" style="color:var(--ec-warning);margin-top:6px">'+esc(v.warnings.join(', '))+'</div>':'') +
+	      ((v.issues||[]).length?'<div class="ec-file-meta" style="color:var(--ec-danger);margin-top:4px">'+esc(v.issues.join(', '))+'</div>':'') +
+	      duplicateHtml +
+	    '</div>';
+	  }).join('');
+	}
 
 /* ── Field rendering ── */
 function fieldStateMeta(field){
@@ -3362,21 +3367,23 @@ function bindOffline(form,allocation,container){
   var clearBtn=document.getElementById('ec-clear-queue');
   if(clearBtn) clearBtn.onclick=function(){ws.uploadFiles=[];renderWorkspace(form,allocation,container);bindWorkspace(form,allocation,container);};
 
-  var receiveAll=document.getElementById('ec-receive-all');
-  if(receiveAll) receiveAll.onclick=function(){
-    var valid=ws.uploadFiles.filter(function(i){return i.inspect&&i.inspect.ok&&i.inspect.verification&&i.inspect.verification.status!=='rejected';});
-    if(!valid.length){toast(t('Không có tệp hợp lệ.','No valid files.'),'warn');return;}
-    receiveAll.disabled=true;
-    Promise.all(valid.map(function(item){
-      var aid=(item.inspect&&item.inspect.allocation&&item.inspect.allocation.allocation_id)||allocation.allocation_id||'';
-      return window.AllocationTracker.receiveUpload(aid,item.file).then(function(r){item.receive=r;return r;});
-    })).then(function(){
-      toast(t('Đã tiếp nhận.','Files received.'),'success');
-      ws.uploadFiles=[];
-      if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
-    }).finally(function(){receiveAll.disabled=false;});
-  };
-}
+	  var receiveAll=document.getElementById('ec-receive-all');
+	  if(receiveAll) receiveAll.onclick=function(){
+	    var valid=ws.uploadFiles.filter(function(i){return i.inspect&&i.inspect.ok&&i.inspect.verification&&i.inspect.verification.status==='verified';});
+	    if(!valid.length){toast(t('Không có tệp đã xác minh để tiếp nhận. Cảnh báo và trùng lặp phải được xử lý trước.','No verified files. Warnings and duplicates must be resolved first.'),'warn');return;}
+	    receiveAll.disabled=true;
+	    Promise.all(valid.map(function(item){
+	      var aid=(item.inspect&&item.inspect.allocation&&item.inspect.allocation.allocation_id)||allocation.allocation_id||'';
+	      return window.AllocationTracker.receiveUpload(aid,item.file).then(function(r){item.receive=r;return r;});
+	    })).then(function(){
+	      toast(t('Đã tiếp nhận.','Files received.'),'success');
+	      ws.uploadFiles=[];
+	      if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
+	    }).catch(function(){
+	      toast(t('Không thể tiếp nhận tệp. Hãy mở kết quả kiểm tra để xử lý lỗi trước.','Could not receive the file. Open the validation result and resolve the error first.'),'error');
+	    }).finally(function(){receiveAll.disabled=false;});
+	  };
+	}
 
 function inspectFiles(files,allocation,container,form){
   Array.prototype.forEach.call(files,function(file){

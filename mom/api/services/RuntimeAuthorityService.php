@@ -24,6 +24,7 @@ final class RuntimeAuthorityService
         private readonly ?CanonicalManufacturingSpineService $manufacturingSpine = null,
         private readonly ?ProductionHistoryReadModelService $productionHistory = null,
         private readonly ?WorkforceQualificationGateService $workforceQualification = null,
+        private readonly ?TrustedReleaseRecordService $trustedReleaseRecord = null,
     ) {
     }
 
@@ -42,6 +43,7 @@ final class RuntimeAuthorityService
         $manufacturingSpine = $spineService->probe();
         $productionHistory = ($this->productionHistory ?? new ProductionHistoryReadModelService($eventBackbone, $spineService))->probe();
         $workforceQualification = ($this->workforceQualification ?? new WorkforceQualificationGateService($this->dataDir, $eventBackbone))->probe();
+        $trustedReleaseRecord = ($this->trustedReleaseRecord ?? new TrustedReleaseRecordService($this->dataDir, $this->data))->probe();
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),
@@ -51,6 +53,7 @@ final class RuntimeAuthorityService
             'canonical_manufacturing_spine' => $this->normalizeOperationalSlice($manufacturingSpine),
             'production_history' => $this->normalizeOperationalSlice($productionHistory),
             'workforce_qualification_gate' => $this->normalizeOperationalSlice($workforceQualification),
+            'trusted_release_record' => $this->normalizeOperationalSlice($trustedReleaseRecord),
         ];
 
         $states = [];

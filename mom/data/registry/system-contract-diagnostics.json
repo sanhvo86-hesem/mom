@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T09:37:15.738Z",
+    "generatedAt": "2026-04-13T11:33:41.088Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "4cf09b68-e8c3-4106-accb-7da755ddc7ee",
+    "publication_run_id": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -16,35 +16,41 @@
       "data/registry/workflow-library.json",
       "data/registry/schema-authority-summary.json",
       "data/registry/global-erp-mom-capability-audit.json",
-      "data/registry/registry-manifest.json"
+      "data/registry/registry-manifest.json",
+      "data/registry/graphics-governance-registry.json"
     ],
     "workspaceDraftUsed": false,
     "artifact": "system-contract-diagnostics",
     "purpose": "Authority diagnostics proving the published contract is registry-derived, not workspace-draft-derived."
   },
   "summary": {
-    "tableCount": 660,
-    "relationCount": 3128,
-    "relationEntityCount": 660,
-    "endpointCount": 3621,
-    "endpointBoundTableCount": 660,
-    "workflowCount": 278,
-    "workflowEligibleTableCount": 329,
-    "workflowBoundTableCount": 298,
+    "tableCount": 694,
+    "relationCount": 3174,
+    "relationEntityCount": 694,
+    "endpointCount": 3808,
+    "endpointBoundTableCount": 694,
+    "workflowCount": 294,
+    "workflowEligibleTableCount": 346,
+    "workflowBoundTableCount": 314,
     "workflowBindingCoveragePercent": 91,
-    "statusManagedTableCount": 310,
-    "supportTableCount": 113,
+    "statusManagedTableCount": 327,
+    "supportTableCount": 114,
     "domainCount": 49,
-    "contractCount": 660,
+    "contractCount": 694,
     "criticalGapCount": 0,
-    "warningCount": 2,
+    "warningCount": 3,
     "capabilityCount": 18,
     "capabilityBlockingGapCount": 0,
-    "releaseReadinessScore": 100,
+    "graphicsTemplateCount": 2,
+    "graphicsComponentContractCount": 10,
+    "graphicsNonCompliantModuleCount": 2,
+    "graphicsReleaseBlockerCount": 2,
+    "graphicsGovernanceReleaseBlocked": true,
+    "releaseReadinessScore": 90,
     "metadataCompletenessPercent": 100,
     "graphDensityScore": 100,
     "blockerCount": 0,
-    "hotspotCount": 2,
+    "hotspotCount": 3,
     "workspaceDraftLeakCount": 0
   },
   "blockers": [],
@@ -52,10 +58,11 @@
     {
       "id": "status_columns_without_workflow_binding",
       "severity": "watch",
-      "count": 31,
+      "count": 32,
       "samples": [
         "ap_invoice_lines",
         "crm_quotes_pipeline",
+        "domain_outbox_events",
         "dw_customer_dim",
         "dw_employee_dim",
         "dw_supplier_dim",
@@ -82,8 +89,7 @@
         "shift_assignments",
         "shift_production_log",
         "sop_action_items",
-        "srm_sourcing_events",
-        "srm_supplier_risk_events"
+        "srm_sourcing_events"
       ],
       "interpretation": "Status-only support/reference objects can be valid, but lifecycle owners should explicitly document why no workflow is required."
     },
@@ -102,6 +108,12 @@
         "period_close_controls"
       ],
       "interpretation": "Service/projection endpoints may not map one-to-one to storage tables; keep them explicit in contracts."
+    },
+    {
+      "id": "graphics_governance_release_blockers_present",
+      "severity": "release-blocker",
+      "count": 2,
+      "interpretation": "Graphics compliance/debt/drift must be resolved or covered by approved waiver before new module release."
     }
   ],
   "checks": {
@@ -109,6 +121,8 @@
     "workflowDefinitionsResolved": true,
     "schemaAuthorityMatchesRegistry": true,
     "globalCapabilityBlockingGapsClosed": true,
-    "workspaceDraftUsed": false
+    "workspaceDraftUsed": false,
+    "graphicsGovernanceRegistryPresent": true,
+    "graphicsReleaseBlockersClosed": false
   }
 }

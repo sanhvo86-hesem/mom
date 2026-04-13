@@ -2,8 +2,8 @@
   "slice_publication": {
     "scope": "foundation_governance_contract_slice",
     "truth_model": "slice_within_global_canonical",
-    "publication_run_family": "4cf09b68-e8c3-4106-accb-7da755ddc7ee",
-    "generated_at": "2026-04-13T09:37:11.376Z",
+    "publication_run_family": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546",
+    "generated_at": "2026-04-13T11:20:33.200Z",
     "slice_verdict": "PASS",
     "blockers": "none",
     "entity_count": 6,
@@ -15,6 +15,7 @@
         "attachment",
         "calendar",
         "electronic_signature",
+        "eqms_electronic_signature_event",
         "org_companies",
         "org_company",
         "org_enterprise",

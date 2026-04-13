@@ -8,6 +8,7 @@ class GraphicsGovernanceService
 {
     private const VALID_TEMPLATE_STATUSES = ['approved', 'draft', 'deprecated', 'retired'];
     private const VALID_DENSITIES = ['compact', 'default', 'comfortable', 'shopfloor'];
+    private const IMPACT_TTL_SECONDS = 86400;
     private const VALID_ZONES = [
         'header',
         'kpi-bar',
@@ -65,7 +66,7 @@ class GraphicsGovernanceService
 
         $next = $config;
         $meta = is_array($next['_meta'] ?? null) ? (array)$next['_meta'] : [];
-        $meta['version'] = $this->nextVersion((string)($meta['version'] ?? $this->documentVersion($current)));
+        $meta['version'] = $this->nextVersion($this->documentVersion($current));
         $meta['updatedAt'] = gmdate('c');
         $meta['updatedBy'] = $username;
         $meta['authority'] = 'backend_graphics_design_config';
@@ -177,6 +178,8 @@ class GraphicsGovernanceService
         if (!$validation['valid']) {
             throw new GraphicsGovernanceException(422, 'template_validation_failed', 'Template draft is invalid', (array)$validation['errors']);
         }
+        $this->assertTemplateIdentityAvailable($registry, $draft, true);
+        $this->assertTemplateVersionBump($registry, $draft);
 
         $this->repo->writeTemplateDraft($templateId, $draft);
         return [
@@ -205,10 +208,6 @@ class GraphicsGovernanceService
         if ($newTemplateId === '') {
             throw new GraphicsGovernanceException(422, 'new_template_id_required', 'Clone request requires newTemplateId');
         }
-        if ($this->resolveTemplate($registry, $newTemplateId) !== null) {
-            throw new GraphicsGovernanceException(409, 'template_id_exists', 'Template id already exists: ' . $newTemplateId);
-        }
-
         $draft = $source;
         $draft['templateId'] = $newTemplateId;
         $draft['canonicalId'] = (string)($input['canonicalId'] ?? $newTemplateId);
@@ -227,10 +226,16 @@ class GraphicsGovernanceService
             'clonedBy' => $username,
         ];
 
+        $validation = $this->validateTemplateDocument($draft, $newTemplateId);
+        if (!$validation['valid']) {
+            throw new GraphicsGovernanceException(422, 'template_validation_failed', 'Cloned template draft is invalid', (array)$validation['errors']);
+        }
+        $this->assertTemplateIdentityAvailable($registry, $draft, false);
+
         $this->repo->writeTemplateDraft($newTemplateId, $draft);
         return [
             'draft' => $draft,
-            'validation' => $this->validateTemplateDocument($draft, $newTemplateId),
+            'validation' => $validation,
             'version' => $this->documentVersion($registry),
             'etag' => $this->etag($registry),
         ];
@@ -255,6 +260,11 @@ class GraphicsGovernanceService
             throw new GraphicsGovernanceException(422, 'invalid_template_status', 'Status must be deprecated or retired');
         }
         $modules = $this->modulesUsingTemplateRows((string)$registry['templates'][$index]['templateId']);
+        if ($status === 'retired' && $modules !== []) {
+            throw new GraphicsGovernanceException(422, 'template_in_use', 'Template cannot be retired while modules still use it', [
+                ['field' => 'status', 'message' => 'Retire requires zero active module bindings', 'code' => 'template_in_use'],
+            ], ['modules' => $modules]);
+        }
         if ($modules !== [] && trim((string)($input['migrationPlan'] ?? '')) === '') {
             throw new GraphicsGovernanceException(422, 'migration_plan_required', 'Deprecating an adopted template requires a migrationPlan', [
                 ['field' => 'migrationPlan', 'message' => 'Required because modules currently use this template', 'code' => 'required'],
@@ -290,20 +300,35 @@ class GraphicsGovernanceService
     {
         $templateId = trim((string)($input['templateId'] ?? ''));
         $template = is_array($input['template'] ?? null) ? (array)$input['template'] : null;
+        $registry = $this->normalizedTemplateRegistry();
         if ($template === null && $templateId !== '') {
             $draft = $this->repo->readTemplateDraft($templateId);
             if ($draft !== null) {
                 $template = $draft;
             } else {
-                $registry = $this->normalizedTemplateRegistry();
                 $template = $this->resolveTemplate($registry, $templateId);
             }
         }
         if ($template === null) {
             throw new GraphicsGovernanceException(404, 'template_not_found', 'Template not found for validation');
         }
+        $validation = $this->validateTemplateDocument($template, $templateId !== '' ? $templateId : null);
+        if (is_array($input['template'] ?? null)) {
+            try {
+                $this->assertTemplateIdentityAvailable($registry, $template, true);
+                $this->assertTemplateVersionBump($registry, $template);
+            } catch (GraphicsGovernanceException $e) {
+                $validation['valid'] = false;
+                $errors = (array)($validation['errors'] ?? []);
+                $extraErrors = $e->errors();
+                if ($extraErrors === []) {
+                    $extraErrors = [['field' => 'template', 'message' => $e->getMessage(), 'code' => $e->errorCode()]];
+                }
+                $validation['errors'] = array_merge($errors, $extraErrors);
+            }
+        }
         return [
-            'validation' => $this->validateTemplateDocument($template, $templateId !== '' ? $templateId : null),
+            'validation' => $validation,
             'template' => $template,
         ];
     }
@@ -328,6 +353,7 @@ class GraphicsGovernanceService
         if (!$validation['valid']) {
             throw new GraphicsGovernanceException(422, 'template_validation_failed', 'Template cannot be published while validation fails', (array)$validation['errors']);
         }
+        $this->assertTemplateIdentityAvailable($registry, $draft, true);
 
         $existingIndex = $this->templateIndex($registry, (string)$draft['templateId']);
         if ($existingIndex !== null) {
@@ -340,6 +366,7 @@ class GraphicsGovernanceService
         }
 
         $impact = $this->analyzeTemplateImpact(['templateId' => (string)$draft['templateId']]);
+        $recordedImpact = $this->assertRecordedImpact($request, $impact);
         $this->assertPublishEvidence($request, $impact);
 
         $this->snapshotRegistry('before_publish_' . (string)$draft['templateId'], $registry, $username);
@@ -361,11 +388,18 @@ class GraphicsGovernanceService
         $this->repo->writeTemplateRegistry($registry);
 
         $state = $this->repo->readState();
+        $state = $this->pruneExpiredImpacts($state);
+        if (isset($state['pendingImpact'][(string)$draft['impactAnalysisId']])) {
+            $state['pendingImpact'][(string)$draft['impactAnalysisId']]['status'] = 'consumed';
+            $state['pendingImpact'][(string)$draft['impactAnalysisId']]['consumedAt'] = gmdate('c');
+            $state['pendingImpact'][(string)$draft['impactAnalysisId']]['consumedBy'] = $username;
+        }
         $state['publishedImpacts'][(string)$draft['impactAnalysisId']] = [
             'publishedAt' => gmdate('c'),
             'publishedBy' => $username,
             'templateId' => (string)$draft['templateId'],
             'version' => (string)$draft['version'],
+            'recordedAt' => (string)($recordedImpact['recordedAt'] ?? ''),
             'blockersResolved' => true,
         ];
         $this->repo->writeState($state);
@@ -441,6 +475,10 @@ class GraphicsGovernanceService
                 $findings[] = ['code' => 'template_missing', 'severity' => 'blocker'];
             } elseif ((string)($template['version'] ?? '') !== (string)($module['templateVersion'] ?? $packet['templateVersion'] ?? '')) {
                 $findings[] = ['code' => 'template_version_mismatch', 'severity' => 'blocker'];
+            } elseif ((string)($template['status'] ?? '') === 'retired') {
+                $findings[] = ['code' => 'template_retired_still_bound', 'severity' => 'blocker'];
+            } elseif ((string)($template['status'] ?? '') === 'deprecated') {
+                $findings[] = ['code' => 'template_deprecated_still_bound', 'severity' => 'warning'];
             }
             foreach ($blockFindings as $finding) {
                 $findings[] = $finding + ['severity' => 'blocker'];
@@ -610,6 +648,29 @@ class GraphicsGovernanceService
     /**
      * @return array<string, mixed>
      */
+    public function debtReport(): array
+    {
+        $bridge = $this->bridgeAliasDebt();
+        $private = $this->privateCssDebt();
+        $coverage = $this->tokenAdoptionCoverage();
+        return [
+            'debt' => [
+                'bridgeAliasDebt' => $bridge,
+                'privateCssDebt' => $private,
+                'tokenAdoptionCoverage' => $coverage,
+            ],
+            'summary' => [
+                'bridgeAliasDebtCount' => (int)($bridge['summary']['debtCount'] ?? 0),
+                'privateCssDebtScore' => (int)($private['summary']['totalDebtScore'] ?? 0),
+                'privateCssFileCount' => (int)($private['summary']['fileCount'] ?? 0),
+                'tokenCoveragePercent' => (int)($coverage['coverage']['coveragePercent'] ?? 0),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function driftReport(): array
     {
         $matrix = $this->complianceMatrix();
@@ -637,6 +698,101 @@ class GraphicsGovernanceService
                 'tokenAdoptionCoverage' => $coverage['coverage'],
             ],
             'blockers' => $blockers,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function releaseBlockers(): array
+    {
+        $matrix = $this->complianceMatrix();
+        $drift = $this->driftReport();
+        $registry = $this->normalizedTemplateRegistry();
+        $state = $this->pruneExpiredImpacts($this->repo->readState());
+        $waivers = $this->activeWaivers();
+        $approvedWaiverTargets = [];
+        foreach ((array)($waivers['waivers'] ?? []) as $waiver) {
+            if (!is_array($waiver)) {
+                continue;
+            }
+            $approvedWaiverTargets[(string)($waiver['targetId'] ?? '')] = true;
+        }
+
+        $blockers = [];
+        foreach ((array)($matrix['matrix'] ?? []) as $row) {
+            if (!is_array($row) || (bool)($row['compliant'] ?? false)) {
+                continue;
+            }
+            $moduleId = (string)($row['moduleId'] ?? '');
+            $findingCodes = array_values(array_filter(array_map(
+                static fn($finding): string => is_array($finding) ? (string)($finding['code'] ?? '') : '',
+                (array)($row['findings'] ?? [])
+            )));
+            $waived = isset($approvedWaiverTargets[$moduleId]);
+            $blockers[] = [
+                'blockerId' => 'graphics_module_' . $moduleId,
+                'scope' => 'module',
+                'targetId' => $moduleId,
+                'severity' => $waived ? 'waived' : 'blocker',
+                'status' => $waived ? 'waived' : 'active',
+                'reason' => $findingCodes === [] ? 'module_graphics_non_compliant' : implode(',', $findingCodes),
+                'releaseGate' => 'G19-graphics-governance',
+                'waiverAllowed' => true,
+            ];
+        }
+
+        foreach ((array)($drift['blockers'] ?? []) as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $targetId = (string)($row['id'] ?? $row['targetId'] ?? $row['scope'] ?? 'graphics');
+            $waived = isset($approvedWaiverTargets[$targetId]);
+            $blockers[] = [
+                'blockerId' => 'graphics_drift_' . $targetId,
+                'scope' => (string)($row['scope'] ?? 'graphics'),
+                'targetId' => $targetId,
+                'severity' => $waived ? 'waived' : 'blocker',
+                'status' => $waived ? 'waived' : 'active',
+                'reason' => (string)($row['code'] ?? 'graphics_drift_blocker'),
+                'releaseGate' => 'G19-graphics-governance',
+                'waiverAllowed' => true,
+            ];
+        }
+
+        foreach ((array)($state['pendingImpact'] ?? []) as $impactId => $impact) {
+            if (!is_array($impact) || (string)($impact['status'] ?? 'pending') !== 'pending') {
+                continue;
+            }
+            $hasBlockers = (bool)($impact['hasBlockers'] ?? false);
+            $blockers[] = [
+                'blockerId' => 'graphics_pending_impact_' . (string)$impactId,
+                'scope' => 'impact-analysis',
+                'targetId' => (string)$impactId,
+                'severity' => $hasBlockers ? 'blocker' : 'warning',
+                'status' => $hasBlockers ? 'active' : 'pending-review',
+                'reason' => $hasBlockers ? 'impact_blockers_unresolved' : 'impact_analysis_not_consumed_by_publish_or_rollout',
+                'releaseGate' => 'G19-graphics-governance',
+                'waiverAllowed' => $hasBlockers,
+            ];
+        }
+
+        $activeBlockers = array_values(array_filter($blockers, static fn(array $row): bool => (string)($row['status'] ?? '') === 'active'));
+        return [
+            'blockers' => $blockers,
+            'summary' => [
+                'blockerCount' => count($activeBlockers),
+                'waivedCount' => count(array_filter($blockers, static fn(array $row): bool => (string)($row['status'] ?? '') === 'waived')),
+                'pendingImpactCount' => count((array)($state['pendingImpact'] ?? [])),
+                'releaseBlocked' => $activeBlockers !== [],
+            ],
+            'evidence' => [
+                'complianceMatrixVersion' => (string)($matrix['version'] ?? ''),
+                'templateRegistryVersion' => $this->documentVersion($registry),
+                'templateRegistryEtag' => $this->etag($registry),
+                'driftReportGeneratedAt' => gmdate('c'),
+                'authority' => 'mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json',
+            ],
         ];
     }
 
@@ -714,6 +870,39 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<string, mixed> $report
+     * @return array<string, mixed>
+     */
+    public function recordImpactReport(array $report, string $username): array
+    {
+        $impactId = trim((string)($report['impactId'] ?? ''));
+        if ($impactId === '') {
+            throw new GraphicsGovernanceException(422, 'impact_id_required', 'Impact report requires impactId');
+        }
+
+        $recordedAt = gmdate('c');
+        $expiresAt = gmdate('c', time() + self::IMPACT_TTL_SECONDS);
+        $state = $this->pruneExpiredImpacts($this->repo->readState());
+        $state['pendingImpact'][$impactId] = [
+            'status' => 'pending',
+            'recordedAt' => $recordedAt,
+            'recordedBy' => $username,
+            'expiresAt' => $expiresAt,
+            'signature' => $this->impactSignature($report),
+            'hasBlockers' => (array)($report['blockers'] ?? []) !== [],
+            'report' => $report,
+        ];
+        $state = $this->bumpLooseDocument($state, $username);
+        $this->repo->writeState($state);
+
+        return $report + [
+            'recordedAt' => $recordedAt,
+            'recordedBy' => $username,
+            'expiresAt' => $expiresAt,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
@@ -763,6 +952,9 @@ class GraphicsGovernanceService
         if ((string)($rollout['status'] ?? '') !== 'staged') {
             throw new GraphicsGovernanceException(409, 'rollout_not_staged', 'Only staged rollouts can be applied');
         }
+        if ($this->normalizeReleaseManifestRefs((array)($rollout['releaseManifestRefs'] ?? [])) === []) {
+            throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Apply requires releaseManifestRefs captured at rollout stage');
+        }
         if ($this->normalizeExpected((string)($rollout['baseRegistryEtag'] ?? '')) !== $this->etag($registry)) {
             throw new GraphicsGovernanceException(412, 'registry_changed_since_stage', 'Registry changed after rollout was staged', [], [
                 'current_version' => $this->documentVersion($registry),
@@ -797,6 +989,9 @@ class GraphicsGovernanceService
         $rollout = is_array($doc['rollouts'][$rolloutId] ?? null) ? (array)$doc['rollouts'][$rolloutId] : null;
         if ($rollout === null) {
             throw new GraphicsGovernanceException(404, 'rollout_not_found', 'Rollout not found: ' . $rolloutId);
+        }
+        if ((string)($rollout['status'] ?? '') !== 'applied') {
+            throw new GraphicsGovernanceException(409, 'rollout_not_applied', 'Only applied rollouts can be rolled back');
         }
         if ($targetSnapshotId === '') {
             $targetSnapshotId = (string)($rollout['rollbackSnapshotId'] ?? '');
@@ -847,19 +1042,40 @@ class GraphicsGovernanceService
                 ]);
             }
         }
+        $scope = (string)$input['scope'];
+        if ($scope === 'graphics-governance') {
+            $scope = 'release_gate';
+        }
+        if (!in_array($scope, ['template', 'module', 'component', 'token', 'release_gate'], true)) {
+            throw new GraphicsGovernanceException(422, 'invalid_waiver_scope', 'Waiver scope is not allowed', [
+                ['field' => 'scope', 'message' => 'Scope must be template, module, component, token, or release_gate', 'code' => 'invalid_scope'],
+            ]);
+        }
+        $riskClass = (string)($input['riskClass'] ?? 'medium');
+        if (!in_array($riskClass, ['low', 'medium', 'high', 'regulated'], true)) {
+            throw new GraphicsGovernanceException(422, 'invalid_waiver_risk_class', 'Waiver riskClass is not allowed', [
+                ['field' => 'riskClass', 'message' => 'riskClass must be low, medium, high, or regulated', 'code' => 'invalid_risk_class'],
+            ]);
+        }
+        $expiresAt = $this->parseTime((string)$input['expiresAt']);
+        if ($expiresAt === null || $expiresAt <= time()) {
+            throw new GraphicsGovernanceException(422, 'invalid_waiver_expiry', 'Waiver expiresAt must be a future date/time', [
+                ['field' => 'expiresAt', 'message' => 'expiresAt must parse to a future date/time', 'code' => 'invalid_expiry'],
+            ]);
+        }
         $waiverId = (string)($input['waiverId'] ?? ('gwv_' . gmdate('YmdHis') . '_' . substr($this->hash(json_encode($input) ?: ''), 0, 8)));
         $waiver = [
             'waiverId' => $waiverId,
-            'scope' => (string)$input['scope'],
+            'scope' => $scope,
             'targetId' => (string)$input['targetId'],
             'reason' => (string)$input['reason'],
-            'riskClass' => (string)($input['riskClass'] ?? 'medium'),
+            'riskClass' => $riskClass,
             'status' => 'draft',
             'documentControlRefs' => array_values(array_map('strval', (array)($input['documentControlRefs'] ?? []))),
             'releaseManifestRefs' => $this->normalizeReleaseManifestRefs((array)($input['releaseManifestRefs'] ?? [])),
             'createdAt' => gmdate('c'),
             'createdBy' => $username,
-            'expiresAt' => (string)$input['expiresAt'],
+            'expiresAt' => gmdate('c', $expiresAt),
         ];
         $doc['waivers'][$waiverId] = $waiver;
         $doc = $this->bumpLooseDocument($doc, $username);
@@ -889,13 +1105,13 @@ class GraphicsGovernanceService
     public function activeWaivers(): array
     {
         $doc = $this->repo->readWaiversDocument();
-        $now = gmdate('c');
         $rows = [];
         foreach ((array)($doc['waivers'] ?? []) as $waiver) {
             if (!is_array($waiver)) {
                 continue;
             }
-            if ((string)($waiver['status'] ?? '') === 'approved' && (string)($waiver['expiresAt'] ?? '') > $now) {
+            $expiresAt = $this->parseTime((string)($waiver['expiresAt'] ?? ''));
+            if ((string)($waiver['status'] ?? '') === 'approved' && $expiresAt !== null && $expiresAt > time()) {
                 $rows[] = $waiver;
             }
         }
@@ -1020,6 +1236,70 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<string, mixed> $registry
+     * @param array<string, mixed> $template
+     */
+    private function assertTemplateIdentityAvailable(array $registry, array $template, bool $allowSameTemplateId): void
+    {
+        $templateId = trim((string)($template['templateId'] ?? ''));
+        $keys = $this->templateIdentityKeys($template);
+        foreach ((array)($registry['templates'] ?? []) as $existing) {
+            if (!is_array($existing)) {
+                continue;
+            }
+            $existingTemplateId = trim((string)($existing['templateId'] ?? ''));
+            if ($allowSameTemplateId && $existingTemplateId !== '' && $existingTemplateId === $templateId) {
+                continue;
+            }
+            $collisions = array_values(array_intersect($keys, $this->templateIdentityKeys($existing)));
+            if ($collisions !== []) {
+                throw new GraphicsGovernanceException(409, 'duplicate_template_identity', 'Template identity collides with an existing registry entry', [
+                    ['field' => 'templateId', 'message' => 'Duplicate template id, alias, canonicalId, or legacyCode: ' . implode(', ', $collisions), 'code' => 'duplicate_template_identity'],
+                ], ['existingTemplateId' => $existingTemplateId, 'collisions' => $collisions]);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $template
+     * @return array<int, string>
+     */
+    private function templateIdentityKeys(array $template): array
+    {
+        $keys = [
+            (string)($template['templateId'] ?? ''),
+            (string)($template['canonicalId'] ?? ''),
+            (string)($template['legacyCode'] ?? ''),
+        ];
+        foreach ((array)($template['aliases'] ?? []) as $alias) {
+            $keys[] = (string)$alias;
+        }
+        return array_values(array_unique(array_filter(array_map(
+            static fn(string $key): string => trim($key),
+            $keys
+        ))));
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @param array<string, mixed> $template
+     */
+    private function assertTemplateVersionBump(array $registry, array $template): void
+    {
+        $templateId = trim((string)($template['templateId'] ?? ''));
+        $index = $this->templateIndex($registry, $templateId);
+        if ($index === null) {
+            return;
+        }
+        $existing = (array)$registry['templates'][$index];
+        if (!$this->isVersionGreater((string)($template['version'] ?? ''), (string)($existing['version'] ?? ''))) {
+            throw new GraphicsGovernanceException(422, 'version_bump_required', 'Template draft version must be greater than the current approved version', [
+                ['field' => 'version', 'message' => 'Version must be greater than ' . (string)($existing['version'] ?? ''), 'code' => 'version_bump_required'],
+            ]);
+        }
+    }
+
+    /**
      * @param array<string, mixed> $template
      * @return array<string, mixed>
      */
@@ -1127,12 +1407,44 @@ class GraphicsGovernanceService
         if (is_array($template['adoption'] ?? null)) {
             $adoptionModules = (array)($template['adoption']['modules'] ?? $template['adoption']);
         }
-        $moduleIds = array_map(static fn(array $row): string => (string)($row['moduleId'] ?? ''), $this->repo->listRuntimeModules());
+        $moduleRows = [];
+        foreach ($this->moduleRecords() as $record) {
+            $moduleId = (string)($record['module']['moduleId'] ?? $record['packet']['moduleId'] ?? '');
+            if ($moduleId !== '') {
+                $moduleRows[$moduleId] = $record;
+            }
+            if (
+                $templateId !== ''
+                && (string)($record['module']['templateId'] ?? $record['packet']['templateId'] ?? '') === $templateId
+            ) {
+                $adoptionModules[] = $moduleId;
+            }
+        }
+        $adoptionModules = array_values(array_unique(array_filter(array_map('strval', $adoptionModules))));
         foreach ($adoptionModules as $moduleId) {
-            $moduleId = (string)$moduleId;
-            if ($moduleId !== '' && !in_array($moduleId, $moduleIds, true)) {
+            if ($moduleId !== '' && !isset($moduleRows[$moduleId])) {
                 $errors[] = ['field' => 'adoption/modules', 'message' => 'Referenced module does not exist: ' . $moduleId, 'code' => 'module_not_found'];
             }
+        }
+        $regulatedAdoption = false;
+        $shopfloorAdoption = false;
+        foreach ($adoptionModules as $moduleId) {
+            $record = $moduleRows[$moduleId] ?? null;
+            if (!is_array($record)) {
+                continue;
+            }
+            $packet = is_array($record['packet'] ?? null) ? (array)$record['packet'] : [];
+            $regulatedAdoption = $regulatedAdoption || $this->isRegulatedPacket($packet);
+            $shopfloorAdoption = $shopfloorAdoption || $this->isShopfloorPacket($packet);
+        }
+        if ($regulatedAdoption && !in_array('high-contrast', $themeModes, true)) {
+            $errors[] = ['field' => 'themePolicy/modes', 'message' => 'Regulated template adoption requires high-contrast mode', 'code' => 'regulated_high_contrast_required'];
+        }
+        if ($shopfloorAdoption && !in_array('shopfloor', $supportedDensities, true)) {
+            $errors[] = ['field' => 'supportedDensities', 'message' => 'Shopfloor template adoption requires shopfloor density', 'code' => 'shopfloor_density_required'];
+        }
+        if (($regulatedAdoption || $shopfloorAdoption) && !in_array((string)($template['qaEvidence']['status'] ?? ''), ['IMPLEMENTED', 'GATED'], true)) {
+            $errors[] = ['field' => 'qaEvidence/status', 'message' => 'Regulated or shopfloor adoption requires implemented/gated QA evidence', 'code' => 'qa_evidence_required'];
         }
 
         return [
@@ -1152,6 +1464,7 @@ class GraphicsGovernanceService
     {
         $errors = [];
         $seen = [];
+        $seenIdentity = [];
         foreach ((array)($registry['templates'] ?? []) as $template) {
             if (!is_array($template)) {
                 $errors[] = ['field' => 'templates', 'message' => 'Template entry must be an object', 'code' => 'invalid_template'];
@@ -1163,6 +1476,12 @@ class GraphicsGovernanceService
                     $errors[] = ['field' => 'templates/templateId', 'message' => 'Duplicate templateId: ' . $templateId, 'code' => 'duplicate_template_id'];
                 }
                 $seen[$templateId] = true;
+            }
+            foreach ($this->templateIdentityKeys($template) as $identityKey) {
+                if (isset($seenIdentity[$identityKey])) {
+                    $errors[] = ['field' => 'templates/identity', 'message' => 'Duplicate template identity key: ' . $identityKey, 'code' => 'duplicate_template_identity'];
+                }
+                $seenIdentity[$identityKey] = true;
             }
             $result = $this->validateTemplateDocument($template, $templateId);
             foreach ((array)$result['errors'] as $error) {
@@ -1409,6 +1728,41 @@ class GraphicsGovernanceService
 
     /**
      * @param array<string, mixed> $request
+     * @param array<string, mixed> $currentImpact
+     * @return array<string, mixed>
+     */
+    private function assertRecordedImpact(array $request, array $currentImpact): array
+    {
+        $impactId = trim((string)($request['impactAnalysisId'] ?? ''));
+        if ($impactId === '') {
+            throw new GraphicsGovernanceException(422, 'impact_analysis_required', 'Publish requires impactAnalysisId');
+        }
+        $state = $this->pruneExpiredImpacts($this->repo->readState());
+        $entry = is_array($state['pendingImpact'][$impactId] ?? null) ? (array)$state['pendingImpact'][$impactId] : null;
+        if ($entry === null || (string)($entry['status'] ?? '') !== 'pending') {
+            throw new GraphicsGovernanceException(422, 'impact_analysis_unresolved', 'Publish requires a current backend-recorded impact analysis', [
+                ['field' => 'impactAnalysisId', 'message' => 'Run backend impact analysis and use its impactId before publish', 'code' => 'impact_analysis_unresolved'],
+            ], ['currentImpactId' => (string)($currentImpact['impactId'] ?? '')]);
+        }
+        $expiresAt = $this->parseTime((string)($entry['expiresAt'] ?? ''));
+        if ($expiresAt === null || $expiresAt <= time()) {
+            throw new GraphicsGovernanceException(422, 'impact_analysis_expired', 'Impact analysis has expired; rerun analysis before publish', [
+                ['field' => 'impactAnalysisId', 'message' => 'Impact analysis expired', 'code' => 'impact_analysis_expired'],
+            ]);
+        }
+        if ((string)($entry['signature'] ?? '') !== $this->impactSignature($currentImpact)) {
+            throw new GraphicsGovernanceException(409, 'impact_analysis_stale', 'Impact analysis no longer matches the current registry/module state', [
+                ['field' => 'impactAnalysisId', 'message' => 'Rerun impact analysis after registry or module changes', 'code' => 'impact_analysis_stale'],
+            ], ['currentImpactId' => (string)($currentImpact['impactId'] ?? '')]);
+        }
+        if ((bool)($entry['hasBlockers'] ?? false) && empty($request['blockersResolved'])) {
+            throw new GraphicsGovernanceException(422, 'impact_blockers_unresolved', 'Recorded impact blockers must be explicitly resolved before publish', (array)($entry['report']['blockers'] ?? []));
+        }
+        return $entry;
+    }
+
+    /**
+     * @param array<string, mixed> $request
      * @param array<string, mixed> $impact
      */
     private function assertPublishEvidence(array $request, array $impact): void
@@ -1481,6 +1835,27 @@ class GraphicsGovernanceService
             throw new GraphicsGovernanceException(404, 'waiver_not_found', 'Waiver not found: ' . $waiverId);
         }
         $waiver = (array)$doc['waivers'][$waiverId];
+        if ($status === 'approved') {
+            $expiresAt = $this->parseTime((string)($waiver['expiresAt'] ?? ''));
+            if ($expiresAt === null || $expiresAt <= time()) {
+                throw new GraphicsGovernanceException(422, 'waiver_expired', 'Expired waivers cannot be approved', [
+                    ['field' => 'expiresAt', 'message' => 'Waiver expiry must be in the future', 'code' => 'waiver_expired'],
+                ]);
+            }
+            $riskClass = (string)($waiver['riskClass'] ?? 'medium');
+            if (in_array($riskClass, ['high', 'regulated'], true)) {
+                if ((array)($waiver['documentControlRefs'] ?? []) === []) {
+                    throw new GraphicsGovernanceException(422, 'document_control_ref_required', 'High-risk waivers require documentControlRefs', [
+                        ['field' => 'documentControlRefs', 'message' => 'Required for high or regulated waiver approval', 'code' => 'required'],
+                    ]);
+                }
+                if ($this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) === []) {
+                    throw new GraphicsGovernanceException(422, 'release_manifest_required', 'High-risk waivers require releaseManifestRefs', [
+                        ['field' => 'releaseManifestRefs', 'message' => 'Required for high or regulated waiver approval', 'code' => 'required'],
+                    ]);
+                }
+            }
+        }
         $waiver['status'] = $status;
         $waiver[$status === 'approved' ? 'approvedAt' : 'expiredAt'] = gmdate('c');
         $waiver[$status === 'approved' ? 'approvedBy' : 'expiredBy'] = $username;
@@ -1488,6 +1863,64 @@ class GraphicsGovernanceService
         $doc = $this->bumpLooseDocument($doc, $username);
         $this->repo->writeWaiversDocument($doc);
         return ['waiver' => $waiver, 'version' => $this->documentVersion($doc), 'etag' => $this->etag($doc)];
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     * @return array<string, mixed>
+     */
+    private function pruneExpiredImpacts(array $state): array
+    {
+        if (!isset($state['pendingImpact']) || !is_array($state['pendingImpact'])) {
+            $state['pendingImpact'] = [];
+        }
+        foreach ($state['pendingImpact'] as $impactId => $entry) {
+            if (!is_array($entry)) {
+                unset($state['pendingImpact'][$impactId]);
+                continue;
+            }
+            $expiresAt = $this->parseTime((string)($entry['expiresAt'] ?? ''));
+            if ($expiresAt !== null && $expiresAt <= time()) {
+                unset($state['pendingImpact'][$impactId]);
+            }
+        }
+        if (!isset($state['publishedImpacts']) || !is_array($state['publishedImpacts'])) {
+            $state['publishedImpacts'] = [];
+        }
+        return $state;
+    }
+
+    /**
+     * @param array<string, mixed> $impact
+     */
+    private function impactSignature(array $impact): string
+    {
+        $stable = $impact;
+        foreach (['impactId', 'generatedAt', 'recordedAt', 'recordedBy', 'expiresAt'] as $field) {
+            unset($stable[$field]);
+        }
+        return $this->hash(json_encode($this->canonicalize($stable), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
+    }
+
+    private function canonicalize(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+        $out = [];
+        foreach ($value as $key => $item) {
+            $out[$key] = $this->canonicalize($item);
+        }
+        if (!array_is_list($out)) {
+            ksort($out);
+        }
+        return $out;
+    }
+
+    private function parseTime(string $value): ?int
+    {
+        $timestamp = strtotime($value);
+        return $timestamp === false ? null : $timestamp;
     }
 
     /**

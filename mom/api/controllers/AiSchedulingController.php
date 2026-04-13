@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
+use MOM\Api\Services\AiPredictionPipeline;
+use MOM\Api\Services\NaturalLanguageQueryService;
+use MOM\Api\Services\RootCauseAnalysisService;
+use MOM\Api\Services\AnthropicService;
+use MOM\Database\Connection;
 use Throwable;
 
 /**
@@ -12,16 +17,19 @@ use Throwable;
  *
  * Provides API endpoints for AI-driven quality predictions, SPC anomaly
  * detection, tool wear predictions, scheduling slot management,
- * capacity heatmaps, and promise date suggestions.
+ * capacity heatmaps, promise date suggestions, natural language queries,
+ * root cause analysis, feedback loops, and AI dashboard.
  *
- * Data stored in `data/ai-scheduling/` with per-entity JSON files.
+ * Data primarily stored in PostgreSQL tables (quality_predictions,
+ * production_schedule_slots, capacity_snapshots, prediction_models).
+ * Falls back to `data/ai-scheduling/` JSON files when DB is unavailable.
  *
  * @package MOM\Api\Controllers
  * @since   3.0.0
  */
 class AiSchedulingController extends BaseController
 {
-    /** @var string Base directory for AI scheduling data. */
+    /** @var string Base directory for AI scheduling data (JSON fallback). */
     private string $aiDir = '';
 
     // -- Helpers --------------------------------------------------------------
@@ -54,6 +62,17 @@ class AiSchedulingController extends BaseController
     }
 
     /**
+     * Extract the user UUID (user_id) from a user record.
+     *
+     * @param array $user User record.
+     * @return string
+     */
+    private function userUuid(array $user): string
+    {
+        return (string)($user['user_id'] ?? $user['id'] ?? $this->userId($user));
+    }
+
+    /**
      * Roles allowed to update AI prediction workflow and planning slots.
      *
      * @return array<int, string>
@@ -74,6 +93,21 @@ class AiSchedulingController extends BaseController
         $this->requireAnyRole($user, $this->aiWriteRoles());
     }
 
+    /**
+     * Get a DB connection instance, or null if unavailable.
+     *
+     * @return Connection|null
+     */
+    private function getDb(): ?Connection
+    {
+        try {
+            return Connection::getInstance();
+        } catch (Throwable $e) {
+            @error_log('[AiScheduling] DB connection failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     // -- Prediction Endpoints -------------------------------------------------
 
     /**
@@ -92,6 +126,61 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $where = ['1=1'];
+                    $params = [];
+
+                    $status = $this->query('status');
+                    if ($status !== null && $status !== '') {
+                        $where[] = 'status = :status';
+                        $params['status'] = strtolower($status);
+                    }
+
+                    $severity = $this->query('severity');
+                    if ($severity !== null && $severity !== '') {
+                        $where[] = 'severity = :severity';
+                        $params['severity'] = strtolower($severity);
+                    }
+
+                    $offset = max(0, (int)($this->query('offset', '0')));
+                    $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+
+                    $whereSql = implode(' AND ', $where);
+
+                    $total = (int)$db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE {$whereSql}",
+                        $params
+                    );
+
+                    $rows = $db->query(
+                        "SELECT * FROM quality_predictions
+                         WHERE {$whereSql}
+                         ORDER BY created_at DESC
+                         LIMIT :_limit OFFSET :_offset",
+                        array_merge($params, ['_limit' => $limit, '_offset' => $offset])
+                    );
+
+                    // Parse JSONB metadata
+                    foreach ($rows as &$row) {
+                        if (isset($row['metadata']) && is_string($row['metadata'])) {
+                            $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                        }
+                        // Map prediction_id to id for backward compatibility
+                        $row['id'] = $row['prediction_id'] ?? $row['id'] ?? '';
+                    }
+                    unset($row);
+
+                    $this->paginated('predictions', $rows, $total, $offset, $limit);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] listPredictions DB fallback: ' . $e->getMessage());
+                    // Fall through to JSON fallback
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/predictions.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -139,8 +228,57 @@ class AiSchedulingController extends BaseController
 
         $id     = trim((string)($body['id'] ?? ''));
         $userId = $this->userId($user);
+        $userUuid = $this->userUuid($user);
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $now = $this->nowIso();
+                    $comment = trim((string)($body['comment'] ?? ''));
+
+                    $rows = $db->query(
+                        "UPDATE quality_predictions
+                         SET status = 'acknowledged',
+                             acknowledged_by = :user_id,
+                             acknowledged_at = :now,
+                             metadata = jsonb_set(
+                                 COALESCE(metadata, '{}'::jsonb),
+                                 '{acknowledge_comment}',
+                                 :comment::jsonb
+                             )
+                         WHERE prediction_id = :id
+                         RETURNING *",
+                        [
+                            'user_id' => $userUuid,
+                            'now'     => $now,
+                            'comment' => json_encode($comment),
+                            'id'      => $id,
+                        ]
+                    );
+
+                    if (empty($rows)) {
+                        $this->error('not_found', 404, "Prediction {$id} not found.");
+                    }
+
+                    $updated = $rows[0];
+                    if (isset($updated['metadata']) && is_string($updated['metadata'])) {
+                        $updated['metadata'] = json_decode($updated['metadata'], true) ?? [];
+                    }
+                    $updated['id'] = $updated['prediction_id'] ?? $id;
+
+                    $this->auditLog('ai_acknowledge_prediction', ['prediction_id' => $id], $userId);
+                    $this->success(['prediction' => $updated]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] acknowledgePrediction DB fallback: ' . $e->getMessage());
+                    // Rethrow 404 response errors
+                    $this->rethrowResponse($e);
+                    // Fall through to JSON fallback
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file  = $this->aiDir() . '/predictions.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
@@ -195,8 +333,60 @@ class AiSchedulingController extends BaseController
 
         $id     = trim((string)($body['id'] ?? ''));
         $userId = $this->userId($user);
+        $userUuid = $this->userUuid($user);
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $now = $this->nowIso();
+                    $resolution  = trim((string)($body['resolution'] ?? ''));
+                    $rootCause   = trim((string)($body['root_cause'] ?? ''));
+                    $actionTaken = trim((string)($body['action_taken'] ?? ''));
+
+                    $metaUpdate = json_encode([
+                        'root_cause'   => $rootCause,
+                        'action_taken' => $actionTaken,
+                    ]);
+
+                    $rows = $db->query(
+                        "UPDATE quality_predictions
+                         SET status = 'resolved',
+                             resolved_by = :user_id,
+                             resolved_at = :now,
+                             resolution_notes = :resolution,
+                             metadata = COALESCE(metadata, '{}'::jsonb) || :meta::jsonb
+                         WHERE prediction_id = :id
+                         RETURNING *",
+                        [
+                            'user_id'    => $userUuid,
+                            'now'        => $now,
+                            'resolution' => $resolution,
+                            'meta'       => $metaUpdate,
+                            'id'         => $id,
+                        ]
+                    );
+
+                    if (empty($rows)) {
+                        $this->error('not_found', 404, "Prediction {$id} not found.");
+                    }
+
+                    $updated = $rows[0];
+                    if (isset($updated['metadata']) && is_string($updated['metadata'])) {
+                        $updated['metadata'] = json_decode($updated['metadata'], true) ?? [];
+                    }
+                    $updated['id'] = $updated['prediction_id'] ?? $id;
+
+                    $this->auditLog('ai_resolve_prediction', ['prediction_id' => $id], $userId);
+                    $this->success(['prediction' => $updated]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] resolvePrediction DB fallback: ' . $e->getMessage());
+                    $this->rethrowResponse($e);
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file  = $this->aiDir() . '/predictions.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
@@ -248,6 +438,67 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first — query quality_predictions with prediction_type = 'spc_anomaly'
+            // Thu DB truoc — truy van quality_predictions voi prediction_type = 'spc_anomaly'
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $where = ["prediction_type = 'spc_anomaly'"];
+                    $params = [];
+
+                    $machineId = $this->query('machine_id');
+                    if ($machineId !== null && $machineId !== '') {
+                        $where[] = 'machine_id = :machine_id';
+                        $params['machine_id'] = $machineId;
+                    }
+
+                    $severity = $this->query('severity');
+                    if ($severity !== null && $severity !== '') {
+                        $where[] = 'severity = :severity';
+                        $params['severity'] = strtolower($severity);
+                    }
+
+                    $dateFrom = $this->query('date_from');
+                    if ($dateFrom !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+                        $where[] = 'created_at >= :date_from';
+                        $params['date_from'] = $dateFrom;
+                    }
+
+                    $offset = max(0, (int)($this->query('offset', '0')));
+                    $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+
+                    $whereSql = implode(' AND ', $where);
+
+                    $total = (int)$db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE {$whereSql}",
+                        $params
+                    );
+
+                    $rows = $db->query(
+                        "SELECT * FROM quality_predictions
+                         WHERE {$whereSql}
+                         ORDER BY created_at DESC
+                         LIMIT :_limit OFFSET :_offset",
+                        array_merge($params, ['_limit' => $limit, '_offset' => $offset])
+                    );
+
+                    // Map fields for backward compatibility
+                    foreach ($rows as &$row) {
+                        if (isset($row['metadata']) && is_string($row['metadata'])) {
+                            $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                        }
+                        $row['id'] = $row['prediction_id'] ?? '';
+                        $row['detected_at'] = $row['created_at'] ?? '';
+                    }
+                    unset($row);
+
+                    $this->paginated('anomalies', $rows, $total, $offset, $limit);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getSpcAnomalies DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/spc-anomalies.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -295,6 +546,65 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first — query quality_predictions with prediction_type = 'tool_wear'
+            // Thu DB truoc — truy van quality_predictions voi prediction_type = 'tool_wear'
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $where = ["prediction_type = 'tool_wear'"];
+                    $params = [];
+
+                    $machineId = $this->query('machine_id');
+                    if ($machineId !== null && $machineId !== '') {
+                        $where[] = 'machine_id = :machine_id';
+                        $params['machine_id'] = $machineId;
+                    }
+
+                    $urgency = $this->query('urgency');
+                    if ($urgency !== null && $urgency !== '') {
+                        // Map urgency to severity: high->critical, medium->warning, low->info
+                        $severityMap = ['high' => 'critical', 'medium' => 'warning', 'low' => 'info'];
+                        $mappedSeverity = $severityMap[strtolower($urgency)] ?? strtolower($urgency);
+                        $where[] = 'severity = :severity';
+                        $params['severity'] = $mappedSeverity;
+                    }
+
+                    $offset = max(0, (int)($this->query('offset', '0')));
+                    $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+
+                    $whereSql = implode(' AND ', $where);
+
+                    $total = (int)$db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE {$whereSql}",
+                        $params
+                    );
+
+                    $rows = $db->query(
+                        "SELECT * FROM quality_predictions
+                         WHERE {$whereSql}
+                         ORDER BY created_at DESC
+                         LIMIT :_limit OFFSET :_offset",
+                        array_merge($params, ['_limit' => $limit, '_offset' => $offset])
+                    );
+
+                    // Map fields for backward compatibility
+                    $severityToUrgency = ['critical' => 'high', 'warning' => 'medium', 'info' => 'low', 'watch' => 'medium'];
+                    foreach ($rows as &$row) {
+                        if (isset($row['metadata']) && is_string($row['metadata'])) {
+                            $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                        }
+                        $row['id'] = $row['prediction_id'] ?? '';
+                        $row['urgency'] = $severityToUrgency[$row['severity'] ?? ''] ?? 'medium';
+                    }
+                    unset($row);
+
+                    $this->paginated('tool_wear', $rows, $total, $offset, $limit);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getToolWearPredictions DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/tool-wear.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -333,6 +643,51 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $kpis = [];
+
+                    // Total predictions by status
+                    $statusCounts = $db->query(
+                        "SELECT status, COUNT(*) AS cnt FROM quality_predictions GROUP BY status"
+                    );
+                    $byStatus = [];
+                    $totalAll = 0;
+                    foreach ($statusCounts as $row) {
+                        $byStatus[$row['status']] = (int)$row['cnt'];
+                        $totalAll += (int)$row['cnt'];
+                    }
+
+                    $kpis['total_predictions']        = $totalAll;
+                    $kpis['active_predictions']       = $byStatus['active'] ?? 0;
+                    $kpis['acknowledged_predictions'] = $byStatus['acknowledged'] ?? 0;
+                    $kpis['resolved_predictions']     = $byStatus['resolved'] ?? 0;
+
+                    // SPC anomalies (prediction_type = 'spc_anomaly')
+                    $kpis['total_anomalies'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'spc_anomaly'"
+                    ) ?? 0);
+                    $kpis['critical_anomalies'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'spc_anomaly' AND severity = 'critical'"
+                    ) ?? 0);
+
+                    // Tool wear alerts (prediction_type = 'tool_wear')
+                    $kpis['tool_wear_alerts'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'tool_wear'"
+                    ) ?? 0);
+                    $kpis['high_urgency_wear'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'tool_wear' AND severity = 'critical'"
+                    ) ?? 0);
+
+                    $this->success(['kpis' => $kpis]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getDashboard DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $predictions = $this->readJsonFile($this->aiDir() . '/predictions.json') ?? [];
             $anomalies   = $this->readJsonFile($this->aiDir() . '/spc-anomalies.json') ?? [];
             $toolWear    = $this->readJsonFile($this->aiDir() . '/tool-wear.json') ?? [];
@@ -374,6 +729,68 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $where = ['1=1'];
+                    $params = [];
+
+                    $startDate = $this->query('start_date');
+                    if ($startDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
+                        $where[] = 'slot_date >= :start_date';
+                        $params['start_date'] = $startDate;
+                    }
+
+                    $endDate = $this->query('end_date');
+                    if ($endDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
+                        $where[] = 'slot_date <= :end_date';
+                        $params['end_date'] = $endDate;
+                    }
+
+                    $machineId = $this->query('machine_id');
+                    if ($machineId !== null && $machineId !== '') {
+                        $where[] = 'machine_id = :machine_id';
+                        $params['machine_id'] = $machineId;
+                    }
+
+                    $offset = max(0, (int)($this->query('offset', '0')));
+                    $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+
+                    $whereSql = implode(' AND ', $where);
+
+                    $total = (int)$db->queryScalar(
+                        "SELECT COUNT(*) FROM production_schedule_slots WHERE {$whereSql}",
+                        $params
+                    );
+
+                    $rows = $db->query(
+                        "SELECT * FROM production_schedule_slots
+                         WHERE {$whereSql}
+                         ORDER BY slot_date, start_time
+                         LIMIT :_limit OFFSET :_offset",
+                        array_merge($params, ['_limit' => $limit, '_offset' => $offset])
+                    );
+
+                    // Map fields for backward compatibility
+                    foreach ($rows as &$row) {
+                        if (isset($row['metadata']) && is_string($row['metadata'])) {
+                            $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                        }
+                        $row['id'] = $row['slot_id'] ?? '';
+                        $row['date'] = $row['slot_date'] ?? '';
+                        $row['start_time'] = $row['start_time'] ?? '';
+                        $row['end_time'] = $row['end_time'] ?? '';
+                    }
+                    unset($row);
+
+                    $this->paginated('slots', $rows, $total, $offset, $limit);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getSchedule DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -431,19 +848,115 @@ class AiSchedulingController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            $machineId = trim((string)($body['machine_id'] ?? ''));
+            $date      = trim((string)($body['date'] ?? ''));
+            $startTime = trim((string)($body['start_time'] ?? ''));
+            $endTime   = trim((string)($body['end_time'] ?? ''));
+            $jobNumber = trim((string)($body['job_number'] ?? ''));
+            $partId    = trim((string)($body['part_id'] ?? ''));
+            $operation = trim((string)($body['operation'] ?? ''));
+            $priority  = strtolower(trim((string)($body['priority'] ?? 'normal')));
+
+            // Map priority string to integer (DB uses INT priority)
+            $priorityMap = ['low' => 25, 'normal' => 50, 'high' => 75, 'urgent' => 100];
+            $priorityInt = $priorityMap[$priority] ?? 50;
+
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    // Calculate duration in minutes
+                    $start = strtotime($startTime);
+                    $end   = strtotime($endTime);
+                    $durationMinutes = ($start !== false && $end !== false && $end > $start)
+                        ? round(($end - $start) / 60, 2)
+                        : null;
+
+                    $params = [
+                        'machine_id'  => $machineId,
+                        'slot_date'   => $date,
+                        'start_time'  => $startTime,
+                        'end_time'    => $endTime,
+                        'priority'    => $priorityInt,
+                        'slot_type'   => 'production',
+                    ];
+
+                    $colStr = 'machine_id, slot_date, start_time, end_time, priority, slot_type';
+                    $valStr = ':machine_id, :slot_date, :start_time, :end_time, :priority, :slot_type';
+
+                    if ($jobNumber !== '') {
+                        $colStr .= ', wo_number';
+                        $valStr .= ', :wo_number';
+                        $params['wo_number'] = $jobNumber;
+                    }
+                    if ($durationMinutes !== null) {
+                        $colStr .= ', duration_minutes';
+                        $valStr .= ', :duration_minutes';
+                        $params['duration_minutes'] = $durationMinutes;
+                    }
+
+                    $metaData = [];
+                    if ($partId !== '') {
+                        $metaData['part_id'] = $partId;
+                    }
+                    if ($operation !== '') {
+                        $metaData['operation'] = $operation;
+                    }
+                    $metaData['created_by'] = $userId;
+
+                    $colStr .= ', metadata';
+                    $valStr .= ', :metadata';
+                    $params['metadata'] = json_encode($metaData, JSON_UNESCAPED_UNICODE);
+
+                    $rows = $db->query(
+                        "INSERT INTO production_schedule_slots ({$colStr})
+                         VALUES ({$valStr})
+                         RETURNING *",
+                        $params
+                    );
+
+                    $slot = $rows[0] ?? null;
+                    if ($slot !== null) {
+                        if (isset($slot['metadata']) && is_string($slot['metadata'])) {
+                            $slot['metadata'] = json_decode($slot['metadata'], true) ?? [];
+                        }
+                        // Map to backward-compatible shape
+                        $slot['id'] = $slot['slot_id'] ?? '';
+                        $slot['date'] = $slot['slot_date'] ?? '';
+                        $slot['job_number'] = $slot['wo_number'] ?? $jobNumber;
+                        $slot['part_id'] = $slot['metadata']['part_id'] ?? $partId;
+                        $slot['operation'] = $slot['metadata']['operation'] ?? $operation;
+                        $slot['priority'] = $priority;
+                        $slot['status'] = $slot['slot_type'] ?? 'scheduled';
+                        $slot['created_by'] = $userId;
+
+                        $this->auditLog('schedule_create_slot', [
+                            'slot_id'    => $slot['id'],
+                            'machine_id' => $machineId,
+                            'date'       => $date,
+                        ], $userId);
+
+                        $this->success(['slot' => $slot], 201);
+                    }
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] createSlot DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
 
             $slot = [
                 'id'         => 'SLOT-' . bin2hex(random_bytes(8)),
-                'machine_id' => trim((string)($body['machine_id'] ?? '')),
-                'date'       => trim((string)($body['date'] ?? '')),
-                'start_time' => trim((string)($body['start_time'] ?? '')),
-                'end_time'   => trim((string)($body['end_time'] ?? '')),
-                'job_number' => trim((string)($body['job_number'] ?? '')),
-                'part_id'    => trim((string)($body['part_id'] ?? '')),
-                'operation'  => trim((string)($body['operation'] ?? '')),
-                'priority'   => strtolower(trim((string)($body['priority'] ?? 'normal'))),
+                'machine_id' => $machineId,
+                'date'       => $date,
+                'start_time' => $startTime,
+                'end_time'   => $endTime,
+                'job_number' => $jobNumber,
+                'part_id'    => $partId,
+                'operation'  => $operation,
+                'priority'   => $priority,
                 'status'     => 'scheduled',
                 'created_by' => $userId,
                 'created_at' => $this->nowIso(),
@@ -488,6 +1001,73 @@ class AiSchedulingController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $setClauses = ['updated_at = NOW()'];
+                    $params = ['id' => $id];
+
+                    // Map JSON fields to DB columns
+                    $fieldMap = [
+                        'date'       => 'slot_date',
+                        'start_time' => 'start_time',
+                        'end_time'   => 'end_time',
+                        'machine_id' => 'machine_id',
+                        'job_number' => 'wo_number',
+                        'status'     => 'slot_type',
+                    ];
+
+                    foreach ($fieldMap as $bodyField => $dbCol) {
+                        if (isset($body[$bodyField])) {
+                            $paramKey = 'u_' . $dbCol;
+                            $setClauses[] = "{$dbCol} = :{$paramKey}";
+                            $params[$paramKey] = trim((string)$body[$bodyField]);
+                        }
+                    }
+
+                    // Priority: map string to int
+                    if (isset($body['priority'])) {
+                        $priorityMap = ['low' => 25, 'normal' => 50, 'high' => 75, 'urgent' => 100];
+                        $pVal = $priorityMap[strtolower(trim((string)$body['priority']))] ?? 50;
+                        $setClauses[] = 'priority = :u_priority';
+                        $params['u_priority'] = $pVal;
+                    }
+
+                    $setSql = implode(', ', $setClauses);
+
+                    $rows = $db->query(
+                        "UPDATE production_schedule_slots
+                         SET {$setSql}
+                         WHERE slot_id = :id
+                         RETURNING *",
+                        $params
+                    );
+
+                    if (empty($rows)) {
+                        $this->error('not_found', 404, "Schedule slot {$id} not found.");
+                    }
+
+                    $updated = $rows[0];
+                    if (isset($updated['metadata']) && is_string($updated['metadata'])) {
+                        $updated['metadata'] = json_decode($updated['metadata'], true) ?? [];
+                    }
+                    $updated['id'] = $updated['slot_id'] ?? $id;
+                    $updated['date'] = $updated['slot_date'] ?? '';
+
+                    $this->auditLog('schedule_update_slot', [
+                        'slot_id' => $id,
+                        'fields'  => array_keys($body),
+                    ], $userId);
+
+                    $this->success(['slot' => $updated]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] updateSlot DB fallback: ' . $e->getMessage());
+                    $this->rethrowResponse($e);
+                }
+            }
+
+            // Fallback to JSON / Du phong doc JSON
             $file  = $this->aiDir() . '/schedule-slots.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
@@ -541,6 +1121,65 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first / Thu DB truoc
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $where = ['1=1'];
+                    $params = [];
+
+                    $date = $this->query('date');
+                    if ($date !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                        $where[] = 'conflict_date = :date';
+                        $params['date'] = $date;
+                    }
+
+                    $machineId = $this->query('machine_id');
+                    if ($machineId !== null && $machineId !== '') {
+                        $where[] = 'machine_id = :machine_id';
+                        $params['machine_id'] = $machineId;
+                    }
+
+                    $whereSql = implode(' AND ', $where);
+
+                    $rows = $db->query(
+                        "SELECT sc.*,
+                                sa.start_time AS slot_a_start, sa.end_time AS slot_a_end,
+                                sb.start_time AS slot_b_start, sb.end_time AS slot_b_end
+                         FROM schedule_conflicts sc
+                         LEFT JOIN production_schedule_slots sa ON sa.slot_id = sc.slot_id_a
+                         LEFT JOIN production_schedule_slots sb ON sb.slot_id = sc.slot_id_b
+                         WHERE {$whereSql}
+                         ORDER BY sc.created_at DESC",
+                        $params
+                    );
+
+                    $conflicts = [];
+                    foreach ($rows as $row) {
+                        $conflicts[] = [
+                            'conflict_id' => $row['conflict_id'] ?? '',
+                            'slot_a'      => $row['slot_id_a'] ?? '',
+                            'slot_b'      => $row['slot_id_b'] ?? '',
+                            'machine_id'  => $row['machine_id'] ?? '',
+                            'date'        => $row['conflict_date'] ?? '',
+                            'overlap'     => sprintf(
+                                '%s-%s vs %s-%s',
+                                $row['slot_a_start'] ?? '', $row['slot_a_end'] ?? '',
+                                $row['slot_b_start'] ?? '', $row['slot_b_end'] ?? ''
+                            ),
+                            'type'        => $row['conflict_type'] ?? '',
+                            'severity'    => $row['severity'] ?? '',
+                            'resolved'    => (bool)($row['resolved'] ?? false),
+                        ];
+                    }
+
+                    $this->success(['conflicts' => $conflicts, 'total' => count($conflicts)]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getConflicts DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON — compute conflicts in-memory / Du phong JSON — tinh xung dot trong bo nho
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -608,6 +1247,43 @@ class AiSchedulingController extends BaseController
         $user = $this->requireAuth();
 
         try {
+            // Try DB first — use capacity_snapshots table / Thu DB truoc — dung bang capacity_snapshots
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $startDate = $this->query('start_date', gmdate('Y-m-d'));
+                    $endDate   = $this->query('end_date', gmdate('Y-m-d', strtotime('+14 days')));
+
+                    $rows = $db->query(
+                        "SELECT machine_id, snapshot_date AS date,
+                                COALESCE(scheduled_minutes, 0) / 60.0 AS total_hours,
+                                utilization_pct,
+                                jobs_completed AS slot_count
+                         FROM capacity_snapshots
+                         WHERE snapshot_date >= :start_date
+                           AND snapshot_date <= :end_date
+                         ORDER BY machine_id, snapshot_date",
+                        ['start_date' => $startDate, 'end_date' => $endDate]
+                    );
+
+                    $heatmap = [];
+                    foreach ($rows as $row) {
+                        $heatmap[] = [
+                            'machine_id'      => $row['machine_id'] ?? '',
+                            'date'            => $row['date'] ?? '',
+                            'total_hours'     => round((float)($row['total_hours'] ?? 0), 2),
+                            'utilization_pct' => round((float)($row['utilization_pct'] ?? 0), 2),
+                            'slot_count'      => (int)($row['slot_count'] ?? 0),
+                        ];
+                    }
+
+                    $this->success(['heatmap' => $heatmap]);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] getCapacityHeatmap DB fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to JSON — compute from schedule slots / Du phong JSON — tinh tu schedule slots
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -667,23 +1343,57 @@ class AiSchedulingController extends BaseController
         $this->requireFields($body, ['part_id', 'quantity']);
 
         try {
-            $file = $this->aiDir() . '/schedule-slots.json';
-            $all  = $this->readJsonFile($file) ?? [];
-
             $machineId = trim((string)($body['machine_id'] ?? ''));
             $quantity  = max(1, (int)($body['quantity'] ?? 1));
             $priority  = strtolower(trim((string)($body['priority'] ?? 'normal')));
+            $today     = gmdate('Y-m-d');
 
-            // Simple heuristic: find earliest date with available capacity
-            $today = gmdate('Y-m-d');
+            // Try DB first — use capacity_snapshots for smarter suggestions
+            // Thu DB truoc — dung capacity_snapshots de de xuat thong minh hon
+            $db = $this->getDb();
             $occupiedDates = [];
-            foreach ($all as $slot) {
-                if ($machineId !== '' && ($slot['machine_id'] ?? '') !== $machineId) {
-                    continue;
+
+            if ($db !== null) {
+                try {
+                    $where = ["slot_date >= :today"];
+                    $params = ['today' => $today];
+
+                    if ($machineId !== '') {
+                        $where[] = 'machine_id = :machine_id';
+                        $params['machine_id'] = $machineId;
+                    }
+
+                    $whereSql = implode(' AND ', $where);
+                    $slotRows = $db->query(
+                        "SELECT slot_date, COUNT(*) AS cnt
+                         FROM production_schedule_slots
+                         WHERE {$whereSql}
+                         GROUP BY slot_date",
+                        $params
+                    );
+
+                    foreach ($slotRows as $row) {
+                        $occupiedDates[$row['slot_date']] = (int)$row['cnt'];
+                    }
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] suggestPromiseDate DB fallback: ' . $e->getMessage());
+                    // Fall through to JSON-based occupancy
                 }
-                $d = $slot['date'] ?? '';
-                if ($d >= $today) {
-                    $occupiedDates[$d] = ($occupiedDates[$d] ?? 0) + 1;
+            }
+
+            // If no DB data, try JSON fallback
+            if (empty($occupiedDates)) {
+                $file = $this->aiDir() . '/schedule-slots.json';
+                $all  = $this->readJsonFile($file) ?? [];
+
+                foreach ($all as $slot) {
+                    if ($machineId !== '' && ($slot['machine_id'] ?? '') !== $machineId) {
+                        continue;
+                    }
+                    $d = $slot['date'] ?? '';
+                    if ($d >= $today) {
+                        $occupiedDates[$d] = ($occupiedDates[$d] ?? 0) + 1;
+                    }
                 }
             }
 
@@ -694,7 +1404,6 @@ class AiSchedulingController extends BaseController
             }
 
             // Find first available window
-            $checkDate   = $today;
             $leadDays    = $priority === 'urgent' ? 1 : ($priority === 'high' ? 3 : 5);
             $suggestedDate = gmdate('Y-m-d', strtotime("+{$leadDays} days", strtotime($today)));
 
@@ -717,6 +1426,326 @@ class AiSchedulingController extends BaseController
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('schedule_promise_failed', 500, $e->getMessage());
+        }
+    }
+
+    // -- New AI Endpoints (Phase 3A) ------------------------------------------
+
+    /**
+     * POST aiNlQuery -- Natural language query endpoint.
+     *
+     * Body fields:
+     *   - question     (string, required): Natural language question.
+     *   - context_type (string, optional): Context hint for query routing.
+     *
+     * @return never
+     */
+    public function aiNlQuery(): never
+    {
+        $user = $this->requireAuth();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['question']);
+
+        $question    = trim((string)($body['question'] ?? ''));
+        $contextType = trim((string)($body['context_type'] ?? ''));
+        $userId      = $this->userUuid($user);
+
+        try {
+            $service = new NaturalLanguageQueryService($this->dataDir);
+            $context = [];
+            if ($contextType !== '') {
+                $context['context_type'] = $contextType;
+            }
+
+            $result = $service->query($question, $userId, $context);
+
+            $this->success(['result' => $result]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_nl_query_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST aiRcaAnalyze -- Root cause analysis for an NCR.
+     *
+     * Body fields:
+     *   - ncr_id (string, required): NCR identifier.
+     *
+     * @return never
+     */
+    public function aiRcaAnalyze(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(
+            admin_roles(),
+            ['quality_manager', 'quality_engineer']
+        ))));
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['ncr_id']);
+
+        $ncrId = trim((string)($body['ncr_id'] ?? ''));
+
+        try {
+            $db = $this->getDb();
+            $service = new RootCauseAnalysisService($this->dataDir, $db);
+            $result = $service->analyzeNcr($ncrId);
+
+            $this->auditLog('ai_rca_analyze', ['ncr_id' => $ncrId], $this->userId($user));
+
+            $this->success(['analysis' => $result]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_rca_analyze_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST aiFeedbackSubmit -- Submit feedback on an AI prediction.
+     *
+     * Body fields:
+     *   - prediction_id (string, required): Prediction UUID.
+     *   - feedback_type (string, required): correct, incorrect, partially_correct, not_applicable.
+     *   - notes         (string, optional)
+     *
+     * @return never
+     */
+    public function aiFeedbackSubmit(): never
+    {
+        $user = $this->requireAuth();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['prediction_id', 'feedback_type']);
+
+        $predictionId = trim((string)($body['prediction_id'] ?? ''));
+        $feedbackType = trim((string)($body['feedback_type'] ?? ''));
+        $notes        = trim((string)($body['notes'] ?? ''));
+        $userId       = $this->userUuid($user);
+
+        try {
+            $pipeline = new AiPredictionPipeline($this->dataDir);
+            $details = [];
+            if ($notes !== '') {
+                $details['notes'] = $notes;
+            }
+
+            $result = $pipeline->recordFeedback($predictionId, $userId, $feedbackType, $details);
+
+            $this->auditLog('ai_feedback_submit', [
+                'prediction_id' => $predictionId,
+                'feedback_type' => $feedbackType,
+            ], $this->userId($user));
+
+            $this->success(['feedback' => $result]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_feedback_submit_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET aiModelList -- List registered AI/ML prediction models.
+     *
+     * @return never
+     */
+    public function aiModelList(): never
+    {
+        $user = $this->requireAuth();
+
+        try {
+            $db = $this->getDb();
+            if ($db !== null) {
+                $rows = $db->query(
+                    "SELECT model_id, model_name, model_type, version, algorithm,
+                            training_data_source, training_samples,
+                            accuracy_score, precision_score, recall_score,
+                            is_active, promoted_at, config, metadata, created_at
+                     FROM prediction_models
+                     ORDER BY created_at DESC"
+                );
+
+                // Parse JSONB fields
+                foreach ($rows as &$row) {
+                    if (isset($row['config']) && is_string($row['config'])) {
+                        $row['config'] = json_decode($row['config'], true) ?? [];
+                    }
+                    if (isset($row['metadata']) && is_string($row['metadata'])) {
+                        $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                    }
+                    $row['is_active'] = (bool)($row['is_active'] ?? false);
+                }
+                unset($row);
+
+                $this->success(['models' => $rows, 'total' => count($rows)]);
+            }
+
+            // No DB available — return empty list
+            $this->success(['models' => [], 'total' => 0]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_model_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET aiConversationHistory -- Get AI conversation history for the current user.
+     *
+     * Query params:
+     *   - limit (int, optional, default 20)
+     *
+     * @return never
+     */
+    public function aiConversationHistory(): never
+    {
+        $user = $this->requireAuth();
+        $userId = $this->userUuid($user);
+
+        try {
+            $limit = min(100, max(1, (int)($this->query('limit', '20'))));
+
+            $service = new NaturalLanguageQueryService($this->dataDir);
+            $conversations = $service->getConversationHistory($userId, $limit);
+
+            $this->success(['conversations' => $conversations, 'total' => count($conversations)]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_conversation_history_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST aiDocumentSummarize -- Summarize a document using AI.
+     *
+     * Body fields:
+     *   - document_id (string, optional): Reference to an existing document.
+     *   - content     (string, required): Text content to summarize.
+     *
+     * @return never
+     */
+    public function aiDocumentSummarize(): never
+    {
+        $user = $this->requireAuth();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['content']);
+
+        $documentId = trim((string)($body['document_id'] ?? ''));
+        $content    = trim((string)($body['content'] ?? ''));
+
+        if ($content === '') {
+            $this->error('validation_error', 400, 'Content must not be empty.');
+        }
+
+        try {
+            $systemPrompt = "You are a document summarization assistant for a manufacturing ERP system (HESEM MOM Portal).\n"
+                . "Summarize the provided document content concisely.\n"
+                . "Focus on key points relevant to manufacturing, quality, production, or business operations.\n"
+                . "Respond with a JSON object containing: summary (string), key_points (array of strings), word_count (int).\n"
+                . "If the content is in Vietnamese, respond in Vietnamese.";
+
+            $aiService = AnthropicService::getInstance();
+            $aiResult = $aiService->analyzeProdData($systemPrompt, $content, [
+                'document_id' => $documentId,
+                'action'      => 'summarize',
+            ]);
+
+            $summary = [
+                'document_id' => $documentId,
+                'summary'     => $aiResult['response'] ?? $aiResult['text'] ?? '',
+                'model_used'  => $aiResult['model'] ?? 'claude',
+                'created_at'  => $this->nowIso(),
+            ];
+
+            // Try to parse structured response from AI
+            $responseText = $aiResult['response'] ?? $aiResult['text'] ?? '';
+            $parsed = json_decode($responseText, true);
+            if (is_array($parsed)) {
+                $summary['summary']    = $parsed['summary'] ?? $responseText;
+                $summary['key_points'] = $parsed['key_points'] ?? [];
+                $summary['word_count'] = $parsed['word_count'] ?? str_word_count($content);
+            } else {
+                $summary['key_points'] = [];
+                $summary['word_count'] = str_word_count($content);
+            }
+
+            $this->auditLog('ai_document_summarize', [
+                'document_id' => $documentId,
+            ], $this->userId($user));
+
+            $this->success(['result' => $summary]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_document_summarize_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET aiDashboard -- Combined AI dashboard with prediction metrics + schedule metrics.
+     *
+     * @return never
+     */
+    public function aiDashboard(): never
+    {
+        $user = $this->requireAuth();
+
+        try {
+            // Get prediction pipeline metrics
+            $pipeline = new AiPredictionPipeline($this->dataDir);
+            $predictionMetrics = $pipeline->getDashboardMetrics();
+
+            // Get schedule metrics from DB or JSON
+            $scheduleMetrics = [
+                'total_slots'     => 0,
+                'active_slots'    => 0,
+                'conflict_count'  => 0,
+            ];
+
+            $db = $this->getDb();
+            if ($db !== null) {
+                try {
+                    $scheduleMetrics['total_slots'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM production_schedule_slots"
+                    ) ?? 0);
+
+                    $scheduleMetrics['active_slots'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM production_schedule_slots WHERE slot_date >= CURRENT_DATE"
+                    ) ?? 0);
+
+                    $scheduleMetrics['conflict_count'] = (int)($db->queryScalar(
+                        "SELECT COUNT(*) FROM schedule_conflicts WHERE resolved = FALSE"
+                    ) ?? 0);
+                } catch (Throwable $e) {
+                    @error_log('[AiScheduling] aiDashboard schedule metrics DB fallback: ' . $e->getMessage());
+
+                    // Fallback to JSON for schedule metrics
+                    $slots = $this->readJsonFile($this->aiDir() . '/schedule-slots.json') ?? [];
+                    $scheduleMetrics['total_slots'] = count($slots);
+                    $today = gmdate('Y-m-d');
+                    $scheduleMetrics['active_slots'] = count(array_filter(
+                        $slots,
+                        fn(array $s) => ($s['date'] ?? '') >= $today
+                    ));
+                }
+            } else {
+                // No DB, use JSON
+                $slots = $this->readJsonFile($this->aiDir() . '/schedule-slots.json') ?? [];
+                $scheduleMetrics['total_slots'] = count($slots);
+                $today = gmdate('Y-m-d');
+                $scheduleMetrics['active_slots'] = count(array_filter(
+                    $slots,
+                    fn(array $s) => ($s['date'] ?? '') >= $today
+                ));
+            }
+
+            $this->success([
+                'prediction_metrics' => $predictionMetrics,
+                'schedule_metrics'   => $scheduleMetrics,
+            ]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('ai_dashboard_combined_failed', 500, $e->getMessage());
         }
     }
 }

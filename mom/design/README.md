@@ -17,3 +17,10 @@ Current pilot scope:
 - `M4-purchasing`
 
 Stop rule: a module is not frontend production-compliant until its build packet, template, block contracts and endpoint bindings pass `mom/tools/design/validate-frontend-contracts.mjs`.
+
+Graphics governance stop rule:
+
+- Template registry production authority is backend-controlled; local browser caches are preview/draft only.
+- Release review must read the graphics compliance matrix, debt/drift report, active waivers and release blockers before publishing a module or applying a global graphics rollout.
+- New modules and major refactors are blocked unless graphics linkage is `full-admin-controlled` or `bridged-to-shared-tokens` with approved, unexpired waiver evidence.
+- Release manifests must carry graphics authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waiver refs and rollback plan.

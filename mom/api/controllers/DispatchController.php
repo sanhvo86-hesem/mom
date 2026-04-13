@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use InvalidArgumentException;
+use MOM\Services\ShopfloorExecutionService;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -14,11 +17,22 @@ use Throwable;
  */
 class DispatchController extends BaseController
 {
+    private ?ShopfloorExecutionService $shopfloorSvc = null;
+
     private function dispatchDir(): string
     {
         $dir = $this->dataDir . '/dispatch';
         if (!is_dir($dir)) @mkdir($dir, 0775, true);
         return $dir;
+    }
+
+    private function shopfloor(): ShopfloorExecutionService
+    {
+        if ($this->shopfloorSvc === null) {
+            $this->shopfloorSvc = new ShopfloorExecutionService($this->dataDir, $this->data);
+        }
+
+        return $this->shopfloorSvc;
     }
 
     private function userId(array $user): string
@@ -160,7 +174,10 @@ class DispatchController extends BaseController
         $this->requireCsrf();
 
         $body = $this->jsonBody();
-        $this->requireFields($body, ['wo_number', 'machine_id', 'shift_date', 'cycle_time_minutes', 'target_quantity']);
+        $this->requireFields($body, ['wo_number', 'shift_date', 'cycle_time_minutes', 'target_quantity']);
+        if (trim((string)($body['machine_id'] ?? $body['equipment_id'] ?? '')) === '') {
+            $this->error('missing_machine_id', 400);
+        }
 
         $uid = $this->userId($user);
         $now = $this->nowIso();
@@ -169,28 +186,7 @@ class DispatchController extends BaseController
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
 
-            $target = [
-                'target_id'             => 'TGT-' . bin2hex(random_bytes(8)),
-                'wo_number'             => trim((string)($body['wo_number'] ?? '')),
-                'jo_number'             => trim((string)($body['jo_number'] ?? '')),
-                'item_id'               => trim((string)($body['item_id'] ?? '')),
-                'item_description'      => trim((string)($body['item_description'] ?? '')),
-                'machine_id'            => trim((string)($body['machine_id'] ?? '')),
-                'operator_id'           => trim((string)($body['operator_id'] ?? '')),
-                'shift_date'            => trim((string)($body['shift_date'] ?? '')),
-                'shift_code'            => strtolower(trim((string)($body['shift_code'] ?? 'morning'))),
-                'cycle_time_minutes'    => (float)($body['cycle_time_minutes'] ?? 0),
-                'setup_time_minutes'    => (float)($body['setup_time_minutes'] ?? 0),
-                'shift_duration_minutes'=> (float)($body['shift_duration_minutes'] ?? 480),
-                'target_quantity'       => (int)($body['target_quantity'] ?? 0),
-                'priority'              => (int)($body['priority'] ?? 50),
-                'dispatch_sequence'     => (int)($body['dispatch_sequence'] ?? 1),
-                'status'                => 'planned',
-                'notes'                 => trim((string)($body['notes'] ?? '')),
-                'created_by'            => $uid,
-                'created_at'            => $now,
-                'updated_at'            => $now,
-            ];
+            $target = $this->shopfloor()->normalizeTargetForCreate($body, $uid, $now);
 
             $targets[] = $target;
             $this->writeJsonFile($file, $targets);
@@ -204,6 +200,8 @@ class DispatchController extends BaseController
             ], $uid);
 
             $this->success(['target' => $target], 201);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('create_target_failed', 500, $e->getMessage());
@@ -271,24 +269,29 @@ class DispatchController extends BaseController
             $this->error('forbidden', 403);
         }
         $date = $this->query('date') ?? date('Y-m-d');
+        $shiftCode = $this->query('shift_code');
 
         try {
+            $date = $this->shopfloor()->normalizeDateFilter($date, 'date');
+            $shiftCode = $this->shopfloor()->normalizeOptionalShiftCode($shiftCode);
             $file    = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($file) ?? [];
+            $logFile = $this->dispatchDir() . '/production_logs.json';
+            $logs    = $this->readJsonFile($logFile) ?? [];
+            $logMap  = [];
+            foreach ($logs as $l) {
+                if (is_array($l) && ($l['target_id'] ?? '') !== '') {
+                    $logMap[(string)$l['target_id']] = $l;
+                }
+            }
 
             $myTasks = [];
             foreach ($targets as $t) {
                 if (($t['operator_id'] ?? '') === $operatorId && ($t['shift_date'] ?? '') === $date) {
-                    // Load production log if exists
-                    $logFile = $this->dispatchDir() . '/production_logs.json';
-                    $logs    = $this->readJsonFile($logFile) ?? [];
-                    $log     = null;
-                    foreach ($logs as $l) {
-                        if (($l['target_id'] ?? '') === ($t['target_id'] ?? '')) {
-                            $log = $l;
-                            break;
-                        }
+                    if ($shiftCode !== null && $shiftCode !== '' && ($t['shift_code'] ?? '') !== $shiftCode) {
+                        continue;
                     }
+                    $log = $logMap[(string)($t['target_id'] ?? '')] ?? null;
                     $t['production_log'] = $log;
                     $myTasks[] = $t;
                 }
@@ -301,13 +304,24 @@ class DispatchController extends BaseController
                 if ($seqA !== $seqB) return $seqA <=> $seqB;
                 return (int)($b['priority'] ?? 50) <=> (int)($a['priority'] ?? 50);
             });
+            $taskCards = array_map(
+                fn(array $task): array => $this->shopfloor()->operatorTaskCard(
+                    $task,
+                    is_array($task['production_log'] ?? null) ? $task['production_log'] : null,
+                ),
+                $myTasks,
+            );
 
             $this->success([
                 'operator_id' => $operatorId,
                 'date'        => $date,
+                'shift_code'  => $shiftCode,
                 'tasks'       => $myTasks,
+                'task_cards'  => $taskCards,
                 'task_count'  => count($myTasks),
             ]);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('operator_dispatch_failed', 500, $e->getMessage());
@@ -338,7 +352,8 @@ class DispatchController extends BaseController
 
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === trim((string)($body['target_id'] ?? ''))) {
-                    if ($t['status'] === 'planned' || $t['status'] === 'dispatched') {
+                    $status = (string)($t['status'] ?? 'planned');
+                    if ($status === 'planned' || $status === 'dispatched') {
                         $t['status']    = 'in_progress';
                         $t['started_at'] = $t['started_at'] ?? $now;
                     }
@@ -350,11 +365,7 @@ class DispatchController extends BaseController
             unset($t);
 
             if (!$target) $this->error('target_not_found', 404);
-            if (($target['operator_id'] ?? '') !== '' && ($target['operator_id'] ?? '') !== $uid && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
-                $this->error('forbidden', 403);
-            }
-
-            $this->writeJsonFile($tFile, $targets);
+            $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $this->userHasAnyRole($user, $this->dispatchWriteRoles()));
 
             // Create or update production log
             $logFile = $this->dispatchDir() . '/production_logs.json';
@@ -368,47 +379,23 @@ class DispatchController extends BaseController
                 }
             }
 
-            $log = [
-                'log_id'              => $existingIdx >= 0 ? $logs[$existingIdx]['log_id'] : 'LOG-' . bin2hex(random_bytes(8)),
-                'target_id'           => $target['target_id'],
-                'wo_number'           => $target['wo_number'],
-                'jo_number'           => $target['jo_number'] ?? '',
-                'machine_id'          => $target['machine_id'],
-                'operator_id'         => $uid,
-                'shift_date'          => $target['shift_date'],
-                'shift_code'          => $target['shift_code'],
-                'quantity_good'       => (int)($body['quantity_good'] ?? 0),
-                'quantity_ng'         => (int)($body['quantity_ng'] ?? 0),
-                'quantity_rework'     => (int)($body['quantity_rework'] ?? 0),
-                'target_quantity'     => $target['target_quantity'],
-                'actual_start'        => (string)($body['actual_start'] ?? $target['started_at'] ?? $now),
-                'actual_end'          => (string)($body['actual_end'] ?? ''),
-                'actual_setup_minutes'=> (float)($body['actual_setup_minutes'] ?? 0),
-                'actual_run_minutes'  => (float)($body['actual_run_minutes'] ?? 0),
-                'actual_idle_minutes' => (float)($body['actual_idle_minutes'] ?? 0),
-                'ng_details'          => is_array($body['ng_details'] ?? null) ? $body['ng_details'] : [],
-                'notes'               => trim((string)($body['notes'] ?? '')),
-                'issues_encountered'  => trim((string)($body['issues_encountered'] ?? '')),
-                'offline_created'     => (bool)($body['offline_created'] ?? false),
-                'sync_status'         => 'synced',
-                'updated_at'          => $now,
-            ];
-
-            // Calculate derived fields
-            $total = $log['quantity_good'] + $log['quantity_ng'] + $log['quantity_rework'];
-            $log['quantity_total']     = $total;
-            $log['achievement_pct']    = $log['target_quantity'] > 0 ? round(($log['quantity_good'] / $log['target_quantity']) * 100, 1) : 0;
-            $log['ng_rate_pct']        = $total > 0 ? round(($log['quantity_ng'] / $total) * 100, 1) : 0;
+            $log = $this->shopfloor()->buildProductionLog(
+                $body,
+                $target,
+                $existingIdx >= 0 && is_array($logs[$existingIdx] ?? null) ? $logs[$existingIdx] : null,
+                $uid,
+                $now,
+            );
 
             if ($existingIdx >= 0) {
-                $log['created_at']      = $logs[$existingIdx]['created_at'];
                 $logs[$existingIdx]     = $log;
             } else {
-                $log['created_at'] = $now;
                 $logs[] = $log;
             }
 
+            $this->writeJsonFile($tFile, $targets);
             $this->writeJsonFile($logFile, $logs);
+            $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             // Auto-complete target if achievement >= 100%
             if ($log['achievement_pct'] >= 100) {
@@ -432,6 +419,13 @@ class DispatchController extends BaseController
             ], $uid);
 
             $this->success(['production_log' => $log]);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
+        } catch (RuntimeException $e) {
+            if ($e->getMessage() === 'forbidden_operator_assignment') {
+                $this->error('forbidden', 403);
+            }
+            $this->error('report_production_failed', 500, $e->getMessage());
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('report_production_failed', 500, $e->getMessage());
@@ -573,12 +567,7 @@ class DispatchController extends BaseController
 
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === $targetId) {
-                    $editable = ['operator_id', 'cycle_time_minutes', 'setup_time_minutes', 'target_quantity',
-                                 'priority', 'dispatch_sequence', 'shift_code', 'notes', 'machine_id'];
-                    foreach ($editable as $field) {
-                        if (isset($body[$field])) $t[$field] = $body[$field];
-                    }
-                    $t['updated_at'] = $now;
+                    $t = $this->shopfloor()->applyTargetUpdates($t, $body, $now);
                     $updated = $t;
                     break;
                 }
@@ -590,6 +579,8 @@ class DispatchController extends BaseController
             $this->writeJsonFile($file, $targets);
             $this->auditLog('dispatch_update_target', ['target_id' => $targetId], $uid);
             $this->success(['target' => $updated]);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('update_target_failed', 500, $e->getMessage());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\ChangeControl\ChangeAuthorityService;
 use Throwable;
 
 /**
@@ -87,6 +88,7 @@ class FormController extends BaseController
 
         $entryData = $data['data'] ?? $data;
         if (!is_array($entryData)) $this->error('invalid_data', 400);
+        $this->assertControlledFormMutationAllowed($code, $entryData);
 
         // Add submission metadata
         $entryData['submitted_by']   = (string)($me['username'] ?? '');
@@ -555,6 +557,174 @@ class FormController extends BaseController
         return $this->rootDir . '/mom/scripts/portal/01-data-config.js';
     }
 
+    /**
+     * @param array<string, mixed> $candidate
+     */
+    private function assertControlledFormMutationAllowed(string $code, array $candidate): void
+    {
+        $sourceEntryId = trim((string)($candidate['source_entry_id'] ?? ''));
+        $entryId = trim((string)($candidate['entry_id'] ?? ''));
+        $allocationId = trim((string)($candidate['allocation_id'] ?? ''));
+        if ($sourceEntryId === '' && $entryId === '' && $allocationId === '') {
+            return;
+        }
+
+        $previous = $this->loadOnlineFormEntry($code, $sourceEntryId !== '' ? $sourceEntryId : $entryId, $allocationId);
+        if ($previous === null) {
+            return;
+        }
+
+        $previousState = $this->entryWorkflowState($previous);
+        if (!$this->isLockedWorkflowState($previousState)) {
+            return;
+        }
+
+        $editOrigin = trim((string)($candidate['edit_origin'] ?? ''));
+        $changeAuthorityId = $this->changeAuthorityFromPayload($candidate);
+        $amendmentReason = trim((string)($candidate['amendment_reason'] ?? ''));
+
+        if ($editOrigin !== 'amendment' || !$this->changeAuthorityFormatValid($changeAuthorityId)) {
+            $this->error('change_authority_required', 409, 'Locked form records require an amendment with a valid released change authority.');
+        }
+        if ($amendmentReason === '') {
+            $this->error('amendment_reason_required', 422);
+        }
+
+        $service = ChangeAuthorityService::fromDataLayer($this->data);
+        foreach ($this->changedContentFields($previous, $candidate) as $fieldPath => $values) {
+            $decision = $service->assertFieldEditAllowed(
+                'form_record',
+                trim((string)($previous['record_id'] ?? $previous['entry_id'] ?? $code)),
+                $fieldPath,
+                $values['old'],
+                $values['new'],
+                $previousState !== '' ? $previousState : 'locked',
+                [
+                    'change_authority_id' => $changeAuthorityId,
+                    'requested_effect' => 'amend',
+                    'form_code' => $code,
+                    'source_entry_id' => (string)($previous['entry_id'] ?? ''),
+                    'source_submission_revision' => (int)($previous['submission_revision'] ?? 0),
+                ],
+            );
+            if (!$decision->allowed) {
+                $this->error($decision->errorCode !== '' ? $decision->errorCode : 'change_authority_required', 409, $decision->message);
+            }
+        }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function loadOnlineFormEntry(string $code, string $entryId = '', string $allocationId = ''): ?array
+    {
+        $entries = $this->readJsonFile($this->dataDir . '/online-forms/entries/' . $code . '.json') ?? [];
+        if (!is_array($entries)) {
+            return null;
+        }
+        foreach ($entries as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            if ($entryId !== '' && (string)($entry['entry_id'] ?? '') === $entryId) {
+                return $entry;
+            }
+            if ($allocationId !== '' && (string)($entry['allocation_id'] ?? '') === $allocationId) {
+                return $entry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $previous
+     * @param array<string, mixed> $candidate
+     * @return array<string, array{old:mixed,new:mixed}>
+     */
+    private function changedContentFields(array $previous, array $candidate): array
+    {
+        $old = $this->contentFields($previous);
+        $new = $this->contentFields($candidate);
+        $fields = array_values(array_unique(array_merge(array_keys($old), array_keys($new))));
+        sort($fields);
+
+        $changes = [];
+        foreach ($fields as $field) {
+            $oldValue = $old[$field] ?? null;
+            $newValue = $new[$field] ?? null;
+            if (json_encode($oldValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                === json_encode($newValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) {
+                continue;
+            }
+            $changes[$field] = ['old' => $oldValue, 'new' => $newValue];
+        }
+        return $changes;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function contentFields(array $payload): array
+    {
+        $fields = is_array($payload['fieldValues'] ?? null) ? $payload['fieldValues'] : $payload;
+        $metadata = array_flip([
+            'entry_id', 'record_id', 'allocation_id', 'form_code', 'form_version',
+            'workflow_state', 'approval_state', '_status', '_ip', '_server_time',
+            '_session_user', 'submitted_at', 'submitted_by', 'submitted_name',
+            'updated_at', 'updated_by', 'created_at', 'created_by',
+            'submission_revision', 'submission_count', 'resubmission_count',
+            'amendment_count', 'edit_origin', 'source_entry_id',
+            'source_submission_revision', 'change_authority_id',
+            'amendment_reason', 'master_context', 'history', 'signatures',
+            'runtime_mode',
+        ]);
+
+        $out = [];
+        foreach ($fields as $key => $value) {
+            $field = trim((string)$key);
+            if ($field === '' || str_starts_with($field, '_') || isset($metadata[$field])) {
+                continue;
+            }
+            $out[$field] = $value;
+        }
+        ksort($out);
+        return $out;
+    }
+
+    private function entryWorkflowState(array $entry): string
+    {
+        return strtolower(trim((string)($entry['workflow_state'] ?? $entry['approval_state'] ?? $entry['_status'] ?? '')));
+    }
+
+    private function isLockedWorkflowState(string $state): bool
+    {
+        return in_array(strtolower(trim($state)), ['submitted', 'received', 'in_review', 'approved', 'closed', 'finalized', 'rejected'], true);
+    }
+
+    private function changeAuthorityFromPayload(array $payload): string
+    {
+        foreach (['change_authority_id', 'change_authority', 'authority_id', 'change_order_id', 'change_order_number', 'plm_change_order_id', 'change_order_ref'] as $key) {
+            $value = $payload[$key] ?? null;
+            if (is_scalar($value) && trim((string)$value) !== '') {
+                return trim((string)$value);
+            }
+        }
+        return '';
+    }
+
+    private function changeAuthorityFormatValid(string $authority): bool
+    {
+        $authority = trim($authority);
+        if ($authority === '') {
+            return false;
+        }
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $authority) === 1) {
+            return true;
+        }
+        return (bool)preg_match('/^[A-Z]{2,12}[A-Z0-9._\/-]{2,80}$/i', $authority);
+    }
+
     // ── Draft API ───────────────────────────────────────────────────────────
 
     /**
@@ -578,6 +748,16 @@ class FormController extends BaseController
         $userId = (string)($me['username'] ?? '');
 
         if (!is_array($fieldValues)) $this->error('invalid_field_values', 400);
+        $draftContext = $fieldValues;
+        if (is_array($body['data'] ?? null) && is_array(($body['data']['fieldValues'] ?? null))) {
+            $draftContext = $body['data'];
+        }
+        foreach (['entry_id', 'allocation_id', 'edit_origin', 'source_entry_id', 'source_submission_revision', 'change_authority_id', 'amendment_reason'] as $field) {
+            if (array_key_exists($field, $body)) {
+                $draftContext[$field] = $body[$field];
+            }
+        }
+        $this->assertControlledFormMutationAllowed($code, $draftContext);
 
         // JSON file draft
         $draftDir = $this->dataDir . '/online-forms/drafts/' . $code;
@@ -592,6 +772,11 @@ class FormController extends BaseController
             'user_id'       => $userId,
             'field_values'  => $fieldValues,
             'signatures'    => is_array($signatures) ? $signatures : [],
+            'edit_origin'   => (string)($body['edit_origin'] ?? 'draft'),
+            'source_entry_id' => trim((string)($body['source_entry_id'] ?? '')),
+            'source_submission_revision' => (int)($body['source_submission_revision'] ?? 0),
+            'change_authority_id' => trim((string)($body['change_authority_id'] ?? $body['change_order_id'] ?? '')),
+            'amendment_reason' => trim((string)($body['amendment_reason'] ?? '')),
             'version'       => $version,
             'saved_at'      => $this->nowIso(),
         ];

@@ -91,3 +91,48 @@ Priority C:
 
 The repo already has canonical identities, event history, evidence, approval/e-signature schemas, and qualification gates. The largest release-critical gap is the missing controlled production record that assembles those pieces into one immutable, queryable, release-blocking packet. This tranche targets that gap without broad rewrite or duplicate domain objects.
 
+## Implemented Closure
+
+Priority 0 is verified complete for the tranche 6 dependency surface:
+
+- Canonical spine, production-history read model, and qualification gate services exist and remain covered by focused unit tests.
+- The release packet uses `ProductionHistoryReadModelService` as its history authority rather than controller-side file stitching.
+
+Priority A is implemented:
+
+- `mes_trusted_release_record` is the authoritative structured release packet table when PostgreSQL authority is enabled.
+- The fallback repository is explicit `json_fallback` / `compatibility_only`; it is not presented as production authority.
+- Packets carry canonical identifiers, execution/quality/evidence/approval/workforce sections, assertions, blockers, release decision, provenance, retention metadata, record-copy metadata, payload schema version, and deterministic packet hash.
+- Released packets are immutable in the service/repository boundary. Attempts to mutate a released packet with a changed hash raise `release_record_immutable`.
+- Release is blocked by service-layer invariants when required execution, quality, evidence, approval/signature, or qualification assertions are not satisfied.
+
+Priority B is implemented:
+
+- Enterprise rollup returns packet state counts, blocker category counts, and site/plant scoped rollups with deterministic scope keys.
+- Release packet schema carries company/legal entity/plant/site fields plus source-system/source-record metadata.
+
+Priority C is implemented:
+
+- Runtime authority report now exposes `trusted_release_record` with backend, state, degradation, repository probe, and counters.
+- Release metrics include packet assembly, blocked packets, released packets, missing evidence/signature/qualification, immutable conflicts, release failures, and enterprise rollup queries.
+- Publication proof regenerated successfully after schema and registry updates.
+
+Priority D is documented separately in `trusted-release-record-readiness-tranche6.md`.
+
+## Verification Evidence
+
+- Syntax checks passed for the trusted release service, repositories, controller, runtime authority service, and operations routes.
+- Focused PHPUnit passed: trusted release record, production history read model, workforce qualification gate, runtime authority, and health runtime authority tests.
+- Backend smoke passed.
+- Data Schema admin smoke passed after schema governance gaps and stale derived artifacts were closed.
+- Enterprise registry authority smoke passed after registry governance artifacts were regenerated in a deterministic order.
+- Full PHPUnit passed with `php -d memory_limit=512M vendor/bin/phpunit`: 174 tests, 737 assertions, 1 skipped.
+- Canonical publication orchestrator passed end to end; latest proof artifact reports `PASS`.
+
+## Remaining Unproven Areas
+
+- Live PostgreSQL concurrency and failover were not exercised in this local run.
+- Release packet export/PDF copy generation remains deferred; structured packet remains the authority.
+- Full eDHR/eBR coverage across every production, supplier, document, and shipment workflow remains deferred.
+- Full genealogy graph projection remains partial; the implemented packet is a trustworthy production-history release slice, not a complete enterprise genealogy engine.
+- Full DB-backed HCM/training requirement resolution remains deferred where runtime qualification requirements are not configured.

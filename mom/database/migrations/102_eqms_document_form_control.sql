@@ -61,7 +61,15 @@ CREATE TABLE IF NOT EXISTS eqms_document_effectivity (
     document_revision_id    UUID NOT NULL REFERENCES eqms_document_revision(document_revision_id) ON DELETE CASCADE,
     effectivity_type        TEXT NOT NULL CHECK (effectivity_type IN ('date', 'site', 'plant', 'product', 'lot', 'serial', 'order', 'role')),
     effectivity_value       JSONB NOT NULL,
-    created_at              TIMESTAMPTZ NOT NULL DEFAULT now()
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version             BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_eqms_doc_effectivity_revision
@@ -73,7 +81,15 @@ CREATE TABLE IF NOT EXISTS eqms_document_distribution (
     audience_type            TEXT NOT NULL CHECK (audience_type IN ('user', 'role', 'department', 'site')),
     audience_ref             TEXT NOT NULL,
     required_ack             BOOLEAN NOT NULL DEFAULT FALSE,
+    org_company_code         VARCHAR(30),
+    org_legal_entity_code    VARCHAR(30),
+    org_plant_id             VARCHAR(30),
+    org_site_id              VARCHAR(30),
+    source_system            VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id         VARCHAR(160),
+    payload_schema_version   VARCHAR(30) NOT NULL DEFAULT '1.0',
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version              BIGINT      NOT NULL DEFAULT 1,
     UNIQUE (document_revision_id, audience_type, audience_ref)
 );
 
@@ -94,6 +110,13 @@ CREATE TABLE IF NOT EXISTS eqms_form_family (
     owner_area     TEXT,
     status         TEXT        NOT NULL DEFAULT 'active'
         CHECK (status IN ('active', 'inactive', 'retired')),
+    org_company_code      VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id          VARCHAR(30),
+    org_site_id           VARCHAR(30),
+    source_system         VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id      VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
     metadata       JSONB       NOT NULL DEFAULT '{}'::jsonb,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -126,9 +149,17 @@ CREATE TABLE IF NOT EXISTS eqms_form_schema_version (
     json_schema                JSONB NOT NULL,
     canonicalization_rules     JSONB NOT NULL DEFAULT '{}'::jsonb,
     validation_rules           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    org_company_code           VARCHAR(30),
+    org_legal_entity_code      VARCHAR(30),
+    org_plant_id               VARCHAR(30),
+    org_site_id                VARCHAR(30),
+    source_system              VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id           VARCHAR(160),
+    payload_schema_version     VARCHAR(30) NOT NULL DEFAULT '1.0',
     status                     TEXT NOT NULL DEFAULT 'draft'
         CHECK (status IN ('draft', 'approved', 'released', 'superseded')),
     created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version                BIGINT      NOT NULL DEFAULT 1,
     UNIQUE (form_template_revision_id, schema_version)
 );
 
@@ -180,6 +211,12 @@ CREATE TABLE IF NOT EXISTS eqms_form_record (
     lifecycle_state    TEXT NOT NULL DEFAULT 'draft'
         CHECK (lifecycle_state IN ('draft', 'finalized', 'locked', 'amending', 'superseded', 'voided')),
     created_from_issuance_id UUID REFERENCES eqms_form_issuance(form_issuance_id),
+    org_company_code   VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id       VARCHAR(30),
+    org_site_id        VARCHAR(30),
+    source_system      VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id   VARCHAR(160),
     metadata           JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -202,10 +239,19 @@ CREATE TABLE IF NOT EXISTS eqms_form_record_version (
     UNIQUE (form_record_id, version_no)
 );
 
-ALTER TABLE eqms_form_record
-    ADD CONSTRAINT fk_eqms_form_record_current_version
-    FOREIGN KEY (current_version_id)
-    REFERENCES eqms_form_record_version(form_record_version_id)
-    DEFERRABLE INITIALLY DEFERRED;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_eqms_form_record_current_version'
+    ) THEN
+        ALTER TABLE eqms_form_record
+            ADD CONSTRAINT fk_eqms_form_record_current_version
+            FOREIGN KEY (current_version_id)
+            REFERENCES eqms_form_record_version(form_record_version_id)
+            DEFERRABLE INITIALLY DEFERRED;
+    END IF;
+END $$;
 
 COMMIT;

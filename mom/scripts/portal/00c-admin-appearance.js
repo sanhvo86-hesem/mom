@@ -1326,11 +1326,15 @@ function graphicsSnapshot(){
       c.controlMode = c.status === 'legacy-bridged' ? 'bridged' : 'draft-cache';
       return c;
     }),
-    modules:[],
-    compliance:[],
-    audit:[],
-    waivers:[],
-    impact:null
+	    modules:[],
+	    compliance:[],
+	    debt:null,
+	    drift:null,
+	    runtimeDiagnostics:null,
+	    releaseBlockers:[],
+	    audit:[],
+	    waivers:[],
+	    impact:null
   };
 }
 
@@ -1352,8 +1356,8 @@ function saveTemplateRecord(tpl){
   var svc = graphicsSvc();
   var payload = cloneTemplateData(tpl);
   payload.templateId = payload.templateId || payload.id;
-  if(svc && typeof svc.saveTemplateDraft === 'function'){
-    svc.saveTemplateDraft(payload);
+  if(svc && typeof svc.cacheUnsavedTemplateDraft === 'function'){
+    svc.cacheUnsavedTemplateDraft(payload);
     return;
   }
   var store = readDraftCache();
@@ -1453,6 +1457,49 @@ function templateControlBadge(tpl){
   if(mode === 'bridged') return statusChip('admin', L('Bridged', 'Bridged'));
   if(mode === 'draft-cache') return statusChip('preview', L('Draft cache', 'Draft cache'));
   return statusChip('partial', L('Legacy', 'Legacy'));
+}
+
+function templateCompatibility(tpl, key){
+  var value = String((tpl && tpl[key]) || '').trim();
+  if(value) return value;
+  var modules = getModulesUsingTemplate(tpl || {});
+  if(key === 'regulatedCompatibility'){
+    return modules.some(function(id){ return /quality|qms|eqms|document|compliance/i.test(String(id)); }) ? 'explicit-required' : 'not-regulated';
+  }
+  return modules.some(function(id){ return /production|shopfloor|mes|dispatch|execution|line/i.test(String(id)); }) ? 'explicit-required' : 'standard-compatible';
+}
+
+function templateReleaseBlockers(tpl){
+  var id = tpl && (tpl.templateId || tpl.id) || '';
+  if(!id) return [];
+  var snap = graphicsSnapshot();
+  return (snap.releaseBlockers || []).filter(function(row){
+    var hay = [
+      row.templateId,
+      row.targetId,
+      row.subjectId,
+      row.moduleId,
+      row.reason,
+      row.message,
+      row.summary
+    ].join(' ');
+    return hay.indexOf(id) >= 0;
+  });
+}
+
+function templateDriftState(tpl){
+  var blockers = templateReleaseBlockers(tpl);
+  if(blockers.some(function(row){ return /drift/i.test([row.kind, row.type, row.reason, row.message].join(' ')); })) return 'drift-blocker';
+  if(String(tpl && tpl.status || '') === 'legacy-bridged') return 'legacy bridge';
+  return 'tracked';
+}
+
+function templatePublishEligibility(tpl){
+  if(!tpl) return 'no-template';
+  if(templateReleaseBlockers(tpl).length) return 'blocked';
+  if(tpl.status === 'validated' || tpl.status === 'controlled-draft' || tpl.status === 'published') return 'eligible';
+  if(tpl.status === 'draft-only') return 'save-draft-required';
+  return 'not-eligible';
 }
 
 function templateStateMachine(){
@@ -1724,6 +1771,7 @@ function renderDriftDetectorPanel(){
   var snap = graphicsSnapshot();
   var compliance = snap.compliance || [];
   var drift = snap.drift || {};
+  var debt = snap.debt || {};
   var selectorDebt = 0;
   var privateTokenDebt = 0;
   var hardcodedDebt = 0;
@@ -1737,6 +1785,10 @@ function renderDriftDetectorPanel(){
   if(drift.bridgeAliasDebt) selectorDebt = Number(drift.bridgeAliasDebt.debtCount || selectorDebt);
   if(drift.privateCssDebt) hardcodedDebt = Number(drift.privateCssDebt.totalDebtScore || hardcodedDebt);
   if(drift.moduleCompliance) blocked = Number(drift.moduleCompliance.nonCompliantCount || blocked);
+  if(debt.summary){
+    selectorDebt = Number(debt.summary.bridgeAliasDebtCount || selectorDebt);
+    hardcodedDebt = Number(debt.summary.privateCssDebtScore || hardcodedDebt);
+  }
   return sect(
     L('Drift detector', 'Drift detector'),
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
@@ -1750,10 +1802,62 @@ function renderDriftDetectorPanel(){
       + '</div>',
     true,
     statusChip(blocked ? 'partial' : 'full', blocked ? L('Drift found', 'Drift found') : L('No blocked module', 'No blocked module'))
-  );
-}
+	  );
+	}
 
-function renderWaiverGovernancePanel(){
+	function renderReleaseBlockersPanel(limit){
+	  var snap = graphicsSnapshot();
+	  var blockers = snap.releaseBlockers || [];
+	  var releaseBlocked = blockers.some(function(row){
+	    return row.releaseBlocked !== false && row.status !== 'waived' && row.waived !== true;
+	  });
+	  var rows = blockers.slice(0, limit || 10).map(function(row){
+	    return '<tr>'
+	      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(row.blockerId || row.id || row.kind || row.type || '-')+'</td>'
+	      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip(row.waived || row.status === 'waived' ? 'preview' : 'partial', row.status || row.severity || 'active')+'</td>'
+	      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.moduleId || row.templateId || row.targetId || row.subjectId || '-')+'</td>'
+	      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary);line-height:1.55">'+esc(row.reason || row.message || row.summary || '-')+'</td>'
+	      + '</tr>';
+	  }).join('');
+	  return sect(
+	    L('Release blockers', 'Release blockers'),
+	    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
+	      + infoCard(L('Active blockers', 'Active blockers'), String(blockers.length), blockers.length ? 'partial' : 'full')
+	      + infoCard(L('Release status', 'Release status'), releaseBlocked ? L('Blocked', 'Blocked') : L('Open', 'Open'), releaseBlocked ? 'partial' : 'full')
+	      + infoCard(L('Backend authority', 'Backend authority'), snap.backendAvailable ? L('Online', 'Online') : L('Fallback only', 'Fallback only'), snap.backendAvailable ? 'full' : 'partial')
+	      + '</div>'
+	      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+	      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Blocker</th>'
+	      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">State</th>'
+	      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Scope</th>'
+	      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Reason</th>'
+	      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="4" style="padding:12px;color:var(--text-secondary)">No active release blockers in current snapshot</td></tr>')+'</tbody></table>',
+	    true,
+	    statusChip(releaseBlocked ? 'partial' : 'full', releaseBlocked ? L('Release blocked', 'Release blocked') : L('No blocker', 'No blocker'))
+	  );
+	}
+
+	function renderRuntimeGraphicsDiagnosticsPanel(){
+	  var snap = graphicsSnapshot();
+	  var dx = snap.runtimeDiagnostics || {};
+	  return sect(
+	    L('Runtime graphics diagnostics', 'Runtime graphics diagnostics'),
+	    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">'
+	      + infoCard(L('Linkage status', 'Linkage status'), dx.linkageStatus || 'not checked', dx.linkageStatus === 'full-admin-controlled' ? 'full' : (dx.linkageStatus === 'blocked' ? 'partial' : 'admin'))
+	      + infoCard(L('Shared token probe', 'Shared token probe'), String(dx.sharedTokenProbeCount || 0), (dx.sharedTokenProbeCount || 0) >= 3 ? 'full' : 'partial')
+	      + infoCard(L('hm-* consumers', 'hm-* consumers'), String(dx.hmComponentConsumerCount || 0), (dx.hmComponentConsumerCount || 0) ? 'full' : 'partial')
+	      + infoCard(L('Private shell selectors', 'Private shell selectors'), String(dx.privateShellSelectorCount || 0), (dx.privateShellSelectorCount || 0) ? 'partial' : 'full')
+	      + infoCard(L('Inline style count', 'Inline style count'), String(dx.inlineStyleCount || 0), (dx.inlineStyleCount || 0) ? 'admin' : 'full')
+	      + '</div>'
+	      + '<div style="margin-top:10px;font-size:11px;line-height:1.7;color:var(--text-secondary)">'
+	      + esc(L('Diagnostics chứng minh runtime shell đang đọc shared tokens/hm-* contracts. Legacy private CSS vẫn được ghi nhận là debt và có thể tạo release blocker.', 'Diagnostics prove whether the runtime shell consumes shared tokens and hm-* contracts. Legacy private CSS remains recorded as debt and may produce release blockers.'))
+	      + '</div>',
+	    true,
+	    statusChip(dx.releaseBlocker ? 'partial' : 'full', dx.releaseBlocker ? L('Runtime blocker', 'Runtime blocker') : L('Runtime linked', 'Runtime linked'))
+	  );
+	}
+
+	function renderWaiverGovernancePanel(){
   var snap = graphicsSnapshot();
   var waiverRows = (snap.waivers || []).slice(0, 5).map(function(row){
     return '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.waiverId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || row.targetId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td></tr>';
@@ -1987,17 +2091,20 @@ function renderTemplateCard(tpl){
     +   '<div class="tpl-gallery-desc">'+esc((tpl.name && tpl.name.en) || '')+'</div>'
     +   '<div class="tpl-gallery-desc" style="margin-top:4px;color:var(--text-tertiary)">'+esc(tpl.desc.vi)+'</div>'
     +   '<div class="tpl-gallery-chips">'
-    +     templateStatusChip(tpl)
-    +     templateControlBadge(tpl)
-    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
-    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
-    +   '</div>'
+	      +     templateStatusChip(tpl)
+	      +     templateControlBadge(tpl)
+	      +     statusChip(templatePublishEligibility(tpl) === 'eligible' ? 'full' : (templatePublishEligibility(tpl) === 'blocked' ? 'partial' : 'preview'), templatePublishEligibility(tpl))
+	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
+	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
+	      +   '</div>'
     +   '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px">'
-    +     smallMeta('version', tpl.version || '1.0.0')
-    +     smallMeta('owner', tpl.owner || '-')
-    +     smallMeta('modules', modulesUsing.length)
-    +     smallMeta('authority', tpl.sourceAuthority || tpl.controlMode || '-')
-    +   '</div>'
+	      +     smallMeta('version', tpl.version || '1.0.0')
+	      +     smallMeta('owner', tpl.owner || '-')
+	      +     smallMeta('modules', modulesUsing.length)
+	      +     smallMeta('authority', tpl.sourceAuthority || tpl.controlMode || '-')
+	      +     smallMeta('regulated', templateCompatibility(tpl, 'regulatedCompatibility'))
+	      +     smallMeta('shopfloor', templateCompatibility(tpl, 'shopfloorCompatibility'))
+	      +   '</div>'
     + '</div>'
     + '</div>';
 }
@@ -2054,15 +2161,19 @@ function renderTemplateDetail(id){
     + smallMeta('templateId', tpl.templateId || tpl.id)
     + smallMeta('version', tpl.version || '1.0.0')
     + smallMeta('status', templateStatusLabel(tpl.status))
-    + smallMeta('owner', tpl.owner || '-')
-    + smallMeta('zone count', tpl.zoneCount || 0)
-    + smallMeta('governed modules', modulesUsing.length)
-    + '</div>'
+	    + smallMeta('owner', tpl.owner || '-')
+	    + smallMeta('zone count', tpl.zoneCount || 0)
+	    + smallMeta('governed modules', modulesUsing.length)
+	    + smallMeta('regulated compatibility', templateCompatibility(tpl, 'regulatedCompatibility'))
+	    + smallMeta('shopfloor compatibility', templateCompatibility(tpl, 'shopfloorCompatibility'))
+	    + smallMeta('drift state', templateDriftState(tpl))
+	    + smallMeta('publish eligibility', templatePublishEligibility(tpl))
+	    + '</div>'
     + '<div style="font-size:11px;color:var(--text-secondary);margin-top:10px;line-height:1.6"><strong>'+esc(T('layoutContract'))+':</strong> '+esc(tpl.layoutMeta)+'</div><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6"><strong>'+esc(T('modulesUsing'))+':</strong> '+esc(modulesUsing.join(', ') || '-')+'</div></div>';
   h += '</div>';
   h += '<div class="zone-scrollable" style="display:grid;gap:14px;max-height:620px;padding-right:4px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>'+renderZoneMiniDiagram(tpl)+'</div>';
-  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">templateId</td><td style="padding:6px 0;text-align:right;color:var(--text-primary);font-family:var(--font-mono)">'+esc(tpl.templateId || tpl.id)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">version</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.version || '1.0.0')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">status</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+templateStatusChip(tpl)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">owner</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.owner || '-')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr></table></div>';
+	  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">templateId</td><td style="padding:6px 0;text-align:right;color:var(--text-primary);font-family:var(--font-mono)">'+esc(tpl.templateId || tpl.id)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">version</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.version || '1.0.0')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">status</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+templateStatusChip(tpl)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">owner</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.owner || '-')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">regulated</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templateCompatibility(tpl, 'regulatedCompatibility'))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">shopfloor</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templateCompatibility(tpl, 'shopfloorCompatibility'))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">publish eligibility</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(templatePublishEligibility(tpl))+'</td></tr></table></div>';
   h += '</div></div>';
   return h;
 }
@@ -2082,10 +2193,14 @@ function renderTemplateEditor(id){
     + smallMeta('templateId', tpl.templateId || tpl.id)
     + smallMeta('version', tpl.version || '1.0.0')
     + smallMeta('status', templateStatusLabel(tpl.status))
-    + smallMeta('owner', tpl.owner || '-')
-    + smallMeta('zone count', tpl.zoneCount || 0)
-    + smallMeta('governed modules', getModulesUsingTemplate(tpl).length)
-    + '</div>';
+	    + smallMeta('owner', tpl.owner || '-')
+	    + smallMeta('zone count', tpl.zoneCount || 0)
+	    + smallMeta('governed modules', getModulesUsingTemplate(tpl).length)
+	    + smallMeta('regulated compatibility', templateCompatibility(tpl, 'regulatedCompatibility'))
+	    + smallMeta('shopfloor compatibility', templateCompatibility(tpl, 'shopfloorCompatibility'))
+	    + smallMeta('drift state', templateDriftState(tpl))
+	    + smallMeta('publish eligibility', templatePublishEligibility(tpl))
+	    + '</div>';
   h += textInput(L('Tên template (VI)','Template name (VI)'), '', 'template.editor.nameVi', tpl.name.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.nameVi\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.vi\',this.value)"');
   h += textInput(L('Tên template (EN)','Template name (EN)'), '', 'template.editor.nameEn', tpl.name.en, '').replace('oninput="_hmSet(\'\',\'template.editor.nameEn\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.en\',this.value)"');
   h += textInput(L('Mô tả ngắn','Short description'), '', 'template.editor.desc', tpl.desc.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.desc\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'desc.vi\',this.value)"');
@@ -2923,11 +3038,13 @@ function renderGovernance(){
     statusChip('admin', 'Standard 36') + statusChip('full', L('Governed behaviors', 'Governed behaviors'))
   );
   h += renderAuthorityStatusPanel();
-  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
-  h += renderComplianceMatrixPanel();
-  h += renderDriftDetectorPanel();
-  h += renderAuditHistoryPanel(10);
-  h += renderWaiverGovernancePanel();
+	  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
+	  h += renderComplianceMatrixPanel();
+	  h += renderDriftDetectorPanel();
+	  h += renderReleaseBlockersPanel(10);
+	  h += renderRuntimeGraphicsDiagnosticsPanel();
+	  h += renderAuditHistoryPanel(10);
+	  h += renderWaiverGovernancePanel();
 
   h += sectionLead(
     L('Governance theo template đã được kích hoạt', 'Template-centric governance is now active'),
@@ -3090,7 +3207,12 @@ function renderGovernance(){
 /* ── SUB-TAB 8: ADVANCED ────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderAdvanced(){
-  var h = renderApiContractPanel();
+  var selected = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
+  var h = renderRolloutControls(selected);
+  h += renderReleaseBlockersPanel(8);
+  h += renderWaiverGovernancePanel();
+  h += renderAuditHistoryPanel(8);
+  h += renderApiContractPanel();
 
   h += sect('📤 '+T('importExport'),
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'
@@ -3102,11 +3224,11 @@ function renderAdvanced(){
     +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry_get.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry_get.'))+'</div>'
   , true);
 
-  h += sect('🖊️ '+T('customCSS'),
-    '<textarea id="adm_custom_css" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary);resize:vertical"'
-    +' oninput="HmTheme.setDeep(\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
-    +'<div style="font-size:10px;color:var(--text-tertiary);margin-top:4px">CSS injected LAST with highest priority. Use sparingly.</div>'
-  , false);
+	  h += sect('🖊️ '+T('customCSS'),
+	    '<textarea id="adm_custom_css" style="width:100%;min-height:120px;font-family:var(--font-mono);font-size:12px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface-alt,#f8fafc);color:var(--text-primary);resize:vertical"'
+	    +' oninput="HmTheme.setDeep(\'advanced.customCSS\',this.value)">'+(cfg('advanced.customCSS')||'')+'</textarea>'
+	    +'<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6">'+esc(L('Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.', 'Emergency/exception use only. Custom CSS must have a waiver, owner, expiry, and migration path back to shared token/component contracts before rollout.'))+'</div>'
+	  , false, statusChip('partial', L('Exception only', 'Exception only')));
 
   h += sect('♿ WCAG '+T('wcag'),
     (function(){
@@ -3145,7 +3267,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260413a';
+window._renderAdminAppearanceFullVersion = '20260413b';
 window._renderAdminAppearanceFull = render;
 
 })();

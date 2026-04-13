@@ -1147,6 +1147,8 @@ html[data-color-scheme-active="dark"]{
 <a href="#token-cascade">Token Cascade</a>
 <a href="#governance">Governance</a>
 <a href="#standard-36-alignment-overview">Authority</a>
+<a href="#admin-graphics-control-plane">Graphics Control Plane</a>
+<a href="#backend-graphics-authority-api-contract">Graphics API</a>
 <a href="#module-archetypes-standard-36">Archetypes</a>
 <a href="#template-naming-standard-archetype">Template ID</a>
 <a href="#module-build-packet-standard-36">Build Packet</a>
@@ -1364,6 +1366,229 @@ html[data-color-scheme-active="dark"]{
 </div>
 </div>
 </section>
+<section class="section" id="admin-graphics-control-plane">
+<h2 class="section-title"><span class="section-number">2A</span>Admin Graphics Control Plane <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Admin Appearance là control surface duy nhất cho graphics authority của ERP/MOM/MES/eQMS. Tài liệu này là human-readable authority; backend registry, runtime projection và release evidence là machine authority.</p>
+<div class="grid-2" style="margin-bottom:18px">
+<div class="card">
+<div class="card-header"><span class="chip chip-red">Controlled Rule</span>Traceability bắt buộc</div>
+<div class="card-body">
+Mọi đồ họa module production PHẢI truy vết được theo chuỗi:
+<pre class="code-block">Admin Appearance
+  -> backend graphics authority
+  -> controlled template registry
+  -> shared hm-* component contracts
+  -> shared/bridge tokens
+  -> module UI thật
+  -> release evidence</pre>
+Không module nào được tạo private visual shell, token riêng hoặc CSS runtime riêng để đi vòng qua chuỗi này. LocalStorage chỉ được dùng cho preview cache, unsaved draft cache và last-view/filter/sort cache.
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="chip chip-blue">State Diagram</span>Graphics governance path</div>
+<div class="card-body">
+<pre class="code-block">preview-only
+  -> draft-saved
+  -> validated
+  -> impact-analysis-recorded
+  -> compliance-reviewed
+  -> staged
+  -> applied
+  -> audited
+
+blocked transitions:
+  validation-failed -> publish-blocked
+  impact-unresolved -> publish-blocked
+  release-blocker-active -> publish-blocked
+  approved-waiver-expired -> publish-blocked
+  rollback-target-invalid -> publish-blocked</pre>
+</div>
+</div>
+</div>
+<div class="info-box info-box-red"><strong>Authority split.</strong> HTML authority mô tả rule, state và evidence. Backend authority quyết định version, publish/apply/rollback, waiver, audit và release blocker. Runtime chỉ consume projection; không tự tạo source of truth.</div>
+</section>
+
+<section class="section" id="controlled-template-registry-governance">
+<h2 class="section-title"><span class="section-number">2B</span>Controlled Template Registry Governance <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Template registry production không được sống ở browser cache. Canonical ownership thuộc backend graphics authority và registry artifacts được kiểm soát version/checksum.</p>
+<div class="card" style="margin-bottom:18px">
+<div class="card-header">Template lifecycle</div>
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>State</th><th>Meaning</th><th>Allowed transition</th><th>Block condition</th></tr></thead>
+<tbody>
+<tr><td><code>draft-only</code></td><td>Chỉ tồn tại trong unsaved draft cache hoặc preview cache.</td><td>save draft</td><td>Không có <code>templateId</code>, owner hoặc version.</td></tr>
+<tr><td><code>controlled-draft</code></td><td>Backend đã nhận draft, có owner/version và optimistic concurrency.</td><td>validate</td><td>Zone/block/module reference sai.</td></tr>
+<tr><td><code>validated</code></td><td>Schema, zones, blocks, compatibility và references pass.</td><td>impact analysis, publish</td><td>Impact chưa recorded hoặc gate evidence thiếu.</td></tr>
+<tr><td><code>publish-blocked</code></td><td>Template không được đưa vào production.</td><td>resolve blocker hoặc request waiver</td><td>Blocker/waiver/evidence chưa hợp lệ.</td></tr>
+<tr><td><code>published</code></td><td>Production authority; module mới được bind nếu compliance pass.</td><td>deprecate, rollback snapshot</td><td>Rollback target invalid hoặc registry changed since stage.</td></tr>
+<tr><td><code>deprecated</code></td><td>Không cho module mới; phải có migration plan.</td><td>retire sau migration</td><td>Module còn dùng nhưng thiếu migration plan.</td></tr>
+<tr><td><code>legacy-bridged</code></td><td>Template cũ chỉ được bridge về shared tokens.</td><td>migrate to controlled</td><td>Private visual shell hoặc debt chưa có reason.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-header">Required registry fields</div>
+<div class="card-body">
+<pre class="code-block">TemplateRegistryEntry {
+  templateId,
+  version,
+  owner,
+  status,
+  allowedZones,
+  allowedBlocks,
+  governedModules,
+  regulatedCompatibility,
+  shopfloorCompatibility,
+  updatedBy,
+  updatedAt,
+  evidenceRefs
+}</pre>
+<p>Publish chỉ hợp lệ khi version bump lớn hơn approved version hiện tại, impact analysis còn hiệu lực, gate evidence đủ, release manifest refs tồn tại và không có unresolved blocker. Deprecation yêu cầu migration plan khi template còn governed modules.</p>
+</div>
+</div>
+</section>
+
+<section class="section" id="graphics-impact-analysis-matrix">
+<h2 class="section-title"><span class="section-number">2C</span>Graphics Impact Analysis Matrix <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Mọi thay đổi token, theme, component contract, template zone hoặc allowed block phải tạo impact report trước publish/apply.</p>
+<div class="card">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Change source</th><th>Required computed impact</th><th>Severity</th><th>Required evidence</th></tr></thead>
+<tbody>
+<tr><td>Token/theme preset</td><td>Affected modules, routes, screens, block families, token adoption coverage.</td><td>low, medium, high</td><td>Before/after token snapshot + visual smoke.</td></tr>
+<tr><td>Shared component contract</td><td>Consumers count, governed modules count, contract debt, affected block families.</td><td>medium, high, regulated</td><td>Component contract diff + consumer screenshot set.</td></tr>
+<tr><td>Template zone</td><td>Affected templates, modules, screens, routes, layout gates.</td><td>medium, shopfloor-critical</td><td>Responsive/keyboard/screenshot evidence.</td></tr>
+<tr><td>Allowed blocks</td><td>Block families, module builder candidates, release blockers.</td><td>medium, regulated</td><td>Builder validation + block schema evidence.</td></tr>
+<tr><td>Regulated/shopfloor module touched</td><td>Regulated modules touched, shopfloor modules touched, gates to rerun, blockers.</td><td>regulated, shopfloor-critical</td><td>QA gate matrix, CSA/Part 11 or operator walkthrough evidence.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="info-box info-box-amber"><strong>Release blocker summary.</strong> Impact report PHẢI trả <code>affectedModules</code>, <code>affectedRoutes</code>, <code>affectedScreens</code>, <code>affectedBlockFamilies</code>, <code>regulatedModulesTouched</code>, <code>shopfloorModulesTouched</code>, <code>gatesToRerun</code> và <code>blockers</code>. Publish không được tự tính lại ở browser rồi bỏ qua backend attestation.</div>
+</section>
+
+<section class="section" id="module-graphics-compliance-matrix">
+<h2 class="section-title"><span class="section-number">2D</span>Module Graphics Compliance Matrix <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Mỗi module phải có một trạng thái linkage duy nhất và reason text khi chưa full-controlled.</p>
+<div class="card">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Status</th><th>Rule</th><th>Fields required</th><th>Upgrade acceptance</th></tr></thead>
+<tbody>
+<tr><td><code>full-admin-controlled</code></td><td>Consumes shared tokens, shared hm-* components and controlled template binding.</td><td rowspan="4"><code>moduleId</code>, <code>route</code>, <code>templateBindingSource</code>, <code>sharedTokenCoverage</code>, <code>sharedComponentCoverage</code>, <code>bridgeAliasDebt</code>, <code>privateCssDebt</code>, <code>hardcodedStyleDebt</code>, <code>driftStatus</code>, <code>blockerReason</code>.</td><td>Zero blocker debt, documented route/template binding, release evidence present.</td></tr>
+<tr><td><code>bridged-to-shared-tokens</code></td><td>Legacy selector layer exists but aliases resolve back to shared tokens.</td><td>Bridge aliases thin, debt counted, migration owner/date present.</td></tr>
+<tr><td><code>legacy-private-css</code></td><td>Module still owns private visual shell or hardcoded styles.</td><td>Must have reason text, release blocker for new build, remediation plan.</td></tr>
+<tr><td><code>blocked</code></td><td>Module violates graphics authority and cannot publish without approved waiver.</td><td>Waiver or remediation required before release.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="section" id="graphics-drift-detector">
+<h2 class="section-title"><span class="section-number">2E</span>Graphics Drift Detector <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Drift detection chạy theo module và sinh release blocker khi đồ họa không còn traceable về admin/shared authority.</p>
+<div class="grid-2">
+<div class="card">
+<div class="card-header">Drift types</div>
+<div class="card-body">
+<ul>
+<li><code>token drift</code>: raw color/spacing/radius/shadow khi shared token tồn tại.</li>
+<li><code>component contract drift</code>: module không dùng hoặc fork shared hm-* contract.</li>
+<li><code>template drift</code>: route/screen không khớp controlled template binding.</li>
+<li><code>runtime selector drift</code>: selector runtime không nằm trong component/bridge allowlist.</li>
+<li><code>private CSS drift</code>: module tự định nghĩa shell riêng.</li>
+<li><code>inline style drift</code>: inline style dùng cho design decision thay vì computed geometry.</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<div class="card-header">Remediation path</div>
+<div class="card-body">
+<pre class="code-block">detect drift
+  -> classify module status
+  -> create blocker/reason
+  -> run impact analysis
+  -> migrate to shared token/component/template
+  -> validate
+  -> stage rollout
+  -> apply or rollback
+  -> attach evidence</pre>
+</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="graphics-publish-apply-rollback-waiver-flow">
+<h2 class="section-title"><span class="section-number">2F</span>Graphics Publish / Apply / Rollback / Waiver Flow <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<div class="card" style="margin-bottom:18px">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Transition</th><th>Allowed actor</th><th>Required evidence</th><th>Block rule</th></tr></thead>
+<tbody>
+<tr><td><code>preview-only -> draft-saved</code></td><td>Graphics editor</td><td>Template fields, owner, version, expectedVersion.</td><td>Browser cache alone cannot promote authority.</td></tr>
+<tr><td><code>draft-saved -> validated</code></td><td>Graphics editor or platform admin</td><td>Schema, zone, block, governed module references.</td><td>Invalid zone/block/module reference.</td></tr>
+<tr><td><code>validated -> staged</code></td><td>Release owner</td><td>Impact report, gate evidence, release manifest refs.</td><td>Unresolved impact blockers.</td></tr>
+<tr><td><code>staged -> applied</code></td><td>Authorized release owner</td><td>Registry ETag unchanged since stage, rollback snapshot, audit event.</td><td>Active release blocker or stale registry.</td></tr>
+<tr><td><code>applied -> rolled-back</code></td><td>Release owner</td><td>Valid rollback snapshot and rollback reason.</td><td>Rollback target invalid or missing snapshot.</td></tr>
+<tr><td><code>blocked -> waived</code></td><td>Approver with graphics governance permission</td><td><code>waiverId</code>, <code>scope</code>, <code>risk</code>, <code>compensatingControl</code>, <code>owner</code>, <code>approver</code>, <code>expiresAt</code>.</td><td>Regulated/shopfloor high-risk waiver missing document control refs or release manifest refs.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="info-box info-box-red"><strong>Waiver rule.</strong> Waiver is never permanent design authority. It must expire, name a compensating control, include owner/approver, and create audit/release evidence. Regulated and shopfloor-critical waivers require explicit risk class and evidence references.</div>
+</section>
+
+<section class="section" id="backend-graphics-authority-api-contract">
+<h2 class="section-title"><span class="section-number">2G</span>Backend Graphics Authority API Contract <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Frontend Admin chỉ gọi service contract; endpoint/action không được hardcode rải rác trong UI controls.</p>
+<div class="card">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Group</th><th>Actions / REST</th><th>Contract</th><th>Audit mapping</th></tr></thead>
+<tbody>
+<tr><td>Design config</td><td><code>admin_design_config</code>, <code>admin_design_config_save</code>, <code>/api/graphics/design-config</code></td><td><code>DesignConfig</code>, version/ETag.</td><td><code>graphics.design_config.saved</code></td></tr>
+<tr><td>Template registry</td><td><code>admin_template_registry_get</code>, <code>admin_template_get</code>, <code>admin_template_draft_save</code>, <code>admin_template_validate</code>, <code>admin_template_publish</code>, <code>admin_template_deprecate</code>, <code>admin_template_modules_get</code>.</td><td><code>TemplateRegistryEntry</code>, <code>TemplateDraft</code>, <code>TemplateValidationResult</code>.</td><td>draft/validate/publish/deprecate events.</td></tr>
+<tr><td>Impact</td><td><code>admin_graphics_impact_token</code>, <code>admin_graphics_impact_template</code>, <code>admin_graphics_impact_component</code>.</td><td><code>GraphicsImpactReport</code>.</td><td><code>graphics.impact.*</code></td></tr>
+<tr><td>Compliance/debt/drift</td><td><code>admin_graphics_compliance_get</code>, <code>admin_graphics_non_compliant_get</code>, <code>admin_graphics_debt_get</code>, <code>admin_graphics_drift_get</code>.</td><td><code>ModuleGraphicsComplianceEntry</code>, <code>GraphicsDebtReport</code>, <code>GraphicsDriftReport</code>.</td><td>read-only evidence snapshot.</td></tr>
+<tr><td>Rollout</td><td><code>admin_graphics_rollout_stage</code>, <code>admin_graphics_rollout_apply</code>, <code>admin_graphics_rollout_rollback</code>.</td><td><code>GraphicsRolloutRequest</code>, <code>GraphicsRolloutResult</code>.</td><td>stage/apply/rollback events.</td></tr>
+<tr><td>Audit/waiver/blockers</td><td><code>admin_graphics_audit_history_get</code>, <code>admin_graphics_waiver_create</code>, <code>admin_graphics_waiver_approve</code>, <code>admin_graphics_waiver_expire</code>, <code>admin_graphics_waiver_active_get</code>, <code>admin_graphics_release_blockers_get</code>.</td><td><code>GraphicsAuditEvent</code>, <code>GraphicsWaiver</code>, <code>GraphicsReleaseBlocker</code>, <code>GraphicsReleaseLink</code>.</td><td>waiver and release blocker evidence.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="info-box info-box-blue"><strong>Error model.</strong> Mutating endpoints require optimistic concurrency using <code>If-Match</code> or <code>expectedVersion</code>. Backend errors use problem-detail semantics with <code>status</code>, <code>code</code>, <code>detail</code>, optional <code>errors</code> and current authority version/ETag.</div>
+</section>
+
+<section class="section" id="admin-graphics-governance-module-builder-release-linkage">
+<h2 class="section-title"><span class="section-number">2H</span>Admin Graphics Governance + Module Builder + Release Linkage <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<div class="card">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Layer</th><th>Required linkage</th><th>Release evidence</th></tr></thead>
+<tbody>
+<tr><td>Module Builder</td><td>Reads graphics compliance, active blockers, unresolved impact reports and waiver validity before publish.</td><td>Builder publish decision + blocker snapshot.</td></tr>
+<tr><td>QA gates</td><td>Gate applicability changes when graphics impact touches regulated/shopfloor modules.</td><td>G07-G19 evidence rerun list, screenshots, keyboard/focus trace.</td></tr>
+<tr><td>Release manifest</td><td>Contains graphics authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waivers ref.</td><td><code>GraphicsReleaseLink</code> in manifest.</td></tr>
+<tr><td>Evidence bundle</td><td>Affected modules snapshot, compliance matrix snapshot, drift report, rollout decision and rollback plan.</td><td>Immutable evidence package.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="section" id="admin-family-upgrade-cat-admin">
+<h2 class="section-title"><span class="section-number">2I</span>Admin Family Upgrade in cat-admin <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">cat-admin không chỉ là admin module family; nó là admin authority family cho identity, graphics, endpoint, waiver, release và observability.</p>
+<div class="grid-2">
+<div class="card"><div class="card-header">Authority family scopes</div><div class="card-body"><ul><li>Identity/role governance.</li><li>Graphics governance.</li><li>Template authority.</li><li>Endpoint authority.</li><li>Waiver authority.</li><li>Release governance.</li></ul></div></div>
+<div class="card"><div class="card-header">Operational consoles</div><div class="card-body"><ul><li>Observability of graphics change.</li><li>Graphics audit console.</li><li>Release blocker dashboard.</li><li>Rollback decision console.</li><li>Controlled exception queue.</li></ul></div></div>
+</div>
+</section>
+
 <section class="section" id="standards">
 <h2 class="section-title"><span class="section-number">3</span>Quy chuẩn đồ họa <span class="chip" style="margin-left:12px;font-size:0.625rem;vertical-align:middle;background:var(--bg-surface-alt);color:var(--text-secondary)">REFERENCE</span></h2>
 <p class="section-subtitle">Bộ quy tắc bắt buộc cho toàn bộ đồ họa phần mềm. Tham khảo SAP Fiori, Material 3, Atlassian, IBM Carbon, Ant Design.</p>
@@ -8788,7 +9013,7 @@ Không copy pattern này vào runtime.</pre>
 </div>
 <div class="info-box info-box-red">
 <strong>CÁC KEY ĐÚNG TRONG CODE</strong>
-  Code hiện dùng <code>hesem_user_appearance</code>, <code>hesem_admin_appearance_cache</code>, <code>hesem_layout_templates</code>, <code>hesem_module_template_binding</code>. Các key khác trong section này là TARGET KEYS cho controlled migration, không được ghi mới nếu chưa có migration/reader tương ứng.
+  Code hiện dùng <code>hesem_user_appearance</code> cho user preference và <code>hesem_graphics_template_preview_cache</code>/<code>hesem_graphics_template_draft_cache</code> cho preview/draft cache. <code>hesem_admin_appearance_cache</code>, <code>hesem_layout_templates</code> và <code>hesem_module_template_binding</code> là legacy/disabled compatibility keys, không được dùng làm production authority.
 </div>
 <div class="grid-5" style="margin-top:18px;margin-bottom:18px">
 <div class="card"><div class="card-body" style="padding:14px;text-align:center"><div style="font-size:0.625rem;font-weight:900;color:var(--brand-2)">L1 System CSS</div><div style="font-size:0.6875rem;color:var(--text-secondary);margin-top:4px">design tokens gốc</div><div style="font-family:var(--mono);font-size:0.625rem;margin-top:6px;color:var(--brand-2)">--text-base:0.875rem</div></div></div>
@@ -8835,12 +9060,12 @@ Không copy pattern này vào runtime.</pre>
 <thead><tr><th>Key</th><th>Mục đích</th><th>Dữ liệu ví dụ</th></tr></thead>
 <tbody>
 <tr><td><code>hesem_user_appearance</code></td><td>Key code-authoritative cho lựa chọn cá nhân: theme/color mode, font size, radius, motion và density. <code>density</code> là property bên trong object này, KHÔNG phải key riêng.</td><td><code>{ "theme": "professional-light", "density": "compact", "motion": "normal" }</code></td></tr>
-<tr><td><code>hesem_admin_appearance_cache</code></td><td>Cache cấu hình appearance cấp admin/org. Đây là Layer 2 trong cascade và phải refresh từ server khi cache hết hạn hoặc thiếu metadata.</td><td><code>{ "cachedAt": "2026-04-11T00:00:00Z", "config": {} }</code></td></tr>
-<tr><td><code>hesem_layout_templates</code></td><td>Lưu template configs/custom clones cho Template Studio. Đây là nguồn template local hiện tại trước khi có server-persisted template endpoint.</td><td><code>{ "sales-list-default": { "zones": [], "tokens": {} } }</code></td></tr>
-<tr><td><code>hesem_module_template_binding</code></td><td>Lưu binding module → template trong admin appearance. Giữ làm compatibility key cho target <code>hesem_active_template_{moduleId}</code>.</td><td><code>{ "sales-orders": "sales-list-default" }</code></td></tr>
-<tr><td><code>hesem_active_template_{moduleId}</code></td><td>Planned runtime key để đọc nhanh template active theo module. Không ghi mới nếu chưa có migration từ <code>hesem_module_template_binding</code>.</td><td><code>{ "templateId": "sales-list-default", "version": "1.0.0" }</code></td></tr>
-<tr><td><code>hesem_template_preview_device</code></td><td>Planned key cho preview UI trong Template Editor. Hiện chưa thấy reader/writer authoritative trong <code>00b</code>/<code>00c</code>.</td><td><code>{ "device": "tablet" }</code></td></tr>
-<tr><td><code>hesem_template_preview_theme</code></td><td>Planned key cho preview theme tạm thời. Runtime deploy không được phụ thuộc key này.</td><td><code>{ "themeId": "professional-light" }</code></td></tr>
+<tr><td><code>hesem_graphics_template_preview_cache</code></td><td>Preview-only cache cho template/token override trong Admin Appearance. Không được publish, bind module hoặc ghi release state từ key này.</td><td><code>{ "T13": { "tokenOverrides": {} } }</code></td></tr>
+<tr><td><code>hesem_graphics_template_draft_cache</code></td><td>Unsaved draft cache cho editor. Chỉ tồn tại trước khi <code>admin_template_draft_save</code> ghi controlled draft ở backend.</td><td><code>{ "C123456": { "status": "draft-only" } }</code></td></tr>
+<tr><td><code>hesem_admin_appearance_cache</code></td><td>Legacy disabled key. Theme runtime không ghi key này như authority/cache mới; admin design config phải đọc backend hoặc controlled JSON fallback.</td><td><code>{ "legacy": true }</code></td></tr>
+<tr><td><code>hesem_layout_templates</code></td><td>Forbidden legacy authority key. Nếu gặp dữ liệu cũ, chỉ bridge/migrate qua backend graphics governance; không đọc làm production registry.</td><td><code>{ "legacyTemplate": "not-authority" }</code></td></tr>
+<tr><td><code>hesem_module_template_binding</code></td><td>Forbidden legacy binding authority. Module binding production phải nằm trong controlled registry/compliance matrix.</td><td><code>{ "legacy": "read-only-migration-source" }</code></td></tr>
+<tr><td><code>hesem_active_template_{moduleId}</code></td><td>Không dùng làm runtime authority. Nếu cần cache runtime sau này, phải sinh từ backend template registry projection với version/checksum.</td><td><code>{ "templateId": "T13", "source": "projection-cache-only" }</code></td></tr>
 <tr><td><code>hesem_zone_scroll_debug</code></td><td>Planned key cho debug zone/scroll/sticky anchors. Không bật trong production nếu chưa có permission/debug guard.</td><td><code>{ "enabled": true }</code></td></tr>
 </tbody>
 </table>

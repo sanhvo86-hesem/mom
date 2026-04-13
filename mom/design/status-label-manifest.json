@@ -1,20 +1,20 @@
 {
   "_meta": {
-    "version": "2026.04.11-v4.8-evidence-first",
-    "generatedAt": "2026-04-11T00:00:00+07:00",
+    "version": "2026.04.13-graphics-control-plane",
+    "generatedAt": "2026-04-13T00:00:00+07:00",
     "authorityRole": "generated_truth",
     "source": "mom/docs/module-layout-template-design-system-v4.html",
     "sourceCounts": {
-      "parseableSectionElements": 89,
-      "rawSectionTagsIncludingComments": 89,
-      "sectionTitleMarkers": 89
+      "parseableSectionElements": 98,
+      "rawSectionTagsIncludingComments": 98,
+      "sectionTitleMarkers": 98
     },
     "rule": "Generated from current HTML section headers. Do not hand-edit counts in HTML."
   },
   "summary": {
     "REFERENCE": 40,
     "PARTIAL": 31,
-    "ENFORCED NOW": 6,
+    "ENFORCED NOW": 15,
     "TARGET": 12
   },
   "sections": [
@@ -29,6 +29,60 @@
       "id": "architecture",
       "title": "Kiến trúc hệ thống",
       "status": "REFERENCE"
+    },
+    {
+      "number": "2A",
+      "id": "admin-graphics-control-plane",
+      "title": "Admin Graphics Control Plane",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2B",
+      "id": "controlled-template-registry-governance",
+      "title": "Controlled Template Registry Governance",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2C",
+      "id": "graphics-impact-analysis-matrix",
+      "title": "Graphics Impact Analysis Matrix",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2D",
+      "id": "module-graphics-compliance-matrix",
+      "title": "Module Graphics Compliance Matrix",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2E",
+      "id": "graphics-drift-detector",
+      "title": "Graphics Drift Detector",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2F",
+      "id": "graphics-publish-apply-rollback-waiver-flow",
+      "title": "Graphics Publish / Apply / Rollback / Waiver Flow",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2G",
+      "id": "backend-graphics-authority-api-contract",
+      "title": "Backend Graphics Authority API Contract",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2H",
+      "id": "admin-graphics-governance-module-builder-release-linkage",
+      "title": "Admin Graphics Governance + Module Builder + Release Linkage",
+      "status": "ENFORCED NOW"
+    },
+    {
+      "number": "2I",
+      "id": "admin-family-upgrade-cat-admin",
+      "title": "Admin Family Upgrade in cat-admin",
+      "status": "ENFORCED NOW"
     },
     {
       "number": 3,

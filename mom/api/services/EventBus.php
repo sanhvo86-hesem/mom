@@ -211,6 +211,72 @@ final class EventBus
             $state = $event->payload['state'] ?? 'unknown';
             $this->broadcaster?->mesStateChanged($machineId, $state, $event->payload);
         });
+
+        // ─── AI Reactive Rules / Quy tắc phản ứng AI ─────────────────────────
+
+        // Rule: SPC out-of-control → create AI prediction
+        // Quy tắc: SPC vượt kiểm soát → tạo dự đoán AI
+        $this->on(DomainEvent::SPC_OUT_OF_CONTROL, function (DomainEvent $event) {
+            try {
+                $pipeline = new AiPredictionPipeline('');
+                $pipeline->createPrediction([
+                    'prediction_type'  => 'spc_anomaly',
+                    'severity'         => ($event->payload['rule_violations'] ?? 0) >= 3 ? 'critical' : 'warning',
+                    'entity_type'      => 'spc_observation',
+                    'entity_id'        => $event->payload['observation_id'] ?? $event->aggregateId,
+                    'machine_id'       => $event->payload['machine_id'] ?? '',
+                    'confidence_score' => 85.0,
+                    'recommendation'   => 'SPC out-of-control detected: ' . ($event->payload['rules_triggered'] ?? 'unknown rules'),
+                    'metadata'         => $event->payload,
+                ]);
+            } catch (\Throwable $e) {
+                @error_log('[EventBus/AI] SPC rule failed: ' . $e->getMessage());
+            }
+        });
+
+        // Rule: Machine alarm/fault → equipment failure prediction
+        // Quy tắc: Máy báo lỗi/sự cố → dự đoán lỗi thiết bị
+        $this->on(DomainEvent::MACHINE_STATE_CHANGED, function (DomainEvent $event) {
+            $state = $event->payload['new_state'] ?? $event->payload['state'] ?? '';
+            if (!in_array($state, ['alarm', 'fault', 'emergency_stop'], true)) {
+                return;
+            }
+            try {
+                $pipeline = new AiPredictionPipeline('');
+                $pipeline->createPrediction([
+                    'prediction_type'  => 'equipment_failure',
+                    'severity'         => $state === 'emergency_stop' ? 'critical' : 'warning',
+                    'entity_type'      => 'machine',
+                    'entity_id'        => $event->aggregateId,
+                    'machine_id'       => $event->payload['machine_id'] ?? $event->aggregateId,
+                    'confidence_score' => 90.0,
+                    'recommendation'   => 'Machine state changed to: ' . $state,
+                    'metadata'         => $event->payload,
+                ]);
+            } catch (\Throwable $e) {
+                @error_log('[EventBus/AI] Machine state rule failed: ' . $e->getMessage());
+            }
+        });
+
+        // Rule: Inspection failed → recalculate defect probability
+        // Quy tắc: Kiểm tra thất bại → tính lại xác suất lỗi
+        $this->on(DomainEvent::INSPECTION_FAILED, function (DomainEvent $event) {
+            try {
+                $pipeline = new AiPredictionPipeline('');
+                $pipeline->createPrediction([
+                    'prediction_type'  => 'defect_probability',
+                    'severity'         => 'warning',
+                    'entity_type'      => 'inspection',
+                    'entity_id'        => $event->payload['inspection_id'] ?? $event->aggregateId,
+                    'machine_id'       => $event->payload['machine_id'] ?? '',
+                    'confidence_score' => 75.0,
+                    'recommendation'   => 'Inspection failure detected - elevated defect probability',
+                    'metadata'         => $event->payload,
+                ]);
+            } catch (\Throwable $e) {
+                @error_log('[EventBus/AI] Inspection rule failed: ' . $e->getMessage());
+            }
+        });
     }
 
     // ── Internal ────────────────────────────────────────────────────────

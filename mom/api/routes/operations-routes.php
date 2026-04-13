@@ -251,12 +251,26 @@ return static function (Router $router, string $dataDir): void {
         'manufacturing_history_packet' => [ManufacturingEventController::class, 'productionHistory'],
         'manufacturing_spine_model'    => [ManufacturingSpineController::class, 'model'],
         'manufacturing_spine_probe'    => [ManufacturingSpineController::class, 'probe'],
+        'trusted_release_record_assemble' => [TrustedReleaseRecordController::class, 'assemble'],
+        'trusted_release_record_readiness' => [TrustedReleaseRecordController::class, 'readiness'],
+        'trusted_release_record_release' => [TrustedReleaseRecordController::class, 'release'],
+        'trusted_release_record_detail' => [TrustedReleaseRecordController::class, 'detail'],
+        'trusted_release_record_provenance' => [TrustedReleaseRecordController::class, 'provenance'],
+        'trusted_release_record_rollup' => [TrustedReleaseRecordController::class, 'rollup'],
+        'trusted_release_record_probe' => [TrustedReleaseRecordController::class, 'probe'],
     ]);
     $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
     $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
     $router->get('/api/manufacturing-events/production-history', ManufacturingEventController::class, 'productionHistory');
     $router->get('/api/manufacturing-spine/model', ManufacturingSpineController::class, 'model');
     $router->get('/api/manufacturing-spine/probe', ManufacturingSpineController::class, 'probe');
+    $router->get('/api/trusted-release-record/readiness', TrustedReleaseRecordController::class, 'readiness');
+    $router->get('/api/trusted-release-record/detail', TrustedReleaseRecordController::class, 'detail');
+    $router->get('/api/trusted-release-record/provenance', TrustedReleaseRecordController::class, 'provenance');
+    $router->get('/api/trusted-release-record/rollup', TrustedReleaseRecordController::class, 'rollup');
+    $router->get('/api/trusted-release-record/probe', TrustedReleaseRecordController::class, 'probe');
+    $router->post('/api/trusted-release-record/assemble', TrustedReleaseRecordController::class, 'assemble');
+    $router->post('/api/trusted-release-record/release', TrustedReleaseRecordController::class, 'release');
     
     // AI Quality Scheduling
     $router->actions([
@@ -272,6 +286,14 @@ return static function (Router $router, string $dataDir): void {
         'schedule_conflicts'         => [AiSchedulingController::class, 'getConflicts'],
         'schedule_capacity'          => [AiSchedulingController::class, 'getCapacityHeatmap'],
         'schedule_promise'           => [AiSchedulingController::class, 'suggestPromiseDate'],
+        // Phase 3A: AI intelligence endpoints
+        'ai_nl_query'                => [AiSchedulingController::class, 'aiNlQuery'],
+        'ai_rca_analyze'             => [AiSchedulingController::class, 'aiRcaAnalyze'],
+        'ai_feedback_submit'         => [AiSchedulingController::class, 'aiFeedbackSubmit'],
+        'ai_model_list'              => [AiSchedulingController::class, 'aiModelList'],
+        'ai_conversation_history'    => [AiSchedulingController::class, 'aiConversationHistory'],
+        'ai_document_summarize'      => [AiSchedulingController::class, 'aiDocumentSummarize'],
+        'ai_dashboard_combined'      => [AiSchedulingController::class, 'aiDashboard'],
     ]);
     
     // Customer Portal

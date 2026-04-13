@@ -12,11 +12,17 @@
     "TemplateValidationResult": { "$ref": "#/$defs/TemplateValidationResult" },
     "GraphicsImpactReport": { "$ref": "#/$defs/GraphicsImpactReport" },
     "ModuleGraphicsComplianceEntry": { "$ref": "#/$defs/ModuleGraphicsComplianceEntry" },
+    "GraphicsDebtReport": { "$ref": "#/$defs/GraphicsDebtReport" },
+    "GraphicsDriftReport": { "$ref": "#/$defs/GraphicsDriftReport" },
     "GraphicsPublishRequest": { "$ref": "#/$defs/GraphicsPublishRequest" },
     "GraphicsPublishResult": { "$ref": "#/$defs/GraphicsPublishResult" },
+    "GraphicsRolloutRequest": { "$ref": "#/$defs/GraphicsRolloutRequest" },
+    "GraphicsRolloutResult": { "$ref": "#/$defs/GraphicsRolloutResult" },
     "GraphicsRollbackRequest": { "$ref": "#/$defs/GraphicsRollbackRequest" },
     "GraphicsAuditEvent": { "$ref": "#/$defs/GraphicsAuditEvent" },
     "GraphicsWaiver": { "$ref": "#/$defs/GraphicsWaiver" },
+    "GraphicsReleaseBlocker": { "$ref": "#/$defs/GraphicsReleaseBlocker" },
+    "GraphicsReleaseLink": { "$ref": "#/$defs/GraphicsReleaseLink" },
     "GraphicsReleaseManifestRef": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
   },
   "$defs": {
@@ -85,6 +91,26 @@
             "minItems": 1,
             "items": { "type": "string" }
           }
+        },
+        "allowedZones": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowedBlocks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "governedModules": { "type": "array", "items": { "type": "string" } },
+        "regulatedCompatibility": { "type": "string" },
+        "shopfloorCompatibility": { "type": "string" },
+        "updatedBy": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "evidenceRefs": {
+          "type": "array",
+          "items": { "type": "string" }
         },
         "defaultDensity": { "enum": ["compact", "default", "comfortable", "shopfloor"] },
         "supportedDensities": {
@@ -171,7 +197,10 @@
         "shopfloorModulesTouched": { "type": "array", "items": { "type": "string" } },
         "gatesToRerun": { "type": "array", "items": { "type": "string" } },
         "blockers": { "type": "array", "items": { "type": "object" } },
-        "machineReadable": { "const": true }
+        "machineReadable": { "const": true },
+        "recordedAt": { "type": "string" },
+        "recordedBy": { "type": "string" },
+        "expiresAt": { "type": "string" }
       }
     },
     "ModuleGraphicsComplianceEntry": {
@@ -191,6 +220,24 @@
         "compliant": { "type": "boolean" }
       }
     },
+    "GraphicsDebtReport": {
+      "type": "object",
+      "required": ["debt", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "debt": { "type": "object", "additionalProperties": true },
+        "summary": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "GraphicsDriftReport": {
+      "type": "object",
+      "required": ["drift", "blockers"],
+      "additionalProperties": true,
+      "properties": {
+        "drift": { "type": "object", "additionalProperties": true },
+        "blockers": { "type": "array", "items": { "$ref": "#/$defs/GraphicsReleaseBlocker" } }
+      }
+    },
     "GraphicsPublishRequest": {
       "type": "object",
       "required": ["expectedVersion", "impactAnalysisId", "gateEvidence", "releaseManifestRefs"],
@@ -198,7 +245,10 @@
         "expectedVersion": { "type": "string" },
         "templateId": { "type": "string" },
         "template": { "$ref": "#/$defs/TemplateDraft" },
-        "impactAnalysisId": { "type": "string" },
+        "impactAnalysisId": {
+          "type": "string",
+          "description": "Backend-recorded impactId that is still pending for the current registry state."
+        },
         "blockersResolved": { "type": "boolean" },
         "gateEvidence": { "type": ["object", "array"] },
         "releaseManifestRefs": {
@@ -221,6 +271,31 @@
           "type": "array",
           "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
         },
+        "registryVersion": { "type": "string" },
+        "registryEtag": { "type": "string" }
+      }
+    },
+    "GraphicsRolloutRequest": {
+      "type": "object",
+      "required": ["expectedVersion", "impactType", "scope"],
+      "additionalProperties": true,
+      "properties": {
+        "expectedVersion": { "type": "string" },
+        "impactType": { "enum": ["token", "template", "component", "rollout"] },
+        "scope": { "type": "object", "additionalProperties": true },
+        "releaseManifestRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+        },
+        "rollbackPlan": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "GraphicsRolloutResult": {
+      "type": "object",
+      "required": ["rollout", "registryVersion", "registryEtag"],
+      "additionalProperties": true,
+      "properties": {
+        "rollout": { "type": "object", "additionalProperties": true },
         "registryVersion": { "type": "string" },
         "registryEtag": { "type": "string" }
       }
@@ -254,9 +329,13 @@
       "additionalProperties": true,
       "properties": {
         "waiverId": { "type": "string" },
-        "scope": { "enum": ["template", "module", "component", "token", "release_gate"] },
+        "scope": { "enum": ["template", "module", "component", "token", "release_gate", "graphics-governance"] },
         "targetId": { "type": "string" },
         "reason": { "type": "string" },
+        "risk": { "type": "string" },
+        "compensatingControl": { "type": "string" },
+        "owner": { "type": "string" },
+        "approver": { "type": "string" },
         "riskClass": { "enum": ["low", "medium", "high", "regulated"] },
         "status": { "enum": ["draft", "approved", "expired"] },
         "documentControlRefs": { "type": "array", "items": { "type": "string" } },
@@ -265,6 +344,36 @@
           "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
         },
         "expiresAt": { "type": "string" }
+      }
+    },
+    "GraphicsReleaseBlocker": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "blockerId": { "type": "string" },
+        "scope": { "type": "string" },
+        "targetId": { "type": "string" },
+        "moduleId": { "type": "string" },
+        "templateId": { "type": "string" },
+        "severity": { "enum": ["warning", "blocker", "waived"] },
+        "status": { "enum": ["active", "waived", "pending-review"] },
+        "reason": { "type": "string" },
+        "releaseGate": { "type": "string" },
+        "releaseBlocked": { "type": "boolean" },
+        "waiverAllowed": { "type": "boolean" }
+      }
+    },
+    "GraphicsReleaseLink": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "graphicsAuthorityRefs": { "type": "array", "items": { "type": "string" } },
+        "templateRegistryVersion": { "type": "string" },
+        "templateRegistryChecksum": { "type": "string" },
+        "complianceMatrixRef": { "type": "string" },
+        "impactAnalysisRef": { "type": "string" },
+        "waiversRef": { "type": "string" },
+        "rollbackPlanRef": { "type": "string" }
       }
     },
     "GraphicsReleaseManifestRef": {

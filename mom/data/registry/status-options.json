@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-13T09:36:26.083Z",
-    "enumCount": 734
+    "generatedAt": "2026-04-13T11:20:13.124Z",
+    "enumCount": 769
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -5383,8 +5383,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "idempotency_replay_ledger",
-    "statusColumn": "status",
+    "sourceTable": "mes_trusted_release_record",
+    "statusColumn": "packet_state",
     "options": [
       {
         "value": "complete",
@@ -5689,8 +5689,8 @@
     "labelEn": "NC Program Status",
     "source": "portal",
     "standard": "internal",
-    "sourceTable": "cnc_programs",
-    "statusColumn": "status",
+    "sourceTable": "eqms_form_template_revision",
+    "statusColumn": "lifecycle_state",
     "options": [
       {
         "value": "draft",
@@ -35909,6 +35909,1576 @@
     "standard": "internal",
     "sourceTable": "idempotency_replay_ledger",
     "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "ai_recommendation_actions_status": {
+    "label": "Ai Recommendation Hành động - Status",
+    "labelEn": "Ai Recommendation Actions Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "ai_recommendation_actions",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "ai_recommendation_actions_status_set": {
+    "label": "Ai Recommendation Hành động - Status",
+    "labelEn": "Ai Recommendation Actions Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "ai_recommendation_actions",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "ai_training_datasets_status": {
+    "label": "Ai Đào tạo Dataset - Status",
+    "labelEn": "Ai Training Datasets Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "ai_training_datasets",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "ai_training_datasets_status_set": {
+    "label": "Ai Đào tạo Dataset - Status",
+    "labelEn": "Ai Training Datasets Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "ai_training_datasets",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "cnc_programs_status_set": {
+    "label": "CNC chương trình - Status",
+    "labelEn": "Cnc Programs Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "cnc_programs",
+    "statusColumn": "status",
+    "aliasOf": "cnc_program_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "fa-pencil",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "in_review",
+        "label": "Đang duyệt",
+        "labelEn": "In Review",
+        "color": "#3b82f6",
+        "icon": "fa-eye",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã duyệt",
+        "labelEn": "Approved",
+        "color": "#8b5cf6",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "in_review"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Phát hành",
+        "labelEn": "Released",
+        "color": "#10b981",
+        "icon": "fa-rocket",
+        "allowedTransitionsFrom": [
+          "approved"
+        ]
+      },
+      {
+        "value": "superseded",
+        "label": "Thay thế",
+        "labelEn": "Superseded",
+        "color": "#f59e0b",
+        "icon": "fa-rotate",
+        "allowedTransitionsFrom": [
+          "released"
+        ]
+      },
+      {
+        "value": "obsolete",
+        "label": "Lỗi thời",
+        "labelEn": "Obsolete",
+        "color": "#6b7280",
+        "icon": "fa-ban",
+        "allowedTransitionsFrom": [
+          "released",
+          "superseded"
+        ]
+      }
+    ]
+  },
+  "domain_outbox_events_status": {
+    "label": "Domain Outbox sự kiện - Status",
+    "labelEn": "Domain Outbox Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "domain_outbox_events",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "domain_outbox_events_status_set": {
+    "label": "Domain Outbox sự kiện - Status",
+    "labelEn": "Domain Outbox Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "domain_outbox_events",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_document_family_status": {
+    "label": "Eqm Tài liệu Family - Status",
+    "labelEn": "Eqms Document Family Status",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "eqms_document_family",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_document_family_status_set": {
+    "label": "Eqm Tài liệu Family - Status",
+    "labelEn": "Eqms Document Family Status",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "eqms_document_family",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_document_revision_lifecycle_state": {
+    "label": "Eqm Tài liệu Phiên bản - Lifecycle State",
+    "labelEn": "Eqms Document Revision Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "eqms_document_revision",
+    "statusColumn": "lifecycle_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_document_revision_lifecycle_state_set": {
+    "label": "Eqm Tài liệu Phiên bản - Lifecycle State",
+    "labelEn": "Eqms Document Revision Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "ISO9001",
+    "sourceTable": "eqms_document_revision",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_evidence_record_lifecycle_state": {
+    "label": "Eqm Bằng chứng hồ sơ - Lifecycle State",
+    "labelEn": "Eqms Evidence Record Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_evidence_record",
+    "statusColumn": "lifecycle_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_evidence_record_lifecycle_state_set": {
+    "label": "Eqm Bằng chứng hồ sơ - Lifecycle State",
+    "labelEn": "Eqms Evidence Record Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_evidence_record",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_field_governance_rule_lifecycle_state": {
+    "label": "Eqm Field quản trị quy tắc - Lifecycle State",
+    "labelEn": "Eqms Field Governance Rule Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_field_governance_rule",
+    "statusColumn": "lifecycle_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_field_governance_rule_lifecycle_state_set": {
+    "label": "Eqm Field quản trị quy tắc - Lifecycle State",
+    "labelEn": "Eqms Field Governance Rule Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_field_governance_rule",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_family_status": {
+    "label": "Eqm biểu mẫu Family - Status",
+    "labelEn": "Eqms Form Family Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_family",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_family_status_set": {
+    "label": "Eqm biểu mẫu Family - Status",
+    "labelEn": "Eqms Form Family Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_family",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_issuance_status": {
+    "label": "Eqm biểu mẫu Issuance - Status",
+    "labelEn": "Eqms Form Issuance Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_issuance",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_issuance_status_set": {
+    "label": "Eqm biểu mẫu Issuance - Status",
+    "labelEn": "Eqms Form Issuance Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_issuance",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_record_lifecycle_state": {
+    "label": "Eqm biểu mẫu hồ sơ - Lifecycle State",
+    "labelEn": "Eqms Form Record Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_record",
+    "statusColumn": "lifecycle_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_record_lifecycle_state_set": {
+    "label": "Eqm biểu mẫu hồ sơ - Lifecycle State",
+    "labelEn": "Eqms Form Record Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_record",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_schema_version_status": {
+    "label": "Eqm biểu mẫu Lược đồ phiên bản - Status",
+    "labelEn": "Eqms Form Schema Version Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_schema_version",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_schema_version_status_set": {
+    "label": "Eqm biểu mẫu Lược đồ phiên bản - Status",
+    "labelEn": "Eqms Form Schema Version Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_schema_version",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_submission_attempt_validation_status": {
+    "label": "Eqm biểu mẫu bản nộp Attempt - Validation Status",
+    "labelEn": "Eqms Form Submission Attempt Validation Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_submission_attempt",
+    "statusColumn": "validation_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_submission_attempt_validation_status_set": {
+    "label": "Eqm biểu mẫu bản nộp Attempt - Validation Status",
+    "labelEn": "Eqms Form Submission Attempt Validation Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_submission_attempt",
+    "statusColumn": "validation_status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_form_template_revision_lifecycle_state": {
+    "label": "Eqm biểu mẫu mẫu Phiên bản - Lifecycle State",
+    "labelEn": "Eqms Form Template Revision Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_template_revision",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "cnc_program_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "fa-pencil",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "in_review",
+        "label": "Đang duyệt",
+        "labelEn": "In Review",
+        "color": "#3b82f6",
+        "icon": "fa-eye",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã duyệt",
+        "labelEn": "Approved",
+        "color": "#8b5cf6",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "in_review"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Phát hành",
+        "labelEn": "Released",
+        "color": "#10b981",
+        "icon": "fa-rocket",
+        "allowedTransitionsFrom": [
+          "approved"
+        ]
+      },
+      {
+        "value": "superseded",
+        "label": "Thay thế",
+        "labelEn": "Superseded",
+        "color": "#f59e0b",
+        "icon": "fa-rotate",
+        "allowedTransitionsFrom": [
+          "released"
+        ]
+      },
+      {
+        "value": "obsolete",
+        "label": "Lỗi thời",
+        "labelEn": "Obsolete",
+        "color": "#6b7280",
+        "icon": "fa-ban",
+        "allowedTransitionsFrom": [
+          "released",
+          "superseded"
+        ]
+      }
+    ]
+  },
+  "eqms_form_template_revision_lifecycle_state_set": {
+    "label": "Eqm biểu mẫu mẫu Phiên bản - Lifecycle State",
+    "labelEn": "Eqms Form Template Revision Lifecycle State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_form_template_revision",
+    "statusColumn": "lifecycle_state",
+    "aliasOf": "cnc_program_status",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "fa-pencil",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "in_review",
+        "label": "Đang duyệt",
+        "labelEn": "In Review",
+        "color": "#3b82f6",
+        "icon": "fa-eye",
+        "allowedTransitionsFrom": [
+          "draft"
+        ]
+      },
+      {
+        "value": "approved",
+        "label": "Đã duyệt",
+        "labelEn": "Approved",
+        "color": "#8b5cf6",
+        "icon": "fa-check",
+        "allowedTransitionsFrom": [
+          "in_review"
+        ]
+      },
+      {
+        "value": "released",
+        "label": "Phát hành",
+        "labelEn": "Released",
+        "color": "#10b981",
+        "icon": "fa-rocket",
+        "allowedTransitionsFrom": [
+          "approved"
+        ]
+      },
+      {
+        "value": "superseded",
+        "label": "Thay thế",
+        "labelEn": "Superseded",
+        "color": "#f59e0b",
+        "icon": "fa-rotate",
+        "allowedTransitionsFrom": [
+          "released"
+        ]
+      },
+      {
+        "value": "obsolete",
+        "label": "Lỗi thời",
+        "labelEn": "Obsolete",
+        "color": "#6b7280",
+        "icon": "fa-ban",
+        "allowedTransitionsFrom": [
+          "released",
+          "superseded"
+        ]
+      }
+    ]
+  },
+  "eqms_integrity_digest_status": {
+    "label": "Eqm Integrity Digest - Status",
+    "labelEn": "Eqms Integrity Digest Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_integrity_digest",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_integrity_digest_status_set": {
+    "label": "Eqm Integrity Digest - Status",
+    "labelEn": "Eqms Integrity Digest Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_integrity_digest",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_integrity_exception_status": {
+    "label": "Eqm Integrity ngoại lệ - Status",
+    "labelEn": "Eqms Integrity Exception Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_integrity_exception",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_integrity_exception_status_set": {
+    "label": "Eqm Integrity ngoại lệ - Status",
+    "labelEn": "Eqms Integrity Exception Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_integrity_exception",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_publication_job_status": {
+    "label": "Eqm Publication Lệnh - Status",
+    "labelEn": "Eqms Publication Job Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_publication_job",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "eqms_publication_job_status_set": {
+    "label": "Eqm Publication Lệnh - Status",
+    "labelEn": "Eqms Publication Job Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "eqms_publication_job",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "mes_trusted_release_record_packet_state": {
+    "label": "Trusted Phát hành hồ sơ MES - Packet State",
+    "labelEn": "MES Trusted Release Record Packet State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "mes_trusted_release_record",
+    "statusColumn": "packet_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "mes_trusted_release_record_packet_state_set": {
+    "label": "Trusted Phát hành hồ sơ MES - Packet State",
+    "labelEn": "MES Trusted Release Record Packet State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "mes_trusted_release_record",
+    "statusColumn": "packet_state",
+    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",

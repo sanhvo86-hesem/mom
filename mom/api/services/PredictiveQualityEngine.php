@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Api\Services\AnthropicService;
 use RuntimeException;
 
 /**
@@ -527,6 +528,9 @@ final class PredictiveQualityEngine
         $predictions[] = $prediction;
         $this->writeJsonFileAtomic($this->predictionsFile, $predictions);
 
+        // Shadow write to quality_predictions DB table / Ghi song song vao bang DB
+        $this->shadowWritePredictionToDb($prediction);
+
         return $prediction;
     }
 
@@ -646,6 +650,528 @@ final class PredictiveQualityEngine
             'by_severity'        => $bySeverity,
             'total_resolved'     => $resolved,
             'total_false_positive' => $falsePositives,
+        ];
+    }
+
+    // ── Telemetry-based Prediction / Dự đoán từ dữ liệu cảm biến ────────
+
+    /**
+     * Predict anomalies from recent machine telemetry data.
+     * Dự đoán bất thường từ dữ liệu cảm biến máy gần đây.
+     *
+     * Analyses vibration, temperature, spindle load, and power consumption
+     * from machine_telemetry_extended (last 24 hours). Creates predictions
+     * via AiPredictionPipeline and optionally requests Claude contextual
+     * analysis for critical anomalies.
+     *
+     * @param string $machineId Machine identifier / Mã máy
+     * @param array  $thresholds Optional threshold overrides / Ngưỡng tùy chỉnh
+     *   - vibration_rms_max (float): default 2.0 mm/s
+     *   - temperature_max (float): default 60.0 °C
+     *   - temperature_rise_per_hour (float): default 2.0 °C/hr
+     *   - spindle_load_sustained (float): default 80.0 %
+     *   - spindle_load_spike (float): default 95.0 %
+     *   - power_deviation_pct (float): default 20.0 %
+     * @return array{predictions: array[], analysis: string|null, anomalies: array[], telemetry_summary: array}
+     */
+    public function predictFromTelemetry(string $machineId, array $thresholds = []): array
+    {
+        // ── Default thresholds / Ngưỡng mặc định ──
+        $vibrationRmsMax       = (float)($thresholds['vibration_rms_max'] ?? 2.0);
+        $temperatureMax        = (float)($thresholds['temperature_max'] ?? 60.0);
+        $temperatureRisePerHr  = (float)($thresholds['temperature_rise_per_hour'] ?? 2.0);
+        $spindleLoadSustained  = (float)($thresholds['spindle_load_sustained'] ?? 80.0);
+        $spindleLoadSpike      = (float)($thresholds['spindle_load_spike'] ?? 95.0);
+        $powerDeviationPct     = (float)($thresholds['power_deviation_pct'] ?? 20.0);
+
+        $predictions = [];
+        $anomalies   = [];
+        $analysis    = null;
+        $hasCritical = false;
+
+        // ── Query telemetry from DB / Truy vấn dữ liệu cảm biến từ DB ──
+        $telemetryRows = [];
+        if ($this->db !== null) {
+            try {
+                $telemetryRows = $this->db->query(
+                    "SELECT * FROM machine_telemetry_extended
+                     WHERE machine_id = :machine_id
+                       AND timestamp >= NOW() - INTERVAL '24 hours'
+                     ORDER BY timestamp DESC
+                     LIMIT 500",
+                    ['machine_id' => $machineId]
+                );
+            } catch (\Throwable $e) {
+                @error_log('[PredictiveQualityEngine] predictFromTelemetry DB error: ' . $e->getMessage());
+            }
+        }
+
+        if (empty($telemetryRows)) {
+            return [
+                'predictions'       => [],
+                'analysis'          => null,
+                'anomalies'         => [],
+                'telemetry_summary' => ['data_points' => 0, 'message' => 'No telemetry data available.'],
+            ];
+        }
+
+        // ── Build summary arrays / Xây dựng mảng tổng hợp ──
+        $vibX = $vibY = $vibZ = $temperatures = $spindleLoads = $powers = [];
+
+        foreach ($telemetryRows as $row) {
+            if ($row['vibration_x'] !== null) $vibX[]         = (float)$row['vibration_x'];
+            if ($row['vibration_y'] !== null) $vibY[]         = (float)$row['vibration_y'];
+            if ($row['vibration_z'] !== null) $vibZ[]         = (float)$row['vibration_z'];
+            if ($row['spindle_temperature'] !== null) $temperatures[] = (float)$row['spindle_temperature'];
+            if ($row['spindle_load_pct'] !== null) $spindleLoads[]   = (float)$row['spindle_load_pct'];
+            if ($row['power_consumption_kw'] !== null) $powers[]      = (float)$row['power_consumption_kw'];
+        }
+
+        $telemetrySummary = [
+            'data_points'   => count($telemetryRows),
+            'time_span_hrs' => 24,
+            'machine_id'    => $machineId,
+        ];
+
+        // ── (a) Vibration analysis / Phân tích rung động ──
+        if (!empty($vibX) && !empty($vibY) && !empty($vibZ)) {
+            $rmsValues = [];
+            $count = min(count($vibX), count($vibY), count($vibZ));
+            for ($i = 0; $i < $count; $i++) {
+                $rmsValues[] = sqrt($vibX[$i] ** 2 + $vibY[$i] ** 2 + $vibZ[$i] ** 2);
+            }
+
+            $currentRms = $rmsValues[0] ?? 0.0; // most recent (DESC order)
+            $avgRms     = $this->_mean($rmsValues);
+            $telemetrySummary['vibration_rms_current'] = round($currentRms, 4);
+            $telemetrySummary['vibration_rms_avg']     = round($avgRms, 4);
+
+            // Trend on last 100 points / Xu hướng trên 100 điểm gần nhất
+            $trendPoints = array_slice(array_reverse($rmsValues), 0, 100);
+            $vibTrend    = 'stable';
+            if (count($trendPoints) >= 10) {
+                $xVals = range(0, count($trendPoints) - 1);
+                $reg   = $this->_linearRegression($xVals, $trendPoints);
+                if ($reg['slope'] > 0.005)      $vibTrend = 'rising';
+                elseif ($reg['slope'] < -0.005)  $vibTrend = 'falling';
+            }
+            $telemetrySummary['vibration_trend'] = $vibTrend;
+
+            if ($currentRms > $vibrationRmsMax || $avgRms > $vibrationRmsMax) {
+                $severity = $currentRms > $vibrationRmsMax * 1.5 ? 'critical' : 'warning';
+                if ($severity === 'critical') $hasCritical = true;
+
+                $anomaly = [
+                    'type'        => 'vibration_excessive',
+                    'severity'    => $severity,
+                    'current_rms' => round($currentRms, 4),
+                    'threshold'   => $vibrationRmsMax,
+                    'trend'       => $vibTrend,
+                    'description' => "Vibration RMS {$currentRms} mm/s exceeds threshold {$vibrationRmsMax} mm/s. Trend: {$vibTrend}.",
+                ];
+                $anomalies[] = $anomaly;
+
+                $pred = $this->createPrediction([
+                    'prediction_type'  => 'equipment_failure',
+                    'severity'         => $severity,
+                    'machine_id'       => $machineId,
+                    'predicted_value'  => round($currentRms, 4),
+                    'threshold_value'  => $vibrationRmsMax,
+                    'current_trend'    => $vibTrend === 'rising' ? 'degrading' : 'stable',
+                    'data_points_used' => count($rmsValues),
+                    'recommendation'   => "Excessive vibration detected (RMS={$currentRms} mm/s, threshold={$vibrationRmsMax}). Inspect spindle bearings and tool holder.",
+                    'recommendation_vi' => "Phat hien rung dong qua muc (RMS={$currentRms} mm/s, nguong={$vibrationRmsMax}). Kiem tra o bi truc chinh va do giu dao.",
+                    'metadata'         => $anomaly,
+                ]);
+                $predictions[] = $pred;
+            }
+        }
+
+        // ── (b) Temperature analysis / Phân tích nhiệt độ ──
+        if (!empty($temperatures)) {
+            $currentTemp = $temperatures[0]; // most recent
+            $telemetrySummary['spindle_temperature_current'] = round($currentTemp, 2);
+            $telemetrySummary['spindle_temperature_avg']     = round($this->_mean($temperatures), 2);
+
+            // Estimate temperature rise per hour / Ước tính tăng nhiệt độ/giờ
+            $tempRisePerHour = 0.0;
+            if (count($temperatures) >= 10) {
+                // Rows are DESC by timestamp; oldest is last
+                $oldestTemp = end($temperatures);
+                $tempRisePerHour = ($currentTemp - $oldestTemp); // approximate over 24h span
+                // Normalize to per-hour based on data span
+                $tempRisePerHour = $tempRisePerHour / max(1, $telemetrySummary['time_span_hrs']);
+            }
+            $telemetrySummary['temperature_rise_per_hour'] = round($tempRisePerHour, 2);
+
+            $tempFlagged = false;
+            $tempSeverity = 'watch';
+            $tempReason = '';
+
+            if ($currentTemp > $temperatureMax) {
+                $tempFlagged = true;
+                $tempSeverity = $currentTemp > $temperatureMax * 1.15 ? 'critical' : 'warning';
+                $tempReason = "Spindle temperature {$currentTemp}C exceeds maximum {$temperatureMax}C.";
+            } elseif ($tempRisePerHour > $temperatureRisePerHr) {
+                $tempFlagged = true;
+                $tempSeverity = 'warning';
+                $tempReason = "Temperature rising at {$tempRisePerHour}C/hr, exceeds threshold {$temperatureRisePerHr}C/hr.";
+            }
+
+            if ($tempFlagged) {
+                if ($tempSeverity === 'critical') $hasCritical = true;
+
+                $anomaly = [
+                    'type'              => 'temperature_anomaly',
+                    'severity'          => $tempSeverity,
+                    'current_value'     => round($currentTemp, 2),
+                    'rise_per_hour'     => round($tempRisePerHour, 2),
+                    'threshold'         => $temperatureMax,
+                    'description'       => $tempReason,
+                ];
+                $anomalies[] = $anomaly;
+
+                $pred = $this->createPrediction([
+                    'prediction_type'  => 'equipment_failure',
+                    'severity'         => $tempSeverity,
+                    'machine_id'       => $machineId,
+                    'predicted_value'  => round($currentTemp, 2),
+                    'threshold_value'  => $temperatureMax,
+                    'current_trend'    => $tempRisePerHour > 0.5 ? 'degrading' : 'stable',
+                    'data_points_used' => count($temperatures),
+                    'recommendation'   => $tempReason . ' Check coolant system and spindle lubrication.',
+                    'recommendation_vi' => 'Nhiet do truc chinh bat thuong. Kiem tra he thong lam mat va boi tron truc chinh.',
+                    'metadata'         => $anomaly,
+                ]);
+                $predictions[] = $pred;
+            }
+        }
+
+        // ── (c) Spindle load analysis / Phân tích tải trục chính ──
+        if (!empty($spindleLoads)) {
+            $currentLoad = $spindleLoads[0];
+            $avgLoad     = $this->_mean($spindleLoads);
+            $maxLoad     = max($spindleLoads);
+            $telemetrySummary['spindle_load_current'] = round($currentLoad, 2);
+            $telemetrySummary['spindle_load_avg']     = round($avgLoad, 2);
+            $telemetrySummary['spindle_load_max']     = round($maxLoad, 2);
+
+            // Count how many readings exceed sustained threshold / Đếm số lần vượt ngưỡng
+            $sustainedCount = 0;
+            foreach ($spindleLoads as $load) {
+                if ($load > $spindleLoadSustained) $sustainedCount++;
+            }
+            $sustainedPct = count($spindleLoads) > 0
+                ? round(($sustainedCount / count($spindleLoads)) * 100, 1)
+                : 0.0;
+            $telemetrySummary['spindle_load_above_threshold_pct'] = $sustainedPct;
+
+            $loadFlagged  = false;
+            $loadSeverity = 'watch';
+            $loadReason   = '';
+
+            if ($maxLoad > $spindleLoadSpike) {
+                $loadFlagged  = true;
+                $loadSeverity = 'critical';
+                $loadReason   = "Spindle load spike detected ({$maxLoad}%, threshold {$spindleLoadSpike}%). Risk of tool breakage.";
+                $hasCritical  = true;
+            } elseif ($sustainedPct > 50) {
+                $loadFlagged  = true;
+                $loadSeverity = 'warning';
+                $loadReason   = "Spindle load consistently above {$spindleLoadSustained}% ({$sustainedPct}% of readings). Tool wear likely accelerating.";
+            }
+
+            if ($loadFlagged) {
+                $anomaly = [
+                    'type'          => 'spindle_load_anomaly',
+                    'severity'      => $loadSeverity,
+                    'current_value' => round($currentLoad, 2),
+                    'max_value'     => round($maxLoad, 2),
+                    'sustained_pct' => $sustainedPct,
+                    'description'   => $loadReason,
+                ];
+                $anomalies[] = $anomaly;
+
+                $pred = $this->createPrediction([
+                    'prediction_type'  => $loadSeverity === 'critical' ? 'equipment_failure' : 'tool_wear',
+                    'severity'         => $loadSeverity,
+                    'machine_id'       => $machineId,
+                    'predicted_value'  => round($maxLoad, 2),
+                    'threshold_value'  => $spindleLoadSpike,
+                    'current_trend'    => 'degrading',
+                    'data_points_used' => count($spindleLoads),
+                    'recommendation'   => $loadReason,
+                    'recommendation_vi' => 'Tai truc chinh bat thuong. Kiem tra dao cu va chuong trinh gia cong.',
+                    'metadata'         => $anomaly,
+                ]);
+                $predictions[] = $pred;
+            }
+        }
+
+        // ── (d) Power consumption anomaly / Bất thường công suất tiêu thụ ──
+        if (!empty($powers) && count($powers) >= 10) {
+            $currentPower = $powers[0];
+            $avgPower     = $this->_mean($powers);
+            $telemetrySummary['power_consumption_current_kw'] = round($currentPower, 3);
+            $telemetrySummary['power_consumption_avg_kw']     = round($avgPower, 3);
+
+            // Compare current to rolling average / So sánh hiện tại với trung bình
+            // Use average of dataset as proxy for 7-day rolling avg
+            $deviation = $avgPower > 0
+                ? abs($currentPower - $avgPower) / $avgPower * 100
+                : 0.0;
+            $telemetrySummary['power_deviation_pct'] = round($deviation, 1);
+
+            if ($deviation > $powerDeviationPct) {
+                $powerSeverity = $deviation > $powerDeviationPct * 2 ? 'warning' : 'watch';
+                $powerReason = "Power consumption deviation {$deviation}% from average ({$currentPower}kW vs avg {$avgPower}kW).";
+
+                $anomaly = [
+                    'type'          => 'power_consumption_anomaly',
+                    'severity'      => $powerSeverity,
+                    'current_value' => round($currentPower, 3),
+                    'average_value' => round($avgPower, 3),
+                    'deviation_pct' => round($deviation, 1),
+                    'description'   => $powerReason,
+                ];
+                $anomalies[] = $anomaly;
+
+                $pred = $this->createPrediction([
+                    'prediction_type'  => 'equipment_failure',
+                    'severity'         => $powerSeverity,
+                    'machine_id'       => $machineId,
+                    'predicted_value'  => round($currentPower, 3),
+                    'threshold_value'  => round($avgPower * (1 + $powerDeviationPct / 100), 3),
+                    'current_trend'    => $currentPower > $avgPower ? 'degrading' : 'stable',
+                    'data_points_used' => count($powers),
+                    'recommendation'   => $powerReason . ' Investigate drive system, bearings, or program changes.',
+                    'recommendation_vi' => "Cong suat tieu thu lech {$deviation}% so voi trung binh. Kiem tra he thong truyen dong.",
+                    'metadata'         => $anomaly,
+                ]);
+                $predictions[] = $pred;
+            }
+        }
+
+        // ── (e) AI contextual analysis for critical anomalies / Phân tích AI cho bất thường nghiêm trọng ──
+        if ($hasCritical && !empty($anomalies)) {
+            try {
+                $anthropic = AnthropicService::getInstance();
+                $anomalySummary = json_encode($anomalies, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                $telemetryJson  = json_encode($telemetrySummary, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+                $result = $anthropic->analyzeProdData(
+                    'You are a CNC machine diagnostics expert. Analyze the following machine telemetry anomalies and provide: '
+                    . '1) Most likely root causes ranked by probability. '
+                    . '2) Recommended immediate actions. '
+                    . '3) Recommended preventive actions. '
+                    . 'Be specific and actionable. Respond in both English and Vietnamese.',
+                    "Machine: {$machineId}\n\nAnomalies detected:\n{$anomalySummary}\n\nTelemetry summary:\n{$telemetryJson}",
+                    ['machine_id' => $machineId, 'anomaly_count' => count($anomalies)]
+                );
+
+                if (!isset($result['error'])) {
+                    // Extract text from Claude response / Trích xuất nội dung từ phản hồi Claude
+                    $analysis = '';
+                    foreach (($result['content'] ?? []) as $block) {
+                        if (($block['type'] ?? '') === 'text') {
+                            $analysis .= $block['text'];
+                        }
+                    }
+                    if ($analysis === '') {
+                        $analysis = null;
+                    }
+                }
+            } catch (\Throwable $e) {
+                @error_log('[PredictiveQualityEngine] AI analysis error: ' . $e->getMessage());
+                // Non-fatal — predictions are already created / Không nghiêm trọng — dự đoán đã được tạo
+            }
+        }
+
+        return [
+            'predictions'       => $predictions,
+            'analysis'          => $analysis,
+            'anomalies'         => $anomalies,
+            'telemetry_summary' => $telemetrySummary,
+        ];
+    }
+
+    // ── Training Dataset Builder / Xây dựng bộ dữ liệu huấn luyện ────────
+
+    /**
+     * Build a training dataset for a specified model type.
+     * Xây dựng bộ dữ liệu huấn luyện cho loại mô hình được chỉ định.
+     *
+     * Supports model types:
+     *   - 'tool_wear': Joins telemetry + tool life events + work orders
+     *   - 'quality_prediction': Joins predictions + NCR records + telemetry
+     *
+     * Stores metadata in ai_training_datasets table and returns dataset info.
+     *
+     * @param string $modelType  One of: 'tool_wear', 'quality_prediction'
+     * @param string $dateFrom   Start date (YYYY-MM-DD) / Ngày bắt đầu
+     * @param string $dateTo     End date (YYYY-MM-DD) / Ngày kết thúc
+     * @return array{dataset_id: string, model_type: string, row_count: int, feature_columns: string[], label_column: string, status: string}
+     * @throws \InvalidArgumentException On invalid model type / Khi loại mô hình không hợp lệ
+     * @throws \RuntimeException On DB errors / Khi lỗi DB
+     */
+    public function buildTrainingDataset(string $modelType, string $dateFrom, string $dateTo): array
+    {
+        $validTypes = ['tool_wear', 'quality_prediction'];
+        if (!in_array($modelType, $validTypes, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid model_type '{$modelType}'. Valid: " . implode(', ', $validTypes)
+                . " / Loai mo hinh khong hop le."
+            );
+        }
+
+        if ($this->db === null) {
+            throw new \RuntimeException(
+                'Database connection required for training dataset generation. / Can ket noi DB de tao bo du lieu huan luyen.'
+            );
+        }
+
+        $featureColumns = [];
+        $labelColumn    = '';
+        $rowCount       = 0;
+        $sourceQuery    = '';
+
+        if ($modelType === 'tool_wear') {
+            // ── Tool wear dataset / Bộ dữ liệu mòn dao ──
+            $featureColumns = [
+                'spindle_load_pct', 'vibration_rms', 'spindle_temperature',
+                'power_consumption_kw', 'life_count_at_event', 'material_type',
+            ];
+            $labelColumn = 'tool_remaining_life_pct';
+
+            $sourceQuery = "SELECT
+                    mt.machine_id,
+                    mt.tool_id,
+                    AVG(mt.spindle_load_pct) AS spindle_load_pct,
+                    AVG(SQRT(COALESCE(mt.vibration_x,0)^2 + COALESCE(mt.vibration_y,0)^2 + COALESCE(mt.vibration_z,0)^2)) AS vibration_rms,
+                    AVG(mt.spindle_temperature) AS spindle_temperature,
+                    AVG(mt.power_consumption_kw) AS power_consumption_kw,
+                    MAX(tle.life_count_at_event) AS life_count_at_event,
+                    MIN(tle.life_remaining_pct) AS tool_remaining_life_pct
+                FROM machine_telemetry_extended mt
+                INNER JOIN mes_tool_life_events tle
+                    ON mt.tool_id = tle.tool_id
+                    AND tle.event_time BETWEEN :date_from::date AND :date_to::date + INTERVAL '1 day'
+                WHERE mt.timestamp BETWEEN :date_from2::date AND :date_to2::date + INTERVAL '1 day'
+                    AND mt.tool_id IS NOT NULL
+                GROUP BY mt.machine_id, mt.tool_id
+                HAVING COUNT(*) >= 5";
+
+            try {
+                $rows = $this->db->query($sourceQuery, [
+                    'date_from'  => $dateFrom,
+                    'date_to'    => $dateTo,
+                    'date_from2' => $dateFrom,
+                    'date_to2'   => $dateTo,
+                ]);
+                $rowCount = count($rows);
+            } catch (\Throwable $e) {
+                @error_log('[PredictiveQualityEngine] buildTrainingDataset tool_wear query error: ' . $e->getMessage());
+                throw new \RuntimeException(
+                    'Failed to build tool_wear dataset: ' . $e->getMessage()
+                    . ' / Khong the tao bo du lieu mon dao.'
+                );
+            }
+
+        } elseif ($modelType === 'quality_prediction') {
+            // ── Quality prediction dataset / Bộ dữ liệu dự đoán chất lượng ──
+            $featureColumns = [
+                'avg_spindle_load', 'avg_vibration_rms', 'avg_spindle_temp',
+                'avg_power_kw', 'ncr_count_30d', 'prediction_count_30d',
+            ];
+            $labelColumn = 'defect_occurred';
+
+            $sourceQuery = "SELECT
+                    mt.machine_id,
+                    AVG(mt.spindle_load_pct) AS avg_spindle_load,
+                    AVG(SQRT(COALESCE(mt.vibration_x,0)^2 + COALESCE(mt.vibration_y,0)^2 + COALESCE(mt.vibration_z,0)^2)) AS avg_vibration_rms,
+                    AVG(mt.spindle_temperature) AS avg_spindle_temp,
+                    AVG(mt.power_consumption_kw) AS avg_power_kw,
+                    COALESCE(ncr_sub.ncr_count, 0) AS ncr_count_30d,
+                    COALESCE(pred_sub.pred_count, 0) AS prediction_count_30d,
+                    CASE WHEN COALESCE(ncr_sub.ncr_count, 0) > 0 THEN TRUE ELSE FALSE END AS defect_occurred
+                FROM machine_telemetry_extended mt
+                LEFT JOIN LATERAL (
+                    SELECT COUNT(*) AS ncr_count
+                    FROM ncr_records ncr
+                    WHERE ncr.job_number IN (
+                        SELECT DISTINCT mt2.wo_number FROM machine_telemetry_extended mt2
+                        WHERE mt2.machine_id = mt.machine_id
+                          AND mt2.timestamp BETWEEN :date_from::date AND :date_to::date + INTERVAL '1 day'
+                    )
+                    AND ncr.created_at BETWEEN :date_from2::date AND :date_to2::date + INTERVAL '1 day'
+                ) ncr_sub ON TRUE
+                LEFT JOIN LATERAL (
+                    SELECT COUNT(*) AS pred_count
+                    FROM quality_predictions qp
+                    WHERE qp.machine_id = mt.machine_id
+                      AND qp.created_at BETWEEN :date_from3::date AND :date_to3::date + INTERVAL '1 day'
+                ) pred_sub ON TRUE
+                WHERE mt.timestamp BETWEEN :date_from4::date AND :date_to4::date + INTERVAL '1 day'
+                GROUP BY mt.machine_id, ncr_sub.ncr_count, pred_sub.pred_count
+                HAVING COUNT(*) >= 5";
+
+            try {
+                $rows = $this->db->query($sourceQuery, [
+                    'date_from'  => $dateFrom, 'date_to'  => $dateTo,
+                    'date_from2' => $dateFrom, 'date_to2' => $dateTo,
+                    'date_from3' => $dateFrom, 'date_to3' => $dateTo,
+                    'date_from4' => $dateFrom, 'date_to4' => $dateTo,
+                ]);
+                $rowCount = count($rows);
+            } catch (\Throwable $e) {
+                @error_log('[PredictiveQualityEngine] buildTrainingDataset quality_prediction query error: ' . $e->getMessage());
+                throw new \RuntimeException(
+                    'Failed to build quality_prediction dataset: ' . $e->getMessage()
+                    . ' / Khong the tao bo du lieu du doan chat luong.'
+                );
+            }
+        }
+
+        // ── Store metadata in ai_training_datasets / Lưu metadata vào bảng DB ──
+        $datasetId   = $this->generateUuidV4();
+        $datasetName = $modelType . '_' . $dateFrom . '_' . $dateTo;
+        $status      = $rowCount > 0 ? 'ready' : 'preparing';
+
+        try {
+            $this->db->execute(
+                "INSERT INTO ai_training_datasets
+                    (dataset_id, dataset_name, model_type, source_query, row_count,
+                     feature_columns, label_column, date_range_start, date_range_end, status)
+                 VALUES
+                    (:id, :name, :model_type, :query, :row_count,
+                     :features::jsonb, :label, :from::date, :to::date, :status)",
+                [
+                    'id'         => $datasetId,
+                    'name'       => $datasetName,
+                    'model_type' => $modelType,
+                    'query'      => $sourceQuery,
+                    'row_count'  => $rowCount,
+                    'features'   => json_encode($featureColumns, JSON_UNESCAPED_UNICODE),
+                    'label'      => $labelColumn,
+                    'from'       => $dateFrom,
+                    'to'         => $dateTo,
+                    'status'     => $status,
+                ]
+            );
+        } catch (\Throwable $e) {
+            @error_log('[PredictiveQualityEngine] buildTrainingDataset metadata insert error: ' . $e->getMessage());
+            // Non-fatal — still return dataset info / Không nghiêm trọng — vẫn trả về thông tin
+        }
+
+        return [
+            'dataset_id'      => $datasetId,
+            'dataset_name'    => $datasetName,
+            'model_type'      => $modelType,
+            'row_count'       => $rowCount,
+            'feature_columns' => $featureColumns,
+            'label_column'    => $labelColumn,
+            'date_range'      => ['from' => $dateFrom, 'to' => $dateTo],
+            'status'          => $status,
         ];
     }
 
@@ -1103,20 +1629,75 @@ final class PredictiveQualityEngine
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
-    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+    // ── PostgreSQL dual-write / Ghi song song PostgreSQL ─────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    /**
+     * Shadow write a prediction record to the quality_predictions DB table.
+     * Ghi song song bản ghi dự đoán vào bảng quality_predictions trong DB.
+     *
+     * This runs alongside JSON file writes during the SHADOW_WRITE migration
+     * phase. DB failures are logged but never thrown.
+     *
+     * @param array $prediction Prediction record from createPrediction()
+     */
+    private function shadowWritePredictionToDb(array $prediction): void
     {
-        if ($this->db === null) return;
+        if ($this->db === null) {
+            return;
+        }
+
         try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $meta = isset($prediction['metadata'])
+                ? (is_string($prediction['metadata'])
+                    ? $prediction['metadata']
+                    : json_encode($prediction['metadata'], JSON_UNESCAPED_UNICODE))
+                : '{}';
+
             $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
+                "INSERT INTO quality_predictions
+                    (prediction_id, prediction_type, severity, status,
+                     confidence_score, item_id, job_number, wo_number,
+                     machine_id, operator_id, characteristic,
+                     predicted_value, threshold_value, current_trend,
+                     data_points_used, model_version,
+                     recommendation, recommendation_vi,
+                     metadata, expires_at)
+                 VALUES
+                    (:prediction_id, :prediction_type, :severity, :status,
+                     :confidence_score, :item_id, :job_number, :wo_number,
+                     :machine_id, :operator_id, :characteristic,
+                     :predicted_value, :threshold_value, :current_trend,
+                     :data_points_used, :model_version,
+                     :recommendation, :recommendation_vi,
+                     :metadata::jsonb, :expires_at::timestamptz)
+                 ON CONFLICT (prediction_id) DO UPDATE SET
+                     metadata = EXCLUDED.metadata,
+                     recommendation = EXCLUDED.recommendation",
+                [
+                    'prediction_id'    => $prediction['prediction_id'],
+                    'prediction_type'  => $prediction['prediction_type'] ?? 'spc_anomaly',
+                    'severity'         => $prediction['severity'] ?? 'info',
+                    'status'           => $prediction['status'] ?? 'active',
+                    'confidence_score' => $prediction['confidence_score'] ?? null,
+                    'item_id'          => $prediction['item_id'] ?? null,
+                    'job_number'       => $prediction['job_number'] ?? null,
+                    'wo_number'        => $prediction['wo_number'] ?? null,
+                    'machine_id'       => $prediction['machine_id'] ?? null,
+                    'operator_id'      => $prediction['operator_id'] ?? null,
+                    'characteristic'   => $prediction['characteristic'] ?? null,
+                    'predicted_value'  => $prediction['predicted_value'] ?? null,
+                    'threshold_value'  => $prediction['threshold_value'] ?? null,
+                    'current_trend'    => $prediction['current_trend'] ?? null,
+                    'data_points_used' => $prediction['data_points_used'] ?? null,
+                    'model_version'    => $prediction['model_version'] ?? null,
+                    'recommendation'   => $prediction['recommendation'] ?? null,
+                    'recommendation_vi' => $prediction['recommendation_vi'] ?? null,
+                    'metadata'         => $meta,
+                    'expires_at'       => $prediction['expires_at'] ?? null,
+                ]
             );
         } catch (\Throwable $e) {
-            error_log("[PredictiveQualityEngine] Shadow write to {$table} failed: " . $e->getMessage());
+            @error_log('[PredictiveQualityEngine] Shadow write to quality_predictions failed: ' . $e->getMessage());
         }
     }
 }

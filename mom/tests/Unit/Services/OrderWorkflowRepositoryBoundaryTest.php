@@ -59,6 +59,35 @@ final class OrderWorkflowRepositoryBoundaryTest extends TestCase
         $this->assertSame(0, $repository->saveCount);
         $this->assertSame([], $repository->auditEvents);
     }
+
+    public function testReleasedEcrFieldCanBeUnlockedByChangeAuthority(): void
+    {
+        $repository = new InMemoryOrderWorkflowRepository([
+            'sales_orders' => [],
+            'job_orders' => [[
+                'jo_number' => 'JO-AUTH-001',
+                'status' => 'released',
+                'part_revision' => 'A',
+            ]],
+            'work_orders' => [],
+        ]);
+        $service = new OrderWorkflowService(
+            sys_get_temp_dir(),
+            db: new ReleasedChangeAuthorityFakeDb(),
+            repository: $repository,
+        );
+
+        $result = $service->validateFieldEdit(
+            'jo',
+            'JO-AUTH-001',
+            'part_revision',
+            'B',
+            'qa_manager',
+            ['change_order_number' => 'ECO-001'],
+        );
+
+        $this->assertTrue($result->ok, $result->message);
+    }
 }
 
 final class InMemoryOrderWorkflowRepository implements OrderWorkflowRepository
@@ -108,6 +137,9 @@ final class InMemoryOrderWorkflowRepository implements OrderWorkflowRepository
             'work_order' => [
                 'roles_edit' => ['qa_manager'],
             ],
+            'job_order' => [
+                'roles_edit' => ['qa_manager'],
+            ],
         ];
     }
 
@@ -140,5 +172,42 @@ final class InMemoryOrderWorkflowRepository implements OrderWorkflowRepository
     public function appendOrderNotification(array $notification): void
     {
         $this->notifications[] = $notification;
+    }
+}
+
+final class ReleasedChangeAuthorityFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return array<int, array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (str_contains($sql, 'eqms_field_governance_rule')) {
+            return [[
+                'object_type' => 'jo',
+                'field_path' => 'part_revision',
+                'lifecycle_state' => 'released',
+                'governance_class' => 'post_release_locked',
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+                'metadata' => '{}',
+            ]];
+        }
+
+        if (str_contains($sql, 'eqms_change_affected_object')) {
+            return [[
+                'plm_change_order_id' => '00000000-0000-4000-8000-000000000001',
+                'change_order_number' => 'ECO-001',
+                'status' => 'released',
+                'allowed_effect' => 'revise',
+                'effectivity_rule' => '{}',
+                'affected_fields' => '{part_revision}',
+                'authority_source' => 'affected_object',
+            ]];
+        }
+
+        return [];
     }
 }

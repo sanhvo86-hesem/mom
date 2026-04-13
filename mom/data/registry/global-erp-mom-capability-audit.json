@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T09:37:06.420Z",
+    "generatedAt": "2026-04-13T11:20:28.353Z",
     "description": "Global ERP+MOM+MES+EQMS backend capability audit mapped against current registry, contracts, workflows, endpoint catalog and OpenAPI.",
     "authority": "Read-only governance artifact. Storage authority remains database/migrations/*.sql -> database/schema.sql."
   },
@@ -1591,12 +1591,12 @@
               "document_revision",
               "document_versions",
               "documents",
-              "order_document_requirements",
-              "order_documents_required",
-              "osc_supplier_portal_documents",
-              "portal_document_access",
-              "qual_certificate_templates",
-              "tms_customs_documents"
+              "eqms_document_distribution",
+              "eqms_document_effectivity",
+              "eqms_document_family",
+              "eqms_document_read_ack",
+              "eqms_document_revision",
+              "order_document_requirements"
             ],
             "serviceBacked": false
           },
@@ -1609,6 +1609,10 @@
               "trace_material_certificates"
             ],
             "matches": [
+              "eqms_evidence_artifact",
+              "eqms_evidence_manifest",
+              "eqms_evidence_record",
+              "eqms_evidence_version",
               "evidence_chain_custody",
               "evidence_fts",
               "evidence_links",
@@ -1657,7 +1661,8 @@
             ],
             "matches": [
               "electronic_signature",
-              "electronic_signatures"
+              "electronic_signatures",
+              "eqms_electronic_signature_event"
             ],
             "serviceBacked": false
           }
@@ -1683,7 +1688,7 @@
           "document_control.documents.list",
           "document_control.documents.transition",
           "document_control.documents.update",
-          "evidence_vault.evidence_chain_custody.create"
+          "evidence_vault.eqms_evidence_artifact.create"
         ],
         "workflowPassed": true,
         "openapiTerms": [],

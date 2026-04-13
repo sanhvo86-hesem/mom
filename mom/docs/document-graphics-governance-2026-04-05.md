@@ -298,6 +298,10 @@ Every new module or major UI refactor must pass:
 - no JS-generated visual shell
 - zero orphan tokens
 - zero unreachable controls
+- backend graphics compliance matrix reviewed
+- impact analysis recorded for token/theme/component/template changes
+- release blocker snapshot attached
+- waiver validity checked when a module is not full-admin-controlled
 - one real live consumer for each new governed token
 - light/dark parity checked
 - density floor checked
@@ -311,10 +315,55 @@ If a new governed pattern is added, the implementation is incomplete until all r
 
 - `scripts/portal/00b-theme-manager.js`
 - `scripts/portal/00c-admin-appearance.js`
+- `scripts/portal/00ba-graphics-governance-service.js`
+- `api/controllers/GraphicsGovernanceController.php`
+- `api/services/GraphicsGovernanceService.php`
+- `api/routes/graphics-governance-routes.php`
+- `api/openapi.yaml`
 - `scripts/portal/02-state-auth-ui.js` loader version if needed
 - one or more shared stylesheets in `/styles`
 - at least one real module consumer
 - this governance document
+
+## Graphics Control Plane Upgrade - 2026-04-13
+
+Admin Appearance is now governed as the Graphics Control Plane. It is not only a theme editor. The control path is:
+
+`Admin Appearance -> backend graphics authority -> controlled template registry -> shared tokens/components -> bridge aliases -> module UI -> release evidence`
+
+### Authority split
+
+- Backend authority owns design config version/ETag, template registry, template lifecycle, impact reports, compliance matrix, debt/drift reports, rollout/apply/rollback, waivers, audit history and release blockers.
+- `00b-theme-manager.js` remains the runtime token/theme engine. It may keep user preference and offline read cache, but it is not template registry authority.
+- `00ba-graphics-governance-service.js` is the frontend service contract. UI code must call it instead of hardcoding endpoint actions in visual controls.
+- LocalStorage is allowed only for preview cache, unsaved draft cache and last-view/filter/sort cache.
+
+### Required backend actions
+
+The frontend expects these action contracts to exist:
+
+- template registry: `admin_template_registry_get`, `admin_template_get`, `admin_template_draft_save`, `admin_template_validate`, `admin_template_publish`, `admin_template_deprecate`, `admin_template_modules_get`
+- impact analysis: `admin_graphics_impact_token`, `admin_graphics_impact_template`, `admin_graphics_impact_component`
+- compliance/debt/drift: `admin_graphics_compliance_get`, `admin_graphics_non_compliant_get`, `admin_graphics_debt_get`, `admin_graphics_drift_get`
+- rollout: `admin_graphics_rollout_stage`, `admin_graphics_rollout_apply`, `admin_graphics_rollout_rollback`
+- audit/waiver/blockers: `admin_graphics_audit_history_get`, `admin_graphics_waiver_create`, `admin_graphics_waiver_approve`, `admin_graphics_waiver_expire`, `admin_graphics_waiver_active_get`, `admin_graphics_release_blockers_get`
+
+Mutating actions must require optimistic concurrency through `expectedVersion` or `If-Match`.
+
+### Module compliance states
+
+Every module must be classified as one of:
+
+- `full-admin-controlled`
+- `bridged-to-shared-tokens`
+- `legacy-private-css`
+- `blocked`
+
+Any non-compliant module must carry reason text, debt counts and remediation ownership. New modules or major refactors are blocked unless their graphics linkage is `full-admin-controlled` or an approved waiver covers the remaining bridged debt.
+
+### Release evidence
+
+Release manifest and evidence bundle must include graphics authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waiver refs, drift report and rollback plan.
 
 ## Ownership Model
 

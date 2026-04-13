@@ -101,6 +101,88 @@ class RegistryService
     }
 
     /**
+     * Load one split data-fields part. Keeping this separate lets endpoint-level
+     * field lookups avoid decoding every generated data-fields registry part.
+     */
+    private function loadDataFieldsPart(string $file): array
+    {
+        $file = basename(trim($file));
+        if ($file === '') {
+            return [];
+        }
+
+        $cacheKey = 'data-fields-part:' . $file;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
+        }
+
+        return $this->cache[$cacheKey] = $this->readJsonFile($this->registryDir . '/' . $file);
+    }
+
+    /**
+     * Return field definitions for a single endpoint without materializing the
+     * full split data-fields registry. The split index carries domain hints, so
+     * most lookups decode only the relevant part.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function dataFieldsForEndpoint(string $endpoint): ?array
+    {
+        $endpoint = trim($endpoint);
+        if ($endpoint === '') {
+            return null;
+        }
+
+        $cacheKey = 'data-fields-endpoint:' . $endpoint;
+        if (array_key_exists($cacheKey, $this->cache)) {
+            /** @var array<int, array<string, mixed>>|null $cached */
+            $cached = $this->cache[$cacheKey];
+            return $cached;
+        }
+
+        $index = $this->readJsonFile($this->registryDir . '/data-fields.json');
+        $parts = $index['parts'] ?? ($index['_meta']['parts'] ?? []);
+        if (!is_array($parts) || $parts === []) {
+            $fields = is_array($index[$endpoint] ?? null) ? $index[$endpoint] : null;
+            $this->cache[$cacheKey] = $fields;
+            return $fields;
+        }
+
+        $domain = strtolower(strtok($endpoint, '.') ?: '');
+        $preferred = [];
+        $fallback = [];
+        foreach ($parts as $part) {
+            if (!is_array($part)) {
+                continue;
+            }
+            $domains = array_map(
+                static fn($value): string => strtolower(trim((string)$value)),
+                (array)($part['domains'] ?? [])
+            );
+            if ($domain !== '' && in_array($domain, $domains, true)) {
+                $preferred[] = $part;
+            } else {
+                $fallback[] = $part;
+            }
+        }
+
+        foreach (array_merge($preferred, $fallback) as $part) {
+            $file = trim((string)($part['file'] ?? ''));
+            if ($file === '') {
+                continue;
+            }
+            $payload = $this->loadDataFieldsPart($file);
+            if (is_array($payload[$endpoint] ?? null)) {
+                $this->cache[$cacheKey] = $payload[$endpoint];
+                return $payload[$endpoint];
+            }
+        }
+
+        $this->cache[$cacheKey] = null;
+        return null;
+    }
+
+    /**
      * Flush cache (call after admin update to a registry file).
      */
     public function flush(?string $registryName = null): void
@@ -176,8 +258,7 @@ class RegistryService
      */
     public function fields(string $endpoint): ?array
     {
-        $df = $this->load('data-fields');
-        return $df[$endpoint] ?? null;
+        return $this->dataFieldsForEndpoint($endpoint);
     }
 
     /**

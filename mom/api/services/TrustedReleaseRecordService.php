@@ -98,6 +98,7 @@ final class TrustedReleaseRecordService
             $packet = [
                 'packet_id' => $packetId,
                 'packet_type' => 'trusted_manufacturing_release_record',
+                'payload_schema_version' => 'release_packet.v1',
                 'packet_version' => 1,
                 'packet_state' => $state,
                 'target_aggregate_type' => $target['type'],
@@ -780,6 +781,7 @@ final class TrustedReleaseRecordService
     private function packetPayload(array $packet): array
     {
         return [
+            'payload_schema_version' => $packet['payload_schema_version'] ?? 'release_packet.v1',
             'canonical_identifiers' => $packet['canonical_identifiers'] ?? [],
             'sections' => $packet['sections'] ?? [],
             'assertions' => $packet['assertions'] ?? [],
@@ -797,6 +799,7 @@ final class TrustedReleaseRecordService
     {
         return hash('sha256', ManufacturingEventCodec::canonicalJson([
             'packet_type' => $packet['packet_type'] ?? '',
+            'payload_schema_version' => $packet['payload_schema_version'] ?? 'release_packet.v1',
             'packet_version' => (int)($packet['packet_version'] ?? 1),
             'target' => [
                 'type' => $packet['target_aggregate_type'] ?? '',
@@ -841,4 +844,3 @@ final class TrustedReleaseRecordService
 if (!class_exists('MOM\\Services\\TrustedReleaseRecordService', false)) {
     class_alias(TrustedReleaseRecordService::class, 'MOM\\Services\\TrustedReleaseRecordService');
 }
-

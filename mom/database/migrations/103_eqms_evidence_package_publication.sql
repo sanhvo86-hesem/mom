@@ -24,6 +24,13 @@ CREATE TABLE IF NOT EXISTS eqms_evidence_record (
         CHECK (lifecycle_state IN ('draft', 'assembling', 'finalized', 'locked', 'superseded', 'voided')),
     current_version_id UUID,
     retention_class    TEXT,
+    org_company_code   VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id       VARCHAR(30),
+    org_site_id        VARCHAR(30),
+    source_system      VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id   VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
     metadata           JSONB       NOT NULL DEFAULT '{}'::jsonb,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -90,8 +97,16 @@ CREATE TABLE IF NOT EXISTS eqms_evidence_artifact (
     mime_type            TEXT,
     size_bytes           BIGINT,
     sha256               CHAR(64) NOT NULL,
+    org_company_code     VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id         VARCHAR(30),
+    org_site_id          VARCHAR(30),
+    source_system        VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id     VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
     created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     metadata             JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version          BIGINT NOT NULL DEFAULT 1,
     UNIQUE (evidence_version_id, artifact_role, sha256)
 );
 
@@ -108,11 +123,20 @@ CREATE TRIGGER trg_eqms_evidence_artifact_immutable_delete
     BEFORE DELETE ON eqms_evidence_artifact
     FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
 
-ALTER TABLE eqms_evidence_record
-    ADD CONSTRAINT fk_eqms_evidence_record_current_version
-    FOREIGN KEY (current_version_id)
-    REFERENCES eqms_evidence_version(evidence_version_id)
-    DEFERRABLE INITIALLY DEFERRED;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_eqms_evidence_record_current_version'
+    ) THEN
+        ALTER TABLE eqms_evidence_record
+            ADD CONSTRAINT fk_eqms_evidence_record_current_version
+            FOREIGN KEY (current_version_id)
+            REFERENCES eqms_evidence_version(evidence_version_id)
+            DEFERRABLE INITIALLY DEFERRED;
+    END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS eqms_publication_target (
     publication_target_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -122,7 +146,15 @@ CREATE TABLE IF NOT EXISTS eqms_publication_target (
         CHECK (authority_role IN ('read_only_replica', 'cache', 'external_index')),
     config                JSONB NOT NULL DEFAULT '{}'::jsonb,
     is_active             BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    org_company_code      VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id          VARCHAR(30),
+    org_site_id           VARCHAR(30),
+    source_system         VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id      VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version           BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS eqms_publication_job (
@@ -150,7 +182,15 @@ CREATE TABLE IF NOT EXISTS eqms_publication_event (
     publication_job_id   UUID NOT NULL REFERENCES eqms_publication_job(publication_job_id) ON DELETE CASCADE,
     event_type           TEXT NOT NULL,
     event_payload        JSONB NOT NULL DEFAULT '{}'::jsonb,
-    recorded_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+    org_company_code     VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id         VARCHAR(30),
+    org_site_id          VARCHAR(30),
+    source_system        VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id     VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    recorded_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version          BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS eqms_retention_lock (
@@ -178,7 +218,15 @@ CREATE TABLE IF NOT EXISTS eqms_integrity_digest (
     verified_at         TIMESTAMPTZ,
     status              TEXT NOT NULL DEFAULT 'valid'
         CHECK (status IN ('valid', 'invalid', 'missing', 'exception_open')),
-    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb
+    org_company_code    VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id        VARCHAR(30),
+    org_site_id         VARCHAR(30),
+    source_system       VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id    VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version         BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_eqms_integrity_digest_object

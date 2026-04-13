@@ -143,6 +143,51 @@ def endpoint_binding(table: str, endpoints: list[dict[str, Any]]) -> dict[str, A
     }
 
 
+def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, Any]:
+    if not graphics_governance:
+        return {
+            "templateCount": 0,
+            "componentContractCount": 0,
+            "nonCompliantModuleCount": 0,
+            "releaseBlockerCount": 1,
+            "releaseBlocked": True,
+            "complianceMatrixVersion": "",
+            "templateRegistryVersion": "",
+            "templateRegistryChecksum": "",
+        }
+
+    template_registry = graphics_governance.get("templateRegistry", {})
+    component_registry = graphics_governance.get("componentContractRegistry", {})
+    compliance = graphics_governance.get("moduleGraphicsCompliance", {})
+    release_blockers = graphics_governance.get("releaseBlockers", {})
+
+    matrix = compliance.get("matrix", []) if isinstance(compliance, dict) else []
+    if not isinstance(matrix, list):
+        matrix = []
+    non_compliant = int((compliance.get("summary", {}) if isinstance(compliance.get("summary"), dict) else {}).get("nonCompliantCount") or 0) if isinstance(compliance, dict) else 0
+    if non_compliant == 0:
+        non_compliant = len([row for row in matrix if isinstance(row, dict) and not bool(row.get("compliant"))])
+
+    blockers = release_blockers.get("blockers", []) if isinstance(release_blockers, dict) else []
+    if not isinstance(blockers, list):
+        blockers = []
+    blocker_count = len([row for row in blockers if isinstance(row, dict) and row.get("status") != "waived"])
+    if blocker_count == 0 and non_compliant > 0:
+        blocker_count = non_compliant
+
+    template_meta = template_registry.get("_meta", {}) if isinstance(template_registry, dict) else {}
+    return {
+        "templateCount": len(template_registry.get("templates", [])) if isinstance(template_registry.get("templates"), list) else 0,
+        "componentContractCount": int(component_registry.get("count") or 0) if isinstance(component_registry, dict) else 0,
+        "nonCompliantModuleCount": non_compliant,
+        "releaseBlockerCount": blocker_count,
+        "releaseBlocked": blocker_count > 0,
+        "complianceMatrixVersion": scalar(compliance.get("version")) if isinstance(compliance, dict) else "",
+        "templateRegistryVersion": scalar(template_meta.get("version") or template_meta.get("governanceRevision")),
+        "templateRegistryChecksum": scalar(template_meta.get("checksum") or graphics_governance.get("_meta", {}).get("sourceHash")),
+    }
+
+
 def workflow_binding(table: str, table_doc: dict[str, Any], relation_entity: dict[str, Any], workflows: dict[str, Any]) -> dict[str, Any] | None:
     workflow_id = scalar(table_doc.get("workflowId") or relation_entity.get("workflowId"))
     if workflow_id == "":
@@ -328,6 +373,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
     schema_authority_count = int(schema_authority.get("schema_authority", {}).get("table_count") or 0)
     global_summary = global_audit.get("summary", {}) if isinstance(global_audit.get("summary"), dict) else {}
     capability_blocking_gap_count = int(global_summary.get("blocking_gap_count") or 0)
+    graphics_summary = graphics_release_summary(graphics_governance)
 
     workflow_eligible_count = len(
         [
@@ -406,6 +452,15 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
                 "interpretation": "Service/projection endpoints may not map one-to-one to storage tables; keep them explicit in contracts.",
             }
         )
+    if graphics_summary["releaseBlocked"]:
+        warnings.append(
+            {
+                "id": "graphics_governance_release_blockers_present",
+                "severity": "release-blocker",
+                "count": graphics_summary["releaseBlockerCount"],
+                "interpretation": "Graphics compliance/debt/drift must be resolved or covered by approved waiver before new module release.",
+            }
+        )
 
     summary = {
         "tableCount": len(tables),
@@ -425,9 +480,12 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "warningCount": len(warnings),
         "capabilityCount": int(global_summary.get("capability_count") or 0),
         "capabilityBlockingGapCount": capability_blocking_gap_count,
-        "graphicsTemplateCount": len(graphics_governance.get("templateRegistry", {}).get("templates", [])) if graphics_governance else 0,
-        "graphicsComponentContractCount": int(graphics_governance.get("componentContractRegistry", {}).get("count") or 0) if graphics_governance else 0,
-        "releaseReadinessScore": 100 if len(critical_gaps) == 0 else max(0, 100 - (len(critical_gaps) * 20)),
+        "graphicsTemplateCount": graphics_summary["templateCount"],
+        "graphicsComponentContractCount": graphics_summary["componentContractCount"],
+        "graphicsNonCompliantModuleCount": graphics_summary["nonCompliantModuleCount"],
+        "graphicsReleaseBlockerCount": graphics_summary["releaseBlockerCount"],
+        "graphicsGovernanceReleaseBlocked": graphics_summary["releaseBlocked"],
+        "releaseReadinessScore": 100 if len(critical_gaps) == 0 and not graphics_summary["releaseBlocked"] else max(0, 100 - (len(critical_gaps) * 20) - (int(graphics_summary["releaseBlockerCount"]) * 5)),
     }
 
     domains = [
@@ -483,6 +541,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "globalCapabilityBlockingGapsClosed": capability_blocking_gap_count == 0,
             "workspaceDraftUsed": False,
             "graphicsGovernanceRegistryPresent": bool(graphics_governance),
+            "graphicsReleaseBlockersClosed": not graphics_summary["releaseBlocked"],
         },
     }
 
@@ -513,6 +572,14 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "diagnostics": source_path(DIAGNOSTICS),
             "manifest": source_path(MANIFEST),
             "graphicsGovernance": source_path(GRAPHICS_GOVERNANCE) if graphics_governance else "",
+        },
+        "graphicsReleaseLink": {
+            "graphicsAuthorityRefs": [source_path(GRAPHICS_GOVERNANCE)] if graphics_governance else [],
+            "templateRegistryVersion": graphics_summary["templateRegistryVersion"],
+            "templateRegistryChecksum": graphics_summary["templateRegistryChecksum"],
+            "complianceMatrixRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsCompliance" if graphics_governance else "",
+            "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
+            "releaseBlocked": graphics_summary["releaseBlocked"],
         },
         "sourceAuthority": {
             "databaseSchema": "public",

@@ -57,14 +57,12 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
         $ref = new ReflectionClass($service);
 
         $mapType = $ref->getMethod('mapEvidenceType');
-        $mapType->setAccessible(true);
         $this->assertSame('material_cert', $mapType->invoke($service, 'certificate'));
         $this->assertSame('measurement_data', $mapType->invoke($service, 'measurement'));
         $this->assertSame('machine_log', $mapType->invoke($service, 'log'));
         $this->assertSame('test_report', $mapType->invoke($service, 'report'));
 
         $mapAction = $ref->getMethod('mapCustodyAction');
-        $mapAction->setAccessible(true);
         $this->assertSame('uploaded', $mapAction->invoke($service, 'stored'));
         $this->assertSame('viewed', $mapAction->invoke($service, 'accessed'));
         $this->assertSame('downloaded', $mapAction->invoke($service, 'exported'));

@@ -26,9 +26,11 @@ var TABS = [
   { key:'predictions', vi:'Du doan',        en:'Predictions',     section:'ai' },
   { key:'spc',         vi:'SPC',            en:'SPC Monitor',     section:'ai' },
   { key:'toolwear',    vi:'Hao mon dao',    en:'Tool Wear',       section:'ai' },
+  { key:'maintenance', vi:'Bao tri du doan', en:'Predictive Maintenance', section:'ai' },
   { key:'gantt',       vi:'Gantt',          en:'Gantt Schedule',  section:'sched' },
   { key:'heatmap',     vi:'Cong suat',      en:'Capacity Heatmap', section:'sched' },
-  { key:'promise',     vi:'Hen giao',       en:'Promise Calculator', section:'sched' }
+  { key:'promise',     vi:'Hen giao',       en:'Promise Calculator', section:'sched' },
+  { key:'machines',    vi:'Trang thai may',  en:'Machine Status',     section:'machines' }
 ];
 
 var SEVERITY_COLORS = {
@@ -75,7 +77,12 @@ var state = {
   filters: {},
   dateRange: { start:'', end:'' },
   pagination: { offset:0, limit:50, total:0 },
-  loading: false
+  loading: false,
+  /* machine status tab */
+  machines: [],
+  machineDetail: null,       // expanded machine_id or null
+  machineRefreshTimer: null,
+  machineCharts: []          // track chart DOM refs for cleanup
 };
 
 /* ── CSS injection ────────────────────────────────────── */
@@ -196,43 +203,220 @@ function _renderPredictionsTab(){
   return html;
 }
 
-/* ── tab: SPC anomaly monitor ────────────────────────── */
+/* ── tab: Enhanced SPC quality prediction (ECharts) ─── */
 function _renderSpcTab(){
-  var html='<h3 style="margin:0 0 var(--space-4,16px)">'+_t('Giam sat SPC','SPC Anomaly Monitor')+'</h3>';
+  var html='';
 
-  if(!state.spcViolations.length) return html+'<div class="aq-empty">'+_t('Khong co vi pham SPC','No SPC violations')+'</div>';
+  /* Part/characteristic selector */
+  html+='<div class="aq-spc-controls" style="display:flex;gap:var(--space-sm,10px);margin-bottom:var(--space-md,16px);flex-wrap:wrap;align-items:center">';
+  html+='<input id="aq-spc-part" placeholder="'+_t('Ma chi tiet...','Part number...')+'" style="padding:var(--space-xs,4px) var(--space-sm,8px);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-sm,4px);background:var(--surface,#fff);color:var(--text,#0f172a);flex:1;min-width:150px;">';
+  html+='<input id="aq-spc-char" placeholder="'+_t('Dac tinh...','Characteristic...')+'" style="padding:var(--space-xs,4px) var(--space-sm,8px);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-sm,4px);background:var(--surface,#fff);color:var(--text,#0f172a);flex:1;min-width:150px;">';
+  html+='<button class="aq-btn aq-btn-primary" data-action="load-spc">'+_t('Xem','View')+'</button>';
+  html+='<button class="aq-btn aq-btn-secondary" data-action="predict-next">'+_t('Du doan tiep','Predict Next')+'</button>';
+  html+='</div>';
 
-  state.spcViolations.forEach(function(v){
-    var rule=SPC_RULES[v.rule_code]||{label:v.rule_code,severity:'info'};
-    var sevColor=SEVERITY_COLORS[rule.severity]||'var(--text-secondary,#64748b)';
-    html+='<div class="aq-card" style="border-left:4px solid '+sevColor+'">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'
-        +'<div><strong>'+_esc(v.rule_code)+'</strong> - '+_esc(rule.label)+'</div>'
-        +_sevBadge(rule.severity)
-      +'</div>'
-      +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:var(--space-1,4px)">'
-        +_t('Dac tinh','Characteristic')+': '+_esc(v.characteristic||'-')
-        +' | '+_t('May','Machine')+': '+_esc(v.machine||'-')
-        +' | '+_fmtDateTime(v.detected_at)
+  /* Main layout: charts + capability panel */
+  html+='<div style="display:flex;gap:var(--space-md,16px);flex-wrap:wrap;">';
+
+  /* X-bar & R chart column */
+  html+='<div style="flex:1;min-width:300px;">';
+  html+='<div id="aq-spc-xbar" class="ai-chart-wrap" style="height:300px;"></div>';
+  html+='<div id="aq-spc-rchart" class="ai-chart-wrap" style="height:200px;margin-top:var(--space-sm,8px);"></div>';
+  html+='</div>';
+
+  /* Capability side panel */
+  html+='<div style="width:200px;min-width:180px;">';
+  html+='<div class="ai-kpi-card" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">Cp</div><div id="aq-spc-cp" class="ai-kpi-value">&mdash;</div></div>';
+  html+='<div class="ai-kpi-card" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">Cpk</div><div id="aq-spc-cpk" class="ai-kpi-value">&mdash;</div></div>';
+  html+='<div class="ai-kpi-card" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">Pp</div><div id="aq-spc-pp" class="ai-kpi-value">&mdash;</div></div>';
+  html+='<div class="ai-kpi-card" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">Ppk</div><div id="aq-spc-ppk" class="ai-kpi-value">&mdash;</div></div>';
+  html+='<div id="aq-spc-status" class="ai-kpi-card"></div>';
+  html+='</div>';
+
+  html+='</div>'; /* end flex layout */
+
+  /* Anomaly details section */
+  html+='<div id="aq-spc-anomalies" style="margin-top:var(--space-md,16px);"></div>';
+
+  /* Also show existing SPC violations as cards below if any */
+  if(state.spcViolations.length){
+    html+='<h4 style="margin:var(--space-md,16px) 0 var(--space-sm,8px);color:var(--text,#0f172a);">'+_t('Vi pham SPC gan day','Recent SPC Violations')+'</h4>';
+    state.spcViolations.forEach(function(v){
+      var rule=SPC_RULES[v.rule_code]||{label:v.rule_code,severity:'info'};
+      var sevColor=SEVERITY_COLORS[rule.severity]||'var(--text-secondary,#64748b)';
+      html+='<div class="aq-card" style="border-left:4px solid '+sevColor+'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center">'
+          +'<div><strong>'+_esc(v.rule_code)+'</strong> - '+_esc(rule.label)+'</div>'
+          +_sevBadge(rule.severity)
+        +'</div>'
+        +'<div style="font-size:.8125rem;color:var(--text-secondary,#64748b);margin-top:var(--space-1,4px)">'
+          +_t('Dac tinh','Characteristic')+': '+_esc(v.characteristic||'-')
+          +' | '+_t('May','Machine')+': '+_esc(v.machine||'-')
+          +' | '+_fmtDateTime(v.detected_at)
+        +'</div>'
+        +'<div style="font-size:.8125rem;margin-top:var(--space-2,6px)"><strong>'+_t('Khuyen nghi','Recommendation')+':</strong> '+_esc(v.recommended_action||'-')+'</div>'
       +'</div>';
+    });
+  }
 
-    /* mini SPC chart */
-    var points=v.last_points||[];
-    if(points.length){
-      var maxVal=Math.max.apply(null, points.map(function(p){return Math.abs(p.value||0);}))||1;
-      html+='<div class="aq-spc-chart" style="margin-top:var(--space-2,8px)">';
-      points.forEach(function(pt, idx){
-        var h=Math.round(Math.abs(pt.value||0)/maxVal*70)+10;
-        var barColor=pt.violation?sevColor:'var(--brand,#1565c0)';
-        html+='<div class="aq-spc-bar" style="height:'+h+'%;background:'+barColor+';opacity:'+(pt.violation?1:0.4)+'"></div>';
-      });
-      html+='</div>';
-    }
-
-    html+='<div style="font-size:.8125rem;margin-top:var(--space-2,6px)"><strong>'+_t('Khuyen nghi','Recommendation')+':</strong> '+_esc(v.recommended_action||'-')+'</div>'
-    +'</div>';
-  });
   return html;
+}
+
+function _loadSpcData(){
+  var partEl=document.getElementById('aq-spc-part');
+  var charEl=document.getElementById('aq-spc-char');
+  var partNum=partEl?partEl.value.trim():'';
+  var charName=charEl?charEl.value.trim():'';
+
+  if(!partNum&&!charName){
+    _toast(_t('Nhap ma chi tiet hoac dac tinh','Enter part number or characteristic'),'warning');
+    return;
+  }
+
+  _api('spc_chart_data',{part_number:partNum,characteristic:charName}).then(function(r){
+    if(!r||!r.ok){
+      _toast(_t('Khong co du lieu SPC','No SPC data found'),'warning');
+      return;
+    }
+    var data=r.data||r;
+    _renderSpcCharts(data);
+  }).catch(function(){
+    _toast(_t('Loi ket noi','Connection error'),'error');
+  });
+}
+
+function _renderSpcCharts(data){
+  var xbarEl=document.getElementById('aq-spc-xbar');
+  if(!xbarEl||!window.HmChart) return;
+
+  /* Build anomaly index array from anomalies list */
+  var anomalyIndices=[];
+  var anomalies=data.anomalies||[];
+  anomalies.forEach(function(a){
+    if(typeof a==='number') anomalyIndices.push(a);
+    else if(a.index!=null) anomalyIndices.push(a.index);
+  });
+
+  /* X-bar chart */
+  var spcOpts={
+    data:      data.measurements||data.data||[],
+    ucl:       data.ucl,
+    lcl:       data.lcl,
+    cl:        data.center_line||data.cl,
+    anomalies: anomalyIndices,
+    title:     _t('Bieu do X-bar','X-bar Chart')
+  };
+
+  /* Add sigma zones if available */
+  if(data.sigma1!=null) spcOpts.sigma1=data.sigma1;
+  if(data.sigma2!=null) spcOpts.sigma2=data.sigma2;
+
+  HmChart.create(xbarEl,'spc',spcOpts);
+
+  /* R-chart */
+  var rEl=document.getElementById('aq-spc-rchart');
+  if(rEl&&(data.ranges||data.r_data)){
+    HmChart.create(rEl,'spc',{
+      data:  data.ranges||data.r_data||[],
+      ucl:   data.r_ucl,
+      lcl:   data.r_lcl||0,
+      cl:    data.r_cl,
+      title: _t('Bieu do R','R Chart')
+    });
+  }
+
+  /* Update capability values */
+  _updateSpcCapability(data.capability||{});
+
+  /* Show anomaly details */
+  _renderSpcAnomalies(anomalies, data);
+}
+
+function _updateSpcCapability(cap){
+  var fields=['cp','cpk','pp','ppk'];
+  fields.forEach(function(f){
+    var el=document.getElementById('aq-spc-'+f);
+    if(!el) return;
+    var val=cap[f]||cap[f.charAt(0).toUpperCase()+f.slice(1)];
+    if(val===undefined||val===null){ el.textContent='\u2014'; el.style.color=''; return; }
+    val=parseFloat(val);
+    el.textContent=val.toFixed(2);
+    /* Color: green >= 1.67, yellow 1.33-1.67, red < 1.33 */
+    el.style.color=val>=1.67?'var(--green,#22c55e)':val>=1.33?'var(--amber,#f59e0b)':'var(--red,#ef4444)';
+  });
+
+  /* Update status card */
+  var statusEl=document.getElementById('aq-spc-status');
+  if(statusEl){
+    var cpk=parseFloat(cap.cpk||cap.Cpk||0);
+    var statusText, statusColor;
+    if(cpk>=1.67){ statusText=_t('Qua trinh xuat sac','Process Excellent'); statusColor='var(--green,#22c55e)'; }
+    else if(cpk>=1.33){ statusText=_t('Qua trinh tot','Process Good'); statusColor='var(--amber,#f59e0b)'; }
+    else if(cpk>=1.0){ statusText=_t('Qua trinh chap nhan','Process Acceptable'); statusColor='var(--amber,#f59e0b)'; }
+    else { statusText=_t('Qua trinh kem','Process Poor'); statusColor='var(--red,#ef4444)'; }
+    statusEl.innerHTML='<div class="ai-kpi-label">'+_t('Trang thai','Status')+'</div><div class="ai-kpi-value" style="font-size:var(--text-sm,.875rem);color:'+statusColor+'">'+statusText+'</div>';
+  }
+}
+
+function _renderSpcAnomalies(anomalies, data){
+  var el=document.getElementById('aq-spc-anomalies');
+  if(!el||!anomalies.length) return;
+
+  var html='<h4 style="color:var(--text,#0f172a);margin-bottom:var(--space-sm,8px);">'+_t('Bat thuong phat hien','Detected Anomalies')+'</h4>';
+  html+='<table class="aq-table"><thead><tr><th>#</th><th>'+_t('Vi tri','Position')+'</th><th>'+_t('Gia tri','Value')+'</th><th>'+_t('Loai','Type')+'</th></tr></thead><tbody>';
+  anomalies.forEach(function(a,i){
+    var idx=typeof a==='number'?a:(a.index!=null?a.index:i);
+    var val=typeof a==='number'?(data.measurements?data.measurements[a]:'-'):(a.value||'-');
+    var type=typeof a==='object'?(a.rule||a.type||'-'):'-';
+    html+='<tr><td>'+(i+1)+'</td><td>'+_esc(idx)+'</td><td>'+_esc(val)+'</td><td>'+_esc(type)+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+function _handlePredictNext(){
+  var partEl=document.getElementById('aq-spc-part');
+  var charEl=document.getElementById('aq-spc-char');
+  var partNum=partEl?partEl.value.trim():'';
+  var charName=charEl?charEl.value.trim():'';
+
+  if(!partNum&&!charName){
+    _toast(_t('Nhap ma chi tiet hoac dac tinh','Enter part number or characteristic'),'warning');
+    return;
+  }
+
+  _toast(_t('Dang du doan...','Predicting...'),'info');
+
+  _api('ai_spc_predict',{part_number:partNum,characteristic:charName}).then(function(r){
+    if(!r||!r.ok){
+      _toast(_t('Loi du doan','Prediction error'),'error');
+      return;
+    }
+    var data=r.data||r;
+
+    /* Re-render SPC chart with forecast overlay if possible */
+    var xbarEl=document.getElementById('aq-spc-xbar');
+    if(xbarEl&&window.HmChart&&data.forecast){
+      /* Build a timeseries view with actuals + forecast */
+      var actuals=(data.measurements||data.data||[]).map(function(v,i){ return [i,v]; });
+      var forecastData=(data.forecast.data||data.forecast||[]).map(function(v,i){ return [actuals.length+i,v]; });
+
+      HmChart.create(xbarEl,'timeseries',{
+        seriesName: _t('Gia tri do','Measured'),
+        data: actuals,
+        xType: 'category',
+        forecastName: _t('Du doan','Forecast'),
+        forecast: forecastData,
+        confidenceUpper: data.forecast.upper?data.forecast.upper.map(function(v,i){ return [actuals.length+i,v]; }):null,
+        confidenceLower: data.forecast.lower?data.forecast.lower.map(function(v,i){ return [actuals.length+i,v]; }):null,
+        yAxisName: data.unit||'',
+        title: _t('Bieu do X-bar voi du doan','X-bar with Forecast')
+      });
+    }
+    _toast(_t('Du doan hoan tat','Prediction complete'),'success');
+  }).catch(function(){
+    _toast(_t('Loi ket noi','Connection error'),'error');
+  });
 }
 
 /* ── tab: tool wear predictions ──────────────────────── */
@@ -263,75 +447,175 @@ function _renderToolWearTab(){
   return html;
 }
 
-/* ── tab: Gantt schedule ─────────────────────────────── */
+/* ── tab: Enhanced Gantt schedule (ECharts) ─────────── */
 function _renderGanttTab(){
-  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
-    +'<h3 style="margin:0">'+_t('Lich trinh Gantt','Gantt Schedule')+'</h3>'
-    +'<div class="aq-filters" style="margin-bottom:0">'
-      +'<input type="date" data-filter="gantt_start" value="'+_esc(state.dateRange.start)+'">'
-      +'<input type="date" data-filter="gantt_end" value="'+_esc(state.dateRange.end)+'">'
-      +'<button class="aq-btn aq-btn-primary" data-action="refresh-gantt">'+_t('Tai lai','Refresh')+'</button>'
-    +'</div>'
-  +'</div>';
+  var html='';
 
-  var machines=state.schedule;
-  if(!machines||!machines.length) return html+'<div class="aq-empty">'+_t('Khong co du lieu lich trinh','No schedule data')+'</div>';
-
-  /* compute day columns */
-  var startDate=state.dateRange.start?new Date(state.dateRange.start):new Date();
-  var endDate=state.dateRange.end?new Date(state.dateRange.end):new Date(startDate.getTime()+7*86400000);
-  var days=[];
-  var d=new Date(startDate);
-  while(d<=endDate){ days.push(new Date(d)); d=new Date(d.getTime()+86400000); }
-  var totalDays=days.length||1;
-
-  html+='<div class="sc-gantt" style="min-height:'+(machines.length*40+40)+'px">';
-  /* header */
-  html+='<div class="sc-gantt-header"><div class="sc-gantt-label">'+_t('May','Machine')+'</div>';
-  days.forEach(function(day){
-    html+='<div class="sc-gantt-cell" style="min-width:60px;padding:var(--space-1,4px);text-align:center;font-size:.6875rem;font-weight:var(--font-heading-weight,600)">'
-      +String(day.getDate()).padStart(2,'0')+'/'+String(day.getMonth()+1).padStart(2,'0')
-    +'</div>';
-  });
+  /* Controls bar */
+  html+='<div class="aq-gantt-controls" style="display:flex;gap:var(--space-sm,10px);margin-bottom:var(--space-md,16px);flex-wrap:wrap;align-items:center">';
+  html+='<select id="aq-gantt-range" style="padding:var(--space-xs,4px) var(--space-sm,8px);border:1px solid var(--border,#e2e8f0);border-radius:var(--radius-sm,4px);background:var(--surface,#fff);color:var(--text,#0f172a);">';
+  html+='<option value="1">'+_t('1 ngay','1 Day')+'</option>';
+  html+='<option value="3" selected>'+_t('3 ngay','3 Days')+'</option>';
+  html+='<option value="7">'+_t('7 ngay','7 Days')+'</option>';
+  html+='</select>';
+  html+='<button class="aq-btn aq-btn-primary" data-action="optimize-schedule">'+_t('Toi uu hoa','Optimize')+'</button>';
+  html+='<button class="aq-btn aq-btn-secondary" id="aq-gantt-apply-btn" data-action="apply-suggestions" style="display:none;">'+_t('Ap dung goi y','Apply Suggestions')+'</button>';
   html+='</div>';
 
-  /* rows */
-  machines.forEach(function(m){
-    html+='<div class="sc-gantt-row"><div class="sc-gantt-label" style="font-size:var(--text-xs,.75rem);display:flex;align-items:center">'+_esc(m.machine_name||'-')+'</div>';
-    days.forEach(function(){ html+='<div class="sc-gantt-cell"></div>'; });
+  /* Gantt chart container */
+  html+='<div id="aq-gantt-chart" class="ai-chart-wrap" style="height:400px;"></div>';
 
-    /* slots/bars */
-    var slots=m.slots||[];
-    slots.forEach(function(slot){
-      var slotStart=new Date(slot.start);
-      var slotEnd=new Date(slot.end);
-      var leftPct=Math.max(0,(slotStart-startDate)/(endDate-startDate)*100);
-      var widthPct=Math.max(1,(slotEnd-slotStart)/(endDate-startDate)*100);
-      var color=SLOT_COLORS[slot.type]||'#94a3b8';
-      var conflict=slot.conflict?' conflict':'';
-      html+='<div class="sc-gantt-bar'+conflict+'" style="left:calc(140px + '+leftPct+'%);width:'+widthPct+'%;background:'+color+'" data-action="slot-detail" data-id="'+_esc(slot.id)+'" title="'+_esc(slot.wo_number||slot.type||'')+'">'
-        +_esc(slot.wo_number||slot.label||'')
-      +'</div>';
-    });
-    html+='</div>';
-  });
-
-  /* today line */
-  var now=new Date();
-  if(now>=startDate&&now<=endDate){
-    var todayPct=(now-startDate)/(endDate-startDate)*100;
-    html+='<div class="sc-gantt-today" style="left:calc(140px + '+todayPct+'%)"></div>';
-  }
+  /* Optimization comparison (hidden until optimize is clicked) */
+  html+='<div id="aq-gantt-optimization" style="display:none;margin-top:var(--space-md,16px);">';
+  html+='<h4 style="color:var(--text,#0f172a);">'+_t('Ket qua toi uu hoa','Optimization Results')+'</h4>';
+  html+='<div id="aq-gantt-improvements" class="ai-kpi-row"></div>';
+  html+='<div id="aq-gantt-changes" style="margin-top:var(--space-sm,8px);"></div>';
   html+='</div>';
 
-  /* legend */
-  html+='<div style="display:flex;gap:var(--space-4,16px);margin-top:var(--space-3,10px);font-size:var(--text-xs,.75rem)">';
-  Object.keys(SLOT_COLORS).forEach(function(k){
-    html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);background:'+SLOT_COLORS[k]+'"></div>'+_esc(k)+'</div>';
-  });
-  html+='<div style="display:flex;align-items:center;gap:var(--space-1,4px)"><div style="width:14px;height:14px;border-radius:var(--radius-sm,3px);border:2px solid var(--red-light,#ef4444)"></div>'+_t('Xung dot','Conflict')+'</div>';
-  html+='</div>';
   return html;
+}
+
+/* load gantt data for N days and render via ECharts */
+function _loadGanttData(days){
+  var startDate=new Date().toISOString().slice(0,10);
+  var endDate=new Date(Date.now()+days*86400000).toISOString().slice(0,10);
+
+  _api('schedule_slots',{start_date:startDate,end_date:endDate}).then(function(r){
+    if(!r||!r.ok){
+      var chartEl=document.getElementById('aq-gantt-chart');
+      if(chartEl) chartEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu lich trinh','No schedule data')+'</div>';
+      return;
+    }
+    var slots=r.data||r.slots||[];
+    _renderGanttChart(slots);
+  }).catch(function(){
+    var chartEl=document.getElementById('aq-gantt-chart');
+    if(chartEl) chartEl.innerHTML='<div class="aq-empty">'+_t('Loi ket noi','Connection error')+'</div>';
+  });
+}
+
+function _renderGanttChart(slots){
+  var chartEl=document.getElementById('aq-gantt-chart');
+  if(!chartEl||!window.HmChart) return;
+
+  /* Group slots by machine */
+  var machines=[];
+  var machineSet={};
+  var tasks=[];
+
+  slots.forEach(function(slot){
+    var mid=slot.machine_id||slot.machine||'Unknown';
+    if(!machineSet[mid]){
+      machineSet[mid]=machines.length;
+      machines.push(mid);
+    }
+
+    var statusColors={
+      scheduled:   'var(--info,#3b82f6)',
+      in_progress: 'var(--success,#22c55e)',
+      delayed:     'var(--danger,#ef4444)',
+      setup:       'var(--warning,#f59e0b)',
+      completed:   '#888',
+      production:  'var(--info,#3b82f6)',
+      maintenance: '#9ca3af',
+      idle:        '#e5e7eb'
+    };
+
+    tasks.push({
+      machine:      mid,
+      machineIndex: machineSet[mid],
+      start:        slot.start_time||slot.start,
+      end:          slot.end_time||slot.end,
+      name:         slot.wo_number||slot.job_number||'Job',
+      status:       slot.status||slot.type||'scheduled',
+      color:        statusColors[slot.status||slot.type]||statusColors.scheduled,
+      slot_id:      slot.slot_id||slot.id
+    });
+  });
+
+  if(!machines.length){
+    chartEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu lich trinh','No schedule data')+'</div>';
+    return;
+  }
+
+  HmChart.create(chartEl,'gantt',{
+    machines: machines,
+    tasks:    tasks
+  });
+}
+
+function _handleOptimizeSchedule(){
+  var rangeEl=document.getElementById('aq-gantt-range');
+  var days=rangeEl?parseInt(rangeEl.value,10):3;
+  var startDate=new Date().toISOString().slice(0,10);
+  var endDate=new Date(Date.now()+days*86400000).toISOString().slice(0,10);
+
+  _toast(_t('Dang toi uu hoa...','Optimizing...'),'info');
+
+  _api('ai_schedule_optimize',{start_date:startDate,end_date:endDate}).then(function(r){
+    if(!r||!r.ok){
+      _toast(_t('Loi toi uu hoa','Optimization error'),'error');
+      return;
+    }
+
+    var data=r.data||r;
+    var optDiv=document.getElementById('aq-gantt-optimization');
+    if(optDiv) optDiv.style.display='block';
+
+    /* Show improvement KPIs */
+    var impEl=document.getElementById('aq-gantt-improvements');
+    if(impEl){
+      var html='';
+      html+='<div class="ai-kpi-card accent-success"><div class="ai-kpi-label">'+_t('Giam thoi gian setup','Setup Time Reduction')+'</div><div class="ai-kpi-value" style="color:var(--green,#22c55e)">'+_esc(data.setup_time_reduction||0)+'%</div></div>';
+      html+='<div class="ai-kpi-card accent-info"><div class="ai-kpi-label">'+_t('Can bang tai','Load Balance')+'</div><div class="ai-kpi-value" style="color:var(--blue,#3b82f6)">'+_esc(data.load_balance||0)+'%</div></div>';
+      html+='<div class="ai-kpi-card accent-warning"><div class="ai-kpi-label">'+_t('Thay doi dung hen','On-Time Change')+'</div><div class="ai-kpi-value" style="color:var(--amber,#f59e0b)">'+(data.on_time_change>0?'+':'')+_esc(data.on_time_change||0)+'%</div></div>';
+      impEl.innerHTML=html;
+    }
+
+    /* Show changes table */
+    var chgEl=document.getElementById('aq-gantt-changes');
+    var changes=data.changes||[];
+    if(chgEl&&changes.length){
+      var tHtml='<table class="aq-table"><thead><tr><th>'+_t('Lenh','Job')+'</th><th>'+_t('May cu','From Machine')+'</th><th>'+_t('May moi','To Machine')+'</th><th>'+_t('Ly do','Reason')+'</th></tr></thead><tbody>';
+      changes.forEach(function(c){
+        tHtml+='<tr><td>'+_esc(c.wo_number||c.job||'-')+'</td><td>'+_esc(c.from_machine||'-')+'</td><td>'+_esc(c.to_machine||'-')+'</td><td>'+_esc(c.reason||'-')+'</td></tr>';
+      });
+      tHtml+='</tbody></table>';
+      chgEl.innerHTML=tHtml;
+    }
+
+    /* Show Apply button */
+    var applyBtn=document.getElementById('aq-gantt-apply-btn');
+    if(applyBtn) applyBtn.style.display='inline-flex';
+
+    /* Store optimization id for apply */
+    state._ganttOptimizationId=data.optimization_id||data.id||null;
+
+    _toast(_t('Toi uu hoa hoan tat','Optimization complete'),'success');
+  }).catch(function(){
+    _toast(_t('Loi ket noi','Connection error'),'error');
+  });
+}
+
+function _handleApplySuggestions(){
+  if(!state._ganttOptimizationId){
+    _toast(_t('Khong co goi y','No suggestions to apply'),'warning');
+    return;
+  }
+  _api('ai_schedule_apply',{optimization_id:state._ganttOptimizationId}).then(function(r){
+    if(r&&r.ok){
+      _toast(_t('Da ap dung goi y','Suggestions applied'),'success');
+      var rangeEl=document.getElementById('aq-gantt-range');
+      var days=rangeEl?parseInt(rangeEl.value,10):3;
+      _loadGanttData(days);
+      var applyBtn=document.getElementById('aq-gantt-apply-btn');
+      if(applyBtn) applyBtn.style.display='none';
+    } else {
+      _toast(_t('Loi ap dung','Apply error'),'error');
+    }
+  }).catch(function(){
+    _toast(_t('Loi ket noi','Connection error'),'error');
+  });
 }
 
 /* ── tab: capacity heatmap ───────────────────────────── */
@@ -431,6 +715,475 @@ function _renderPromiseTab(){
   return html;
 }
 
+/* ── tab: Predictive Maintenance Dashboard ──────────── */
+function _renderMaintenanceTab(){
+  var html='';
+
+  /* Tool wear curves chart */
+  html+='<h4 style="color:var(--text,#0f172a);margin-bottom:var(--space-sm,8px);">'+_t('Duong cong mai mon dung cu','Tool Wear Curves')+'</h4>';
+  html+='<div id="aq-maint-wear-chart" class="ai-chart-wrap" style="height:300px;"></div>';
+
+  /* RUL table */
+  html+='<h4 style="color:var(--text,#0f172a);margin:var(--space-md,16px) 0 var(--space-sm,8px);">'+_t('Tuoi tho con lai','Remaining Useful Life')+'</h4>';
+  html+='<div id="aq-maint-rul-table"></div>';
+
+  /* Bottom row: cost avoidance + accuracy */
+  html+='<div style="display:flex;gap:var(--space-md,16px);margin-top:var(--space-md,16px);flex-wrap:wrap;">';
+  html+='<div style="flex:1;min-width:250px;">';
+  html+='<h4 style="color:var(--text,#0f172a);margin-bottom:var(--space-sm,8px);">'+_t('Chi phi tranh duoc','Cost Avoidance')+'</h4>';
+  html+='<div id="aq-maint-cost" class="ai-kpi-row"></div>';
+  html+='</div>';
+  html+='<div style="flex:1;min-width:250px;">';
+  html+='<h4 style="color:var(--text,#0f172a);margin-bottom:var(--space-sm,8px);">'+_t('Do chinh xac du doan','Prediction Accuracy')+'</h4>';
+  html+='<div id="aq-maint-accuracy-chart" class="ai-chart-wrap" style="height:200px;"></div>';
+  html+='</div>';
+  html+='</div>';
+
+  return html;
+}
+
+function _loadMaintenanceData(){
+  /* Load tool wear predictions */
+  _api('tool_wear_predictions').then(function(r){
+    if(!r||!r.ok){
+      var wEl=document.getElementById('aq-maint-wear-chart');
+      if(wEl) wEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+      var tEl=document.getElementById('aq-maint-rul-table');
+      if(tEl) tEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+      return;
+    }
+    var tools=r.data||r.predictions||[];
+    _renderWearCurves(tools);
+    _renderRulTable(tools);
+  }).catch(function(){
+    var wEl=document.getElementById('aq-maint-wear-chart');
+    if(wEl) wEl.innerHTML='<div class="aq-empty">'+_t('Loi ket noi','Connection error')+'</div>';
+  });
+
+  /* Load dashboard for cost/accuracy */
+  _api('ai_dashboard_combined').then(function(r){
+    if(!r||!r.ok){
+      var cEl=document.getElementById('aq-maint-cost');
+      if(cEl) cEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+      return;
+    }
+    var data=r.data||r;
+    _renderCostAvoidance(data);
+    _renderAccuracyChart(data);
+  }).catch(function(){
+    var cEl=document.getElementById('aq-maint-cost');
+    if(cEl) cEl.innerHTML='<div class="aq-empty">'+_t('Loi ket noi','Connection error')+'</div>';
+  });
+}
+
+function _renderWearCurves(tools){
+  var chartEl=document.getElementById('aq-maint-wear-chart');
+  if(!chartEl||!window.HmChart) return;
+
+  if(!tools.length){
+    chartEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+    return;
+  }
+
+  /* Build multi-series timeseries */
+  var series=[];
+  tools.forEach(function(tool){
+    var wearPct=parseFloat(tool.wear_pct||tool.current_wear||0);
+    var rul=parseFloat(tool.remaining_hours||tool.rul_hours||0);
+
+    /* Current point + projected endpoint */
+    var now=new Date();
+    var failureTime=new Date(now.getTime()+rul*3600000);
+
+    series.push({
+      name: tool.tool_id||tool.name||'Tool',
+      type: 'line',
+      data: [
+        [now.toISOString(), wearPct],
+        [failureTime.toISOString(), 100]
+      ],
+      smooth: false,
+      symbol: 'circle',
+      symbolSize: 6,
+      lineStyle: { type: wearPct>80?'solid':'dashed', width: 2 }
+    });
+  });
+
+  HmChart.create(chartEl,'timeseries',{
+    series:     series,
+    yAxisName:  _t('Mai mon %','Wear %'),
+    title:      _t('Du doan mai mon','Wear Projection'),
+    area:       false,
+    smooth:     false
+  });
+}
+
+function _renderRulTable(tools){
+  var el=document.getElementById('aq-maint-rul-table');
+  if(!el) return;
+
+  if(!tools.length){
+    el.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+    return;
+  }
+
+  var html='<table class="aq-table"><thead><tr style="border-bottom:2px solid var(--border,#e2e8f0);">';
+  html+='<th>'+_t('Dung cu','Tool ID')+'</th>';
+  html+='<th style="text-align:center;">'+_t('Mai mon','Wear %')+'</th>';
+  html+='<th style="text-align:center;">'+_t('Con lai','RUL')+'</th>';
+  html+='<th style="text-align:center;">'+_t('Hanh dong','Action')+'</th>';
+  html+='<th style="text-align:center;">'+_t('Tin cay','Confidence')+'</th>';
+  html+='</tr></thead><tbody>';
+
+  /* Sort by wear descending */
+  tools.sort(function(a,b){
+    return (parseFloat(b.wear_pct||b.current_wear||0))-(parseFloat(a.wear_pct||a.current_wear||0));
+  });
+
+  tools.forEach(function(tool){
+    var wear=parseFloat(tool.wear_pct||tool.current_wear||0);
+    var rul=tool.remaining_hours||tool.rul_hours||'?';
+    var conf=parseFloat(tool.confidence||0);
+    var color=wear>80?'var(--red,#ef4444)':wear>60?'var(--amber,#f59e0b)':'var(--green,#22c55e)';
+    var icon=wear>80?'\uD83D\uDD34':wear>60?'\uD83D\uDFE1':'\uD83D\uDFE2';
+    var action=wear>80?_t('Thay the','Replace'):wear>60?_t('Theo doi','Monitor'):'OK';
+
+    html+='<tr style="border-bottom:1px solid var(--border,#e2e8f0);">';
+    html+='<td>'+icon+' '+_esc(tool.tool_id||tool.name||'')+'</td>';
+    html+='<td style="text-align:center;color:'+color+';font-weight:600;">'+wear.toFixed(0)+'%</td>';
+    html+='<td style="text-align:center;">~'+_esc(String(rul))+'h</td>';
+    html+='<td style="text-align:center;">';
+    if(wear>60){
+      html+='<button class="aq-btn aq-btn-secondary" data-action="schedule-pm" data-tool="'+_esc(tool.tool_id||'')+'" style="padding:var(--space-1,4px) var(--space-sm,8px);font-size:var(--text-xs,.75rem);">'+action+'</button>';
+    } else {
+      html+=action;
+    }
+    html+='</td>';
+    html+='<td style="text-align:center;">'+conf.toFixed(0)+'%</td>';
+    html+='</tr>';
+  });
+
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+function _renderCostAvoidance(data){
+  var el=document.getElementById('aq-maint-cost');
+  if(!el) return;
+
+  var maint=data.maintenance||data.cost_avoidance||data;
+  var html='';
+  html+='<div class="ai-kpi-card accent-success" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">'+_t('Tiet kiem thang nay','Saved This Month')+'</div><div class="ai-kpi-value" style="color:var(--green,#22c55e)">$'+_esc(maint.monthly_savings||maint.saved_this_month||0)+'</div></div>';
+  html+='<div class="ai-kpi-card accent-info" style="margin-bottom:var(--space-sm,8px);"><div class="ai-kpi-label">'+_t('Su co tranh duoc','Incidents Prevented')+'</div><div class="ai-kpi-value" style="color:var(--blue,#3b82f6)">'+_esc(maint.incidents_prevented||0)+'</div></div>';
+  html+='<div class="ai-kpi-card accent-purple"><div class="ai-kpi-label">'+_t('Thoi gian hoat dong them','Extra Uptime')+'</div><div class="ai-kpi-value" style="color:var(--purple,#7c3aed)">'+_esc(maint.extra_uptime_hours||0)+'h</div></div>';
+  el.innerHTML=html;
+}
+
+function _renderAccuracyChart(data){
+  var chartEl=document.getElementById('aq-maint-accuracy-chart');
+  if(!chartEl||!window.HmChart) return;
+
+  var accuracy=data.prediction_accuracy||data.accuracy||{};
+  var value=parseFloat(accuracy.overall||accuracy.value||0);
+
+  if(!value&&!accuracy.history){
+    chartEl.innerHTML='<div class="aq-empty">'+_t('Khong co du lieu','No data')+'</div>';
+    return;
+  }
+
+  /* If we have history data, render as timeseries; otherwise as gauge */
+  if(accuracy.history&&accuracy.history.length){
+    HmChart.create(chartEl,'timeseries',{
+      seriesName: _t('Do chinh xac','Accuracy'),
+      data: accuracy.history.map(function(pt){ return [pt.date||pt.t, pt.value||pt.v]; }),
+      area: true,
+      smooth: true,
+      yAxisName: '%'
+    });
+  } else {
+    HmChart.create(chartEl,'gauge',{
+      value: value,
+      min:   0,
+      max:   100,
+      title: _t('Do chinh xac','Accuracy'),
+      unit:  '%'
+    });
+  }
+}
+
+function _handleSchedulePm(toolId){
+  if(!toolId) return;
+  _toast(_t('Dang len lich bao tri...','Scheduling maintenance...'),'info');
+  _api('ai_schedule_pm',{tool_id:toolId}).then(function(r){
+    if(r&&r.ok){
+      _toast(_t('Da len lich bao tri','Maintenance scheduled'),'success');
+    } else {
+      _toast(_t('Loi len lich','Scheduling error'),'error');
+    }
+  }).catch(function(){
+    _toast(_t('Loi ket noi','Connection error'),'error');
+  });
+}
+
+/* ── Machine Status constants ────────────────────────── */
+var MACHINE_STATUS_META = {
+  running:     { vi:'Dang chay',   en:'Running',     color:'var(--green,#22c55e)' },
+  idle:        { vi:'Ranh',        en:'Idle',         color:'var(--amber,#f59e0b)' },
+  alarm:       { vi:'Bao dong',    en:'Alarm',        color:'var(--red,#ef4444)' },
+  maintenance: { vi:'Bao tri',     en:'Maintenance',  color:'var(--text-secondary,#64748b)' }
+};
+
+/* ── tab: machine status ─────────────────────────────── */
+function _renderMachinesTab(){
+  var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4,16px)">'
+    +'<h3 style="margin:0;display:flex;align-items:center;gap:var(--space-2,8px)">'
+      +_t('Trang thai may','Machine Status')
+      +' <span class="ai-status-dot ai-sse-status '+(window.HmAiStream?HmAiStream.getStatus():'disconnected')+'"></span>'
+      +'<span class="ai-status-label">'+(window.HmAiStream&&HmAiStream.getStatus()==='connected'?'Live':'--')+'</span>'
+    +'</h3>'
+    +'<button class="aq-btn aq-btn-secondary" data-action="refresh-machines">'+_t('Tai lai','Refresh')+'</button>'
+  +'</div>';
+
+  if(!state.machines||!state.machines.length){
+    return html+'<div class="aq-empty">'+_t('Khong co du lieu may','No machine data')+'</div>';
+  }
+
+  html+='<div class="ai-machine-grid">';
+  state.machines.forEach(function(m){
+    var st=m.status||'idle';
+    var meta=MACHINE_STATUS_META[st]||MACHINE_STATUS_META.idle;
+    var oee=m.oee||{};
+    var isExpanded=(state.machineDetail===m.machine_id);
+
+    html+='<div class="ai-machine-card '+_esc(st)+'" data-action="toggle-machine" data-machine-id="'+_esc(m.machine_id)+'">';
+
+    /* header */
+    html+='<div class="ai-machine-name">'+_esc(m.machine_name||m.machine_id||'-')+'</div>';
+    html+='<div class="ai-machine-status">'+_esc(_t(meta.vi,meta.en))+'</div>';
+
+    /* OEE gauge container */
+    html+='<div class="ai-chart-wrap" style="margin-top:var(--space-3,12px);padding:var(--space-2,8px);border:none;box-shadow:none">'
+      +'<div class="ai-machine-oee-gauge" data-machine-oee="'+_esc(m.machine_id)+'" style="height:120px"></div>'
+    +'</div>';
+
+    /* current job */
+    if(m.current_job){
+      html+='<div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);margin-top:var(--space-2,8px)">'
+        +'<strong>'+_t('Lenh','Job')+':</strong> '+_esc(m.current_job.wo_number||'-')
+        +' | '+_esc(m.current_job.part_number||'-')
+        +' | Op '+_esc(m.current_job.operation||'-')
+      +'</div>';
+    }
+
+    /* telemetry mini metrics */
+    var tel=m.telemetry||{};
+    html+='<div class="ai-machine-metrics">'
+      +'<div class="ai-machine-metric">'+_t('Rung','Vibration')+'<strong>'+_esc(tel.vibration_rms!=null?tel.vibration_rms.toFixed(2):'-')+' mm/s</strong></div>'
+      +'<div class="ai-machine-metric">'+_t('Nhiet do','Temp')+'<strong>'+_esc(tel.spindle_temp!=null?tel.spindle_temp.toFixed(1):'-')+' C</strong></div>'
+      +'<div class="ai-machine-metric">'+_t('Tai','Load')+'<strong>'+_esc(tel.spindle_load!=null?tel.spindle_load+'%':'-')+'</strong></div>'
+      +'<div class="ai-machine-metric">OEE<strong style="color:'+((oee.overall||0)>=80?'var(--green,#22c55e)':(oee.overall||0)>=60?'var(--amber,#f59e0b)':'var(--red,#ef4444)')+'">'+_esc((oee.overall||0).toFixed(1))+'%</strong></div>'
+    +'</div>';
+
+    /* AI prediction badges */
+    var preds=m.predictions||[];
+    if(preds.length){
+      html+='<div style="display:flex;flex-wrap:wrap;gap:var(--space-1,4px);margin-top:var(--space-2,8px)">';
+      preds.forEach(function(p){
+        var confClass=p.confidence>=80?'high-confidence':p.confidence>=50?'medium-confidence':'low-confidence';
+        html+='<span class="ai-prediction-badge '+confClass+'">'
+          +_esc(p.prediction_type||p.message||'-')
+          +' <span class="ai-confidence-bar"><span class="ai-confidence-fill" style="width:'+_esc(p.confidence||0)+'%"></span></span>'
+          +_esc(p.confidence||0)+'%'
+        +'</span>';
+      });
+      html+='</div>';
+    }
+
+    /* expanded detail area */
+    if(isExpanded){
+      html+='<div style="margin-top:var(--space-4,16px);padding-top:var(--space-4,16px);border-top:1px solid var(--border,#e2e8f0)">';
+
+      /* OEE breakdown */
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-2,8px);margin-bottom:var(--space-4,16px)">'
+        +'<div style="text-align:center"><div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);text-transform:uppercase;font-weight:700">'+_t('San sang','Availability')+'</div><div style="font-size:var(--text-lg,1.25rem);font-weight:800;color:var(--blue,#3b82f6)">'+_esc((oee.availability||0).toFixed(1))+'%</div></div>'
+        +'<div style="text-align:center"><div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);text-transform:uppercase;font-weight:700">'+_t('Hieu suat','Performance')+'</div><div style="font-size:var(--text-lg,1.25rem);font-weight:800;color:var(--amber,#f59e0b)">'+_esc((oee.performance||0).toFixed(1))+'%</div></div>'
+        +'<div style="text-align:center"><div style="font-size:var(--text-xs,.75rem);color:var(--text-secondary,#64748b);text-transform:uppercase;font-weight:700">'+_t('Chat luong','Quality')+'</div><div style="font-size:var(--text-lg,1.25rem);font-weight:800;color:var(--green,#22c55e)">'+_esc((oee.quality||0).toFixed(1))+'%</div></div>'
+      +'</div>';
+
+      /* vibration chart */
+      html+='<div class="ai-chart-wrap">'
+        +'<div class="ai-chart-title">'+_t('Rung 24h','24h Vibration')+'</div>'
+        +'<div class="ai-chart-area ai-machine-vibration-chart" data-machine-vib="'+_esc(m.machine_id)+'" style="min-height:200px"></div>'
+      +'</div>';
+
+      /* temperature chart */
+      html+='<div class="ai-chart-wrap">'
+        +'<div class="ai-chart-title">'+_t('Nhiet do 24h','24h Temperature')+'</div>'
+        +'<div class="ai-chart-area ai-machine-temp-chart" data-machine-temp="'+_esc(m.machine_id)+'" style="min-height:200px"></div>'
+      +'</div>';
+
+      /* active predictions list */
+      if(preds.length){
+        html+='<h5 style="margin:var(--space-3,12px) 0 var(--space-2,8px);font-size:var(--text-xs,.75rem);text-transform:uppercase;color:var(--text-secondary,#64748b);font-weight:700">'+_t('Du doan dang hoat dong','Active Predictions')+'</h5>';
+        html+='<table class="aq-table"><thead><tr><th>'+_t('Loai','Type')+'</th><th>'+_t('Muc do','Severity')+'</th><th>'+_t('Do tin cay','Confidence')+'</th><th>'+_t('Thong bao','Message')+'</th></tr></thead><tbody>';
+        preds.forEach(function(p){
+          var sevColor=SEVERITY_COLORS[p.severity]||'var(--text-secondary,#64748b)';
+          html+='<tr>'
+            +'<td>'+_esc(p.prediction_type||'-')+'</td>'
+            +'<td><span class="aq-badge" style="background:'+sevColor+'">'+_esc(p.severity||'-')+'</span></td>'
+            +'<td>'+_esc(p.confidence||0)+'%</td>'
+            +'<td>'+_esc(p.message||'-')+'</td>'
+          +'</tr>';
+        });
+        html+='</tbody></table>';
+      }
+
+      html+='</div>'; /* end expanded detail */
+    }
+
+    html+='</div>'; /* end .ai-machine-card */
+  });
+  html+='</div>'; /* end .ai-machine-grid */
+  return html;
+}
+
+/* ── machine data loading ────────────────────────────── */
+function _loadMachineData(){
+  _api('ai_dashboard', { section:'machines' }).then(function(r){
+    if(r&&r.ok){
+      state.machines=r.machines||[];
+      _paint();
+      _initMachineCharts();
+    }
+  }).catch(function(){
+    /* silent fail — will retry on next poll */
+  });
+}
+
+/* ── initialize ECharts on machine cards ─────────────── */
+function _initMachineCharts(){
+  if(!state.container||!window.HmChart) return;
+
+  /* OEE gauges */
+  var gauges=state.container.querySelectorAll('.ai-machine-oee-gauge');
+  for(var i=0;i<gauges.length;i++){
+    var gEl=gauges[i];
+    var mid=gEl.getAttribute('data-machine-oee');
+    var machine=_findMachine(mid);
+    if(machine&&machine.oee){
+      HmChart.create(gEl, 'gauge', {
+        value: machine.oee.overall||0,
+        min: 0, max: 100,
+        title: 'OEE'
+      });
+    }
+  }
+
+  /* Vibration timeseries (expanded cards) */
+  var vibCharts=state.container.querySelectorAll('.ai-machine-vibration-chart');
+  for(var v=0;v<vibCharts.length;v++){
+    var vEl=vibCharts[v];
+    var vmid=vEl.getAttribute('data-machine-vib');
+    _loadMachineTelemetry(vmid, 'vibration', vEl);
+  }
+
+  /* Temperature timeseries (expanded cards) */
+  var tempCharts=state.container.querySelectorAll('.ai-machine-temp-chart');
+  for(var tc=0;tc<tempCharts.length;tc++){
+    var tEl=tempCharts[tc];
+    var tmid=tEl.getAttribute('data-machine-temp');
+    _loadMachineTelemetry(tmid, 'temperature', tEl);
+  }
+}
+
+function _loadMachineTelemetry(machineId, metric, el){
+  _api('ai_machine_telemetry', { machine_id:machineId, metric:metric, range:'24h' }).then(function(r){
+    if(r&&r.ok&&window.HmChart){
+      var seriesName=metric==='vibration'?_t('Rung RMS','Vibration RMS'):_t('Nhiet do truc chinh','Spindle Temp');
+      var unit=metric==='vibration'?'mm/s':'C';
+      HmChart.create(el, 'timeseries', {
+        seriesName: seriesName,
+        data: (r.data||[]).map(function(pt){ return [pt.time||pt.t, pt.value||pt.v]; }),
+        area: true,
+        smooth: true,
+        xAxis: { type:'time' },
+        yAxisName: unit
+      });
+    }
+  }).catch(function(){ /* silent */ });
+}
+
+function _findMachine(id){
+  for(var i=0;i<state.machines.length;i++){
+    if(state.machines[i].machine_id===id) return state.machines[i];
+  }
+  return null;
+}
+
+/* ── machine auto-refresh (30s polling) ──────────────── */
+function _startMachinePolling(){
+  _stopMachinePolling();
+  _loadMachineData();
+  state.machineRefreshTimer=setInterval(function(){
+    if(state.activeTab==='machines') _loadMachineData();
+  }, 30000);
+}
+
+function _stopMachinePolling(){
+  if(state.machineRefreshTimer){
+    clearInterval(state.machineRefreshTimer);
+    state.machineRefreshTimer=null;
+  }
+}
+
+/* ── SSE integration for machine events ──────────────── */
+function _registerMachineSSE(){
+  if(!window.HmAiStream) return;
+
+  HmAiStream.on('ai.machine.status_changed', function(data){
+    if(state.activeTab!=='machines') return;
+    var m=_findMachine(data.machine_id);
+    if(m){
+      m.status=data.status||m.status;
+      if(data.telemetry) m.telemetry=data.telemetry;
+      _paint();
+      _initMachineCharts();
+    }
+  });
+
+  HmAiStream.on('ai.machine.telemetry_update', function(data){
+    if(state.activeTab!=='machines') return;
+    var m=_findMachine(data.machine_id);
+    if(m&&data.telemetry){
+      m.telemetry=data.telemetry;
+      /* lightweight update: just re-render metric numbers without full repaint */
+      var card=state.container?state.container.querySelector('[data-machine-id="'+data.machine_id+'"]'):null;
+      if(card){
+        var metrics=card.querySelectorAll('.ai-machine-metric strong');
+        if(metrics.length>=3){
+          var tel=data.telemetry;
+          metrics[0].textContent=(tel.vibration_rms!=null?tel.vibration_rms.toFixed(2):'-')+' mm/s';
+          metrics[1].textContent=(tel.spindle_temp!=null?tel.spindle_temp.toFixed(1):'-')+' C';
+          metrics[2].textContent=(tel.spindle_load!=null?tel.spindle_load+'%':'-');
+        }
+      }
+    }
+  });
+
+  HmAiStream.on('ai.prediction.created', function(data){
+    if(state.activeTab!=='machines') return;
+    if(!data.machine_id) return;
+    var m=_findMachine(data.machine_id);
+    if(m){
+      if(!m.predictions) m.predictions=[];
+      m.predictions.push(data);
+      _paint();
+      _initMachineCharts();
+    }
+  });
+}
+_registerMachineSSE();
+
 /* ── data loading ─────────────────────────────────────── */
 function _loadData(){
   state.loading=true; _paint();
@@ -455,32 +1208,65 @@ function _loadData(){
   }).catch(function(){ state.loading=false; _toast(_t('Loi ket noi','Connection error'),'error'); _paint(); });
 }
 
+/* ── build dynamic tabs (includes external AI Chat if available) ── */
+function _buildTabs(){
+  var tabs = TABS.slice();
+  if(window._aiChatRenderer){
+    tabs.push({ key:'ai_chat', vi:'Tro ly AI', en:'AI Assistant', section:'ai_ext' });
+  }
+  return tabs;
+}
+
 /* ── main paint ───────────────────────────────────────── */
 function _paint(){
   if(!state.container) return;
+  var allTabs = _buildTabs();
   var html='<div class="aq">';
   html+='<div class="aq-tabs">';
   var lastSection='';
-  TABS.forEach(function(tab){
+  allTabs.forEach(function(tab){
     if(lastSection&&lastSection!==tab.section) html+='<div class="aq-tab-sep"></div>';
     lastSection=tab.section;
     html+='<div class="aq-tab'+(state.activeTab===tab.key?' active':'')+'" data-action="tab" data-tab="'+tab.key+'">'+_esc(_t(tab.vi,tab.en))+'</div>';
   });
   html+='</div>';
+  if(state.activeTab==='ai_chat' && window._aiChatRenderer){
+    html+='<div id="aq-ai-chat-mount"></div>';
+    html+='</div>';
+    state.container.innerHTML=html;
+    var mount=state.container.querySelector('#aq-ai-chat-mount');
+    if(mount) window._aiChatRenderer(mount);
+    return;
+  }
   if(state.loading){
     html+='<div class="aq-empty">'+_t('Dang tai...','Loading...')+'</div>';
   } else {
     switch(state.activeTab){
-      case 'predictions': html+=_renderPredictionsTab(); break;
-      case 'spc':         html+=_renderSpcTab(); break;
-      case 'toolwear':    html+=_renderToolWearTab(); break;
-      case 'gantt':       html+=_renderGanttTab(); break;
-      case 'heatmap':     html+=_renderHeatmapTab(); break;
-      case 'promise':     html+=_renderPromiseTab(); break;
+      case 'predictions':  html+=_renderPredictionsTab(); break;
+      case 'spc':          html+=_renderSpcTab(); break;
+      case 'toolwear':     html+=_renderToolWearTab(); break;
+      case 'maintenance':  html+=_renderMaintenanceTab(); break;
+      case 'gantt':        html+=_renderGanttTab(); break;
+      case 'heatmap':      html+=_renderHeatmapTab(); break;
+      case 'promise':      html+=_renderPromiseTab(); break;
+      case 'machines':     html+=_renderMachinesTab(); break;
     }
   }
   html+='</div>';
   state.container.innerHTML=html;
+
+  /* post-paint: init charts for enhanced tabs */
+  if(!state.loading){
+    if(state.activeTab==='machines') _initMachineCharts();
+    if(state.activeTab==='gantt'&&!state._ganttLoaded){
+      state._ganttLoaded=true;
+      _loadGanttData(3);
+    }
+    if(state.activeTab==='maintenance'&&!state._maintLoaded){
+      state._maintLoaded=true;
+      _loadMaintenanceData();
+    }
+  }
 }
 
 /* ── event delegation ─────────────────────────────────── */
@@ -492,8 +1278,16 @@ function _bind(){
     var id=t.getAttribute('data-id');
     switch(action){
       case 'tab':
-        state.activeTab=t.getAttribute('data-tab');
+        var newTab=t.getAttribute('data-tab');
+        var oldTab=state.activeTab;
+        state.activeTab=newTab;
         state.pagination.offset=0;
+        /* reset load flags so enhanced tabs re-fetch data on switch */
+        if(newTab==='gantt') state._ganttLoaded=false;
+        if(newTab==='maintenance') state._maintLoaded=false;
+        /* start/stop machine polling on tab switch */
+        if(newTab==='machines'&&oldTab!=='machines') _startMachinePolling();
+        if(newTab!=='machines'&&oldTab==='machines') _stopMachinePolling();
         _paint();
         break;
       case 'acknowledge-pred':
@@ -526,6 +1320,14 @@ function _bind(){
           }
         });
         break;
+      case 'toggle-machine':
+        var tmid=t.getAttribute('data-machine-id');
+        state.machineDetail=(state.machineDetail===tmid)?null:tmid;
+        _paint();
+        break;
+      case 'refresh-machines':
+        _loadMachineData();
+        break;
       case 'heatmap-cell':
         var machineId=t.getAttribute('data-machine');
         var day=t.getAttribute('data-day');
@@ -546,6 +1348,24 @@ function _bind(){
           else { _toast(_t('Loi tinh toan','Calculation error'),'error'); }
         });
         break;
+      /* Enhanced Gantt actions */
+      case 'optimize-schedule':
+        _handleOptimizeSchedule();
+        break;
+      case 'apply-suggestions':
+        _handleApplySuggestions();
+        break;
+      /* Enhanced SPC actions */
+      case 'load-spc':
+        _loadSpcData();
+        break;
+      case 'predict-next':
+        _handlePredictNext();
+        break;
+      /* Predictive Maintenance actions */
+      case 'schedule-pm':
+        _handleSchedulePm(t.getAttribute('data-tool'));
+        break;
     }
   });
 
@@ -554,6 +1374,11 @@ function _bind(){
     if(f==='gantt_start'){ state.dateRange.start=e.target.value; return; }
     if(f==='gantt_end'){ state.dateRange.end=e.target.value; return; }
     if(f){ state.filters[f]=e.target.value; state.pagination.offset=0; _loadData(); }
+    /* Enhanced Gantt: range dropdown */
+    if(e.target.id==='aq-gantt-range'){
+      var days=parseInt(e.target.value,10)||3;
+      _loadGanttData(days);
+    }
   });
 }
 

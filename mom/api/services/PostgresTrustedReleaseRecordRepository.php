@@ -128,6 +128,7 @@ final class PostgresTrustedReleaseRecordRepository implements TrustedReleaseReco
         $columns = [
             'packet_id',
             'packet_type',
+            'payload_schema_version',
             'packet_version',
             'packet_state',
             'target_aggregate_type',

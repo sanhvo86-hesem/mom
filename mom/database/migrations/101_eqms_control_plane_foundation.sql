@@ -66,10 +66,18 @@ CREATE TABLE IF NOT EXISTS domain_outbox_events (
     last_attempt_at        TIMESTAMPTZ,
     idempotency_key        TEXT,
     correlation_id         TEXT,
+    org_company_code       VARCHAR(30),
+    org_legal_entity_code  VARCHAR(30),
+    org_plant_id           VARCHAR(30),
+    org_site_id            VARCHAR(30),
+    source_system          VARCHAR(80)  NOT NULL DEFAULT 'mom',
+    source_record_id       VARCHAR(160),
+    payload_schema_version VARCHAR(30)  NOT NULL DEFAULT '1.0',
     error_class            TEXT,
     error_message          TEXT,
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at             TIMESTAMPTZ NOT NULL DEFAULT now()
+    updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version            BIGINT      NOT NULL DEFAULT 1
 );
 
 CREATE INDEX IF NOT EXISTS idx_domain_outbox_pending

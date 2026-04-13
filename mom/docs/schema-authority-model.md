@@ -27,8 +27,24 @@ The runtime/API/frontend contract must be generated from registry authority, not
 | `data/registry/system-contract-registry-contracts.json` | Full table contract index, one contract per registry table | `table-registry`, `endpoint-catalog`, `workflow-library` |
 | `data/registry/system-contract-diagnostics.json` | Release gate diagnostics for the published system contract | registry authority artifacts and global capability audit |
 | `data/registry/system-contract-manifest.json` | Single read-only manifest for the full backend contract layer | generated system-contract artifacts |
+| `data/registry/graphics-governance-registry.json` | Machine-readable graphics authority projection for runtime, builder, release and evidence tooling | backend graphics authority, controlled template registry, module compliance, drift/debt diagnostics |
+| `data/registry/graphics-template-registry.json` | Runtime template registry projection consumed by frontend and module builder | `design/template-registry.json` through graphics governance publication |
 
 `schema-studio-*` artifacts remain valid only as workspace/design outputs. With the active blank workspace they should compile to zero design projections and must not be used as the source of truth for runtime release decisions.
+
+## Graphics Authority Model
+
+Graphics governance follows the same authority rule as schema governance: runtime/API/frontend contracts are generated or read from registry authority, not from editable workspace drafts or browser cache.
+
+| Layer | Authority Role | LocalStorage Policy |
+| --- | --- | --- |
+| Admin Graphics Control Plane | User-facing control surface for graphics changes, impact, compliance, rollout, rollback, waiver and audit | May store last view/filter/sort only |
+| Backend Graphics Authority | Canonical owner of design config, controlled template registry, compliance matrix, drift/debt, audit, waiver and release blockers | No browser cache authority |
+| Theme runtime (`HmTheme`) | Applies admin config and user preview prefs to CSS variables | User preference and offline read cache only |
+| Template draft/preview cache | Unsaved editor draft and preview-only token/template overrides | Must not be treated as production registry |
+| Module UI | Consumes shared tokens/components or approved bridge aliases | No private graphics source of truth |
+
+Any registry, builder or release tool that reads `hesem_layout_templates` or a browser-only template cache as production authority is invalid. The controlled path is backend graphics authority -> registry artifact/projection -> runtime/module builder -> release evidence.
 
 ## Workspace Deletion Impact
 

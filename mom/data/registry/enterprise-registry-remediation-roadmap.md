@@ -1,6 +1,6 @@
 # Enterprise Registry Remediation Roadmap
 
-Generated: 2026-04-13T09:36:47.863676+00:00
+Generated: 2026-04-13T11:20:36.128648+00:00
 Status: watch
 
 ## Findings

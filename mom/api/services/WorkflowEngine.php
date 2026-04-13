@@ -1156,13 +1156,6 @@ final class WorkflowEngine
                             'actions'  => [],
                             'requires' => [],
                         ],
-                        'in_review' => [
-                            'label'    => 'Revise',
-                            'label_vi' => 'Sua doi',
-                            'roles'    => ['owner', 'admin', 'qms_engineer'],
-                            'actions'  => [],
-                            'requires' => [],
-                        ],
                     ],
                     'obsolete' => [],
                 ],

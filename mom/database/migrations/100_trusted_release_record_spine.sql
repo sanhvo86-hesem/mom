@@ -21,6 +21,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS mes_trusted_release_record (
     packet_id                   VARCHAR(120) PRIMARY KEY,
     packet_type                 VARCHAR(80)  NOT NULL DEFAULT 'trusted_manufacturing_release_record',
+    payload_schema_version      VARCHAR(40)  NOT NULL DEFAULT 'release_packet.v1',
     packet_version              INTEGER      NOT NULL DEFAULT 1,
     packet_state                VARCHAR(30)  NOT NULL
         CHECK (packet_state IN ('draft', 'assembled', 'blocked', 'releasable', 'released', 'superseded', 'voided')),
@@ -115,4 +116,3 @@ COMMENT ON COLUMN mes_trusted_release_record.provenance IS
     'Ordered provenance timeline and source event hashes used to reproduce the release record.';
 
 COMMIT;
-

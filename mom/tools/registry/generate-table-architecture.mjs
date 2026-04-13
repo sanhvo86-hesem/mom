@@ -696,6 +696,20 @@ const migrationDomainDefaults = new Map([
   ['088_canonical_finance_inventory_valuations.sql', 'finance'],
   ['089_canonical_analytics_plant_performance_snapshots.sql', 'bi_datawarehouse'],
   ['090_canonical_projection_lineage_hardening.sql', 'bi_datawarehouse'],
+  ['091_runtime_governance_continuity.sql', 'system_infrastructure'],
+  ['092_risk_register_contract_alignment.sql', 'audit_risk'],
+  ['093_runtime_observed_contract_columns.sql', 'system_infrastructure'],
+  ['094_department_enum_operational_alignment.sql', 'foundation_governance'],
+  ['095_department_master_operational_alignment.sql', 'foundation_governance'],
+  ['096_runtime_identifier_and_state_contract_alignment.sql', 'system_infrastructure'],
+  ['097_idempotency_replay_ledger.sql', 'system_infrastructure'],
+  ['098_canonical_manufacturing_event_backbone.sql', 'mes_execution'],
+  ['099_ai_integration_foundation.sql', 'ai_predictive'],
+  ['100_trusted_release_record_spine.sql', 'mes_execution'],
+  ['101_eqms_control_plane_foundation.sql', 'record_system'],
+  ['102_eqms_document_form_control.sql', 'document_control'],
+  ['103_eqms_evidence_package_publication.sql', 'evidence_vault'],
+  ['104_eqms_change_authority_field_governance.sql', 'plm_change_control'],
 ]);
 
 const tableDomainOverrides = {
@@ -874,6 +888,7 @@ const tableDomainOverrides = {
   production_schedule_slots: 'advanced_planning',
   schedule_conflicts: 'advanced_planning',
   capacity_snapshots: 'advanced_planning',
+  machine_telemetry_extended: 'mes_execution',
   mobile_work_queue: 'mobile_operations',
   mobile_time_entries: 'mobile_operations',
   mobile_inspection_captures: 'mobile_operations',
@@ -885,6 +900,34 @@ const tableDomainOverrides = {
   lean_smed_events: 'lean_manufacturing',
   lean_tier_meetings: 'lean_manufacturing',
   lean_tier_escalations: 'lean_manufacturing',
+  domain_outbox_events: 'system_infrastructure',
+  eqms_electronic_signature_event: 'foundation_governance',
+  eqms_document_family: 'document_control',
+  eqms_document_revision: 'document_control',
+  eqms_document_effectivity: 'document_control',
+  eqms_document_distribution: 'document_control',
+  eqms_document_read_ack: 'document_control',
+  eqms_form_family: 'forms_system',
+  eqms_form_template_revision: 'forms_system',
+  eqms_form_schema_version: 'forms_system',
+  eqms_form_issuance: 'forms_system',
+  eqms_form_submission_attempt: 'forms_system',
+  eqms_form_record: 'forms_system',
+  eqms_form_record_version: 'forms_system',
+  eqms_evidence_record: 'evidence_vault',
+  eqms_evidence_manifest: 'evidence_vault',
+  eqms_evidence_version: 'evidence_vault',
+  eqms_evidence_artifact: 'evidence_vault',
+  eqms_publication_target: 'evidence_vault',
+  eqms_publication_job: 'evidence_vault',
+  eqms_publication_event: 'evidence_vault',
+  eqms_retention_lock: 'record_system',
+  eqms_integrity_digest: 'evidence_vault',
+  eqms_integrity_exception: 'evidence_vault',
+  eqms_change_affected_object: 'plm_change_control',
+  eqms_change_resulting_object: 'plm_change_control',
+  eqms_field_governance_rule: 'plm_change_control',
+  eqms_field_change_authorization: 'plm_change_control',
 };
 
 const mesSubdomains = {
@@ -2301,6 +2344,7 @@ function buildStatusSignatures(statusOptions) {
 function inferDomain(tableName, migration) {
   if (tableDomainOverrides[tableName]) return tableDomainOverrides[tableName];
   if (/^mes_/.test(tableName)) return 'mes_execution';
+  if (/^ai_/.test(tableName)) return 'ai_predictive';
   if (/^pm_/.test(tableName)) return 'plant_maintenance';
   if (/^aps_/.test(tableName)) return 'advanced_planning';
   if (/^plm_/.test(tableName)) return 'plm_change_control';

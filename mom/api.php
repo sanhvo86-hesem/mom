@@ -12002,6 +12002,207 @@ function find_online_form_entry_index(array $entries, string $entryId = '', stri
   return -1;
 }
 
+function eqms_locked_workflow_states(): array {
+  return ['submitted', 'received', 'in_review', 'approved', 'closed', 'finalized', 'rejected'];
+}
+
+function eqms_is_locked_workflow_state(string $state): bool {
+  return in_array(strtolower(trim($state)), eqms_locked_workflow_states(), true);
+}
+
+function eqms_entry_workflow_state(array $entry): string {
+  return strtolower(trim((string)($entry['workflow_state'] ?? $entry['approval_state'] ?? $entry['_status'] ?? '')));
+}
+
+function eqms_change_authority_from_payload(array $payload): string {
+  foreach (['change_authority_id', 'change_authority', 'authority_id', 'change_order_id', 'change_order_number', 'plm_change_order_id', 'change_order_ref', 'change_request_id', 'change_id'] as $key) {
+    $value = trim((string)($payload[$key] ?? ''));
+    if ($value !== '') return $value;
+  }
+  return '';
+}
+
+function eqms_change_authority_format_valid(string $authority): bool {
+  $authority = trim($authority);
+  if ($authority === '') return false;
+  if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $authority)) return true;
+  return (bool)preg_match('/^[A-Z]{2,12}[A-Z0-9._\/-]{2,80}$/i', $authority);
+}
+
+function eqms_change_authority_service(): ?object {
+  $serviceFile = __DIR__ . '/api/services/ChangeControl/ChangeAuthorityService.php';
+  if (!is_file($serviceFile)) return null;
+  require_once $serviceFile;
+  if (!class_exists('\MOM\Services\ChangeControl\ChangeAuthorityService')) return null;
+  try {
+    return new \MOM\Services\ChangeControl\ChangeAuthorityService(portal_system_db_connection());
+  } catch (Throwable $e) {
+    @error_log('[EQMS] Change authority service unavailable: ' . $e->getMessage());
+    return null;
+  }
+}
+
+function eqms_form_control_metadata_fields(): array {
+  return [
+    'entry_id' => true,
+    'record_id' => true,
+    'allocation_id' => true,
+    'form_code' => true,
+    'form_version' => true,
+    'workflow_state' => true,
+    'approval_state' => true,
+    '_status' => true,
+    '_ip' => true,
+    '_server_time' => true,
+    '_session_user' => true,
+    'submitted_at' => true,
+    'submitted_by' => true,
+    'submitted_name' => true,
+    'updated_at' => true,
+    'updated_by' => true,
+    'created_at' => true,
+    'created_by' => true,
+    'submission_revision' => true,
+    'submission_count' => true,
+    'resubmission_count' => true,
+    'amendment_count' => true,
+    'edit_origin' => true,
+    'source_entry_id' => true,
+    'source_submission_revision' => true,
+    'change_authority_id' => true,
+    'amendment_reason' => true,
+    'change_authority_decisions' => true,
+    'version_created_at' => true,
+    'version_created_by' => true,
+    'source_created_at' => true,
+    'source_created_by' => true,
+    'master_context' => true,
+    'history' => true,
+    'signatures' => true,
+    'runtime_mode' => true,
+  ];
+}
+
+function eqms_form_content_fields(array $payload): array {
+  $fields = is_array($payload['fieldValues'] ?? null) ? $payload['fieldValues'] : $payload;
+  if (!is_array($fields)) return [];
+  $metadataFields = eqms_form_control_metadata_fields();
+  $out = [];
+  foreach ($fields as $key => $value) {
+    $field = trim((string)$key);
+    if ($field === '' || str_starts_with($field, '_') || isset($metadataFields[$field])) continue;
+    $out[$field] = $value;
+  }
+  ksort($out);
+  return $out;
+}
+
+function eqms_same_canonical_value(mixed $left, mixed $right): bool {
+  return json_encode($left, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+    === json_encode($right, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function eqms_form_change_effectivity(array $entry, array $allocation = []): array {
+  $context = is_array($entry['master_context'] ?? null) ? $entry['master_context'] : [];
+  if (is_array($allocation['master_context'] ?? null)) {
+    $context = array_merge((array)$allocation['master_context'], $context);
+  }
+  return array_filter([
+    'site' => $context['site'] ?? $context['site_id'] ?? $entry['site_id'] ?? $allocation['site_id'] ?? null,
+    'plant' => $context['plant'] ?? $context['plant_id'] ?? $entry['plant_id'] ?? $allocation['plant_id'] ?? null,
+    'lot' => $context['lot'] ?? $context['lot_number'] ?? $entry['lot_number'] ?? $allocation['lot_number'] ?? null,
+    'serial' => $context['serial'] ?? $context['serial_number'] ?? $entry['serial_number'] ?? $allocation['serial_number'] ?? null,
+    'order_id' => $context['order_id'] ?? $entry['work_order'] ?? $entry['job_number'] ?? $allocation['record_id'] ?? null,
+  ], static fn($value): bool => $value !== null && trim((string)$value) !== '');
+}
+
+function eqms_assert_online_form_change_authority(
+  string $formCode,
+  array $previous,
+  array $candidate,
+  string $changeAuthorityId,
+  array $allocation = []
+): array {
+  $service = eqms_change_authority_service();
+  if ($service === null || !method_exists($service, 'assertFieldEditAllowed')) {
+    return [
+      'ok' => false,
+      'error' => 'change_authority_unavailable',
+      'message' => 'Change authority service is unavailable; governed amendment denied.',
+      'decisions' => [],
+    ];
+  }
+
+  $previousFields = eqms_form_content_fields($previous);
+  $candidateFields = eqms_form_content_fields($candidate);
+  $allFields = array_values(array_unique(array_merge(array_keys($previousFields), array_keys($candidateFields))));
+  sort($allFields);
+
+  $objectId = trim((string)($previous['record_id'] ?? ''));
+  if ($objectId === '') $objectId = trim((string)($previous['entry_id'] ?? ''));
+  if ($objectId === '') $objectId = trim((string)($candidate['source_entry_id'] ?? $candidate['entry_id'] ?? $formCode));
+
+  $lifecycleState = eqms_entry_workflow_state($previous);
+  if ($lifecycleState === '') $lifecycleState = 'locked';
+
+  $decisions = [];
+  foreach ($allFields as $fieldPath) {
+    $oldValue = $previousFields[$fieldPath] ?? null;
+    $newValue = $candidateFields[$fieldPath] ?? null;
+    if (eqms_same_canonical_value($oldValue, $newValue)) continue;
+
+    try {
+      $decision = $service->assertFieldEditAllowed(
+        'form_record',
+        $objectId,
+        $fieldPath,
+        $oldValue,
+        $newValue,
+        $lifecycleState,
+        [
+          'change_authority_id' => $changeAuthorityId,
+          'requested_effect' => 'amend',
+          'form_code' => $formCode,
+          'source_entry_id' => (string)($previous['entry_id'] ?? ''),
+          'source_submission_revision' => (int)($previous['submission_revision'] ?? 0),
+          'effectivity' => eqms_form_change_effectivity($candidate, $allocation),
+        ]
+      );
+    } catch (Throwable $e) {
+      return [
+        'ok' => false,
+        'error' => 'change_authority_check_failed',
+        'message' => $e->getMessage(),
+        'decisions' => $decisions,
+      ];
+    }
+
+    $item = [
+      'field_path' => $fieldPath,
+      'allowed' => (bool)($decision->allowed ?? false),
+      'message' => (string)($decision->message ?? ''),
+      'error_code' => (string)($decision->errorCode ?? ''),
+      'data' => is_array($decision->data ?? null) ? $decision->data : [],
+    ];
+    $decisions[] = $item;
+    if (!$item['allowed']) {
+      return [
+        'ok' => false,
+        'error' => $item['error_code'] !== '' ? $item['error_code'] : 'change_authority_required',
+        'message' => $item['message'],
+        'field_path' => $fieldPath,
+        'decisions' => $decisions,
+      ];
+    }
+  }
+
+  return ['ok' => true, 'decisions' => $decisions];
+}
+
+function eqms_new_amendment_entry_id(string $formCode): string {
+  return $formCode . '-AMD-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+}
+
 function form_is_online_runtime(string $formCode): bool {
   $schema = load_form_schema_by_code($formCode);
   if (!$schema) return false;
@@ -13267,7 +13468,7 @@ function verify_hidden_sheet_metadata(array $metadata, ?array $allocation, strin
 
   $pattern = (string)($metadata['expected_filename_pattern'] ?? '');
   if ($pattern !== '' && @preg_match('/' . $pattern . '/i', '') !== false && !preg_match('/' . $pattern . '/i', $originalFilename)) {
-    $warnings[] = 'filename_warning';
+    $issues[] = 'filename_mismatch';
   }
 
   if ($issues) {
@@ -13284,6 +13485,26 @@ function verify_hidden_sheet_metadata(array $metadata, ?array $allocation, strin
     'origin_valid' => !in_array('origin_invalid', $issues, true),
     'allocation_valid' => !in_array('allocation_not_found', $issues, true) && !in_array('allocation_wrong_state', $issues, true),
   ];
+}
+
+function allocation_duplicate_receipt_candidates(?array $allocation, string $sha256): array {
+  $sha256 = strtolower(trim($sha256));
+  if (!$allocation || $sha256 === '') return [];
+  $matches = [];
+  foreach ((array)($allocation['receipts'] ?? []) as $receipt) {
+    if (!is_array($receipt)) continue;
+    $receiptHash = strtolower(trim((string)($receipt['sha256_hash'] ?? '')));
+    if ($receiptHash !== '' && hash_equals($receiptHash, $sha256)) {
+      $matches[] = [
+        'version' => (int)($receipt['version'] ?? 0),
+        'uploaded_at' => (string)($receipt['uploaded_at'] ?? ''),
+        'uploaded_by' => (string)($receipt['uploaded_by'] ?? ''),
+        'stored_filename' => (string)($receipt['stored_filename'] ?? ''),
+        'sha256_hash' => $receiptHash,
+      ];
+    }
+  }
+  return $matches;
 }
 
 function file_head_bytes(string $path, int $length = 4096): string {
@@ -19606,12 +19827,14 @@ if ($username === '') {
     }
 
     $entryId = trim((string)($formData['entry_id'] ?? $allocation['online_submission']['entry_id'] ?? ''));
-    $editOrigin = trim((string)($formData['edit_origin'] ?? ''));
-    $sourceEntryId = trim((string)($formData['source_entry_id'] ?? ''));
-    $sourceSubmissionRevision = (int)($formData['source_submission_revision'] ?? 0);
-    if ($entryId === '') {
-      $entryId = $formCode . '-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
-    }
+	    $editOrigin = trim((string)($formData['edit_origin'] ?? ''));
+	    $sourceEntryId = trim((string)($formData['source_entry_id'] ?? ''));
+	    $sourceSubmissionRevision = (int)($formData['source_submission_revision'] ?? 0);
+	    $changeAuthorityId = eqms_change_authority_from_payload($formData);
+	    $amendmentReason = trim((string)($formData['amendment_reason'] ?? ''));
+	    if ($entryId === '') {
+	      $entryId = $formCode . '-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+	    }
 
     $formData['entry_id'] = $entryId;
     $formData['record_id'] = (string)($allocation['record_id'] ?? '');
@@ -19622,30 +19845,71 @@ if ($username === '') {
     $formData['updated_at'] = now_iso();
     $formData['updated_by'] = $formData['submitted_by'];
 
-    $existing = load_online_form_entries_store($formCode);
-    $existingIdx = find_online_form_entry_index($existing, $entryId, $allocationId);
-    $previous = $existingIdx >= 0 && is_array($existing[$existingIdx] ?? null) ? $existing[$existingIdx] : null;
-    $formData['submission_revision'] = ((int)($previous['submission_revision'] ?? 0)) + 1;
-    $formData['submission_count'] = max(1, ((int)($previous['submission_count'] ?? 0)) + 1);
-    $formData['resubmission_count'] = max(0, ((int)$formData['submission_count']) - 1);
-    $isControlledEdit = $previous && strtolower(trim((string)($previous['workflow_state'] ?? 'draft'))) !== 'draft';
-    $formData['amendment_count'] = max(0, (int)($previous['amendment_count'] ?? 0) + ($isControlledEdit ? 1 : 0));
-    $formData['workflow_state'] = 'submitted';
-    $formData['edit_origin'] = $editOrigin !== '' ? $editOrigin : ($isControlledEdit ? 'controlled_edit' : 'new');
+	    $existing = load_online_form_entries_store($formCode);
+	    $existingIdx = find_online_form_entry_index($existing, $entryId, $allocationId);
+	    $previous = $existingIdx >= 0 && is_array($existing[$existingIdx] ?? null) ? $existing[$existingIdx] : null;
+	    $previousState = $previous ? eqms_entry_workflow_state($previous) : '';
+	    $isControlledEdit = $previous && eqms_is_locked_workflow_state($previousState);
+	    if ($isControlledEdit) {
+	      if (!eqms_change_authority_format_valid($changeAuthorityId)) {
+	        api_json([
+	          'ok' => false,
+	          'error' => 'change_authority_required',
+	          'message' => 'Final/submitted records cannot be overwritten directly. Create an amendment with a valid change authority.',
+	          'allowed_action' => 'create_amendment',
+	          'locked_state' => $previousState,
+	        ], 409);
+	      }
+	      if ($amendmentReason === '') {
+	        api_json(['ok' => false, 'error' => 'amendment_reason_required'], 422);
+	      }
+	      $authorityCheck = eqms_assert_online_form_change_authority($formCode, $previous, $formData, $changeAuthorityId, $allocation);
+	      if (!($authorityCheck['ok'] ?? false)) {
+	        api_json([
+	          'ok' => false,
+	          'error' => (string)($authorityCheck['error'] ?? 'change_authority_required'),
+	          'message' => (string)($authorityCheck['message'] ?? 'Change authority does not cover this amendment.'),
+	          'field_path' => (string)($authorityCheck['field_path'] ?? ''),
+	          'decisions' => $authorityCheck['decisions'] ?? [],
+	          'allowed_action' => 'create_amendment_with_released_change_order',
+	          'locked_state' => $previousState,
+	        ], 409);
+	      }
+	      $entryId = eqms_new_amendment_entry_id($formCode);
+	      $formData['entry_id'] = $entryId;
+	      $formData['change_authority_id'] = $changeAuthorityId;
+	      $formData['amendment_reason'] = $amendmentReason;
+	      $formData['change_authority_decisions'] = $authorityCheck['decisions'] ?? [];
+	      $editOrigin = 'amendment';
+	      $sourceEntryId = (string)($previous['entry_id'] ?? $sourceEntryId);
+	      $sourceSubmissionRevision = (int)($previous['submission_revision'] ?? $sourceSubmissionRevision);
+	    }
+	    $formData['submission_revision'] = ((int)($previous['submission_revision'] ?? 0)) + 1;
+	    $formData['submission_count'] = max(1, ((int)($previous['submission_count'] ?? 0)) + 1);
+	    $formData['resubmission_count'] = max(0, ((int)$formData['submission_count']) - 1);
+	    $formData['amendment_count'] = max(0, (int)($previous['amendment_count'] ?? 0) + ($isControlledEdit ? 1 : 0));
+	    $formData['workflow_state'] = 'submitted';
+	    $formData['edit_origin'] = $editOrigin !== '' ? $editOrigin : ($isControlledEdit ? 'controlled_edit' : 'new');
     $formData['source_entry_id'] = $sourceEntryId !== '' ? $sourceEntryId : (string)($previous['entry_id'] ?? '');
     $formData['source_submission_revision'] = $sourceSubmissionRevision > 0 ? $sourceSubmissionRevision : (int)($previous['submission_revision'] ?? 0);
-    if ($previous && !empty($previous['created_at'])) {
+    if ($previous && !$isControlledEdit && !empty($previous['created_at'])) {
       $formData['created_at'] = (string)$previous['created_at'];
       $formData['created_by'] = (string)($previous['created_by'] ?? $formData['submitted_by']);
     } else {
       $formData['created_at'] = $formData['submitted_at'];
       $formData['created_by'] = $formData['submitted_by'];
     }
+    if ($isControlledEdit && $previous) {
+      $formData['version_created_at'] = $formData['submitted_at'];
+      $formData['version_created_by'] = $formData['submitted_by'];
+      $formData['source_created_at'] = (string)($previous['created_at'] ?? '');
+      $formData['source_created_by'] = (string)($previous['created_by'] ?? '');
+    }
     $history = is_array($previous['history'] ?? null) ? $previous['history'] : [];
     if ($previous) {
       array_unshift($history, [
         'timestamp' => now_iso(),
-        'event' => $isControlledEdit ? 'controlled_edit_superseded_submission' : 'submission_superseded',
+	        'event' => $isControlledEdit ? 'amendment_version_created' : 'submission_superseded',
         'user' => $formData['submitted_by'],
         'entry_id' => (string)($previous['entry_id'] ?? ''),
         'submission_revision' => (int)($previous['submission_revision'] ?? 0),
@@ -19658,9 +19922,9 @@ if ($username === '') {
     if ($previous && empty($formData['master_context']) && !empty($previous['master_context']) && is_array($previous['master_context'])) {
       $formData['master_context'] = $previous['master_context'];
     }
-    if ($existingIdx >= 0) {
-      array_splice($existing, $existingIdx, 1);
-    }
+	    if ($existingIdx >= 0 && !$isControlledEdit) {
+	      array_splice($existing, $existingIdx, 1);
+	    }
     array_unshift($existing, $formData);
     if (count($existing) > 1000) $existing = array_slice($existing, 0, 1000);
     save_online_form_entries_store($formCode, $existing);
@@ -19676,22 +19940,31 @@ if ($username === '') {
       'resubmission_count' => (int)($formData['resubmission_count'] ?? 0),
       'amendment_count' => (int)($formData['amendment_count'] ?? 0),
       'workflow_state' => 'submitted',
-      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
-      'signature_count' => count((array)($signatureValidation['summary'] ?? [])),
-      'signature_summary' => $signatureValidation['summary'] ?? [],
-    ];
+	      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
+	      'signature_count' => count((array)($signatureValidation['summary'] ?? [])),
+	      'signature_summary' => $signatureValidation['summary'] ?? [],
+	      'edit_origin' => (string)($formData['edit_origin'] ?? ''),
+	      'source_entry_id' => (string)($formData['source_entry_id'] ?? ''),
+	      'source_submission_revision' => (int)($formData['source_submission_revision'] ?? 0),
+	      'change_authority_id' => (string)($formData['change_authority_id'] ?? ''),
+	    ];
     $allocation['signatures'] = is_array($formData['signatures'] ?? null) ? $formData['signatures'] : [];
     delete_online_form_draft($allocationId);
-    allocation_append_event($allocation, 'submitted', $formData['submitted_by'], ((int)($formData['resubmission_count'] ?? 0) > 0 ? 'online_form_resubmitted' : 'online_form_submitted'), [
+    $submissionEventNote = $isControlledEdit
+      ? 'online_form_amendment_submitted'
+      : (((int)($formData['resubmission_count'] ?? 0) > 0) ? 'online_form_resubmitted' : 'online_form_submitted');
+    allocation_append_event($allocation, 'submitted', $formData['submitted_by'], $submissionEventNote, [
       'entry_id' => $entryId,
       'submission_revision' => (int)$formData['submission_revision'],
       'submission_count' => (int)($formData['submission_count'] ?? 1),
       'resubmission_count' => (int)($formData['resubmission_count'] ?? 0),
-      'amendment_count' => (int)($formData['amendment_count'] ?? 0),
-      'edit_origin' => (string)($formData['edit_origin'] ?? ''),
-      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
-      'signature_blocks' => array_keys((array)($signatureValidation['summary'] ?? [])),
-    ]);
+	      'amendment_count' => (int)($formData['amendment_count'] ?? 0),
+	      'edit_origin' => (string)($formData['edit_origin'] ?? ''),
+	      'change_authority_id' => (string)($formData['change_authority_id'] ?? ''),
+	      'amendment_reason' => (string)($formData['amendment_reason'] ?? ''),
+	      'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
+	      'signature_blocks' => array_keys((array)($signatureValidation['summary'] ?? [])),
+	    ]);
     save_allocation_store($allocationStore);
 
     api_json([
@@ -19719,17 +19992,25 @@ if ($username === '') {
     try {
       $inspect = inspect_uploaded_workbook($tmpInspect);
       if (!($inspect['ok'] ?? false)) api_json(['ok' => false, 'error' => $inspect['error'] ?? 'inspect_failed'], 422);
-      $metadata = is_array($inspect['metadata'] ?? null) ? $inspect['metadata'] : [];
-      $allocationId = trim((string)($metadata['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
-      $allocation = $allocationId !== '' ? allocation_find(load_allocation_store(), $allocationId) : null;
-      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
-      api_json([
-        'ok' => true,
-        'metadata' => $metadata,
-        'upload_log' => $inspect['upload_log'] ?? [],
-        'allocation' => $allocation,
-        'verification' => $verification,
-      ]);
+	      $metadata = is_array($inspect['metadata'] ?? null) ? $inspect['metadata'] : [];
+	      $allocationId = trim((string)($metadata['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+	      $allocation = $allocationId !== '' ? allocation_find(load_allocation_store(), $allocationId) : null;
+	      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
+	      $uploadHash = hash_file('sha256', $tmpInspect) ?: '';
+	      $duplicates = allocation_duplicate_receipt_candidates($allocation, $uploadHash);
+	      if ($duplicates) {
+	        $verification['status'] = 'rejected';
+	        $verification['issues'] = array_values(array_unique(array_merge((array)($verification['issues'] ?? []), ['duplicate_upload'])));
+	        $verification['duplicate_candidates'] = $duplicates;
+	      }
+	      api_json([
+	        'ok' => true,
+	        'metadata' => $metadata,
+	        'upload_log' => $inspect['upload_log'] ?? [],
+	        'allocation' => $allocation,
+	        'verification' => $verification,
+	        'sha256_hash' => $uploadHash,
+	      ]);
     } finally {
       @unlink($tmpInspect);
     }
@@ -19765,13 +20046,32 @@ if ($username === '') {
       $allocation =& allocation_find_ref($allocationStore, $allocationId);
       if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
 
-      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
-      if (($verification['status'] ?? 'rejected') === 'rejected') {
-        api_json(['ok' => false, 'error' => 'verification_failed', 'verification' => $verification, 'metadata' => $metadata], 422);
-      }
+	      $verification = verify_hidden_sheet_metadata($metadata, $allocation, (string)$file['name']);
+		      if (($verification['status'] ?? 'rejected') !== 'verified') {
+		        api_json([
+		          'ok' => false,
+		          'error' => (($verification['status'] ?? 'rejected') === 'warning') ? 'verification_warning_requires_resolution' : 'verification_failed',
+		          'verification' => $verification,
+		          'metadata' => $metadata,
+		        ], 422);
+		      }
+	      $uploadHash = hash_file('sha256', $tmpUpload) ?: '';
+	      $duplicates = allocation_duplicate_receipt_candidates($allocation, $uploadHash);
+	      if ($duplicates) {
+	        $verification['status'] = 'rejected';
+	        $verification['issues'] = array_values(array_unique(array_merge((array)($verification['issues'] ?? []), ['duplicate_upload'])));
+	        $verification['duplicate_candidates'] = $duplicates;
+	        api_json([
+	          'ok' => false,
+	          'error' => 'duplicate_upload',
+	          'verification' => $verification,
+	          'metadata' => $metadata,
+	          'duplicate_candidates' => $duplicates,
+	        ], 409);
+	      }
 
-      $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
-      $receiptVersion = ((int)($allocation['receipt_version'] ?? 0)) + 1;
+	      $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+	      $receiptVersion = ((int)($allocation['receipt_version'] ?? 0)) + 1;
       $storedFilename = build_received_filename($allocation, $receiptVersion, $ext);
       $targetDir = allocation_base_dir() . '/uploads/' . $allocationId;
       ensure_dir($targetDir);
@@ -19779,12 +20079,12 @@ if ($username === '') {
 
       $receiptHistory = is_array($allocation['receipts'] ?? null) ? $allocation['receipts'] : [];
       $receiptPayload = [
-        'upload_timestamp' => now_iso(),
-        'uploaded_by' => $username,
-        'version' => $receiptVersion,
-        'server_path' => $storedPath,
-        'sha256_hash' => hash_file('sha256', $tmpUpload),
-        'verification_status' => ($verification['warnings'] ?? []) ? 'filename_warning' : 'verified',
+	        'upload_timestamp' => now_iso(),
+	        'uploaded_by' => $username,
+	        'version' => $receiptVersion,
+	        'server_path' => $storedPath,
+	        'sha256_hash' => $uploadHash,
+	        'verification_status' => 'verified',
         'receipt_status' => 'received',
         'receipt_version' => $receiptVersion,
         'latest_stored_filename' => $storedFilename,
@@ -19795,9 +20095,10 @@ if ($username === '') {
         'uploaded_at' => $receiptPayload['upload_timestamp'],
         'uploaded_by' => $username,
         'original_filename' => (string)$file['name'],
-        'stored_filename' => $storedFilename,
-        'verification_status' => $receiptPayload['verification_status'],
-      ];
+	        'stored_filename' => $storedFilename,
+	        'verification_status' => $receiptPayload['verification_status'],
+	        'sha256_hash' => $uploadHash,
+	      ];
       $receiptPayload['receipt_history_json'] = $receiptHistory;
 
       append_receipt_to_workbook($tmpUpload, $storedPath, $receiptPayload);
@@ -19820,7 +20121,7 @@ if ($username === '') {
         'stored_filename' => $storedFilename,
         'download_url' => 'api.php?action=form_fill_download_received&allocation_id=' . rawurlencode($allocationId) . '&version=' . $receiptVersion,
         'checklist' => evidence_evaluate_checklist($allocation, 'review'),
-        'warning' => ($verification['warnings'] ?? []) ? 'filename_warning' : null,
+	        'warning' => null,
       ]);
     } finally {
       @unlink($tmpUpload);
@@ -20514,8 +20815,63 @@ if ($username === '') {
       $existing = $raw ? json_decode($raw, true) : [];
       if (!is_array($existing)) $existing = [];
     }
+    $legacyEntryId = trim((string)($data['entry_id'] ?? ''));
+    $legacySourceEntryId = trim((string)($data['source_entry_id'] ?? ''));
+    $legacyAllocationId = trim((string)($data['allocation_id'] ?? $input['allocation_id'] ?? ''));
+    $legacyPreviousIdx = $legacySourceEntryId !== ''
+      ? find_online_form_entry_index($existing, $legacySourceEntryId, '')
+      : find_online_form_entry_index($existing, $legacyEntryId, $legacyAllocationId);
+    $legacyPrevious = $legacyPreviousIdx >= 0 && is_array($existing[$legacyPreviousIdx] ?? null) ? $existing[$legacyPreviousIdx] : null;
+    $legacyPreviousState = $legacyPrevious ? eqms_entry_workflow_state($legacyPrevious) : '';
+    if ($legacyPrevious && eqms_is_locked_workflow_state($legacyPreviousState)) {
+      $legacyChangeAuthorityId = eqms_change_authority_from_payload($data);
+      $legacyAmendmentReason = trim((string)($data['amendment_reason'] ?? ''));
+      if (!eqms_change_authority_format_valid($legacyChangeAuthorityId)) {
+        api_json([
+          'ok' => false,
+          'error' => 'change_authority_required',
+          'message' => 'Final/submitted records cannot be overwritten directly. Create an amendment with a valid released change authority.',
+          'allowed_action' => 'create_amendment',
+          'locked_state' => $legacyPreviousState,
+        ], 409);
+      }
+      if ($legacyAmendmentReason === '') {
+        api_json(['ok' => false, 'error' => 'amendment_reason_required'], 422);
+      }
+      $authorityCheck = eqms_assert_online_form_change_authority($code, $legacyPrevious, $data, $legacyChangeAuthorityId);
+      if (!($authorityCheck['ok'] ?? false)) {
+        api_json([
+          'ok' => false,
+          'error' => (string)($authorityCheck['error'] ?? 'change_authority_required'),
+          'message' => (string)($authorityCheck['message'] ?? 'Change authority does not cover this amendment.'),
+          'field_path' => (string)($authorityCheck['field_path'] ?? ''),
+          'decisions' => $authorityCheck['decisions'] ?? [],
+          'allowed_action' => 'create_amendment_with_released_change_order',
+          'locked_state' => $legacyPreviousState,
+        ], 409);
+      }
+      $data['source_entry_id'] = (string)($legacyPrevious['entry_id'] ?? $legacySourceEntryId);
+      $data['source_submission_revision'] = (int)($legacyPrevious['submission_revision'] ?? 0);
+      $data['entry_id'] = eqms_new_amendment_entry_id($code);
+      $data['edit_origin'] = 'amendment';
+      $data['change_authority_id'] = $legacyChangeAuthorityId;
+      $data['amendment_reason'] = $legacyAmendmentReason;
+      $data['change_authority_decisions'] = $authorityCheck['decisions'] ?? [];
+    } elseif ($legacyEntryId === '') {
+      $data['entry_id'] = $code . '-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+    }
     // Add server-side metadata
-    $data['_server_time'] = date('c');
+    $legacyServerTime = now_iso();
+    $legacyUsername = strtolower(trim((string)($_SESSION['user'] ?? 'anonymous')));
+    if (($data['edit_origin'] ?? '') === 'amendment') {
+      $data['version_created_at'] = $legacyServerTime;
+      $data['version_created_by'] = $legacyUsername;
+      if ($legacyPrevious) {
+        $data['source_created_at'] = (string)($legacyPrevious['created_at'] ?? '');
+        $data['source_created_by'] = (string)($legacyPrevious['created_by'] ?? '');
+      }
+    }
+    $data['_server_time'] = $legacyServerTime;
     $data['_status'] = $status;
     $data['_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
     if (!empty($_SESSION['user'])) $data['_session_user'] = (string)$_SESSION['user'];
@@ -23285,12 +23641,18 @@ if ($username === '') {
     if ($reason === '') {
       $reason = 'Controlled field update via Order Management';
     }
-    $result = $workflow->executeFieldEdit($entity, $orderId, $sanitizedChanges, $username, $reason);
+    $changeAuthorityContext = [
+      'actor_id' => $username,
+      'change_order_id' => trim((string)($body['change_order_id'] ?? $body['plm_change_order_id'] ?? '')),
+      'change_order_number' => trim((string)($body['change_order_number'] ?? $body['change_order_ref'] ?? '')),
+      'effectivity' => is_array($body['effectivity'] ?? null) ? $body['effectivity'] : [],
+    ];
+    $result = $workflow->executeFieldEdit($entity, $orderId, $sanitizedChanges, $username, $reason, $changeAuthorityContext);
     if (!$result->ok) {
       $statusCode = match ($result->errorCode) {
         'not_found' => 404,
         'forbidden' => 403,
-        'validation_failed', 'field_locked', 'ecr_required', 'status_locked' => 409,
+        'validation_failed', 'field_locked', 'ecr_required', 'change_authority_required', 'change_authority_unavailable', 'status_locked' => 409,
         default => 400,
       };
       api_json([
@@ -23417,24 +23779,62 @@ if ($username === '') {
     $entryId = trim((string)($body['entry_id'] ?? ''));
     $recordId = trim((string)($body['record_id'] ?? ''));
     $editOrigin = trim((string)($body['edit_origin'] ?? 'draft'));
-    $sourceEntryId = trim((string)($body['source_entry_id'] ?? ''));
-    $sourceRevision = (int)($body['source_submission_revision'] ?? 0);
-    if ($allocationId === '' || $formCode === '') {
-      api_json(['ok' => false, 'error' => 'missing_allocation_id_or_form_code'], 400);
-    }
-    // Sanitise allocation_id
-    if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
-    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
-    $draftPayload = [
+	    $sourceEntryId = trim((string)($body['source_entry_id'] ?? ''));
+	    $sourceRevision = (int)($body['source_submission_revision'] ?? 0);
+	    $changeAuthorityId = eqms_change_authority_from_payload($body);
+	    $amendmentReason = trim((string)($body['amendment_reason'] ?? ''));
+	    if ($allocationId === '' || $formCode === '') {
+	      api_json(['ok' => false, 'error' => 'missing_allocation_id_or_form_code'], 400);
+	    }
+	    // Sanitise allocation_id
+	    if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
+	    $entries = load_online_form_entries_store($formCode);
+	    $existingIdx = find_online_form_entry_index($entries, $entryId, $allocationId);
+	    $previous = $existingIdx >= 0 && is_array($entries[$existingIdx] ?? null) ? $entries[$existingIdx] : null;
+	    $previousState = $previous ? eqms_entry_workflow_state($previous) : '';
+	    if ($previous && eqms_is_locked_workflow_state($previousState)) {
+	      if ($editOrigin !== 'amendment' || !eqms_change_authority_format_valid($changeAuthorityId)) {
+	        api_json([
+	          'ok' => false,
+	          'error' => 'change_authority_required',
+	          'message' => 'Locked records require an amendment draft with change authority.',
+	          'allowed_action' => 'create_amendment',
+	          'locked_state' => $previousState,
+	        ], 409);
+	      }
+	      if ($amendmentReason === '') {
+	        api_json(['ok' => false, 'error' => 'amendment_reason_required'], 422);
+	      }
+	      $draftCandidate = is_array($data['fieldValues'] ?? null) ? $data['fieldValues'] : $data;
+	      $draftCandidate['source_entry_id'] = $sourceEntryId !== '' ? $sourceEntryId : (string)($previous['entry_id'] ?? '');
+	      $draftCandidate['entry_id'] = $entryId;
+	      $authorityCheck = eqms_assert_online_form_change_authority($formCode, $previous, $draftCandidate, $changeAuthorityId);
+	      if (!($authorityCheck['ok'] ?? false)) {
+	        api_json([
+	          'ok' => false,
+	          'error' => (string)($authorityCheck['error'] ?? 'change_authority_required'),
+	          'message' => (string)($authorityCheck['message'] ?? 'Change authority does not cover this amendment draft.'),
+	          'field_path' => (string)($authorityCheck['field_path'] ?? ''),
+	          'decisions' => $authorityCheck['decisions'] ?? [],
+	          'allowed_action' => 'create_amendment_with_released_change_order',
+	          'locked_state' => $previousState,
+	        ], 409);
+	      }
+	    }
+	    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+	    $draftPayload = [
       'allocation_id' => $allocationId,
       'form_code' => $formCode,
       'entry_id' => $entryId,
       'record_id' => $recordId,
       'data' => $data,
-      'edit_origin' => $editOrigin !== '' ? $editOrigin : 'draft',
-      'source_entry_id' => $sourceEntryId,
-      'source_submission_revision' => $sourceRevision,
-      'saved_at' => date('c'),
+	      'edit_origin' => $editOrigin !== '' ? $editOrigin : 'draft',
+	      'source_entry_id' => $sourceEntryId,
+	      'source_submission_revision' => $sourceRevision,
+	      'change_authority_id' => $changeAuthorityId,
+	      'amendment_reason' => $amendmentReason,
+	      'change_authority_decisions' => $authorityCheck['decisions'] ?? [],
+	      'saved_at' => date('c'),
       'saved_by' => $username,
     ];
     save_online_form_draft($allocationId, $draftPayload);

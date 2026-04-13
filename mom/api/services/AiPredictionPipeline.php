@@ -30,6 +30,7 @@ final class AiPredictionPipeline
 
     private Connection $db;
     private string $dataDir;
+    private ?EventBroadcaster $broadcaster;
 
     // ── Valid enum values (must match DB enums) ────────────────────────────
     // Giá trị enum hợp lệ (phải khớp với enum trong DB)
@@ -95,13 +96,15 @@ final class AiPredictionPipeline
     // ── Construction ───────────────────────────────────────────────────────
 
     /**
-     * @param string       $dataDir Absolute path to data directory / Đường dẫn tuyệt đối đến thư mục dữ liệu
-     * @param Connection|null $db   Database connection (null = singleton) / Kết nối DB (null = singleton)
+     * @param string              $dataDir     Absolute path to data directory / Đường dẫn tuyệt đối đến thư mục dữ liệu
+     * @param Connection|null     $db          Database connection (null = singleton) / Kết nối DB (null = singleton)
+     * @param EventBroadcaster|null $broadcaster SSE broadcaster (null = skip SSE) / Phát SSE (null = bỏ qua SSE)
      */
-    public function __construct(string $dataDir, ?Connection $db = null)
+    public function __construct(string $dataDir, ?Connection $db = null, ?EventBroadcaster $broadcaster = null)
     {
         $this->dataDir = rtrim($dataDir, '/');
         $this->db = $db ?? Connection::getInstance();
+        $this->broadcaster = $broadcaster;
     }
 
     // ── Public API ─────────────────────────────────────────────────────────
@@ -226,7 +229,7 @@ final class AiPredictionPipeline
 
         // ── Broadcast via SSE / Phát qua SSE thời gian thực ──
         try {
-            EventBroadcaster::getInstance()->aiPredictionUpdated('created', $record);
+            $this->broadcaster?->aiPredictionUpdated('created', $record);
         } catch (\Throwable $e) {
             @error_log('[AiPredictionPipeline] EventBroadcaster error: ' . $e->getMessage());
         }
@@ -357,7 +360,7 @@ final class AiPredictionPipeline
 
         // ── Broadcast via SSE / Phát qua SSE thời gian thực ──
         try {
-            EventBroadcaster::getInstance()->aiPredictionUpdated('actioned', [
+            $this->broadcaster?->aiPredictionUpdated('actioned', [
                 'prediction_id' => $predictionId,
                 'action_type'   => $actionType,
                 'actions'       => $triggeredActions,

@@ -1,19 +1,19 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T09:36:32.514Z",
+    "generatedAt": "2026-04-13T11:20:23.239Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 671,
+    "total_frontend_entities": 705,
     "canonical_resources": 67,
     "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 73,
-    "governed_support_entities": 592,
-    "conditional_extension_entities": 1,
+    "governed_support_entities": 624,
+    "conditional_extension_entities": 3,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 5,
     "generic_status_only_core_entities": 0,
@@ -1203,6 +1203,28 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "ai_predictive.ai_recommendation_actions",
+        "entity": "ai_recommendation_actions",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "ai_predictive.ai_training_datasets",
+        "entity": "ai_training_datasets",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "ai_predictive.prediction_models",
         "entity": "prediction_models",
         "profile": "transactional_record",
@@ -1780,7 +1802,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 204,
+        "relation_count": 218,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2248,6 +2270,61 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "document_control.eqms_document_distribution",
+        "entity": "eqms_document_distribution",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.eqms_document_effectivity",
+        "entity": "eqms_document_effectivity",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.eqms_document_family",
+        "entity": "eqms_document_family",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.eqms_document_read_ack",
+        "entity": "eqms_document_read_ack",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.eqms_document_revision",
+        "entity": "eqms_document_revision",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "ehs_sustainability.ehs_contractors",
         "entity": "ehs_contractors",
         "profile": "transactional_record",
@@ -2419,6 +2496,105 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_evidence_artifact",
+        "entity": "eqms_evidence_artifact",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_evidence_manifest",
+        "entity": "eqms_evidence_manifest",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_evidence_record",
+        "entity": "eqms_evidence_record",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_evidence_version",
+        "entity": "eqms_evidence_version",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_integrity_digest",
+        "entity": "eqms_integrity_digest",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_integrity_exception",
+        "entity": "eqms_integrity_exception",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_publication_event",
+        "entity": "eqms_publication_event",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_publication_job",
+        "entity": "eqms_publication_job",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "evidence_vault.eqms_publication_target",
+        "entity": "eqms_publication_target",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -2864,6 +3040,83 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "forms_system.eqms_form_family",
+        "entity": "eqms_form_family",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_issuance",
+        "entity": "eqms_form_issuance",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_record",
+        "entity": "eqms_form_record",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_record_version",
+        "entity": "eqms_form_record_version",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_schema_version",
+        "entity": "eqms_form_schema_version",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_submission_attempt",
+        "entity": "eqms_form_submission_attempt",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "forms_system.eqms_form_template_revision",
+        "entity": "eqms_form_template_revision",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "forms_system.form_attachments",
         "entity": "form_attachments",
         "profile": "business_record",
@@ -2981,6 +3234,17 @@
         "archive_candidate": false,
         "relation_count": 8,
         "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "foundation_governance.eqms_electronic_signature_event",
+        "entity": "eqms_electronic_signature_event",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3964,6 +4228,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "mes_execution.machine_telemetry_extended",
+        "entity": "machine_telemetry_extended",
+        "profile": "operator_console",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "mes_execution.material_consumption",
         "entity": "material_consumption",
         "profile": "operator_console",
@@ -4443,6 +4718,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "mes_execution.mes_trusted_release_record",
+        "entity": "mes_trusted_release_record",
+        "profile": "operator_console",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5196,6 +5482,50 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "plm_change_control.eqms_change_affected_object",
+        "entity": "eqms_change_affected_object",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.eqms_change_resulting_object",
+        "entity": "eqms_change_resulting_object",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.eqms_field_change_authorization",
+        "entity": "eqms_field_change_authorization",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "plm_change_control.eqms_field_governance_rule",
+        "entity": "eqms_field_governance_rule",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "plm_change_control.plm_change_order_lines",
         "entity": "plm_change_order_lines",
         "profile": "governed_case",
@@ -5212,7 +5542,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 9,
+        "relation_count": 16,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6065,6 +6395,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "record_system.eqms_retention_lock",
+        "entity": "eqms_retention_lock",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "record_system.record_counters",
         "entity": "record_counters",
         "profile": "document_record",
@@ -6666,6 +7007,17 @@
         "archive_candidate": false,
         "relation_count": 7,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.domain_outbox_events",
+        "entity": "domain_outbox_events",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -7540,6 +7892,28 @@
       }
     ],
     "conditional_extension": [
+      {
+        "entity_key": "ai_predictive.ai_conversations",
+        "entity": "ai_conversations",
+        "profile": "transactional_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "ai_predictive.ai_feedback_loops",
+        "entity": "ai_feedback_loops",
+        "profile": "transactional_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
       {
         "entity_key": "bi_datawarehouse.dw_kpi_scorecards",
         "entity": "dw_kpi_scorecards",

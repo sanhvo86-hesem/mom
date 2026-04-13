@@ -251,6 +251,9 @@ Required template fields:
 | `moduleArchetype` | One of the approved archetypes in Section 10. |
 | `zones` | Ordered zone definitions. |
 | `allowedBlocks` | Block types allowed by zone. |
+| `governedModules` | Explicit module IDs allowed or currently governed by the template. |
+| `regulatedCompatibility` | Explicit regulated compatibility statement. Required for eQMS/quality/document-control modules. |
+| `shopfloorCompatibility` | Explicit shop-floor/operator compatibility statement. Required for MES/operator modules. |
 | `defaultDensity` | Density allowed for primary device. |
 | `supportedDensities` | Explicit list. |
 | `themePolicy` | Light, dark, high-contrast, night-shift, print support. |
@@ -260,6 +263,8 @@ Required template fields:
 | `printPolicy` | Printable, export-only or not-printable. |
 | `adoption` | Modules currently using the template. |
 | `evidence` | Screenshots, keyboard proof, responsive proof and design review link. |
+| `updatedBy` / `updatedAt` | Backend authority writer and timestamp. |
+| `evidenceRefs` | Release/evidence references for validation, impact, rollout or waiver decisions. |
 
 Template registry rules:
 
@@ -269,6 +274,10 @@ Template registry rules:
 - Template fallback MUST be explicit. Silent fallback to a generic template is allowed only for preview, never production.
 - Retired templates cannot be used by new modules.
 - Deprecated templates require migration plan and deadline.
+- Production template registry authority MUST come from backend graphics governance or generated registry artifacts. Browser localStorage is allowed only for preview cache and unsaved draft cache.
+- Template lifecycle MUST be explicit: `draft-only`, `controlled-draft`, `validated`, `publish-blocked`, `published`, `deprecated`, `legacy-bridged`.
+- Publish/apply/rollback MUST require impact analysis, graphics compliance matrix review, release blocker check, audit event and optimistic concurrency through `If-Match` or `expectedVersion`.
+- New modules or major UI refactors MUST be blocked when module graphics linkage is not `full-admin-controlled` or approved bridged debt is missing waiver evidence.
 
 ---
 

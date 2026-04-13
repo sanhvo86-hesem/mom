@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T09:36:20.782Z",
-    "description": "Resolution plan for 0 orphan registry fields and 418 orphan DB column names."
+    "generatedAt": "2026-04-13T11:20:04.628Z",
+    "description": "Resolution plan for 0 orphan registry fields and 427 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 344,
+      "count": 351,
       "columns": [
         {
           "column": "item_class",
@@ -2875,20 +2875,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "spindle_load_pct",
-          "tables": [
-            "mes_machine_snapshot",
-            "mes_machine_telemetry"
-          ],
-          "suggestedLabel": "Tỷ lệ Spindle Tải",
-          "suggestedLabelEn": "Spindle Load Pct",
-          "suggestedType": "percentage",
-          "dbTypes": [
-            "NUMERIC(6,2)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "spindle_torque_nm",
           "tables": [
             "mes_machine_telemetry"
@@ -4505,7 +4491,8 @@
         {
           "column": "traceparent",
           "tables": [
-            "mes_operational_event_ledger"
+            "mes_operational_event_ledger",
+            "mes_trusted_release_record"
           ],
           "suggestedLabel": "Traceparent",
           "suggestedLabelEn": "Traceparent",
@@ -4527,6 +4514,110 @@
             "VARCHAR(80)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "packet_type",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Packet Loại",
+          "suggestedLabelEn": "Packet Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "packet_version",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Packet phiên bản",
+          "suggestedLabelEn": "Packet Version",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "target_aggregate_type",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Mục tiêu tổng thể Loại",
+          "suggestedLabelEn": "Target Aggregate Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "release_decision_reason",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Phát hành Decision Lý do",
+          "suggestedLabelEn": "Release Decision Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "packet_payload",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Packet gói dữ liệu",
+          "suggestedLabelEn": "Packet Payload",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "provenance",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Provenance",
+          "suggestedLabelEn": "Provenance",
+          "suggestedType": "json",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "retention_metadata",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Lưu giữ siêu dữ liệu",
+          "suggestedLabelEn": "Retention Metadata",
+          "suggestedType": "json",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "record_copy_metadata",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Hồ sơ Copy siêu dữ liệu",
+          "suggestedLabelEn": "Record Copy Metadata",
+          "suggestedType": "json",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4537,7 +4628,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 74,
+      "count": 76,
       "columns": [
         {
           "column": "substitute_item_id",
@@ -5263,7 +5354,8 @@
         {
           "column": "request_id",
           "tables": [
-            "mes_operational_event_ledger"
+            "mes_operational_event_ledger",
+            "mes_trusted_release_record"
           ],
           "dbTypes": [
             "VARCHAR(120)"
@@ -5274,6 +5366,26 @@
           "column": "source_aggregate_id",
           "tables": [
             "mes_operational_event_ledger"
+          ],
+          "dbTypes": [
+            "VARCHAR(160)"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "telemetry_id",
+          "tables": [
+            "machine_telemetry_extended"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "target_aggregate_id",
+          "tables": [
+            "mes_trusted_release_record"
           ],
           "dbTypes": [
             "VARCHAR(160)"

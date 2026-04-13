@@ -37,7 +37,7 @@ class GraphicsGovernanceController extends BaseController
         }
         $result = $this->call(fn(): array => $this->graphics()->saveDesignConfig(
             (array)$config,
-            $this->expectedVersion($body),
+            $this->expectedVersion($body, (array)$config),
             (string)($user['username'] ?? '')
         ));
         $this->graphicsAudit('graphics.design_config.saved', 'design-config', [
@@ -196,6 +196,13 @@ class GraphicsGovernanceController extends BaseController
         $this->respond(fn(): array => $this->graphics()->tokenAdoptionCoverage());
     }
 
+    public function debtReport(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->debtReport());
+    }
+
     public function driftReport(): never
     {
         $user = $this->requireAuth();
@@ -318,6 +325,13 @@ class GraphicsGovernanceController extends BaseController
         $this->respond(fn(): array => $this->graphics()->activeWaivers());
     }
 
+    public function releaseBlockers(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->releaseBlockers());
+    }
+
     /**
      * @param callable(): array<string, mixed> $fn
      */
@@ -351,7 +365,8 @@ class GraphicsGovernanceController extends BaseController
         $this->requireCsrf();
         $this->requireGraphicsRead($user);
         $body = $this->jsonBody();
-        $result = $this->call(fn(): array => $fn($body));
+        $username = (string)($user['username'] ?? '');
+        $result = $this->call(fn(): array => $this->graphics()->recordImpactReport($fn($body), $username));
         $this->graphicsAudit($eventType, (string)($result['impactId'] ?? $eventType), [
             'impactId' => $result['impactId'] ?? '',
             'analysisType' => $result['analysisType'] ?? '',
@@ -422,7 +437,7 @@ class GraphicsGovernanceController extends BaseController
     /**
      * @param array<string, mixed> $body
      */
-    private function expectedVersion(array $body): ?string
+    private function expectedVersion(array $body, ?array $resource = null): ?string
     {
         $header = $this->requestHeader('If-Match');
         if ($header !== null && trim($header) !== '') {
@@ -431,6 +446,18 @@ class GraphicsGovernanceController extends BaseController
         foreach (['expectedVersion', 'baseVersion', 'registryVersion', 'version'] as $key) {
             if (isset($body[$key]) && is_scalar($body[$key])) {
                 return (string)$body[$key];
+            }
+        }
+        foreach ([$body['config'] ?? null, $resource] as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+            $meta = is_array($candidate['_meta'] ?? null) ? (array)$candidate['_meta'] : [];
+            if (isset($meta['version']) && is_scalar($meta['version'])) {
+                return (string)$meta['version'];
+            }
+            if (isset($meta['governanceRevision']) && is_scalar($meta['governanceRevision'])) {
+                return 'rev-' . (string)$meta['governanceRevision'];
             }
         }
         return null;

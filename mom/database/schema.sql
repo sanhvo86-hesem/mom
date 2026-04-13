@@ -26327,3 +26327,1152 @@ COMMENT ON COLUMN mes_operational_event_ledger.correlation_id IS
 
 COMMIT;
 -- <<< END MIGRATION: 098_canonical_manufacturing_event_backbone.sql
+
+-- >>> BEGIN MIGRATION: 099_ai_integration_foundation.sql
+-- ============================================================================
+-- Migration: 099_ai_integration_foundation.sql
+-- Description: AI Integration Foundation — chat conversations, feedback loops,
+--              training datasets, extended machine telemetry, recommendation
+--              action tracking for Phase 1B backend AI integration
+-- Dependencies: 041_ai_predictive_quality_aps.sql, 006_erp_master_data.sql
+-- Rollback: DROP TABLE ai_recommendation_actions, machine_telemetry_extended,
+--           ai_training_datasets, ai_feedback_loops, ai_conversations CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+-- ============================================================================
+-- ai_conversations / Lich su hoi thoai AI (giao dien truy van ngon ngu tu nhien)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ai_conversations (
+    conversation_id         UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- ID nguoi dung / User identifier
+    user_id                 UUID            NOT NULL,
+    -- Loai ngu canh hoi thoai / Conversation context type
+    context_type            VARCHAR(50)     NOT NULL DEFAULT 'production_query'
+                            CHECK (context_type IN (
+                                'production_query', 'ncr_analysis',
+                                'scheduling', 'document_summary'
+                            )),
+    -- Danh sach tin nhan JSON / Message list as JSON array
+    -- Format: [{role: 'user'|'assistant', content: string, timestamp: ISO8601}]
+    messages                JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    -- Du lieu mo rong / Extended metadata
+    metadata                JSONB           DEFAULT '{}'::jsonb,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
+);
+COMMENT ON TABLE ai_conversations IS 'AI chat conversation history for NL query interface / Lich su hoi thoai AI cho giao dien truy van ngon ngu tu nhien';
+COMMENT ON COLUMN ai_conversations.context_type IS 'Conversation context: production_query, ncr_analysis, scheduling, document_summary / Ngu canh hoi thoai';
+COMMENT ON COLUMN ai_conversations.messages IS 'JSON array of messages [{role, content, timestamp}] / Mang JSON cac tin nhan';
+
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_user_created
+    ON ai_conversations (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_context_created
+    ON ai_conversations (context_type, created_at DESC);
+
+-- ============================================================================
+-- ai_feedback_loops / Vong phan hoi AI (phan hoi tu van hanh vien/quan ly)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ai_feedback_loops (
+    feedback_id             UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- ID du doan lien quan / Related prediction identifier
+    prediction_id           UUID            NOT NULL,
+    -- ID nguoi phan hoi / User who provided feedback
+    user_id                 UUID            NOT NULL,
+    -- Loai phan hoi / Feedback classification
+    feedback_type           VARCHAR(30)     NOT NULL
+                            CHECK (feedback_type IN (
+                                'correct', 'incorrect',
+                                'partially_correct', 'not_applicable'
+                            )),
+    -- Dieu chinh do tin cay / Confidence score adjustment
+    confidence_adjustment   NUMERIC(5,2)    DEFAULT 0,
+    -- Ghi chu tu nguoi dung / User notes
+    notes                   TEXT,
+    -- Ket qua thuc te / Actual observed outcome
+    actual_outcome          JSONB,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
+);
+COMMENT ON TABLE ai_feedback_loops IS 'Operator/manager feedback on AI predictions / Phan hoi cua van hanh vien/quan ly ve du doan AI';
+COMMENT ON COLUMN ai_feedback_loops.feedback_type IS 'Feedback type: correct, incorrect, partially_correct, not_applicable / Loai phan hoi';
+COMMENT ON COLUMN ai_feedback_loops.confidence_adjustment IS 'Numeric adjustment to prediction confidence / Dieu chinh do tin cay du doan';
+
+CREATE INDEX IF NOT EXISTS idx_ai_feedback_prediction_created
+    ON ai_feedback_loops (prediction_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_feedback_user_created
+    ON ai_feedback_loops (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_feedback_type
+    ON ai_feedback_loops (feedback_type);
+
+-- ============================================================================
+-- ai_training_datasets / Bo du lieu huan luyen AI (ETL snapshots)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ai_training_datasets (
+    dataset_id              UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- Ten bo du lieu / Dataset name
+    dataset_name            VARCHAR(200)    NOT NULL,
+    -- Loai mo hinh / Target model type
+    model_type              VARCHAR(50)     NOT NULL,
+    -- Truy van nguon du lieu / Source data query
+    source_query            TEXT,
+    -- So dong du lieu / Number of data rows
+    row_count               INT             DEFAULT 0,
+    -- Cac cot dac trung JSON / Feature columns as JSON array
+    feature_columns         JSONB           DEFAULT '[]'::jsonb,
+    -- Cot nhan / Label column name
+    label_column            VARCHAR(100),
+    -- Pham vi ngay bat dau / Date range start
+    date_range_start        DATE,
+    -- Pham vi ngay ket thuc / Date range end
+    date_range_end          DATE,
+    -- Duong dan file / File storage path
+    file_path               VARCHAR(500),
+    -- Trang thai chuan bi / Dataset preparation status
+    status                  VARCHAR(30)     NOT NULL DEFAULT 'preparing'
+                            CHECK (status IN (
+                                'preparing', 'ready', 'training', 'archived'
+                            )),
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    -- Nguoi tao / Created by user
+    created_by              UUID,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             BIGINT          NOT NULL DEFAULT 1
+);
+COMMENT ON TABLE ai_training_datasets IS 'ETL snapshots for ML model training / Bo du lieu ETL cho huan luyen mo hinh ML';
+COMMENT ON COLUMN ai_training_datasets.model_type IS 'Target model type for this dataset / Loai mo hinh muc tieu';
+COMMENT ON COLUMN ai_training_datasets.status IS 'Dataset status: preparing, ready, training, archived / Trang thai bo du lieu';
+COMMENT ON COLUMN ai_training_datasets.feature_columns IS 'JSON array of feature column names / Mang JSON ten cac cot dac trung';
+
+CREATE INDEX IF NOT EXISTS idx_ai_training_model_status
+    ON ai_training_datasets (model_type, status);
+CREATE INDEX IF NOT EXISTS idx_ai_training_status_created
+    ON ai_training_datasets (status, created_at DESC);
+
+-- ============================================================================
+-- machine_telemetry_extended / Du lieu cam bien may mo rong (cho ML)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS machine_telemetry_extended (
+    telemetry_id            UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- ID may / Machine identifier
+    machine_id              VARCHAR(50)     NOT NULL,
+    -- Thoi diem ghi nhan / Sensor reading timestamp
+    timestamp               TIMESTAMPTZ     NOT NULL,
+    -- Rung dong truc X / Vibration axis X
+    vibration_x             NUMERIC(10,4),
+    -- Rung dong truc Y / Vibration axis Y
+    vibration_y             NUMERIC(10,4),
+    -- Rung dong truc Z / Vibration axis Z
+    vibration_z             NUMERIC(10,4),
+    -- Nhiet do truc chinh / Spindle temperature
+    spindle_temperature     NUMERIC(8,2),
+    -- Nhiet do dung dich lam mat / Coolant temperature
+    coolant_temperature     NUMERIC(8,2),
+    -- Tai truc chinh (%) / Spindle load percentage
+    spindle_load_pct        NUMERIC(5,2),
+    -- Toc do tien thuc te / Actual feed rate
+    feed_rate_actual        NUMERIC(10,4),
+    -- Toc do truc chinh thuc te / Actual spindle speed
+    spindle_speed_actual    NUMERIC(10,2),
+    -- Cong suat tieu thu (kW) / Power consumption in kilowatts
+    power_consumption_kw    NUMERIC(8,3),
+    -- ID dung cu / Tool identifier
+    tool_id                 VARCHAR(50),
+    -- Thu tu nguyen cong / Operation sequence number
+    operation_seq           INT,
+    -- So lenh san xuat / Work order number
+    wo_number               VARCHAR(50),
+    -- Du lieu mo rong / Extended metadata
+    metadata                JSONB           DEFAULT '{}'::jsonb,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             BIGINT          NOT NULL DEFAULT 1
+);
+COMMENT ON TABLE machine_telemetry_extended IS 'Extended machine sensor data for ML predictive models / Du lieu cam bien may mo rong cho mo hinh du doan ML';
+COMMENT ON COLUMN machine_telemetry_extended.vibration_x IS 'Vibration reading axis X / Gia tri rung dong truc X';
+COMMENT ON COLUMN machine_telemetry_extended.spindle_temperature IS 'Spindle temperature in Celsius / Nhiet do truc chinh (do C)';
+COMMENT ON COLUMN machine_telemetry_extended.power_consumption_kw IS 'Power consumption in kilowatts / Cong suat tieu thu (kW)';
+
+CREATE INDEX IF NOT EXISTS idx_telemetry_ext_machine_ts
+    ON machine_telemetry_extended (machine_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_telemetry_ext_tool_ts
+    ON machine_telemetry_extended (tool_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_telemetry_ext_wo_ts
+    ON machine_telemetry_extended (wo_number, timestamp DESC);
+
+-- ============================================================================
+-- ai_recommendation_actions / Hanh dong tu dong tu du doan AI
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ai_recommendation_actions (
+    action_id               UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    -- ID du doan nguon / Source prediction identifier
+    prediction_id           UUID            NOT NULL,
+    -- Loai hanh dong / Action type classification
+    action_type             VARCHAR(50)     NOT NULL
+                            CHECK (action_type IN (
+                                'auto_ncr', 'maintenance_request',
+                                'schedule_adjustment', 'alert_sent',
+                                'tool_change_order'
+                            )),
+    -- Du lieu hanh dong JSON / Action payload as JSON
+    action_payload          JSONB           DEFAULT '{}'::jsonb,
+    -- Trang thai thuc thi / Execution status
+    status                  VARCHAR(30)     NOT NULL DEFAULT 'pending'
+                            CHECK (status IN (
+                                'pending', 'executed', 'failed', 'cancelled'
+                            )),
+    -- Thoi diem thuc thi / Timestamp when action was executed
+    executed_at             TIMESTAMPTZ,
+    -- Ket qua thuc thi / Execution result
+    result                  JSONB,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
+);
+COMMENT ON TABLE ai_recommendation_actions IS 'Automated actions triggered by AI predictions / Hanh dong tu dong duoc kich hoat tu du doan AI';
+COMMENT ON COLUMN ai_recommendation_actions.action_type IS 'Action type: auto_ncr, maintenance_request, schedule_adjustment, alert_sent, tool_change_order / Loai hanh dong';
+COMMENT ON COLUMN ai_recommendation_actions.status IS 'Execution status: pending, executed, failed, cancelled / Trang thai thuc thi';
+
+CREATE INDEX IF NOT EXISTS idx_ai_actions_prediction
+    ON ai_recommendation_actions (prediction_id);
+CREATE INDEX IF NOT EXISTS idx_ai_actions_status_created
+    ON ai_recommendation_actions (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_actions_type_status
+    ON ai_recommendation_actions (action_type, status);
+
+COMMIT;
+-- <<< END MIGRATION: 099_ai_integration_foundation.sql
+
+-- >>> BEGIN MIGRATION: 100_trusted_release_record_spine.sql
+-- ============================================================================
+-- Migration 100: Trusted Manufacturing Release Record Spine
+-- ============================================================================
+-- Purpose:
+--   Add an authoritative release-grade production record packet table for
+--   eDHR/eBR-style work-order/lot release decisions. The packet freezes
+--   production history, quality, evidence, qualification, approval/signature,
+--   release decision, retention, and record-copy metadata into a reproducible
+--   structured record.
+--
+-- Data safety:
+--   Additive migration only. Existing shipment, event, evidence, approval,
+--   and genealogy tables are not modified.
+--
+-- Rollback:
+--   DROP TABLE IF EXISTS mes_trusted_release_record CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS mes_trusted_release_record (
+    packet_id                   VARCHAR(120) PRIMARY KEY,
+    packet_type                 VARCHAR(80)  NOT NULL DEFAULT 'trusted_manufacturing_release_record',
+    payload_schema_version      VARCHAR(40)  NOT NULL DEFAULT 'release_packet.v1',
+    packet_version              INTEGER      NOT NULL DEFAULT 1,
+    packet_state                VARCHAR(30)  NOT NULL
+        CHECK (packet_state IN ('draft', 'assembled', 'blocked', 'releasable', 'released', 'superseded', 'voided')),
+
+    target_aggregate_type       VARCHAR(80)  NOT NULL,
+    target_aggregate_id         VARCHAR(160) NOT NULL,
+    so_number                   VARCHAR(80),
+    jo_number                   VARCHAR(80),
+    wo_number                   VARCHAR(80),
+    operation_seq               VARCHAR(40),
+    part_number                 VARCHAR(120),
+    part_revision               VARCHAR(80),
+    lot_number                  VARCHAR(120),
+    serial_number               VARCHAR(120),
+
+    enterprise_id               VARCHAR(80),
+    company_id                  VARCHAR(80),
+    site_id                     VARCHAR(80),
+    plant_id                    VARCHAR(80),
+    org_company_code            VARCHAR(30),
+    org_legal_entity_code       VARCHAR(30),
+    org_plant_id                VARCHAR(30),
+    org_site_id                 VARCHAR(30),
+    work_center_id              VARCHAR(80),
+
+    history_packet_id           VARCHAR(120),
+    packet_hash                 CHAR(64)     NOT NULL,
+    packet_hash_algorithm       VARCHAR(30)  NOT NULL DEFAULT 'sha256',
+    frozen_at                   TIMESTAMPTZ,
+    released_at                 TIMESTAMPTZ,
+    released_by                 VARCHAR(120),
+    release_decision_code       VARCHAR(40),
+    release_decision_reason     TEXT,
+
+    blocker_count               INTEGER      NOT NULL DEFAULT 0,
+    blocker_categories          JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    canonical_identifiers       JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    assertions                  JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    packet_payload              JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    provenance                  JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    retention_metadata          JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    record_copy_metadata        JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    metrics_snapshot            JSONB        NOT NULL DEFAULT '{}'::jsonb,
+
+    correlation_id              VARCHAR(120),
+    request_id                  VARCHAR(120),
+    traceparent                 VARCHAR(255),
+    source_system               VARCHAR(80)  NOT NULL DEFAULT 'mom',
+    source_record_id            VARCHAR(160),
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    row_version                 BIGINT       NOT NULL DEFAULT 1
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_mes_release_record_released_hash
+    ON mes_trusted_release_record (packet_id, packet_hash)
+    WHERE packet_state = 'released';
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_target
+    ON mes_trusted_release_record (target_aggregate_type, target_aggregate_id, packet_state);
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_work_order
+    ON mes_trusted_release_record (wo_number, packet_state, updated_at DESC)
+    WHERE wo_number IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_lot_serial
+    ON mes_trusted_release_record (lot_number, serial_number, packet_state)
+    WHERE lot_number IS NOT NULL OR serial_number IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_org_scope
+    ON mes_trusted_release_record (org_company_code, org_legal_entity_code, org_plant_id, org_site_id, packet_state);
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_runtime_scope
+    ON mes_trusted_release_record (enterprise_id, company_id, site_id, plant_id, packet_state);
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_payload
+    ON mes_trusted_release_record USING GIN (packet_payload);
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_blockers
+    ON mes_trusted_release_record USING GIN (blocker_categories);
+
+COMMENT ON TABLE mes_trusted_release_record IS
+    'Authoritative trusted manufacturing release record packet for eDHR/eBR-style controlled production release.';
+
+COMMENT ON COLUMN mes_trusted_release_record.packet_hash IS
+    'SHA-256 hash of the reproducible release packet basis used for record-copy and immutable release proof.';
+
+COMMENT ON COLUMN mes_trusted_release_record.packet_payload IS
+    'Structured release packet containing canonical identifiers, history sections, assertions, blockers, and release decision.';
+
+COMMENT ON COLUMN mes_trusted_release_record.provenance IS
+    'Ordered provenance timeline and source event hashes used to reproduce the release record.';
+
+COMMIT;
+-- <<< END MIGRATION: 100_trusted_release_record_spine.sql
+
+-- >>> BEGIN MIGRATION: 101_eqms_control_plane_foundation.sql
+-- ============================================================================
+-- Migration 101: eQMS Control Plane Foundation
+-- ============================================================================
+-- Purpose:
+--   Add the append-only control-plane primitives needed for governed commands,
+--   audit hash verification, electronic signatures, and domain outbox events.
+--
+-- Data safety:
+--   Additive migration. Existing legacy routes and JSON stores keep working.
+--
+-- Rollback:
+--   DROP TABLE IF EXISTS domain_outbox_events, eqms_electronic_signature_event CASCADE;
+--   DROP FUNCTION IF EXISTS eqms_prevent_update_delete() CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Align the audit table with AuditTrail.php. These columns are added to the
+-- partitioned parent so existing/future partitions inherit the contract.
+ALTER TABLE audit_events
+    ADD COLUMN IF NOT EXISTS esig_reason TEXT,
+    ADD COLUMN IF NOT EXISTS prev_hash CHAR(64),
+    ADD COLUMN IF NOT EXISTS event_hash CHAR(64),
+    ADD COLUMN IF NOT EXISTS esig JSONB,
+    ADD COLUMN IF NOT EXISTS correlation_id TEXT,
+    ADD COLUMN IF NOT EXISTS command_id TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_audit_events_event_hash
+    ON audit_events (event_hash, recorded_at)
+    WHERE event_hash IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_audit_events_correlation
+    ON audit_events (correlation_id, recorded_at)
+    WHERE correlation_id IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION eqms_prevent_update_delete()
+RETURNS trigger AS $$
+BEGIN
+    RAISE EXCEPTION 'eqms immutable record cannot be updated or deleted: %.%', TG_TABLE_SCHEMA, TG_TABLE_NAME;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_audit_events_immutable_update ON audit_events;
+CREATE TRIGGER trg_audit_events_immutable_update
+    BEFORE UPDATE ON audit_events
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DROP TRIGGER IF EXISTS trg_audit_events_immutable_delete ON audit_events;
+CREATE TRIGGER trg_audit_events_immutable_delete
+    BEFORE DELETE ON audit_events
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+CREATE TABLE IF NOT EXISTS domain_outbox_events (
+    domain_outbox_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    aggregate_type         TEXT        NOT NULL,
+    aggregate_id           TEXT        NOT NULL,
+    event_type             TEXT        NOT NULL,
+    payload                JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    occurred_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    status                 TEXT        NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'processing', 'done', 'failed', 'dead_letter')),
+    attempts               INT         NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+    next_attempt_at        TIMESTAMPTZ,
+    last_attempt_at        TIMESTAMPTZ,
+    idempotency_key        TEXT,
+    correlation_id         TEXT,
+    org_company_code       VARCHAR(30),
+    org_legal_entity_code  VARCHAR(30),
+    org_plant_id           VARCHAR(30),
+    org_site_id            VARCHAR(30),
+    source_system          VARCHAR(80)  NOT NULL DEFAULT 'mom',
+    source_record_id       VARCHAR(160),
+    payload_schema_version VARCHAR(30)  NOT NULL DEFAULT '1.0',
+    error_class            TEXT,
+    error_message          TEXT,
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version            BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_domain_outbox_pending
+    ON domain_outbox_events (status, next_attempt_at, occurred_at);
+
+CREATE INDEX IF NOT EXISTS idx_domain_outbox_aggregate
+    ON domain_outbox_events (aggregate_type, aggregate_id, occurred_at);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_domain_outbox_idempotency
+    ON domain_outbox_events (aggregate_type, aggregate_id, event_type, idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS eqms_electronic_signature_event (
+    signature_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    signer_user_id     UUID        REFERENCES users(user_id),
+    signer_identifier  TEXT        NOT NULL,
+    meaning            TEXT        NOT NULL CHECK (length(trim(meaning)) > 0),
+    reason             TEXT        NOT NULL CHECK (length(trim(reason)) > 0),
+    object_type        TEXT        NOT NULL,
+    object_id          TEXT        NOT NULL,
+    object_version     TEXT,
+    record_hash_sha256 CHAR(64)    NOT NULL,
+    manifest_hash_sha256 CHAR(64),
+    reauth_method      TEXT,
+    reauth_reference   TEXT,
+    ip_address         INET,
+    session_id         UUID,
+    signature_hash_sha256 CHAR(64) NOT NULL,
+    signed_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata           JSONB       NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_esig_object
+    ON eqms_electronic_signature_event (object_type, object_id, signed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_esig_signer
+    ON eqms_electronic_signature_event (signer_identifier, signed_at DESC);
+
+DROP TRIGGER IF EXISTS trg_eqms_esig_immutable_update ON eqms_electronic_signature_event;
+CREATE TRIGGER trg_eqms_esig_immutable_update
+    BEFORE UPDATE ON eqms_electronic_signature_event
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DROP TRIGGER IF EXISTS trg_eqms_esig_immutable_delete ON eqms_electronic_signature_event;
+CREATE TRIGGER trg_eqms_esig_immutable_delete
+    BEFORE DELETE ON eqms_electronic_signature_event
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+COMMIT;
+-- <<< END MIGRATION: 101_eqms_control_plane_foundation.sql
+
+-- >>> BEGIN MIGRATION: 102_eqms_document_form_control.sql
+-- ============================================================================
+-- Migration 102: eQMS Document and Form Control
+-- ============================================================================
+-- Purpose:
+--   Add record-centric document and form lifecycle tables. Existing document
+--   files, form_schemas, form_entries, allocations, and form workflow JSON
+--   remain compatibility sources until their command services cut over.
+--
+-- Rollback:
+--   DROP TABLE IF EXISTS eqms_form_record_version, eqms_form_record,
+--   eqms_form_submission_attempt, eqms_form_issuance, eqms_form_schema_version,
+--   eqms_form_template_revision, eqms_form_family, eqms_document_read_ack,
+--   eqms_document_distribution, eqms_document_effectivity,
+--   eqms_document_revision, eqms_document_family CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS eqms_document_family (
+    document_family_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    doc_code           TEXT        NOT NULL UNIQUE,
+    doc_type           TEXT        NOT NULL CHECK (doc_type IN ('SOP', 'WI', 'ANNEX', 'FRM', 'SPEC', 'POLICY', 'OTHER')),
+    title              TEXT        NOT NULL,
+    process_area       TEXT,
+    owner_user_id      UUID        REFERENCES users(user_id),
+    status             TEXT        NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'inactive', 'retired')),
+    metadata           JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version        BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS eqms_document_revision (
+    document_revision_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_family_id   UUID        NOT NULL REFERENCES eqms_document_family(document_family_id),
+    revision             TEXT        NOT NULL,
+    lifecycle_state      TEXT        NOT NULL DEFAULT 'draft'
+        CHECK (lifecycle_state IN ('draft', 'in_review', 'approved', 'released', 'superseded', 'obsolete', 'withdrawn')),
+    source_change_order_id UUID      REFERENCES plm_change_orders(plm_change_order_id),
+    effective_from       TIMESTAMPTZ,
+    effective_to         TIMESTAMPTZ,
+    approved_by          UUID        REFERENCES users(user_id),
+    approved_at          TIMESTAMPTZ,
+    released_at          TIMESTAMPTZ,
+    canonical_payload    JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    readable_snapshot_artifact_id UUID,
+    manifest_id          UUID,
+    metadata             JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version          BIGINT      NOT NULL DEFAULT 1,
+    UNIQUE (document_family_id, revision)
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_doc_revision_state
+    ON eqms_document_revision (lifecycle_state, released_at DESC);
+
+CREATE TABLE IF NOT EXISTS eqms_document_effectivity (
+    document_effectivity_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_revision_id    UUID NOT NULL REFERENCES eqms_document_revision(document_revision_id) ON DELETE CASCADE,
+    effectivity_type        TEXT NOT NULL CHECK (effectivity_type IN ('date', 'site', 'plant', 'product', 'lot', 'serial', 'order', 'role')),
+    effectivity_value       JSONB NOT NULL,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version             BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_doc_effectivity_revision
+    ON eqms_document_effectivity (document_revision_id);
+
+CREATE TABLE IF NOT EXISTS eqms_document_distribution (
+    document_distribution_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_revision_id     UUID NOT NULL REFERENCES eqms_document_revision(document_revision_id) ON DELETE CASCADE,
+    audience_type            TEXT NOT NULL CHECK (audience_type IN ('user', 'role', 'department', 'site')),
+    audience_ref             TEXT NOT NULL,
+    required_ack             BOOLEAN NOT NULL DEFAULT FALSE,
+    org_company_code         VARCHAR(30),
+    org_legal_entity_code    VARCHAR(30),
+    org_plant_id             VARCHAR(30),
+    org_site_id              VARCHAR(30),
+    source_system            VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id         VARCHAR(160),
+    payload_schema_version   VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version              BIGINT      NOT NULL DEFAULT 1,
+    UNIQUE (document_revision_id, audience_type, audience_ref)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_document_read_ack (
+    document_read_ack_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_revision_id UUID NOT NULL REFERENCES eqms_document_revision(document_revision_id) ON DELETE CASCADE,
+    user_id              UUID NOT NULL REFERENCES users(user_id),
+    acknowledged_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    signature_event_id   UUID REFERENCES eqms_electronic_signature_event(signature_event_id),
+    metadata             JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (document_revision_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_family (
+    form_family_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_code      TEXT        NOT NULL UNIQUE,
+    title          TEXT        NOT NULL,
+    owner_area     TEXT,
+    status         TEXT        NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'inactive', 'retired')),
+    org_company_code      VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id          VARCHAR(30),
+    org_site_id           VARCHAR(30),
+    source_system         VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id      VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    metadata       JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version    BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_template_revision (
+    form_template_revision_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_family_id            UUID NOT NULL REFERENCES eqms_form_family(form_family_id),
+    revision                  TEXT NOT NULL,
+    lifecycle_state           TEXT NOT NULL DEFAULT 'draft'
+        CHECK (lifecycle_state IN ('draft', 'in_review', 'approved', 'released', 'superseded', 'obsolete')),
+    source_document_revision_id UUID REFERENCES eqms_document_revision(document_revision_id),
+    source_change_order_id    UUID REFERENCES plm_change_orders(plm_change_order_id),
+    template_artifact_id      UUID,
+    template_checksum_sha256  CHAR(64) NOT NULL,
+    released_at               TIMESTAMPTZ,
+    manifest_id               UUID,
+    metadata                  JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version               BIGINT NOT NULL DEFAULT 1,
+    UNIQUE (form_family_id, revision)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_schema_version (
+    form_schema_version_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_template_revision_id  UUID NOT NULL REFERENCES eqms_form_template_revision(form_template_revision_id) ON DELETE CASCADE,
+    schema_version             TEXT NOT NULL,
+    json_schema                JSONB NOT NULL,
+    canonicalization_rules     JSONB NOT NULL DEFAULT '{}'::jsonb,
+    validation_rules           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    org_company_code           VARCHAR(30),
+    org_legal_entity_code      VARCHAR(30),
+    org_plant_id               VARCHAR(30),
+    org_site_id                VARCHAR(30),
+    source_system              VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id           VARCHAR(160),
+    payload_schema_version     VARCHAR(30) NOT NULL DEFAULT '1.0',
+    status                     TEXT NOT NULL DEFAULT 'draft'
+        CHECK (status IN ('draft', 'approved', 'released', 'superseded')),
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version                BIGINT      NOT NULL DEFAULT 1,
+    UNIQUE (form_template_revision_id, schema_version)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_issuance (
+    form_issuance_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    allocation_id          TEXT NOT NULL UNIQUE,
+    record_id              TEXT NOT NULL,
+    form_template_revision_id UUID NOT NULL REFERENCES eqms_form_template_revision(form_template_revision_id),
+    form_schema_version_id UUID NOT NULL REFERENCES eqms_form_schema_version(form_schema_version_id),
+    issued_to              UUID REFERENCES users(user_id),
+    issued_for_context     JSONB NOT NULL DEFAULT '{}'::jsonb,
+    delivery_mode          TEXT NOT NULL CHECK (delivery_mode IN ('online', 'offline_excel')),
+    issued_artifact_id     UUID,
+    issuance_manifest_id   UUID,
+    status                 TEXT NOT NULL DEFAULT 'issued'
+        CHECK (status IN ('issued', 'downloaded', 'submitted', 'accepted', 'rejected', 'voided', 'expired')),
+    issued_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at             TIMESTAMPTZ,
+    metadata               JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version            BIGINT NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_form_issuance_record
+    ON eqms_form_issuance (record_id, status);
+
+CREATE TABLE IF NOT EXISTS eqms_form_submission_attempt (
+    form_submission_attempt_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_issuance_id           UUID NOT NULL REFERENCES eqms_form_issuance(form_issuance_id),
+    attempt_no                 INT NOT NULL CHECK (attempt_no > 0),
+    submitted_by               UUID REFERENCES users(user_id),
+    submitted_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    original_artifact_id       UUID,
+    parsed_payload             JSONB,
+    validation_status          TEXT NOT NULL DEFAULT 'received'
+        CHECK (validation_status IN ('received', 'parsing', 'validating', 'valid', 'invalid', 'duplicate', 'quarantined')),
+    validation_errors          JSONB NOT NULL DEFAULT '[]'::jsonb,
+    idempotency_key            TEXT,
+    file_hash_sha256           CHAR(64),
+    metadata                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (form_issuance_id, attempt_no),
+    UNIQUE (form_issuance_id, file_hash_sha256)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_record (
+    form_record_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    record_id          TEXT NOT NULL UNIQUE,
+    form_family_id     UUID REFERENCES eqms_form_family(form_family_id),
+    current_version_id UUID,
+    lifecycle_state    TEXT NOT NULL DEFAULT 'draft'
+        CHECK (lifecycle_state IN ('draft', 'finalized', 'locked', 'amending', 'superseded', 'voided')),
+    created_from_issuance_id UUID REFERENCES eqms_form_issuance(form_issuance_id),
+    org_company_code   VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id       VARCHAR(30),
+    org_site_id        VARCHAR(30),
+    source_system      VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id   VARCHAR(160),
+    metadata           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version        BIGINT NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS eqms_form_record_version (
+    form_record_version_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    form_record_id         UUID NOT NULL REFERENCES eqms_form_record(form_record_id),
+    version_no             INT NOT NULL CHECK (version_no > 0),
+    amendment_no           INT NOT NULL DEFAULT 0 CHECK (amendment_no >= 0),
+    source_attempt_id      UUID REFERENCES eqms_form_submission_attempt(form_submission_attempt_id),
+    canonical_payload      JSONB NOT NULL,
+    readable_snapshot_artifact_id UUID NOT NULL,
+    evidence_version_id    UUID NOT NULL,
+    finalized_by           UUID REFERENCES users(user_id),
+    finalized_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    change_order_id        UUID REFERENCES plm_change_orders(plm_change_order_id),
+    metadata               JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (form_record_id, version_no)
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_eqms_form_record_current_version'
+    ) THEN
+        ALTER TABLE eqms_form_record
+            ADD CONSTRAINT fk_eqms_form_record_current_version
+            FOREIGN KEY (current_version_id)
+            REFERENCES eqms_form_record_version(form_record_version_id)
+            DEFERRABLE INITIALLY DEFERRED;
+    END IF;
+END $$;
+
+COMMIT;
+-- <<< END MIGRATION: 102_eqms_document_form_control.sql
+
+-- >>> BEGIN MIGRATION: 103_eqms_evidence_package_publication.sql
+-- ============================================================================
+-- Migration 103: eQMS Evidence Package, Publication, Retention, Integrity
+-- ============================================================================
+-- Purpose:
+--   Promote evidence from single artifact uploads into immutable evidence
+--   packages with original artifact, canonical payload, readable snapshot, and
+--   hash/signature manifest. Publication is modeled as a replayable side effect.
+--
+-- Rollback:
+--   DROP TABLE IF EXISTS eqms_integrity_exception, eqms_integrity_digest,
+--   eqms_retention_lock, eqms_publication_event, eqms_publication_job,
+--   eqms_publication_target, eqms_evidence_artifact, eqms_evidence_version,
+--   eqms_evidence_manifest, eqms_evidence_record CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS eqms_evidence_record (
+    evidence_record_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evidence_key       TEXT        NOT NULL UNIQUE,
+    subject_type       TEXT        NOT NULL,
+    subject_id         TEXT        NOT NULL,
+    lifecycle_state    TEXT        NOT NULL DEFAULT 'draft'
+        CHECK (lifecycle_state IN ('draft', 'assembling', 'finalized', 'locked', 'superseded', 'voided')),
+    current_version_id UUID,
+    retention_class    TEXT,
+    org_company_code   VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id       VARCHAR(30),
+    org_site_id        VARCHAR(30),
+    source_system      VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id   VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    metadata           JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version        BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_evidence_record_subject
+    ON eqms_evidence_record (subject_type, subject_id);
+
+CREATE TABLE IF NOT EXISTS eqms_evidence_manifest (
+    evidence_manifest_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    manifest_json        JSONB       NOT NULL,
+    manifest_hash_sha256 CHAR(64)    NOT NULL UNIQUE,
+    signed_by            UUID        REFERENCES users(user_id),
+    signature_event_id   UUID        REFERENCES eqms_electronic_signature_event(signature_event_id),
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_manifest_immutable_update ON eqms_evidence_manifest;
+CREATE TRIGGER trg_eqms_evidence_manifest_immutable_update
+    BEFORE UPDATE ON eqms_evidence_manifest
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_manifest_immutable_delete ON eqms_evidence_manifest;
+CREATE TRIGGER trg_eqms_evidence_manifest_immutable_delete
+    BEFORE DELETE ON eqms_evidence_manifest
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+CREATE TABLE IF NOT EXISTS eqms_evidence_version (
+    evidence_version_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evidence_record_id  UUID NOT NULL REFERENCES eqms_evidence_record(evidence_record_id),
+    version_no          INT  NOT NULL CHECK (version_no > 0),
+    source_change_order_id UUID REFERENCES plm_change_orders(plm_change_order_id),
+    finalized_by        UUID REFERENCES users(user_id),
+    finalized_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    evidence_manifest_id UUID NOT NULL REFERENCES eqms_evidence_manifest(evidence_manifest_id),
+    package_hash_sha256 CHAR(64) NOT NULL,
+    canonical_payload_hash_sha256 CHAR(64) NOT NULL,
+    snapshot_hash_sha256 CHAR(64) NOT NULL,
+    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (evidence_record_id, version_no)
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_evidence_version_record
+    ON eqms_evidence_version (evidence_record_id, version_no DESC);
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_version_immutable_update ON eqms_evidence_version;
+CREATE TRIGGER trg_eqms_evidence_version_immutable_update
+    BEFORE UPDATE ON eqms_evidence_version
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_version_immutable_delete ON eqms_evidence_version;
+CREATE TRIGGER trg_eqms_evidence_version_immutable_delete
+    BEFORE DELETE ON eqms_evidence_version
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+CREATE TABLE IF NOT EXISTS eqms_evidence_artifact (
+    evidence_artifact_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evidence_version_id  UUID NOT NULL REFERENCES eqms_evidence_version(evidence_version_id),
+    artifact_role        TEXT NOT NULL
+        CHECK (artifact_role IN ('original', 'canonical_payload', 'readable_snapshot', 'manifest', 'supporting_attachment')),
+    storage_adapter      TEXT NOT NULL,
+    storage_uri          TEXT NOT NULL,
+    mime_type            TEXT,
+    size_bytes           BIGINT,
+    sha256               CHAR(64) NOT NULL,
+    org_company_code     VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id         VARCHAR(30),
+    org_site_id          VARCHAR(30),
+    source_system        VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id     VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata             JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version          BIGINT NOT NULL DEFAULT 1,
+    UNIQUE (evidence_version_id, artifact_role, sha256)
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_evidence_artifact_version
+    ON eqms_evidence_artifact (evidence_version_id, artifact_role);
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_artifact_immutable_update ON eqms_evidence_artifact;
+CREATE TRIGGER trg_eqms_evidence_artifact_immutable_update
+    BEFORE UPDATE ON eqms_evidence_artifact
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DROP TRIGGER IF EXISTS trg_eqms_evidence_artifact_immutable_delete ON eqms_evidence_artifact;
+CREATE TRIGGER trg_eqms_evidence_artifact_immutable_delete
+    BEFORE DELETE ON eqms_evidence_artifact
+    FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_eqms_evidence_record_current_version'
+    ) THEN
+        ALTER TABLE eqms_evidence_record
+            ADD CONSTRAINT fk_eqms_evidence_record_current_version
+            FOREIGN KEY (current_version_id)
+            REFERENCES eqms_evidence_version(evidence_version_id)
+            DEFERRABLE INITIALLY DEFERRED;
+    END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS eqms_publication_target (
+    publication_target_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    target_code           TEXT NOT NULL UNIQUE,
+    target_type           TEXT NOT NULL CHECK (target_type IN ('sharepoint_graph', 'local_read_model', 'other')),
+    authority_role        TEXT NOT NULL DEFAULT 'read_only_replica'
+        CHECK (authority_role IN ('read_only_replica', 'cache', 'external_index')),
+    config                JSONB NOT NULL DEFAULT '{}'::jsonb,
+    is_active             BOOLEAN NOT NULL DEFAULT TRUE,
+    org_company_code      VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id          VARCHAR(30),
+    org_site_id           VARCHAR(30),
+    source_system         VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id      VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version           BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS eqms_publication_job (
+    publication_job_id    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    publication_target_id UUID NOT NULL REFERENCES eqms_publication_target(publication_target_id),
+    source_object_type    TEXT NOT NULL,
+    source_object_id      TEXT NOT NULL,
+    evidence_version_id   UUID REFERENCES eqms_evidence_version(evidence_version_id),
+    requested_by          UUID REFERENCES users(user_id),
+    requested_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    status                TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'processing', 'published', 'failed', 'revoked', 'dead_letter')),
+    attempts              INT NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+    next_attempt_at       TIMESTAMPTZ,
+    published_uri         TEXT,
+    published_hash_sha256 CHAR(64),
+    metadata              JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_publication_job_status
+    ON eqms_publication_job (status, next_attempt_at, requested_at);
+
+CREATE TABLE IF NOT EXISTS eqms_publication_event (
+    publication_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    publication_job_id   UUID NOT NULL REFERENCES eqms_publication_job(publication_job_id) ON DELETE CASCADE,
+    event_type           TEXT NOT NULL,
+    event_payload        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    org_company_code     VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id         VARCHAR(30),
+    org_site_id          VARCHAR(30),
+    source_system        VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id     VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    recorded_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version          BIGINT      NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS eqms_retention_lock (
+    retention_lock_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type       TEXT NOT NULL,
+    object_id         TEXT NOT NULL,
+    lock_type         TEXT NOT NULL CHECK (lock_type IN ('regulatory', 'litigation', 'quality_event', 'retention_schedule')),
+    locked_until      TIMESTAMPTZ,
+    reason            TEXT NOT NULL,
+    created_by        UUID REFERENCES users(user_id),
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata          JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_retention_lock_object
+    ON eqms_retention_lock (object_type, object_id);
+
+CREATE TABLE IF NOT EXISTS eqms_integrity_digest (
+    integrity_digest_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type         TEXT NOT NULL,
+    object_id           TEXT NOT NULL,
+    digest_scope        TEXT NOT NULL CHECK (digest_scope IN ('record', 'version', 'artifact', 'manifest', 'audit_chain')),
+    sha256              CHAR(64) NOT NULL,
+    computed_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    verified_at         TIMESTAMPTZ,
+    status              TEXT NOT NULL DEFAULT 'valid'
+        CHECK (status IN ('valid', 'invalid', 'missing', 'exception_open')),
+    org_company_code    VARCHAR(30),
+    org_legal_entity_code VARCHAR(30),
+    org_plant_id        VARCHAR(30),
+    org_site_id         VARCHAR(30),
+    source_system       VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id    VARCHAR(160),
+    payload_schema_version VARCHAR(30) NOT NULL DEFAULT '1.0',
+    metadata            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version         BIGINT NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_integrity_digest_object
+    ON eqms_integrity_digest (object_type, object_id, digest_scope);
+
+CREATE TABLE IF NOT EXISTS eqms_integrity_exception (
+    integrity_exception_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    integrity_digest_id    UUID REFERENCES eqms_integrity_digest(integrity_digest_id),
+    severity               TEXT NOT NULL CHECK (severity IN ('minor', 'major', 'critical')),
+    status                 TEXT NOT NULL DEFAULT 'open'
+        CHECK (status IN ('open', 'investigating', 'accepted_risk', 'corrected', 'closed')),
+    reason                 TEXT,
+    opened_by              UUID REFERENCES users(user_id),
+    opened_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    closed_by              UUID REFERENCES users(user_id),
+    closed_at              TIMESTAMPTZ,
+    metadata               JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+INSERT INTO eqms_publication_target (target_code, target_type, authority_role, config)
+VALUES ('sharepoint-readonly', 'sharepoint_graph', 'read_only_replica', '{"direct_user_upload_allowed": false}'::jsonb)
+ON CONFLICT (target_code) DO NOTHING;
+
+COMMIT;
+-- <<< END MIGRATION: 103_eqms_evidence_package_publication.sql
+
+-- >>> BEGIN MIGRATION: 104_eqms_change_authority_field_governance.sql
+-- ============================================================================
+-- Migration 104: eQMS Change Authority and Field Governance
+-- ============================================================================
+-- Purpose:
+--   Extend the existing PLM change-control backbone with executable authority
+--   rules for post-release object/field/effectivity changes.
+--
+-- Rollback:
+--   DROP TABLE IF EXISTS eqms_field_change_authorization,
+--   eqms_field_governance_rule, eqms_change_resulting_object,
+--   eqms_change_affected_object CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS eqms_change_affected_object (
+    change_affected_object_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id       UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id) ON DELETE CASCADE,
+    object_type               TEXT NOT NULL,
+    object_id                 TEXT NOT NULL,
+    object_revision           TEXT,
+    affected_fields           TEXT[] NOT NULL DEFAULT '{}',
+    allowed_effect            TEXT NOT NULL
+        CHECK (allowed_effect IN ('create', 'revise', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update')),
+    effectivity_rule          JSONB NOT NULL DEFAULT '{}'::jsonb,
+    verification_required     BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata                  JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_change_affected_object_lookup
+    ON eqms_change_affected_object (object_type, object_id, plm_change_order_id);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_change_affected_object_fields
+    ON eqms_change_affected_object USING GIN (affected_fields);
+
+CREATE TABLE IF NOT EXISTS eqms_change_resulting_object (
+    change_resulting_object_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id        UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id) ON DELETE CASCADE,
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    resulting_revision         TEXT,
+    result_role                TEXT NOT NULL
+        CHECK (result_role IN ('new_revision', 'replacement', 'superseding_record', 'published_record')),
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata                   JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_change_resulting_object_lookup
+    ON eqms_change_resulting_object (object_type, object_id, plm_change_order_id);
+
+CREATE TABLE IF NOT EXISTS eqms_field_governance_rule (
+    field_governance_rule_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type              TEXT NOT NULL,
+    field_path               TEXT NOT NULL,
+    lifecycle_state          TEXT NOT NULL,
+    governance_class         TEXT NOT NULL
+        CHECK (governance_class IN ('free_edit', 'controlled', 'post_release_locked', 'never_editable')),
+    change_required          BOOLEAN NOT NULL DEFAULT FALSE,
+    signature_required       BOOLEAN NOT NULL DEFAULT FALSE,
+    warn_only                BOOLEAN NOT NULL DEFAULT FALSE,
+    effective_from           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    effective_to             TIMESTAMPTZ,
+    org_company_code         VARCHAR(30),
+    org_legal_entity_code    VARCHAR(30),
+    org_plant_id             VARCHAR(30),
+    org_site_id              VARCHAR(30),
+    source_system            VARCHAR(80) NOT NULL DEFAULT 'mom',
+    source_record_id         VARCHAR(160),
+    payload_schema_version   VARCHAR(30) NOT NULL DEFAULT '1.0',
+    metadata                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version              BIGINT NOT NULL DEFAULT 1,
+    UNIQUE (object_type, field_path, lifecycle_state, effective_from)
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_field_governance_lookup
+    ON eqms_field_governance_rule (object_type, field_path, lifecycle_state, effective_from, effective_to);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_eqms_field_governance_active_rule
+    ON eqms_field_governance_rule (object_type, field_path, lifecycle_state)
+    WHERE effective_to IS NULL;
+
+CREATE TABLE IF NOT EXISTS eqms_field_change_authorization (
+    field_change_authorization_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id           UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id),
+    object_type                   TEXT NOT NULL,
+    object_id                     TEXT NOT NULL,
+    field_path                    TEXT NOT NULL,
+    authorized_effect             TEXT NOT NULL,
+    authorized_from               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    authorized_to                 TIMESTAMPTZ,
+    consumed_at                   TIMESTAMPTZ,
+    consumed_by                   UUID REFERENCES users(user_id),
+    metadata                      JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_field_change_authorization_lookup
+    ON eqms_field_change_authorization (object_type, object_id, field_path, authorized_from, authorized_to);
+
+-- Seed the highest-risk order fields already flagged by OrderWorkflowService.
+INSERT INTO eqms_field_governance_rule (
+    object_type, field_path, lifecycle_state, governance_class,
+    change_required, signature_required, warn_only, effective_from, metadata
+)
+VALUES
+    ('jo', 'part_revision', 'released', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'part_revision', 'active', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'material_spec', 'released', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'material_spec', 'active', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'routing_id', 'released', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'routing_id', 'active', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'part_revision', 'running', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'material_spec', 'running', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'routing_id', 'running', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'part_revision', 'inspection', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'material_spec', 'inspection', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('jo', 'routing_id', 'inspection', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "order_ecr_fields"}'::jsonb),
+    ('document_revision', '*', 'released', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "document_release_lock"}'::jsonb),
+    ('form_record', '*', 'locked', 'post_release_locked', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "form_record_lock"}'::jsonb),
+    ('evidence_record', '*', 'locked', 'never_editable', true, true, false, '2026-01-01T00:00:00Z', '{"seed": "evidence_lock"}'::jsonb)
+ON CONFLICT (object_type, field_path, lifecycle_state) WHERE effective_to IS NULL
+DO UPDATE SET
+    governance_class = EXCLUDED.governance_class,
+    change_required = EXCLUDED.change_required,
+    signature_required = EXCLUDED.signature_required,
+    warn_only = EXCLUDED.warn_only,
+    metadata = eqms_field_governance_rule.metadata || EXCLUDED.metadata;
+
+COMMIT;
+-- <<< END MIGRATION: 104_eqms_change_authority_field_governance.sql

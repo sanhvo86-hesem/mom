@@ -28,8 +28,16 @@ CREATE TABLE IF NOT EXISTS ai_conversations (
     messages                JSONB           NOT NULL DEFAULT '[]'::jsonb,
     -- Du lieu mo rong / Extended metadata
     metadata                JSONB           DEFAULT '{}'::jsonb,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
     created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
-    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now()
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE ai_conversations IS 'AI chat conversation history for NL query interface / Lich su hoi thoai AI cho giao dien truy van ngon ngu tu nhien';
 COMMENT ON COLUMN ai_conversations.context_type IS 'Conversation context: production_query, ncr_analysis, scheduling, document_summary / Ngu canh hoi thoai';
@@ -61,7 +69,15 @@ CREATE TABLE IF NOT EXISTS ai_feedback_loops (
     notes                   TEXT,
     -- Ket qua thuc te / Actual observed outcome
     actual_outcome          JSONB,
-    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now()
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE ai_feedback_loops IS 'Operator/manager feedback on AI predictions / Phan hoi cua van hanh vien/quan ly ve du doan AI';
 COMMENT ON COLUMN ai_feedback_loops.feedback_type IS 'Feedback type: correct, incorrect, partially_correct, not_applicable / Loai phan hoi';
@@ -104,7 +120,15 @@ CREATE TABLE IF NOT EXISTS ai_training_datasets (
                             )),
     created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
     -- Nguoi tao / Created by user
-    created_by              UUID
+    created_by              UUID,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             BIGINT          NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE ai_training_datasets IS 'ETL snapshots for ML model training / Bo du lieu ETL cho huan luyen mo hinh ML';
 COMMENT ON COLUMN ai_training_datasets.model_type IS 'Target model type for this dataset / Loai mo hinh muc tieu';
@@ -150,7 +174,15 @@ CREATE TABLE IF NOT EXISTS machine_telemetry_extended (
     -- So lenh san xuat / Work order number
     wo_number               VARCHAR(50),
     -- Du lieu mo rong / Extended metadata
-    metadata                JSONB           DEFAULT '{}'::jsonb
+    metadata                JSONB           DEFAULT '{}'::jsonb,
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             BIGINT          NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE machine_telemetry_extended IS 'Extended machine sensor data for ML predictive models / Du lieu cam bien may mo rong cho mo hinh du doan ML';
 COMMENT ON COLUMN machine_telemetry_extended.vibration_x IS 'Vibration reading axis X / Gia tri rung dong truc X';
@@ -189,7 +221,15 @@ CREATE TABLE IF NOT EXISTS ai_recommendation_actions (
     executed_at             TIMESTAMPTZ,
     -- Ket qua thuc thi / Execution result
     result                  JSONB,
-    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now()
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    source_system           VARCHAR(80)     NOT NULL DEFAULT 'mom',
+    source_record_id        VARCHAR(160),
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    row_version             BIGINT          NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE ai_recommendation_actions IS 'Automated actions triggered by AI predictions / Hanh dong tu dong duoc kich hoat tu du doan AI';
 COMMENT ON COLUMN ai_recommendation_actions.action_type IS 'Action type: auto_ncr, maintenance_request, schedule_adjustment, alert_sent, tool_change_order / Loai hanh dong';

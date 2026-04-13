@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\GraphicsGovernanceException;
+use MOM\Api\Services\GraphicsGovernanceService;
 use Throwable;
 
 /**
@@ -17,6 +19,16 @@ use Throwable;
  */
 class AdminController extends BaseController
 {
+    private ?GraphicsGovernanceService $graphicsGovernanceService = null;
+
+    private function graphicsGovernance(): GraphicsGovernanceService
+    {
+        if ($this->graphicsGovernanceService === null) {
+            $this->graphicsGovernanceService = new GraphicsGovernanceService($this->rootDir, $this->dataDir);
+        }
+        return $this->graphicsGovernanceService;
+    }
+
     /**
      * POST gitSync â€” Commit and push local document changes to git.
      *
@@ -724,9 +736,11 @@ class AdminController extends BaseController
     {
         $this->requireAuth();
         try {
-            $file = $this->dataDir . '/config/design-system-config.json';
-            $data = $this->readJsonFile($file) ?? [];
-            $this->success(['config' => $data, 'data' => $data]);
+            $this->success($this->graphicsGovernance()->getDesignConfig());
+        } catch (GraphicsGovernanceException $e) {
+            $this->error($e->errorCode(), $e->statusCode(), $e->getMessage(), [
+                'errors' => $e->errors(),
+            ] + $e->extra());
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('design_config_load_failed', 500, $e->getMessage());
@@ -749,19 +763,50 @@ class AdminController extends BaseController
         }
 
         try {
-            $file = $this->dataDir . '/config/design-system-config.json';
-            $config['_meta'] = [
-                'version' => '2.0',
-                'description' => 'Admin-configurable design system.',
-                'updatedAt' => date('c'),
-                'updatedBy' => $user['username'] ?? 'admin',
-            ];
-            $this->writeJsonFile($file, (array)$config);
-            $this->auditLog('design_config_save', ['keys' => count((array)$config)], (string)($user['username'] ?? ''));
-            $this->success(['saved' => true]);
+            $result = $this->graphicsGovernance()->saveDesignConfig(
+                (array)$config,
+                $this->expectedGraphicsVersion($body, (array)$config),
+                (string)($user['username'] ?? 'admin')
+            );
+            $this->auditLog('design_config_save', [
+                'keys' => count((array)$config),
+                'authority' => 'backend_graphics_design_config',
+                'version' => $result['version'] ?? '',
+                'etag' => $result['etag'] ?? '',
+            ], (string)($user['username'] ?? ''));
+            $this->success($result);
+        } catch (GraphicsGovernanceException $e) {
+            $this->error($e->errorCode(), $e->statusCode(), $e->getMessage(), [
+                'errors' => $e->errors(),
+            ] + $e->extra());
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('design_config_save_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $resource
+     */
+    private function expectedGraphicsVersion(array $body, array $resource): ?string
+    {
+        $header = $this->requestHeader('If-Match');
+        if ($header !== null && trim($header) !== '') {
+            return $header;
+        }
+        foreach (['expectedVersion', 'baseVersion', 'registryVersion', 'version'] as $key) {
+            if (isset($body[$key]) && is_scalar($body[$key])) {
+                return (string)$body[$key];
+            }
+        }
+        $meta = is_array($resource['_meta'] ?? null) ? (array)$resource['_meta'] : [];
+        if (isset($meta['governanceRevision']) && is_scalar($meta['governanceRevision'])) {
+            return 'rev-' . (string)$meta['governanceRevision'];
+        }
+        if (isset($meta['version']) && is_scalar($meta['version'])) {
+            return (string)$meta['version'];
+        }
+        return null;
     }
 }

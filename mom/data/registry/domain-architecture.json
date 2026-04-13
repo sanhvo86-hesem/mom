@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T09:36:20.782Z",
+    "generatedAt": "2026-04-13T11:20:04.628Z",
     "domainCount": 49,
-    "tableCount": 660,
+    "tableCount": 694,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-13T09:36:26.083Z"
+    "workflowCoverageGeneratedAt": "2026-04-13T11:20:13.124Z"
   },
   "domains": {
     "core_system": {
@@ -293,6 +293,7 @@
         "finance_extended",
         "fmea_apqp",
         "forms_system",
+        "foundation_governance",
         "hcm_workforce",
         "inventory",
         "lean_manufacturing",
@@ -335,6 +336,7 @@
         "attachment",
         "calendar",
         "electronic_signature",
+        "eqms_electronic_signature_event",
         "org_companies",
         "org_company",
         "org_enterprise",
@@ -375,6 +377,7 @@
         "wf_uom"
       ],
       "upstreamDomains": [
+        "core_system",
         "mes_execution"
       ],
       "downstreamDomains": [
@@ -462,19 +465,28 @@
         "document_embeddings",
         "document_revision",
         "document_versions",
-        "documents"
+        "documents",
+        "eqms_document_distribution",
+        "eqms_document_effectivity",
+        "eqms_document_family",
+        "eqms_document_read_ack",
+        "eqms_document_revision"
       ],
       "primaryWorkflows": [
         "wf_document",
         "wf_document_revision",
-        "wf_document_change_control"
+        "wf_document_change_control",
+        "wf_eqms_document_family",
+        "wf_eqms_document_revision"
       ],
       "upstreamDomains": [
         "core_system",
         "foundation_governance",
-        "mes_execution"
+        "mes_execution",
+        "plm_change_control"
       ],
       "downstreamDomains": [
+        "forms_system",
         "hcm_workforce",
         "mfg_engineering",
         "plm_change_control",
@@ -485,7 +497,9 @@
       "workflows": [
         "wf_document",
         "wf_document_change_control",
-        "wf_document_revision"
+        "wf_document_revision",
+        "wf_eqms_document_family",
+        "wf_eqms_document_revision"
       ]
     },
     "master_data": {
@@ -1170,6 +1184,7 @@
         "job_event",
         "labor_capture",
         "machine_event",
+        "machine_telemetry_extended",
         "material_consumption",
         "mes_alarm_catalog",
         "mes_alarm_playbooks",
@@ -1219,6 +1234,7 @@
         "mes_tool_assemblies",
         "mes_tool_life_events",
         "mes_tool_preset_offsets",
+        "mes_trusted_release_record",
         "mes_wip_location",
         "mes_wip_movements",
         "pause_resume",
@@ -1246,6 +1262,7 @@
         "wf_mes_shift_handover",
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
+        "wf_mes_trusted_release_record",
         "wf_mes_wip_location",
         "wf_production_completion",
         "wf_rework",
@@ -1416,6 +1433,7 @@
         "wf_mes_shift_handover",
         "wf_mes_tool_assembly",
         "wf_mes_tool_preset_offset",
+        "wf_mes_trusted_release_record",
         "wf_mes_wip_location",
         "wf_production_completion",
         "wf_rework",
@@ -1530,6 +1548,10 @@
       "tables": [
         "change_control",
         "engineering_change_requests",
+        "eqms_change_affected_object",
+        "eqms_change_resulting_object",
+        "eqms_field_change_authorization",
+        "eqms_field_governance_rule",
         "plm_change_order_lines",
         "plm_change_orders",
         "plm_change_requests",
@@ -1546,6 +1568,7 @@
       "primaryWorkflows": [
         "wf_change_control",
         "wf_engineering_change_request",
+        "wf_eqms_field_governance_rule",
         "wf_plm_change_order",
         "wf_plm_change_request",
         "wf_plm_deviation_permit",
@@ -1564,11 +1587,16 @@
         "record_system",
         "sales"
       ],
-      "downstreamDomains": [],
+      "downstreamDomains": [
+        "document_control",
+        "evidence_vault",
+        "forms_system"
+      ],
       "supportDomain": false,
       "workflows": [
         "wf_change_control",
         "wf_engineering_change_request",
+        "wf_eqms_field_governance_rule",
         "wf_plm_change_order",
         "wf_plm_change_request",
         "wf_plm_deviation_permit",
@@ -2621,19 +2649,34 @@
       "description": "Schema biểu mẫu, entry và attachment runtime.",
       "businessProcess": "Schema-driven form publishing, submission, approval, and attachment capture.",
       "tables": [
+        "eqms_form_family",
+        "eqms_form_issuance",
+        "eqms_form_record",
+        "eqms_form_record_version",
+        "eqms_form_schema_version",
+        "eqms_form_submission_attempt",
+        "eqms_form_template_revision",
         "form_attachments",
         "form_drafts",
         "form_entries",
         "form_schemas"
       ],
       "primaryWorkflows": [
+        "wf_eqms_form_family",
+        "wf_eqms_form_issuance",
+        "wf_eqms_form_record",
+        "wf_eqms_form_schema_version",
+        "wf_eqms_form_submission_attempt",
+        "wf_eqms_form_template_revision",
         "wf_form_submission",
         "wf_form_schema"
       ],
       "upstreamDomains": [
         "core_system",
+        "document_control",
         "foundation_governance",
         "mes_execution",
+        "plm_change_control",
         "record_system"
       ],
       "downstreamDomains": [
@@ -2641,6 +2684,12 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_eqms_form_family",
+        "wf_eqms_form_issuance",
+        "wf_eqms_form_record",
+        "wf_eqms_form_schema_version",
+        "wf_eqms_form_submission_attempt",
+        "wf_eqms_form_template_revision",
         "wf_form_schema",
         "wf_form_submission"
       ]
@@ -2656,6 +2705,7 @@
         "allocation_events",
         "allocations",
         "electronic_signatures",
+        "eqms_retention_lock",
         "record_counters",
         "record_links",
         "records"
@@ -2697,6 +2747,7 @@
       "businessProcess": "Infrastructure, metadata, notification, workflow runtime, and system-level services.",
       "tables": [
         "comments",
+        "domain_outbox_events",
         "escalation_log",
         "escalation_rules",
         "file_attachments",
@@ -2773,22 +2824,40 @@
       "description": "Evidence, chain-of-custody, links và full-text search.",
       "businessProcess": "Evidence retention, chain of custody, indexing, and audit support.",
       "tables": [
+        "eqms_evidence_artifact",
+        "eqms_evidence_manifest",
+        "eqms_evidence_record",
+        "eqms_evidence_version",
+        "eqms_integrity_digest",
+        "eqms_integrity_exception",
+        "eqms_publication_event",
+        "eqms_publication_job",
+        "eqms_publication_target",
         "evidence_chain_custody",
         "evidence_fts",
         "evidence_links",
         "evidence_vault"
       ],
       "primaryWorkflows": [
-        "wf_evidence_chain"
+        "wf_eqms_evidence_record",
+        "wf_eqms_integrity_digest",
+        "wf_eqms_integrity_exception",
+        "wf_eqms_publication_job"
       ],
       "upstreamDomains": [
         "core_system",
         "foundation_governance",
-        "mes_execution"
+        "mes_execution",
+        "plm_change_control"
       ],
       "downstreamDomains": [],
       "supportDomain": true,
-      "workflows": []
+      "workflows": [
+        "wf_eqms_evidence_record",
+        "wf_eqms_integrity_digest",
+        "wf_eqms_integrity_exception",
+        "wf_eqms_publication_job"
+      ]
     },
     "cnc_programs": {
       "label": "Chương trình CNC",
@@ -2859,11 +2928,17 @@
       "description": "Prediction models, quality predictions, anomaly rules và AI scheduling signals.",
       "businessProcess": "Predictive quality, anomaly detection, and AI-assisted planning decisions.",
       "tables": [
+        "ai_conversations",
+        "ai_feedback_loops",
+        "ai_recommendation_actions",
+        "ai_training_datasets",
         "prediction_models",
         "quality_predictions",
         "spc_anomaly_rules"
       ],
       "primaryWorkflows": [
+        "wf_ai_recommendation_action",
+        "wf_ai_training_dataset",
         "wf_predictive_quality"
       ],
       "upstreamDomains": [
@@ -2875,6 +2950,8 @@
       "downstreamDomains": [],
       "supportDomain": false,
       "workflows": [
+        "wf_ai_recommendation_action",
+        "wf_ai_training_dataset",
         "wf_predictive_quality"
       ]
     },

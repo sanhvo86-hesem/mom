@@ -3682,7 +3682,7 @@ paths:
       description: |
         Returns the governed design configuration with version and ETag.
 
-        **Legacy action:** `graphics_design_config_get`
+        **Legacy actions:** `graphics_design_config_get`, `admin_design_config`
       responses:
         '200':
           description: Design config returned.
@@ -3700,9 +3700,10 @@ paths:
       summary: Save backend-authoritative design config
       description: |
         Persists design config on the backend. Requires optimistic concurrency
-        using `If-Match` or `expectedVersion`.
+        using `If-Match`, `expectedVersion`, or the nested `config._meta.version`
+        returned by the last authority read.
 
-        **Legacy action:** `graphics_design_config_save`
+        **Legacy actions:** `graphics_design_config_save`, `admin_design_config_save`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -3732,7 +3733,7 @@ paths:
       description: |
         Returns the canonical template registry and component contract index.
 
-        **Legacy action:** `graphics_template_registry_get`
+        **Action aliases:** `graphics_template_registry_get`, `admin_template_registry_get`
       responses:
         '200':
           description: Template registry returned.
@@ -3747,7 +3748,7 @@ paths:
       tags: [Graphics Governance]
       summary: Read one template by ID or alias
       description: |
-        **Legacy action:** `graphics_template_get`
+        **Action aliases:** `graphics_template_get`, `admin_template_get`
       parameters:
         - $ref: '#/components/parameters/TemplateIdPath'
       responses:
@@ -3769,7 +3770,7 @@ paths:
         Persists a draft under backend governance. Drafts are controlled work
         products, not production authority until publish.
 
-        **Legacy action:** `graphics_template_draft_save`
+        **Action aliases:** `graphics_template_draft_save`, `admin_template_draft_save`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -3822,7 +3823,7 @@ paths:
       description: |
         Requires migration plan when modules currently use the template.
 
-        **Legacy action:** `graphics_template_deprecate`
+        **Action aliases:** `graphics_template_deprecate`, `admin_template_deprecate`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -3850,7 +3851,7 @@ paths:
         Runs backend validation for unique template IDs, semantic version,
         valid zones, allowed blocks, module references and compatibility rules.
 
-        **Legacy action:** `graphics_template_validate`
+        **Action aliases:** `graphics_template_validate`, `admin_template_validate`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/TemplateIdPath'
@@ -3875,10 +3876,11 @@ paths:
       summary: Publish an approved template version
       description: |
         Blocks publish when validation fails, impact blockers are unresolved,
-        required gate evidence is missing, release evidence is missing, or the
-        registry version check fails.
+        required gate evidence is missing, release evidence is missing, the
+        registry version check fails, or `impactAnalysisId` was not recorded by
+        the backend impact-analysis endpoint for the current registry state.
 
-        **Legacy action:** `graphics_template_publish`
+        **Action aliases:** `graphics_template_publish`, `admin_template_publish`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -3905,7 +3907,7 @@ paths:
       tags: [Graphics Governance]
       summary: List modules using a template
       description: |
-        **Legacy action:** `graphics_template_modules`
+        **Action aliases:** `graphics_template_modules`, `admin_template_modules_get`
       parameters:
         - $ref: '#/components/parameters/TemplateIdPath'
       responses:
@@ -3937,7 +3939,7 @@ paths:
       tags: [Graphics Governance]
       summary: Read module graphics compliance matrix
       description: |
-        **Legacy action:** `graphics_compliance_matrix`
+        **Action aliases:** `graphics_compliance_matrix`, `admin_graphics_compliance_get`
       responses:
         '200':
           description: Compliance matrix returned.
@@ -3952,7 +3954,7 @@ paths:
       tags: [Graphics Governance]
       summary: List non-compliant modules
       description: |
-        **Legacy action:** `graphics_non_compliant_modules`
+        **Action aliases:** `graphics_non_compliant_modules`, `admin_graphics_non_compliant_get`
       responses:
         '200':
           description: Non-compliant modules returned.
@@ -4006,13 +4008,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenAdoptionCoverageResponse'
 
+  /api/graphics/compliance/debt:
+    get:
+      operationId: graphicsComplianceDebtGet
+      tags: [Graphics Governance]
+      summary: Read aggregate graphics debt
+      description: |
+        Aggregates bridge alias debt, private CSS debt and token adoption coverage.
+
+        **Legacy actions:** `admin_graphics_debt_get`
+      responses:
+        '200':
+          description: Aggregate graphics debt returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsDebtAggregateResponse'
+
   /api/graphics/drift:
     get:
       operationId: graphicsDriftGet
       tags: [Graphics Governance]
       summary: Read graphics drift report
       description: |
-        **Legacy action:** `graphics_drift_report`
+        **Action aliases:** `graphics_drift_report`, `admin_graphics_drift_get`
       responses:
         '200':
           description: Drift report returned.
@@ -4021,13 +4040,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/GraphicsDriftResponse'
 
+  /api/graphics/release-blockers:
+    get:
+      operationId: graphicsReleaseBlockersGet
+      tags: [Graphics Governance]
+      summary: Read graphics release blockers
+      description: |
+        Returns release-gate blockers derived from module compliance, drift, pending
+        impact analysis and active waivers.
+
+        **Legacy actions:** `graphics_release_blockers_get`, `admin_graphics_release_blockers_get`
+      responses:
+        '200':
+          description: Graphics release blockers returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsReleaseBlockersResponse'
+
   /api/graphics/impact/token:
     post:
       operationId: graphicsTokenImpactAnalyze
       tags: [Graphics Governance]
       summary: Analyze token impact
       description: |
-        **Legacy action:** `graphics_impact_token`
+        **Action aliases:** `graphics_impact_token`, `admin_graphics_impact_token`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -4050,7 +4087,7 @@ paths:
       tags: [Graphics Governance]
       summary: Analyze template impact
       description: |
-        **Legacy action:** `graphics_impact_template`
+        **Action aliases:** `graphics_impact_template`, `admin_graphics_impact_template`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -4073,7 +4110,7 @@ paths:
       tags: [Graphics Governance]
       summary: Analyze component impact
       description: |
-        **Legacy action:** `graphics_impact_component`
+        **Action aliases:** `graphics_impact_component`, `admin_graphics_impact_component`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -4096,7 +4133,7 @@ paths:
       tags: [Graphics Governance]
       summary: Stage graphics governance rollout
       description: |
-        **Legacy action:** `graphics_rollout_stage`
+        **Action aliases:** `graphics_rollout_stage`, `admin_graphics_rollout_stage`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4120,7 +4157,7 @@ paths:
       tags: [Graphics Governance]
       summary: Apply staged graphics rollout
       description: |
-        **Legacy action:** `graphics_rollout_apply`
+        **Action aliases:** `graphics_rollout_apply`, `admin_graphics_rollout_apply`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4144,7 +4181,7 @@ paths:
       tags: [Graphics Governance]
       summary: Roll back a graphics rollout
       description: |
-        **Legacy action:** `graphics_rollout_rollback`
+        **Action aliases:** `graphics_rollout_rollback`, `admin_graphics_rollout_rollback`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4168,7 +4205,7 @@ paths:
       tags: [Graphics Governance]
       summary: Read graphics governance audit history
       description: |
-        **Legacy action:** `graphics_audit_history`
+        **Action aliases:** `graphics_audit_history`, `admin_graphics_audit_history_get`
       parameters:
         - name: limit
           in: query
@@ -4190,7 +4227,7 @@ paths:
       tags: [Graphics Governance]
       summary: Create graphics governance waiver
       description: |
-        **Legacy action:** `graphics_waiver_create`
+        **Action aliases:** `graphics_waiver_create`, `admin_graphics_waiver_create`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4214,7 +4251,7 @@ paths:
       tags: [Graphics Governance]
       summary: Approve graphics governance waiver
       description: |
-        **Legacy action:** `graphics_waiver_approve`
+        **Action aliases:** `graphics_waiver_approve`, `admin_graphics_waiver_approve`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4233,7 +4270,7 @@ paths:
       tags: [Graphics Governance]
       summary: Expire graphics governance waiver
       description: |
-        **Legacy action:** `graphics_waiver_expire`
+        **Action aliases:** `graphics_waiver_expire`, `admin_graphics_waiver_expire`
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
         - $ref: '#/components/parameters/IfMatchHeader'
@@ -4252,7 +4289,7 @@ paths:
       tags: [Graphics Governance]
       summary: List active graphics governance waivers
       description: |
-        **Legacy action:** `graphics_waivers_active`
+        **Action aliases:** `graphics_waivers_active`, `admin_graphics_waiver_active_get`
       responses:
         '200':
           description: Active waivers returned.
@@ -5068,6 +5105,19 @@ components:
               type: object
               additionalProperties: true
 
+    GraphicsDebtAggregateResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [debt, summary]
+          properties:
+            debt:
+              type: object
+              additionalProperties: true
+            summary:
+              type: object
+              additionalProperties: true
+
     TokenAdoptionCoverageResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
@@ -5097,6 +5147,52 @@ components:
               items:
                 type: object
                 additionalProperties: true
+
+    GraphicsReleaseBlockersResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [blockers, summary]
+          properties:
+            blockers:
+              type: array
+              items:
+                $ref: '#/components/schemas/GraphicsReleaseBlocker'
+            summary:
+              type: object
+              additionalProperties: true
+            evidence:
+              $ref: '#/components/schemas/GraphicsReleaseLink'
+
+    GraphicsReleaseBlocker:
+      type: object
+      additionalProperties: true
+      properties:
+        blockerId:
+          type: string
+        scope:
+          type: string
+          enum: [module, drift, impact-analysis, template, component, token, graphics]
+        targetId:
+          type: string
+        moduleId:
+          type: string
+        templateId:
+          type: string
+        severity:
+          type: string
+          enum: [warning, blocker, waived]
+        status:
+          type: string
+          enum: [active, waived, pending-review]
+        reason:
+          type: string
+        releaseGate:
+          type: string
+        releaseBlocked:
+          type: boolean
+        waiverAllowed:
+          type: boolean
 
     GraphicsImpactReport:
       type: object
@@ -5150,6 +5246,16 @@ components:
         generatedAt:
           type: string
           format: date-time
+        recordedAt:
+          type: string
+          format: date-time
+          description: Present when the backend has stored this impact report as a publish precondition.
+        recordedBy:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+          description: Time after which publish must rerun impact analysis.
 
     GraphicsImpactReportResponse:
       allOf:
@@ -5183,17 +5289,39 @@ components:
         blockType:
           type: string
 
-    GraphicsReleaseManifestRef:
-      type: object
-      required: [refType, refId]
-      properties:
+      GraphicsReleaseManifestRef:
+        type: object
+        required: [refType, refId]
+        properties:
         refType:
           type: string
           enum: [document, dcr, evidence, release_manifest, test_report, approval]
         refId:
           type: string
-        uri:
-          type: string
+          uri:
+            type: string
+
+      GraphicsReleaseLink:
+        type: object
+        additionalProperties: true
+        properties:
+          graphicsAuthorityRefs:
+            type: array
+            items:
+              type: string
+          templateRegistryVersion:
+            type: string
+          templateRegistryChecksum:
+            type: string
+          complianceMatrixRef:
+            type: string
+          impactAnalysisRef:
+            type: string
+          waiversRef:
+            type: string
+          driftReportGeneratedAt:
+            type: string
+            format: date-time
 
     GraphicsPublishRequest:
       type: object
@@ -5207,6 +5335,7 @@ components:
           $ref: '#/components/schemas/TemplateDraft'
         impactAnalysisId:
           type: string
+          description: Impact ID returned by a backend impact-analysis endpoint and recorded as pending for the current registry/module state.
         blockersResolved:
           type: boolean
           default: false
@@ -5367,16 +5496,24 @@ components:
           type: string
         waiverId:
           type: string
-        scope:
-          type: string
-          enum: [template, module, component, token, release_gate]
-        targetId:
-          type: string
-        reason:
-          type: string
-        riskClass:
-          type: string
-          enum: [low, medium, high, regulated]
+          scope:
+            type: string
+            enum: [template, module, component, token, release_gate, graphics-governance]
+          targetId:
+            type: string
+          reason:
+            type: string
+          risk:
+            type: string
+          compensatingControl:
+            type: string
+          owner:
+            type: string
+          approver:
+            type: string
+          riskClass:
+            type: string
+            enum: [low, medium, high, regulated]
         status:
           type: string
           enum: [draft, approved, expired]

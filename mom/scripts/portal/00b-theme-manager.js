@@ -3,20 +3,22 @@
    Enterprise-grade theme management with 150+ configurable properties.
 
    Architecture (SAP Fiori + Atlassian + Material Theme Builder pattern):
-     Admin org defaults → data/config/design-system-config.json
+     Admin org defaults → backend admin_design_config / data/config/design-system-config.json
      User prefs → localStorage hesem_user_appearance
      Template registry authority → backend graphics governance endpoints
      Template preview cache → localStorage hesem_graphics_template_preview_cache
      Applied as: data-* attributes + CSS custom properties on <html>
 
-   Cascade: System CSS defaults → Admin config → User prefs → inline override
+   Cascade: System CSS defaults → Admin config → user preview prefs → inline preview override
+   Inline overrides are runtime previews only; they are not an authority path for
+   module visuals and cannot replace backend graphics governance.
    Load order: AFTER 00a-registry-service.js, BEFORE 00-block-engine.js
    ============================================================================ */
 (function(){
 'use strict';
 
 var STORAGE_KEY = 'hesem_user_appearance';
-var ADMIN_STORAGE_KEY = 'hesem_admin_appearance_cache';
+var ADMIN_STORAGE_KEY = 'hesem_admin_appearance_cache'; /* legacy key; no longer written as authority/cache */
 var TEMPLATE_PREVIEW_CACHE_KEY = 'hesem_graphics_template_preview_cache';
 var ROOT = document.documentElement;
 
@@ -33,6 +35,8 @@ var DEFAULTS = {
 };
 
 var _adminConfig = null;
+var _adminConfigVersion = '';
+var _adminConfigEtag = '';
 var _userPrefs = null;
 var _templateStore = null;
 var _listeners = [];
@@ -69,9 +73,6 @@ function _saveTemplatePreviewCache(){
 
 function _loadAdminConfig(callback){
   if(_adminConfig){ if(callback) callback(_adminConfig); return; }
-  /* Try cached first */
-  try { var cached = localStorage.getItem(ADMIN_STORAGE_KEY); if(cached) _adminConfig = JSON.parse(cached); } catch(e){}
-
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'api.php?action=admin_design_config', true);
   xhr.onreadystatechange = function(){
@@ -80,7 +81,8 @@ function _loadAdminConfig(callback){
       try {
         var resp = JSON.parse(xhr.responseText);
         _adminConfig = (resp && resp.data) ? resp.data : (resp && resp.config) ? resp.config : (_adminConfig || {});
-        try { localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(_adminConfig)); } catch(e){}
+        _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
+        _adminConfigEtag = String((resp && resp.etag) || '');
         if(callback) callback(_adminConfig);
         return;
       } catch(e){}
@@ -90,7 +92,11 @@ function _loadAdminConfig(callback){
     xhr2.open('GET', 'data/config/design-system-config.json', true);
     xhr2.onreadystatechange = function(){
       if(xhr2.readyState !== 4) return;
-      try { _adminConfig = JSON.parse(xhr2.responseText) || (_adminConfig || {}); } catch(e){ _adminConfig = _adminConfig || {}; }
+      try {
+        _adminConfig = JSON.parse(xhr2.responseText) || (_adminConfig || {});
+        _adminConfigVersion = String((_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
+        _adminConfigEtag = '';
+      } catch(e){ _adminConfig = _adminConfig || {}; }
       if(callback) callback(_adminConfig);
     };
     xhr2.send();
@@ -467,7 +473,8 @@ function _applyCustomVars(){
   _setVar('--breadcrumb-color', cfg, 'components.breadcrumb.color');
   _setVar('--breadcrumb-active-color', cfg, 'components.breadcrumb.activeColor');
 
-  /* Custom CSS injection */
+  /* Custom CSS injection is emergency/exception-only. It remains under Admin
+     config and must be accompanied by waiver/governance evidence before rollout. */
   var customCSS = _resolveDeep('advanced.customCSS');
   _applyCustomCSS(customCSS || '');
 }
@@ -632,7 +639,9 @@ function set(key, value){
   _apply();
 }
 
-/** Set a nested value: setDeep('typography.heading.family', 'Roboto') */
+/** Set a nested value for local preview/user preference.
+    This does not promote graphics authority; saveAdminConfig must pass backend
+    concurrency and governance review before becoming admin org default. */
 function setDeep(path, value){
   _loadUserPrefs();
   var parts = path.split('.');
@@ -646,7 +655,8 @@ function setDeep(path, value){
   _apply();
 }
 
-/** Set a CSS variable directly (for real-time slider preview) */
+/** Set a CSS variable directly for real-time preview only.
+    Modules must not use this as a bypass around Admin/shared token authority. */
 function setVar(varName, value){
   ROOT.style.setProperty(varName, value);
 }
@@ -697,19 +707,41 @@ function isDark(){
 
 function getAdminConfig(){ return _adminConfig || {}; }
 
+function getAdminConfigAuthority(){
+  return {
+    authority: 'backend_admin_design_config',
+    cacheKey: ADMIN_STORAGE_KEY,
+    cacheRole: 'legacy-disabled',
+    localStorageAuthority: false,
+    version: _adminConfigVersion,
+    etag: _adminConfigEtag
+  };
+}
+
 function saveAdminConfig(config, callback){
   _adminConfig = config;
-  try { localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(config)); } catch(e){}
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'api.php?action=admin_design_config_save', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
+  if(_adminConfigEtag || _adminConfigVersion) xhr.setRequestHeader('If-Match', _adminConfigEtag || _adminConfigVersion);
   if(typeof csrfToken !== 'undefined' && csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
   xhr.onreadystatechange = function(){
     if(xhr.readyState !== 4) return;
+    if(xhr.status >= 200 && xhr.status < 300){
+      try {
+        var resp = JSON.parse(xhr.responseText);
+        var data = resp && resp.data ? resp.data : resp;
+        if(data && data.config){
+          _adminConfig = data.config;
+          _adminConfigVersion = String(data.version || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
+          _adminConfigEtag = String(data.etag || '');
+        }
+      } catch(e){}
+    }
     _apply();
     if(callback) callback(xhr.status >= 200 && xhr.status < 300);
   };
-  xhr.send(JSON.stringify({ config: config }));
+  xhr.send(JSON.stringify({ config: config, expectedVersion: _adminConfigEtag || _adminConfigVersion || '' }));
 }
 
 /** WCAG contrast ratio calculator */
@@ -880,6 +912,20 @@ function deleteTemplate(templateId){
   return deleteTemplatePreview(templateId);
 }
 
+function getTemplateAuthorityStatus(){
+  return {
+    authority: 'backend_graphics_governance_template_registry',
+    previewCacheKey: TEMPLATE_PREVIEW_CACHE_KEY,
+    previewCacheRole: 'preview-only',
+    localStorageAuthority: false,
+    endpoints: window.HmGraphicsGovernance ? window.HmGraphicsGovernance.ENDPOINTS : null
+  };
+}
+
+function graphicsAuthorityClient(){
+  return window.HmGraphicsGovernance || null;
+}
+
 function applyVisualTheme(themeId){
   var theme = VISUAL_THEME_PRESETS[String(themeId || '')];
   if(!theme) return false;
@@ -932,6 +978,7 @@ window.HmTheme = {
   off: off,
   isDark: isDark,
   getAdminConfig: getAdminConfig,
+  getAdminConfigAuthority: getAdminConfigAuthority,
   saveAdminConfig: saveAdminConfig,
   contrastRatio: contrastRatio,
   exportTheme: exportTheme,
@@ -942,6 +989,8 @@ window.HmTheme = {
   getTemplates: getTemplates,
   saveTemplate: saveTemplate,
   deleteTemplate: deleteTemplate,
+  getTemplateAuthorityStatus: getTemplateAuthorityStatus,
+  graphicsAuthorityClient: graphicsAuthorityClient,
   resolveWithTemplate: resolveWithTemplate,
   applyVisualTheme: applyVisualTheme,
   DEFAULTS: DEFAULTS

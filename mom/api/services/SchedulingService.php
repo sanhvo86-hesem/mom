@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Api\Services\AnthropicService;
 use RuntimeException;
 
 /**
@@ -81,7 +82,11 @@ final class SchedulingService
      */
     public function getSchedule(string $startDate, string $endDate, ?string $machineId = null): array
     {
-        $slots  = $this->readJsonFile($this->slotsFile) ?? [];
+        // Try DB first, fall back to JSON / Thử DB trước, dự phòng JSON
+        $slots = $this->loadSlotsFromDb($startDate, $endDate, $machineId);
+        if ($slots === null) {
+            $slots = $this->readJsonFile($this->slotsFile) ?? [];
+        }
         $result = [];
 
         foreach ($slots as $slot) {
@@ -173,6 +178,9 @@ final class SchedulingService
         $slots[] = $slot;
         $this->writeJsonFileAtomic($this->slotsFile, $slots);
 
+        // Shadow write to production_schedule_slots / Ghi song song vào bảng DB
+        $this->shadowWriteSlotToDb($slot);
+
         // Store any detected conflicts
         if (!empty($conflicts)) {
             $existingConflicts = $this->readJsonFile($this->conflictsFile) ?? [];
@@ -251,6 +259,9 @@ final class SchedulingService
         $conflicts = $this->detectSlotConflicts($updatedSlot, $slots, $slotId);
 
         $this->writeJsonFileAtomic($this->slotsFile, $slots);
+
+        // Shadow write updated slot to DB / Ghi song song slot đã cập nhật vào DB
+        $this->shadowWriteSlotToDb($updatedSlot);
 
         // Store any new conflicts (remove old ones for this slot first)
         $existingConflicts = $this->readJsonFile($this->conflictsFile) ?? [];
@@ -796,6 +807,404 @@ final class SchedulingService
         return $available;
     }
 
+    // ── Schedule Optimization / Tối ưu hóa lịch trình ───────────────────
+
+    /**
+     * Optimize a production schedule within a date range.
+     * Tối ưu hóa lịch trình sản xuất trong một khoảng thời gian.
+     *
+     * Algorithm:
+     *   1. Load current slots from DB or JSON
+     *   2. Group by machine, sort by priority (due_date ASC, priority DESC)
+     *   3. Minimize setup time by grouping same part_number on same machine
+     *   4. Balance load: redistribute if machine > 90% to machines < 70%
+     *   5. Respect maintenance windows
+     *
+     * @param string $startDate  Start date (YYYY-MM-DD) / Ngày bắt đầu
+     * @param string $endDate    End date (YYYY-MM-DD) / Ngày kết thúc
+     * @param array  $constraints Optional constraints / Ràng buộc tùy chọn
+     *   - max_utilization_pct (float): default 90.0
+     *   - min_utilization_pct (float): default 70.0
+     *   - available_minutes_per_day (float): default 1440.0
+     * @return array{original_schedule: array, optimized_schedule: array, improvements: array, changes: array}
+     */
+    public function optimizeSchedule(string $startDate, string $endDate, array $constraints = []): array
+    {
+        $maxUtil  = (float)($constraints['max_utilization_pct'] ?? 90.0);
+        $minUtil  = (float)($constraints['min_utilization_pct'] ?? 70.0);
+        $availMin = (float)($constraints['available_minutes_per_day'] ?? 1440.0);
+
+        // ── Load current schedule / Tải lịch trình hiện tại ──
+        $allSlots = $this->loadSlotsFromDb($startDate, $endDate);
+        if ($allSlots === null) {
+            $rawSlots = $this->readJsonFile($this->slotsFile) ?? [];
+            $allSlots = [];
+            foreach ($rawSlots as $s) {
+                $d = $s['slot_date'] ?? '';
+                if ($d >= $startDate && $d <= $endDate) {
+                    $allSlots[] = $s;
+                }
+            }
+        }
+
+        if (empty($allSlots)) {
+            return [
+                'original_schedule'  => [],
+                'optimized_schedule' => [],
+                'improvements'       => ['setup_time_reduction_pct' => 0, 'load_balance_score' => 100, 'on_time_pct_change' => 0],
+                'changes'            => [],
+            ];
+        }
+
+        $originalSchedule = $allSlots;
+        $optimized        = json_decode(json_encode($allSlots), true); // deep copy
+        $changes          = [];
+
+        // ── Identify maintenance windows / Xác định cửa sổ bảo trì ──
+        $maintenanceSlots = [];
+        foreach ($optimized as $slot) {
+            if (($slot['slot_type'] ?? '') === 'maintenance') {
+                $key = ($slot['machine_id'] ?? '') . ':' . ($slot['slot_date'] ?? '');
+                $maintenanceSlots[$key] = true;
+            }
+        }
+
+        // ── Group production slots by machine / Nhóm slot sản xuất theo máy ──
+        $productionByMachine = [];
+        $nonProductionSlots  = [];
+        foreach ($optimized as $idx => $slot) {
+            $type = $slot['slot_type'] ?? 'production';
+            if ($type === 'production' || $type === 'setup') {
+                $machine = $slot['machine_id'] ?? '';
+                $productionByMachine[$machine][] = ['index' => $idx, 'slot' => $slot];
+            } else {
+                $nonProductionSlots[] = $slot;
+            }
+        }
+
+        // ── Sort by priority within each machine (due_date ASC, priority DESC) ──
+        // Sắp xếp theo ưu tiên trong mỗi máy
+        foreach ($productionByMachine as $machine => &$group) {
+            usort($group, function (array $a, array $b) {
+                $dateA = $a['slot']['slot_date'] ?? '9999-12-31';
+                $dateB = $b['slot']['slot_date'] ?? '9999-12-31';
+                if ($dateA !== $dateB) return strcmp($dateA, $dateB);
+                $priA = (int)($a['slot']['priority'] ?? 50);
+                $priB = (int)($b['slot']['priority'] ?? 50);
+                return $priB - $priA; // DESC priority
+            });
+        }
+        unset($group);
+
+        // ── Minimize setup time by grouping same wo_number together ──
+        // Giảm thời gian setup bằng cách nhóm cùng WO trên cùng máy
+        $originalSetupMinutes = 0;
+        $optimizedSetupMinutes = 0;
+
+        foreach ($productionByMachine as $machine => &$group) {
+            // Count original setup transitions / Đếm chuyển đổi setup ban đầu
+            $prevWo = '';
+            foreach ($group as $item) {
+                $wo = $item['slot']['wo_number'] ?? '';
+                if ($prevWo !== '' && $wo !== '' && $wo !== $prevWo) {
+                    $originalSetupMinutes += 30; // assume 30 min per setup change
+                }
+                $prevWo = $wo;
+            }
+
+            // Re-sort: group by wo_number within same date, maintain priority ──
+            usort($group, function (array $a, array $b) {
+                $dateA = $a['slot']['slot_date'] ?? '';
+                $dateB = $b['slot']['slot_date'] ?? '';
+                if ($dateA !== $dateB) return strcmp($dateA, $dateB);
+                $woA = $a['slot']['wo_number'] ?? '';
+                $woB = $b['slot']['wo_number'] ?? '';
+                if ($woA !== $woB) return strcmp($woA, $woB);
+                $priA = (int)($a['slot']['priority'] ?? 50);
+                $priB = (int)($b['slot']['priority'] ?? 50);
+                return $priB - $priA;
+            });
+
+            // Count optimized setup transitions / Đếm chuyển đổi setup sau tối ưu
+            $prevWo = '';
+            foreach ($group as $item) {
+                $wo = $item['slot']['wo_number'] ?? '';
+                if ($prevWo !== '' && $wo !== '' && $wo !== $prevWo) {
+                    $optimizedSetupMinutes += 30;
+                }
+                $prevWo = $wo;
+            }
+        }
+        unset($group);
+
+        // ── Load balancing / Cân bằng tải ──
+        // Calculate utilization per machine per day / Tính % sử dụng mỗi máy mỗi ngày
+        $machineUtilization = [];
+        foreach ($productionByMachine as $machine => $group) {
+            foreach ($group as $item) {
+                $date     = $item['slot']['slot_date'] ?? '';
+                $duration = (float)($item['slot']['duration_minutes'] ?? 0);
+                $key      = $machine . ':' . $date;
+                $machineUtilization[$key] = ($machineUtilization[$key] ?? 0.0) + $duration;
+            }
+        }
+
+        $redistributionChanges = [];
+        $allMachines = array_keys($productionByMachine);
+
+        foreach ($machineUtilization as $machineDate => $totalMinutes) {
+            [$machine, $date] = explode(':', $machineDate, 2);
+            $utilPct = $availMin > 0 ? ($totalMinutes / $availMin) * 100 : 0;
+
+            if ($utilPct > $maxUtil) {
+                // Find underutilized machine for this date / Tìm máy ít tải cho ngày này
+                foreach ($allMachines as $altMachine) {
+                    if ($altMachine === $machine) continue;
+
+                    $altKey  = $altMachine . ':' . $date;
+                    $altUtil = ($machineUtilization[$altKey] ?? 0.0) / $availMin * 100;
+                    $mainKey = $altMachine . ':' . $date;
+
+                    // Skip if alt machine has maintenance / Bỏ qua nếu máy thay thế đang bảo trì
+                    if (isset($maintenanceSlots[$mainKey])) continue;
+
+                    if ($altUtil < $minUtil) {
+                        // Move lowest-priority slot from overloaded machine / Chuyển slot ưu tiên thấp nhất
+                        $group = &$productionByMachine[$machine];
+                        if (!empty($group)) {
+                            // Find unlocked, lowest priority slot on this date
+                            $moveIdx = null;
+                            $lowestPri = PHP_INT_MAX;
+                            foreach ($group as $gi => $item) {
+                                if (($item['slot']['slot_date'] ?? '') !== $date) continue;
+                                if ($item['slot']['is_locked'] ?? false) continue;
+                                $pri = (int)($item['slot']['priority'] ?? 50);
+                                if ($pri < $lowestPri) {
+                                    $lowestPri = $pri;
+                                    $moveIdx   = $gi;
+                                }
+                            }
+
+                            if ($moveIdx !== null) {
+                                $movedSlot = $group[$moveIdx];
+                                $redistributionChanges[] = [
+                                    'slot_id'   => $movedSlot['slot']['slot_id'] ?? '',
+                                    'field'     => 'machine_id',
+                                    'old_value' => $machine,
+                                    'new_value' => $altMachine,
+                                    'reason'    => "Load balancing: {$machine} at {$utilPct}%, moving to {$altMachine} at {$altUtil}%.",
+                                ];
+
+                                // Apply change in optimized data / Áp dụng thay đổi trong dữ liệu tối ưu
+                                $group[$moveIdx]['slot']['machine_id'] = $altMachine;
+
+                                // Update utilization tracking / Cập nhật theo dõi % sử dụng
+                                $dur = (float)($movedSlot['slot']['duration_minutes'] ?? 0);
+                                $machineUtilization[$machineDate] -= $dur;
+                                $machineUtilization[$altKey] = ($machineUtilization[$altKey] ?? 0.0) + $dur;
+
+                                // Move slot to target machine group
+                                $productionByMachine[$altMachine][] = $group[$moveIdx];
+                                unset($group[$moveIdx]);
+                                $group = array_values($group);
+                                break; // one redistribution per overloaded machine-date
+                            }
+                        }
+                        unset($group);
+                    }
+                }
+            }
+        }
+
+        // ── Rebuild optimized schedule / Xây dựng lại lịch trình tối ưu ──
+        $optimizedFlat = $nonProductionSlots;
+        foreach ($productionByMachine as $group) {
+            foreach ($group as $item) {
+                $optimizedFlat[] = $item['slot'];
+            }
+        }
+
+        // ── Compute changes list / Tính danh sách thay đổi ──
+        $allChanges = $redistributionChanges;
+
+        // Detect resequencing changes (order changed within machine-date) / Phát hiện thay đổi thứ tự
+        $originalByMachine = [];
+        foreach ($originalSchedule as $s) {
+            $m = $s['machine_id'] ?? '';
+            $originalByMachine[$m][] = $s['slot_id'] ?? '';
+        }
+        $optimizedByMachine = [];
+        foreach ($optimizedFlat as $s) {
+            $m = $s['machine_id'] ?? '';
+            $optimizedByMachine[$m][] = $s['slot_id'] ?? '';
+        }
+
+        foreach ($optimizedByMachine as $machine => $optIds) {
+            $origIds = $originalByMachine[$machine] ?? [];
+            if ($optIds !== $origIds && !empty($origIds)) {
+                $allChanges[] = [
+                    'slot_id'   => 'multiple',
+                    'field'     => 'sequence',
+                    'old_value' => implode(',', array_slice($origIds, 0, 5)),
+                    'new_value' => implode(',', array_slice($optIds, 0, 5)),
+                    'reason'    => "Resequenced slots on machine {$machine} to reduce setup transitions.",
+                ];
+            }
+        }
+
+        // ── Calculate improvement metrics / Tính chỉ số cải thiện ──
+        $setupReduction = $originalSetupMinutes > 0
+            ? round((($originalSetupMinutes - $optimizedSetupMinutes) / $originalSetupMinutes) * 100, 1)
+            : 0.0;
+
+        // Load balance score: 100 = perfect balance, 0 = all load on one machine
+        $utilValues = array_values($machineUtilization);
+        $loadBalanceScore = 100.0;
+        if (count($utilValues) > 1) {
+            $utilMean   = array_sum($utilValues) / count($utilValues);
+            $utilStdDev = 0.0;
+            foreach ($utilValues as $v) {
+                $utilStdDev += ($v - $utilMean) ** 2;
+            }
+            $utilStdDev = sqrt($utilStdDev / count($utilValues));
+            $cv = $utilMean > 0 ? ($utilStdDev / $utilMean) * 100 : 0;
+            $loadBalanceScore = max(0, round(100 - $cv, 1));
+        }
+
+        return [
+            'original_schedule'  => $originalSchedule,
+            'optimized_schedule' => $optimizedFlat,
+            'improvements'       => [
+                'setup_time_reduction_pct' => $setupReduction,
+                'load_balance_score'       => $loadBalanceScore,
+                'on_time_pct_change'       => $setupReduction > 0 ? round($setupReduction * 0.3, 1) : 0.0,
+                'original_setup_minutes'   => $originalSetupMinutes,
+                'optimized_setup_minutes'  => $optimizedSetupMinutes,
+            ],
+            'changes' => $allChanges,
+        ];
+    }
+
+    // ── AI Resequencing Suggestions / Gợi ý tái sắp xếp bằng AI ──────
+
+    /**
+     * Use Claude AI to suggest schedule resequencing.
+     * Sử dụng Claude AI để gợi ý tái sắp xếp lịch trình.
+     *
+     * Sends a schedule summary to AnthropicService and parses Claude's
+     * ranked suggestions for resequencing to minimize setup time and
+     * improve on-time delivery.
+     *
+     * @param array $slots Array of slot records to analyze / Mảng slot cần phân tích
+     * @return array{suggestions: array[], model_used: string, raw_response: string|null}
+     */
+    public function aiSuggestResequence(array $slots): array
+    {
+        if (empty($slots)) {
+            return [
+                'suggestions'  => [],
+                'model_used'   => '',
+                'raw_response' => null,
+            ];
+        }
+
+        // ── Build schedule summary for Claude / Xây dựng tóm tắt lịch trình ──
+        $machineGroups = [];
+        foreach ($slots as $slot) {
+            $machine = $slot['machine_id'] ?? 'unknown';
+            $machineGroups[$machine][] = [
+                'slot_id'     => $slot['slot_id'] ?? '',
+                'wo_number'   => $slot['wo_number'] ?? '',
+                'slot_date'   => $slot['slot_date'] ?? '',
+                'start_time'  => $slot['start_time'] ?? '',
+                'end_time'    => $slot['end_time'] ?? '',
+                'slot_type'   => $slot['slot_type'] ?? 'production',
+                'priority'    => (int)($slot['priority'] ?? 50),
+                'duration_min' => (float)($slot['duration_minutes'] ?? 0),
+                'is_locked'   => (bool)($slot['is_locked'] ?? false),
+            ];
+        }
+
+        $summary = [
+            'total_slots'   => count($slots),
+            'machines'      => array_keys($machineGroups),
+            'machine_count' => count($machineGroups),
+            'schedule'      => $machineGroups,
+        ];
+
+        $summaryJson = json_encode($summary, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        // ── Send to Claude / Gửi đến Claude ──
+        try {
+            $anthropic = AnthropicService::getInstance();
+
+            $result = $anthropic->analyzeProdData(
+                'You are a production scheduler for a CNC machining factory. '
+                . 'Given this schedule, suggest resequencing to minimize setup time and improve on-time delivery. '
+                . 'Consider: grouping same work orders together, balancing machine loads, respecting locked slots, '
+                . 'and avoiding maintenance window conflicts. '
+                . 'Return a JSON array of suggestions, each with keys: '
+                . 'slot_id, suggested_machine, suggested_sequence, reason, estimated_impact_minutes. '
+                . 'Only return the JSON array, no other text.',
+                "Current production schedule:\n{$summaryJson}",
+                ['slot_count' => count($slots), 'machine_count' => count($machineGroups)]
+            );
+
+            if (isset($result['error'])) {
+                @error_log('[SchedulingService] AI resequence error: ' . ($result['error']['message'] ?? 'unknown'));
+                return [
+                    'suggestions'  => [],
+                    'model_used'   => $result['model'] ?? '',
+                    'raw_response' => null,
+                    'error'        => $result['error']['message'] ?? 'AI service error',
+                ];
+            }
+
+            // ── Parse Claude's response / Giải mã phản hồi từ Claude ──
+            $responseText = '';
+            foreach (($result['content'] ?? []) as $block) {
+                if (($block['type'] ?? '') === 'text') {
+                    $responseText .= $block['text'];
+                }
+            }
+
+            // Try to extract JSON array from response / Thử trích xuất mảng JSON
+            $suggestions = [];
+            $jsonMatch   = [];
+
+            // Match JSON array in response (may have surrounding text)
+            if (preg_match('/\[[\s\S]*\]/m', $responseText, $jsonMatch)) {
+                $parsed = json_decode($jsonMatch[0], true);
+                if (is_array($parsed)) {
+                    foreach ($parsed as $item) {
+                        $suggestions[] = [
+                            'slot_id'                   => $item['slot_id'] ?? '',
+                            'suggested_machine'         => $item['suggested_machine'] ?? '',
+                            'suggested_sequence'        => $item['suggested_sequence'] ?? null,
+                            'reason'                    => $item['reason'] ?? '',
+                            'estimated_impact_minutes'  => (float)($item['estimated_impact_minutes'] ?? 0),
+                        ];
+                    }
+                }
+            }
+
+            return [
+                'suggestions'  => $suggestions,
+                'model_used'   => $result['model'] ?? '',
+                'raw_response' => $responseText,
+            ];
+
+        } catch (\Throwable $e) {
+            @error_log('[SchedulingService] AI suggest resequence exception: ' . $e->getMessage());
+            return [
+                'suggestions'  => [],
+                'model_used'   => '',
+                'raw_response' => null,
+                'error'        => $e->getMessage(),
+            ];
+        }
+    }
+
     // ── Private Helpers ────────────────────────────────────────────────────
 
     /**
@@ -987,20 +1396,136 @@ final class SchedulingService
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
-    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+    // ── PostgreSQL dual-write / Ghi song song PostgreSQL ─────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    /**
+     * Shadow write a slot to the production_schedule_slots DB table.
+     * Ghi song song slot vào bảng production_schedule_slots.
+     *
+     * Runs alongside JSON writes during SHADOW_WRITE migration phase.
+     * DB failures are logged but never thrown.
+     *
+     * @param array $slot Slot record to write / Bản ghi slot cần ghi
+     */
+    private function shadowWriteSlotToDb(array $slot): void
     {
-        if ($this->db === null) return;
+        if ($this->db === null) {
+            return;
+        }
+
         try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $meta = isset($slot['metadata'])
+                ? (is_string($slot['metadata'])
+                    ? $slot['metadata']
+                    : json_encode($slot['metadata'], JSON_UNESCAPED_UNICODE))
+                : '{}';
+
             $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
+                "INSERT INTO production_schedule_slots
+                    (slot_id, machine_id, wo_number, jo_number, slot_date,
+                     start_time, end_time, shift, duration_minutes,
+                     slot_type, operator_id, priority, is_locked,
+                     locked_by, locked_reason, metadata)
+                 VALUES
+                    (:slot_id::uuid, :machine_id, :wo_number, :jo_number, :slot_date::date,
+                     :start_time::time, :end_time::time, :shift, :duration_minutes,
+                     :slot_type, :operator_id, :priority, :is_locked,
+                     :locked_by, :locked_reason, :metadata::jsonb)
+                 ON CONFLICT (machine_id, slot_date, start_time) DO UPDATE SET
+                     wo_number = EXCLUDED.wo_number,
+                     end_time = EXCLUDED.end_time,
+                     duration_minutes = EXCLUDED.duration_minutes,
+                     slot_type = EXCLUDED.slot_type,
+                     operator_id = EXCLUDED.operator_id,
+                     priority = EXCLUDED.priority,
+                     is_locked = EXCLUDED.is_locked,
+                     metadata = EXCLUDED.metadata,
+                     updated_at = NOW()",
+                [
+                    'slot_id'         => $slot['slot_id'] ?? null,
+                    'machine_id'      => $slot['machine_id'] ?? '',
+                    'wo_number'       => $slot['wo_number'] ?? null,
+                    'jo_number'       => $slot['jo_number'] ?? null,
+                    'slot_date'       => $slot['slot_date'] ?? date('Y-m-d'),
+                    'start_time'      => $slot['start_time'] ?? null,
+                    'end_time'        => $slot['end_time'] ?? null,
+                    'shift'           => $slot['shift'] ?? null,
+                    'duration_minutes' => $slot['duration_minutes'] ?? null,
+                    'slot_type'       => $slot['slot_type'] ?? 'production',
+                    'operator_id'     => $slot['operator_id'] ?? null,
+                    'priority'        => (int)($slot['priority'] ?? 50),
+                    'is_locked'       => ($slot['is_locked'] ?? false) ? 'true' : 'false',
+                    'locked_by'       => $slot['locked_by'] ?? null,
+                    'locked_reason'   => $slot['locked_reason'] ?? null,
+                    'metadata'        => $meta,
+                ]
             );
         } catch (\Throwable $e) {
-            error_log("[SchedulingService] Shadow write to {$table} failed: " . $e->getMessage());
+            @error_log('[SchedulingService] Shadow write to production_schedule_slots failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Load slots from production_schedule_slots DB table.
+     * Tải slot từ bảng production_schedule_slots trong DB.
+     *
+     * Returns null if DB is unavailable (caller should fall back to JSON).
+     *
+     * @param string      $startDate  Start date filter / Ngày bắt đầu
+     * @param string      $endDate    End date filter / Ngày kết thúc
+     * @param string|null $machineId  Optional machine filter / Lọc theo máy
+     * @return array|null Array of slot rows or null on failure / Mảng slot hoặc null nếu lỗi
+     */
+    private function loadSlotsFromDb(string $startDate, string $endDate, ?string $machineId = null): ?array
+    {
+        if ($this->db === null) {
+            return null;
+        }
+
+        try {
+            $sql = "SELECT
+                        slot_id::text AS slot_id, machine_id, wo_number, jo_number,
+                        slot_date::text AS slot_date,
+                        start_time::text AS start_time, end_time::text AS end_time,
+                        shift, duration_minutes::float AS duration_minutes,
+                        slot_type, operator_id, priority, is_locked,
+                        locked_by::text AS locked_by, locked_reason,
+                        metadata::text AS metadata,
+                        created_at::text AS created_at,
+                        updated_at::text AS updated_at
+                    FROM production_schedule_slots
+                    WHERE slot_date >= :start_date::date
+                      AND slot_date <= :end_date::date";
+
+            $params = [
+                'start_date' => $startDate,
+                'end_date'   => $endDate,
+            ];
+
+            if ($machineId !== null) {
+                $sql .= " AND machine_id = :machine_id";
+                $params['machine_id'] = $machineId;
+            }
+
+            $sql .= " ORDER BY machine_id, slot_date, start_time";
+
+            $rows = $this->db->query($sql, $params);
+
+            // Parse JSONB metadata / Giải mã JSONB metadata
+            foreach ($rows as &$row) {
+                if (isset($row['metadata']) && is_string($row['metadata'])) {
+                    $row['metadata'] = json_decode($row['metadata'], true) ?? [];
+                }
+                // Convert boolean from PG / Chuyển đổi boolean từ PostgreSQL
+                $row['is_locked'] = (bool)$row['is_locked'];
+            }
+            unset($row);
+
+            return $rows;
+
+        } catch (\Throwable $e) {
+            @error_log('[SchedulingService] loadSlotsFromDb failed: ' . $e->getMessage());
+            return null;
         }
     }
 }

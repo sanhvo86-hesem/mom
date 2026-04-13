@@ -177,7 +177,9 @@ These files are mandatory for frontend/runtime module work. For conflicts, `36-f
 4. Use only approved `templateId`, zones and block contracts.
 5. Bind UI only to approved registry endpoints; do not invent endpoint or field behavior.
 6. Implement loading, empty, error, permission-denied, readonly, dirty, saving, saved and conflict states.
-7. Run the required frontend gates: schema, token, inline style, Vietnamese diacritics, API contract, accessibility, keyboard, responsive, visual, permission and audit evidence.
+7. Confirm graphics linkage through Admin Graphics Control Plane: backend template registry, shared tokens/components, compliance matrix, drift/debt report and release blocker snapshot.
+8. LocalStorage template data may be preview/draft cache only; production authority must come from backend graphics governance or generated registry artifacts.
+9. Run the required frontend gates: schema, token, inline style, Vietnamese diacritics, API contract, graphics compliance, accessibility, keyboard, responsive, visual, permission and audit evidence.
 
 ---
 

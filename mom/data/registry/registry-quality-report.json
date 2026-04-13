@@ -2,25 +2,25 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-13T09:36:30.848Z",
+    "generatedAt": "2026-04-13T11:20:20.896Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "4cf09b68-e8c3-4106-accb-7da755ddc7ee"
+    "publication_run_id": "fa526d9a-18f9-4ae9-bf48-1a7c92f9e546"
   },
   "summary": {
-    "endpoint_count": 3621,
-    "pack_count": 3960,
-    "relation_edge_count": 3128,
-    "workflow_count": 278,
-    "status_set_count": 734,
-    "validation_rule_count": 43911,
-    "formula_count": 1180,
-    "formula_reference_count": 1180,
-    "field_context_count": 48862,
-    "row_version_tables": 543,
-    "org_scoped_tables": 528,
+    "endpoint_count": 3808,
+    "pack_count": 4164,
+    "relation_edge_count": 3174,
+    "workflow_count": 294,
+    "status_set_count": 769,
+    "validation_rule_count": 45295,
+    "formula_count": 1231,
+    "formula_reference_count": 1231,
+    "field_context_count": 50836,
+    "row_version_tables": 565,
+    "org_scoped_tables": 546,
     "composite_pk_tables": 20,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -29,29 +29,29 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 261,
-    "workflow_engine_bridge_ready": 262,
+    "transition_runtime_warnings": 277,
+    "workflow_engine_bridge_ready": 278,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 660,
+    "archive_only_tables": 694,
     "soft_delete_tables": 0,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 337,
-      "generic_status_only": 31,
+      "stateless": 354,
+      "generic_status_only": 32,
       "guarded_transition_runtime": 31,
-      "persisted": 261,
+      "persisted": 277,
       "unknown": 0
     },
-    "frontend_foundation_entities": 671,
-    "frontend_ready_entities": 671,
+    "frontend_foundation_entities": 705,
+    "frontend_ready_entities": 705,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 5,
-    "frontend_publishable_entities": 655,
+    "frontend_publishable_entities": 689,
     "frontend_unpublishable_entities": 0,
-    "attachment_contract_entities": 659,
-    "comment_contract_entities": 659,
-    "activity_contract_entities": 532,
+    "attachment_contract_entities": 693,
+    "comment_contract_entities": 693,
+    "activity_contract_entities": 551,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -74,44 +74,44 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 660,
-      "target": 660
+      "actual": 694,
+      "target": 694
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 660,
-      "target": 660
+      "actual": 694,
+      "target": 694
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 660,
-      "target": 660
+      "actual": 694,
+      "target": 694
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3128,
-      "target": 3128
+      "actual": 3174,
+      "target": 3174
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 404,
-      "target": 404
+      "actual": 421,
+      "target": 421
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 310,
-      "target": 310
+      "actual": 327,
+      "target": 327
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 640,
-      "target": 628
+      "actual": 674,
+      "target": 662
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -140,8 +140,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 660,
-      "target": 660
+      "actual": 694,
+      "target": 694
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -164,7 +164,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 278,
+      "actual": 294,
       "target": 60
     },
     {
@@ -176,30 +176,46 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 734,
+      "actual": 769,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 43911,
+      "actual": 45295,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1180,
+      "actual": 1231,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1180,
-      "target": 1180
+      "actual": 1231,
+      "target": 1231
     }
   ],
   "warnings": {
     "row_version_tables": [
+      {
+        "table": "ai_conversations",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_feedback_loops",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_training_datasets",
+        "concurrency_field": "row_version"
+      },
       {
         "table": "allocation",
         "concurrency_field": "row_version"
@@ -423,25 +439,45 @@
       {
         "table": "competency",
         "concurrency_field": "row_version"
-      },
-      {
-        "table": "complaint",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "compliance_records",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "concessions",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "contamination_checks",
-        "concurrency_field": "row_version"
       }
     ],
     "org_scoped_tables": [
+      {
+        "table": "ai_conversations",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_feedback_loops",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_training_datasets",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
       {
         "table": "allocation",
         "scope_fields": [
@@ -945,42 +981,6 @@
           "org_plant_id",
           "org_site_id"
         ]
-      },
-      {
-        "table": "compliance_records",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "concessions",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "contamination_checks",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "control_plan_characteristics",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
       }
     ],
     "composite_pk_tables": [
@@ -1155,6 +1155,20 @@
     "contract_issues": [],
     "workflow_alignment_issues": [],
     "transition_runtime_warnings": [
+      {
+        "table": "ai_recommendation_actions",
+        "workflowId": "wf_ai_recommendation_action",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "ai_training_datasets",
+        "workflowId": "wf_ai_training_dataset",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
       {
         "table": "allocations",
         "workflowId": "wf_allocation",
@@ -1420,24 +1434,34 @@
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "customer_complaints",
-        "workflowId": "wf_customer_complaint",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
-        "table": "customer_sites",
-        "workflowId": "wf_customer_site",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       }
     ],
     "workflow_engine_bridge": [],
     "delete_governance": [
+      {
+        "table": "ai_conversations",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "ai_feedback_loops",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "ai_training_datasets",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
       {
         "table": "alarm_event",
         "domain": "mes_execution",
@@ -1773,30 +1797,6 @@
         "domain": "commercial_contracts",
         "mode": "archive_only",
         "governance_level": "governed"
-      },
-      {
-        "table": "com_incoterms_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "default_no_data_loss"
-      },
-      {
-        "table": "com_order_promises",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "governed"
-      },
-      {
-        "table": "com_payment_terms_profiles",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "default_no_data_loss"
-      },
-      {
-        "table": "com_price_list_lines",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "support"
       }
     ],
     "frontend_foundation": []

@@ -502,3 +502,11 @@ Round 10 adds a new visual-review layer on top of the round 8/9 card system:
 - new `schema_studio_round10_report` artifact for admin/registry propagation
 
 This round does not replace the earlier world-class layers; it composes over them and keeps round 2–9 compatible.
+
+## Graphics Governance Boundary
+
+Schema Studio remains a data/schema design workspace and must not become a parallel graphics authority. Graphics governance belongs to Admin Graphics Control Plane and backend graphics authority.
+
+- Template registry production state must come from graphics governance registry/artifacts, not Schema Studio workspace drafts.
+- Module Builder must read graphics compliance, drift/debt and release blockers before publishing module UI.
+- Schema Studio may reference graphics release evidence, but it must not mutate template lifecycle, waiver state or graphics rollout decisions.

@@ -861,6 +861,71 @@ final class ScheduledJobs
         });
     }
 
+    /**
+     * Daily AI data ETL — creates training dataset snapshots.
+     * ETL dữ liệu AI hàng ngày — tạo bản chụp tập dữ liệu huấn luyện.
+     *
+     * Iterates over all supported model types and creates a snapshot of
+     * the most recent 90 days of training data for each. Results are
+     * stored in the ai_training_datasets table.
+     *
+     * Schedule: Daily at 02:00.
+     *
+     * @return array{job: string, status: string, results: list<array>, duration_ms: float}
+     */
+    public function runAiDataEtl(): array
+    {
+        return $this->executeJob('ai_data_etl', function (): array {
+            require_once __DIR__ . '/AiDataEtlService.php';
+
+            $etl = new \MOM\Api\Services\AiDataEtlService($this->dataDir, $this->db);
+            $results = [];
+
+            foreach (['tool_wear', 'quality_prediction', 'scheduling'] as $modelType) {
+                try {
+                    $dataset = $etl->snapshotForModel($modelType);
+                    $results[] = [
+                        'model_type' => $modelType,
+                        'status'     => 'success',
+                        'row_count'  => $dataset['row_count'] ?? 0,
+                        'dataset_id' => $dataset['dataset_id'] ?? null,
+                    ];
+                } catch (Throwable $e) {
+                    $results[] = [
+                        'model_type' => $modelType,
+                        'status'     => 'failed',
+                        'error'      => $e->getMessage(),
+                    ];
+                }
+            }
+
+            return ['results' => $results];
+        });
+    }
+
+    /**
+     * Daily AI prediction expiry — expires stale predictions.
+     * Hết hạn dự đoán AI hàng ngày — đánh hết hạn các dự đoán cũ.
+     *
+     * Updates active predictions older than 30 days to 'expired' status.
+     * Keeps the prediction table focused on actionable items.
+     *
+     * Schedule: Daily at 02:30.
+     *
+     * @return array{job: string, expired_count: int, duration_ms: float}
+     */
+    public function runAiPredictionExpiry(): array
+    {
+        return $this->executeJob('ai_prediction_expiry', function (): array {
+            require_once __DIR__ . '/AiPredictionPipeline.php';
+
+            $pipeline = new \MOM\Api\Services\AiPredictionPipeline($this->dataDir, $this->db);
+            $expired = $pipeline->expireStale(30);
+
+            return ['expired_count' => $expired];
+        });
+    }
+
     // ── Job Execution Framework ─────────────────────────────────────────────
 
     /**
