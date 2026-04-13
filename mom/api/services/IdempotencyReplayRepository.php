@@ -21,3 +21,7 @@ interface IdempotencyReplayRepository
         callable $operation,
     ): array;
 }
+
+if (!interface_exists('MOM\\Services\\IdempotencyReplayRepository', false)) {
+    class_alias(IdempotencyReplayRepository::class, 'MOM\\Services\\IdempotencyReplayRepository');
+}

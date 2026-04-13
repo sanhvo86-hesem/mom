@@ -6,7 +6,7 @@
 - The active API surface is hybrid: `mom/api/index.php` is the MVC/router entrypoint, while `mom/api.php?action=...` remains a live compatibility entrypoint.
 - The data layer has a real migration ladder: `JSON_ONLY`, `SHADOW_WRITE`, `POSTGRES_PRIMARY`, and `POSTGRES_ONLY`, driven by the existing `mom/database/config.php` env surface.
 - PostgreSQL migrations are authoritative under `mom/database/migrations/`, applied by `mom/database/migrate.php`, and snapshotted into `mom/database/schema.sql` by `mom/database/build_schema_snapshot.php`.
-- `IdempotencyService` is currently Redis-first with file fallback under `data/idempotency`. It serializes file fallback with file locks and replays completed success payloads, but it is not DB authoritative.
+- Before this tranche, `IdempotencyService` was Redis-first with file fallback under `data/idempotency`. After Priority A, DB-enabled runtime uses the PostgreSQL replay ledger as the authoritative path; DB-disabled runtime keeps Redis-capable cache compatibility when a `CacheService` is available and otherwise falls back to explicit file replay storage.
 - `OrderWorkflowService` still performs core persistence itself: it loads/writes `orders.json`, appends immutable audit JSONL, writes notification JSONL, and shadow-writes PostgreSQL from inside the business service.
 - `MasterDataService` still performs core persistence itself: it loads/writes active, history, pending, and archive JSON files directly from the business service.
 - The practical harness is mixed: PHPUnit unit tests exist, but backend assurance is still strongly represented by custom PHP smoke scripts, especially `mom/tests/backend_smoke.php`.
@@ -15,20 +15,25 @@
 
 - Priority A: idempotency replay state becomes PostgreSQL authoritative whenever the existing DB mode enables PostgreSQL.
 - DB-enabled idempotency must use a durable replay ledger with uniqueness on `(scope_key, idempotency_key)`, transactional claim/update semantics, explicit in-progress markers, success replay, conflict detection, and failure persistence.
-- DB-disabled idempotency keeps an explicit file-backed fallback so local/legacy JSON-only runtime remains backward compatible.
+- DB-disabled idempotency keeps the existing Redis-capable cache path when available and an explicit file-backed fallback so local/legacy JSON-only runtime remains backward compatible.
 - No new DB/config env surface is introduced. Existing `USE_POSTGRES`, `SHADOW_WRITE`, and `JSON_FALLBACK` determine whether PostgreSQL is active.
 
 ## Exact files touched
 
-Planned for Priority A:
+Implemented for Priority A:
 
 - `mom/api/services/IdempotencyService.php`
 - `mom/api/services/IdempotencyReplayRepository.php`
+- `mom/api/services/CacheIdempotencyReplayRepository.php`
 - `mom/api/services/FileIdempotencyReplayRepository.php`
 - `mom/api/services/PostgresIdempotencyReplayRepository.php`
 - `mom/database/migrations/097_idempotency_replay_ledger.sql`
 - `mom/database/migrations/README.md`
+- `mom/database/schema-authority-summary.json`
+- `mom/database/schema-authority-summary.md`
 - `mom/database/schema.sql`
+- `mom/data/registry/schema-authority-summary.json`
+- `mom/tests/Integration/IdempotencyPostgresIntegrationTest.php`
 - `mom/tests/Unit/Services/IdempotencyServiceTest.php`
 - `mom/docs/system/backend-authority-upgrade-tranche1.md`
 
@@ -54,6 +59,7 @@ No Priority B/C files will be modified unless Priority A is fully implemented an
   - `expires_at`
 - Add a unique constraint on `(scope_key, idempotency_key)`.
 - Add indexes for expiry cleanup and in-progress observability.
+- Non-expired `in_progress` rows are fail-closed. They cannot be reclaimed by a retry-window timestamp alone; only expiry allows a fresh claim. This avoids duplicate callback execution if a slow worker outlives the retry window.
 
 ## Compatibility strategy
 
@@ -66,12 +72,14 @@ No Priority B/C files will be modified unless Priority A is fully implemented an
 - Same key plus same fingerprint replays a completed success response.
 - Same key plus different fingerprint fails before executing the callback.
 - Failed attempts are persisted but not replayed as success; matching retry can execute again after the failed marker is recorded.
-- JSON-only runtime keeps the file fallback path for backward compatibility.
+- JSON-only runtime keeps Redis-capable cache compatibility when Redis is available and the file fallback path when Redis is unavailable.
+- Legacy `MOM\Services\...` autoload requests for the idempotency service and repository types are preserved by aliases to the `MOM\Api\Services\...` classes.
 - DB-enabled runtime does not silently fall back to file persistence on primary ledger failures.
+- If the business callback throws and the failure marker cannot be written, the original business exception is preserved and logged; the failure-marker write failure does not mask the application error.
 
 ## Rollback strategy
 
-- Code rollback: revert the Priority A service/repository/test changes and return to the previous Redis/file implementation.
+- Code rollback: revert the Priority A service/repository/test changes to the pre-ledger implementation.
 - DB rollback:
   - `DROP TABLE IF EXISTS idempotency_replay_ledger CASCADE;`
   - Remove migration `097_idempotency_replay_ledger.sql` from the applied migration ledger only in a controlled rollback window.
@@ -85,6 +93,9 @@ No Priority B/C files will be modified unless Priority A is fully implemented an
   - `php -l mom/tests/backend_smoke.php`
 - Unit tests:
   - `cd mom && ./vendor/bin/phpunit tests/Unit/Services/IdempotencyServiceTest.php`
+- Optional PostgreSQL integration:
+  - `cd mom && MOM_TEST_POSTGRES_IDEMPOTENCY=1 ./vendor/bin/phpunit tests/Integration/IdempotencyPostgresIntegrationTest.php`
+  - This is gated to avoid mutating an arbitrary developer database during the default test suite.
 - Smoke tests:
   - `php mom/tests/backend_smoke.php`
 - Regression suite:

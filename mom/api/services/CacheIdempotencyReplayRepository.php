@@ -3,21 +3,15 @@ declare(strict_types=1);
 
 namespace MOM\Api\Services;
 
-use RuntimeException;
 use Throwable;
 
 /**
- * JSON-only compatibility replay store.
- *
- * This repository is intentionally selected only when PostgreSQL is disabled.
+ * Redis-capable compatibility replay store for DB-disabled runtime.
  */
-final class FileIdempotencyReplayRepository implements IdempotencyReplayRepository
+final class CacheIdempotencyReplayRepository implements IdempotencyReplayRepository
 {
-    private string $storeDir;
-
-    public function __construct(string $dataDir)
+    public function __construct(private CacheService $cacheService)
     {
-        $this->storeDir = rtrim(str_replace('\\', '/', $dataDir), '/') . '/idempotency';
     }
 
     /**
@@ -32,38 +26,38 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
         int $retryWindowSeconds,
         callable $operation,
     ): array {
-        unset($retryWindowSeconds);
-
         $scopeKey = (string)($state['scope_key'] ?? '');
-        $path = $this->statePath($scopeKey, $idempotencyKey);
-        $lockPath = $path . '.lock';
-        $this->ensureDirectory(dirname($path));
+        $stateKey = $this->stateKey($scopeKey, $idempotencyKey);
+        $lockKey = $stateKey . ':lock';
+        $lockTtl = max(5, min(60, $retryWindowSeconds));
 
-        $handle = @fopen($lockPath, 'c+');
-        if ($handle === false) {
-            throw new RuntimeException('Unable to open idempotency lock.');
+        $existing = $this->cacheState($stateKey);
+        $replay = $this->replayExistingState($existing, $fingerprintHash);
+        if ($replay !== null) {
+            return $replay;
+        }
+
+        $lockOwner = bin2hex(random_bytes(8));
+        if (!$this->cacheService->setNx($lockKey, [
+            'owner' => $lockOwner,
+            'created_at' => $this->nowIso(),
+        ], $lockTtl)) {
+            $existing = $this->cacheState($stateKey);
+            $replay = $this->replayExistingState($existing, $fingerprintHash);
+            if ($replay !== null) {
+                return $replay;
+            }
+            throw new RecordConflictException('Idempotency request is already in progress.');
         }
 
         try {
-            if (!@flock($handle, LOCK_EX)) {
-                throw new RuntimeException('Unable to lock idempotency state.');
-            }
-
-            $existing = $this->readState($path);
+            $existing = $this->cacheState($stateKey);
             $replay = $this->replayExistingState($existing, $fingerprintHash);
             if ($replay !== null) {
                 return $replay;
             }
 
-            if (
-                $existing !== null
-                && !$this->isExpired($existing)
-                && ($existing['status'] ?? '') === 'in_progress'
-            ) {
-                throw new RecordConflictException('Idempotency request is already in progress.');
-            }
-
-            $this->writeState($path, $state);
+            $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
 
             try {
                 $result = $operation();
@@ -73,9 +67,9 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
                 $state['error_class'] = $e::class;
                 $state['error_message'] = $e->getMessage();
                 try {
-                    $this->writeState($path, $state);
+                    $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
                 } catch (Throwable $ledgerFailure) {
-                    @error_log('[Idempotency] file failure marker write failed: ' . $ledgerFailure->getMessage());
+                    @error_log('[Idempotency] cache failure marker write failed: ' . $ledgerFailure->getMessage());
                 }
                 throw $e;
             }
@@ -90,7 +84,7 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
             $state['status_code'] = $statusCode;
             $state['response_payload'] = $payload;
             unset($state['error_class'], $state['error_message']);
-            $this->writeState($path, $state);
+            $this->cacheService->set($stateKey, $state, max(15, (int)($state['ttl_seconds'] ?? 86400)));
 
             return [
                 'status_code' => $statusCode,
@@ -99,9 +93,17 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
                 'stored_at' => $completedAt,
             ];
         } finally {
-            @flock($handle, LOCK_UN);
-            @fclose($handle);
+            $this->cacheService->delete($lockKey);
         }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function cacheState(string $stateKey): ?array
+    {
+        $state = $this->cacheService->get($stateKey);
+        return is_array($state) ? $state : null;
     }
 
     /**
@@ -131,61 +133,6 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
         return null;
     }
 
-    private function statePath(string $scopeKey, string $idempotencyKey): string
-    {
-        $hash = hash('sha256', $scopeKey . '|' . $idempotencyKey);
-        $bucket = substr($hash, 0, 2);
-        return $this->storeDir . '/' . $bucket . '/' . $hash . '.json';
-    }
-
-    private function ensureDirectory(string $dir): void
-    {
-        if (is_dir($dir)) {
-            return;
-        }
-        if (!@mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new RuntimeException('Unable to initialize idempotency storage.');
-        }
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    private function readState(string $path): ?array
-    {
-        if (!is_file($path)) {
-            return null;
-        }
-
-        $raw = @file_get_contents($path);
-        if ($raw === false || trim($raw) === '') {
-            return null;
-        }
-
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : null;
-    }
-
-    /**
-     * @param array<string, mixed> $state
-     */
-    private function writeState(string $path, array $state): void
-    {
-        $this->ensureDirectory(dirname($path));
-        $tmp = $path . '.tmp';
-        $json = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if ($json === false) {
-            throw new RuntimeException('Unable to encode idempotency state.');
-        }
-        if (@file_put_contents($tmp, $json . PHP_EOL, LOCK_EX) === false) {
-            throw new RuntimeException('Unable to persist idempotency state.');
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new RuntimeException('Unable to finalize idempotency state.');
-        }
-    }
-
     /**
      * @param array<string, mixed> $state
      */
@@ -199,12 +146,17 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
         return $ts !== false && $ts < time();
     }
 
+    private function stateKey(string $scopeKey, string $idempotencyKey): string
+    {
+        return 'state:' . hash('sha256', $scopeKey . '|' . $idempotencyKey);
+    }
+
     private function nowIso(): string
     {
         return gmdate('Y-m-d\TH:i:s\Z');
     }
 }
 
-if (!class_exists('MOM\\Services\\FileIdempotencyReplayRepository', false)) {
-    class_alias(FileIdempotencyReplayRepository::class, 'MOM\\Services\\FileIdempotencyReplayRepository');
+if (!class_exists('MOM\\Services\\CacheIdempotencyReplayRepository', false)) {
+    class_alias(CacheIdempotencyReplayRepository::class, 'MOM\\Services\\CacheIdempotencyReplayRepository');
 }

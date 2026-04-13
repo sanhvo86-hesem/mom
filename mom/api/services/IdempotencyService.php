@@ -25,15 +25,13 @@ final class IdempotencyService
         ?IdempotencyReplayRepository $repository = null,
         ?array $databaseConfig = null,
     ) {
-        unset($cacheService);
-
         $apiConfigPath = dirname(__DIR__) . '/config.php';
         $apiConfig = is_file($apiConfigPath) ? (array)(require $apiConfigPath) : [];
         $idempotency = is_array($apiConfig['idempotency'] ?? null) ? $apiConfig['idempotency'] : [];
         $this->enabled = (bool)($idempotency['enabled'] ?? true);
         $this->ttlSeconds = max(300, (int)($idempotency['ttl_seconds'] ?? 86400));
         $this->retryWindowSeconds = max(15, (int)($idempotency['retry_window_seconds'] ?? 120));
-        $this->repository = $repository ?? $this->defaultRepository($dataDir, $databaseConfig);
+        $this->repository = $repository ?? $this->defaultRepository($dataDir, $cacheService, $databaseConfig);
     }
 
     public function isEnabled(): bool
@@ -83,11 +81,23 @@ final class IdempotencyService
         );
     }
 
-    private function defaultRepository(string $dataDir, ?array $databaseConfig): IdempotencyReplayRepository
-    {
-        $dbConfig = $databaseConfig ?? (array)(require dirname(__DIR__, 2) . '/database/config.php');
+    private function defaultRepository(
+        string $dataDir,
+        ?CacheService $cacheService,
+        ?array $databaseConfig
+    ): IdempotencyReplayRepository {
+        $dbConfig = $databaseConfig;
+        if ($dbConfig === null) {
+            $dbConfigPath = dirname(__DIR__, 2) . '/database/config.php';
+            $dbConfig = is_file($dbConfigPath) ? (array)(require $dbConfigPath) : [];
+        }
         if ((bool)($dbConfig['use_postgres'] ?? false)) {
             return new PostgresIdempotencyReplayRepository(Connection::getInstance($dbConfig));
+        }
+
+        $cacheService ??= new CacheService($dataDir, 'mom:idempotency:');
+        if ($cacheService->isRedisAvailable()) {
+            return new CacheIdempotencyReplayRepository($cacheService);
         }
 
         return new FileIdempotencyReplayRepository($dataDir);
@@ -196,4 +206,8 @@ final class IdempotencyService
     {
         return gmdate('Y-m-d\TH:i:s\Z');
     }
+}
+
+if (!class_exists('MOM\\Services\\IdempotencyService', false)) {
+    class_alias(IdempotencyService::class, 'MOM\\Services\\IdempotencyService');
 }

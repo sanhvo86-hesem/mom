@@ -28,7 +28,9 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
         int $retryWindowSeconds,
         callable $operation,
     ): array {
-        $reservation = $this->reserve($state, $idempotencyKey, $fingerprintHash, $retryWindowSeconds);
+        unset($retryWindowSeconds);
+
+        $reservation = $this->reserve($state, $idempotencyKey, $fingerprintHash);
         if (($reservation['replay'] ?? false) === true) {
             return [
                 'status_code' => max(200, (int)($reservation['status_code'] ?? 200)),
@@ -41,7 +43,11 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
         try {
             $result = $operation();
         } catch (Throwable $e) {
-            $this->markFailed($state, $idempotencyKey, $fingerprintHash, (string)$reservation['lock_owner'], $e);
+            try {
+                $this->markFailed($state, $idempotencyKey, $fingerprintHash, (string)$reservation['lock_owner'], $e);
+            } catch (Throwable $ledgerFailure) {
+                @error_log('[Idempotency] PostgreSQL failure marker write failed: ' . $ledgerFailure->getMessage());
+            }
             throw $e;
         }
 
@@ -61,7 +67,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
      * @param array<string, mixed> $state
      * @return array<string, mixed>
      */
-    private function reserve(array $state, string $idempotencyKey, string $fingerprintHash, int $retryWindowSeconds): array
+    private function reserve(array $state, string $idempotencyKey, string $fingerprintHash): array
     {
         $scopeKey = (string)($state['scope_key'] ?? '');
         $lockOwner = bin2hex(random_bytes(16));
@@ -77,7 +83,6 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
             $now,
             $expiresAt,
             $metadata,
-            $retryWindowSeconds,
         ): array {
             $inserted = $this->db->insertReturning(
                 "INSERT INTO idempotency_replay_ledger (
@@ -170,10 +175,7 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
                     ];
                 }
 
-                if (
-                    ($existing['status'] ?? '') === 'in_progress'
-                    && !$this->isInProgressStale($existing, $retryWindowSeconds)
-                ) {
+                if (($existing['status'] ?? '') === 'in_progress') {
                     throw new RecordConflictException('Idempotency request is already in progress.');
                 }
             }
@@ -360,21 +362,12 @@ final class PostgresIdempotencyReplayRepository implements IdempotencyReplayRepo
         return $ts !== false && $ts < time();
     }
 
-    /**
-     * @param array<string, mixed> $row
-     */
-    private function isInProgressStale(array $row, int $retryWindowSeconds): bool
-    {
-        $updatedAt = trim((string)($row['updated_at'] ?? ''));
-        if ($updatedAt === '') {
-            return false;
-        }
-        $ts = strtotime($updatedAt);
-        return $ts !== false && $ts <= (time() - max(15, $retryWindowSeconds));
-    }
-
     private function nowIso(): string
     {
         return gmdate('Y-m-d\TH:i:s\Z');
     }
+}
+
+if (!class_exists('MOM\\Services\\PostgresIdempotencyReplayRepository', false)) {
+    class_alias(PostgresIdempotencyReplayRepository::class, 'MOM\\Services\\PostgresIdempotencyReplayRepository');
 }

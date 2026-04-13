@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace MOM\Tests\Unit\Services;
 
 use MOM\Api\Services\IdempotencyService;
+use MOM\Api\Services\CacheIdempotencyReplayRepository;
+use MOM\Api\Services\CacheService;
+use MOM\Api\Services\FileIdempotencyReplayRepository;
 use MOM\Api\Services\PostgresIdempotencyReplayRepository;
 use MOM\Api\Services\RecordConflictException;
 use MOM\Database\Connection;
@@ -13,15 +16,19 @@ use PHPUnit\Framework\TestCase;
 final class IdempotencyServiceTest extends TestCase
 {
     private string $tmpDir;
+    private string $oldErrorLog = '';
 
     protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir() . '/mom_idempotency_test_' . bin2hex(random_bytes(4));
         mkdir($this->tmpDir, 0775, true);
+        $this->oldErrorLog = (string)ini_get('error_log');
+        ini_set('error_log', $this->tmpDir . '/php_error.log');
     }
 
     protected function tearDown(): void
     {
+        ini_set('error_log', $this->oldErrorLog);
         $this->removeDir($this->tmpDir);
     }
 
@@ -50,6 +57,41 @@ final class IdempotencyServiceTest extends TestCase
         $this->assertTrue($second['replayed']);
         $this->assertSame('SO-001', $second['payload']['record']['id'] ?? null);
         $this->assertDirectoryExists($this->tmpDir . '/idempotency');
+    }
+
+    public function testCacheCompatibilityRepositoryReplaysWithoutIdempotencyFileStore(): void
+    {
+        $cache = new CacheService($this->tmpDir, 'mom:idempotency-test:', [
+            'host' => '127.0.0.1',
+            'port' => 1,
+            'timeout' => 0.01,
+        ]);
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            $cache,
+            new CacheIdempotencyReplayRepository($cache),
+            ['use_postgres' => false],
+        );
+        $descriptor = $this->descriptor('cache-key-001');
+        $executions = 0;
+
+        $first = $service->execute($descriptor, static function () use (&$executions): array {
+            $executions++;
+            return [
+                'status_code' => 202,
+                'payload' => ['record' => ['id' => 'CACHE-001']],
+            ];
+        });
+        $second = $service->execute($descriptor, static function (): array {
+            throw new \RuntimeException('Cache replay should not execute operation.');
+        });
+
+        $this->assertSame(1, $executions);
+        $this->assertFalse($first['replayed']);
+        $this->assertTrue($second['replayed']);
+        $this->assertSame('CACHE-001', $second['payload']['record']['id'] ?? null);
+        $this->assertDirectoryExists($this->tmpDir . '/cache');
+        $this->assertDirectoryDoesNotExist($this->tmpDir . '/idempotency');
     }
 
     public function testDbBackedRepositoryReplaysMatchingRequestWithoutFileStore(): void
@@ -139,6 +181,76 @@ final class IdempotencyServiceTest extends TestCase
         ]);
     }
 
+    public function testDbBackedRepositoryRejectsNonExpiredStaleInProgressDuplicate(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-stale-in-progress-key');
+        $key = $this->rowKey($descriptor);
+        $db->rows[$key] = [
+            'scope_key' => $descriptor['scope_key'],
+            'idempotency_key' => $descriptor['key'],
+            'fingerprint_hash' => $this->fingerprintForDescriptor($descriptor),
+            'status' => 'in_progress',
+            'status_code' => null,
+            'response_payload' => '{}',
+            'metadata' => '{}',
+            'lock_owner' => 'slow-worker',
+            'created_at' => gmdate('c', time() - 1000),
+            'updated_at' => gmdate('c', time() - 1000),
+            'completed_at' => null,
+            'expires_at' => gmdate('c', time() + 300),
+        ];
+
+        $this->expectException(RecordConflictException::class);
+        $service->execute($descriptor, static fn(): array => [
+            'status_code' => 200,
+            'payload' => ['ok' => true],
+        ]);
+    }
+
+    public function testDbBackedRepositoryDoesNotReexecuteWhenCompletionPersistenceFails(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $db->failComplete = true;
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-complete-failure-key');
+        $executions = 0;
+
+        try {
+            $service->execute($descriptor, static function () use (&$executions): array {
+                $executions++;
+                return [
+                    'status_code' => 201,
+                    'payload' => ['ok' => true],
+                ];
+            });
+            $this->fail('Completion persistence failure should bubble.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Unable to complete idempotency ledger row.', $e->getMessage());
+        }
+
+        $this->assertSame(1, $executions);
+        $this->assertSame('in_progress', $db->rows[$this->rowKey($descriptor)]['status'] ?? null);
+
+        $this->expectException(RecordConflictException::class);
+        $service->execute($descriptor, static function () use (&$executions): array {
+            $executions++;
+            return [
+                'status_code' => 200,
+                'payload' => ['should_not' => 'run'],
+            ];
+        });
+    }
+
     public function testDbBackedRepositoryPersistsFailureAndAllowsMatchingRetry(): void
     {
         $db = new IdempotencyFakeConnection();
@@ -178,10 +290,34 @@ final class IdempotencyServiceTest extends TestCase
         $this->assertSame('completed', $db->rows[$this->rowKey($descriptor)]['status'] ?? null);
     }
 
+    public function testDbBackedRepositoryPreservesBusinessExceptionWhenFailureMarkerFails(): void
+    {
+        $db = new IdempotencyFakeConnection();
+        $db->failFailureUpdate = true;
+        $service = new IdempotencyService(
+            $this->tmpDir,
+            repository: new PostgresIdempotencyReplayRepository($db),
+            databaseConfig: ['use_postgres' => true],
+        );
+        $descriptor = $this->descriptor('db-failure-marker-key');
+
+        try {
+            $service->execute($descriptor, static function (): array {
+                throw new \RuntimeException('Business failure survives.');
+            });
+            $this->fail('The original business exception should bubble.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Business failure survives.', $e->getMessage());
+        }
+
+        $this->assertSame('in_progress', $db->rows[$this->rowKey($descriptor)]['status'] ?? null);
+    }
+
     public function testFileFallbackRejectsConflictingFingerprint(): void
     {
         $service = new IdempotencyService(
             $this->tmpDir,
+            repository: new FileIdempotencyReplayRepository($this->tmpDir),
             databaseConfig: ['use_postgres' => false],
         );
         $descriptor = $this->descriptor('file-conflict-key');
@@ -199,6 +335,15 @@ final class IdempotencyServiceTest extends TestCase
             'status_code' => 200,
             'payload' => ['ok' => true],
         ]);
+    }
+
+    public function testLegacyServicesNamespaceAliasesRemainAvailable(): void
+    {
+        $this->assertTrue(class_exists('MOM\\Services\\IdempotencyService'));
+        $this->assertTrue(interface_exists('MOM\\Services\\IdempotencyReplayRepository'));
+        $this->assertTrue(class_exists('MOM\\Services\\PostgresIdempotencyReplayRepository'));
+        $this->assertTrue(class_exists('MOM\\Services\\FileIdempotencyReplayRepository'));
+        $this->assertTrue(class_exists('MOM\\Services\\CacheIdempotencyReplayRepository'));
     }
 
     /**
@@ -287,6 +432,8 @@ final class IdempotencyFakeConnection extends Connection
 {
     /** @var array<string, array<string, mixed>> */
     public array $rows = [];
+    public bool $failComplete = false;
+    public bool $failFailureUpdate = false;
 
     public function __construct()
     {
@@ -341,6 +488,9 @@ final class IdempotencyFakeConnection extends Connection
             if (!$this->matchesClaim($key, $params)) {
                 return 0;
             }
+            if ($this->failComplete) {
+                return 0;
+            }
             $this->rows[$key]['status'] = 'completed';
             $this->rows[$key]['status_code'] = (int)$params[':status_code'];
             $this->rows[$key]['response_payload'] = (string)$params[':response_payload'];
@@ -354,6 +504,9 @@ final class IdempotencyFakeConnection extends Connection
 
         if (str_contains($sql, "status = 'failed'")) {
             if (!$this->matchesClaim($key, $params)) {
+                return 0;
+            }
+            if ($this->failFailureUpdate) {
                 return 0;
             }
             $this->rows[$key]['status'] = 'failed';
