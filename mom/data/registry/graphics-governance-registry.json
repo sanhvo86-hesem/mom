@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T12:23:48+00:00",
+        "generatedAt": "2026-04-13T13:44:52+00:00",
         "source": "graphics_governance_backend",
         "authorityLayer": "system_contract_registry",
         "authority": "mom/design/template-registry.json",
@@ -566,7 +566,7 @@
     },
     "componentContractRegistry": {
         "_meta": {
-            "generatedAt": "2026-04-13T12:23:48+00:00",
+            "generatedAt": "2026-04-13T13:44:52+00:00",
             "authority": "mom/design/block-contracts",
             "authorityRole": "component_contract_registry",
             "componentModel": "frontend_block_contracts"
@@ -3667,7 +3667,22 @@
                         "severity": "blocker"
                     }
                 ],
-                "compliant": false
+                "compliant": false,
+                "linkageStatus": "blocked",
+                "templateBindingSource": "backend-template-registry",
+                "sharedTokenCoverage": 100,
+                "sharedComponentCoverage": 100,
+                "bridgeAliasDebt": 0,
+                "privateCssDebt": 0,
+                "hardcodedStyleDebt": 0,
+                "driftStatus": "blocked",
+                "blockerReason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "consumesHmComponents": true,
+                "consumesSharedTokens": true,
+                "usesPrivateCssShell": false,
+                "reason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "ownerTeam": "Commercial Operations + Frontend Platform",
+                "domain": "commercial_customer"
             },
             {
                 "moduleId": "M4-purchasing",
@@ -3726,13 +3741,32 @@
                         "severity": "blocker"
                     }
                 ],
-                "compliant": false
+                "compliant": false,
+                "linkageStatus": "blocked",
+                "templateBindingSource": "backend-template-registry",
+                "sharedTokenCoverage": 100,
+                "sharedComponentCoverage": 100,
+                "bridgeAliasDebt": 0,
+                "privateCssDebt": 0,
+                "hardcodedStyleDebt": 0,
+                "driftStatus": "blocked",
+                "blockerReason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "consumesHmComponents": true,
+                "consumesSharedTokens": true,
+                "usesPrivateCssShell": false,
+                "reason": "Release blocked: regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform",
+                "domain": "procurement_supplier_quality"
             }
         ],
         "summary": {
             "moduleCount": 2,
             "compliantCount": 0,
-            "nonCompliantCount": 2
+            "nonCompliantCount": 2,
+            "fullAdminControlledCount": 0,
+            "bridgedToSharedTokensCount": 0,
+            "legacyPrivateCssCount": 0,
+            "blockedCount": 2
         },
         "version": "2026.04.11-p0",
         "etag": "sha256:136e36f950c87af3c578bc2622732a03"
@@ -3780,9 +3814,808 @@
             "complianceMatrixVersion": "2026.04.11-p0",
             "templateRegistryVersion": "2026.04.11-p0",
             "templateRegistryEtag": "sha256:136e36f950c87af3c578bc2622732a03",
-            "driftReportGeneratedAt": "2026-04-13T12:23:48+00:00",
+            "driftReportGeneratedAt": "2026-04-13T13:44:52+00:00",
             "authority": "mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json"
         }
+    },
+    "changeSetModel": {
+        "changeSetId": "gcs_464921330da4",
+        "status": "preview-only",
+        "source": "backend_graphics_governance_state",
+        "edits": [],
+        "diffSummary": {
+            "impactCount": 0,
+            "rolloutCount": 0,
+            "authority": "mom/data/graphics-governance/state.json"
+        },
+        "impact": {
+            "impactId": "gia_20260413134452_ca9111f8",
+            "analysisType": "change-set",
+            "subject": {
+                "scope": "graphics-control-plane"
+            },
+            "affectedModules": [],
+            "affectedRoutes": [],
+            "affectedScreens": [],
+            "affectedBlockFamilies": [],
+            "affectedTemplates": [],
+            "regulatedModulesTouched": [],
+            "shopfloorModulesTouched": [],
+            "gatesToRerun": [],
+            "blockers": [],
+            "severityClass": "low",
+            "requiredEvidence": [
+                {
+                    "evidenceType": "impact-snapshot",
+                    "required": "true",
+                    "owner": "Frontend Platform"
+                },
+                {
+                    "evidenceType": "rollback-plan",
+                    "required": "true",
+                    "owner": "Release Engineering"
+                }
+            ],
+            "rerunPlan": {
+                "gates": [],
+                "regulatedEvidenceRequired": false,
+                "shopfloorEvidenceRequired": false,
+                "screenshotDiffRequired": false
+            },
+            "rolloutScopes": [
+                {
+                    "mode": "preview-only",
+                    "allowed": true,
+                    "releaseCondition": "No production write; preview cache only."
+                },
+                {
+                    "mode": "canary-module-group",
+                    "allowed": false,
+                    "releaseCondition": "Impact report and rollback plan attached."
+                },
+                {
+                    "mode": "canary-domain",
+                    "allowed": false,
+                    "releaseCondition": "Domain owner approval and evidence checklist complete."
+                },
+                {
+                    "mode": "environment-stage",
+                    "allowed": true,
+                    "releaseCondition": "Environment policy pack selected and QA rerun plan complete."
+                },
+                {
+                    "mode": "global-apply",
+                    "allowed": true,
+                    "releaseCondition": "No active release blockers and release manifest refs present."
+                }
+            ],
+            "changeSetRef": "gcs_261e45b508f7",
+            "machineReadable": true,
+            "generatedAt": "2026-04-13T13:44:52+00:00"
+        },
+        "risk": {
+            "severityClass": "low",
+            "blockerCount": 0
+        },
+        "rolloutScopePlan": [
+            {
+                "mode": "preview-only",
+                "allowed": true,
+                "releaseCondition": "No production write; preview cache only."
+            },
+            {
+                "mode": "canary-module-group",
+                "allowed": false,
+                "releaseCondition": "Impact report and rollback plan attached."
+            },
+            {
+                "mode": "canary-domain",
+                "allowed": false,
+                "releaseCondition": "Domain owner approval and evidence checklist complete."
+            },
+            {
+                "mode": "environment-stage",
+                "allowed": true,
+                "releaseCondition": "Environment policy pack selected and QA rerun plan complete."
+            },
+            {
+                "mode": "global-apply",
+                "allowed": true,
+                "releaseCondition": "No active release blockers and release manifest refs present."
+            }
+        ],
+        "evidenceChecklist": [
+            {
+                "evidenceType": "impact-snapshot",
+                "required": "true",
+                "owner": "Frontend Platform"
+            },
+            {
+                "evidenceType": "rollback-plan",
+                "required": "true",
+                "owner": "Release Engineering"
+            }
+        ]
+    },
+    "moduleGraphicsLineageGraph": {
+        "nodes": [
+            {
+                "id": "admin-appearance",
+                "type": "admin-control-plane",
+                "label": "Admin Appearance / Template Studio"
+            },
+            {
+                "id": "backend-graphics-authority",
+                "type": "backend-authority",
+                "label": "Backend graphics authority"
+            },
+            {
+                "id": "shared-tokens",
+                "type": "token-layer",
+                "label": "Shared tokens"
+            },
+            {
+                "id": "shared-components",
+                "type": "component-layer",
+                "label": "Shared hm-* components"
+            },
+            {
+                "id": "template:T13",
+                "type": "template",
+                "label": "T13 v1.0.0",
+                "status": "approved",
+                "lineage": {
+                    "templateId": "T13",
+                    "version": "1.0.0",
+                    "parentTemplateId": "",
+                    "supersedesVersion": "",
+                    "deprecationWindow": [],
+                    "migrationPlanRequired": false,
+                    "migrationPlanRefs": []
+                }
+            },
+            {
+                "id": "template:T29",
+                "type": "template",
+                "label": "T29 v1.0.0",
+                "status": "approved",
+                "lineage": {
+                    "templateId": "T29",
+                    "version": "1.0.0",
+                    "parentTemplateId": "",
+                    "supersedesVersion": "",
+                    "deprecationWindow": [],
+                    "migrationPlanRequired": false,
+                    "migrationPlanRefs": []
+                }
+            },
+            {
+                "id": "component:action-status-flow",
+                "type": "component-contract",
+                "label": "action-status-flow"
+            },
+            {
+                "id": "component:action-toolbar",
+                "type": "component-contract",
+                "label": "action-toolbar"
+            },
+            {
+                "id": "component:data-detail",
+                "type": "component-contract",
+                "label": "data-detail"
+            },
+            {
+                "id": "component:data-table",
+                "type": "component-contract",
+                "label": "data-table"
+            },
+            {
+                "id": "component:data-timeline",
+                "type": "component-contract",
+                "label": "data-timeline"
+            },
+            {
+                "id": "component:data-tree",
+                "type": "component-contract",
+                "label": "data-tree"
+            },
+            {
+                "id": "component:filter-bar",
+                "type": "component-contract",
+                "label": "filter-bar"
+            },
+            {
+                "id": "component:form-standard",
+                "type": "component-contract",
+                "label": "form-standard"
+            },
+            {
+                "id": "component:info-banner",
+                "type": "component-contract",
+                "label": "info-banner"
+            },
+            {
+                "id": "component:kpi-row",
+                "type": "component-contract",
+                "label": "kpi-row"
+            },
+            {
+                "id": "module:M2-orders",
+                "type": "module",
+                "label": "M2-orders",
+                "route": "/orders",
+                "domain": "commercial_customer",
+                "ownerTeam": "Commercial Operations + Frontend Platform"
+            },
+            {
+                "id": "module:M4-purchasing",
+                "type": "module",
+                "label": "M4-purchasing",
+                "route": "/purchasing",
+                "domain": "procurement_supplier_quality",
+                "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform"
+            }
+        ],
+        "edges": [
+            {
+                "from": "admin-appearance",
+                "to": "backend-graphics-authority",
+                "relation": "persists-through"
+            },
+            {
+                "from": "backend-graphics-authority",
+                "to": "shared-tokens",
+                "relation": "publishes-runtime-tokens"
+            },
+            {
+                "from": "shared-tokens",
+                "to": "shared-components",
+                "relation": "drives-contracts"
+            },
+            {
+                "from": "backend-graphics-authority",
+                "to": "template:T13",
+                "relation": "controls-template"
+            },
+            {
+                "from": "backend-graphics-authority",
+                "to": "template:T29",
+                "relation": "controls-template"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:action-status-flow",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:action-toolbar",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:data-detail",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:data-table",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:data-timeline",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:data-tree",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:filter-bar",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:form-standard",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:info-banner",
+                "relation": "contract"
+            },
+            {
+                "from": "shared-components",
+                "to": "component:kpi-row",
+                "relation": "contract"
+            },
+            {
+                "from": "template:T13",
+                "to": "module:M2-orders",
+                "relation": "governs-module"
+            },
+            {
+                "from": "component:kpi-row",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:filter-bar",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-toolbar",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-tree",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:kpi-row",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-toolbar",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-detail",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-toolbar",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-status-flow",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-timeline",
+                "to": "module:M2-orders",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "template:T29",
+                "to": "module:M4-purchasing",
+                "relation": "governs-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:filter-bar",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-detail",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-status-flow",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-toolbar",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:info-banner",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-table",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:data-detail",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:action-status-flow",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            },
+            {
+                "from": "component:form-standard",
+                "to": "module:M4-purchasing",
+                "relation": "consumed-by-module"
+            }
+        ],
+        "summary": {
+            "nodeCount": 18,
+            "edgeCount": 56,
+            "templateCount": 2
+        },
+        "authorityRefs": {
+            "templateRegistry": "mom/design/template-registry.json",
+            "blockContracts": "mom/design/block-contracts/*.json",
+            "moduleBuildPackets": "mom/design/build-packets/*.json"
+        }
+    },
+    "runtimeGraphicsComplianceBeacon": {
+        "beacons": [
+            {
+                "moduleId": "M2-orders",
+                "route": "/orders",
+                "linkageStatus": "blocked",
+                "sharedTokenProbe": true,
+                "hmComponentProbe": true,
+                "privateCssProbe": false,
+                "beaconStatus": "release-blocking",
+                "reportedAt": "2026-04-13T13:44:52+00:00"
+            },
+            {
+                "moduleId": "M4-purchasing",
+                "route": "/purchasing",
+                "linkageStatus": "blocked",
+                "sharedTokenProbe": true,
+                "hmComponentProbe": true,
+                "privateCssProbe": false,
+                "beaconStatus": "release-blocking",
+                "reportedAt": "2026-04-13T13:44:52+00:00"
+            }
+        ],
+        "summary": {
+            "reportedModules": 2,
+            "releaseBlockingModules": 2,
+            "authority": "runtime diagnostics feed into backend graphics compliance"
+        }
+    },
+    "visualDebtObservatory": {
+        "byModule": [
+            {
+                "moduleId": "M2-orders",
+                "route": "/orders",
+                "domain": "commercial_customer",
+                "ownerTeam": "Commercial Operations + Frontend Platform",
+                "linkageStatus": "blocked",
+                "bridgeAliasDebt": 0,
+                "privateCssDebt": 0,
+                "hardcodedStyleDebt": 0,
+                "uncontrolledLegacyShellDebt": 0,
+                "debtScore": 25
+            },
+            {
+                "moduleId": "M4-purchasing",
+                "route": "/purchasing",
+                "domain": "procurement_supplier_quality",
+                "ownerTeam": "Supply Chain + Supplier Quality + Frontend Platform",
+                "linkageStatus": "blocked",
+                "bridgeAliasDebt": 0,
+                "privateCssDebt": 0,
+                "hardcodedStyleDebt": 0,
+                "uncontrolledLegacyShellDebt": 0,
+                "debtScore": 25
+            }
+        ],
+        "byDomain": [
+            {
+                "key": "commercial_customer",
+                "debtScore": 25,
+                "moduleCount": 1
+            },
+            {
+                "key": "procurement_supplier_quality",
+                "debtScore": 25,
+                "moduleCount": 1
+            }
+        ],
+        "byTeam": [
+            {
+                "key": "Commercial Operations + Frontend Platform",
+                "debtScore": 25,
+                "moduleCount": 1
+            },
+            {
+                "key": "Supply Chain + Supplier Quality + Frontend Platform",
+                "debtScore": 25,
+                "moduleCount": 1
+            }
+        ],
+        "byRoute": [
+            {
+                "key": "/orders",
+                "debtScore": 25,
+                "moduleCount": 1
+            },
+            {
+                "key": "/purchasing",
+                "debtScore": 25,
+                "moduleCount": 1
+            }
+        ],
+        "globalSignals": {
+            "bridgeAliasDebtCount": 71,
+            "privateCssDebtScore": 14553,
+            "tokenCoveragePercent": 29
+        },
+        "summary": {
+            "moduleDebtCount": 2,
+            "uncontrolledLegacyShellDebt": 0
+        }
+    },
+    "environmentPolicyPacks": {
+        "packs": [
+            {
+                "environment": "office",
+                "tokenOverrides": {
+                    "density": "default",
+                    "contrast": "standard"
+                },
+                "evidenceObligations": [
+                    "visual-regression"
+                ]
+            },
+            {
+                "environment": "review",
+                "tokenOverrides": {
+                    "density": "comfortable",
+                    "contrast": "standard"
+                },
+                "evidenceObligations": [
+                    "screenshot-diff",
+                    "keyboard-path"
+                ]
+            },
+            {
+                "environment": "admin",
+                "tokenOverrides": {
+                    "density": "compact",
+                    "contrast": "standard"
+                },
+                "evidenceObligations": [
+                    "audit-trail",
+                    "permission-review"
+                ]
+            },
+            {
+                "environment": "shopfloor",
+                "tokenOverrides": {
+                    "density": "shopfloor",
+                    "contrast": "high"
+                },
+                "evidenceObligations": [
+                    "shopfloor-kiosk-smoke",
+                    "touch-target-proof"
+                ]
+            },
+            {
+                "environment": "kiosk",
+                "tokenOverrides": {
+                    "density": "shopfloor",
+                    "contrast": "high"
+                },
+                "evidenceObligations": [
+                    "kiosk-viewport-proof",
+                    "timeout-proof"
+                ]
+            },
+            {
+                "environment": "tv",
+                "tokenOverrides": {
+                    "density": "comfortable",
+                    "contrast": "high"
+                },
+                "evidenceObligations": [
+                    "distance-legibility-proof"
+                ]
+            },
+            {
+                "environment": "night-shift",
+                "tokenOverrides": {
+                    "mode": "dark",
+                    "contrast": "high"
+                },
+                "evidenceObligations": [
+                    "dark-mode-contrast",
+                    "fatigue-review"
+                ]
+            }
+        ],
+        "summary": {
+            "packCount": 7,
+            "authority": "backend_graphics_environment_policy_pack",
+            "localStorageAuthority": false
+        }
+    },
+    "graphicsReleaseDashboard": {
+        "readiness": "blocked",
+        "blockers": {
+            "blockers": [
+                {
+                    "blockerId": "graphics_module_M2-orders",
+                    "scope": "module",
+                    "targetId": "M2-orders",
+                    "severity": "blocker",
+                    "status": "active",
+                    "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                    "releaseGate": "G19-graphics-governance",
+                    "waiverAllowed": true
+                },
+                {
+                    "blockerId": "graphics_module_M4-purchasing",
+                    "scope": "module",
+                    "targetId": "M4-purchasing",
+                    "severity": "blocker",
+                    "status": "active",
+                    "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                    "releaseGate": "G19-graphics-governance",
+                    "waiverAllowed": true
+                },
+                {
+                    "blockerId": "graphics_drift_bridge_alias_debt",
+                    "scope": "tokens",
+                    "targetId": "bridge_alias_debt",
+                    "severity": "blocker",
+                    "status": "active",
+                    "reason": "bridge_alias_raw_value_debt",
+                    "releaseGate": "G19-graphics-governance",
+                    "waiverAllowed": true
+                }
+            ],
+            "summary": {
+                "blockerCount": 3,
+                "waivedCount": 0,
+                "pendingImpactCount": 0,
+                "releaseBlocked": true
+            },
+            "evidence": {
+                "complianceMatrixVersion": "2026.04.11-p0",
+                "templateRegistryVersion": "2026.04.11-p0",
+                "templateRegistryEtag": "sha256:136e36f950c87af3c578bc2622732a03",
+                "driftReportGeneratedAt": "2026-04-13T13:44:52+00:00",
+                "authority": "mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json"
+            }
+        },
+        "waivers": {
+            "waivers": [],
+            "version": "1",
+            "etag": "sha256:8df7401c18c5a8e745204a10cf0fda84"
+        },
+        "complianceSummary": {
+            "moduleCount": 2,
+            "compliantCount": 0,
+            "nonCompliantCount": 2,
+            "fullAdminControlledCount": 0,
+            "bridgedToSharedTokensCount": 0,
+            "legacyPrivateCssCount": 0,
+            "blockedCount": 2
+        },
+        "debtSummary": {
+            "bridgeAliasDebtCount": 71,
+            "privateCssDebtScore": 14553,
+            "privateCssFileCount": 75,
+            "tokenCoveragePercent": 29,
+            "uncontrolledLegacyShellDebt": 0
+        },
+        "rolloutSummary": {
+            "rolloutCount": 0,
+            "stagedCount": 0,
+            "appliedCount": 0
+        },
+        "postApplyVerification": {
+            "runtimeBeaconRequired": true,
+            "driftReportRequired": true,
+            "evidenceBundleRequired": true
+        },
+        "generatedAt": "2026-04-13T13:44:52+00:00"
     },
     "persistence": {
         "canonicalTemplateRegistry": "mom/design/template-registry.json",

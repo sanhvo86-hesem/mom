@@ -34,6 +34,28 @@ final class SharePointPublicationAdapterTest extends TestCase
         ]);
     }
 
+    public function testPublicationRequestRejectsManifestThatTreatsTargetAsInputChannel(): void
+    {
+        $adapter = new SharePointPublicationAdapter([]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('read-only replica');
+
+        $adapter->buildPublicationRequest([
+            'manifest_hash_sha256' => str_repeat('a', 64),
+            'package_hash_sha256' => str_repeat('b', 64),
+            'artifacts' => [
+                'readable_snapshot' => ['storage_uri' => 'immutable://snapshot'],
+            ],
+            'manifest' => [
+                'publication_state' => [
+                    'authority_role' => 'source_of_truth',
+                    'direct_user_upload' => true,
+                ],
+            ],
+        ]);
+    }
+
     public function testPublicationRequestIsReadOnlyReplicaWithHashes(): void
     {
         $adapter = new SharePointPublicationAdapter([

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T13:26:34.581Z",
+    "generatedAt": "2026-04-13T13:46:27.206Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -64,9 +64,15 @@
     "graphicsAuthorityRefs": [
       "data/registry/graphics-governance-registry.json"
     ],
-    "templateRegistryVersion": "",
-    "templateRegistryChecksum": "",
+    "templateRegistryVersion": "2026.04.11-p0",
+    "templateRegistryChecksum": "sha256:136e36f950c87af3c578bc2622732a03",
     "complianceMatrixRef": "data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+    "changeSetRef": "data/registry/graphics-governance-registry.json#/changeSetModel",
+    "lineageGraphRef": "data/registry/graphics-governance-registry.json#/moduleGraphicsLineageGraph",
+    "runtimeBeaconRef": "data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+    "debtObservatoryRef": "data/registry/graphics-governance-registry.json#/visualDebtObservatory",
+    "environmentPolicyPacksRef": "data/registry/graphics-governance-registry.json#/environmentPolicyPacks",
+    "releaseDashboardRef": "data/registry/graphics-governance-registry.json#/graphicsReleaseDashboard",
     "releaseBlockerCount": 3,
     "releaseBlocked": true
   },

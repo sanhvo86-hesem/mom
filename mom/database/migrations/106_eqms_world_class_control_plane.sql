@@ -349,6 +349,10 @@ CREATE TABLE IF NOT EXISTS evidence_artifacts (
     UNIQUE (idempotency_key)
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS ux_evidence_artifacts_single_package_role
+    ON evidence_artifacts (evidence_version_id, artifact_role)
+    WHERE artifact_role IN ('original', 'canonical_payload', 'readable_snapshot', 'hash_signature_manifest');
+
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_evidence_records_current_version') THEN
@@ -454,6 +458,16 @@ CREATE TABLE IF NOT EXISTS plm_change_affected_objects (
 
 CREATE INDEX IF NOT EXISTS idx_plm_change_affected_objects_lookup
     ON plm_change_affected_objects (object_type, object_id, plm_change_order_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_plm_change_affected_objects_order_scope
+    ON plm_change_affected_objects (
+        plm_change_order_id,
+        object_type,
+        object_id,
+        COALESCE(object_revision, ''),
+        requested_effect
+    )
+    WHERE plm_change_order_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS plm_change_resulting_objects (
     plm_change_resulting_object_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

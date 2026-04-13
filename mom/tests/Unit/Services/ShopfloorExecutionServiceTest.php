@@ -305,6 +305,122 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $service->shouldCompleteTarget($log, ['completion_intent' => 'complete_target']);
     }
 
+    public function testReportGovernanceBlocksUndispatchedAndCompletedSnapshotReports(): void
+    {
+        $service = $this->service();
+        $planned = $this->target();
+        $planned['status'] = 'planned';
+
+        try {
+            $service->assertProductionReportGovernance([], $planned, false, '2026-04-13T08:00:00Z');
+            $this->fail('Normal operators must not report planned targets directly.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('target_not_dispatched', $e->getMessage());
+        }
+
+        $service->assertProductionReportGovernance([], $planned, true, '2026-04-13T08:00:00Z');
+        $this->addToAssertionCount(1);
+
+        $completed = $this->target();
+        $completed['status'] = 'completed';
+        try {
+            $service->assertProductionReportGovernance([], $completed, true, '2026-04-13T08:00:00Z');
+            $this->fail('Completed targets must require correction mode.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('completed_target_requires_correction', $e->getMessage());
+        }
+
+        try {
+            $service->assertProductionReportGovernance(['report_mode' => 'correction'], $completed, false, '2026-04-13T08:00:00Z');
+            $this->fail('Corrections require explicit planner or supervisor override.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('correction_override_required', $e->getMessage());
+        }
+    }
+
+    public function testBackdateAndFutureTimestampGovernance(): void
+    {
+        $service = $this->service();
+        $target = $this->target();
+        $target['shift_date'] = '2026-04-10';
+
+        try {
+            $service->assertProductionReportGovernance([], $target, false, '2026-04-13T08:00:00Z');
+            $this->fail('Backdated reports outside the grace window require override.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('backdate_override_required', $e->getMessage());
+        }
+
+        $service->assertProductionReportGovernance([], $target, true, '2026-04-13T08:00:00Z');
+        $this->addToAssertionCount(1);
+
+        $current = $this->target();
+        try {
+            $service->assertProductionReportGovernance([
+                'actual_end' => '2026-04-13T09:30:01Z',
+            ], $current, false, '2026-04-13T09:00:00Z');
+            $this->fail('Future actual timestamps should be rejected.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('future_actual_timestamp', $e->getMessage());
+        }
+
+        try {
+            $service->assertProductionReportGovernance([
+                'actual_end' => '2026-04-14T08:00:00Z',
+            ], $current, false, '2026-04-14T09:00:00Z');
+            $this->fail('Morning shift reports should not accept next-day actual timestamps.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('actual_timestamp_outside_shift', $e->getMessage());
+        }
+
+        $night = $this->target();
+        $night['shift_code'] = 'night';
+        $service->assertProductionReportGovernance([
+            'actual_end' => '2026-04-14T02:00:00Z',
+        ], $night, false, '2026-04-14T03:00:00Z');
+        $this->addToAssertionCount(1);
+    }
+
+    public function testPauseResumeAndOfflineReportSemanticsAreStructured(): void
+    {
+        $service = $this->service();
+        $pause = $service->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'pause',
+            'downtime_events' => [
+                ['reason_code' => 'DT-TOOL-LIFE', 'minutes' => 12],
+            ],
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+        $this->assertSame('pause', $pause['execution_event_type']);
+        $this->assertSame(['DT-TOOL-LIFE'], $pause['reason_codes']['downtime']);
+
+        $resume = $service->buildProductionLog([
+            'quantity_good' => 0,
+            'execution_event_type' => 'resume',
+            'resumed_from_event_id' => 'PRE-PAUSE-1',
+        ], $this->target(), $pause, 'operator-1', '2026-04-13T08:30:00Z');
+        $this->assertSame('resume', $resume['execution_event_type']);
+        $this->assertSame('PRE-PAUSE-1', $resume['resumed_from_event_id']);
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 5,
+                'offline_created' => 'true',
+            ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+            $this->fail('Offline reports must carry replay-safe identifiers.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('offline_report_requires_idempotency_key', $e->getMessage());
+        }
+
+        $offline = $service->buildProductionLog([
+            'quantity_good' => 5,
+            'offline_created' => 'true',
+            'idempotency_key' => 'tablet-1:TGT-1001:offline-1',
+            'client_report_id' => 'offline-1',
+        ], $this->target(), null, 'operator-1', '2026-04-13T09:00:00Z');
+        $this->assertTrue($offline['offline_created']);
+    }
+
     public function testBuildsAiReadyProductionLogAndManufacturingEventProjection(): void
     {
         $eventBackbone = new ManufacturingEventBackboneService(
@@ -518,6 +634,27 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('NC-FINISH-BORE-V4', $target['cnc_program_id']);
         $this->assertSame('operator-7', $target['operator_id']);
         $this->assertSame('TRV-001', $target['traveler_number']);
+    }
+
+    public function testTargetReferenceValidationWarnsWithoutBlockingManualDispatch(): void
+    {
+        mkdir($this->dataDir . '/cnc-programs', 0775, true);
+        file_put_contents($this->dataDir . '/cnc-programs/programs.json', json_encode([
+            ['id' => 'NC-KNOWN', 'name' => 'known.nc', 'status' => 'released'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $target = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-REF-1',
+            'machine_id' => 'MC-5AX-01',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+            'cnc_program_id' => 'NC-MISSING',
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('warning', $target['reference_validation']['status']);
+        $this->assertContains('unverified_cnc_program_reference', $target['reference_validation']['warnings']);
+        $this->assertContains('missing_inspection_plan_reference', $target['reference_validation']['warnings']);
     }
 
     /**

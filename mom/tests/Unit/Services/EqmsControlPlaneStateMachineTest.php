@@ -140,7 +140,7 @@ final class EqmsControlPlaneStateMachineTest extends TestCase
     {
         $allowed = $this->stateMachine->canTransition('change_order', 'approved', 'released', [
             'roles' => ['qa_qms'],
-            'evidence' => ['release_manifest', 'verification_passed', 'training_gate_complete', 'read_ack_gate_complete'],
+            'evidence' => ['release_manifest', 'verification_passed', 'training_gate_complete'],
             'training_gate_required' => true,
             'read_ack_gate_required' => false,
             'training_gate_complete' => true,

@@ -323,6 +323,18 @@ function validateGraphicsGovernance(graphicsGovernance, packets) {
   if (!matrix.length) {
     errors.push('mom/data/registry/graphics-governance-registry.json: moduleGraphicsCompliance.matrix is empty or missing');
   }
+  for (const [key, label] of [
+    ['changeSetModel', 'graphics change set model'],
+    ['moduleGraphicsLineageGraph', 'module graphics lineage graph'],
+    ['runtimeGraphicsComplianceBeacon', 'runtime graphics compliance beacon'],
+    ['visualDebtObservatory', 'visual debt observatory'],
+    ['environmentPolicyPacks', 'environment policy packs'],
+    ['graphicsReleaseDashboard', 'graphics release dashboard'],
+  ]) {
+    if (!graphicsGovernance[key] || typeof graphicsGovernance[key] !== 'object') {
+      warnings.push(`graphics-governance: missing ${label}; release dashboard is incomplete`);
+    }
+  }
 
   const complianceByModule = new Map(matrix.map((row) => [row.moduleId, row]));
   for (const moduleId of packets.keys()) {

@@ -23,7 +23,14 @@
     "GraphicsWaiver": { "$ref": "#/$defs/GraphicsWaiver" },
     "GraphicsReleaseBlocker": { "$ref": "#/$defs/GraphicsReleaseBlocker" },
     "GraphicsReleaseLink": { "$ref": "#/$defs/GraphicsReleaseLink" },
-    "GraphicsReleaseManifestRef": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+    "GraphicsReleaseManifestRef": { "$ref": "#/$defs/GraphicsReleaseManifestRef" },
+    "GraphicsChangeSet": { "$ref": "#/$defs/GraphicsChangeSet" },
+    "ModuleGraphicsLineageGraph": { "$ref": "#/$defs/ModuleGraphicsLineageGraph" },
+    "RuntimeGraphicsComplianceBeacon": { "$ref": "#/$defs/RuntimeGraphicsComplianceBeacon" },
+    "VisualDebtObservatory": { "$ref": "#/$defs/VisualDebtObservatory" },
+    "GraphicsEnvironmentPolicyPack": { "$ref": "#/$defs/GraphicsEnvironmentPolicyPack" },
+    "GraphicsEvidencePlan": { "$ref": "#/$defs/GraphicsEvidencePlan" },
+    "GraphicsReleaseDashboard": { "$ref": "#/$defs/GraphicsReleaseDashboard" }
   },
   "$defs": {
     "DesignConfig": {
@@ -200,16 +207,22 @@
       ],
       "properties": {
         "impactId": { "type": "string" },
-        "analysisType": { "enum": ["token", "template", "component", "rollout"] },
+        "analysisType": { "enum": ["token", "template", "component", "rollout", "change-set"] },
         "subject": { "type": "object" },
         "affectedModules": { "type": "array", "items": { "type": "object" } },
         "affectedRoutes": { "type": "array", "items": { "type": "string" } },
         "affectedScreens": { "type": "array", "items": { "type": "string" } },
         "affectedBlockFamilies": { "type": "array", "items": { "type": "string" } },
+        "affectedTemplates": { "type": "array", "items": { "type": "string" } },
         "regulatedModulesTouched": { "type": "array", "items": { "type": "string" } },
         "shopfloorModulesTouched": { "type": "array", "items": { "type": "string" } },
         "gatesToRerun": { "type": "array", "items": { "type": "string" } },
         "blockers": { "type": "array", "items": { "type": "object" } },
+        "severityClass": { "enum": ["low", "medium", "high", "regulated", "shopfloor-critical"] },
+        "requiredEvidence": { "type": "array", "items": { "$ref": "#/$defs/GraphicsEvidencePlan" } },
+        "rerunPlan": { "type": "object", "additionalProperties": true },
+        "rolloutScopes": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "changeSetRef": { "type": "string" },
         "machineReadable": { "const": true },
         "recordedAt": { "type": "string" },
         "recordedBy": { "type": "string" },
@@ -230,7 +243,20 @@
         "screens": { "type": "array", "items": { "type": "string" } },
         "blockFamilies": { "type": "array", "items": { "type": "string" } },
         "findings": { "type": "array", "items": { "type": "object" } },
-        "compliant": { "type": "boolean" }
+        "compliant": { "type": "boolean" },
+        "linkageStatus": { "enum": ["full-admin-controlled", "bridged-to-shared-tokens", "legacy-private-css", "blocked"] },
+        "templateBindingSource": { "type": "string" },
+        "sharedTokenCoverage": { "type": "number" },
+        "sharedComponentCoverage": { "type": "number" },
+        "bridgeAliasDebt": { "type": "integer" },
+        "privateCssDebt": { "type": "integer" },
+        "hardcodedStyleDebt": { "type": "integer" },
+        "driftStatus": { "type": "string" },
+        "blockerReason": { "type": "string" },
+        "consumesHmComponents": { "type": "boolean" },
+        "consumesSharedTokens": { "type": "boolean" },
+        "usesPrivateCssShell": { "type": "boolean" },
+        "reason": { "type": "string" }
       }
     },
     "GraphicsDebtReport": {
@@ -295,6 +321,7 @@
       "properties": {
         "expectedVersion": { "type": "string" },
         "impactType": { "enum": ["token", "template", "component", "rollout"] },
+        "scopeMode": { "enum": ["preview-only", "canary-module-group", "canary-domain", "environment-stage", "global-apply"] },
         "scope": { "type": "object", "additionalProperties": true },
         "releaseManifestRefs": {
           "type": "array",
@@ -387,6 +414,88 @@
         "impactAnalysisRef": { "type": "string" },
         "waiversRef": { "type": "string" },
         "rollbackPlanRef": { "type": "string" }
+      }
+    },
+    "GraphicsEvidencePlan": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "evidenceType": { "type": "string" },
+        "required": { "type": ["boolean", "string"] },
+        "owner": { "type": "string" }
+      }
+    },
+    "GraphicsChangeSet": {
+      "type": "object",
+      "required": ["changeSetId", "status", "impact", "rolloutScopePlan", "evidenceChecklist"],
+      "additionalProperties": true,
+      "properties": {
+        "changeSetId": { "type": "string" },
+        "status": { "enum": ["preview-only", "impact-recorded", "draft-saved", "validated", "staged", "publish-blocked", "applied", "rolled-back", "waived"] },
+        "source": { "type": "string" },
+        "edits": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "diffSummary": { "type": "object", "additionalProperties": true },
+        "impact": { "$ref": "#/$defs/GraphicsImpactReport" },
+        "risk": { "type": "object", "additionalProperties": true },
+        "rolloutScopePlan": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "evidenceChecklist": { "type": "array", "items": { "$ref": "#/$defs/GraphicsEvidencePlan" } }
+      }
+    },
+    "ModuleGraphicsLineageGraph": {
+      "type": "object",
+      "required": ["nodes", "edges", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "nodes": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "edges": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "summary": { "type": "object", "additionalProperties": true },
+        "authorityRefs": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "RuntimeGraphicsComplianceBeacon": {
+      "type": "object",
+      "required": ["beacons", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "beacons": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "summary": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "VisualDebtObservatory": {
+      "type": "object",
+      "required": ["byModule", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "byModule": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "byDomain": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "byTeam": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "byRoute": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+        "summary": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "GraphicsEnvironmentPolicyPack": {
+      "type": "object",
+      "required": ["environment", "tokenOverrides", "evidenceObligations"],
+      "additionalProperties": true,
+      "properties": {
+        "environment": { "enum": ["office", "review", "admin", "shopfloor", "kiosk", "tv", "night-shift"] },
+        "tokenOverrides": { "type": "object", "additionalProperties": true },
+        "evidenceObligations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "GraphicsReleaseDashboard": {
+      "type": "object",
+      "required": ["readiness", "blockers", "complianceSummary", "debtSummary", "rolloutSummary"],
+      "additionalProperties": true,
+      "properties": {
+        "readiness": { "enum": ["ready", "blocked", "unknown"] },
+        "blockers": { "type": "object", "additionalProperties": true },
+        "waivers": { "type": "object", "additionalProperties": true },
+        "complianceSummary": { "type": "object", "additionalProperties": true },
+        "debtSummary": { "type": "object", "additionalProperties": true },
+        "rolloutSummary": { "type": "object", "additionalProperties": true },
+        "postApplyVerification": { "type": "object", "additionalProperties": true },
+        "generatedAt": { "type": "string" }
       }
     },
     "GraphicsReleaseManifestRef": {

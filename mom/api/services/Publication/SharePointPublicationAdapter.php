@@ -35,6 +35,11 @@ final class SharePointPublicationAdapter
         $manifest = is_array($evidencePackage['manifest'] ?? null) ? $evidencePackage['manifest'] : [];
         $artifacts = is_array($evidencePackage['artifacts'] ?? null) ? $evidencePackage['artifacts'] : [];
         $snapshot = is_array($artifacts['readable_snapshot'] ?? null) ? $artifacts['readable_snapshot'] : [];
+        $publicationState = is_array($manifest['publication_state'] ?? null) ? $manifest['publication_state'] : [];
+        $authorityRole = strtolower(trim((string)($publicationState['authority_role'] ?? 'read_only_replica')));
+        if ($authorityRole !== 'read_only_replica' || $this->boolValue($publicationState['direct_user_upload'] ?? false)) {
+            throw new RuntimeException('Publication manifest must describe a read-only replica and no direct user upload.');
+        }
 
         $snapshotUri = trim((string)($snapshot['storage_uri'] ?? ''));
         if ($snapshotUri === '') {
@@ -65,7 +70,11 @@ final class SharePointPublicationAdapter
 
     private function boolConfig(string $key): bool
     {
-        $value = $this->targetConfig[$key] ?? false;
+        return $this->boolValue($this->targetConfig[$key] ?? false);
+    }
+
+    private function boolValue(mixed $value): bool
+    {
         if (is_bool($value)) {
             return $value;
         }

@@ -347,6 +347,7 @@ The frontend expects these action contracts to exist:
 - compliance/debt/drift: `admin_graphics_compliance_get`, `admin_graphics_non_compliant_get`, `admin_graphics_debt_get`, `admin_graphics_drift_get`
 - rollout: `admin_graphics_rollout_stage`, `admin_graphics_rollout_apply`, `admin_graphics_rollout_rollback`
 - audit/waiver/blockers: `admin_graphics_audit_history_get`, `admin_graphics_waiver_create`, `admin_graphics_waiver_approve`, `admin_graphics_waiver_expire`, `admin_graphics_waiver_active_get`, `admin_graphics_release_blockers_get`
+- leadership control-plane artifacts: `admin_graphics_change_set_get`, `admin_graphics_lineage_get`, `admin_graphics_runtime_beacon_get`, `admin_graphics_debt_observatory_get`, `admin_graphics_environment_policy_packs_get`, `admin_graphics_release_dashboard_get`
 
 Mutating actions must require optimistic concurrency through `expectedVersion` or `If-Match`.
 
@@ -364,6 +365,19 @@ Any non-compliant module must carry reason text, debt counts and remediation own
 ### Release evidence
 
 Release manifest and evidence bundle must include graphics authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waiver refs, drift report and rollback plan.
+
+### Leadership control-plane artifacts
+
+The backend projection must expose these machine-readable artifacts:
+
+- `GraphicsChangeSet`: grouped graphics edit model with diff, impact, severity, rollout scope and evidence checklist.
+- `ModuleGraphicsLineageGraph`: Admin -> backend -> tokens -> components -> template -> module route/screen lineage.
+- `RuntimeGraphicsComplianceBeacon`: per-module runtime probe for shared token, hm-* component and private CSS linkage.
+- `VisualDebtObservatory`: bridge alias, private CSS, hardcoded style and uncontrolled legacy shell debt by module/domain/team/route.
+- `GraphicsEnvironmentPolicyPack`: office, review, admin, shopfloor, kiosk, TV and night-shift policy packs.
+- `GraphicsReleaseDashboard`: blockers, waivers, drift/debt counts, rollout readiness and post-apply verification obligations.
+
+Impact severity is fixed to `low`, `medium`, `high`, `regulated` and `shopfloor-critical`; evidence and QA rerun gates must be derived from that class.
 
 ## Ownership Model
 

@@ -60,7 +60,16 @@ class DispatchController extends BaseController
         array $originalTargets,
         array $originalEvents,
     ): void {
+        $lockFile = dirname($logFile) . '/dispatch_state.lock';
+        $lockHandle = @fopen($lockFile, 'c');
+        if (!is_resource($lockHandle)) {
+            throw new RuntimeException('dispatch_state_lock_unavailable');
+        }
+
         try {
+            if (!flock($lockHandle, LOCK_EX)) {
+                throw new RuntimeException('dispatch_state_lock_failed');
+            }
             $this->writeJsonFile($logFile, $logs);
             $this->writeJsonFile($targetFile, $targets);
             $this->writeJsonFile($eventFile, $events);
@@ -73,6 +82,9 @@ class DispatchController extends BaseController
                 @error_log('[DispatchController] dispatch state rollback failed: ' . $rollback->getMessage());
             }
             throw $e;
+        } finally {
+            @flock($lockHandle, LOCK_UN);
+            @fclose($lockHandle);
         }
     }
 
@@ -391,29 +403,37 @@ class DispatchController extends BaseController
             $tFile   = $this->dispatchDir() . '/targets.json';
             $targets = $this->readJsonFile($tFile) ?? [];
             $originalTargets = $targets;
-            $target  = null;
+            $target = null;
+            $targetIdx = null;
 
-            foreach ($targets as &$t) {
-                if (($t['target_id'] ?? '') === trim((string)($body['target_id'] ?? ''))) {
-                    $status = (string)($t['status'] ?? 'planned');
-                    if ($status === 'planned' || $status === 'dispatched') {
-                        $t['status']    = 'in_progress';
-                        $t['started_at'] = $t['started_at'] ?? $now;
-                    }
-                    $t['updated_at'] = $now;
+            foreach ($targets as $idx => $t) {
+                if (is_array($t) && ($t['target_id'] ?? '') === trim((string)($body['target_id'] ?? ''))) {
                     $target = $t;
+                    $targetIdx = $idx;
                     break;
                 }
             }
-            unset($t);
 
             if (!$target) $this->error('target_not_found', 404);
-            $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $this->userHasAnyRole($user, $this->dispatchWriteRoles()), [
+            $hasPlannerOverride = $this->userHasAnyRole($user, $this->dispatchWriteRoles());
+            $this->shopfloor()->assertProductionReportGovernance($body, $target, $hasPlannerOverride, $now);
+            $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $hasPlannerOverride, [
                 'action' => 'dispatch.report_production',
                 'request_id' => trim((string)($body['client_report_id'] ?? $body['idempotency_key'] ?? '')),
                 'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
                 'correlation_id' => (string)($target['target_id'] ?? ''),
             ]);
+
+            if ($targetIdx !== null && is_array($targets[$targetIdx] ?? null)) {
+                $status = (string)($target['status'] ?? 'planned');
+                if ($status === 'planned' || $status === 'dispatched') {
+                    $targets[$targetIdx]['status'] = 'in_progress';
+                    $targets[$targetIdx]['started_at'] = $targets[$targetIdx]['started_at'] ?? $now;
+                }
+                $targets[$targetIdx]['updated_at'] = $now;
+                $target = $targets[$targetIdx];
+            }
+
             if (is_array($entitlement)) {
                 $target['execution_entitlement'] = $entitlement;
             }
@@ -502,6 +522,12 @@ class DispatchController extends BaseController
         } catch (RuntimeException $e) {
             if (in_array($e->getMessage(), ['forbidden_operator_assignment', 'missing_operator_assignment'], true)) {
                 $this->error('forbidden', 403);
+            }
+            if (in_array($e->getMessage(), ['correction_override_required', 'backdate_override_required'], true)) {
+                $this->error($e->getMessage(), 403);
+            }
+            if ($e->getMessage() === 'target_not_dispatched') {
+                $this->error('target_not_dispatched', 409);
             }
             if ($e->getMessage() === 'idempotency_conflict') {
                 $this->error('idempotency_conflict', 409);

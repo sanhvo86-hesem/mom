@@ -40,6 +40,8 @@ final class EvidencePackageBuilderTest extends TestCase
         $this->assertArrayHasKey('canonical_payload', $package['artifacts']);
         $this->assertArrayHasKey('readable_snapshot', $package['artifacts']);
         $this->assertArrayHasKey('manifest', $package['artifacts']);
+        $this->assertArrayHasKey('hash_signature_manifest', $package['artifacts']);
+        $this->assertSame($package['artifacts']['manifest'], $package['artifacts']['hash_signature_manifest']);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $package['package_hash_sha256']);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $package['manifest_hash_sha256']);
         $this->assertSame($package['snapshot_hash_sha256'], $package['readable_snapshot_hash_sha256']);

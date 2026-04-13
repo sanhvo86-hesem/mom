@@ -2385,6 +2385,7 @@ function renderTemplateEditor(id){
   if(graphicsSvc() && typeof graphicsSvc().markChange === 'function') graphicsSvc().markChange({ kind:'template-zone', target:tpl.templateId || tpl.id, label:'Template editor selected' }, BASE_TEMPLATE_PRESETS);
   var h = '<div id="adm-graphics-impact-panel" style="margin-bottom:14px">'+renderImpactAnalysisPanel(false)+'</div>';
   h += renderRolloutControls(tpl);
+  h += renderTemplateLineagePanel(tpl);
   h += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><div><div style="font-size:16px;font-weight:800;color:var(--text-primary)">'+esc(T('templateEditor'))+': '+(tpl.templateId || tpl.id)+' '+templateDisplayName(tpl)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+templateStatusChip(tpl)+templateControlBadge(tpl)+statusChip('preview', tpl.sourceAuthority || 'draft cache')+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplPick(\''+tpl.id+'\')">'+T('detail')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'</div></div>';
   h += '<div style="display:grid;grid-template-columns:minmax(320px,40%) 1fr;gap:14px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">';

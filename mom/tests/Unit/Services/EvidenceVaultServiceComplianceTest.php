@@ -69,6 +69,21 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
         $this->assertSame('verified', $mapAction->invoke($service, 'sealed'));
     }
 
+    public function testFileUploadEvidenceFailsClosedWhenTempFileIsMissing(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('evidence_upload_temp_unreadable');
+
+        $service->store([
+            'tmp_name' => $this->tmpDir . '/missing.xlsx',
+            'name' => 'offline.xlsx',
+            'type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'size' => 123,
+        ], ['type' => 'form_upload'], 'operator');
+    }
+
     private function removeTree(string $path): void
     {
         if (!is_dir($path)) {

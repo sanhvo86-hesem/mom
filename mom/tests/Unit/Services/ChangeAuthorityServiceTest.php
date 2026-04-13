@@ -109,7 +109,7 @@ final class ChangeAuthorityServiceTest extends TestCase
                     'status' => 'released',
                     'allowed_effect' => 'amend',
                     'effectivity_rule' => '{}',
-                    'field_scope' => ['fields' => ['wrong_field']],
+                    'affected_fields' => ['wrong_field'],
                     'authority_source' => 'affected_object',
                 ],
                 [
@@ -118,7 +118,7 @@ final class ChangeAuthorityServiceTest extends TestCase
                     'status' => 'released',
                     'allowed_effect' => 'amend',
                     'effectivity_rule' => '{}',
-                    'field_scope' => ['fields' => ['package_metadata']],
+                    'affected_fields' => ['package_metadata'],
                     'authority_source' => 'affected_object',
                 ],
             ],
@@ -152,7 +152,7 @@ final class ChangeAuthorityServiceTest extends TestCase
                 'status' => 'released',
                 'allowed_effect' => 'amend',
                 'effectivity_rule' => '{}',
-                'field_scope' => ['fields' => ['package_metadata']],
+                'affected_fields' => ['package_metadata'],
                 'authority_source' => 'affected_object',
             ]],
         ]);

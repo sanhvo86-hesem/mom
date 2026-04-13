@@ -1589,6 +1589,31 @@ blocked transitions:
 </div>
 </section>
 
+<section class="section" id="graphics-control-plane-leadership-extensions">
+<h2 class="section-title"><span class="section-number">2J</span>Graphics Control Plane Leadership Extensions <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Admin Graphics Control Plane phải quản trị change-set, lineage, runtime proof, debt observability, severity/evidence, rollout scopes, policy packs và release dashboard như backend-authoritative artifacts.</p>
+<div class="card">
+<div class="card-body" style="padding:0">
+<table class="spec-table">
+<thead><tr><th>Capability</th><th>Purpose</th><th>Required fields / allowed states</th><th>Blockers / evidence / release condition</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td><strong>Graphics Change Set</strong></td><td>Group token/template/component edits into one controlled unit with diff, impact, risk and rollout scope.</td><td><code>changeSetId</code>, edits, diffSummary, <code>GraphicsImpactReport</code>, severity, rolloutScopePlan, evidenceChecklist. States: preview-only, impact-recorded, draft-saved, validated, staged, publish-blocked, applied, rolled-back, waived.</td><td>No publish/apply unless change set has backend impact ID, evidence checklist and rollback plan.</td><td>Frontend Platform + Release Engineering</td></tr>
+<tr><td><strong>Module Graphics Lineage Graph</strong></td><td>Visualize Admin setting -> token -> component contract -> template -> modules -> routes/screens.</td><td>nodes, edges, relation, authorityRefs, template lineage, module route/domain/team.</td><td>Missing edge from module to controlled template or shared component becomes drift evidence and may create release blocker.</td><td>Design System Governance</td></tr>
+<tr><td><strong>Runtime Compliance Beacon</strong></td><td>Each module reports actual shared-token, hm-* component and private-CSS linkage at runtime.</td><td>moduleId, route, linkageStatus, sharedTokenProbe, hmComponentProbe, privateCssProbe, beaconStatus, reportedAt.</td><td>New or major-refactor module cannot release when beacon status is blocked unless waiver is approved and unexpired.</td><td>Runtime Governance</td></tr>
+<tr><td><strong>Visual Debt Observatory</strong></td><td>Track bridge alias debt, private CSS debt, hardcoded selector/style debt and uncontrolled legacy shell debt by module/domain/team/route.</td><td>byModule, byDomain, byTeam, byRoute, debtScore, linkageStatus, debt dimensions.</td><td>Debt must carry reason/owner/remediation date; uncontrolled legacy shell debt blocks new release.</td><td>Module Owner + Frontend Platform</td></tr>
+<tr><td><strong>Impact Severity Engine</strong></td><td>Classify graphics changes as low, medium, high, regulated or shopfloor-critical.</td><td>severityClass, requiredEvidence, rerunPlan, affected templates/modules/routes/screens/block families.</td><td>Evidence and rerun gates scale with severity; regulated/shopfloor-critical require explicit QA and rollback proof.</td><td>QA Governance</td></tr>
+<tr><td><strong>Rollout Scopes</strong></td><td>Control preview-only, canary by module group, canary by domain, stage by environment, global apply and governed rollback.</td><td>scope.mode: preview-only, canary-module-group, canary-domain, environment-stage, global-apply; selected environment/module/domain; releaseManifestRefs.</td><td>Global apply blocked by unresolved blockers, stale ETag, missing release refs or missing rollback snapshot.</td><td>Release Engineering</td></tr>
+<tr><td><strong>Evidence Orchestration</strong></td><td>Generate per-change-set evidence checklist, screenshot diff requirements and QA rerun plan from impact result.</td><td>impact-snapshot, screenshot-diff, keyboard-focus-proof, compliance snapshot, drift report, audit-traceability pack, shopfloor smoke proof.</td><td>Checklist completion required before stage/apply according to severity.</td><td>QA + Evidence Owner</td></tr>
+<tr><td><strong>Template Lineage</strong></td><td>Track inheritance/version lineage, deprecation windows and migration plan requirements.</td><td>templateId, version, parentTemplateId, supersedesVersion, deprecationWindow, migrationPlanRefs.</td><td>Deprecating a governed template without migration plan blocks publish/apply.</td><td>Design System Governance</td></tr>
+<tr><td><strong>Environment Policy Packs</strong></td><td>Define environment-specific token overrides and evidence obligations.</td><td>office, review, admin, shopfloor, kiosk, TV, night-shift packs with tokenOverrides and evidenceObligations.</td><td>Environment-stage rollout must name a policy pack and satisfy its evidence obligations.</td><td>Runtime Governance + Operations</td></tr>
+<tr><td><strong>Graphics Release Dashboard</strong></td><td>Show blockers, waivers, drift counts, affected modules, rollout readiness and post-apply verification.</td><td>readiness, blockers, waivers, complianceSummary, debtSummary, rolloutSummary, postApplyVerification.</td><td>Release manifest and evidence bundle must reference dashboard snapshot for high/regulatory/shopfloor changes.</td><td>Release Engineering</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="info-box info-box-red"><strong>Derivative artifacts.</strong> Backend projection must include <code>changeSetModel</code>, <code>moduleGraphicsLineageGraph</code>, <code>runtimeGraphicsComplianceBeacon</code>, <code>visualDebtObservatory</code>, <code>environmentPolicyPacks</code> and <code>graphicsReleaseDashboard</code>. Browser localStorage may never become authority for any of these artifacts.</div>
+</section>
+
 <section class="section" id="standards">
 <h2 class="section-title"><span class="section-number">3</span>Quy chuẩn đồ họa <span class="chip" style="margin-left:12px;font-size:0.625rem;vertical-align:middle;background:var(--bg-surface-alt);color:var(--text-secondary)">REFERENCE</span></h2>
 <p class="section-subtitle">Bộ quy tắc bắt buộc cho toàn bộ đồ họa phần mềm. Tham khảo SAP Fiori, Material 3, Atlassian, IBM Carbon, Ant Design.</p>

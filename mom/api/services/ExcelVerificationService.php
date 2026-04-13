@@ -108,9 +108,6 @@ final class ExcelVerificationService
     /** System origin identifier. */
     private const SYSTEM_ORIGIN = 'HESEM-MOM-v3';
 
-    /** Sheet visibility constant for xlVeryHidden. */
-    private const VISIBILITY_VERY_HIDDEN = 'xlVeryHidden';
-
     /** Default server salt fallback. */
     private const DEFAULT_SALT = 'HESEM-MOM-2026-SALT-KEY';
 
@@ -762,7 +759,7 @@ final class ExcelVerificationService
             'issued_to_user'           => $userId,
             'issued_at'                => $timestamp,
             'receipt_status'           => 'allocated',
-            'receipt_version'          => 0,
+            'receipt_version'          => 1,
             'master_context_json'      => '{}',
             'receipt_history_json'     => '[]',
             'latest_stored_filename'   => '',
@@ -871,7 +868,7 @@ final class ExcelVerificationService
             return match ($type) {
                 'number', 'integer' => 0,
                 'boolean'           => false,
-                'json'              => $type === 'json' ? '{}' : '',
+                'json'              => '{}',
                 default             => '',
             };
         }

@@ -154,6 +154,12 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
             "complianceMatrixVersion": "",
             "templateRegistryVersion": "",
             "templateRegistryChecksum": "",
+            "changeSetPresent": False,
+            "lineageGraphPresent": False,
+            "runtimeBeaconPresent": False,
+            "debtObservatoryPresent": False,
+            "environmentPolicyPacksPresent": False,
+            "releaseDashboardPresent": False,
         }
 
     template_registry = graphics_governance.get("templateRegistry", {})
@@ -183,8 +189,14 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
         "releaseBlockerCount": blocker_count,
         "releaseBlocked": blocker_count > 0,
         "complianceMatrixVersion": scalar(compliance.get("version")) if isinstance(compliance, dict) else "",
-        "templateRegistryVersion": scalar(template_meta.get("version") or template_meta.get("governanceRevision")),
-        "templateRegistryChecksum": scalar(template_meta.get("checksum") or graphics_governance.get("_meta", {}).get("sourceHash")),
+        "templateRegistryVersion": scalar(template_registry.get("version") or template_meta.get("version") or template_meta.get("governanceRevision")),
+        "templateRegistryChecksum": scalar(template_registry.get("etag") or template_meta.get("checksum") or graphics_governance.get("_meta", {}).get("sourceHash")),
+        "changeSetPresent": isinstance(graphics_governance.get("changeSetModel"), dict),
+        "lineageGraphPresent": isinstance(graphics_governance.get("moduleGraphicsLineageGraph"), dict),
+        "runtimeBeaconPresent": isinstance(graphics_governance.get("runtimeGraphicsComplianceBeacon"), dict),
+        "debtObservatoryPresent": isinstance(graphics_governance.get("visualDebtObservatory"), dict),
+        "environmentPolicyPacksPresent": isinstance(graphics_governance.get("environmentPolicyPacks"), dict),
+        "releaseDashboardPresent": isinstance(graphics_governance.get("graphicsReleaseDashboard"), dict),
     }
 
 
@@ -578,6 +590,12 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "templateRegistryVersion": graphics_summary["templateRegistryVersion"],
             "templateRegistryChecksum": graphics_summary["templateRegistryChecksum"],
             "complianceMatrixRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsCompliance" if graphics_governance else "",
+            "changeSetRef": source_path(GRAPHICS_GOVERNANCE) + "#/changeSetModel" if graphics_summary["changeSetPresent"] else "",
+            "lineageGraphRef": source_path(GRAPHICS_GOVERNANCE) + "#/moduleGraphicsLineageGraph" if graphics_summary["lineageGraphPresent"] else "",
+            "runtimeBeaconRef": source_path(GRAPHICS_GOVERNANCE) + "#/runtimeGraphicsComplianceBeacon" if graphics_summary["runtimeBeaconPresent"] else "",
+            "debtObservatoryRef": source_path(GRAPHICS_GOVERNANCE) + "#/visualDebtObservatory" if graphics_summary["debtObservatoryPresent"] else "",
+            "environmentPolicyPacksRef": source_path(GRAPHICS_GOVERNANCE) + "#/environmentPolicyPacks" if graphics_summary["environmentPolicyPacksPresent"] else "",
+            "releaseDashboardRef": source_path(GRAPHICS_GOVERNANCE) + "#/graphicsReleaseDashboard" if graphics_summary["releaseDashboardPresent"] else "",
             "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
             "releaseBlocked": graphics_summary["releaseBlocked"],
         },

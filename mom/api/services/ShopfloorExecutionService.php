@@ -36,6 +36,12 @@ final class ShopfloorExecutionService
     /** @var list<string> */
     private const COMPLETION_INTENTS = ['none', 'complete_shift', 'complete_target'];
 
+    /** @var list<string> */
+    private const EXECUTION_EVENT_TYPES = ['progress', 'downtime', 'blocked', 'pause', 'resume', 'correction', 'completion'];
+
+    private const BACKDATE_GRACE_DAYS = 2;
+    private const FUTURE_TIMESTAMP_TOLERANCE_SECONDS = 900;
+
     private readonly string $dataDir;
     private ?ManufacturingEventBackboneService $eventBackbone;
     private ?ConnectedGovernanceService $connectedGovernance;
@@ -244,6 +250,31 @@ final class ShopfloorExecutionService
     }
 
     /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     */
+    public function assertProductionReportGovernance(array $body, array $target, bool $hasPlannerOverride, string $now): void
+    {
+        $status = strtolower($this->stringValue($target['status'] ?? 'planned'));
+        $reportMode = $this->normalizeReportMode($body['report_mode'] ?? 'snapshot');
+
+        if ($status === 'cancelled') {
+            throw new InvalidArgumentException('target_cancelled');
+        }
+        if ($status === 'planned' && !$hasPlannerOverride) {
+            throw new RuntimeException('target_not_dispatched');
+        }
+        if ($status === 'completed' && $reportMode !== 'correction') {
+            throw new InvalidArgumentException('completed_target_requires_correction');
+        }
+        if ($reportMode === 'correction' && !$hasPlannerOverride) {
+            throw new RuntimeException('correction_override_required');
+        }
+
+        $this->assertReportTimestampGovernance($body, $target, $hasPlannerOverride, $now);
+    }
+
+    /**
      * @param array<string, mixed>      $body
      * @param array<string, mixed>      $target
      * @param array<string, mixed>|null $existingLog
@@ -288,9 +319,28 @@ final class ShopfloorExecutionService
 
         $notes = $this->stringValue($body['notes'] ?? '');
         $issuesText = $this->stringValue($body['issues_encountered'] ?? $body['issue_notes'] ?? '');
+        $executionEventType = $this->executionEventType($body, $reportMode, $completionIntent, $reasonPayload);
+        $resumedFromEventId = $this->stringValue($body['resumed_from_event_id'] ?? '');
+        if ($executionEventType === 'pause' && $reasonPayload['reason_codes']['downtime'] === [] && $reasonPayload['reason_codes']['blocking'] === []) {
+            throw new InvalidArgumentException('pause_requires_reason_code');
+        }
+        if ($executionEventType === 'blocked' && $reasonPayload['reason_codes']['blocking'] === []) {
+            throw new InvalidArgumentException('blocked_report_requires_reason_code');
+        }
+        if ($executionEventType === 'resume' && $resumedFromEventId === '' && $notes === '' && $issuesText === '') {
+            throw new InvalidArgumentException('resume_requires_context');
+        }
+
         $quantityTotal = $quantityGood + $quantityNg + $quantityRework;
         $totalActualMinutes = $actualSetup + $actualRun + $actualIdle;
-        if ($quantityTotal === 0 && $totalActualMinutes <= 0.0 && $notes === '' && $issuesText === '' && $reasonPayload['has_issue_context'] === false) {
+        if (
+            $quantityTotal === 0
+            && $totalActualMinutes <= 0.0
+            && $notes === ''
+            && $issuesText === ''
+            && $reasonPayload['has_issue_context'] === false
+            && !in_array($executionEventType, ['resume'], true)
+        ) {
             throw new InvalidArgumentException('empty_production_report');
         }
 
@@ -350,14 +400,17 @@ final class ShopfloorExecutionService
             'ng_details' => $reasonPayload['ng_details'],
             'rework_details' => $reasonPayload['rework_details'],
             'blocking_issues' => $reasonPayload['blocking_issues'],
+            'reference_validation' => is_array($target['reference_validation'] ?? null) ? $target['reference_validation'] : null,
             'notes' => $notes,
             'issues_encountered' => $issuesText,
-            'offline_created' => (bool)($body['offline_created'] ?? false),
+            'offline_created' => $this->truthy($body['offline_created'] ?? false),
             'sync_status' => 'synced',
             'device_id' => $this->stringValue($body['device_id'] ?? ''),
             'client_report_id' => $this->stringValue($body['client_report_id'] ?? ''),
             'idempotency_key' => $this->stringValue($body['idempotency_key'] ?? ''),
             'execution_entitlement' => is_array($target['execution_entitlement'] ?? null) ? $target['execution_entitlement'] : null,
+            'execution_event_type' => $executionEventType,
+            'resumed_from_event_id' => $resumedFromEventId,
             'report_mode' => $reportMode,
             'completion_intent' => $completionIntent,
             'correction_reason' => $correctionReason,
@@ -373,6 +426,14 @@ final class ShopfloorExecutionService
 
         if ($log['log_id'] === '') {
             $log['log_id'] = 'LOG-' . bin2hex(random_bytes(8));
+        }
+        if ($log['offline_created'] === true) {
+            if ((string)$log['idempotency_key'] === '') {
+                throw new InvalidArgumentException('offline_report_requires_idempotency_key');
+            }
+            if ((string)$log['client_report_id'] === '') {
+                throw new InvalidArgumentException('offline_report_requires_client_report_id');
+            }
         }
         $log['created_at'] = is_array($existingLog) ? (string)($existingLog['created_at'] ?? $now) : $now;
         $log['report_fingerprint'] = $this->productionReportFingerprint($log);
@@ -460,6 +521,12 @@ final class ShopfloorExecutionService
     public function buildProductionReportEvent(array $log, array $target, ?array $previousLog, string $actorId, string $now): array
     {
         $previousFingerprint = is_array($previousLog) ? $this->stringValue($previousLog['report_fingerprint'] ?? '') : '';
+        $previousGood = is_array($previousLog) ? (int)($previousLog['quantity_good'] ?? 0) : 0;
+        $previousNg = is_array($previousLog) ? (int)($previousLog['quantity_ng'] ?? 0) : 0;
+        $previousRework = is_array($previousLog) ? (int)($previousLog['quantity_rework'] ?? 0) : 0;
+        $previousSetup = is_array($previousLog) ? (float)($previousLog['actual_setup_minutes'] ?? 0) : 0.0;
+        $previousRun = is_array($previousLog) ? (float)($previousLog['actual_run_minutes'] ?? 0) : 0.0;
+        $previousIdle = is_array($previousLog) ? (float)($previousLog['actual_idle_minutes'] ?? 0) : 0.0;
 
         return [
             'event_id' => 'PRE-' . bin2hex(random_bytes(8)),
@@ -467,6 +534,7 @@ final class ShopfloorExecutionService
             'event_schema_version' => 'phase1_shopfloor_execution_event.v1',
             'target_id' => (string)($log['target_id'] ?? ''),
             'log_id' => (string)($log['log_id'] ?? ''),
+            'execution_event_type' => (string)($log['execution_event_type'] ?? 'progress'),
             'report_mode' => (string)($log['report_mode'] ?? 'snapshot'),
             'completion_intent' => (string)($log['completion_intent'] ?? 'none'),
             'idempotency_key' => (string)($log['idempotency_key'] ?? ''),
@@ -506,14 +574,14 @@ final class ShopfloorExecutionService
                 'traveler_number' => (string)($log['traveler_number'] ?? ''),
             ],
             'quantity_delta' => [
-                'good' => (int)($log['quantity_good'] ?? 0) - (int)($previousLog['quantity_good'] ?? 0),
-                'ng' => (int)($log['quantity_ng'] ?? 0) - (int)($previousLog['quantity_ng'] ?? 0),
-                'rework' => (int)($log['quantity_rework'] ?? 0) - (int)($previousLog['quantity_rework'] ?? 0),
+                'good' => (int)($log['quantity_good'] ?? 0) - $previousGood,
+                'ng' => (int)($log['quantity_ng'] ?? 0) - $previousNg,
+                'rework' => (int)($log['quantity_rework'] ?? 0) - $previousRework,
             ],
             'time_delta_minutes' => [
-                'setup' => round((float)($log['actual_setup_minutes'] ?? 0) - (float)($previousLog['actual_setup_minutes'] ?? 0), 2),
-                'run' => round((float)($log['actual_run_minutes'] ?? 0) - (float)($previousLog['actual_run_minutes'] ?? 0), 2),
-                'idle' => round((float)($log['actual_idle_minutes'] ?? 0) - (float)($previousLog['actual_idle_minutes'] ?? 0), 2),
+                'setup' => round((float)($log['actual_setup_minutes'] ?? 0) - $previousSetup, 2),
+                'run' => round((float)($log['actual_run_minutes'] ?? 0) - $previousRun, 2),
+                'idle' => round((float)($log['actual_idle_minutes'] ?? 0) - $previousIdle, 2),
             ],
             'production_log' => $log,
         ];
@@ -615,6 +683,7 @@ final class ShopfloorExecutionService
             'setup_sheet_id' => (string)($target['setup_sheet_id'] ?? ''),
             'setup_sheet_revision' => (string)($target['setup_sheet_revision'] ?? ''),
             'inspection_plan_id' => (string)($target['inspection_plan_id'] ?? ''),
+            'reference_validation' => is_array($target['reference_validation'] ?? null) ? $target['reference_validation'] : null,
             'report_count' => (int)($log['report_count'] ?? 0),
             'notes' => (string)($target['notes'] ?? ''),
         ];
@@ -711,6 +780,12 @@ final class ShopfloorExecutionService
         if (($target['item_id'] ?? '') === '' && ($target['part_number'] ?? '') !== '') {
             $target['item_id'] = (string)$target['part_number'];
         }
+        $warnings = $this->digitalThreadReferenceWarnings($target);
+        $target['reference_validation'] = [
+            'status' => $warnings === [] ? 'ok' : 'warning',
+            'warnings' => $warnings,
+            'source' => 'phase1_dispatch_reference_guard',
+        ];
 
         return $target;
     }
@@ -961,6 +1036,12 @@ final class ShopfloorExecutionService
         if ((float)($log['actual_run_minutes'] ?? 0) <= 0.0 && (int)($log['quantity_total'] ?? 0) > 0) {
             $flags[] = 'missing_actual_run_time';
         }
+        $referenceValidation = is_array($log['reference_validation'] ?? null) ? $log['reference_validation'] : [];
+        foreach ((array)($referenceValidation['warnings'] ?? []) as $warning) {
+            if (is_string($warning) && $warning !== '') {
+                $flags[] = $warning;
+            }
+        }
 
         $achievement = (float)($log['achievement_pct'] ?? 0.0);
         $ngRate = (float)($log['ng_rate_pct'] ?? 0.0);
@@ -983,6 +1064,7 @@ final class ShopfloorExecutionService
                 'work_center_id' => (string)($log['work_center_id'] ?? ''),
                 'shift_date' => (string)($log['shift_date'] ?? ''),
                 'shift_code' => (string)($log['shift_code'] ?? ''),
+                'execution_event_type' => (string)($log['execution_event_type'] ?? 'progress'),
                 'target_quantity' => (int)($log['target_quantity'] ?? 0),
                 'quantity_total' => (int)($log['quantity_total'] ?? 0),
                 'quantity_good' => (int)($log['quantity_good'] ?? 0),
@@ -1078,6 +1160,8 @@ final class ShopfloorExecutionService
             'client_report_id',
             'report_mode',
             'completion_intent',
+            'execution_event_type',
+            'resumed_from_event_id',
             'correction_reason',
             'overproduction_reason',
         ];
@@ -1138,6 +1222,81 @@ final class ShopfloorExecutionService
         }
 
         return $intent;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $reasonPayload
+     */
+    private function executionEventType(array $body, string $reportMode, string $completionIntent, array $reasonPayload): string
+    {
+        $explicit = $this->stringValue($body['execution_event_type'] ?? $body['event_type'] ?? '');
+        if ($explicit !== '') {
+            $eventType = strtolower($explicit);
+            if (!in_array($eventType, self::EXECUTION_EVENT_TYPES, true)) {
+                throw new InvalidArgumentException('invalid_execution_event_type');
+            }
+            if ($eventType === 'correction' && $reportMode !== 'correction') {
+                throw new InvalidArgumentException('correction_event_requires_report_mode');
+            }
+            if ($eventType === 'completion' && $completionIntent === 'none') {
+                throw new InvalidArgumentException('completion_event_requires_completion_intent');
+            }
+
+            return $eventType;
+        }
+
+        if ($reportMode === 'correction') {
+            return 'correction';
+        }
+        if ($completionIntent !== 'none') {
+            return 'completion';
+        }
+        if (($reasonPayload['reason_codes']['blocking'] ?? []) !== []) {
+            return 'blocked';
+        }
+        if (($reasonPayload['reason_codes']['downtime'] ?? []) !== []) {
+            return 'downtime';
+        }
+
+        return 'progress';
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     */
+    private function assertReportTimestampGovernance(array $body, array $target, bool $hasPlannerOverride, string $now): void
+    {
+        $nowAt = $this->timestamp($now, 'now');
+        $shiftDate = $this->normalizeDate($target['shift_date'] ?? null, 'shift_date');
+        $shiftCode = strtolower($this->stringValue($target['shift_code'] ?? 'morning'));
+        $shiftDateAt = new \DateTimeImmutable($shiftDate . 'T00:00:00+00:00');
+        $nowDateAt = new \DateTimeImmutable($nowAt->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d') . 'T00:00:00+00:00');
+
+        if (!$hasPlannerOverride && $nowDateAt > $shiftDateAt->modify('+' . self::BACKDATE_GRACE_DAYS . ' days')) {
+            throw new RuntimeException('backdate_override_required');
+        }
+
+        $allowedDates = [$shiftDate];
+        if ($shiftCode === 'night') {
+            $allowedDates[] = $shiftDateAt->modify('+1 day')->format('Y-m-d');
+        }
+
+        foreach (['actual_start', 'actual_end'] as $field) {
+            if (!array_key_exists($field, $body) || $this->stringValue($body[$field]) === '') {
+                continue;
+            }
+
+            $value = $this->optionalTimestampString($body[$field], $field);
+            $timestamp = $this->timestamp($value, $field);
+            if ($timestamp->getTimestamp() > $nowAt->getTimestamp() + self::FUTURE_TIMESTAMP_TOLERANCE_SECONDS) {
+                throw new InvalidArgumentException('future_actual_timestamp');
+            }
+            if (!in_array($timestamp->format('Y-m-d'), $allowedDates, true)) {
+                throw new InvalidArgumentException('actual_timestamp_outside_shift');
+            }
+        }
     }
 
     private function truthy(mixed $value): bool
@@ -1263,6 +1422,55 @@ final class ShopfloorExecutionService
 
         $decoded = json_decode($raw, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     * @return list<string>
+     */
+    private function digitalThreadReferenceWarnings(array $target): array
+    {
+        $warnings = [];
+        $cncProgramId = $this->stringValue($target['cnc_program_id'] ?? '');
+        if ($cncProgramId !== '' && !$this->cncProgramKnown($cncProgramId)) {
+            $warnings[] = 'unverified_cnc_program_reference';
+        }
+        if ($this->stringValue($target['inspection_plan_id'] ?? '') === '') {
+            $warnings[] = 'missing_inspection_plan_reference';
+        }
+
+        return $warnings;
+    }
+
+    private function cncProgramKnown(string $programId): bool
+    {
+        $file = $this->dataDir . '/cnc-programs/programs.json';
+        if (!is_file($file)) {
+            return true;
+        }
+
+        $raw = @file_get_contents($file);
+        if (!is_string($raw) || trim($raw) === '') {
+            return true;
+        }
+
+        $programs = json_decode($raw, true);
+        if (!is_array($programs) || $programs === []) {
+            return true;
+        }
+
+        foreach ($programs as $program) {
+            if (!is_array($program)) {
+                continue;
+            }
+            foreach (['id', 'program_id', 'cnc_program_id', 'nc_program_id', 'name'] as $field) {
+                if ($this->stringValue($program[$field] ?? '') === $programId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1519,6 +1727,15 @@ final class ShopfloorExecutionService
             throw new InvalidArgumentException('invalid_' . str_replace('.', '_', $field));
         }
         return $text;
+    }
+
+    private function timestamp(string $value, string $field): \DateTimeImmutable
+    {
+        try {
+            return new \DateTimeImmutable($value);
+        } catch (Throwable) {
+            throw new InvalidArgumentException('invalid_' . str_replace('.', '_', $field));
+        }
     }
 
     private function assertTimestampOrder(string $start, string $end): void

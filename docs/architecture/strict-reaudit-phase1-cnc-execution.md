@@ -39,12 +39,16 @@ The least-risk path is a staged bridge:
 2. Keep `targets.json` and `production_logs.json` as live compatibility stores.
 3. Add append-only production report event history beside the snapshot.
 4. Use event history for idempotency replay after later snapshot updates.
-5. Append canonical manufacturing events as read-model projections only.
-6. Defer DB authority migration until `shift_targets`, `shift_production_log`, and `mes_operational_event_ledger` can be migrated with controlled backfill and reconciliation.
+5. Serialize the file-backed target/snapshot/event update under a dispatch state lock to reduce concurrent write races while DB authority is staged.
+6. Add explicit report governance for planned/completed target lifecycle, correction override, backdate override, future timestamps, offline replay identifiers, and pause/resume event markers.
+7. Add lightweight CNC digital-thread reference warnings without blocking manual Phase 1 dispatch.
+8. Append canonical manufacturing events as read-model projections only.
+9. Defer DB authority migration until `shift_targets`, `shift_production_log`, and `mes_operational_event_ledger` can be migrated with controlled backfill and reconciliation.
 
 ## Deferred Items
 
-- Real DB transaction boundaries across dispatch target, snapshot, and event history.
-- Full pause/resume command semantics.
-- Full route/operation/inspection-plan referential enforcement against DB tables.
+- Real DB transaction boundaries across dispatch target, snapshot, and event history; the current file lock is a compatibility-stage race guard only.
+- Dedicated pause/resume command endpoints and state-machine transitions; current support is event-ledger capture without a separate command abstraction.
+- Full route/operation/inspection-plan referential enforcement against DB tables; current support is enrichment plus warning-level validation.
 - Full MTConnect/OPC-UA ingestion. Phase 1 only preserves stable machine/equipment and timestamp semantics for later ingestion.
+- Repository-wide PHPStan closure remains outside this scoped shopfloor patch; focused changed-file analysis is clean while unrelated existing debt remains.

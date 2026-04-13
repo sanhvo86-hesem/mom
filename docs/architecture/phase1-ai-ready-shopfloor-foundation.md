@@ -98,6 +98,7 @@ Validation:
 - Quantity and time assumptions cannot be negative.
 - `setup_time_minutes` cannot exceed `shift_duration_minutes`.
 - When `data/orders/orders.json` has a matching work order, missing dispatch fields such as JO, operation, work center, operator, CNC program, setup estimates, traveler, and material lot are filled from the existing order source of truth. Dispatch does not create another work-order model.
+- Dispatch target responses include `reference_validation` warnings for lightweight CNC digital-thread checks, such as an unverified CNC program reference or missing inspection plan. These warnings do not block Phase 1 manual dispatch because canonical DB referential authority is still staged.
 
 Legacy portal aliases are accepted on input for compatibility: `wo_id`, `target_date`, `shift`, `cycle_time`, `setup_time`, `shift_duration`, and `target_qty`. They are normalized into canonical storage fields. Read responses include those legacy aliases as response-only compatibility fields so existing dispatch screens keep working without making aliases a second source of truth.
 
@@ -168,6 +169,7 @@ AI-ready structured payload:
       "notes": "Material cart arrived late."
     }
   ],
+  "execution_event_type": "progress",
   "completion_intent": "complete_target",
   "report_mode": "snapshot",
   "client_report_id": "tablet-7-shift-20260413-001",
@@ -189,9 +191,16 @@ Validation:
 - Downtime reason codes are rejected unless downtime/idle minutes are also supplied or derived from a downtime event.
 - Blank downtime rows are ignored; non-empty downtime rows require a known reason code.
 - A target with no assigned operator cannot be reported by a normal operator; planner/manager roles are treated as explicit override actors.
+- A normal operator cannot report a `planned` target directly; it must be dispatched first. Planner/manager override can submit explicitly when needed.
+- A `completed` target only accepts `report_mode: "correction"`.
+- Corrections require planner/manager override, an existing report, and `correction_reason`.
+- Backdated reports outside the configured two-day grace window require planner/manager override.
+- Explicit `actual_start` and `actual_end` cannot be future-dated beyond the clock-skew tolerance and must fall on the target `shift_date`; `night` shift also permits the next calendar date.
 - `report_mode` defaults to `snapshot`; `correction` requires an existing report and `correction_reason`.
+- `execution_event_type` may be `progress`, `downtime`, `blocked`, `pause`, `resume`, `correction`, or `completion`. Pause/blocker events require governed downtime or blocking reason context; resume events require a prior event reference or operator context note.
 - Over-target good quantity requires `overproduction_reason`.
 - Target completion is no longer inferred from quantity alone. Completion requires `completion_intent` or `complete_target: true`, good quantity at least target quantity, and `actual_end`.
+- `offline_created: true` requires both `idempotency_key` and `client_report_id` so tablet/offline sync cannot create ambiguous duplicate facts.
 
 Legacy `ng_details` rows using `{ "type": "dimensional", "qty": 2 }` are accepted when `type` resolves to an active `defect_catalog.defect_group`, `defect_name`, or `defect_code`; the stored log still uses canonical `defect_code` and `quantity`. The seeded CNC defect catalog covers the existing dispatch UI groups: `dimensional`, `surface`, `material`, `visual`, `burr`, `thread`, `fod`, and `other`.
 
@@ -211,3 +220,5 @@ This field is not execution authority and must not drive autonomous schedule cha
 ## Storage Notes
 
 The schema already has DB-backed equivalents in migrations such as `043_production_dispatch_shift_targets.sql`, `076_canonical_mes_execution_spine.sql`, and `098_canonical_manufacturing_event_backbone.sql`. This Phase 1 implementation keeps file-backed dispatch as the compatibility authority and uses the existing manufacturing event backbone as a read-model bridge only. Production report writes update `production_report_events.json`, `production_logs.json`, and `targets.json` together with best-effort rollback if any atomic file write fails; this is not a replacement for a future database transaction boundary. A later migration can shadow-write dispatch files into `shift_targets`, `shift_production_log`, and the canonical MES event ledger without changing operator contracts.
+
+The file-backed write path now uses a dispatch state lock before updating the event history, snapshot, and target state. This reduces concurrent writer races for 50+ machine shift reporting, but it remains a compatibility-stage guard rather than a substitute for a database transaction.

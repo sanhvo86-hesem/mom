@@ -34,6 +34,25 @@ final class DomainOutboxWorkerTest extends TestCase
         $this->assertSame('failed', $failedMark['params'][':status']);
         $this->assertSame(5, $failedMark['params'][':max_attempts']);
     }
+
+    public function testMissingHandlerFailsInsteadOfDroppingEventAsDone(): void
+    {
+        $db = new DomainOutboxWorkerFakeDb([
+            [
+                'domain_outbox_event_id' => '00000000-0000-0000-0000-000000000002',
+                'event_type' => 'NoHandlerRegistered',
+                'attempts' => 0,
+            ],
+        ]);
+        $worker = new DomainOutboxWorker($db, []);
+
+        $result = $worker->runOnce(1);
+
+        $this->assertSame(['processed' => 0, 'failed' => 1, 'dead_letter' => 0], $result);
+        $this->assertCount(2, $db->executeCalls);
+        $this->assertSame('failed', $db->executeCalls[1]['params'][':status']);
+        $this->assertSame('outbox_handler_missing:NoHandlerRegistered', $db->executeCalls[1]['params'][':error_message']);
+    }
 }
 
 final class DomainOutboxWorkerFakeDb

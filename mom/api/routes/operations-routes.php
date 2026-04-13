@@ -265,6 +265,16 @@ return static function (Router $router, string $dataDir): void {
         'connected_governance_enterprise_rollout' => [ConnectedGovernanceController::class, 'enterpriseRollout'],
         'connected_governance_blockers' => [ConnectedGovernanceController::class, 'blockers'],
         'connected_governance_probe' => [ConnectedGovernanceController::class, 'probe'],
+        'planning_scenario_calculate' => [PlanningScenarioController::class, 'calculate'],
+        'planning_scenario_detail' => [PlanningScenarioController::class, 'detail'],
+        'planning_scenario_feasibility' => [PlanningScenarioController::class, 'feasibility'],
+        'planning_scenario_capacity' => [PlanningScenarioController::class, 'capacityLoad'],
+        'planning_scenario_approve' => [PlanningScenarioController::class, 'approve'],
+        'planning_scenario_publish' => [PlanningScenarioController::class, 'publish'],
+        'planning_dispatch_readiness' => [PlanningScenarioController::class, 'dispatchReadiness'],
+        'planning_replanning_signal_create' => [PlanningScenarioController::class, 'recordSignal'],
+        'planning_replanning_signals' => [PlanningScenarioController::class, 'replanningSignals'],
+        'planning_scenario_probe' => [PlanningScenarioController::class, 'probe'],
     ]);
     $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
     $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
@@ -285,6 +295,16 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/connected-governance/enterprise-rollout', ConnectedGovernanceController::class, 'enterpriseRollout');
     $router->get('/api/connected-governance/blockers', ConnectedGovernanceController::class, 'blockers');
     $router->get('/api/connected-governance/probe', ConnectedGovernanceController::class, 'probe');
+    $router->post('/api/planning/scenarios/calculate', PlanningScenarioController::class, 'calculate');
+    $router->get('/api/planning/scenarios/detail', PlanningScenarioController::class, 'detail');
+    $router->get('/api/planning/scenarios/feasibility', PlanningScenarioController::class, 'feasibility');
+    $router->get('/api/planning/scenarios/capacity-load', PlanningScenarioController::class, 'capacityLoad');
+    $router->post('/api/planning/scenarios/approve', PlanningScenarioController::class, 'approve');
+    $router->post('/api/planning/scenarios/publish', PlanningScenarioController::class, 'publish');
+    $router->get('/api/planning/dispatch-readiness', PlanningScenarioController::class, 'dispatchReadiness');
+    $router->post('/api/planning/replanning-signals', PlanningScenarioController::class, 'recordSignal');
+    $router->get('/api/planning/replanning-signals', PlanningScenarioController::class, 'replanningSignals');
+    $router->get('/api/planning/scenarios/probe', PlanningScenarioController::class, 'probe');
     
     // AI Quality Scheduling
     $router->actions([

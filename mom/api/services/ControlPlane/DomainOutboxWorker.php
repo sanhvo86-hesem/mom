@@ -55,9 +55,10 @@ final class DomainOutboxWorker
             try {
                 $this->mark($id, 'processing', null);
                 $handler = $this->handlers[$eventType] ?? null;
-                if (is_callable($handler)) {
-                    $handler($row);
+                if (!is_callable($handler)) {
+                    throw new \RuntimeException('outbox_handler_missing:' . $eventType);
                 }
+                $handler($row);
                 $this->mark($id, 'done', null);
                 $processed++;
             } catch (\Throwable $e) {

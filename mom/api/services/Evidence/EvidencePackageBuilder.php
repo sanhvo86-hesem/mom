@@ -77,6 +77,7 @@ final class EvidencePackageBuilder
             $this->logicalName($subjectType, $subjectId, 'manifest.json'),
             $this->canonicalJson($manifest),
         );
+        $artifacts['hash_signature_manifest'] = $artifacts['manifest'];
 
         $packageHash = hash('sha256', implode('|', [
             $artifacts['original']['sha256'],

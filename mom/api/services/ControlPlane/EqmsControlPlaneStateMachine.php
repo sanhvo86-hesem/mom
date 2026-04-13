@@ -283,7 +283,8 @@ final class EqmsControlPlaneStateMachine
         $roles = $this->stringList($context['roles'] ?? []);
         $evidence = $this->stringList($context['evidence'] ?? []);
         $missingRoles = $this->missingAnyRole($transition['required_roles'], $roles);
-        $missingEvidence = array_values(array_diff($transition['required_evidence'], $evidence));
+        $requiredEvidence = $this->requiredEvidenceForContext($transition, $context);
+        $missingEvidence = array_values(array_diff($requiredEvidence, $evidence));
         $failedGuards = $this->failedGuards($transition, $context);
 
         $allowed = $missingRoles === [] && $missingEvidence === [] && $failedGuards === [];
@@ -292,7 +293,7 @@ final class EqmsControlPlaneStateMachine
             'allowed' => $allowed,
             'error' => $allowed ? null : $this->errorCode($missingRoles, $missingEvidence, $failedGuards),
             'message' => $allowed ? 'Transition allowed.' : 'Transition blocked by state-machine guard.',
-            'transition' => $transition,
+            'transition' => array_merge($transition, ['required_evidence' => $requiredEvidence]),
             'missing_roles' => $missingRoles,
             'missing_evidence' => $missingEvidence,
             'failed_guards' => $failedGuards,
@@ -319,6 +320,28 @@ final class EqmsControlPlaneStateMachine
         }
 
         return $requiredRoles;
+    }
+
+    /**
+     * @param array<string, mixed> $transition
+     * @param array<string, mixed> $context
+     * @return list<string>
+     */
+    private function requiredEvidenceForContext(array $transition, array $context): array
+    {
+        $required = $transition['required_evidence'];
+        if (!in_array('training_or_read_ack_complete', $transition['guards'], true)) {
+            return $required;
+        }
+
+        if (!$this->boolContext($context, 'training_gate_required', true)) {
+            $required = array_values(array_diff($required, ['training_gate_complete']));
+        }
+        if (!$this->boolContext($context, 'read_ack_gate_required', true)) {
+            $required = array_values(array_diff($required, ['read_ack_gate_complete']));
+        }
+
+        return $required;
     }
 
     /**

@@ -7264,8 +7264,36 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     return schema;
   }
 
+  function _ngGraphicsGovernanceBlockerInfo(schema){
+    var svc = window.HmGraphicsGovernance || null;
+    var moduleId = (schema && (schema.moduleId || schema.id)) || '';
+    var route = (schema && schema.route) || '';
+    var blockers = [];
+    var compliance = [];
+    if(svc && typeof svc.getGraphicsReleaseBlockers === 'function') blockers = svc.getGraphicsReleaseBlockers() || [];
+    else if(svc && typeof svc.getReleaseBlockers === 'function') blockers = svc.getReleaseBlockers() || [];
+    if(svc && typeof svc.getGraphicsComplianceMatrix === 'function') compliance = svc.getGraphicsComplianceMatrix() || [];
+    var row = (compliance || []).find(function(item){
+      return item && (item.moduleId === moduleId || item.route === route);
+    });
+    var relevantBlockers = (blockers || []).filter(function(item){
+      if(!item || item.status === 'waived') return false;
+      return item.targetId === moduleId || item.moduleId === moduleId || item.route === route || item.scope === 'impact-analysis' || item.scope === 'graphics';
+    });
+    var status = row && row.linkageStatus ? row.linkageStatus : (moduleId ? 'pending-graphics-beacon' : 'missing-module-id');
+    var acceptable = status === 'full-admin-controlled' || status === 'bridged-to-shared-tokens';
+    return {
+      status: status,
+      acceptable: acceptable && relevantBlockers.length === 0,
+      blockerCount: relevantBlockers.length,
+      blockers: relevantBlockers,
+      reason: row && row.reason ? row.reason : _t('Graphics compliance beacon chưa xác nhận module này.', 'Graphics compliance beacon has not attested this module yet.')
+    };
+  }
+
   function _ngComputeModuleStudioReadiness(schema){
     var blocks = _ngCountBlocks(schema);
+    var graphicsGate = _ngGraphicsGovernanceBlockerInfo(schema);
     var items = [
       { key:'title.vi', label:_t('Tên module (VI)', 'Module title (VI)'), ok: !!(schema && schema.title && schema.title.vi) },
       { key:'title.en', label:_t('Tên module (EN)', 'Module title (EN)'), ok: !!(schema && schema.title && schema.title.en) },
@@ -7280,7 +7308,8 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
       { key:'qa.testOwner', label:_t('Test owner', 'Test owner'), ok: !!(schema && schema.qa && schema.qa.testOwner) },
       { key:'qa.smokeChecklist', label:_t('Smoke checklist', 'Smoke checklist'), ok: !!((schema && schema.qa && schema.qa.smokeChecklist && schema.qa.smokeChecklist.length) || 0) },
       { key:'publish.changeSummary', label:_t('Change summary', 'Change summary'), ok: !!(schema && schema.publish && (schema.publish.changeSummary || schema.publish.releaseNote)) },
-      { key:'integration.primaryEntity', label:_t('Primary entity', 'Primary entity'), ok: !!(schema && schema.integration && schema.integration.primaryEntity) }
+      { key:'integration.primaryEntity', label:_t('Primary entity', 'Primary entity'), ok: !!(schema && schema.integration && schema.integration.primaryEntity) },
+      { key:'graphics.linkage', label:_t('Graphics linkage authority', 'Graphics linkage authority'), ok: graphicsGate.acceptable }
     ];
     var completed = items.filter(function(item){ return item.ok; }).length;
     var score = items.length ? Math.round((completed / items.length) * 100) : 0;
@@ -7293,7 +7322,8 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
       tabCount: (schema && schema.tabs ? schema.tabs.length : 0),
       lifecycle: (schema && schema.meta && schema.meta.lifecycle) || 'draft',
       releaseChannel: (schema && schema.meta && schema.meta.releaseChannel) || 'pilot',
-      criticality: (schema && schema.meta && schema.meta.criticality) || 'standard'
+      criticality: (schema && schema.meta && schema.meta.criticality) || 'standard',
+      graphicsGate: graphicsGate
     };
   }
 
@@ -7312,6 +7342,7 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     schema.builderManifest.tabCount = (schema.tabs || []).length;
     schema.builderManifest.blockCount = _ngCountBlocks(schema);
     schema.builderManifest.readinessScore = readiness.score;
+    schema.builderManifest.graphicsGovernance = readiness.graphicsGate;
     schema.builderManifest.updatedAt = _ngNowIso();
     schema.builderManifest.updatedBy = _ngCurrentUser();
     return schema.builderManifest;
@@ -7453,6 +7484,14 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
     h += '<div style="padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page)"><div style="font-size:11px;color:var(--text-tertiary);text-transform:uppercase">' + _esc(_t('Criticality', 'Criticality')) + '</div><strong>' + _esc(readiness.criticality) + '</strong></div>';
     h += '</div>';
     h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:12px">' + _esc(_t('Manifest patch', 'Manifest patch')) + ': <strong>' + _esc((schema && schema.builderManifest && schema.builderManifest.patchVersion) || '2026-04-07') + '</strong></div>';
+    if(readiness.graphicsGate){
+      h += '<div style="margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-page);font-size:12px;color:var(--text-secondary);line-height:1.6">';
+      h += '<strong style="color:var(--text-primary)">' + _esc(_t('Graphics publish blocker', 'Graphics publish blocker')) + ':</strong> ';
+      h += _esc(readiness.graphicsGate.status || 'pending');
+      h += ' · ' + _esc(_t('blockers', 'blockers')) + ': ' + _esc(readiness.graphicsGate.blockerCount || 0);
+      h += '<br>' + _esc(readiness.graphicsGate.reason || '');
+      h += '</div>';
+    }
     if(missing.length){
       h += '<div style="margin-top:10px;font-size:12px;color:var(--text-secondary)"><strong>' + _esc(_t('Thiếu:', 'Missing:')) + '</strong> ' + _esc(missing.join(', ')) + (readiness.missing.length > missing.length ? '…' : '') + '</div>';
     }

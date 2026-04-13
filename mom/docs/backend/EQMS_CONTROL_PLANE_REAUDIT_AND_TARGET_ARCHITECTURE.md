@@ -320,7 +320,7 @@ Common error:
     "details": {
       "object_type": "evidence_record",
       "object_id": "EVR-100",
-      "field_scope": ["canonical_payload"],
+      "affected_fields": ["canonical_payload"],
       "required_state": "released"
     },
     "retryable": false
@@ -456,7 +456,7 @@ Request:
   "source_version_id": "uuid",
   "change_order_id": "CO-2026-009",
   "amendment_reason": "Correct transcribed equipment id",
-  "field_scope": ["equipment_id"],
+  "affected_fields": ["equipment_id"],
   "idempotency_key": "amend-EVR-100-1"
 }
 ```

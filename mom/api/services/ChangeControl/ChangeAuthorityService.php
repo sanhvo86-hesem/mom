@@ -492,8 +492,8 @@ final class ChangeAuthorityService
                     co.change_order_number,
                     co.status,
                     cao.requested_effect AS allowed_effect,
-                    cao.effectivity_scope AS effectivity_rule,
-                    cao.field_scope,
+                    cao.effectivity_rule,
+                    cao.affected_fields,
                     'affected_object' AS authority_source
                  FROM plm_change_orders co
                  INNER JOIN plm_change_affected_objects cao
@@ -522,7 +522,7 @@ final class ChangeAuthorityService
             if (!is_array($row)) {
                 continue;
             }
-            if (!$this->fieldScopeMatches($row['field_scope'] ?? null, $fieldPath)) {
+            if (!$this->fieldScopeMatches($row['affected_fields'] ?? null, $fieldPath)) {
                 continue;
             }
             if ($this->effectivityMatches($row['effectivity_rule'] ?? null, $context)) {
@@ -669,11 +669,15 @@ final class ChangeAuthorityService
         $scope = $scopeRaw;
         if (is_string($scopeRaw)) {
             $decoded = json_decode($scopeRaw, true);
-            $scope = is_array($decoded) ? $decoded : [];
+            $scope = is_array($decoded) ? $decoded : $this->textList($scopeRaw);
         }
 
         if (!is_array($scope) || $scope === []) {
             return true;
+        }
+
+        if (array_is_list($scope)) {
+            return in_array('*', $scope, true) || in_array($fieldPath, $scope, true);
         }
 
         foreach (['fields', 'field_paths', 'affected_fields'] as $key) {

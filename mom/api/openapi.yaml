@@ -4058,6 +4058,112 @@ paths:
               schema:
                 $ref: '#/components/schemas/GraphicsReleaseBlockersResponse'
 
+  /api/graphics/change-set:
+    get:
+      operationId: graphicsChangeSetGet
+      tags: [Graphics Governance]
+      summary: Read current graphics change set model
+      description: |
+        Groups token/template/component edits with diff, impact, risk, rollout scope,
+        and evidence obligations.
+
+        **Action aliases:** `graphics_change_set_get`, `admin_graphics_change_set_get`
+      responses:
+        '200':
+          description: Graphics change set returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsChangeSetResponse'
+
+  /api/graphics/lineage:
+    get:
+      operationId: graphicsLineageGet
+      tags: [Graphics Governance]
+      summary: Read module graphics lineage graph
+      description: |
+        Returns Admin -> backend authority -> shared tokens -> shared components ->
+        template -> module linkage proof.
+
+        **Action aliases:** `graphics_lineage_get`, `admin_graphics_lineage_get`
+      responses:
+        '200':
+          description: Graphics lineage graph returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleGraphicsLineageGraphResponse'
+
+  /api/graphics/runtime-beacon:
+    get:
+      operationId: graphicsRuntimeBeaconGet
+      tags: [Graphics Governance]
+      summary: Read runtime graphics compliance beacon
+      description: |
+        Returns runtime linkage beacons by module.
+
+        **Action aliases:** `graphics_runtime_beacon_get`, `admin_graphics_runtime_beacon_get`
+      responses:
+        '200':
+          description: Runtime beacon returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuntimeGraphicsComplianceBeaconResponse'
+
+  /api/graphics/debt-observatory:
+    get:
+      operationId: graphicsDebtObservatoryGet
+      tags: [Graphics Governance]
+      summary: Read visual debt observatory
+      description: |
+        Groups bridge alias, private CSS, hardcoded style, and uncontrolled shell debt by
+        module, domain, team, and route.
+
+        **Action aliases:** `graphics_debt_observatory_get`, `admin_graphics_debt_observatory_get`
+      responses:
+        '200':
+          description: Visual debt observatory returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualDebtObservatoryResponse'
+
+  /api/graphics/environment-policy-packs:
+    get:
+      operationId: graphicsEnvironmentPolicyPacksGet
+      tags: [Graphics Governance]
+      summary: Read graphics environment policy packs
+      description: |
+        Returns office, review, admin, shopfloor, kiosk, TV, and night-shift policy packs.
+
+        **Action aliases:** `graphics_environment_policy_packs_get`, `admin_graphics_environment_policy_packs_get`
+      responses:
+        '200':
+          description: Environment policy packs returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsEnvironmentPolicyPacksResponse'
+
+  /api/graphics/release-dashboard:
+    get:
+      operationId: graphicsReleaseDashboardGet
+      tags: [Graphics Governance]
+      summary: Read graphics release dashboard
+      description: |
+        Summarizes blockers, waivers, drift, debt, affected modules, rollout readiness,
+        and post-apply verification obligations.
+
+        **Action aliases:** `graphics_release_dashboard_get`, `admin_graphics_release_dashboard_get`
+      responses:
+        '200':
+          description: Graphics release dashboard returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsReleaseDashboardResponse'
+
   /api/graphics/impact/token:
     post:
       operationId: graphicsTokenImpactAnalyze
@@ -5085,6 +5191,33 @@ components:
             additionalProperties: true
         compliant:
           type: boolean
+        linkageStatus:
+          type: string
+          enum: [full-admin-controlled, bridged-to-shared-tokens, legacy-private-css, blocked]
+        templateBindingSource:
+          type: string
+        sharedTokenCoverage:
+          type: number
+        sharedComponentCoverage:
+          type: number
+        bridgeAliasDebt:
+          type: integer
+        privateCssDebt:
+          type: integer
+        hardcodedStyleDebt:
+          type: integer
+        driftStatus:
+          type: string
+        blockerReason:
+          type: string
+        consumesHmComponents:
+          type: boolean
+        consumesSharedTokens:
+          type: boolean
+        usesPrivateCssShell:
+          type: boolean
+        reason:
+          type: string
 
     GraphicsComplianceMatrixResponse:
       allOf:
@@ -5224,6 +5357,223 @@ components:
         waiverAllowed:
           type: boolean
 
+    GraphicsEvidencePlan:
+      type: object
+      additionalProperties: true
+      properties:
+        evidenceType:
+          type: string
+        required:
+          type: boolean
+        owner:
+          type: string
+
+    GraphicsChangeSet:
+      type: object
+      required: [changeSetId, status, impact, rolloutScopePlan, evidenceChecklist]
+      additionalProperties: true
+      properties:
+        changeSetId:
+          type: string
+        status:
+          type: string
+          enum: [preview-only, impact-recorded, draft-saved, validated, staged, publish-blocked, applied, rolled-back, waived]
+        source:
+          type: string
+        edits:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        diffSummary:
+          type: object
+          additionalProperties: true
+        impact:
+          $ref: '#/components/schemas/GraphicsImpactReport'
+        risk:
+          type: object
+          additionalProperties: true
+        rolloutScopePlan:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        evidenceChecklist:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphicsEvidencePlan'
+
+    GraphicsChangeSetResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [changeSet]
+          properties:
+            changeSet:
+              $ref: '#/components/schemas/GraphicsChangeSet'
+
+    ModuleGraphicsLineageGraph:
+      type: object
+      required: [nodes, edges, summary]
+      additionalProperties: true
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        edges:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        summary:
+          type: object
+          additionalProperties: true
+        authorityRefs:
+          type: object
+          additionalProperties: true
+
+    ModuleGraphicsLineageGraphResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [lineageGraph]
+          properties:
+            lineageGraph:
+              $ref: '#/components/schemas/ModuleGraphicsLineageGraph'
+
+    RuntimeGraphicsComplianceBeacon:
+      type: object
+      required: [beacons, summary]
+      additionalProperties: true
+      properties:
+        beacons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        summary:
+          type: object
+          additionalProperties: true
+
+    RuntimeGraphicsComplianceBeaconResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [runtimeBeacon]
+          properties:
+            runtimeBeacon:
+              $ref: '#/components/schemas/RuntimeGraphicsComplianceBeacon'
+
+    VisualDebtObservatory:
+      type: object
+      required: [byModule, summary]
+      additionalProperties: true
+      properties:
+        byModule:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byDomain:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byTeam:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byRoute:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        summary:
+          type: object
+          additionalProperties: true
+
+    VisualDebtObservatoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [observatory]
+          properties:
+            observatory:
+              $ref: '#/components/schemas/VisualDebtObservatory'
+
+    GraphicsEnvironmentPolicyPack:
+      type: object
+      required: [environment, tokenOverrides, evidenceObligations]
+      additionalProperties: true
+      properties:
+        environment:
+          type: string
+          enum: [office, review, admin, shopfloor, kiosk, tv, night-shift]
+        tokenOverrides:
+          type: object
+          additionalProperties: true
+        evidenceObligations:
+          type: array
+          items:
+            type: string
+
+    GraphicsEnvironmentPolicyPacksResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [policyPacks]
+          properties:
+            policyPacks:
+              type: object
+              additionalProperties: true
+              properties:
+                packs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/GraphicsEnvironmentPolicyPack'
+
+    GraphicsReleaseDashboard:
+      type: object
+      required: [readiness, blockers, complianceSummary, debtSummary, rolloutSummary]
+      additionalProperties: true
+      properties:
+        readiness:
+          type: string
+          enum: [ready, blocked, unknown]
+        blockers:
+          type: object
+          additionalProperties: true
+        waivers:
+          type: object
+          additionalProperties: true
+        complianceSummary:
+          type: object
+          additionalProperties: true
+        debtSummary:
+          type: object
+          additionalProperties: true
+        rolloutSummary:
+          type: object
+          additionalProperties: true
+        postApplyVerification:
+          type: object
+          additionalProperties: true
+        generatedAt:
+          type: string
+          format: date-time
+
+    GraphicsReleaseDashboardResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [releaseDashboard]
+          properties:
+            releaseDashboard:
+              $ref: '#/components/schemas/GraphicsReleaseDashboard'
+
     GraphicsImpactReport:
       type: object
       required: [impactId, analysisType, subject, affectedModules, affectedRoutes, affectedScreens, affectedBlockFamilies, regulatedModulesTouched, shopfloorModulesTouched, gatesToRerun, blockers, machineReadable]
@@ -5232,7 +5582,7 @@ components:
           type: string
         analysisType:
           type: string
-          enum: [token, template, component, rollout]
+          enum: [token, template, component, rollout, change-set]
         subject:
           type: object
           additionalProperties: true
@@ -5253,6 +5603,10 @@ components:
           type: array
           items:
             type: string
+        affectedTemplates:
+          type: array
+          items:
+            type: string
         regulatedModulesTouched:
           type: array
           items:
@@ -5270,6 +5624,23 @@ components:
           items:
             type: object
             additionalProperties: true
+        severityClass:
+          type: string
+          enum: [low, medium, high, regulated, shopfloor-critical]
+        requiredEvidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphicsEvidencePlan'
+        rerunPlan:
+          type: object
+          additionalProperties: true
+        rolloutScopes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        changeSetRef:
+          type: string
         machineReadable:
           type: boolean
           const: true
@@ -5429,6 +5800,9 @@ components:
         scope:
           type: object
           additionalProperties: true
+        scopeMode:
+          type: string
+          enum: [preview-only, canary-module-group, canary-domain, environment-stage, global-apply]
         templateId:
           type: string
         tokenKeys:

@@ -86,7 +86,14 @@ final class EvidenceVaultService
 
             $tmpPath = $file['tmp_name'] ?? '';
             $originalName = $file['name'] ?? 'unknown';
-            $fileHash = is_file($tmpPath) ? hash_file('sha256', $tmpPath) : hash('sha256', $originalName . $this->nowIso());
+            if (!is_string($tmpPath) || $tmpPath === '' || !is_file($tmpPath)) {
+                throw new RuntimeException('evidence_upload_temp_unreadable');
+            }
+
+            $fileHash = hash_file('sha256', $tmpPath);
+            if ($fileHash === false) {
+                throw new RuntimeException('evidence_upload_hash_failed');
+            }
 
             $uploadDir = $this->dataDir . '/uploads/evidence';
             if (!is_dir($uploadDir)) {
@@ -94,8 +101,8 @@ final class EvidenceVaultService
             }
             $storedName = $this->generateUuidV4() . '_' . basename($originalName);
             $storedPath = $uploadDir . '/' . $storedName;
-            if (is_file($tmpPath)) {
-                @move_uploaded_file($tmpPath, $storedPath);
+            if (!@move_uploaded_file($tmpPath, $storedPath) && !@copy($tmpPath, $storedPath)) {
+                throw new RuntimeException('evidence_upload_store_failed');
             }
 
             $evidence = array_merge($metadata, [
@@ -108,7 +115,7 @@ final class EvidenceVaultService
         } else {
             // Called as store($evidence, $userId) — legacy/programmatic path
             $evidence = $fileOrEvidence;
-            $actorId = is_string($metadataOrUser) ? $metadataOrUser : ($userId ?? 'unknown');
+            $actorId = $metadataOrUser !== '' ? $metadataOrUser : ($userId ?? 'unknown');
         }
 
         $vault = $this->loadVault();
@@ -576,7 +583,7 @@ final class EvidenceVaultService
      * Iterates all records by chain_sequence, re-computes each chain_hash,
      * and compares with the stored value.
      *
-     * @return array{valid: bool, broken_at: ?int, total: int}
+     * @return array{valid: bool, broken_at: int|null, total: int, error?: string}
      */
     public function verifyChain(?string $evidenceId = null): array
     {

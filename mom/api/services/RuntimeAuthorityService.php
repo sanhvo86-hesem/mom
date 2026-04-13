@@ -26,6 +26,7 @@ final class RuntimeAuthorityService
         private readonly ?WorkforceQualificationGateService $workforceQualification = null,
         private readonly ?TrustedReleaseRecordService $trustedReleaseRecord = null,
         private readonly ?ConnectedGovernanceService $connectedGovernance = null,
+        private readonly ?PlanningScenarioService $planningScenario = null,
     ) {
     }
 
@@ -46,6 +47,7 @@ final class RuntimeAuthorityService
         $workforceQualification = ($this->workforceQualification ?? new WorkforceQualificationGateService($this->dataDir, $eventBackbone))->probe();
         $trustedReleaseRecord = ($this->trustedReleaseRecord ?? new TrustedReleaseRecordService($this->dataDir, $this->data))->probe();
         $connectedGovernance = ($this->connectedGovernance ?? new ConnectedGovernanceService($this->dataDir, $this->data, events: $eventBackbone))->probe();
+        $planningScenario = ($this->planningScenario ?? new PlanningScenarioService($this->dataDir, $this->data))->probe();
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),
@@ -57,6 +59,7 @@ final class RuntimeAuthorityService
             'workforce_qualification_gate' => $this->normalizeOperationalSlice($workforceQualification),
             'trusted_release_record' => $this->normalizeOperationalSlice($trustedReleaseRecord),
             'connected_governance' => $this->normalizeOperationalSlice($connectedGovernance),
+            'planning_scenario' => $this->normalizeOperationalSlice($planningScenario),
         ];
 
         $states = [];

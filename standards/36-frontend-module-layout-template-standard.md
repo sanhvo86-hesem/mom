@@ -278,6 +278,11 @@ Template registry rules:
 - Template lifecycle MUST be explicit: `draft-only`, `controlled-draft`, `validated`, `publish-blocked`, `published`, `deprecated`, `legacy-bridged`.
 - Publish/apply/rollback MUST require impact analysis, graphics compliance matrix review, release blocker check, audit event and optimistic concurrency through `If-Match` or `expectedVersion`.
 - New modules or major UI refactors MUST be blocked when module graphics linkage is not `full-admin-controlled` or approved bridged debt is missing waiver evidence.
+- Graphics changes MUST be grouped into a backend-visible change set containing diff summary, impact report, severity class, rollout scope plan and evidence checklist.
+- The backend graphics projection MUST expose module graphics lineage graph, runtime graphics compliance beacon, visual debt observatory, environment policy packs and graphics release dashboard.
+- Impact severity MUST be one of `low`, `medium`, `high`, `regulated`, `shopfloor-critical`; evidence and QA rerun gates MUST scale with that class.
+- Rollout scope MUST be explicit: `preview-only`, `canary-module-group`, `canary-domain`, `environment-stage` or `global-apply`.
+- Environment-stage rollout MUST name an environment policy pack (`office`, `review`, `admin`, `shopfloor`, `kiosk`, `tv`, `night-shift`) and satisfy its evidence obligations.
 
 ---
 
