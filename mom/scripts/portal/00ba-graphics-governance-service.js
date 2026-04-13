@@ -804,7 +804,7 @@ function getSnapshot(seedTemplates){
     debtObservatory: clone(_state.debtObservatory || buildDebtObservatory()),
     environmentPolicyPacks: clone(_state.environmentPolicyPacks || buildEnvironmentPolicyPacks()),
     releaseDashboard: clone(_state.releaseDashboard || buildReleaseDashboard()),
-    releaseBlockers: clone(_state.releaseBlockers),
+    releaseBlockers: effectiveReleaseBlockers(),
     audit: clone(_state.audit),
     waivers: clone(_state.waivers),
     rolloutsByTemplate: clone(_state.rolloutsByTemplate),
@@ -1014,7 +1014,7 @@ function buildEnvironmentPolicyPacks(){
 }
 
 function buildReleaseDashboard(){
-  var blockers = _state.releaseBlockers || [];
+  var blockers = effectiveReleaseBlockers();
   var observatory = _state.debtObservatory || buildDebtObservatory();
   return {
     readiness: blockers.some(function(row){ return String(row.status || '') === 'active'; }) ? 'blocked' : 'ready',
@@ -1028,6 +1028,26 @@ function buildReleaseDashboard(){
     postApplyVerification: { runtimeBeaconRequired:true, driftReportRequired:true, evidenceBundleRequired:true },
     generatedAt: nowIso()
   };
+}
+
+function effectiveReleaseBlockers(){
+  var blockers = clone(_state.releaseBlockers || []) || [];
+  if(!_state.backendAvailable){
+    var exists = blockers.some(function(row){ return row && row.blockerId === 'graphics_backend_authority_unavailable'; });
+    if(!exists){
+      blockers.unshift({
+        blockerId:'graphics_backend_authority_unavailable',
+        scope:'graphics',
+        targetId:'backend-graphics-authority',
+        severity:'blocker',
+        status:'active',
+        reason:'Backend graphics authority endpoint is unavailable; publish/apply must remain blocked.',
+        releaseGate:'G19-graphics-governance',
+        waiverAllowed:false
+      });
+    }
+  }
+  return blockers;
 }
 
 function blockFamiliesForChange(change){
@@ -1426,8 +1446,8 @@ window.HmGraphicsGovernance = {
   getGraphicsDebtReport: function(){ return clone(_state.debt || {}); },
   getGraphicsAuditHistory: function(){ return clone(_state.audit || []); },
   getActiveWaivers: function(){ return clone(_state.waivers || []); },
-  getReleaseBlockers: function(){ return clone(_state.releaseBlockers || []); },
-  getGraphicsReleaseBlockers: function(){ return clone(_state.releaseBlockers || []); },
+  getReleaseBlockers: function(){ return effectiveReleaseBlockers(); },
+  getGraphicsReleaseBlockers: function(){ return effectiveReleaseBlockers(); },
   getGraphicsChangeSet: function(seedTemplates){ return clone(_state.changeSet || buildChangeSet(_state.lastImpact || computeImpact(_state.lastChange, seedTemplates || []))); },
   getModuleGraphicsLineageGraph: function(seedTemplates){ return clone(_state.lineageGraph || buildLineageGraph(seedTemplates || [])); },
   getRuntimeGraphicsComplianceBeacon: function(){ return clone(_state.runtimeBeacon || collectRuntimeBeacon()); },

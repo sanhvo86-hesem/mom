@@ -5690,39 +5690,39 @@ components:
         blockType:
           type: string
 
-      GraphicsReleaseManifestRef:
-        type: object
-        required: [refType, refId]
-        properties:
+    GraphicsReleaseManifestRef:
+      type: object
+      required: [refType, refId]
+      properties:
         refType:
           type: string
           enum: [document, dcr, evidence, release_manifest, test_report, approval]
         refId:
           type: string
-          uri:
-            type: string
+        uri:
+          type: string
 
-      GraphicsReleaseLink:
-        type: object
-        additionalProperties: true
-        properties:
-          graphicsAuthorityRefs:
-            type: array
-            items:
-              type: string
-          templateRegistryVersion:
+    GraphicsReleaseLink:
+      type: object
+      additionalProperties: true
+      properties:
+        graphicsAuthorityRefs:
+          type: array
+          items:
             type: string
-          templateRegistryChecksum:
-            type: string
-          complianceMatrixRef:
-            type: string
-          impactAnalysisRef:
-            type: string
-          waiversRef:
-            type: string
-          driftReportGeneratedAt:
-            type: string
-            format: date-time
+        templateRegistryVersion:
+          type: string
+        templateRegistryChecksum:
+          type: string
+        complianceMatrixRef:
+          type: string
+        impactAnalysisRef:
+          type: string
+        waiversRef:
+          type: string
+        driftReportGeneratedAt:
+          type: string
+          format: date-time
 
     GraphicsPublishRequest:
       type: object

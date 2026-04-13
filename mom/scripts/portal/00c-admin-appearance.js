@@ -2312,6 +2312,8 @@ function renderTemplateLineagePanel(tpl){
   var snap = graphicsSnapshot();
   var graph = snap.lineageGraph || {};
   var templateId = tpl && (tpl.templateId || tpl.id) || '';
+  var migrationPlanRefs = Array.isArray(tpl && tpl.migrationPlanRefs) ? tpl.migrationPlanRefs : [];
+  var deprecationWindow = tpl && tpl.deprecationWindow && typeof tpl.deprecationWindow === 'object' ? tpl.deprecationWindow : null;
   var edges = (graph.edges || []).filter(function(edge){
     return edge.from === 'template:' + templateId || edge.to === 'template:' + templateId;
   });
@@ -2327,8 +2329,8 @@ function renderTemplateLineagePanel(tpl){
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px">'
       + infoCard('templateId', templateId || '-', 'admin')
       + infoCard('version', (tpl && tpl.version) || '-', 'admin')
-      + infoCard(L('Deprecated window', 'Deprecated window'), (tpl && tpl.deprecationWindow) ? JSON.stringify(tpl.deprecationWindow) : '-', 'preview')
-      + infoCard(L('Migration plan', 'Migration plan'), (tpl && (tpl.migrationPlanRefs || []).length) ? joinList(tpl.migrationPlanRefs) : L('Required on deprecation', 'Required on deprecation'), 'preview')
+      + infoCard(L('Deprecated window', 'Deprecated window'), deprecationWindow ? JSON.stringify(deprecationWindow) : '-', 'preview')
+      + infoCard(L('Migration plan', 'Migration plan'), migrationPlanRefs.length ? joinList(migrationPlanRefs) : L('Required on deprecation', 'Required on deprecation'), 'preview')
       + '</div>'
       + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">From</th>'

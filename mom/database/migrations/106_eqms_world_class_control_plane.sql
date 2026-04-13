@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS doc_read_acknowledgements (
     acknowledgement_hash_sha256 CHAR(64) NOT NULL,
     idempotency_key        TEXT,
     metadata               JSONB NOT NULL DEFAULT '{}'::jsonb,
+    CHECK (audience_user_id IS NOT NULL OR NULLIF(trim(actor_ref), '') IS NOT NULL),
     UNIQUE (doc_revision_id, audience_user_id),
     UNIQUE (doc_revision_id, actor_ref),
     UNIQUE (idempotency_key)
@@ -231,6 +232,7 @@ CREATE TABLE IF NOT EXISTS frm_issuances (
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version            BIGINT NOT NULL DEFAULT 1,
+    CHECK (issued_to_user_id IS NOT NULL OR NULLIF(trim(issued_to_ref), '') IS NOT NULL),
     UNIQUE (issued_record_id, issuance_no),
     UNIQUE (idempotency_key)
 );
@@ -283,6 +285,7 @@ CREATE TABLE IF NOT EXISTS evidence_records (
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version           BIGINT NOT NULL DEFAULT 1,
+    CHECK (record_state IN ('open', 'under_review') OR current_version_id IS NOT NULL),
     UNIQUE (idempotency_key)
 );
 
@@ -318,6 +321,7 @@ CREATE TABLE IF NOT EXISTS evidence_versions (
             AND readable_snapshot_hash_sha256 IS NOT NULL
         )
     ),
+    CHECK (version_state NOT IN ('locked', 'superseded', 'voided') OR finalized_at IS NOT NULL),
     UNIQUE (evidence_record_id, version_no),
     UNIQUE (package_hash_sha256),
     UNIQUE (idempotency_key)
@@ -394,6 +398,15 @@ CREATE TABLE IF NOT EXISTS evidence_publications (
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version           BIGINT NOT NULL DEFAULT 1,
+    CHECK (
+        publication_state <> 'published'
+        OR (
+            published_hash_sha256 IS NOT NULL
+            AND publication_receipt <> '{}'::jsonb
+            AND (target_uri IS NOT NULL OR target_item_id IS NOT NULL)
+        )
+    ),
+    CHECK (publication_state NOT IN ('failed', 'retry_scheduled', 'dead_letter') OR last_error_code IS NOT NULL),
     UNIQUE (evidence_version_id, publication_target),
     UNIQUE (idempotency_key)
 );
@@ -414,6 +427,7 @@ CREATE TABLE IF NOT EXISTS signature_events (
     signed_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     idempotency_key       TEXT,
     metadata              JSONB NOT NULL DEFAULT '{}'::jsonb,
+    CHECK (signer_user_id IS NOT NULL OR NULLIF(trim(signer_ref), '') IS NOT NULL),
     UNIQUE (idempotency_key)
 );
 
