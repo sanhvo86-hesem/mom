@@ -28,7 +28,7 @@ class ApiKeyMiddleware
     private string $dataDir;
     private ?CacheService $cache;
 
-    /** @var array<string, array> Loaded API keys (cached per-request) */
+    /** @var array<int, array> Loaded API keys (cached per-request) */
     private ?array $keyStore = null;
 
     public function __construct(string $dataDir, ?CacheService $cache = null)
@@ -145,10 +145,14 @@ class ApiKeyMiddleware
             $parsedToken = $config->parser()->parse($token);
 
             // Validate claims
+            $clock = new class implements \Psr\Clock\ClockInterface {
+                public function now(): \DateTimeImmutable
+                {
+                    return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+                }
+            };
             $constraints = [
-                new \Lcobucci\JWT\Validation\Constraint\StrictValidAt(
-                    new \Lcobucci\JWT\Token\InMemory\SystemClock(new \DateTimeZone('UTC'))
-                ),
+                new \Lcobucci\JWT\Validation\Constraint\StrictValidAt($clock),
                 new \Lcobucci\JWT\Validation\Constraint\SignedWith(
                     $config->signer(),
                     $config->signingKey()
@@ -156,6 +160,10 @@ class ApiKeyMiddleware
             ];
 
             if (!$config->validator()->validate($parsedToken, ...$constraints)) {
+                $this->deny('invalid_jwt', 401);
+            }
+
+            if (!$parsedToken instanceof \Lcobucci\JWT\UnencryptedToken) {
                 $this->deny('invalid_jwt', 401);
             }
 
@@ -190,8 +198,8 @@ class ApiKeyMiddleware
         // Try cache first
         if ($this->cache) {
             $cached = $this->cache->get('api_keys:store');
-            if ($cached !== null) {
-                $this->keyStore = $cached;
+            if (is_array($cached)) {
+                $this->keyStore = array_values(array_filter($cached, 'is_array'));
                 return $this->keyStore;
             }
         }
@@ -205,7 +213,8 @@ class ApiKeyMiddleware
 
         $raw = @file_get_contents($file);
         $data = $raw !== false ? json_decode($raw, true) : null;
-        $this->keyStore = is_array($data) ? ($data['keys'] ?? []) : [];
+        $keys = is_array($data) && is_array($data['keys'] ?? null) ? $data['keys'] : [];
+        $this->keyStore = array_values(array_filter($keys, 'is_array'));
 
         // Cache for 5 minutes
         if ($this->cache) {

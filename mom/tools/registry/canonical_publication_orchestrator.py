@@ -21,12 +21,14 @@ Single entry-point that runs the full publication pipeline in sequence:
   15. generate_wave6_finance_projection_governance.py (wave-6 finance/projection closure report)
   16. generate_operational_stress_report.py   (stress/exception reality assessment)
   17. generate_business_contract_bundle.py    (authored object package bundle)
-  18. generate_global_erp_mom_capability_audit.py (global ERP+MOM capability audit)
-  19. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  20. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
-  21. generate_system_contract_authority.py   (DB-derived full system contract)
-  22. Generate wave/gap ledger                (wave-gap-ledger.json)
-  23. Generate publication proof artifact     (_reports/publication-proof-latest.json)
+  18. enterprise_registry_doctor.py           (authority/probe overlay outputs)
+  19. enterprise_frontend_simulator.py        (frontend/runtime simulation proof)
+  20. generate_global_erp_mom_capability_audit.py (global ERP+MOM capability audit)
+  21. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
+  22. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
+  23. generate_system_contract_authority.py   (DB-derived full system contract)
+  24. Generate wave/gap ledger                (wave-gap-ledger.json)
+  25. Generate publication proof artifact     (_reports/publication-proof-latest.json)
 
 The proof artifact contains checksums, counts, and invariant checks so that
 downstream consumers can verify the publication run is consistent.
@@ -795,7 +797,23 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 17: Global ERP+MOM capability assessment
+    # Step 17: Enterprise authority doctor outputs consumed by DataSchemaService freshness.
+    step_results["enterprise_registry_doctor"] = run_step(
+        "Enterprise Registry Doctor (enterprise_registry_doctor.py)",
+        [sys.executable, "enterprise_registry_doctor.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 18: Enterprise frontend/runtime simulation output consumed by DataSchemaService freshness.
+    step_results["enterprise_frontend_simulator"] = run_step(
+        "Enterprise Frontend Simulator (enterprise_frontend_simulator.py)",
+        [sys.executable, "enterprise_frontend_simulator.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 19: Global ERP+MOM capability assessment
     step_results["global_erp_mom_capability_audit"] = run_step(
         "Global ERP+MOM Capability Audit (generate_global_erp_mom_capability_audit.py)",
         [sys.executable, "generate_global_erp_mom_capability_audit.py"],
@@ -803,7 +821,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 18: Compact truth/accounting summaries
+    # Step 20: Compact truth/accounting summaries
     step_results["publication_truth_summaries"] = run_step(
         "Publication Truth Summaries (generate_publication_truth_summaries.py)",
         [sys.executable, "generate_publication_truth_summaries.py"],
@@ -811,7 +829,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 19: Synchronize workspace-design / authority artifacts to the same publication cycle
+    # Step 21: Synchronize workspace-design / authority artifacts to the same publication cycle
     step_results["schema_authority_sync"] = run_step(
         "Schema Authority Sync (refresh_data_schema_authority.php --skip-publication)",
         ["php", str(PORTAL_ROOT / "tools" / "schema" / "refresh_data_schema_authority.php"), "--skip-publication"],
@@ -819,7 +837,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 20: DB-derived full system contract artifacts
+    # Step 22: DB-derived full system contract artifacts
     step_results["system_contract_authority"] = run_step(
         "System Contract Authority (generate_system_contract_authority.py)",
         [sys.executable, "generate_system_contract_authority.py"],
@@ -827,7 +845,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 21-22: Proof + wave/gap ledger
+    # Step 23-24: Proof + wave/gap ledger
     print(f"\n{'=' * 72}")
     print("STEP: Wave/Gap Ledger Generation")
     print(f"{'=' * 72}")

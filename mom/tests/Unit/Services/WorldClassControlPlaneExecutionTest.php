@@ -10,11 +10,15 @@ use MOM\Services\ControlPlane\ControlPlaneCommandGuard;
 use MOM\Services\ControlPlane\ControlPlaneCommandService;
 use MOM\Services\ControlPlane\EffectivityGateService;
 use MOM\Services\ControlPlane\EqmsFormExecutionService;
+use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
+use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
+use MOM\Services\Traceability\GenealogyGraphService;
 use MOM\Services\Traceability\UnifiedEvidenceGraphService;
 use PHPUnit\Framework\TestCase;
 
@@ -115,8 +119,27 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'change_order_ref' => 'CO-2026-001',
             'change_order_state' => 'released',
             'authority_source' => 'canonical_change_authority',
+            'authority_verified' => true,
+            'authority_context' => [
+                'resolved_by' => 'ChangeAuthorityService',
+                'resolution_status' => 'verified',
+                'field_path' => 'canonical_payload.result',
+            ],
         ]);
         $this->assertTrue($allowed->allowed);
+    }
+
+    public function testLegacyWriteSurfacePolicyPermanentlyClosesFileJsonMutationSurfaces(): void
+    {
+        $policy = new LegacyWriteSurfacePolicy();
+
+        foreach (['document_files', 'online_form_json', 'evidence_vault_json', 'product_passport_json'] as $surface) {
+            $decision = $policy->assess($surface, 'write');
+
+            $this->assertFalse($decision['allowed']);
+            $this->assertSame(410, $decision['status']);
+            $this->assertNotSame('', $decision['canonical_path']);
+        }
     }
 
     public function testCanonicalOutboxWritesToOutboxEventsWithHandlerAndJsonbCast(): void
@@ -198,6 +221,29 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('system_integrity', $row['evaluation_scope']);
         $this->assertStringContainsString('INSERT INTO periodic_evaluations', $db->queryOneCalls[0]['sql']);
+    }
+
+    public function testPeriodicEvaluationServiceClosesWithDigestOrAuditPackEvidence(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'passed',
+            'integrity_digest_id' => '00000000-0000-0000-0000-000000000021',
+            'result_payload' => '{"result":"ok"}',
+        ];
+
+        $row = (new PeriodicEvaluationService($db))->close([
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_state' => 'passed',
+            'integrity_digest_id' => '00000000-0000-0000-0000-000000000021',
+            'result_payload' => ['result' => 'ok'],
+        ]);
+
+        $this->assertSame('passed', $row['evaluation_state']);
+        $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[0]['sql']);
     }
 
     public function testCanonicalOutboxWorkerDispatchesByHandlerKey(): void
@@ -333,6 +379,208 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('evidence_package_incomplete', $manifest['exceptions'][0]['exception_code']);
     }
 
+    public function testEvidenceFinalizationServiceBuildsCompleteImmutablePackage(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $db = new EvidenceFinalizationFakeDb();
+            $result = (new EvidenceFinalizationService($dir, $db))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+            ]);
+
+            $this->assertSame('finalized', $result['finalization_state']);
+            $this->assertSame('locked', $result['record_state']);
+            $this->assertTrue($result['persisted']);
+            $this->assertSame('EVREC-1', $result['canonical']['evidence_record']['evidence_record_id']);
+            $this->assertArrayHasKey('original', $result['package']['artifacts']);
+            $this->assertArrayHasKey('canonical_payload', $result['package']['artifacts']);
+            $this->assertArrayHasKey('readable_snapshot', $result['package']['artifacts']);
+            $this->assertArrayHasKey('hash_signature_manifest', $result['package']['artifacts']);
+            $this->assertGreaterThanOrEqual(7, count($db->queryOneCalls));
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testChangeLifecycleCommandServicePersistsRequestOrderAndImpactObjects(): void
+    {
+        $db = new ChangeLifecycleFakeDb();
+        $service = new ChangeLifecycleCommandService($db);
+
+        $request = $service->createChangeRequest([
+            'change_request_number' => 'CR-1',
+            'request_type' => 'ecr',
+            'title' => 'Revise inspection form',
+            'affected_objects' => [[
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001',
+                'affected_fields' => ['schema_version'],
+                'requested_effect' => 'revise',
+            ]],
+        ], 'qa-1');
+        $this->assertSame('CR-1', $request['change_request_number']);
+
+        $order = $service->createChangeOrder([
+            'change_order_number' => 'CO-1',
+            'order_type' => 'eco',
+            'title' => 'Release revised inspection form',
+            'affected_objects' => [[
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001',
+                'affected_fields' => ['schema_version'],
+                'requested_effect' => 'revise',
+            ]],
+            'resulting_objects' => [[
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001-REV-B',
+                'result_role' => 'new_revision',
+            ]],
+            'effectivities' => [[
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001',
+                'effectivity_type' => 'date',
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'release_impact' => 'prospective',
+            ]],
+            'training_requirements' => [[
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001',
+                'audience_type' => 'role',
+                'audience_ref' => 'qa',
+                'training_requirement_type' => 'read_ack',
+                'requirement_state' => 'satisfied',
+                'due_before_effective' => true,
+            ]],
+            'verifications' => [[
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ]],
+            'effectiveness_reviews' => [[
+                'review_state' => 'scheduled',
+                'review_due_at' => '2026-04-15T00:00:00Z',
+            ]],
+        ], 'qa-1');
+        $this->assertSame('CO-1', $order['change_order_number']);
+
+        $inReview = $service->transitionChangeOrder([
+            'change_order_id' => 'CO-1',
+            'target_status' => 'in_review',
+            'reason' => 'submitted for review',
+        ], 'qa-1');
+        $this->assertSame('in_review', $inReview['status']);
+
+        $approved = $service->transitionChangeOrder([
+            'change_order_id' => 'CO-1',
+            'target_status' => 'approved',
+            'reason' => 'approved review',
+        ], 'qa-1');
+        $this->assertSame('approved', $approved['status']);
+
+        $released = $service->transitionChangeOrder([
+            'change_order_id' => 'CO-1',
+            'target_status' => 'released',
+            'reason' => 'approved implementation',
+        ], 'qa-1');
+        $this->assertSame('released', $released['status']);
+        $this->assertNotEmpty($db->queryOneCalls);
+    }
+
+    public function testChangeLifecycleReleaseBlocksUntilCanonicalLifecycleIsComplete(): void
+    {
+        $db = new ChangeLifecycleFakeDb();
+        $service = new ChangeLifecycleCommandService($db);
+
+        $service->createChangeOrder([
+            'change_order_number' => 'CO-BLOCK',
+            'title' => 'Incomplete change',
+            'affected_objects' => [[
+                'object_type' => 'document_revision',
+                'object_id' => 'SOP-001-A',
+                'affected_fields' => ['release_state'],
+            ]],
+        ], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'in_review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'approved'], 'qa-1');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('change_order_release_gate_blocked');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'released'], 'qa-1');
+    }
+
+    public function testEmergencyChangeReleaseRequiresRollbackAndPostImplementationControls(): void
+    {
+        $db = new ChangeLifecycleFakeDb();
+        $service = new ChangeLifecycleCommandService($db);
+
+        $service->createChangeOrder([
+            'change_order_number' => 'CO-EMERGENCY',
+            'order_type' => 'temporary_deviation',
+            'title' => 'Emergency containment deviation',
+            'emergency_change' => true,
+            'emergency_justification' => 'Containment needed before next shipment.',
+            'risk_accepted' => true,
+            'post_implementation_review_due_at' => '2026-04-21T00:00:00Z',
+            'rollback_plan' => [
+                'rollback_strategy' => 'restore prior SOP revision and quarantine WIP',
+                'rollback_trigger' => 'verification failure or elevated defect signal',
+            ],
+            'affected_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10',
+                'affected_fields' => ['operation.20.method'],
+                'requested_effect' => 'deviation',
+            ]],
+            'resulting_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'result_role' => 'replacement',
+            ]],
+            'effectivities' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'effectivity_type' => 'date',
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'release_impact' => 'wip_hold',
+            ]],
+            'training_requirements' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'audience_type' => 'role',
+                'audience_ref' => 'operator',
+                'training_requirement_type' => 'read_ack',
+                'requirement_state' => 'satisfied',
+            ]],
+            'verifications' => [[
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ]],
+            'effectiveness_reviews' => [[
+                'review_state' => 'scheduled',
+                'review_due_at' => '2026-04-21T00:00:00Z',
+            ]],
+        ], 'qa-1');
+
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'in_review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'approved'], 'qa-1');
+        $released = $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'released'], 'qa-1');
+
+        $this->assertSame('released', $released['status']);
+    }
+
     public function testUnifiedEvidenceGraphBuilds5mLinksAndImpactClosure(): void
     {
         $service = new UnifiedEvidenceGraphService();
@@ -358,6 +606,93 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $closure = $service->impactClosure('DOC-REV-1', $graph['edges']);
         $this->assertContains('EV-1', $closure);
+    }
+
+    public function testGenealogyGraphServiceWritesEdgeFactsAndBlocksIncomplete5M(): void
+    {
+        $db = new GenealogyGraphFakeDb();
+        $service = new GenealogyGraphService($db);
+
+        $fact = $service->recordEdgeFact([
+            'edge_fact_type' => 'consume',
+            'from_object_type' => 'material',
+            'from_object_id' => 'MAT-LOT-1',
+            'to_object_type' => 'work_order',
+            'to_object_id' => 'WO-1',
+            'change_order_id' => '00000000-0000-0000-0000-000000000201',
+            'field_path' => 'genealogy.consume',
+            'quantity' => 1,
+            'uom' => 'EA',
+        ], 'operator-1');
+
+        $this->assertSame('consume', $fact['edge_fact_type']);
+        $this->assertArrayHasKey('projected_graph', $fact);
+        $this->assertNotEmpty($db->queryOneCalls);
+        $this->assertStringContainsString('INSERT INTO genealogy_edge_facts', $db->queryOneCalls[0]['sql']);
+        $this->assertTrue($db->sawProjectionWrite);
+
+        $gate = $service->evaluateAndPersist5M([
+            'operation_class' => 'cnc_milling',
+            'object_type' => 'work_order',
+            'object_id' => 'WO-1',
+            'context' => [
+                'material_lot_id' => 'MAT-LOT-1',
+                'equipment_id' => 'MILL-1',
+            ],
+        ]);
+
+        $this->assertFalse($gate['allowed']);
+        $this->assertContains('method', $gate['missing_context']);
+        $this->assertContains('measurement', $gate['missing_context']);
+        $this->assertContains('manpower', $gate['missing_context']);
+    }
+
+    public function testGenealogyGraphWriteRequiresReleasedChangeAuthority(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('genealogy_change_authority_required');
+
+        (new GenealogyGraphService(new GenealogyGraphFakeDb()))->recordEdgeFact([
+            'edge_fact_type' => 'consume',
+            'from_object_type' => 'material',
+            'from_object_id' => 'MAT-LOT-1',
+            'to_object_type' => 'work_order',
+            'to_object_id' => 'WO-1',
+        ], 'operator-1');
+    }
+
+    public function testAsManufacturedThreadReadsProjectedGraphAndSnapshot(): void
+    {
+        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('work_order', 'WO-1');
+
+        $this->assertSame('genealogy_projected_graph', $thread['authority']);
+        $this->assertSame(str_repeat('a', 64), $thread['graph_hash_sha256']);
+        $this->assertNotEmpty($thread['edges']);
+        $this->assertSame('material', $thread['edges'][0]['from_node_type']);
+    }
+
+    private function removeTree(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $entries = scandir($dir);
+        if (!is_array($entries)) {
+            return;
+        }
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $dir . '/' . $entry;
+            if (is_dir($path)) {
+                $this->removeTree($path);
+            } else {
+                @chmod($path, 0644);
+                @unlink($path);
+            }
+        }
+        @rmdir($dir);
     }
 }
 
@@ -419,5 +754,369 @@ final class CanonicalOutboxFakeDb
             'idempotency_key' => (string)($params[':idempotency_key'] ?? ''),
             'scope_key' => (string)($params[':scope_key'] ?? ''),
         ];
+    }
+}
+
+final class GenealogyGraphFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryCalls = [];
+
+    public bool $sawProjectionWrite = false;
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'genealogy_edge_facts')) {
+            return [
+                'edge_fact_type' => (string)$params[':edge_fact_type'],
+                'from_object_type' => (string)$params[':from_object_type'],
+                'from_object_id' => (string)$params[':from_object_id'],
+                'to_object_type' => (string)$params[':to_object_type'],
+                'to_object_id' => (string)$params[':to_object_id'],
+                'source_event_id' => (string)$params[':source_event_id'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'genealogy_nodes')) {
+            $this->sawProjectionWrite = true;
+            return [
+                'genealogy_node_id' => $params[':node_ref'] === 'MAT-LOT-1'
+                    ? '00000000-0000-0000-0000-000000000301'
+                    : '00000000-0000-0000-0000-000000000302',
+                'node_type' => (string)$params[':node_type'],
+                'node_ref' => (string)$params[':node_ref'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'genealogy_edges')) {
+            $this->sawProjectionWrite = true;
+            return [
+                'genealogy_edge_id' => '00000000-0000-0000-0000-000000000401',
+                'edge_type' => (string)$params[':edge_type'],
+                'source_event_id' => (string)$params[':source_event_id'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'as_manufactured_snapshots')) {
+            $this->sawProjectionWrite = true;
+            return [
+                'as_manufactured_snapshot_id' => '00000000-0000-0000-0000-000000000501',
+                'subject_type' => (string)$params[':subject_type'],
+                'subject_ref' => (string)$params[':subject_ref'],
+                'snapshot_hash_sha256' => (string)$params[':snapshot_hash_sha256'],
+            ];
+        }
+
+        return [
+            'operation_class' => (string)$params[':operation_class'],
+            'object_type' => (string)$params[':object_type'],
+            'object_id' => (string)$params[':object_id'],
+            'gate_state' => (string)$params[':gate_state'],
+            'missing_context' => (string)$params[':missing_context'],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        $this->queryCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM plm_change_orders co')) {
+            return [[
+                'plm_change_order_id' => '00000000-0000-0000-0000-000000000201',
+                'change_order_number' => 'CO-GENEALOGY',
+                'status' => 'released',
+                'object_type' => 'material',
+                'object_id' => 'MAT-LOT-1',
+                'affected_fields' => '{"genealogy.consume"}',
+                'effectivity_rule' => '{}',
+                'plm_change_effectivity_id' => '00000000-0000-0000-0000-000000000202',
+                'effectivity_scope' => '{}',
+                'effective_from' => '2026-04-14T00:00:00Z',
+            ]];
+        }
+        if (str_contains($sql, 'FROM as_manufactured_snapshots')) {
+            return [[
+                'as_manufactured_snapshot_id' => '00000000-0000-0000-0000-000000000501',
+                'subject_type' => 'work_order',
+                'subject_ref' => 'WO-1',
+                'snapshot_state' => 'current',
+                'snapshot_hash_sha256' => str_repeat('a', 64),
+                'snapshot_payload' => '{}',
+            ]];
+        }
+        if (str_contains($sql, 'FROM genealogy_edges e')) {
+            return [[
+                'genealogy_edge_id' => '00000000-0000-0000-0000-000000000401',
+                'edge_type' => 'consumed',
+                'from_node_type' => 'material',
+                'from_node_ref' => 'MAT-LOT-1',
+                'to_node_type' => 'work_order',
+                'to_node_ref' => 'WO-1',
+                'source_event_id' => 'portal-1',
+                'metadata' => '{}',
+            ]];
+        }
+        return [];
+    }
+}
+
+final class EvidenceFinalizationFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_records')) {
+            return ['evidence_record_id' => 'EVREC-1', 'evidence_key' => (string)$params[':evidence_key'], 'record_state' => 'open'];
+        }
+        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_versions')) {
+            return ['evidence_version_id' => 'EVVER-1', 'evidence_record_id' => (string)$params[':evidence_record_id'], 'version_state' => 'locked'];
+        }
+        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_artifacts')) {
+            return ['evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'], 'artifact_role' => (string)$params[':artifact_role']];
+        }
+        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_publications')) {
+            return ['evidence_publication_id' => 'PUB-1', 'publication_state' => (string)$params[':publication_state']];
+        }
+        if (str_starts_with(ltrim($sql), 'UPDATE evidence_records')) {
+            return ['evidence_record_id' => 'EVREC-1', 'current_version_id' => (string)$params[':evidence_version_id'], 'record_state' => 'finalized'];
+        }
+        return [];
+    }
+}
+
+final class ChangeLifecycleFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $changeOrders = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $changeEffectivities = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $changeTrainingRequirements = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $changeVerifications = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $changeEffectivenessReviews = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $affectedObjects = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    private array $resultingObjects = [];
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        $trimmed = ltrim($sql);
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_requests')) {
+            return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => (string)$params[':number'], 'status' => (string)$params[':status']];
+        }
+        if (str_starts_with($trimmed, 'SELECT * FROM plm_change_requests')) {
+            return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => 'CR-1', 'status' => 'draft'];
+        }
+        if (str_starts_with($trimmed, 'UPDATE plm_change_requests')) {
+            return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => 'CR-1', 'status' => (string)$params[':status']];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_orders')) {
+            $row = [
+                'plm_change_order_id' => '00000000-0000-0000-0000-000000000201',
+                'change_order_number' => (string)$params[':number'],
+                'order_type' => (string)($params[':order_type'] ?? 'eco'),
+                'status' => (string)$params[':status'],
+                'metadata' => json_decode((string)($params[':metadata'] ?? '{}'), true) ?: [],
+            ];
+            $this->changeOrders[$row['change_order_number']] = $row;
+            $this->changeOrders[$row['plm_change_order_id']] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'SELECT * FROM plm_change_orders')) {
+            $id = (string)($params[':id'] ?? '');
+            if (isset($this->changeOrders[$id])) {
+                return $this->changeOrders[$id];
+            }
+            return ['plm_change_order_id' => '00000000-0000-0000-0000-000000000201', 'change_order_number' => 'CO-1', 'status' => 'draft'];
+        }
+        if (str_starts_with($trimmed, 'UPDATE plm_change_orders')) {
+            $id = (string)($params[':id'] ?? '');
+            $row = $this->changeOrders[$id] ?? ['plm_change_order_id' => '00000000-0000-0000-0000-000000000201', 'change_order_number' => $id === '' ? 'CO-1' : $id];
+            $row['status'] = (string)$params[':status'];
+            $row['metadata'] = array_merge(
+                is_array($row['metadata'] ?? null) ? $row['metadata'] : [],
+                json_decode((string)($params[':metadata'] ?? '{}'), true) ?: [],
+            );
+            $this->changeOrders[(string)$row['change_order_number']] = $row;
+            $this->changeOrders[$row['plm_change_order_id']] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_effectivities')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'effectivity_type' => (string)($params[':effectivity_type'] ?? ''),
+                'effectivity_scope' => $params[':effectivity_scope'] ?? '{}',
+                'effective_from' => (string)($params[':effective_from'] ?? ''),
+                'effective_to' => (string)($params[':effective_to'] ?? ''),
+                'release_impact' => (string)($params[':release_impact'] ?? ''),
+            ];
+            $this->changeEffectivities[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_affected_objects')) {
+            $row = [
+                'plm_change_request_id' => (string)($params[':request_id'] ?? ''),
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'object_revision' => (string)($params[':object_revision'] ?? ''),
+                'affected_fields' => $params[':affected_fields'] ?? '{}',
+                'requested_effect' => (string)($params[':requested_effect'] ?? ''),
+                'disposition' => (string)($params[':disposition'] ?? ''),
+                'effectivity_rule' => $params[':effectivity_rule'] ?? '{}',
+                'wip_disposition' => $params[':wip_disposition'] ?? '{}',
+            ];
+            $this->affectedObjects[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_resulting_objects')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'resulting_revision' => (string)($params[':resulting_revision'] ?? ''),
+                'result_role' => (string)($params[':result_role'] ?? ''),
+                'release_state' => (string)($params[':release_state'] ?? ''),
+            ];
+            $this->resultingObjects[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_training_requirements')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'audience_type' => (string)($params[':audience_type'] ?? ''),
+                'audience_ref' => (string)($params[':audience_ref'] ?? ''),
+                'training_requirement_type' => (string)($params[':training_requirement_type'] ?? $params[':requirement_type'] ?? ''),
+                'due_before_effective' => (bool)($params[':due_before_effective'] ?? false),
+                'requirement_state' => (string)($params[':requirement_state'] ?? ''),
+                'due_at' => (string)($params[':due_at'] ?? ''),
+                'satisfied_at' => (string)($params[':satisfied_at'] ?? ''),
+            ];
+            $this->changeTrainingRequirements[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_verifications')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'verification_type' => (string)($params[':verification_type'] ?? ''),
+                'verification_state' => (string)($params[':verification_state'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'evidence_record_id' => (string)($params[':evidence_record_id'] ?? ''),
+                'verified_by_user_id' => (string)($params[':verified_by_user_id'] ?? ''),
+                'verified_at' => (string)($params[':verified_at'] ?? ''),
+                'failure_reason' => (string)($params[':failure_reason'] ?? ''),
+            ];
+            $this->changeVerifications[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO plm_change_effectiveness_reviews')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'review_state' => (string)($params[':review_state'] ?? ''),
+                'review_due_at' => (string)($params[':review_due_at'] ?? ''),
+                'reviewed_by_user_id' => (string)($params[':reviewed_by_user_id'] ?? ''),
+                'reviewed_at' => (string)($params[':reviewed_at'] ?? ''),
+                'effectiveness_result' => $params[':effectiveness_result'] ?? '{}',
+                'followup_required' => (bool)($params[':followup_required'] ?? false),
+                'followup_object_type' => (string)($params[':followup_object_type'] ?? ''),
+                'followup_object_id' => (string)($params[':followup_object_id'] ?? ''),
+            ];
+            $this->changeEffectivenessReviews[] = $row;
+            return $row;
+        }
+        return ['ok' => true];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        $trimmed = ltrim($sql);
+        if (str_contains($trimmed, 'FROM plm_change_affected_objects')) {
+            return $this->affectedObjects;
+        }
+        if (str_contains($trimmed, 'FROM plm_change_resulting_objects')) {
+            return $this->resultingObjects;
+        }
+        if (str_contains($trimmed, 'FROM plm_change_effectivities')) {
+            return $this->changeEffectivities;
+        }
+        if (str_contains($trimmed, 'FROM plm_change_training_requirements')) {
+            return $this->changeTrainingRequirements;
+        }
+        if (str_contains($trimmed, 'FROM plm_change_verifications')) {
+            return $this->changeVerifications;
+        }
+        if (str_contains($trimmed, 'FROM plm_change_effectiveness_reviews')) {
+            return $this->changeEffectivenessReviews;
+        }
+        if (str_contains($trimmed, 'FROM effectivity_conflicts')) {
+            return [];
+        }
+        return [];
     }
 }

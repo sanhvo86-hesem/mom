@@ -2,7 +2,7 @@
 
 Audited branch: `main`
 
-Date: 2026-04-13
+Date: 2026-04-14
 
 This document defines the current Phase 1 execution truth model for CNC/discrete manufacturing. It preserves the existing custom MVC architecture, router/middleware behavior, and legacy JSON fallback while making the operational boundary explicit.
 
@@ -31,6 +31,8 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
 | Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. |
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
+| AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
+| Evidence artifact | `EvidenceVaultService` custody/hash chain with DB bridge where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. |
 
 ## Event vs snapshot rules
 
@@ -47,6 +49,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | JSON dispatch/mobile files | Legacy live fallback and current operational compatibility store | Existing controllers/services only, under role/CSRF checks. |
 | PostgreSQL MES/mobile bridge tables | Migration bridge, analytics-ready mirror, future DB-primary candidate | Service-layer shadow writes after accepted operational validation. |
 | AI scheduling/analytics files | Advisory projections and model inputs/outputs | Advisory service writes only. No execution authority. |
+| AI recommendation actions | Advisory review ledger in `ai_recommendation_actions` | Legacy migration 099 wording | Migration 110 re-documents the table as human-review advisory records, not autonomous execution. |
 | Master-data JSON/DB seeds | Controlled vocabulary and governance seed | Migration/master-data governance path. No hardcoded business lists in controller logic. |
 
 ## State model rules
@@ -69,6 +72,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 
 - AI may read canonical execution facts and derived projections.
 - AI may record feedback only through CSRF-protected, idempotent write paths.
+- AI natural-language query and RCA POST surfaces require CSRF because they write conversation/advisory history or trigger advisory processing.
 - AI may suggest risk, priority, or quality insights, but may not dispatch work, complete targets, approve inspections, create quality disposition, or command machines.
 - Execution truth remains in MOM/MES service paths, not in AI JSON files.
 - AI ETL may extract `shopfloor_execution` features from accepted execution facts for training/projection snapshots; those datasets are downstream analytics artifacts and never overwrite dispatch, quality, maintenance, tooling, or machine state.

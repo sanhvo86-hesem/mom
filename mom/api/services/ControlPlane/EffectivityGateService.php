@@ -93,7 +93,7 @@ final class EffectivityGateService
             if (!$required) {
                 continue;
             }
-            if (in_array($gate, ['complete', 'waived'], true)) {
+            if (in_array($gate, ['complete', 'satisfied', 'waived'], true)) {
                 if ($gate === 'waived') {
                     $warnings[] = $this->blocker('training_gate_waived', 'Training gate was waived and must be visible in audit pack.', $requirement);
                 }

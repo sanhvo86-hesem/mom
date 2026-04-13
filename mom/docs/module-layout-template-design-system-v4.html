@@ -1583,6 +1583,36 @@ blocked transitions:
 </div>
 </section>
 
+<section class="section" id="graphics-release-evidence-pack">
+<h2 class="section-title"><span class="section-number">2H.1</span>Graphics Release Evidence Pack <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Graphics evidence pack là artifact bất biến dùng để chứng minh một graphics change đã đi qua impact, compliance, drift, rollout, rollback và waiver control.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Evidence item</th><th>Required contents</th><th>Release condition</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td><code>GraphicsReleaseLink</code></td><td>Authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waiver refs, rollout decision ref, rollback plan ref.</td><td>Required for every governed graphics publish/apply. Missing ref blocks G19.</td><td>Release Engineering</td></tr>
+<tr><td>Affected module snapshot</td><td>Modules, routes, screens, block families, regulated/shopfloor flags and owner teams from the approved impact report.</td><td>Required when any token, component, template, zone or policy pack change is staged.</td><td>Frontend Platform + QA</td></tr>
+<tr><td>Compliance and drift snapshot</td><td>Module Graphics Compliance Matrix, Runtime Compliance Beacon, drift report, visual debt observatory and release blockers at decision time.</td><td>Required before stage, canary apply and global apply.</td><td>Design System Governance</td></tr>
+<tr><td>Verification proof</td><td>Screenshot diff refs, keyboard/focus proof, WCAG evidence, shopfloor smoke proof, regulated traceability where applicable.</td><td>Evidence list scales with <code>severityClass</code>; regulated/shopfloor-critical cannot rely on waiver alone.</td><td>QA Governance</td></tr>
+<tr><td>Rollback proof</td><td>Rollback snapshot id, rollback plan ref, owner signoff and post-apply verification plan.</td><td>Global apply is invalid without rollback path and post-canary evidence for canary rollouts.</td><td>Release Engineering</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
+<section class="section" id="staged-canary-graphics-rollout">
+<h2 class="section-title"><span class="section-number">2H.2</span>Staged / Canary Graphics Rollout <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Canary rollout is a governed release state, not a visual preview. It limits blast radius while preserving backend authority, release evidence and rollback accountability.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Rollout scope</th><th>Required inputs</th><th>Apply gate</th><th>Post-canary proof</th></tr></thead>
+<tbody>
+<tr><td><code>preview-only</code></td><td>Draft or preview cache, change-set candidate, no production binding.</td><td>Never changes production module authority.</td><td>None; clearly labeled non-authority.</td></tr>
+<tr><td><code>canary-module-group</code></td><td>Backend impact ID, module list, releaseManifestRefs, rollback snapshot target.</td><td>No active scoped blockers and registry ETag must still match staged state.</td><td>Runtime beacon artifact, drift report artifact, module owner signoff artifact.</td></tr>
+<tr><td><code>canary-domain</code></td><td>Domain, affected module set, regulated/shopfloor flags, evidence checklist.</td><td>Domain scope may not include unwaived regulated/shopfloor blockers.</td><td>Domain-level beacon and screenshot/keyboard evidence where impact requires it.</td></tr>
+<tr><td><code>environment-stage</code></td><td>Environment policy pack, token overrides, evidence obligations.</td><td>Policy pack impact must be current and backend-attested.</td><td>Environment-specific proof: kiosk, TV/andon, night-shift, glare or glove-mode as applicable.</td></tr>
+<tr><td><code>global-apply</code></td><td>Staged or canary-applied rollout, release refs, rollback plan, active blocker snapshot.</td><td>Blocked if post-canary proof does not resolve to controlled artifacts.</td><td>Release evidence pack and rollback readiness recorded in audit history.</td></tr>
+</tbody>
+</table></div></div>
+</section>
+
 <section class="section" id="admin-family-upgrade-cat-admin">
 <h2 class="section-title"><span class="section-number">2I</span>Admin Family Upgrade in cat-admin <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
 <p class="section-subtitle">cat-admin không chỉ là admin module family; nó là admin authority family cho identity, graphics, endpoint, waiver, release và observability.</p>
@@ -1673,6 +1703,15 @@ blocked transitions:
 <div class="grid-2">
 <div class="card"><div class="card-header">Required nodes</div><div class="card-body"><ul><li><code>admin-appearance</code></li><li><code>backend-graphics-authority</code></li><li><code>shared-tokens</code></li><li><code>shared-components</code></li><li><code>template:{templateId}</code></li><li><code>module:{moduleId}</code></li><li><code>route:{route}</code> and release artifact refs.</li></ul></div></div>
 <div class="card"><div class="card-header">Verification rules</div><div class="card-body"><ul><li>Missing module-to-template edge creates template drift.</li><li>Missing component-to-module edge creates component contract drift.</li><li>Missing release artifact edge blocks release for new/major-refactor modules.</li><li>Every edge must name relation, source artifact and generatedAt.</li></ul></div></div>
+</div>
+</section>
+
+<section class="section" id="template-lineage-migration-graph">
+<h2 class="section-title"><span class="section-number">2N.1</span>Template Lineage / Migration Graph <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Template lineage tracks inheritance, version history, deprecation windows and migration readiness as backend authority, not as gallery metadata.</p>
+<div class="grid-2">
+<div class="card"><div class="card-header">Required lineage fields</div><div class="card-body"><ul><li><code>templateId</code>, <code>version</code>, <code>parentTemplateId</code>, <code>supersedesTemplateId</code>, <code>supersedesVersion</code>.</li><li><code>deprecatedAt</code>, <code>deprecationWindow</code>, <code>migrationDeadline</code>, <code>migrationPlanRefs</code>.</li><li><code>affectedModules</code>, <code>owner</code>, <code>approver</code>, <code>evidenceRefs</code>, checksum and authority ref.</li></ul></div></div>
+<div class="card"><div class="card-header">Blocker rules</div><div class="card-body"><ul><li>Deprecating a published template requires migration plan refs for every governed module.</li><li>Publishing a replacement template requires impact analysis against both old and new template versions.</li><li>Module migration is blocked when regulated/shopfloor evidence is missing or rollback target is invalid.</li><li>Legacy-bridged templates must carry explicit owner, reason, expiry or migration backlog ref.</li></ul></div></div>
 </div>
 </section>
 

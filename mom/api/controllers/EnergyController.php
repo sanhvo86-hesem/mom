@@ -374,20 +374,22 @@ class EnergyController extends BaseController
             }
 
             // Calculate averages
-            foreach ($perPart as &$pp) {
-                $pp['total_kwh']     = round($pp['total_kwh'], 2);
-                $pp['total_cost']    = round($pp['total_cost'], 2);
-                $pp['kwh_per_part']  = $pp['total_parts'] > 0
-                    ? round($pp['total_kwh'] / $pp['total_parts'], 3)
-                    : 0;
-                $pp['cost_per_part'] = $pp['total_parts'] > 0
-                    ? round($pp['total_cost'] / $pp['total_parts'], 4)
-                    : 0;
+            $partList = [];
+            foreach ($perPart as $pp) {
+                $totalKwh = round((float)$pp['total_kwh'], 2);
+                $totalCost = round((float)$pp['total_cost'], 2);
+                $totalParts = (int)$pp['total_parts'];
+                $partList[] = [
+                    'part_id' => (string)$pp['part_id'],
+                    'total_kwh' => $totalKwh,
+                    'total_parts' => $totalParts,
+                    'total_cost' => $totalCost,
+                    'kwh_per_part' => $totalParts > 0 ? round($totalKwh / $totalParts, 3) : 0.0,
+                    'cost_per_part' => $totalParts > 0 ? round($totalCost / $totalParts, 4) : 0.0,
+                ];
             }
-            unset($pp);
 
             // Sort by kwh_per_part descending
-            $partList = array_values($perPart);
             usort($partList, fn(array $a, array $b) => $b['kwh_per_part'] <=> $a['kwh_per_part']);
 
             $this->success([

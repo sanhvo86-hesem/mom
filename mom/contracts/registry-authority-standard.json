@@ -101,7 +101,12 @@
     {
       "layer": "runtime_registry",
       "sourceOfTruth": [
-        "mom/data/registry/table-registry.json",
+        "mom/contracts/table-registry.json",
+        "mom/contracts/object-index.json",
+        "mom/contracts/domain-map.json",
+        "mom/contracts/command-index.json"
+      ],
+      "derivedArtifacts": [
         "mom/data/registry/endpoint-catalog.json",
         "mom/data/registry/relation-map.json",
         "mom/data/registry/registry-manifest.json"

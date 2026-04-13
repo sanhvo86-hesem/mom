@@ -124,11 +124,12 @@ final class TrustedReleaseRecordService
                     'record_copy_hash' => null,
                 ],
                 'provenance' => [
-                    'source' => 'production_history_read_model',
+                    'source' => 'production_history_read_model_with_canonical_genealogy_projection',
                     'history_packet_id' => (string)($historyPacket['packet_id'] ?? ''),
                     'event_hashes' => array_values(array_filter(array_column($events, 'event_hash'))),
                     'timeline' => $this->provenanceTimeline($events, $now, 'assembled'),
                     'deterministic_order' => (string)($historyPacket['deterministic_order'] ?? 'occurred_at, recorded_at, event_id'),
+                    'canonical_genealogy_graph' => $this->canonicalGenealogyProvenance($criteria, $sections['genealogy'] ?? []),
                 ],
                 'metrics_snapshot' => $this->metrics,
                 'correlation_id' => trim((string)($criteria['correlation_id'] ?? $this->firstRef($references, 'correlation_id'))),
@@ -325,6 +326,7 @@ final class TrustedReleaseRecordService
                 'evidence_present',
                 'approval_or_signature_present',
                 'qualification_asserted',
+                'canonical_genealogy_projection_when_required',
             ],
             'state_model' => ['draft', 'assembled', 'blocked', 'releasable', 'released', 'superseded', 'voided'],
             'metrics' => $this->metrics,
@@ -419,13 +421,34 @@ final class TrustedReleaseRecordService
         $evidence = $this->evidenceAssertion($events, $sections['evidence'] ?? []);
         $approval = $this->approvalAssertion($events, $sections['approvals'] ?? []);
         $qualification = $this->qualificationAssertion($events, $sections['workforce'] ?? [], $criteria);
+        $genealogy = $this->canonicalGenealogyAssertion($criteria, $sections['genealogy'] ?? []);
 
-        return [
+        $assertions = [
             'execution_complete' => $execution,
             'quality_accepted' => $quality,
             'evidence_present' => $evidence,
             'approval_or_signature_present' => $approval,
             'qualification_asserted' => $qualification,
+        ];
+        if ((bool)($criteria['requires_canonical_genealogy'] ?? false)) {
+            $assertions['canonical_genealogy_projection'] = $genealogy;
+        }
+        return $assertions;
+    }
+
+    /**
+     * @param array<string, mixed> $criteria
+     * @param mixed $section
+     * @return array<string, mixed>
+     */
+    private function canonicalGenealogyAssertion(array $criteria, mixed $section): array
+    {
+        $provenance = $this->canonicalGenealogyProvenance($criteria, $section);
+        return [
+            'satisfied' => (bool)$provenance['projection_present'],
+            'snapshot_id' => $provenance['snapshot_id'],
+            'snapshot_hash_sha256' => $provenance['snapshot_hash_sha256'],
+            'reason_code' => (bool)$provenance['projection_present'] ? 'canonical_genealogy_projection_present' : 'canonical_genealogy_projection_missing',
         ];
     }
 
@@ -612,6 +635,7 @@ final class TrustedReleaseRecordService
             'evidence_present' => 'evidence',
             'approval_or_signature_present' => 'approval_signature',
             'qualification_asserted' => 'workforce_qualification',
+            'canonical_genealogy_projection' => 'genealogy',
             default => 'release_record',
         };
     }
@@ -624,6 +648,7 @@ final class TrustedReleaseRecordService
             'evidence_present' => 'Required release evidence attachment is missing.',
             'approval_or_signature_present' => 'Required release approval or electronic signature assertion is missing.',
             'qualification_asserted' => 'Required workforce qualification assertion is missing or blocked.',
+            'canonical_genealogy_projection' => 'Canonical as-manufactured genealogy projection is missing.',
             default => 'Release assertion is not satisfied.',
         };
     }
@@ -728,6 +753,32 @@ final class TrustedReleaseRecordService
     }
 
     /**
+     * @param array<string, mixed> $criteria
+     * @param mixed $genealogySection
+     * @return array<string, mixed>
+     */
+    private function canonicalGenealogyProvenance(array $criteria, mixed $genealogySection): array
+    {
+        $section = is_array($genealogySection) ? $genealogySection : [];
+        $snapshotId = trim((string)($criteria['as_manufactured_snapshot_id'] ?? $criteria['canonical_genealogy_snapshot_id'] ?? ''));
+        $snapshotHash = trim((string)($criteria['as_manufactured_snapshot_hash'] ?? $criteria['canonical_genealogy_graph_hash'] ?? ''));
+        if ($snapshotId === '' && isset($section['as_manufactured_snapshot_id']) && is_scalar($section['as_manufactured_snapshot_id'])) {
+            $snapshotId = trim((string)$section['as_manufactured_snapshot_id']);
+        }
+        if ($snapshotHash === '' && isset($section['snapshot_hash_sha256']) && is_scalar($section['snapshot_hash_sha256'])) {
+            $snapshotHash = trim((string)$section['snapshot_hash_sha256']);
+        }
+
+        return [
+            'authority' => 'as_manufactured_snapshots',
+            'snapshot_id' => $snapshotId,
+            'snapshot_hash_sha256' => $snapshotHash,
+            'projection_required' => (bool)($criteria['requires_canonical_genealogy'] ?? false),
+            'projection_present' => $snapshotId !== '' || preg_match('/^[a-f0-9]{64}$/i', $snapshotHash) === 1,
+        ];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function retentionMetadata(): array
@@ -768,8 +819,8 @@ final class TrustedReleaseRecordService
             'actor_id' => null,
         ];
         usort($timeline, static function (array $left, array $right): int {
-            $cmp = strcmp((string)($left['occurred_at'] ?? ''), (string)($right['occurred_at'] ?? ''));
-            return $cmp !== 0 ? $cmp : strcmp((string)($left['event_id'] ?? ''), (string)($right['event_id'] ?? ''));
+            $cmp = strcmp((string)$left['occurred_at'], (string)$right['occurred_at']);
+            return $cmp !== 0 ? $cmp : strcmp((string)$left['event_id'], (string)$right['event_id']);
         });
         return $timeline;
     }

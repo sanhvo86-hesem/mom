@@ -12,6 +12,10 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS governed_route_registry (
     governed_route_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
     route_pattern TEXT NOT NULL,
     http_method TEXT NOT NULL DEFAULT '*',
     object_type TEXT NOT NULL,
@@ -22,6 +26,10 @@ CREATE TABLE IF NOT EXISTS governed_route_registry (
         CHECK (route_state IN ('blocked', 'compat_read_only', 'command_authoritative', 'retired')),
     legacy_owner TEXT,
     sunset_at TIMESTAMPTZ,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
     metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -30,6 +38,10 @@ CREATE TABLE IF NOT EXISTS governed_route_registry (
 
 CREATE TABLE IF NOT EXISTS legacy_authority_sunset (
     legacy_authority_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
     legacy_surface TEXT NOT NULL UNIQUE,
     legacy_storage TEXT NOT NULL,
     replacement_service TEXT NOT NULL,
@@ -41,12 +53,20 @@ CREATE TABLE IF NOT EXISTS legacy_authority_sunset (
     owner TEXT NOT NULL DEFAULT 'platform',
     sunset_due_at TIMESTAMPTZ,
     exception_reason TEXT,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS control_plane_command_handlers (
     command_handler_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
     command_name TEXT NOT NULL,
     handler_key TEXT NOT NULL,
     handler_state TEXT NOT NULL DEFAULT 'active'
@@ -55,6 +75,10 @@ CREATE TABLE IF NOT EXISTS control_plane_command_handlers (
     required_guard_set JSONB NOT NULL DEFAULT '[]'::jsonb,
     emitted_event_types JSONB NOT NULL DEFAULT '[]'::jsonb,
     idempotency_scope TEXT NOT NULL DEFAULT 'command_name',
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (command_name, handler_key)
@@ -148,6 +172,10 @@ CREATE TABLE IF NOT EXISTS genealogy_edge_facts (
 
 CREATE TABLE IF NOT EXISTS traceability_5m_obligations (
     traceability_5m_obligation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
     operation_class TEXT NOT NULL,
     object_type TEXT NOT NULL,
     object_id TEXT NOT NULL,
@@ -161,9 +189,53 @@ CREATE TABLE IF NOT EXISTS traceability_5m_obligations (
     missing_context JSONB NOT NULL DEFAULT '[]'::jsonb,
     waiver_signature_event_id UUID,
     decided_at TIMESTAMPTZ,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'traceability_5m_obligation.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (operation_class, object_type, object_id)
 );
+
+ALTER TABLE governed_route_registry
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE legacy_authority_sunset
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE control_plane_command_handlers
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE traceability_5m_obligations
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'traceability_5m_obligation.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
 
 CREATE OR REPLACE VIEW canonical_outbox_legacy_bridge AS
 SELECT

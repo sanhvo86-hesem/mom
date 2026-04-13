@@ -64,6 +64,7 @@ final class AiAdvisoryExecutionProjectionTest extends TestCase
         $result = $etl->extractTrainingData('quality_prediction', [
             'date_from' => '2026-04-01',
             'date_to' => '2026-04-12',
+            'org_id' => 'ORG-1',
         ]);
 
         $sql = $db->queries[0]['sql'];
@@ -97,6 +98,7 @@ final class AiAdvisoryExecutionProjectionTest extends TestCase
         $result = $etl->extractTrainingData('shopfloor_execution', [
             'date_from' => '2026-04-01',
             'date_to' => '2026-04-12',
+            'org_id' => 'ORG-1',
         ]);
 
         $sql = $db->queries[0]['sql'];
@@ -120,6 +122,7 @@ final class AiAdvisoryExecutionProjectionTest extends TestCase
             $etl->extractTrainingData('shopfloor_execution', [
                 'date_from' => '2026-02-31',
                 'date_to' => '2026-03-01',
+                'org_id' => 'ORG-1',
             ]);
             $this->fail('Invalid calendar date should be rejected.');
         } catch (\InvalidArgumentException $e) {
@@ -132,6 +135,7 @@ final class AiAdvisoryExecutionProjectionTest extends TestCase
         $etl->extractTrainingData('shopfloor_execution', [
             'date_from' => '2026-04-12',
             'date_to' => '2026-04-01',
+            'org_id' => 'ORG-1',
         ]);
     }
 }

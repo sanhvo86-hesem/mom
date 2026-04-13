@@ -327,7 +327,7 @@ class GenericCrudService
         }
 
         foreach ($query as $key => $value) {
-            if (!is_scalar($value) || $value === '' || $value === null) {
+            if (!is_scalar($value) || $value === '') {
                 continue;
             }
             if (in_array($key, ['search', 'q', 'status', 'sort', 'direction', 'limit', 'offset', 'action', 'domain', 'table', 'id', 'cursor', 'scope', 'row_version', 'expected_row_version', 'version'], true)) {
@@ -956,7 +956,7 @@ class GenericCrudService
             }
             if (isset($constraints['enumRef']) && is_scalar($value)) {
                 $allowed = array_map(
-                    static fn(array $option): string => (string)($option['value'] ?? ''),
+                    static fn(array $option): string => (string)$option['value'],
                     $this->registry->statusSet((string)$constraints['enumRef'])
                 );
                 if ($allowed !== [] && !in_array((string)$value, $allowed, true)) {
@@ -1105,8 +1105,8 @@ class GenericCrudService
         if (in_array($candidate, $columns, true)) {
             return $this->assertIdentifier($candidate, 'primary key');
         }
-        if (preg_match_all('/[A-Za-z_][A-Za-z0-9_]*/', $candidate, $matches) === 1 || !empty($matches[0])) {
-            foreach ((array)($matches[0] ?? []) as $token) {
+        if (preg_match_all('/[A-Za-z_][A-Za-z0-9_]*/', $candidate, $matches) >= 1) {
+            foreach ($matches[0] as $token) {
                 $token = trim((string)$token);
                 if ($token !== '' && in_array($token, $columns, true)) {
                     return $this->assertIdentifier($token, 'primary key');
@@ -1218,7 +1218,7 @@ class GenericCrudService
     }
 
     /**
-     * @param array<int, array{sql:string, params:array<string, mixed>}> $clauses
+     * @param array<string, mixed> ...$clauses
      * @return array{sql:string, params:array<string, mixed>}
      */
     private function combineWhereClauses(array ...$clauses): array
@@ -1266,7 +1266,7 @@ class GenericCrudService
     /**
      * @param array<string, mixed> $column
      */
-    private function auditActorValue(array $column, string $actor): string|int|float|bool|null
+    private function auditActorValue(array $column, string $actor): ?string
     {
         $trimmed = trim($actor);
         if ($trimmed === '') {
@@ -1326,7 +1326,7 @@ class GenericCrudService
         }
 
         $values = array_map(
-            static fn(array $option): string => (string)($option['value'] ?? ''),
+            static fn(array $option): string => (string)$option['value'],
             $this->registry->statusSet($statusSet)
         );
         if ($values !== [] && !in_array($toStatus, $values, true)) {

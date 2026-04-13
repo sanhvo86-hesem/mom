@@ -32,6 +32,7 @@ class AuthController extends BaseController
         $user = null;
 
         if (!empty($_SESSION['user']) && is_array($this->store)) {
+            /** @var array<string, mixed>|false $u */
             $u = find_user_by_username($this->store, (string)$_SESSION['user']);
             if ($u) {
                 $settings = $this->store['settings'] ?? [];
@@ -82,7 +83,7 @@ class AuthController extends BaseController
         }
 
         // Clean up expired enrollment state
-        if (!$logged && ($enrollUser !== '' || $enrollSecret !== '' || $enrollStarted > 0) && !$enrollPending) {
+        if (($enrollUser !== '' || $enrollSecret !== '' || $enrollStarted > 0) && !$enrollPending) {
             clear_pending_auth_session_state();
             $authExpired = 'enroll';
         }
@@ -92,13 +93,14 @@ class AuthController extends BaseController
         $preauthStarted   = (int)($_SESSION['preauth_started'] ?? 0);
         $preauthRemaining = pending_auth_remaining_seconds($preauthStarted);
 
-        if (!$logged && !$enrollPending && $preauthUser !== '' && $preauthRemaining <= 0) {
+        if (!$enrollPending && $preauthUser !== '' && $preauthRemaining <= 0) {
             clear_pending_auth_session_state();
             $authExpired = $authExpired ?: 'mfa';
             $preauthUser = '';
         }
 
-        if (!$logged && !$enrollPending && $preauthUser !== '' && is_array($this->store)) {
+        if (!$enrollPending && $preauthUser !== '' && is_array($this->store)) {
+            /** @var array<string, mixed>|false $u */
             $u = find_user_by_username($this->store, $preauthUser);
             if ($u && session_requires_completed_mfa(
                 $u,

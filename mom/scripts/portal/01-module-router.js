@@ -48,25 +48,18 @@ function renderModuleById(container, moduleId) {
   });
 }
 
-/* ── Load Schema (API → localStorage → embedded) ────────────────────────── */
-function _loadSchema(moduleId) {
-  // Try API first
-  return _apiGet('module_schema_get', { id: moduleId }).then(function(r) {
-    if (r && r.ok && r.schema) return r.schema;
-    // Fallback: try localStorage
-    return _loadLocal(moduleId);
-  }).catch(function() {
-    return _loadLocal(moduleId);
-  });
-}
-
-function _loadLocal(moduleId) {
-  try {
-    var raw = localStorage.getItem('hm_module_schema_' + moduleId) || localStorage.getItem('hm_schema_' + moduleId);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return null;
-}
+  /* ── Load Schema (API authority only) ──────────────────────────────────────
+     Runtime module schema authority must come from backend registry/API.
+     Preview schema must be served by a backend/builder endpoint, never by a
+     browser flag, browser storage, or session-injected provider. */
+  function _loadSchema(moduleId) {
+    return _apiGet('module_schema_get', { id: moduleId }).then(function(r) {
+      if (r && r.ok && r.schema) return r.schema;
+      return null;
+    }).catch(function() {
+      return null;
+    });
+  }
 
 function _apiGet(action, params) {
   if (typeof apiCall === 'function') {
@@ -96,7 +89,7 @@ function _apiPost(action, body) {
 }
 
 /* ── Render From Schema ──────────────────────────────────────────────────── */
-function _renderFromSchema(container, schema) {
+  function _renderFromSchema(container, schema) {
   var moduleId = schema.moduleId;
   var state = BE.getModuleState(moduleId);
 
@@ -106,6 +99,12 @@ function _renderFromSchema(container, schema) {
   }
 
   var h = '';
+  if (schema._graphicsAuthority && schema._graphicsAuthority.releaseBlocking) {
+    h += '<div class="hm-alert hm-alert-warning" role="status" style="margin-bottom:var(--space-3);padding:var(--space-3);border:1px solid var(--color-warning-300,var(--amber));border-radius:var(--radius-md);background:var(--color-warning-50,#fffbeb);color:var(--text-primary)">'
+      + '<strong>Graphics authority preview only.</strong> '
+      + _esc(schema._graphicsAuthority.reason || 'Local preview cache is not production authority.')
+      + '</div>';
+  }
 
   /* ── Page Header (gradient) ────────────────────────────────────────── */
   h += '<div style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);color:#fff;padding:var(--space-5) var(--space-6) var(--space-4);border-radius:var(--radius-xl);margin-bottom:var(--space-5)">';

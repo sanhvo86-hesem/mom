@@ -17,6 +17,12 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Block generated/runtime artifacts in controlled source
+        run: php mom/tools/release/check_repo_boundary.php
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1

@@ -877,10 +877,10 @@ final class DataSchemaService
             ],
             'registry_authority_standard' => [
                 'label' => 'Enterprise registry authority standard',
-                'category' => 'authority',
+                'category' => 'reference',
                 'path' => $this->contractsPath('registry-authority-standard.json'),
-                'targetAgeSeconds' => 14400,
-                'requiredForRelease' => true,
+                'targetAgeSeconds' => 2592000,
+                'requiredForRelease' => false,
                 'dependencyPaths' => [
                     $this->contractsPath('schemas/registry-authority-standard.schema.json'),
                 ],

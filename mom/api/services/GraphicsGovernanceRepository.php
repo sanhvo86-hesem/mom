@@ -310,6 +310,59 @@ class GraphicsGovernanceRepository
         return is_string($raw) ? $raw : '';
     }
 
+    public function controlledArtifactExists(string $ref): bool
+    {
+        $ref = trim(str_replace('\\', '/', $ref));
+        if ($ref === '' || str_contains($ref, "\0") || str_starts_with($ref, '/') || str_contains($ref, '../')) {
+            return false;
+        }
+
+        [$path, $fragment] = array_pad(explode('#', $ref, 2), 2, '');
+        $allowed = [
+            'mom/data/graphics-governance/',
+            'mom/data/registry/',
+            'mom/release/',
+            'mom/docs/forms/design-system/',
+            '_reports/',
+        ];
+        $allowedPath = false;
+        foreach ($allowed as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                $allowedPath = true;
+                break;
+            }
+        }
+        if (!$allowedPath) {
+            return false;
+        }
+
+        $absolute = $this->rootDir . '/' . $path;
+        if (!is_file($absolute)) {
+            return false;
+        }
+        if ($fragment === '') {
+            return true;
+        }
+        if (!str_starts_with($fragment, '/')) {
+            return false;
+        }
+
+        $raw = @file_get_contents($absolute);
+        $doc = is_string($raw) ? json_decode($raw, true) : null;
+        if (!is_array($doc)) {
+            return false;
+        }
+        $node = $doc;
+        foreach (explode('/', ltrim($fragment, '/')) as $segment) {
+            $segment = str_replace(['~1', '~0'], ['/', '~'], $segment);
+            if (!is_array($node) || !array_key_exists($segment, $node)) {
+                return false;
+            }
+            $node = $node[$segment];
+        }
+        return true;
+    }
+
     public function relativePath(string $path): string
     {
         $path = str_replace('\\', '/', $path);

@@ -64,7 +64,7 @@ var _state = {
   loaded: false,
   loading: false,
   lastLoadedAt: null,
-  registryAuthority: 'fallback-seed',
+  registryAuthority: 'backend-unavailable-preview-seed',
   endpointStatus: {},
   backendAvailable: false,
   designConfigVersion: '',
@@ -93,7 +93,7 @@ var _state = {
     kind: 'template-registry',
     target: 'T13',
     label: 'Template registry baseline',
-    source: 'frontend-fallback'
+    source: 'frontend-preview-fallback'
   },
   lastImpact: null
 };
@@ -231,7 +231,7 @@ function normalizeTemplate(tpl){
       return /production|shopfloor|mes|dispatch|execution|line/i.test(String(moduleId || ''));
     }) ? 'explicit-required' : 'standard-compatible';
   }
-  out.sourceAuthority = out.sourceAuthority || (out.status === 'draft-only' ? 'local-draft-cache' : 'frontend-fallback-seed');
+  out.sourceAuthority = out.sourceAuthority || (out.status === 'draft-only' ? 'local-draft-cache' : 'backend-unavailable-preview-seed');
   return out;
 }
 
@@ -312,7 +312,7 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
   (seedTemplates || []).forEach(function(tpl){
     var normalized = normalizeTemplate(tpl);
     if(_state.registryAuthority !== 'backend'){
-      normalized.sourceAuthority = 'frontend-fallback-seed';
+      normalized.sourceAuthority = 'backend-unavailable-preview-seed';
       if(normalized.controlMode === 'controlled') normalized.controlMode = 'preview-seed';
     }
     if(normalized.templateId) map[normalized.templateId] = normalized;
@@ -321,7 +321,7 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
   (_state.templates || []).forEach(function(tpl){
     var normalized = normalizeTemplate(tpl);
     if(_state.registryAuthority === 'backend'){
-      normalized.sourceAuthority = normalized.sourceAuthority === 'frontend-fallback-seed'
+      normalized.sourceAuthority = normalized.sourceAuthority === 'backend-unavailable-preview-seed'
         ? 'backend-graphics-authority'
         : (normalized.sourceAuthority || 'backend-graphics-authority');
       if(normalized.controlMode === 'preview-seed') normalized.controlMode = normalized.status === 'draft-only' ? 'draft-cache' : 'controlled';
@@ -753,7 +753,7 @@ function refresh(seedTemplates){
       _state.registryEtag = String(remoteRegistry.etag || remoteRegistry.registryEtag || '');
     } else {
       _state.templates = [];
-      _state.registryAuthority = 'fallback-seed';
+      _state.registryAuthority = 'backend-unavailable-preview-seed';
       _state.registryVersion = '';
       _state.registryEtag = '';
     }
@@ -961,7 +961,7 @@ function buildChangeSet(impact){
   return {
     changeSetId: impact.changeSetRef || ('gcs_' + String(Date.now()).slice(-8)),
     status: impact.backendAttested ? 'impact-recorded' : 'preview-only',
-    source: impact.backendAttested ? 'backend-attested' : 'frontend-fallback',
+    source: impact.backendAttested ? 'backend-attested' : 'frontend-preview-fallback-blocked',
     edits: [{
       analysisType: impact.kind || 'graphics',
       subject: { target: impact.target || '', label: impact.label || '' },
@@ -1058,12 +1058,27 @@ function buildEnvironmentPolicyPacks(){
       { environment:'glove-mode', tokenOverrides:{ density:'shopfloor', targetSize:'large' }, componentPolicy:['large-action-button','stepper-control'], evidenceObligations:['glove-touch-proof','mis-tap-review'] }
     ],
     multiSitePlantBranding: multiSite,
-    summary: { authority:'frontend-fallback-backend-contract', localStorageAuthority:false, packCount:9 }
+    summary: { authority:'backend-unavailable-preview-only', localStorageAuthority:false, packCount:9 }
   };
 }
 
 function buildReleaseDashboard(){
   var blockers = effectiveReleaseBlockers();
+  if(!_state.backendAvailable){
+    return {
+      readiness:'blocked',
+      authority:'backend-unavailable-preview-only',
+      authorityUsableForRelease:false,
+      blockers:{ blockers:blockers, summary:{ blockerCount:blockers.length, releaseBlocked:true } },
+      complianceSummary:{ moduleCount:0, blockedCount:0 },
+      debtSummary:{},
+      rolloutSummary:{ rolloutCount:0 },
+      postApplyVerification:{ runtimeBeaconRequired:true, driftReportRequired:true, evidenceBundleRequired:true, blockedUntilBackendAuthority:true },
+      trendDashboard:{ currentDebtScore:0, activeBlockerCount:blockers.length, trendWindow:'backend-unavailable', releaseReadinessTrend:'blocked-backend-authority-required' },
+      emergencyOverridePath:{ status:'blocked-until-backend-authority', authority:'graphics_governance_waiver_register' },
+      generatedAt:nowIso()
+    };
+  }
   var observatory = _state.debtObservatory || buildDebtObservatory();
   var activeCount = blockers.filter(function(row){ return String(row.status || '') === 'active'; }).length;
   return {
@@ -1094,6 +1109,19 @@ function buildReleaseDashboard(){
 
 function buildReleaseLink(){
   var blockers = effectiveReleaseBlockers();
+  if(!_state.backendAvailable){
+    return {
+      authority:'backend-unavailable-preview-only',
+      authorityUsableForRelease:false,
+      graphicsAuthorityRefs:[],
+      templateRegistryVersion:'',
+      templateRegistryChecksum:'',
+      releaseBlocked:true,
+      blockerCount:blockers.length,
+      evidenceBundleRequirements:[],
+      generatedAt:nowIso()
+    };
+  }
   return {
     graphicsAuthorityRefs:[
       'mom/design/template-registry.json',
@@ -1140,6 +1168,27 @@ function hasReleaseManifestRefs(body){
     if(typeof ref === 'string') return ref.trim() !== '';
     return ref && typeof ref === 'object' && String(ref.refId || ref.id || ref.uri || '').trim() !== '';
   });
+}
+
+function hasDocumentControlRefs(body){
+  var refs = (body && (body.documentControlRefs || body.documentRefs || body.evidenceRefs)) || [];
+  return Array.isArray(refs) && refs.some(function(ref){
+    if(typeof ref === 'string') return ref.trim() !== '';
+    return ref && typeof ref === 'object' && String(ref.refId || ref.id || ref.uri || '').trim() !== '';
+  });
+}
+
+function validateWaiverContract(waiver){
+  var required = ['scope','targetId','reason','riskClass','compensatingControl','owner','approver','expiresAt'];
+  var missing = required.filter(function(field){
+    return String(waiver && waiver[field] || '').trim() === '';
+  });
+  if(['low','medium','high','regulated','shopfloor-critical'].indexOf(String(waiver.riskClass || '')) < 0){
+    missing.push('riskClass:allowed-value');
+  }
+  if(!hasReleaseManifestRefs(waiver)) missing.push('releaseManifestRefs');
+  if(!hasDocumentControlRefs(waiver)) missing.push('documentControlRefs');
+  return missing;
 }
 
 function hasGateEvidence(body){
@@ -1354,7 +1403,7 @@ function analyzeImpact(change, seedTemplates){
     recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'backend-attested', { impactId:_state.lastImpact.impactId || '' });
     return clone(_state.lastImpact);
   }).catch(function(){
-    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'frontend-fallback');
+    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'frontend-preview-fallback-blocked');
     return clone(localImpact);
   });
 }
@@ -1594,18 +1643,30 @@ function requestWaiver(payload){
     d.setDate(d.getDate() + 30);
     expires = d.toISOString();
   }
-  var waiver = Object.assign({
-    waiverId:'WV-' + String(Date.now()).slice(-8),
+	  var waiver = Object.assign({
+	    waiverId:'WV-' + String(Date.now()).slice(-8),
     at: nowIso(),
     scope: payload.scope || 'release_gate',
     targetId: targetId || 'graphics-control-plane',
     subjectId: targetId || payload.subjectId || 'graphics-control-plane',
     reason: payload.reason || payload.reasonText || 'Graphics exception requires review before rollout.',
     reasonText: payload.reasonText || payload.reason || 'Graphics exception requires review before rollout.',
-    expiresAt: expires,
-    status:'requested'
-  }, payload);
-  return callEndpoint('waiverRequest', waiver).then(function(data){
+	    expiresAt: expires,
+	    status:'requested'
+	  }, payload);
+	  var missing = validateWaiverContract(waiver);
+	  if(missing.length){
+	    waiver.status = 'publish-blocked';
+	    waiver.blockerReason = 'missing waiver governance fields: ' + missing.join(', ');
+	    recordAudit('waiver-request-blocked', waiver.subjectId || waiver.templateId || waiver.moduleId || waiver.waiverId, 'publish-blocked', { missingFields:missing });
+	    return Promise.resolve({
+	      ok:false,
+	      waiver:waiver,
+	      status:'publish-blocked',
+	      message:'Waiver request is blocked until required governance fields are present: ' + missing.join(', ')
+	    });
+	  }
+	  return callEndpoint('waiverRequest', waiver).then(function(data){
     var backendWaiver = data && data.waiver ? data.waiver : {};
     _state.waivers.unshift(Object.assign({}, waiver, backendWaiver, normalizeWaiverRows([Object.assign({}, waiver, backendWaiver)])[0], { status:(backendWaiver.status || 'submitted') }));
     recordAudit('waiver-requested', waiver.subjectId || waiver.templateId || waiver.moduleId || waiver.waiverId, 'submitted');

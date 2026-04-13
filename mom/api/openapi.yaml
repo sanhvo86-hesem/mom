@@ -5737,7 +5737,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/SuccessEnvelope'
         - type: object
-          required: [blockers, summary]
+          required: [blockers, summary, evidence]
           properties:
             blockers:
               type: array
@@ -6433,7 +6433,9 @@ components:
         documentControlRefs:
           type: array
           items:
-            type: string
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/GraphicsReleaseManifestRef'
         releaseManifestRefs:
           type: array
           items:

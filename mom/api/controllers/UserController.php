@@ -59,10 +59,12 @@ class UserController extends BaseController
         if ($username === '') $this->error('missing_username', 400);
 
         $usersFile = $this->confDir . '/users.json';
+        /** @var array<string, mixed>|false $existing */
         $existing  = find_user_by_username($this->store, $username);
         $shadowSync = new AuthUserShadowSyncService($this->rootDir);
 
         if ($existing) {
+            /** @var array<string, mixed> $existing */
             // Update existing user
             $allowed = [
                 'name',
@@ -95,14 +97,17 @@ class UserController extends BaseController
                 $existing['password_hash'] = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]);
             }
 
-            if (trim((string)($existing['employee_id'] ?? '')) === '') {
+            $existingEmployeeId = array_key_exists('employee_id', $existing) ? (string)$existing['employee_id'] : '';
+            if (trim($existingEmployeeId) === '') {
                 $existing['employee_id'] = AuthUserShadowSyncService::canonicalEmployeeIdForUser($existing);
             }
 
             if (method_exists($shadowSync, 'normalizeUserLinkage')) {
                 $linkage = $shadowSync->normalizeUserLinkage($existing);
-                $existing['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $existing['hcm_org_unit_id'] ?? '');
-                $existing['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $existing['hcm_position_id'] ?? '');
+                $existingOrgUnitId = array_key_exists('hcm_org_unit_id', $existing) ? (string)$existing['hcm_org_unit_id'] : '';
+                $existingPositionId = array_key_exists('hcm_position_id', $existing) ? (string)$existing['hcm_position_id'] : '';
+                $existing['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $existingOrgUnitId);
+                $existing['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $existingPositionId);
                 if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
                     $existing['dept'] = (string)$linkage['dept_code'];
                 }
@@ -146,8 +151,8 @@ class UserController extends BaseController
 
             if (method_exists($shadowSync, 'normalizeUserLinkage')) {
                 $linkage = $shadowSync->normalizeUserLinkage($newUser);
-                $newUser['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $newUser['hcm_org_unit_id'] ?? '');
-                $newUser['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $newUser['hcm_position_id'] ?? '');
+                $newUser['hcm_org_unit_id'] = (string)($linkage['hcm_org_unit_id'] ?? $newUser['hcm_org_unit_id']);
+                $newUser['hcm_position_id'] = (string)($linkage['hcm_position_id'] ?? $newUser['hcm_position_id']);
                 if (trim((string)($linkage['dept_code'] ?? '')) !== '') {
                     $newUser['dept'] = (string)$linkage['dept_code'];
                 }
@@ -253,12 +258,15 @@ class UserController extends BaseController
         [$pwOk, $pwErr] = password_policy($newPw);
         if (!$pwOk) $this->error($pwErr, 400);
 
+        /** @var array<string, mixed>|false $user */
         $user = find_user_by_username($this->store, $username);
         if (!$user) $this->error('user_not_found', 404);
+        /** @var array<string, mixed> $user */
 
         $user['password_hash'] = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]);
         $user['updated_at']    = $this->nowIso();
-        if (trim((string)($user['employee_id'] ?? '')) === '') {
+        $employeeId = array_key_exists('employee_id', $user) ? (string)$user['employee_id'] : '';
+        if (trim($employeeId) === '') {
             $user['employee_id'] = AuthUserShadowSyncService::canonicalEmployeeIdForUser($user);
         }
         update_user($this->store, $user);

@@ -22701,7 +22701,17 @@ INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
 ON CONFLICT (entity_type, entity_id) DO NOTHING;
 
 -- ================================================================
--- 11. DEFECT CATALOG (6 records → master_data_store)
+-- 11. BLOCKING REASON CODES (4 records -> master_data_store)
+-- ================================================================
+INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
+  ('blocking_reason_codes', 'BLK-MATL-WAIT', 'active', '{"reason_code":"BLK-MATL-WAIT","reason_name":"Material, fixture, or outsource lot not available","reason_name_vi":"Thiếu vật tư, đồ gá hoặc lô outsource","reason_group":"material","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":30}'::jsonb),
+  ('blocking_reason_codes', 'BLK-QUAL-HOLD', 'active', '{"reason_code":"BLK-QUAL-HOLD","reason_name":"Quality disposition, first-piece, or inspection release pending","reason_name_vi":"Chờ quyết định chất lượng, first-piece hoặc release kiểm tra","reason_group":"quality","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-ENG-CLARIFY', 'active', '{"reason_code":"BLK-ENG-CLARIFY","reason_name":"Engineering, drawing, setup, or CNC program clarification required","reason_name_vi":"Cần kỹ thuật làm rõ bản vẽ, setup hoặc chương trình CNC","reason_group":"engineering","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-OPERATOR-AUTH', 'active', '{"reason_code":"BLK-OPERATOR-AUTH","reason_name":"Qualified operator, certification, or supervisor authorization missing","reason_name_vi":"Thiếu thợ đủ năng lực, chứng nhận hoặc phê duyệt trưởng ca","reason_group":"labor","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":15}'::jsonb)
+ON CONFLICT (entity_type, entity_id) DO NOTHING;
+
+-- ================================================================
+-- 12. DEFECT CATALOG (6 records → master_data_store)
 -- ================================================================
 INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
   ('defect_catalog', 'DEF-DIM', 'active', '{"defect_code":"DEF-DIM","defect_name":"Dimensional Out of Tolerance","defect_name_vi":"Kích thước ngoài dung sai","defect_group":"dimensional","severity_default":"major"}'::jsonb),
@@ -22713,7 +22723,7 @@ INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
 ON CONFLICT (entity_type, entity_id) DO NOTHING;
 
 -- ================================================================
--- 12. MES CONNECTIVITY ADAPTERS (3 records → master_data_store)
+-- 13. MES CONNECTIVITY ADAPTERS (3 records → master_data_store)
 -- ================================================================
 INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
   ('mes_connectivity_adapters', 'ADAPT-5AX-01', 'active', '{"adapter_id":"ADAPT-5AX-01","machine_id":"MC-5AX-01","adapter_name":"Makino MTConnect Adapter","adapter_type":"mtconnect","transport_protocol":"HTTPS","endpoint_url":"https://mes.hesem.local/mtconnect/mc-5ax-01/current","poll_interval_seconds":5,"heartbeat_sla_seconds":90}'::jsonb),
@@ -27821,6 +27831,7 @@ CREATE TABLE IF NOT EXISTS doc_read_acknowledgements (
     acknowledgement_hash_sha256 CHAR(64) NOT NULL,
     idempotency_key        TEXT,
     metadata               JSONB NOT NULL DEFAULT '{}'::jsonb,
+    CHECK (audience_user_id IS NOT NULL OR NULLIF(trim(actor_ref), '') IS NOT NULL),
     UNIQUE (doc_revision_id, audience_user_id),
     UNIQUE (doc_revision_id, actor_ref),
     UNIQUE (idempotency_key)
@@ -27919,6 +27930,7 @@ CREATE TABLE IF NOT EXISTS frm_issuances (
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version            BIGINT NOT NULL DEFAULT 1,
+    CHECK (issued_to_user_id IS NOT NULL OR NULLIF(trim(issued_to_ref), '') IS NOT NULL),
     UNIQUE (issued_record_id, issuance_no),
     UNIQUE (idempotency_key)
 );
@@ -27971,6 +27983,7 @@ CREATE TABLE IF NOT EXISTS evidence_records (
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version           BIGINT NOT NULL DEFAULT 1,
+    CHECK (record_state IN ('open', 'under_review') OR current_version_id IS NOT NULL),
     UNIQUE (idempotency_key)
 );
 
@@ -28006,6 +28019,7 @@ CREATE TABLE IF NOT EXISTS evidence_versions (
             AND readable_snapshot_hash_sha256 IS NOT NULL
         )
     ),
+    CHECK (version_state NOT IN ('locked', 'superseded', 'voided') OR finalized_at IS NOT NULL),
     UNIQUE (evidence_record_id, version_no),
     UNIQUE (package_hash_sha256),
     UNIQUE (idempotency_key)
@@ -28036,6 +28050,10 @@ CREATE TABLE IF NOT EXISTS evidence_artifacts (
     UNIQUE (evidence_version_id, artifact_role, sha256),
     UNIQUE (idempotency_key)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_evidence_artifacts_single_package_role
+    ON evidence_artifacts (evidence_version_id, artifact_role)
+    WHERE artifact_role IN ('original', 'canonical_payload', 'readable_snapshot', 'hash_signature_manifest');
 
 DO $$
 BEGIN
@@ -28078,6 +28096,15 @@ CREATE TABLE IF NOT EXISTS evidence_publications (
     created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     row_version           BIGINT NOT NULL DEFAULT 1,
+    CHECK (
+        publication_state <> 'published'
+        OR (
+            published_hash_sha256 IS NOT NULL
+            AND publication_receipt <> '{}'::jsonb
+            AND (target_uri IS NOT NULL OR target_item_id IS NOT NULL)
+        )
+    ),
+    CHECK (publication_state NOT IN ('failed', 'retry_scheduled', 'dead_letter') OR last_error_code IS NOT NULL),
     UNIQUE (evidence_version_id, publication_target),
     UNIQUE (idempotency_key)
 );
@@ -28098,6 +28125,7 @@ CREATE TABLE IF NOT EXISTS signature_events (
     signed_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     idempotency_key       TEXT,
     metadata              JSONB NOT NULL DEFAULT '{}'::jsonb,
+    CHECK (signer_user_id IS NOT NULL OR NULLIF(trim(signer_ref), '') IS NOT NULL),
     UNIQUE (idempotency_key)
 );
 
@@ -28142,6 +28170,16 @@ CREATE TABLE IF NOT EXISTS plm_change_affected_objects (
 
 CREATE INDEX IF NOT EXISTS idx_plm_change_affected_objects_lookup
     ON plm_change_affected_objects (object_type, object_id, plm_change_order_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_plm_change_affected_objects_order_scope
+    ON plm_change_affected_objects (
+        plm_change_order_id,
+        object_type,
+        object_id,
+        COALESCE(object_revision, ''),
+        requested_effect
+    )
+    WHERE plm_change_order_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS plm_change_resulting_objects (
     plm_change_resulting_object_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -28482,5 +28520,1112 @@ CREATE TRIGGER trg_evidence_artifacts_immutable_delete
     BEFORE DELETE ON evidence_artifacts
     FOR EACH ROW EXECUTE FUNCTION eqms_prevent_update_delete();
 
+DO $$
+DECLARE
+    governed_table TEXT;
+BEGIN
+    FOREACH governed_table IN ARRAY ARRAY[
+        'doc_families',
+        'doc_revisions',
+        'doc_effectivities',
+        'doc_distributions',
+        'frm_families',
+        'frm_template_revisions',
+        'frm_schema_versions',
+        'frm_issuances',
+        'frm_submission_attempts',
+        'evidence_records',
+        'evidence_versions',
+        'evidence_artifacts',
+        'evidence_publications',
+        'plm_change_affected_objects',
+        'plm_change_resulting_objects',
+        'plm_change_effectivities',
+        'plm_change_training_requirements',
+        'plm_change_verifications',
+        'plm_change_effectiveness_reviews',
+        'field_governance_rules',
+        'outbox_events',
+        'background_jobs',
+        'integrity_digests',
+        'integrity_exceptions',
+        'retention_locks'
+    ]
+    LOOP
+        EXECUTE format('DROP TRIGGER IF EXISTS %I ON %I', 'trg_' || governed_table || '_row_version', governed_table);
+        EXECUTE format(
+            'CREATE TRIGGER %I BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION set_row_version()',
+            'trg_' || governed_table || '_row_version',
+            governed_table
+        );
+    END LOOP;
+END $$;
+
 COMMIT;
 -- <<< END MIGRATION: 106_eqms_world_class_control_plane.sql
+
+-- >>> BEGIN MIGRATION: 107_phase1_shopfloor_execution_bridge.sql
+-- Migration: 107_phase1_shopfloor_execution_bridge.sql
+-- Description: Transactional PostgreSQL bridge for Phase 1 CNC dispatch execution facts.
+-- Dependencies: 043_production_dispatch_shift_targets.sql, 070_enterprise_governance_uplift.sql, 079_foundation_governance_contract_hardening.sql
+-- Rollback: DROP TABLE IF EXISTS shift_dispatch_execution_events CASCADE; DROP TABLE IF EXISTS shift_production_report_events CASCADE;
+
+BEGIN;
+
+INSERT INTO source_system_registry (
+    source_system,
+    source_system_name,
+    source_system_name_vi,
+    source_system_category,
+    ownership_team,
+    synchronization_mode,
+    trust_level,
+    source_status,
+    metadata
+) VALUES (
+    'mom.dispatch',
+    'MOM Dispatch Manual Execution',
+    'Thuc thi thu cong MOM Dispatch',
+    'mes',
+    'manufacturing_platform',
+    'event_driven',
+    'system_of_record',
+    'active',
+    '{"phase":"phase1_cnc_manual_input","ot_boundary":"manual_capture_no_machine_control"}'::jsonb
+) ON CONFLICT (source_system) DO NOTHING;
+
+ALTER TABLE shift_targets
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(40) NOT NULL DEFAULT 'mom.dispatch',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(40) NOT NULL DEFAULT 'phase1_dispatch_target.v1';
+
+ALTER TABLE shift_production_log
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(40) NOT NULL DEFAULT 'mom.dispatch',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(40) NOT NULL DEFAULT 'phase1_dispatch_production_log.v1',
+    ADD COLUMN IF NOT EXISTS execution_event_type VARCHAR(30) NOT NULL DEFAULT 'progress',
+    ADD COLUMN IF NOT EXISTS report_mode VARCHAR(30) NOT NULL DEFAULT 'snapshot',
+    ADD COLUMN IF NOT EXISTS idempotency_key VARCHAR(200),
+    ADD COLUMN IF NOT EXISTS report_fingerprint VARCHAR(128),
+    ADD COLUMN IF NOT EXISTS client_report_id VARCHAR(120);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_shift_production_log_source
+    ON shift_production_log (source_system, source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_production_log_idempotency
+    ON shift_production_log (source_system, idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_production_log_scope
+    ON shift_production_log (org_company_code, org_legal_entity_code, org_plant_id, org_site_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_shift_targets_source
+    ON shift_targets (source_system, source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_targets_phase1_scope
+    ON shift_targets (org_company_code, org_legal_entity_code, org_plant_id, org_site_id);
+
+CREATE TABLE IF NOT EXISTS shift_production_report_events (
+    production_report_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    source_system              VARCHAR(40)  NOT NULL DEFAULT 'mom.dispatch',
+    source_event_id            VARCHAR(120) NOT NULL,
+    target_source_record_id    VARCHAR(120) NOT NULL,
+    log_source_record_id       VARCHAR(120),
+    event_type                 VARCHAR(80)  NOT NULL,
+    execution_event_type       VARCHAR(30)  NOT NULL DEFAULT 'progress',
+    report_mode                VARCHAR(30)  NOT NULL DEFAULT 'snapshot',
+    idempotency_key            VARCHAR(200),
+    report_fingerprint         VARCHAR(128),
+    occurred_at                TIMESTAMPTZ,
+    recorded_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    payload                    JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    payload_schema_version     VARCHAR(40) NOT NULL DEFAULT 'phase1_shopfloor_execution_event.v1',
+    UNIQUE (source_system, source_event_id)
+);
+
+ALTER TABLE shift_production_report_events
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_target
+    ON shift_production_report_events (source_system, target_source_record_id, occurred_at);
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_scope
+    ON shift_production_report_events (org_company_code, org_legal_entity_code, org_plant_id, org_site_id);
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_lineage
+    ON shift_production_report_events (source_system, source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_log
+    ON shift_production_report_events (source_system, log_source_record_id);
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_idempotency
+    ON shift_production_report_events (source_system, idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_report_events_payload
+    ON shift_production_report_events USING GIN (payload);
+
+DROP TRIGGER IF EXISTS trg_shift_report_events_row_version ON shift_production_report_events;
+CREATE TRIGGER trg_shift_report_events_row_version
+    BEFORE UPDATE ON shift_production_report_events
+    FOR EACH ROW EXECUTE FUNCTION set_row_version();
+
+COMMENT ON TABLE shift_production_report_events IS
+    'Append-only manual shopfloor production report events mirrored from dispatch/production_report_events.json.';
+
+CREATE TABLE IF NOT EXISTS shift_dispatch_execution_events (
+    dispatch_execution_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    source_system              VARCHAR(40)  NOT NULL DEFAULT 'mom.dispatch',
+    source_event_id            VARCHAR(120) NOT NULL,
+    target_source_record_id    VARCHAR(120),
+    event_type                 VARCHAR(80)  NOT NULL,
+    target_status              VARCHAR(40),
+    execution_state            VARCHAR(40),
+    actor_id                   VARCHAR(80),
+    occurred_at                TIMESTAMPTZ,
+    recorded_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    payload                    JSONB       NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    payload_schema_version     VARCHAR(60) NOT NULL DEFAULT 'phase1_dispatch_execution_event.v1',
+    UNIQUE (source_system, source_event_id)
+);
+
+ALTER TABLE shift_dispatch_execution_events
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+CREATE INDEX IF NOT EXISTS idx_shift_dispatch_execution_events_target
+    ON shift_dispatch_execution_events (source_system, target_source_record_id, occurred_at);
+
+CREATE INDEX IF NOT EXISTS idx_shift_dispatch_execution_events_scope
+    ON shift_dispatch_execution_events (org_company_code, org_legal_entity_code, org_plant_id, org_site_id);
+
+CREATE INDEX IF NOT EXISTS idx_shift_dispatch_execution_events_lineage
+    ON shift_dispatch_execution_events (source_system, source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_shift_dispatch_execution_events_type
+    ON shift_dispatch_execution_events (source_system, event_type, occurred_at);
+
+CREATE INDEX IF NOT EXISTS idx_shift_dispatch_execution_events_payload
+    ON shift_dispatch_execution_events USING GIN (payload);
+
+DROP TRIGGER IF EXISTS trg_shift_dispatch_execution_events_row_version ON shift_dispatch_execution_events;
+CREATE TRIGGER trg_shift_dispatch_execution_events_row_version
+    BEFORE UPDATE ON shift_dispatch_execution_events
+    FOR EACH ROW EXECUTE FUNCTION set_row_version();
+
+COMMENT ON TABLE shift_dispatch_execution_events IS
+    'Append-only dispatch target lifecycle and production-reference events mirrored from dispatch/execution_events.json.';
+
+COMMIT;
+-- <<< END MIGRATION: 107_phase1_shopfloor_execution_bridge.sql
+
+-- >>> BEGIN MIGRATION: 108_mobile_inspection_execution_bridge.sql
+-- Migration: 108_mobile_inspection_execution_bridge.sql
+-- Description: Hardens mobile inspection capture as the Phase 1 quality bridge for manual CNC execution.
+-- Dependencies: 042_fmea_apqp_control_plan_mobile.sql, 080_seed_master_data_from_json.sql
+-- Rollback: DROP INDEX IF EXISTS idx_mobile_insp_metadata_thread; DROP INDEX IF EXISTS uq_mobile_insp_idempotency; DROP INDEX IF EXISTS uq_mobile_insp_client_capture;
+
+BEGIN;
+
+ALTER TABLE mobile_inspection_captures
+    ADD COLUMN IF NOT EXISTS equipment_id VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS work_center_id VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS client_capture_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS idempotency_key VARCHAR(200),
+    ADD COLUMN IF NOT EXISTS inspection_fingerprint VARCHAR(128);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_mobile_insp_client_capture
+    ON mobile_inspection_captures (operator_id, client_capture_id)
+    WHERE client_capture_id IS NOT NULL AND client_capture_id <> '';
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_mobile_insp_idempotency
+    ON mobile_inspection_captures (idempotency_key)
+    WHERE idempotency_key IS NOT NULL AND idempotency_key <> '';
+
+CREATE INDEX IF NOT EXISTS idx_mobile_insp_metadata_thread
+    ON mobile_inspection_captures (
+        wo_number,
+        operation_seq,
+        capture_type,
+        overall_result,
+        work_center_id,
+        equipment_id
+    );
+
+INSERT INTO master_data_store (entity_type, entity_id, status, data) VALUES
+  ('blocking_reason_codes', 'BLK-MATL-WAIT', 'active', '{"reason_code":"BLK-MATL-WAIT","reason_name":"Material, fixture, or outsource lot not available","reason_name_vi":"Thiếu vật tư, đồ gá hoặc lô outsource","reason_group":"material","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":30}'::jsonb),
+  ('blocking_reason_codes', 'BLK-QUAL-HOLD', 'active', '{"reason_code":"BLK-QUAL-HOLD","reason_name":"Quality disposition, first-piece, or inspection release pending","reason_name_vi":"Chờ quyết định chất lượng, first-piece hoặc release kiểm tra","reason_group":"quality","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-ENG-CLARIFY', 'active', '{"reason_code":"BLK-ENG-CLARIFY","reason_name":"Engineering, drawing, setup, or CNC program clarification required","reason_name_vi":"Cần kỹ thuật làm rõ bản vẽ, setup hoặc chương trình CNC","reason_group":"engineering","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":20}'::jsonb),
+  ('blocking_reason_codes', 'BLK-OPERATOR-AUTH', 'active', '{"reason_code":"BLK-OPERATOR-AUTH","reason_name":"Qualified operator, certification, or supervisor authorization missing","reason_name_vi":"Thiếu thợ đủ năng lực, chứng nhận hoặc phê duyệt trưởng ca","reason_group":"labor","loss_class":"blocked","default_severity":"major","escalation_sla_minutes":15}'::jsonb)
+ON CONFLICT (entity_type, entity_id) DO UPDATE
+    SET status = EXCLUDED.status,
+        data = EXCLUDED.data,
+        updated_at = now();
+
+COMMIT;
+-- <<< END MIGRATION: 108_mobile_inspection_execution_bridge.sql
+
+-- >>> BEGIN MIGRATION: 108_world_class_control_plane_execution.sql
+-- ============================================================================
+-- Migration 108: World-Class Control Plane Execution Layer
+-- ============================================================================
+-- Purpose:
+--   Turn the eQMS/MOM/PLM target architecture into executable control-plane
+--   infrastructure. This migration is additive and assumes the canonical
+--   spine from migration 106 remains the business authority.
+--
+-- Non-negotiable semantics:
+--   - SharePoint remains publication/read-only only.
+--   - Commands, not generic CRUD, are the mutation authority.
+--   - Final evidence is package-centric.
+--   - Post-release changes require exact released change authority.
+--   - Genealogy projections are derived from authoritative records/events.
+-- ============================================================================
+
+BEGIN;
+
+-- --------------------------------------------------------------------------
+-- Wave 0: repo/source promotion discipline
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS release_manifests (
+    release_manifest_id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    release_ref              TEXT NOT NULL UNIQUE,
+    source_commit_sha        TEXT NOT NULL,
+    source_tree_hash_sha256  CHAR(64) NOT NULL,
+    artifact_manifest        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    artifact_manifest_hash_sha256 CHAR(64) NOT NULL,
+    promotion_scope          TEXT NOT NULL DEFAULT 'controlled_source'
+        CHECK (promotion_scope IN ('controlled_source', 'runtime_config', 'schema_registry', 'publication_bundle')),
+    manifest_state           TEXT NOT NULL DEFAULT 'draft'
+        CHECK (manifest_state IN ('draft', 'reviewed', 'approved', 'promoted', 'rejected', 'superseded')),
+    created_by               UUID REFERENCES users(user_id),
+    reviewed_by              UUID REFERENCES users(user_id),
+    approved_by              UUID REFERENCES users(user_id),
+    signature_event_id       UUID,
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    reviewed_at              TIMESTAMPTZ,
+    approved_at              TIMESTAMPTZ,
+    promoted_at              TIMESTAMPTZ,
+    metadata                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    row_version              BIGINT NOT NULL DEFAULT 1,
+    CHECK (manifest_state NOT IN ('approved', 'promoted') OR signature_event_id IS NOT NULL)
+);
+
+CREATE TABLE IF NOT EXISTS promotion_receipts (
+    promotion_receipt_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    release_manifest_id      UUID NOT NULL REFERENCES release_manifests(release_manifest_id),
+    environment_code         TEXT NOT NULL,
+    deployed_commit_sha      TEXT NOT NULL,
+    deployed_manifest_hash_sha256 CHAR(64) NOT NULL,
+    runtime_config_hash_sha256 CHAR(64),
+    promotion_state          TEXT NOT NULL DEFAULT 'pending'
+        CHECK (promotion_state IN ('pending', 'succeeded', 'failed', 'rolled_back')),
+    promoted_by              UUID REFERENCES users(user_id),
+    promoted_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    receipt_payload          JSONB NOT NULL DEFAULT '{}'::jsonb,
+    failure_code             TEXT,
+    failure_message          TEXT,
+    UNIQUE (release_manifest_id, environment_code)
+);
+
+CREATE TABLE IF NOT EXISTS reverse_sync_intakes (
+    reverse_sync_intake_id   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    intake_source            TEXT NOT NULL,
+    source_uri               TEXT NOT NULL,
+    source_hash_sha256       CHAR(64) NOT NULL,
+    intake_class             TEXT NOT NULL
+        CHECK (intake_class IN ('external_reference', 'operator_upload', 'm365_publication_receipt', 'vendor_package', 'break_glass')),
+    disposition_state        TEXT NOT NULL DEFAULT 'quarantined'
+        CHECK (disposition_state IN ('quarantined', 'accepted', 'rejected', 'superseded')),
+    accepted_record_type     TEXT,
+    accepted_record_id       TEXT,
+    accepted_by              UUID REFERENCES users(user_id),
+    accepted_at              TIMESTAMPTZ,
+    reason                   TEXT,
+    metadata                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS source_boundary_violations (
+    source_boundary_violation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    path                     TEXT NOT NULL,
+    violation_type           TEXT NOT NULL
+        CHECK (violation_type IN ('runtime_artifact', 'generated_report', 'browser_output', 'prompt_file', 'deleted_archive', 'publication_output', 'unknown')),
+    severity                 TEXT NOT NULL DEFAULT 'P1'
+        CHECK (severity IN ('P0', 'P1', 'P2')),
+    detection_source         TEXT NOT NULL DEFAULT 'repo_boundary_scanner',
+    detected_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    resolved_at              TIMESTAMPTZ,
+    resolution_note          TEXT,
+    metadata                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (path, violation_type, resolved_at)
+);
+
+-- --------------------------------------------------------------------------
+-- Wave 1: command authority, object registry, transition event store
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS eqms_command_ledger (
+    eqms_command_id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    command_name             TEXT NOT NULL,
+    command_version          INT NOT NULL DEFAULT 1 CHECK (command_version > 0),
+    command_state            TEXT NOT NULL DEFAULT 'accepted'
+        CHECK (command_state IN ('accepted', 'replayed', 'succeeded', 'failed', 'rejected')),
+    idempotency_key          TEXT NOT NULL,
+    actor_user_id            UUID REFERENCES users(user_id),
+    actor_ref                TEXT,
+    scope_key                TEXT NOT NULL,
+    scope_key_hash_sha256    CHAR(64) NOT NULL,
+    request_hash_sha256      CHAR(64) NOT NULL,
+    response_hash_sha256     CHAR(64),
+    correlation_id           TEXT,
+    causation_id             TEXT,
+    authority_context        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    error_code               TEXT,
+    error_message            TEXT,
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    completed_at             TIMESTAMPTZ,
+    CHECK (actor_user_id IS NOT NULL OR NULLIF(trim(actor_ref), '') IS NOT NULL),
+    UNIQUE (command_name, idempotency_key),
+    UNIQUE (scope_key_hash_sha256, request_hash_sha256)
+);
+
+CREATE TABLE IF NOT EXISTS control_plane_object_registry (
+    object_type              TEXT NOT NULL,
+    object_id                TEXT NOT NULL,
+    authoritative_table      TEXT NOT NULL,
+    lifecycle_state          TEXT NOT NULL,
+    current_version_id       TEXT,
+    source_change_order_id   UUID REFERENCES plm_change_orders(plm_change_order_id),
+    immutable_after_state    TEXT,
+    retention_state          TEXT NOT NULL DEFAULT 'not_locked'
+        CHECK (retention_state IN ('not_locked', 'retained', 'legal_hold', 'disposition_due', 'disposed')),
+    publication_state        TEXT,
+    row_version              BIGINT NOT NULL DEFAULT 1,
+    metadata                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (object_type, object_id)
+);
+
+CREATE TABLE IF NOT EXISTS state_transition_events (
+    state_transition_event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    machine                  TEXT NOT NULL,
+    object_type              TEXT NOT NULL,
+    object_id                TEXT NOT NULL,
+    from_state               TEXT NOT NULL,
+    to_state                 TEXT NOT NULL,
+    guard_result             JSONB NOT NULL DEFAULT '{}'::jsonb,
+    emitted_events           JSONB NOT NULL DEFAULT '[]'::jsonb,
+    side_effects             JSONB NOT NULL DEFAULT '[]'::jsonb,
+    command_id               UUID REFERENCES eqms_command_ledger(eqms_command_id),
+    actor_user_id            UUID REFERENCES users(user_id),
+    actor_ref                TEXT,
+    occurred_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    event_hash_sha256        CHAR(64) NOT NULL,
+    prev_event_hash_sha256   CHAR(64),
+    CHECK (actor_user_id IS NOT NULL OR NULLIF(trim(actor_ref), '') IS NOT NULL)
+);
+
+CREATE INDEX IF NOT EXISTS idx_state_transition_events_object
+    ON state_transition_events (object_type, object_id, occurred_at DESC);
+
+-- Reconcile the 106 canonical outbox with handler/lease fields required by
+-- publication, audit-pack, training, and genealogy workers.
+ALTER TABLE outbox_events ADD COLUMN IF NOT EXISTS handler_key TEXT;
+ALTER TABLE outbox_events ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+ALTER TABLE outbox_events ADD COLUMN IF NOT EXISTS lease_owner TEXT;
+ALTER TABLE outbox_events ADD COLUMN IF NOT EXISTS leased_until TIMESTAMPTZ;
+ALTER TABLE outbox_events ADD COLUMN IF NOT EXISTS dead_letter_reason TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_outbox_events_dedupe_key
+    ON outbox_events (dedupe_key)
+    WHERE dedupe_key IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_outbox_events_handler_ready
+    ON outbox_events (handler_key, outbox_state, next_attempt_at, occurred_at);
+
+-- --------------------------------------------------------------------------
+-- Wave 2: issuance, validation, duplicate detection, online runtime
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS submission_validation_results (
+    submission_validation_result_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    frm_submission_attempt_id UUID NOT NULL REFERENCES frm_submission_attempts(frm_submission_attempt_id) ON DELETE CASCADE,
+    validation_state          TEXT NOT NULL
+        CHECK (validation_state IN ('passed', 'failed', 'warning', 'quarantined')),
+    schema_version_id         UUID REFERENCES frm_schema_versions(frm_schema_version_id),
+    validator_version         TEXT NOT NULL DEFAULT 'submission_validator.v1',
+    canonical_payload_hash_sha256 CHAR(64),
+    original_artifact_hash_sha256 CHAR(64),
+    validation_summary        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (frm_submission_attempt_id, validator_version)
+);
+
+CREATE TABLE IF NOT EXISTS submission_validation_errors (
+    submission_validation_error_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    submission_validation_result_id UUID NOT NULL REFERENCES submission_validation_results(submission_validation_result_id) ON DELETE CASCADE,
+    severity                  TEXT NOT NULL CHECK (severity IN ('blocker', 'error', 'warning', 'info')),
+    error_code                TEXT NOT NULL,
+    field_path                TEXT,
+    message                   TEXT NOT NULL,
+    remediation_hint          TEXT,
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS duplicate_detection_fingerprints (
+    duplicate_detection_fingerprint_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    fingerprint_scope          TEXT NOT NULL CHECK (fingerprint_scope IN ('issuance', 'form_family', 'subject', 'global')),
+    fingerprint_type           TEXT NOT NULL CHECK (fingerprint_type IN ('artifact_hash', 'canonical_payload_hash', 'business_key')),
+    fingerprint_value_sha256   CHAR(64) NOT NULL,
+    frm_submission_attempt_id  UUID REFERENCES frm_submission_attempts(frm_submission_attempt_id),
+    evidence_record_id         UUID REFERENCES evidence_records(evidence_record_id),
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (fingerprint_scope, fingerprint_type, fingerprint_value_sha256)
+);
+
+CREATE TABLE IF NOT EXISTS online_form_sessions (
+    online_form_session_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    frm_issuance_id            UUID NOT NULL REFERENCES frm_issuances(frm_issuance_id),
+    session_state              TEXT NOT NULL DEFAULT 'draft'
+        CHECK (session_state IN ('draft', 'validating', 'ready_to_finalize', 'finalized', 'cancelled', 'expired')),
+    draft_payload              JSONB NOT NULL DEFAULT '{}'::jsonb,
+    draft_payload_hash_sha256  CHAR(64),
+    locked_payload_hash_sha256 CHAR(64),
+    row_version                BIGINT NOT NULL DEFAULT 1,
+    created_by                 UUID REFERENCES users(user_id),
+    finalized_by               UUID REFERENCES users(user_id),
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finalized_at               TIMESTAMPTZ,
+    CHECK (session_state <> 'finalized' OR locked_payload_hash_sha256 IS NOT NULL)
+);
+
+-- --------------------------------------------------------------------------
+-- Wave 3: effectivity, WIP disposition, training/read acknowledgement gates
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS effectivity_conflicts (
+    effectivity_conflict_id    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id        UUID REFERENCES plm_change_orders(plm_change_order_id),
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    conflict_type              TEXT NOT NULL
+        CHECK (conflict_type IN ('overlap', 'gap', 'wip_collision', 'training_incomplete', 'read_ack_incomplete', 'obsolete_reference')),
+    conflict_state             TEXT NOT NULL DEFAULT 'open'
+        CHECK (conflict_state IN ('open', 'accepted_risk', 'resolved', 'cancelled')),
+    conflict_payload           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    resolved_by                UUID REFERENCES users(user_id),
+    resolved_at                TIMESTAMPTZ,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS wip_dispositions (
+    wip_disposition_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id        UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id),
+    wip_object_type            TEXT NOT NULL CHECK (wip_object_type IN ('work_order', 'job_order', 'lot', 'serial', 'purchase_order', 'inventory_lot')),
+    wip_object_id              TEXT NOT NULL,
+    disposition                TEXT NOT NULL CHECK (disposition IN ('use_as_is', 'rework', 'scrap', 'hold', 'convert_to_new_revision', 'ship_under_deviation')),
+    disposition_state          TEXT NOT NULL DEFAULT 'planned'
+        CHECK (disposition_state IN ('planned', 'approved', 'executed', 'waived', 'cancelled')),
+    evidence_record_id         UUID REFERENCES evidence_records(evidence_record_id),
+    approved_by                UUID REFERENCES users(user_id),
+    approved_at                TIMESTAMPTZ,
+    metadata                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+    UNIQUE (plm_change_order_id, wip_object_type, wip_object_id)
+);
+
+CREATE TABLE IF NOT EXISTS training_gate_decisions (
+    training_gate_decision_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    gate_scope                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    gate_state                 TEXT NOT NULL DEFAULT 'pending'
+        CHECK (gate_state IN ('pending', 'complete', 'blocked', 'waived')),
+    required_training          JSONB NOT NULL DEFAULT '[]'::jsonb,
+    missing_training           JSONB NOT NULL DEFAULT '[]'::jsonb,
+    waiver_signature_event_id  UUID,
+    decided_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (object_type, object_id, gate_scope)
+);
+
+CREATE TABLE IF NOT EXISTS read_ack_gate_decisions (
+    read_ack_gate_decision_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    gate_scope                 JSONB NOT NULL DEFAULT '{}'::jsonb,
+    gate_state                 TEXT NOT NULL DEFAULT 'pending'
+        CHECK (gate_state IN ('pending', 'complete', 'blocked', 'waived')),
+    required_doc_revisions     JSONB NOT NULL DEFAULT '[]'::jsonb,
+    missing_acknowledgements   JSONB NOT NULL DEFAULT '[]'::jsonb,
+    waiver_signature_event_id  UUID,
+    decided_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (object_type, object_id, gate_scope)
+);
+
+-- --------------------------------------------------------------------------
+-- Wave 4: publication attempts, receipts, immutable storage, audit packs
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS publication_attempts (
+    publication_attempt_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evidence_publication_id    UUID NOT NULL REFERENCES evidence_publications(evidence_publication_id) ON DELETE CASCADE,
+    attempt_no                 INT NOT NULL CHECK (attempt_no > 0),
+    attempt_state              TEXT NOT NULL DEFAULT 'started'
+        CHECK (attempt_state IN ('started', 'succeeded', 'failed', 'dead_letter')),
+    request_payload            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    response_payload           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    error_code                 TEXT,
+    error_message              TEXT,
+    started_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    completed_at               TIMESTAMPTZ,
+    UNIQUE (evidence_publication_id, attempt_no)
+);
+
+CREATE TABLE IF NOT EXISTS publication_receipts (
+    publication_receipt_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evidence_publication_id    UUID NOT NULL REFERENCES evidence_publications(evidence_publication_id) ON DELETE CASCADE,
+    target_type                TEXT NOT NULL CHECK (target_type IN ('sharepoint_graph', 'external_index', 'cache')),
+    target_uri                 TEXT NOT NULL,
+    target_hash_sha256         CHAR(64) NOT NULL,
+    source_package_hash_sha256 CHAR(64) NOT NULL,
+    receipt_payload            JSONB NOT NULL DEFAULT '{}'::jsonb,
+    received_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    verified_at                TIMESTAMPTZ,
+    UNIQUE (evidence_publication_id, target_uri)
+);
+
+CREATE TABLE IF NOT EXISTS immutable_storage_objects (
+    immutable_storage_object_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    storage_adapter            TEXT NOT NULL,
+    storage_uri                TEXT NOT NULL UNIQUE,
+    object_hash_sha256         CHAR(64) NOT NULL,
+    object_size_bytes          BIGINT NOT NULL CHECK (object_size_bytes >= 0),
+    retention_mode             TEXT NOT NULL DEFAULT 'none'
+        CHECK (retention_mode IN ('none', 'governance', 'compliance', 'legal_hold')),
+    retain_until               TIMESTAMPTZ,
+    object_lock_receipt        JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS audit_pack_exports (
+    audit_pack_export_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    export_scope               TEXT NOT NULL CHECK (export_scope IN ('evidence_record', 'change_order', 'job', 'lot', 'serial', 'document_revision', 'periodic_evaluation')),
+    scope_ref                  TEXT NOT NULL,
+    export_state               TEXT NOT NULL DEFAULT 'queued'
+        CHECK (export_state IN ('queued', 'building', 'ready', 'failed', 'expired')),
+    requested_by               UUID REFERENCES users(user_id),
+    requested_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    completed_at               TIMESTAMPTZ,
+    package_uri                TEXT,
+    package_hash_sha256        CHAR(64),
+    manifest_payload           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    error_code                 TEXT,
+    error_message              TEXT,
+    CHECK (export_state <> 'ready' OR (package_uri IS NOT NULL AND package_hash_sha256 IS NOT NULL))
+);
+
+CREATE TABLE IF NOT EXISTS legal_holds (
+    legal_hold_id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    hold_reference             TEXT NOT NULL,
+    hold_state                 TEXT NOT NULL DEFAULT 'active'
+        CHECK (hold_state IN ('active', 'released')),
+    applied_by                 UUID REFERENCES users(user_id),
+    applied_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    released_by                UUID REFERENCES users(user_id),
+    released_at                TIMESTAMPTZ,
+    reason                     TEXT NOT NULL,
+    UNIQUE (object_type, object_id, hold_reference)
+);
+
+-- --------------------------------------------------------------------------
+-- Wave 5: genealogy and digital-thread projections
+-- --------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS genealogy_nodes (
+    genealogy_node_id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    node_type                  TEXT NOT NULL
+        CHECK (node_type IN ('job', 'work_order', 'operation', 'lot', 'serial', 'material', 'equipment', 'tool', 'personnel', 'document_revision', 'evidence_record', 'evidence_version', 'change_order', 'nonconformance', 'shipment')),
+    node_ref                   TEXT NOT NULL,
+    canonical_label            TEXT,
+    lifecycle_state            TEXT,
+    metadata                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (node_type, node_ref)
+);
+
+CREATE TABLE IF NOT EXISTS genealogy_edges (
+    genealogy_edge_id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    from_node_id               UUID NOT NULL REFERENCES genealogy_nodes(genealogy_node_id) ON DELETE CASCADE,
+    to_node_id                 UUID NOT NULL REFERENCES genealogy_nodes(genealogy_node_id) ON DELETE CASCADE,
+    edge_type                  TEXT NOT NULL
+        CHECK (edge_type IN ('consumed', 'produced', 'executed_by', 'used_equipment', 'used_tool', 'documented_by', 'evidenced_by', 'authorized_by_change', 'supersedes', 'reworked_from', 'shipped_as')),
+    event_time                 TIMESTAMPTZ,
+    evidence_record_id         UUID REFERENCES evidence_records(evidence_record_id),
+    source_event_id            TEXT,
+    metadata                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (from_node_id, to_node_id, edge_type, source_event_id)
+);
+
+CREATE TABLE IF NOT EXISTS as_manufactured_snapshots (
+    as_manufactured_snapshot_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    subject_type               TEXT NOT NULL CHECK (subject_type IN ('job', 'work_order', 'lot', 'serial', 'shipment')),
+    subject_ref                TEXT NOT NULL,
+    snapshot_state             TEXT NOT NULL DEFAULT 'current'
+        CHECK (snapshot_state IN ('current', 'superseded', 'voided')),
+    snapshot_payload           JSONB NOT NULL DEFAULT '{}'::jsonb,
+    snapshot_hash_sha256       CHAR(64) NOT NULL,
+    built_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    evidence_record_id         UUID REFERENCES evidence_records(evidence_record_id),
+    UNIQUE (subject_type, subject_ref, snapshot_hash_sha256)
+);
+
+CREATE TABLE IF NOT EXISTS traceability_exceptions (
+    traceability_exception_id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    exception_type             TEXT NOT NULL
+        CHECK (exception_type IN ('missing_genealogy_link', 'orphan_evidence', 'stale_document_reference', 'unauthorized_change_reference', 'incomplete_5m_context')),
+    object_type                TEXT NOT NULL,
+    object_id                  TEXT NOT NULL,
+    exception_state            TEXT NOT NULL DEFAULT 'open'
+        CHECK (exception_state IN ('open', 'accepted_risk', 'resolved', 'cancelled')),
+    severity                   TEXT NOT NULL DEFAULT 'P1' CHECK (severity IN ('P0', 'P1', 'P2')),
+    details                    JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    resolved_at                TIMESTAMPTZ
+);
+
+-- Governance scope columns keep control-plane projections compatible with the
+-- enterprise registry contract even when the projection is derived.
+ALTER TABLE submission_validation_results
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE submission_validation_errors
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE duplicate_detection_fingerprints
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE source_boundary_violations
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE training_gate_decisions
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE read_ack_gate_decisions
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE immutable_storage_objects
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE genealogy_nodes
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE genealogy_edges
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE as_manufactured_snapshots
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE traceability_exceptions
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS source_system VARCHAR(80) NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(80) NOT NULL DEFAULT 'control_plane_projection.v1',
+    ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1;
+
+COMMIT;
+-- <<< END MIGRATION: 108_world_class_control_plane_execution.sql
+
+-- >>> BEGIN MIGRATION: 109_control_plane_cutover_hardening.sql
+-- ============================================================================
+-- Migration 109: Control Plane Cutover Hardening
+-- ============================================================================
+-- Purpose:
+--   Close second-pass re-audit gaps without removing legacy tables abruptly.
+--   This migration adds executable cutover ledgers for governed route blocking,
+--   command handlers, periodic evaluation, emergency/rollback change control,
+--   and expanded genealogy facts.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS governed_route_registry (
+    governed_route_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
+    route_pattern TEXT NOT NULL,
+    http_method TEXT NOT NULL DEFAULT '*',
+    object_type TEXT NOT NULL,
+    mutation_class TEXT NOT NULL
+        CHECK (mutation_class IN ('create', 'update', 'delete', 'transition', 'finalize', 'amend', 'publish', 'release', 'import')),
+    required_command_name TEXT NOT NULL,
+    route_state TEXT NOT NULL DEFAULT 'blocked'
+        CHECK (route_state IN ('blocked', 'compat_read_only', 'command_authoritative', 'retired')),
+    legacy_owner TEXT,
+    sunset_at TIMESTAMPTZ,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (route_pattern, http_method, mutation_class)
+);
+
+CREATE TABLE IF NOT EXISTS legacy_authority_sunset (
+    legacy_authority_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
+    legacy_surface TEXT NOT NULL UNIQUE,
+    legacy_storage TEXT NOT NULL,
+    replacement_service TEXT NOT NULL,
+    replacement_table_set JSONB NOT NULL DEFAULT '[]'::jsonb,
+    allowed_mode TEXT NOT NULL DEFAULT 'read_only_compatibility'
+        CHECK (allowed_mode IN ('read_only_compatibility', 'import_only', 'blocked', 'retired')),
+    sunset_state TEXT NOT NULL DEFAULT 'active'
+        CHECK (sunset_state IN ('active', 'migration_in_progress', 'sunset_complete', 'exception')),
+    owner TEXT NOT NULL DEFAULT 'platform',
+    sunset_due_at TIMESTAMPTZ,
+    exception_reason TEXT,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS control_plane_command_handlers (
+    command_handler_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
+    command_name TEXT NOT NULL,
+    handler_key TEXT NOT NULL,
+    handler_state TEXT NOT NULL DEFAULT 'active'
+        CHECK (handler_state IN ('active', 'paused', 'retired')),
+    required_role_set JSONB NOT NULL DEFAULT '[]'::jsonb,
+    required_guard_set JSONB NOT NULL DEFAULT '[]'::jsonb,
+    emitted_event_types JSONB NOT NULL DEFAULT '[]'::jsonb,
+    idempotency_scope TEXT NOT NULL DEFAULT 'command_name',
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (command_name, handler_key)
+);
+
+ALTER TABLE eqms_command_ledger ADD COLUMN IF NOT EXISTS handler_key TEXT;
+ALTER TABLE eqms_command_ledger ADD COLUMN IF NOT EXISTS governed_route_id UUID REFERENCES governed_route_registry(governed_route_id);
+ALTER TABLE eqms_command_ledger ADD COLUMN IF NOT EXISTS completion_payload JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+CREATE INDEX IF NOT EXISTS idx_eqms_command_ledger_handler_state
+    ON eqms_command_ledger (handler_key, command_state, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS periodic_evaluations (
+    periodic_evaluation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evaluation_scope TEXT NOT NULL
+        CHECK (evaluation_scope IN ('evidence_record', 'change_order', 'document_revision', 'publication', 'genealogy_graph', 'system_integrity')),
+    scope_ref TEXT NOT NULL,
+    evaluation_state TEXT NOT NULL DEFAULT 'scheduled'
+        CHECK (evaluation_state IN ('scheduled', 'in_progress', 'passed', 'failed', 'overdue', 'waived')),
+    due_at TIMESTAMPTZ NOT NULL,
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    assigned_role TEXT,
+    assigned_user_id UUID REFERENCES users(user_id),
+    result_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    integrity_digest_id UUID REFERENCES integrity_digests(integrity_digest_id),
+    audit_pack_export_id UUID REFERENCES audit_pack_exports(audit_pack_export_id),
+    waiver_signature_event_id UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (evaluation_scope, scope_ref, due_at)
+);
+
+CREATE TABLE IF NOT EXISTS emergency_change_controls (
+    emergency_change_control_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id),
+    emergency_state TEXT NOT NULL DEFAULT 'declared'
+        CHECK (emergency_state IN ('declared', 'approved_for_use', 'contained', 'normalized', 'rejected', 'rolled_back')),
+    declared_reason TEXT NOT NULL,
+    risk_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    required_followup_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    declared_by UUID REFERENCES users(user_id),
+    declared_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    normalized_by UUID REFERENCES users(user_id),
+    normalized_at TIMESTAMPTZ,
+    signature_event_id UUID,
+    CHECK (emergency_state NOT IN ('approved_for_use', 'normalized') OR signature_event_id IS NOT NULL),
+    UNIQUE (plm_change_order_id)
+);
+
+CREATE TABLE IF NOT EXISTS rollback_requirements (
+    rollback_requirement_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plm_change_order_id UUID NOT NULL REFERENCES plm_change_orders(plm_change_order_id),
+    object_type TEXT NOT NULL,
+    object_id TEXT NOT NULL,
+    rollback_state TEXT NOT NULL DEFAULT 'required'
+        CHECK (rollback_state IN ('required', 'planned', 'approved', 'executed', 'waived', 'not_required')),
+    rollback_plan JSONB NOT NULL DEFAULT '{}'::jsonb,
+    execution_evidence_record_id UUID REFERENCES evidence_records(evidence_record_id),
+    approved_by UUID REFERENCES users(user_id),
+    approved_at TIMESTAMPTZ,
+    executed_at TIMESTAMPTZ,
+    waiver_signature_event_id UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (plm_change_order_id, object_type, object_id)
+);
+
+CREATE TABLE IF NOT EXISTS genealogy_edge_facts (
+    genealogy_edge_fact_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    edge_fact_type TEXT NOT NULL
+        CHECK (edge_fact_type IN ('consume', 'produce', 'split', 'merge', 'rework', 'hold', 'release', 'quarantine', 'scrap', 'supersede', 'ship', 'inspect', 'measure')),
+    from_object_type TEXT NOT NULL,
+    from_object_id TEXT NOT NULL,
+    to_object_type TEXT NOT NULL,
+    to_object_id TEXT NOT NULL,
+    quantity NUMERIC,
+    uom TEXT,
+    event_time TIMESTAMPTZ NOT NULL DEFAULT now(),
+    effective_at TIMESTAMPTZ,
+    superseded_at TIMESTAMPTZ,
+    evidence_record_id UUID REFERENCES evidence_records(evidence_record_id),
+    change_order_id UUID REFERENCES plm_change_orders(plm_change_order_id),
+    source_event_id TEXT,
+    fact_state TEXT NOT NULL DEFAULT 'active'
+        CHECK (fact_state IN ('active', 'superseded', 'voided')),
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id)
+);
+
+CREATE TABLE IF NOT EXISTS traceability_5m_obligations (
+    traceability_5m_obligation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_company_code TEXT,
+    org_legal_entity_code TEXT,
+    org_plant_id UUID,
+    org_site_id UUID,
+    operation_class TEXT NOT NULL,
+    object_type TEXT NOT NULL,
+    object_id TEXT NOT NULL,
+    material_required BOOLEAN NOT NULL DEFAULT true,
+    machine_required BOOLEAN NOT NULL DEFAULT true,
+    method_required BOOLEAN NOT NULL DEFAULT true,
+    measurement_required BOOLEAN NOT NULL DEFAULT true,
+    manpower_required BOOLEAN NOT NULL DEFAULT true,
+    gate_state TEXT NOT NULL DEFAULT 'pending'
+        CHECK (gate_state IN ('pending', 'complete', 'blocked', 'waived')),
+    missing_context JSONB NOT NULL DEFAULT '[]'::jsonb,
+    waiver_signature_event_id UUID,
+    decided_at TIMESTAMPTZ,
+    source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    source_record_id TEXT,
+    payload_schema_version TEXT NOT NULL DEFAULT 'traceability_5m_obligation.v1',
+    row_version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (operation_class, object_type, object_id)
+);
+
+ALTER TABLE governed_route_registry
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE legacy_authority_sunset
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE control_plane_command_handlers
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'control_plane_cutover.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE traceability_5m_obligations
+    ADD COLUMN IF NOT EXISTS org_company_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code TEXT,
+    ADD COLUMN IF NOT EXISTS org_plant_id UUID,
+    ADD COLUMN IF NOT EXISTS org_site_id UUID,
+    ADD COLUMN IF NOT EXISTS source_system TEXT NOT NULL DEFAULT 'mom.control_plane',
+    ADD COLUMN IF NOT EXISTS source_record_id TEXT,
+    ADD COLUMN IF NOT EXISTS payload_schema_version TEXT NOT NULL DEFAULT 'traceability_5m_obligation.v1',
+    ADD COLUMN IF NOT EXISTS row_version INTEGER NOT NULL DEFAULT 1;
+
+CREATE OR REPLACE VIEW canonical_outbox_legacy_bridge AS
+SELECT
+    outbox_event_id AS legacy_event_id,
+    aggregate_type,
+    aggregate_id,
+    event_type,
+    payload,
+    idempotency_key,
+    correlation_id,
+    outbox_state AS status,
+    attempt_count AS attempts,
+    occurred_at,
+    updated_at
+FROM outbox_events
+WHERE payload_schema_version = 'legacy_domain_outbox_bridge.v1';
+
+INSERT INTO legacy_authority_sunset
+    (legacy_surface, legacy_storage, replacement_service, replacement_table_set, allowed_mode, owner)
+VALUES
+    ('EvidenceVaultService', 'data/evidence/vault.json|custody.json|links.json', 'EvidenceFinalizationService', '["evidence_records","evidence_versions","evidence_artifacts","signature_events"]'::jsonb, 'import_only', 'qms'),
+    ('WorkflowEngine', 'data/workflows/*.json', 'ControlPlaneCommandService', '["eqms_command_ledger","state_transition_events","control_plane_object_registry"]'::jsonb, 'read_only_compatibility', 'platform'),
+    ('FormController', 'form_control_registry.json|record_counters.json|online-forms/entries', 'FormIssuanceService|SubmissionAttemptService|EvidenceFinalizationService', '["frm_issuances","frm_submission_attempts","evidence_records","evidence_versions"]'::jsonb, 'read_only_compatibility', 'qms'),
+    ('ProductPassportController', 'data/passports/*.json', 'GenealogyGraphService', '["genealogy_nodes","genealogy_edges","genealogy_edge_facts","as_manufactured_snapshots"]'::jsonb, 'read_only_compatibility', 'mes')
+ON CONFLICT (legacy_surface) DO UPDATE
+SET replacement_service = EXCLUDED.replacement_service,
+    replacement_table_set = EXCLUDED.replacement_table_set,
+    allowed_mode = EXCLUDED.allowed_mode,
+    updated_at = now();
+
+COMMIT;
+-- <<< END MIGRATION: 109_control_plane_cutover_hardening.sql
+
+-- >>> BEGIN MIGRATION: 110_ai_advisory_boundary_comments.sql
+-- Migration: 110_ai_advisory_boundary_comments
+-- Purpose: Align AI recommendation action metadata with the current advisory-only execution boundary.
+-- Phase: AI / analytics governance hardening
+-- Rollback: Reapply the previous comments from 099_ai_integration_foundation.sql if needed.
+
+COMMENT ON TABLE ai_recommendation_actions IS
+    'Advisory recommendation records created from AI predictions. These rows require human review and are not execution authority / Ban ghi khuyen nghi tu van tu du doan AI, can con nguoi xem xet va khong co tham quyen thuc thi';
+
+COMMENT ON COLUMN ai_recommendation_actions.action_type IS
+    'Advisory recommendation type. Values may point reviewers to NCR, maintenance, scheduling, alert, or tooling review, but do not directly create or execute operational records / Loai khuyen nghi tu van, khong tu dong tao hoac thuc thi ban ghi van hanh';
+
+COMMENT ON COLUMN ai_recommendation_actions.status IS
+    'Human-review workflow status for an advisory recommendation: pending, executed, failed, cancelled. Executed means a human-governed review action was recorded, not autonomous machine or MES execution / Trang thai quy trinh xem xet cua khuyen nghi';
+
+COMMENT ON COLUMN ai_recommendation_actions.action_payload IS
+    'Advisory payload. Expected governance fields include advisory_only=true, execution_authority=false, requires_human_approval=true, and side_effect_policy=pending_human_review_only / Du lieu khuyen nghi tu van voi ranh gioi khong co tham quyen thuc thi';
+-- <<< END MIGRATION: 110_ai_advisory_boundary_comments.sql

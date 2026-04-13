@@ -92,7 +92,6 @@ class GenericCrudController extends BaseController
 
     private ?GenericCrudService $service = null;
     private ?IdempotencyService $idempotencyService = null;
-    private ?array $endpointCatalog = null;
     private ?array $runtimeAccessPolicy = null;
 
     private function service(): GenericCrudService
@@ -111,48 +110,6 @@ class GenericCrudController extends BaseController
         }
 
         return $this->idempotencyService;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function writeRoles(): array
-    {
-        return array_values(array_unique(array_merge(
-            admin_roles(),
-            [
-                'it_admin',
-                'qms_engineer',
-                'quality_manager',
-                'quality_engineer',
-                'qc_inspector',
-                'production_manager',
-                'production_planner',
-                'engineering_manager',
-                'supply_chain_manager',
-                'buyer',
-                'warehouse_clerk',
-                'logistics_coordinator',
-                'finance_manager',
-                'hr_manager',
-            ]
-        )));
-    }
-
-    private function requireGenericWriteAccess(array $user): void
-    {
-        $this->requireAnyRole($user, $this->writeRoles());
-    }
-
-    private function endpointCatalog(): array
-    {
-        if ($this->endpointCatalog === null) {
-            $path = $this->dataDir . '/registry/endpoint-catalog.json';
-            $payload = $this->readJsonFile($path) ?? [];
-            $this->endpointCatalog = is_array($payload['endpoints'] ?? null) ? $payload['endpoints'] : [];
-        }
-
-        return $this->endpointCatalog;
     }
 
     private function runtimeAccessPolicy(): array
@@ -207,7 +164,7 @@ class GenericCrudController extends BaseController
                 continue;
             }
             if (preg_match_all('/[A-Za-z_][A-Za-z0-9_]*/', $candidate, $matches) !== false) {
-                foreach ((array)($matches[0] ?? []) as $token) {
+                foreach ($matches[0] as $token) {
                     $token = trim((string)$token);
                     if ($token !== '' && in_array($token, $columns, true) && !in_array($token, $fields, true)) {
                         $fields[] = $token;

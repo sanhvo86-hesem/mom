@@ -1,6 +1,6 @@
 # Shopfloor Execution API Contracts
 
-Date: 2026-04-13
+Date: 2026-04-14
 
 Scope: Phase 1 CNC shopfloor manual-input foundation using the existing custom MVC routes, middleware, CSRF, role, audit, dispatch, mobile, and AI advisory patterns.
 
@@ -254,6 +254,54 @@ Rules:
 - Feedback write is idempotent.
 - Feedback is advisory analytics data only and cannot mutate dispatch or execution state.
 - Critical prediction recommendation records remain `pending` and carry `advisory_only: true`, `execution_authority: false`, and `requires_human_approval: true`. They may point a human to quality, maintenance, tooling, or planning review, but they do not create NCRs, maintenance work, tool orders, schedule moves, or machine commands.
+
+## AI natural-language query
+
+Handler: existing AI route in `AiSchedulingController::aiNlQuery()`.
+
+Payload:
+
+```json
+{
+  "question": "Show critical defect probability predictions for CNC-01 this week",
+  "context_type": "production_query"
+}
+```
+
+Rules:
+
+- Actor must be authenticated and hold an AI read role such as quality, production planning/management, CNC workshop management, engineering management/lead, supervisor, shift lead, or admin.
+- CSRF is required because the route writes conversation history and may trigger external advisory processing.
+- The service validates generated SQL as SELECT/CTE only, rejects DDL/DML and dangerous functions, caps rows, runs in a PostgreSQL read-only transaction, and sets `statement_timeout` inside that transaction.
+- The NLQ prompt uses canonical AI prediction types: `defect_probability`, `tool_wear`, `spc_anomaly`, `process_drift`, and `equipment_failure`.
+- NLQ is read-only advisory access. It cannot dispatch work, approve quality, alter schedules, create NCRs, or command machines.
+
+## AI root-cause analysis
+
+Handler: existing AI route in `AiSchedulingController::aiRcaAnalyze()`.
+
+Payload:
+
+```json
+{
+  "ncr_id": "NCR-1001"
+}
+```
+
+Rules:
+
+- Actor must be authenticated and hold admin, `quality_manager`, or `quality_engineer` access.
+- CSRF is required.
+- RCA output is advisory. Any NCR disposition, CAPA, waiver, shipment gate, or production release must still go through governed EQMS/MOM write paths.
+
+## Evidence upload safety
+
+Evidence upload and governance attachment paths validate:
+
+- temporary file exists and is readable
+- file size is greater than zero and no more than 50 MB
+- MIME type is detected from file bytes
+- extension fallback is allowed only for generic/ambiguous byte detection, not for concrete disallowed content
 
 ## Backward compatibility
 

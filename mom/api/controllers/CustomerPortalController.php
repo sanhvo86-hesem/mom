@@ -386,14 +386,14 @@ class CustomerPortalController extends BaseController
         }
         foreach ($documentsOut as $document) {
             $recentActivity[] = [
-                'timestamp' => (string)($document['shared_at'] ?? ''),
+                'timestamp' => (string)$document['shared_at'],
                 'user_email' => (string)($document['customer_email'] ?? ''),
                 'action' => 'document_shared',
-                'detail' => (string)($document['title'] ?? ''),
+                'detail' => (string)$document['title'],
             ];
         }
         usort($recentActivity, static function (array $a, array $b): int {
-            return strcmp((string)($b['timestamp'] ?? ''), (string)($a['timestamp'] ?? ''));
+            return strcmp((string)$b['timestamp'], (string)$a['timestamp']);
         });
 
         return [
@@ -404,7 +404,7 @@ class CustomerPortalController extends BaseController
             'analytics' => [
                 'active_users' => count(array_filter($users, static fn($user) => is_array($user) && strtolower((string)($user['status'] ?? '')) === 'active')),
                 'logins_this_month' => $loginsThisMonth,
-                'docs_downloaded' => array_sum(array_map(static fn($document) => (int)($document['download_count'] ?? 0), $documentsOut)),
+                'docs_downloaded' => array_sum(array_map(static fn($document) => (int)$document['download_count'], $documentsOut)),
                 'complaints_submitted' => count($complaints),
                 'total_users' => count($users),
                 'recent_activity' => array_slice($recentActivity, 0, 20),
@@ -547,6 +547,7 @@ class CustomerPortalController extends BaseController
             $file  = $this->portalDir() . '/users.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
             $nextEmail = isset($body['email']) ? $this->validatePortalEmail((string)$body['email']) : null;
             if ($nextEmail !== null && $this->portalEmailExists($all, $nextEmail, $id)) {
                 $this->error('email_exists', 409);
@@ -589,6 +590,9 @@ class CustomerPortalController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Portal user {$id} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('portal_update_user_failed', 500, 'Portal user update result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);
@@ -758,6 +762,7 @@ class CustomerPortalController extends BaseController
             $file  = $this->portalDir() . '/access.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 $matchesId = $id !== '' && (string)($entry['id'] ?? '') === $id;
@@ -778,6 +783,9 @@ class CustomerPortalController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Access grant {$id} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('portal_revoke_access_failed', 500, 'Portal access revoke result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);
@@ -860,6 +868,7 @@ class CustomerPortalController extends BaseController
             $file  = $this->portalDir() . '/complaints.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $complaintId) {
@@ -875,6 +884,9 @@ class CustomerPortalController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Portal complaint {$complaintId} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('portal_link_complaint_failed', 500, 'Portal complaint link result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);
@@ -978,6 +990,7 @@ class CustomerPortalController extends BaseController
         $all = $this->readJsonFile($file) ?? [];
         $userId = $this->userId($user);
         $found = false;
+        $updated = null;
 
         foreach ($all as &$entry) {
             if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
@@ -993,6 +1006,9 @@ class CustomerPortalController extends BaseController
 
         if (!$found) {
             $this->error('not_found', 404, "Portal complaint {$id} not found.");
+        }
+        if (!is_array($updated)) {
+            $this->error('portal_update_complaint_failed', 500, 'Portal complaint update result was not materialized.');
         }
 
         $this->writeJsonFile($file, $all);
@@ -1019,6 +1035,7 @@ class CustomerPortalController extends BaseController
         $file = $this->portalDir() . '/users.json';
         $all = $this->readJsonFile($file) ?? [];
         $found = false;
+        $updated = null;
 
         foreach ($all as &$entry) {
             if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
@@ -1035,6 +1052,9 @@ class CustomerPortalController extends BaseController
 
         if (!$found) {
             $this->error('not_found', 404, "Portal user {$id} not found.");
+        }
+        if (!is_array($updated)) {
+            $this->error('portal_resend_verification_failed', 500, 'Portal user verification result was not materialized.');
         }
 
         $this->writeJsonFile($file, $all);
@@ -1061,6 +1081,7 @@ class CustomerPortalController extends BaseController
         $file = $this->portalDir() . '/doc-access.json';
         $all = $this->readJsonFile($file) ?? [];
         $found = false;
+        $updated = null;
 
         foreach ($all as &$entry) {
             if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
@@ -1076,6 +1097,9 @@ class CustomerPortalController extends BaseController
 
         if (!$found) {
             $this->error('not_found', 404, "Shared document {$id} not found.");
+        }
+        if (!is_array($updated)) {
+            $this->error('portal_revoke_document_failed', 500, 'Portal document revoke result was not materialized.');
         }
 
         $this->writeJsonFile($file, $all);

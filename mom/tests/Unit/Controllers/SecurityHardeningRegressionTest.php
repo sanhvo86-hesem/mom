@@ -48,6 +48,40 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertStringContainsString('$this->idempotency()->execute', $source);
     }
 
+    public function testAiNaturalLanguageAndRcaWritesRequireCsrfAndScopedRoles(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+
+        $this->assertStringContainsString('private function aiReadRoles(): array', $source);
+        $this->assertMatchesRegularExpression('/public function aiNlQuery\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
+        $this->assertMatchesRegularExpression('/public function aiRcaAnalyze\(\): never\s*\{.*?\$this->requireAnyRole\(\$user,.*?\$this->requireCsrf\(\);/s', $source);
+        $this->assertStringContainsString('question_hash', $source);
+    }
+
+    public function testOperationalOverridesUseCanonicalElevatedRolesAfterPermissionGate(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/OperationalOverrideController.php');
+
+        $this->assertStringContainsString('private function overrideElevatedRoles(): array', $source);
+        $this->assertStringContainsString('admin_roles()', $source);
+        $this->assertStringContainsString("'production_director'", $source);
+        $this->assertStringContainsString("'cnc_workshop_manager'", $source);
+        $this->assertStringContainsString('$this->userHasAnyRole($user, $this->overrideElevatedRoles())', $source);
+        $this->assertMatchesRegularExpression('/public function createOverride\(\): never\s*\{.*?\$this->requireOverrideWrite\(\$user\);.*?\$this->requireElevatedRole\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
+    }
+
+    public function testFmeaAccessUsesMigratedRolesAndRoleBuckets(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/FmeaController.php');
+
+        $this->assertStringContainsString('private function fmeaPermissionRoles(array $user): array', $source);
+        $this->assertStringContainsString('migrate_role(strtolower(trim((string)$role)))', $source);
+        $this->assertStringContainsString("\$roles[] = 'quality';", $source);
+        $this->assertStringContainsString("\$roles[] = 'engineering';", $source);
+        $this->assertStringContainsString("\$roles[] = 'production';", $source);
+        $this->assertStringContainsString('$this->userHasAnyRole($user, $this->fmeaElevatedRoles())', $source);
+    }
+
     public function testLocalStorageAllowsFirstWriteToNewSubdirectoryButRejectsTraversal(): void
     {
         $driver = new LocalStorageDriver($this->tmpDir);

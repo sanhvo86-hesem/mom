@@ -397,6 +397,7 @@ class GraphicsGovernanceService
             (string)$draft['templateId'],
             $impact
         );
+        $this->assertNoActiveReleaseBlockersForPublish((string)$draft['templateId'], $impact);
         $draft['publishedAt'] = gmdate('c');
         $draft['publishedBy'] = $username;
         $draft['releaseManifestRefs'] = $releaseRefs;
@@ -518,7 +519,7 @@ class GraphicsGovernanceService
             if ($usesPrivateCssShell) {
                 $findings[] = ['code' => 'legacy_private_css_shell', 'severity' => 'blocker'];
             }
-            $hasBlocker = count(array_filter($findings, static fn(array $finding): bool => (string)($finding['severity'] ?? '') === 'blocker')) > 0;
+            $hasBlocker = count(array_filter($findings, static fn(array $finding): bool => (string)$finding['severity'] === 'blocker')) > 0;
             $consumesSharedTokens = !$usesPrivateCssShell && $template !== null;
             $consumesHmComponents = $blockFamilies !== [] && $blockFindings === [];
             $linkageStatus = $hasBlocker ? 'blocked' : 'full-admin-controlled';
@@ -530,7 +531,7 @@ class GraphicsGovernanceService
             $reason = 'Consumes backend template authority, shared tokens, and governed block contracts.';
             if ($linkageStatus === 'blocked') {
                 $reason = 'Release blocked: ' . implode(',', array_values(array_unique(array_filter(array_map(
-                    static fn(array $finding): string => (string)($finding['code'] ?? ''),
+                    static fn(array $finding): string => (string)$finding['code'],
                     $findings
                 )))));
             } elseif ($linkageStatus === 'legacy-private-css') {
@@ -578,10 +579,10 @@ class GraphicsGovernanceService
                 'moduleCount' => count($rows),
                 'compliantCount' => count(array_filter($rows, static fn(array $row): bool => (bool)$row['compliant'])),
                 'nonCompliantCount' => count(array_filter($rows, static fn(array $row): bool => !(bool)$row['compliant'])),
-                'fullAdminControlledCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'full-admin-controlled')),
-                'bridgedToSharedTokensCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'bridged-to-shared-tokens')),
-                'legacyPrivateCssCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'legacy-private-css')),
-                'blockedCount' => count(array_filter($rows, static fn(array $row): bool => (string)($row['linkageStatus'] ?? '') === 'blocked')),
+                'fullAdminControlledCount' => count(array_filter($rows, static fn(array $row): bool => (string)$row['linkageStatus'] === 'full-admin-controlled')),
+                'bridgedToSharedTokensCount' => count(array_filter($rows, static fn(array $row): bool => (string)$row['linkageStatus'] === 'bridged-to-shared-tokens')),
+                'legacyPrivateCssCount' => count(array_filter($rows, static fn(array $row): bool => (string)$row['linkageStatus'] === 'legacy-private-css')),
+                'blockedCount' => count(array_filter($rows, static fn(array $row): bool => (string)$row['linkageStatus'] === 'blocked')),
             ],
             'version' => $this->documentVersion($registry),
             'etag' => $this->etag($registry),
@@ -785,26 +786,7 @@ class GraphicsGovernanceService
         $drift = $this->driftReport();
         $registry = $this->normalizedTemplateRegistry();
         $state = $this->pruneExpiredImpacts($this->repo->readState());
-        $waivers = $this->activeWaivers();
-        $approvedWaiverTargets = [];
-        $approvedWaiverReleaseGates = [];
-        $approvedWaiverBlockers = [];
-        foreach ((array)($waivers['waivers'] ?? []) as $waiver) {
-            if (!is_array($waiver)) {
-                continue;
-            }
-            $targetId = (string)($waiver['targetId'] ?? '');
-            $approvedWaiverTargets[$targetId] = true;
-            if ((string)($waiver['scope'] ?? '') === 'release_gate') {
-                $approvedWaiverReleaseGates[$targetId] = true;
-                if ($targetId === 'graphics-governance') {
-                    $approvedWaiverReleaseGates['G19-graphics-governance'] = true;
-                }
-            }
-            if (str_starts_with($targetId, 'graphics_')) {
-                $approvedWaiverBlockers[$targetId] = true;
-            }
-        }
+        $waivers = (array)($this->activeWaivers()['waivers'] ?? []);
 
         $blockers = [];
         foreach ((array)($matrix['matrix'] ?? []) as $row) {
@@ -818,9 +800,7 @@ class GraphicsGovernanceService
             )));
             $blockerId = 'graphics_module_' . $moduleId;
             $releaseGate = 'G19-graphics-governance';
-            $waived = isset($approvedWaiverTargets[$moduleId])
-                || isset($approvedWaiverBlockers[$blockerId])
-                || isset($approvedWaiverReleaseGates[$releaseGate]);
+            $waived = $this->releaseBlockerHasEligibleWaiver($waivers, $moduleId, $blockerId, $releaseGate, 'module');
             $blockers[] = [
                 'blockerId' => $blockerId,
                 'scope' => 'module',
@@ -843,9 +823,7 @@ class GraphicsGovernanceService
             $targetId = (string)($row['id'] ?? $row['targetId'] ?? $row['scope'] ?? 'graphics');
             $blockerId = 'graphics_drift_' . $targetId;
             $releaseGate = 'G19-graphics-governance';
-            $waived = isset($approvedWaiverTargets[$targetId])
-                || isset($approvedWaiverBlockers[$blockerId])
-                || isset($approvedWaiverReleaseGates[$releaseGate]);
+            $waived = $this->releaseBlockerHasEligibleWaiver($waivers, $targetId, $blockerId, $releaseGate, (string)($row['scope'] ?? 'graphics'));
             $blockers[] = [
                 'blockerId' => $blockerId,
                 'scope' => (string)($row['scope'] ?? 'graphics'),
@@ -865,9 +843,7 @@ class GraphicsGovernanceService
             $hasBlockers = (bool)($impact['hasBlockers'] ?? false);
             $blockerId = 'graphics_pending_impact_' . (string)$impactId;
             $releaseGate = 'G19-graphics-governance';
-            $waived = isset($approvedWaiverTargets[(string)$impactId])
-                || isset($approvedWaiverBlockers[$blockerId])
-                || isset($approvedWaiverReleaseGates[$releaseGate]);
+            $waived = $this->releaseBlockerHasEligibleWaiver($waivers, (string)$impactId, $blockerId, $releaseGate, 'impact-analysis');
             $blockers[] = [
                 'blockerId' => $blockerId,
                 'scope' => 'impact-analysis',
@@ -880,21 +856,49 @@ class GraphicsGovernanceService
             ];
         }
 
-        $activeBlockers = array_values(array_filter($blockers, static fn(array $row): bool => (string)($row['status'] ?? '') === 'active'));
+        $activeBlockers = array_values(array_filter($blockers, static fn(array $row): bool => (string)$row['status'] === 'active'));
+        $driftGeneratedAt = (string)($drift['generatedAt'] ?? gmdate('c'));
         return [
             'blockers' => $blockers,
             'summary' => [
                 'blockerCount' => count($activeBlockers),
-                'waivedCount' => count(array_filter($blockers, static fn(array $row): bool => (string)($row['status'] ?? '') === 'waived')),
+                'waivedCount' => count(array_filter($blockers, static fn(array $row): bool => (string)$row['status'] === 'waived')),
                 'pendingImpactCount' => count((array)($state['pendingImpact'] ?? [])),
                 'releaseBlocked' => $activeBlockers !== [],
             ],
             'evidence' => [
+                'graphicsAuthorityRefs' => [
+                    'mom/design/template-registry.json',
+                    'mom/data/registry/graphics-governance-registry.json',
+                    'mom/docs/module-layout-template-design-system-v4.html',
+                    'standards/36-frontend-module-layout-template-standard.md',
+                ],
                 'complianceMatrixVersion' => (string)($matrix['version'] ?? ''),
                 'templateRegistryVersion' => $this->documentVersion($registry),
                 'templateRegistryEtag' => $this->etag($registry),
-                'driftReportGeneratedAt' => gmdate('c'),
-                'authority' => 'mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json',
+                'templateRegistryChecksum' => $this->etag($registry),
+                'complianceMatrixRef' => 'mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance',
+                'impactAnalysisRef' => 'mom/data/graphics-governance/state.json#/pendingImpact',
+                'waiversRef' => 'mom/data/graphics-governance/waivers.json#/waivers',
+                'runtimeBeaconRef' => 'mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon',
+                'debtObservatoryRef' => 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory',
+                'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
+                'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
+                'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
+                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots',
+                'releaseBlocked' => $activeBlockers !== [],
+                'blockerCount' => count($activeBlockers),
+                'evidenceBundleRequirements' => [
+                    'affectedModulesSnapshot',
+                    'complianceMatrixSnapshot',
+                    'debtDriftSnapshot',
+                    'runtimeBeaconSnapshot',
+                    'rolloutDecision',
+                    'rollbackPlan',
+                    'waiverRegisterSnapshot',
+                ],
+                'driftReportGeneratedAt' => $driftGeneratedAt,
+                'generatedAt' => gmdate('c'),
             ],
         ];
     }
@@ -1067,7 +1071,7 @@ class GraphicsGovernanceService
                     ],
                 ]) ?: ''), 0, 16),
                 'complianceState' => (string)($row['status'] ?? $row['linkageStatus'] ?? 'blocked'),
-                'beaconStatus' => (string)($row['linkageStatus'] ?? '') === 'blocked' ? 'release-blocking' : 'reported',
+                'beaconStatus' => in_array((string)($row['linkageStatus'] ?? ''), ['blocked', 'legacy-private-css'], true) ? 'release-blocking' : 'reported',
                 'reportedAt' => gmdate('c'),
             ];
         }
@@ -2657,6 +2661,90 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<int, mixed> $waivers
+     */
+    private function releaseBlockerHasEligibleWaiver(array $waivers, string $targetId, string $blockerId, string $releaseGate, string $blockerScope): bool
+    {
+        foreach ($waivers as $waiver) {
+            if (!is_array($waiver) || !$this->isReleaseWaiverEligible($waiver)) {
+                continue;
+            }
+            if ($this->waiverCoversReleaseBlocker($waiver, $targetId, $blockerId, $releaseGate, $blockerScope)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isReleaseWaiverEligible(array $waiver): bool
+    {
+        if ((string)($waiver['status'] ?? '') !== 'approved') {
+            return false;
+        }
+        if (!in_array((string)($waiver['riskClass'] ?? ''), ['high', 'regulated', 'shopfloor-critical'], true)) {
+            return false;
+        }
+        if (trim((string)($waiver['compensatingControl'] ?? '')) === '') {
+            return false;
+        }
+        if (trim((string)($waiver['approver'] ?? '')) === '' || trim((string)($waiver['approvedBy'] ?? '')) === '') {
+            return false;
+        }
+        if (trim((string)($waiver['createdBy'] ?? '')) === '' || trim((string)($waiver['approvedAt'] ?? '')) === '') {
+            return false;
+        }
+        if (strcasecmp((string)($waiver['createdBy'] ?? ''), (string)($waiver['approvedBy'] ?? '')) === 0) {
+            return false;
+        }
+        if ((array)($waiver['documentControlRefs'] ?? []) === []) {
+            return false;
+        }
+        return $this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) !== [];
+    }
+
+    private function waiverCoversReleaseBlocker(array $waiver, string $targetId, string $blockerId, string $releaseGate, string $blockerScope): bool
+    {
+        $waiverTarget = (string)($waiver['targetId'] ?? '');
+        $scope = (string)($waiver['scope'] ?? '');
+        if (in_array($waiverTarget, ['graphics-governance', $releaseGate], true)) {
+            return $scope === 'release_gate';
+        }
+        if ($waiverTarget === $blockerId) {
+            return $scope === 'release_gate';
+        }
+        if ($waiverTarget !== $targetId) {
+            return false;
+        }
+        return match ($blockerScope) {
+            'module' => $scope === 'module',
+            'template' => $scope === 'template',
+            'component' => $scope === 'component',
+            'tokens', 'token' => $scope === 'token',
+            default => $scope === 'release_gate',
+        };
+    }
+
+    /**
+     * @param array<string, mixed> $impact
+     */
+    private function assertNoActiveReleaseBlockersForPublish(string $templateId, array $impact): void
+    {
+        $releaseBlockers = $this->releaseBlockers();
+        $active = array_values(array_filter(
+            (array)($releaseBlockers['blockers'] ?? []),
+            static fn($row): bool => is_array($row) && (string)($row['status'] ?? '') === 'active'
+        ));
+        if ($active === []) {
+            return;
+        }
+        throw new GraphicsGovernanceException(422, 'release_blockers_active', 'Publish cannot proceed while graphics release blockers remain active', [], [
+            'templateId' => $templateId,
+            'impactId' => (string)($impact['impactId'] ?? ''),
+            'releaseBlockers' => $active,
+        ]);
+    }
+
+    /**
      * @param array<int, string> $waiverIds
      * @param array<string, mixed> $impact
      * @return array<int, string>
@@ -2707,6 +2795,11 @@ class GraphicsGovernanceService
             if (!is_array($waiver)) {
                 throw new GraphicsGovernanceException(422, 'waiver_not_approved', 'Publish waiver must exist, be approved, and be unexpired: ' . $waiverId, [
                     ['field' => 'waiverIds', 'message' => 'Unknown, draft, expired, or unapproved waiver: ' . $waiverId, 'code' => 'waiver_not_approved'],
+                ]);
+            }
+            if (!$this->isReleaseWaiverEligible($waiver)) {
+                throw new GraphicsGovernanceException(422, 'waiver_not_release_eligible', 'Publish waiver lacks release-grade evidence or separation of duties: ' . $waiverId, [
+                    ['field' => 'waiverIds', 'message' => 'Waiver must be high/regulated/shopfloor-critical, approved by a separate approver, and carry document/release refs', 'code' => 'waiver_not_release_eligible'],
                 ]);
             }
             $riskClass = (string)($waiver['riskClass'] ?? '');
@@ -2764,12 +2857,12 @@ class GraphicsGovernanceService
     {
         $verification = is_array($input['postCanaryVerification'] ?? null)
             ? (array)$input['postCanaryVerification']
-            : (is_array($input['verification'] ?? null) ? (array)$input['verification'] : []);
+            : [];
 
         $missing = [];
-        $runtimeBeaconRef = trim((string)($verification['runtimeBeaconRef'] ?? $input['runtimeBeaconRef'] ?? ''));
-        $driftReportRef = trim((string)($verification['driftReportRef'] ?? $input['driftReportRef'] ?? ''));
-        $moduleOwnerSignoffRef = trim((string)($verification['moduleOwnerSignoffRef'] ?? $input['moduleOwnerSignoffRef'] ?? ''));
+        $runtimeBeaconRef = trim((string)($verification['runtimeBeaconRef'] ?? ''));
+        $driftReportRef = trim((string)($verification['driftReportRef'] ?? ''));
+        $moduleOwnerSignoffRef = trim((string)($verification['moduleOwnerSignoffRef'] ?? ''));
         if ($runtimeBeaconRef === '') {
             $missing[] = 'runtimeBeaconRef';
         }
@@ -2779,7 +2872,7 @@ class GraphicsGovernanceService
         if ($moduleOwnerSignoffRef === '') {
             $missing[] = 'moduleOwnerSignoffRef';
         }
-        $manifestRefs = $this->normalizeReleaseManifestRefs((array)($verification['releaseManifestRefs'] ?? $input['releaseManifestRefs'] ?? $rollout['releaseManifestRefs'] ?? []));
+        $manifestRefs = $this->normalizeReleaseManifestRefs((array)($verification['releaseManifestRefs'] ?? $rollout['releaseManifestRefs'] ?? []));
         if ($manifestRefs === []) {
             $missing[] = 'releaseManifestRefs';
         }
@@ -2799,20 +2892,11 @@ class GraphicsGovernanceService
 
     private function assertControlledEvidenceRef(string $field, string $ref): void
     {
-        $allowed = [
-            'mom/data/graphics-governance/',
-            'mom/data/registry/',
-            'mom/release/',
-            'mom/docs/forms/design-system/',
-            '_reports/',
-        ];
-        foreach ($allowed as $prefix) {
-            if (str_starts_with($ref, $prefix)) {
-                return;
-            }
+        if ($this->repo->controlledArtifactExists($ref)) {
+            return;
         }
-        throw new GraphicsGovernanceException(422, 'controlled_evidence_ref_required', 'Evidence ref must point to a controlled graphics/release artifact', [
-            ['field' => 'postCanaryVerification.' . $field, 'message' => 'Use a controlled evidence ref, not an ad hoc string or boolean', 'code' => 'controlled_evidence_ref_required'],
+        throw new GraphicsGovernanceException(422, 'controlled_evidence_artifact_required', 'Evidence ref must resolve to an existing controlled graphics/release artifact', [
+            ['field' => 'postCanaryVerification.' . $field, 'message' => 'Use an existing controlled evidence artifact, not an ad hoc string or boolean', 'code' => 'controlled_evidence_artifact_required'],
         ], ['ref' => $ref]);
     }
 
@@ -3115,16 +3199,6 @@ class GraphicsGovernanceService
                 if ((array)($waiver['documentControlRefs'] ?? []) === []) {
                     throw new GraphicsGovernanceException(422, 'document_control_ref_required', 'High-risk waivers require documentControlRefs', [
                         ['field' => 'documentControlRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
-                    ]);
-                }
-                if ($this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])) === []) {
-                    throw new GraphicsGovernanceException(422, 'release_manifest_required', 'High-risk waivers require releaseManifestRefs', [
-                        ['field' => 'releaseManifestRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
-                    ]);
-                }
-                if (trim((string)($waiver['compensatingControl'] ?? '')) === '') {
-                    throw new GraphicsGovernanceException(422, 'compensating_control_required', 'High-risk waivers require compensatingControl', [
-                        ['field' => 'compensatingControl', 'message' => 'Required for high, regulated, or shopfloor-critical waiver approval', 'code' => 'required'],
                     ]);
                 }
             }

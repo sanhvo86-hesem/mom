@@ -355,6 +355,8 @@ class DocumentController extends BaseController
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
         if (!$state) $this->error('doc_not_found', 404);
+        /** @var array<string, mixed> $state */
+        $state = (array)$state;
 
         $revision    = (string)($state['revision'] ?? '0.0');
         $updateType  = strtolower(trim((string)($state['submittedUpdateType'] ?? 'minor')));
@@ -463,6 +465,8 @@ class DocumentController extends BaseController
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
         if (!$state) $this->error('doc_not_found', 404);
+        /** @var array<string, mixed> $state */
+        $state = (array)$state;
 
         $revision = (string)($state['revision'] ?? '0.0');
 

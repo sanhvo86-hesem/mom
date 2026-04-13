@@ -47,7 +47,6 @@ class EventStreamController extends BaseController
         $orgId = $_SESSION['org_id'] ?? null;
         if ($orgId === null) {
             $this->json(['ok' => false, 'error' => 'org_context_required'], 400);
-            return;
         }
 
         $channels = [];
@@ -64,7 +63,6 @@ class EventStreamController extends BaseController
                 if (!$this->userHasAnyRole($user, $requiredRoles)) {
                     // Return 403 Forbidden for channels user is not authorized for
                     $this->json(['ok' => false, 'error' => 'channel_authorization_required', 'channel' => $ch], 403);
-                    return;
                 }
             }
 
@@ -75,7 +73,6 @@ class EventStreamController extends BaseController
 
         if (empty($channels)) {
             $this->json(['ok' => false, 'error' => 'no_valid_channels'], 400);
-            return;
         }
 
         // SSE headers
@@ -119,8 +116,10 @@ class EventStreamController extends BaseController
                     break;
                 }
 
-                if ($message->kind === 'message') {
-                    $data = json_decode($message->payload, true);
+                $kind = is_array($message) ? (string)($message['kind'] ?? '') : (string)($message->kind ?? '');
+                $payload = is_array($message) ? (string)($message['payload'] ?? '') : (string)($message->payload ?? '');
+                if ($kind === 'message') {
+                    $data = json_decode($payload, true);
                     $eventType = $data['type'] ?? 'event';
                     $this->sendSseEvent($eventType, $data);
                 }

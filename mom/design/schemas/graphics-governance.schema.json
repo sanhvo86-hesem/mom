@@ -360,6 +360,29 @@
         "rollbackPlan": { "type": "object", "additionalProperties": true }
       }
     },
+    "GraphicsRolloutApplyRequest": {
+      "type": "object",
+      "required": ["expectedVersion", "rolloutId"],
+      "additionalProperties": false,
+      "properties": {
+        "expectedVersion": { "type": "string" },
+        "rolloutId": { "type": "string" },
+        "postCanaryVerification": {
+          "type": "object",
+          "required": ["runtimeBeaconRef", "driftReportRef", "moduleOwnerSignoffRef", "releaseManifestRefs"],
+          "additionalProperties": false,
+          "properties": {
+            "runtimeBeaconRef": { "type": "string" },
+            "driftReportRef": { "type": "string" },
+            "moduleOwnerSignoffRef": { "type": "string" },
+            "releaseManifestRefs": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+            }
+          }
+        }
+      }
+    },
     "GraphicsRolloutResult": {
       "type": "object",
       "required": ["rollout", "registryVersion", "registryEtag"],
@@ -408,7 +431,15 @@
         "approver": { "type": "string" },
         "riskClass": { "enum": ["low", "medium", "high", "regulated", "shopfloor-critical"] },
         "status": { "enum": ["draft", "approved", "expired"] },
-        "documentControlRefs": { "type": "array", "items": { "type": "string" } },
+        "documentControlRefs": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+            ]
+          }
+        },
         "releaseManifestRefs": {
           "type": "array",
           "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }

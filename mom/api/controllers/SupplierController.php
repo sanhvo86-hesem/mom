@@ -424,10 +424,6 @@ class SupplierController extends BaseController
 
         try {
             $updated = $this->supplierService()->updateIncoming($id, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "Incoming inspection {$id} not found.");
-            }
-
             $this->auditLog('supplier_update_incoming', [
                 'inspection_id' => $id,
                 'fields'        => array_keys($body),
@@ -499,10 +495,14 @@ class SupplierController extends BaseController
 
         $vendorId = trim((string)($body['vendor_id'] ?? ''));
         $partId   = trim((string)($body['part_id'] ?? ''));
+        $inspectionResult = strtolower(trim((string)($body['inspection_result'] ?? $body['insp_result'] ?? $body['result'] ?? '')));
+        if (!in_array($inspectionResult, ['accept', 'reject'], true)) {
+            $this->error('invalid_inspection_result', 400, 'inspection_result must be accept or reject.');
+        }
         $userId   = $this->userId($user);
 
         try {
-            $status = $this->supplierService()->updateSkipLotLevel($vendorId, $partId, $body, $userId);
+            $status = $this->supplierService()->updateSkipLotLevel($vendorId, $partId, $inspectionResult);
 
             $this->auditLog('supplier_update_skip_lot', [
                 'vendor_id' => $vendorId,
@@ -600,7 +600,7 @@ class SupplierController extends BaseController
                 'notes'          => trim((string)($body['notes'] ?? '')),
                 'review_date'    => trim((string)($body['review_date'] ?? '')),
                 'updated_by'     => $userId,
-            ]);
+            ], $userId, (string)($user['role'] ?? ''));
 
             $this->auditLog('supplier_upsert_asl', [
                 'vendor_id' => $body['vendor_id'],
@@ -757,10 +757,6 @@ class SupplierController extends BaseController
 
         try {
             $updated = $this->supplierService()->updateScar($id, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "SCAR {$id} not found.");
-            }
-
             $this->auditLog('supplier_update_scar', [
                 'scar_id' => $id,
                 'fields'  => array_keys($body),
@@ -799,10 +795,6 @@ class SupplierController extends BaseController
 
         try {
             $updated = $this->supplierService()->transitionScar($id, $toStatus, $userId, $comment);
-            if ($updated === null) {
-                $this->error('transition_failed', 400, "Cannot transition SCAR {$id} to {$toStatus}.");
-            }
-
             $this->auditLog('supplier_scar_transition', [
                 'scar_id'   => $id,
                 'to_status' => $toStatus,
@@ -904,7 +896,7 @@ class SupplierController extends BaseController
                 'score'          => isset($body['score']) ? (float)$body['score'] : null,
                 'status'         => strtolower(trim((string)($body['status'] ?? 'scheduled'))),
                 'updated_by'     => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('supplier_upsert_audit', [
                 'audit_id'  => $audit['id'],

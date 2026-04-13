@@ -50,6 +50,13 @@ final class RuntimeAuthorityService
         $connectedGovernance = ($this->connectedGovernance ?? new ConnectedGovernanceService($this->dataDir, $this->data, events: $eventBackbone))->probe();
         $planningScenario = ($this->planningScenario ?? new PlanningScenarioService($this->dataDir, $this->data))->probe();
         $traceabilityGenealogy = ($this->traceabilityGenealogy ?? new TraceabilityGenealogyService($this->dataDir, $this->data, $eventBackbone))->probe();
+        $canonicalGenealogy = (new \MOM\Services\Traceability\GenealogyGraphService($this->data))->probe();
+        if (($canonicalGenealogy['authoritative'] ?? false) === true) {
+            $traceabilityGenealogy = array_merge($traceabilityGenealogy, $canonicalGenealogy, [
+                'compatibility_reader' => 'TraceabilityGenealogyService',
+                'compatibility_reader_state' => 'deprecated_read_only',
+            ]);
+        }
 
         $slices = [
             'idempotency' => $this->normalizeIdempotencySlice($idempotency, $modeSummary),

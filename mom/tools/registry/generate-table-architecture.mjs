@@ -714,6 +714,7 @@ const migrationDomainDefaults = new Map([
   ['106_eqms_world_class_control_plane.sql', 'quality_management'],
   ['107_phase1_shopfloor_execution_bridge.sql', 'production'],
   ['108_world_class_control_plane_execution.sql', 'record_system'],
+  ['109_control_plane_cutover_hardening.sql', 'record_system'],
 ]);
 
 const tableDomainOverrides = {
@@ -986,6 +987,14 @@ const tableDomainOverrides = {
   integrity_digests: 'evidence_vault',
   integrity_exceptions: 'evidence_vault',
   retention_locks: 'record_system',
+  governed_route_registry: 'record_system',
+  legacy_authority_sunset: 'record_system',
+  control_plane_command_handlers: 'record_system',
+  periodic_evaluations: 'record_system',
+  emergency_change_controls: 'plm_change_control',
+  rollback_requirements: 'plm_change_control',
+  genealogy_edge_facts: 'traceability_serialization',
+  traceability_5m_obligations: 'traceability_serialization',
 };
 
 const mesSubdomains = {

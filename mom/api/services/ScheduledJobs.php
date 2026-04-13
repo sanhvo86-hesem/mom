@@ -608,25 +608,25 @@ final class ScheduledJobs
                 }
 
                 $allocationsScanned++;
-                $formCode = trim((string)($allocation['form_code'] ?? ''));
+                $allocationRow = $allocation;
+                $formCode = trim((string)($allocationRow['form_code'] ?? ''));
                 if ($formCode !== '' && !array_key_exists($formCode, $schemaCache)) {
                     $schemaCache[$formCode] = \load_form_schema_by_code($formCode) ?: [];
                 }
                 $schema = is_array($schemaCache[$formCode] ?? null) ? $schemaCache[$formCode] : [];
                 $reviewConfig = \evidence_review_config($schema);
-                $allocationStore['allocations'][$idx]['approval_summary'] = \evidence_approval_summary($allocationStore['allocations'][$idx], $schema);
-                $reviewSla = \evidence_review_sla_materialize($allocationStore['allocations'][$idx], $recordTypes, $schema);
+                $allocationRow['approval_summary'] = \evidence_approval_summary($allocationRow, $schema);
+                $reviewSla = \evidence_review_sla_materialize($allocationRow, $recordTypes, $schema);
 
-                $notificationLog = is_array($allocationStore['allocations'][$idx]['review_sla']['notifications'] ?? null)
-                    ? $allocationStore['allocations'][$idx]['review_sla']['notifications']
-                    : [];
+                $reviewSlaState = is_array($allocationRow['review_sla'] ?? null) ? $allocationRow['review_sla'] : [];
+                $notificationLog = is_array($reviewSlaState['notifications'] ?? null) ? $reviewSlaState['notifications'] : [];
                 $rowDirty = false;
 
-                $recordId = trim((string)($allocationStore['allocations'][$idx]['record_id'] ?? $allocationStore['allocations'][$idx]['allocation_id'] ?? ''));
-                $recordType = trim((string)($reviewSla['record_type'] ?? $allocationStore['allocations'][$idx]['record_type'] ?? 'record'));
+                $recordId = trim((string)($allocationRow['record_id'] ?? $allocationRow['allocation_id'] ?? ''));
+                $recordType = trim((string)($reviewSla['record_type'] ?? $allocationRow['record_type'] ?? 'record'));
                 $detailPath = '/portal.html?page=forms';
                 $data = [
-                    'allocation_id' => (string)($allocationStore['allocations'][$idx]['allocation_id'] ?? ''),
+                    'allocation_id' => (string)($allocationRow['allocation_id'] ?? ''),
                     'record_id' => $recordId,
                     'record_type' => $recordType,
                     'form_code' => $formCode,
@@ -652,7 +652,7 @@ final class ScheduledJobs
                     if ($sent > 0) {
                         $notificationLog['warn_sent_at'] = gmdate('c');
                         $notificationLog['warn_recipients'] = array_keys($recipients);
-                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_due_soon_notified', 'scheduled_job', 'review_sla_due_soon_notified', [
+                        \allocation_append_audit_log($allocationRow, 'review_sla_due_soon_notified', 'scheduled_job', 'review_sla_due_soon_notified', [
                             'recipients' => array_keys($recipients),
                             'due_at' => (string)($reviewSla['due_at'] ?? ''),
                         ]);
@@ -676,7 +676,7 @@ final class ScheduledJobs
                     if ($sent > 0) {
                         $notificationLog['overdue_sent_at'] = gmdate('c');
                         $notificationLog['overdue_recipients'] = array_keys($recipients);
-                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_overdue_notified', 'scheduled_job', 'review_sla_overdue_notified', [
+                        \allocation_append_audit_log($allocationRow, 'review_sla_overdue_notified', 'scheduled_job', 'review_sla_overdue_notified', [
                             'recipients' => array_keys($recipients),
                             'due_at' => (string)($reviewSla['due_at'] ?? ''),
                             'overdue_hours' => (int)($reviewSla['overdue_hours'] ?? 0),
@@ -701,7 +701,7 @@ final class ScheduledJobs
                     if ($sent > 0) {
                         $notificationLog['escalated_sent_at'] = gmdate('c');
                         $notificationLog['escalated_recipients'] = array_keys($recipients);
-                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_escalation_notified', 'scheduled_job', 'review_sla_escalation_notified', [
+                        \allocation_append_audit_log($allocationRow, 'review_sla_escalation_notified', 'scheduled_job', 'review_sla_escalation_notified', [
                             'recipients' => array_keys($recipients),
                             'escalation_roles' => array_values((array)($reviewSla['escalation_roles'] ?? [])),
                             'escalation_due_at' => (string)($reviewSla['escalation_due_at'] ?? ''),
@@ -713,8 +713,9 @@ final class ScheduledJobs
                 }
 
                 if ($rowDirty) {
-                    $allocationStore['allocations'][$idx]['review_sla']['notifications'] = $notificationLog;
+                    $allocationRow['review_sla']['notifications'] = $notificationLog;
                 }
+                $allocationStore['allocations'][$idx] = $allocationRow;
             }
 
             if ($dirty) {

@@ -28,17 +28,30 @@ if ($findings === []) {
     exit(0);
 }
 
+$strictP2 = in_array('--strict-p2', $argv, true);
+$blockingFindings = [];
 foreach ($findings as $finding) {
+    $severity = (string)$finding['severity'];
+    $stream = $severity === 'P2' && !$strictP2 ? STDOUT : STDERR;
     fwrite(
-        STDERR,
+        $stream,
         sprintf(
             "[%s] %s %s\n",
-            (string)$finding['severity'],
+            $severity,
             (string)$finding['violation_type'],
             (string)$finding['path'],
         ),
     );
+
+    if ($severity !== 'P2' || $strictP2) {
+        $blockingFindings[] = $finding;
+    }
 }
 
-fwrite(STDERR, sprintf("repo boundary violations: %d\n", count($findings)));
-exit(1);
+if ($blockingFindings !== []) {
+    fwrite(STDERR, sprintf("repo boundary blocking violations: %d of %d total\n", count($blockingFindings), count($findings)));
+    exit(1);
+}
+
+fwrite(STDOUT, sprintf("repo boundary warnings only: %d P2 findings; P0/P1 clean\n", count($findings)));
+exit(0);

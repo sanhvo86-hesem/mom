@@ -31,6 +31,12 @@ final class OutboxWorker
         $limit = max(1, min(100, (int)($options['limit'] ?? 25)));
         $userId = trim((string)($options['user_id'] ?? 'scheduled_job')) ?: 'scheduled_job';
         $runtime = \load_epicor_runtime_store();
+        $runtime += [
+            'outbox_events' => [],
+            '_meta' => [],
+            'health' => [],
+            'sync_runs' => [],
+        ];
         $policy = \load_epicor_integration_policy();
 
         $retryPlan = array_values(array_map('intval', (array)($policy['outbound_targets']['retry_backoff_minutes'] ?? [1, 5, 15, 30, 60])));
@@ -154,7 +160,7 @@ final class OutboxWorker
         }
 
         $runtime['_meta']['updated'] = gmdate(DATE_ATOM);
-        $runtime['health'] = is_array($runtime['health'] ?? null) ? $runtime['health'] : [];
+        $runtime['health'] = is_array($runtime['health']) ? $runtime['health'] : [];
         $runtime['health']['last_outbox_worker_at'] = gmdate(DATE_ATOM);
         $runtime['health']['last_outbox_worker_result'] = [
             'processed' => $processed,
@@ -164,7 +170,7 @@ final class OutboxWorker
             'skipped' => $skipped,
         ];
 
-        $runtime['sync_runs'] = array_values((array)($runtime['sync_runs'] ?? []));
+        $runtime['sync_runs'] = is_array($runtime['sync_runs']) ? array_values($runtime['sync_runs']) : [];
         foreach ($domainStats as $domain => $stats) {
             $status = $stats['failed'] > 0
                 ? ($stats['delivered'] > 0 ? 'partial' : 'failed')
@@ -178,17 +184,17 @@ final class OutboxWorker
                     'started_at' => gmdate(DATE_ATOM),
                     'completed_at' => gmdate(DATE_ATOM),
                     'records_received' => 0,
-                    'records_processed' => (int)($stats['delivered'] ?? 0),
-                    'records_failed' => (int)($stats['failed'] ?? 0),
+                    'records_processed' => (int)$stats['delivered'],
+                    'records_failed' => (int)$stats['failed'],
                     'summary' => 'Epicor outbox worker cycle completed.',
                     'summary_vi' => 'Chu kỳ Epicor outbox worker đã hoàn tất.',
                     'summary_en' => 'Epicor outbox worker cycle completed.',
                     'metadata' => [
                         'worker' => 'OutboxWorker',
-                        'processed' => (int)($stats['processed'] ?? 0),
-                        'delivered' => (int)($stats['delivered'] ?? 0),
-                        'failed' => (int)($stats['failed'] ?? 0),
-                        'skipped' => (int)($stats['skipped'] ?? 0),
+                        'processed' => (int)$stats['processed'],
+                        'delivered' => (int)$stats['delivered'],
+                        'failed' => (int)$stats['failed'],
+                        'skipped' => (int)$stats['skipped'],
                     ],
                 ], $userId, $policy);
                 \upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $normalized);

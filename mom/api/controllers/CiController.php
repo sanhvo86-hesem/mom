@@ -188,7 +188,7 @@ class CiController extends BaseController
                 }
             }
 
-            usort($recentActivity, static fn(array $a, array $b): int => strcmp((string)($b['date'] ?? ''), (string)($a['date'] ?? '')));
+            usort($recentActivity, static fn(array $a, array $b): int => strcmp((string)$b['date'], (string)$a['date']));
 
             $kpis = [
                 'total_suggestions'   => count($suggestions),
@@ -495,6 +495,7 @@ class CiController extends BaseController
             $file  = $this->ciDir() . '/projects.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -524,6 +525,9 @@ class CiController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "CI project {$id} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('ci_update_project_failed', 500, 'CI project update result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);
@@ -576,6 +580,7 @@ class CiController extends BaseController
             $file  = $this->ciDir() . '/projects.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -616,6 +621,9 @@ class CiController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "CI project {$id} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('ci_transition_failed', 500, 'CI project transition result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);

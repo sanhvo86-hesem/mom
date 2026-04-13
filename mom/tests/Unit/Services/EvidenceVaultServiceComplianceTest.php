@@ -132,6 +132,48 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
         ], 'approval-group-1', 'party-1', new \stdClass());
     }
 
+    public function testGovernanceAttachmentListReadFailureIsNotReturnedAsEmptyList(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('governance_attachment_list_read_failed');
+
+        $service->listGovernanceAttachments('approval_group', 'approval-group-1', $this->failingReadConnection());
+    }
+
+    public function testGovernanceAttachmentReadFailureIsNotReturnedAsNotFound(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('governance_attachment_read_failed');
+
+        $service->getGovernanceAttachment('attachment-1', $this->failingReadConnection());
+    }
+
+    public function testMimeDetectionDoesNotAllowExtensionToOverrideDangerousContent(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+        $path = $this->tmpDir . '/spoofed.pdf';
+        file_put_contents($path, "<?php echo 'not evidence';");
+
+        $method = (new ReflectionClass($service))->getMethod('detectMimeType');
+
+        $this->assertNull($method->invoke($service, $path, 'spoofed.pdf'));
+    }
+
+    public function testMimeDetectionStillAllowsPlainTextEvidence(): void
+    {
+        $service = new EvidenceVaultService($this->tmpDir);
+        $path = $this->tmpDir . '/notes.txt';
+        file_put_contents($path, 'first article inspection note');
+
+        $method = (new ReflectionClass($service))->getMethod('detectMimeType');
+
+        $this->assertSame('text/plain', $method->invoke($service, $path, 'notes.txt'));
+    }
+
     public function testPostgresPrimaryEvidenceWriteFailsClosedWhenDatabaseUnavailable(): void
     {
         $service = new EvidenceVaultService($this->tmpDir, $this->failingDataLayer(DataLayer::MODE_POSTGRES_PRIMARY));
@@ -161,9 +203,26 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
         $this->assertTrue($probe['enabled']);
         $this->assertSame(DataLayer::MODE_SHADOW_WRITE, $probe['mode']);
         $this->assertTrue($probe['degraded']);
+        $this->assertFalse($probe['ok']);
+        $this->assertFalse($probe['available']);
+        $this->assertFalse($probe['postgres_reachable']);
         $this->assertGreaterThanOrEqual(1, $probe['failure_count']);
         $this->assertSame('failed', $probe['last_status']);
         $this->assertNotSame('', $probe['last_error']);
+    }
+
+    public function testCorruptJsonVaultDoesNotCollapseToEmptyChain(): void
+    {
+        $evidenceDir = $this->tmpDir . '/evidence';
+        mkdir($evidenceDir, 0775, true);
+        file_put_contents($evidenceDir . '/vault.json', '{not valid json');
+
+        $service = new EvidenceVaultService($this->tmpDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('evidence_vault_json_decode_failed:vault.json');
+
+        $service->verifyChain();
     }
 
     private function failingDataLayer(string $mode): DataLayer
@@ -180,6 +239,16 @@ final class EvidenceVaultServiceComplianceTest extends TestCase
             'schema' => 'public',
             'statement_timeout' => 1000,
         ]);
+    }
+
+    private function failingReadConnection(): object
+    {
+        return new class {
+            public function prepare(string $sql): void
+            {
+                throw new RuntimeException('db_read_unavailable');
+            }
+        };
     }
 
     private function removeTree(string $path): void

@@ -37,6 +37,11 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         }
 
         $this->assertIsArray($payload);
+        $this->assertArrayHasKey('infrastructure', $payload);
+        $this->assertArrayHasKey('evidence_vault', $payload['infrastructure']);
+        $this->assertArrayHasKey('upload_hardening', $payload['infrastructure']);
+        $this->assertSame('postgres', $payload['infrastructure']['evidence_vault']['backend'] ?? null);
+        $this->assertSame('file_quarantine', $payload['infrastructure']['upload_hardening']['backend'] ?? null);
         $this->assertArrayHasKey('authority', $payload);
         $this->assertArrayHasKey('health_evaluation', $payload);
         $this->assertSame(
@@ -114,11 +119,14 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertArrayHasKey('redis', $payload['checks']);
         $this->assertArrayHasKey('rabbitmq', $payload['checks']);
         $this->assertArrayHasKey('logging', $payload['checks']);
+        $this->assertArrayHasKey('evidence_vault', $payload['checks']);
+        $this->assertArrayHasKey('upload_hardening', $payload['checks']);
         $this->assertArrayHasKey('runtime_authority', $payload['checks']);
         $this->assertSame(
             !in_array(false, $payload['checks'], true),
             $payload['ok'],
         );
+        $this->assertNoErrorKeys($payload);
     }
 
     private function adminController(): HealthController
@@ -139,6 +147,20 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
             (string)QMS_TEST_ROOT_DIR,
             $this->tmpDir,
         ))->setStore($store);
+    }
+
+    /**
+     * @param mixed $payload
+     */
+    private function assertNoErrorKeys(mixed $payload): void
+    {
+        if (!is_array($payload)) {
+            return;
+        }
+        foreach ($payload as $key => $value) {
+            $this->assertNotSame('error', $key, 'Unauthenticated readiness payload leaked an error key.');
+            $this->assertNoErrorKeys($value);
+        }
     }
 
     private function removeDir(string $dir): void

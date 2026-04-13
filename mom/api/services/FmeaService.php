@@ -20,7 +20,6 @@ final class FmeaService
 {
     private readonly string $dataDir;
     private readonly string $fmeaDir;
-    private ?object $db = null;
 
     /** Valid FMEA types. */
     private const FMEA_TYPES = ['design', 'process', 'system', 'msf', 'supplemental'];
@@ -55,7 +54,7 @@ final class FmeaService
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->fmeaDir = $this->dataDir . '/fmea';
-        $this->db      = $db;
+        unset($db);
 
         foreach (['records', 'failure_modes', 'actions', 'revisions', 'control_plans', 'control_plan_chars'] as $sub) {
             $dir = $this->fmeaDir . '/' . $sub;
@@ -70,21 +69,40 @@ final class FmeaService
         }
     }
 
-    // ── Shadow Write ────────────────────────────────────────────────────────
+    // ── Validation ──────────────────────────────────────────────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    /**
+     * @param array<int, string> $allowed
+     */
+    private function enumValue(array $allowed, mixed $value, string $field, string $default): string
     {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[FmeaService] Shadow write to {$table} failed: " . $e->getMessage());
+        $raw = trim((string)($value ?? $default));
+        foreach ([$raw, strtolower($raw), strtoupper($raw)] as $candidate) {
+            if (in_array($candidate, $allowed, true)) {
+                return $candidate;
+            }
         }
+
+        throw new RuntimeException("Invalid {$field}: {$raw}");
+    }
+
+    /**
+     * @param array<int, string> $allowed
+     */
+    private function nullableEnumValue(array $allowed, mixed $value, string $field): ?string
+    {
+        if ($value === null || trim((string)$value) === '') {
+            return null;
+        }
+
+        $raw = trim((string)$value);
+        foreach ([$raw, strtolower($raw), strtoupper($raw)] as $candidate) {
+            if (in_array($candidate, $allowed, true)) {
+                return $candidate;
+            }
+        }
+
+        throw new RuntimeException("Invalid {$field}: {$raw}");
     }
 
     // ── FMEA Records ──────────────────────────────────────────────────────
@@ -101,11 +119,12 @@ final class FmeaService
         $fmeaNumber = $this->generateNumber('fmea', 'FMEA', 3);
         $now        = $this->nowIso();
         $fmeaId     = $this->generateUuidV4();
+        $fmeaType   = $this->enumValue(self::FMEA_TYPES, $data['fmea_type'] ?? null, 'fmea_type', 'process');
 
         $record = [
             'fmea_id'                => $fmeaId,
             'fmea_number'            => $fmeaNumber,
-            'fmea_type'              => $data['fmea_type'] ?? 'process',
+            'fmea_type'              => $fmeaType,
             'status'                 => 'draft',
             'title'                  => $data['title'] ?? '',
             'title_vi'               => $data['title_vi'] ?? '',
@@ -152,6 +171,12 @@ final class FmeaService
 
             // Prevent overwriting system fields
             unset($updates['fmea_id'], $updates['fmea_number'], $updates['created_at']);
+            if (array_key_exists('fmea_type', $updates)) {
+                $updates['fmea_type'] = $this->enumValue(self::FMEA_TYPES, $updates['fmea_type'], 'fmea_type', (string)($rec['fmea_type'] ?? 'process'));
+            }
+            if (array_key_exists('status', $updates)) {
+                $updates['status'] = $this->enumValue(self::FMEA_STATUSES, $updates['status'], 'status', (string)($rec['status'] ?? 'draft'));
+            }
 
             $records[$idx] = array_merge($rec, $updates, [
                 'updated_at' => $now,
@@ -302,7 +327,7 @@ final class FmeaService
             'action_priority'          => $this->calculateActionPriority($severity, $occurrence, $detection),
             'current_prevention_control' => $data['current_prevention_control'] ?? null,
             'current_detection_control'  => $data['current_detection_control'] ?? null,
-            'classification'           => $data['classification'] ?? null,
+                'classification'           => $this->nullableEnumValue(self::CLASSIFICATIONS, $data['classification'] ?? null, 'classification'),
             'metadata'                 => $data['metadata'] ?? new \stdClass(),
             'created_at'               => $now,
             'updated_at'               => $now,
@@ -331,6 +356,9 @@ final class FmeaService
             }
 
             unset($updates['failure_mode_id'], $updates['fmea_id'], $updates['created_at']);
+            if (array_key_exists('classification', $updates)) {
+                $updates['classification'] = $this->nullableEnumValue(self::CLASSIFICATIONS, $updates['classification'], 'classification');
+            }
 
             $merged = array_merge($fm, $updates, ['updated_at' => $now]);
 
@@ -436,7 +464,7 @@ final class FmeaService
                 : null;
 
             $actions[$idx] = array_merge($act, [
-                'status'              => 'completed',
+                'status'              => $this->enumValue(self::ACTION_STATUSES, 'completed', 'status', 'completed'),
                 'completion_date'     => substr($now, 0, 10),
                 'new_severity'        => $ns,
                 'new_occurrence'      => $no,
@@ -549,7 +577,7 @@ final class FmeaService
             ];
         }
 
-        usort($trend, fn(array $a, array $b) => ($a['sequence'] ?? 0) <=> ($b['sequence'] ?? 0));
+        usort($trend, fn(array $a, array $b) => (int)$a['sequence'] <=> (int)$b['sequence']);
 
         return $trend;
     }
@@ -635,12 +663,12 @@ final class FmeaService
         $controlPlan = [
             'control_plan_id'          => $cpId,
             'plan_number'              => $cpNumber,
-            'plan_type'                => 'production',
+            'plan_type'                => $this->enumValue(self::CP_TYPES, 'production', 'plan_type', 'production'),
             'title'                    => 'Control Plan from ' . ($fmea['fmea_number'] ?? $fmeaId),
             'title_vi'                 => 'Ke hoach kiem soat tu ' . ($fmea['fmea_number'] ?? $fmeaId),
             'item_id'                  => $fmea['item_id'] ?? null,
             'revision'                 => 1,
-            'status'                   => 'draft',
+            'status'                   => $this->enumValue(self::FMEA_STATUSES, 'draft', 'status', 'draft'),
             'linked_fmea_id'           => $fmeaId,
             'linked_pfmea_number'      => $fmea['fmea_number'] ?? null,
             'approved_by'              => null,
@@ -668,7 +696,7 @@ final class FmeaService
                 continue;
             }
 
-            $classification = $fm['classification'] ?? null;
+            $classification = $this->nullableEnumValue(self::CLASSIFICATIONS, $fm['classification'] ?? null, 'classification');
             $ap             = $fm['action_priority'] ?? 'low';
 
             // Include if classified or medium/high AP
@@ -692,8 +720,8 @@ final class FmeaService
                 'evaluation_method'       => null,
                 'sample_size'             => null,
                 'sample_frequency'        => null,
-                'control_method'          => $fm['current_detection_control'] ?? null,
-                'reaction_plan'           => ($ap === 'high') ? 'stop_production' : 'notify_supervisor',
+                'control_method'          => $this->nullableEnumValue(self::CONTROL_METHODS, $fm['current_detection_control'] ?? null, 'control_method'),
+                'reaction_plan'           => $this->enumValue(self::REACTION_TYPES, ($ap === 'high') ? 'stop_production' : 'notify_supervisor', 'reaction_plan', 'notify_supervisor'),
                 'reaction_plan_detail'    => null,
                 'responsible_role'        => null,
                 'linked_failure_mode_id'  => $fm['failure_mode_id'] ?? null,

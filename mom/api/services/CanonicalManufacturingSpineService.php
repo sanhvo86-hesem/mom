@@ -412,7 +412,11 @@ final class CanonicalManufacturingSpineService
             return (array)($this->tableRegistry['tables'] ?? $this->tableRegistry);
         }
 
-        $path = rtrim($this->baseDir, '/') . '/data/registry/table-registry.json';
+        $baseDir = rtrim($this->baseDir, '/');
+        $path = $baseDir . '/data/registry/table-registry.json';
+        if (!is_file($path)) {
+            $path = $baseDir . '/contracts/table-registry.json';
+        }
         if (!is_file($path)) {
             return [];
         }

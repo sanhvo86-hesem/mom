@@ -14597,6 +14597,12 @@ function git_sync_documents(array $me, string $repoDir, array $options = []): ar
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
+
+  // Validate branch name to prevent shell injection
+  if (!preg_match('/^[a-zA-Z0-9_\-\/\.]{1,100}$/', $branch)) {
+    throw new RuntimeException('invalid_git_branch_name');
+  }
+
   $headBefore = git_head_commit($repoReal);
 
   $statusArgs = ['status', '--porcelain', '--untracked-files=all'];
@@ -14762,6 +14768,12 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   $branchCode = 0;
   $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
   if ($branchCode !== 0 || $branch === '') $branch = 'main';
+
+  // Validate branch name to prevent shell injection
+  if (!preg_match('/^[a-zA-Z0-9_\-\/\.]{1,100}$/', $branch)) {
+    throw new RuntimeException('invalid_git_branch_name');
+  }
+
   $headBefore = git_head_commit($repoReal);
 
   // Fetch remote state.
@@ -14844,7 +14856,10 @@ function rate_limit_check(string $key, int $maxHits, int $windowSec, string $rlD
   @file_put_contents($file, json_encode($state), LOCK_EX);
 
   if ((int)$state['hits'] > $maxHits) {
-    api_json(['ok' => false, 'error' => 'rate_limited'], 429);
+    $retryAfter = max(1, (int)$windowSec - ((int)$t - (int)$state['start']));
+    http_response_code(429);
+    header('Retry-After: ' . $retryAfter);
+    api_json(['ok' => false, 'error' => 'rate_limited', 'retry_after' => $retryAfter], 429);
   }
 }
 

@@ -851,7 +851,7 @@ class SchemaStudioController extends BaseController
 
         $rows = [];
         foreach ($groups as $domain => $group) {
-            $tables = array_values(array_filter((array)($group['tables'] ?? []), 'is_array'));
+            $tables = array_values(array_filter((array)$group['tables'], 'is_array'));
             $tableCount = count($tables);
             if ($tableCount === 0) {
                 continue;
@@ -900,7 +900,7 @@ class SchemaStudioController extends BaseController
             $workflowCoverage = $workflowCandidates > 0 ? $this->percentage($workflowBound, $workflowCandidates, 0) : 0;
             $ownershipCoverage = $this->percentage($ownershipCount, $tableCount, 100);
             $hotspotCount = (int)($hotspotCountByDomain[$domain] ?? 0);
-            $layers = array_values(array_keys((array)($group['layers'] ?? [])));
+            $layers = array_values(array_keys((array)$group['layers']));
             $readinessScore = max(0, min(100, (int)round(
                 ($metadataCompleteness * 0.42)
                 + ($workflowCoverage * 0.18)
@@ -934,7 +934,7 @@ class SchemaStudioController extends BaseController
                 'hotspotCount' => $hotspotCount,
                 'layerCount' => count($layers),
                 'layers' => $layers,
-                'representativeTables' => array_values(array_filter(array_map(static fn(array $item): string => (string)($item['table'] ?? ''), array_slice($representative, 0, 5)))),
+                'representativeTables' => array_values(array_filter(array_map(static fn(array $item): string => (string)$item['table'], array_slice($representative, 0, 5)))),
                 'blockers' => $blockers,
                 'readinessScore' => $readinessScore,
                 'tone' => $readinessScore >= 80 ? 'good' : ($readinessScore >= 65 ? 'warning' : 'critical'),
@@ -978,7 +978,7 @@ class SchemaStudioController extends BaseController
 
         $rows = [];
         foreach ($groups as $layer => $group) {
-            $tables = array_values(array_filter((array)($group['tables'] ?? []), 'is_array'));
+            $tables = array_values(array_filter((array)$group['tables'], 'is_array'));
             $tableCount = count($tables);
             if ($tableCount === 0) {
                 continue;
@@ -1391,7 +1391,7 @@ class SchemaStudioController extends BaseController
 
         if ((int)($governance['workflowBindingCoveragePercent'] ?? 0) < 55) {
             $workflowFocus = [];
-            foreach ((array)($journeys ?? []) as $journey) {
+            foreach ($journeys as $journey) {
                 foreach ((array)($journey['focusTables'] ?? []) as $tableName) {
                     if ($tableName !== '' && !in_array($tableName, $workflowFocus, true)) {
                         $workflowFocus[] = $tableName;
@@ -1732,7 +1732,7 @@ class SchemaStudioController extends BaseController
         int $visualReadinessScore
     ): array {
         $journeyByKey = [];
-        foreach ((array)($journeys ?? []) as $journey) {
+        foreach ($journeys as $journey) {
             if (is_array($journey) && trim((string)($journey['key'] ?? '')) !== '') {
                 $journeyByKey[(string)$journey['key']] = $journey;
             }
@@ -2134,7 +2134,7 @@ class SchemaStudioController extends BaseController
 
         foreach ($lanes as &$lane) {
             $lane['recommended'] = $lane['key'] === $recommended;
-            $lane['gateCount'] = count((array)($lane['gates'] ?? []));
+            $lane['gateCount'] = count((array)$lane['gates']);
         }
         unset($lane);
 
@@ -2504,8 +2504,8 @@ class SchemaStudioController extends BaseController
         ];
 
         $environments = array_map(static function (array $item) use ($statusFor, $toneFor): array {
-            $item['status'] = $statusFor((int)($item['score'] ?? 0));
-            $item['tone'] = $toneFor((int)($item['score'] ?? 0));
+            $item['status'] = $statusFor((int)$item['score']);
+            $item['tone'] = $toneFor((int)$item['score']);
             return $item;
         }, $environmentBlueprints);
 
@@ -3266,7 +3266,7 @@ class SchemaStudioController extends BaseController
         ];
 
         $physicalCoverageScore = max(0, min(100, (int)round(array_reduce($objectSurfaces, static function (int $carry, array $item): int {
-            return $carry + (int)($item['readinessScore'] ?? 0);
+            return $carry + (int)$item['readinessScore'];
         }, 0) / max(1, count($objectSurfaces)))));
 
         $reviewBoards = [];
@@ -3341,7 +3341,7 @@ class SchemaStudioController extends BaseController
         }
 
         $modeAverageScore = count($modeCards) > 0
-            ? (int)round(array_reduce($modeCards, static fn(int $carry, array $item): int => $carry + (int)($item['score'] ?? 0), 0) / count($modeCards))
+            ? (int)round(array_reduce($modeCards, static fn(int $carry, array $item): int => $carry + (int)$item['score'], 0) / count($modeCards))
             : 84;
         $beautyConfigCoverageScore = min(100, (count($ambiences) * 24) + (count($densities) * 18) + (count($sceneFamilies) * 16));
         $storyCoverageScore = min(100, ((int)($summary['sceneCount'] ?? 0) * 10) + ((int)($summary['spotlightCount'] ?? 0) * 6));
@@ -3571,19 +3571,19 @@ class SchemaStudioController extends BaseController
         usort($hotspots, static function (array $a, array $b): int {
             return [$b['score'], $b['issueCount'], $b['relationCount'], $a['table']] <=> [$a['score'], $a['issueCount'], $a['relationCount'], $b['table']];
         });
-        $hotspots = array_values(array_filter($hotspots, static fn(array $item): bool => (int)($item['score'] ?? 0) > 0));
+        $hotspots = array_values(array_filter($hotspots, static fn(array $item): bool => (int)$item['score'] > 0));
         $hotspots = array_map(static function (array $item): array {
             $item['severity'] = match (true) {
-                (int)($item['score'] ?? 0) >= 40 => 'critical',
-                (int)($item['score'] ?? 0) >= 24 => 'high',
-                (int)($item['score'] ?? 0) >= 12 => 'medium',
+                (int)$item['score'] >= 40 => 'critical',
+                (int)$item['score'] >= 24 => 'high',
+                (int)$item['score'] >= 12 => 'medium',
                 default => 'low',
             };
-            $item['reasons'] = array_values(array_unique(array_filter((array)($item['reasons'] ?? []), static fn($value): bool => trim((string)$value) !== '')));
+            $item['reasons'] = array_values(array_unique(array_filter((array)$item['reasons'], static fn($value): bool => trim((string)$value) !== '')));
             return $item;
         }, array_slice($hotspots, 0, 12));
 
-        $hotspotCount = count(array_filter($hotspots, static fn(array $item): bool => (int)($item['score'] ?? 0) >= 12));
+        $hotspotCount = count(array_filter($hotspots, static fn(array $item): bool => (int)$item['score'] >= 12));
         $visualReadinessScore = max(0, min(100, (int)round(
             ((int)($report['summary']['releaseReadinessScore'] ?? 0) * 0.30)
             + ($metadataCompletenessPercent * 0.25)
@@ -4484,7 +4484,7 @@ class SchemaStudioController extends BaseController
             (array)($compilerBundle['report'] ?? []),
             ['summary' => (array)($compilerBundle['health']['diffSummary'] ?? [])]
         );
-        $diagnostics['summary'] = array_merge((array)($diagnostics['summary'] ?? []), (array)($round7Report['summary'] ?? []));
+        $diagnostics['summary'] = array_merge((array)$diagnostics['summary'], (array)$round7Report['summary']);
         $diagnostics['round7'] = $round7Report;
 
         $manifest = [
@@ -4495,12 +4495,12 @@ class SchemaStudioController extends BaseController
                 'designName' => (string)($compilerBundle['_meta']['designName'] ?? ''),
             ],
             'summary' => [
-                'projectionCount' => count((array)($projection['tables'] ?? [])),
-                'relationCount' => count((array)($projection['relations'] ?? [])),
-                'fieldCount' => array_reduce((array)($projection['tables'] ?? []), static function (int $carry, $table): int {
+                'projectionCount' => count((array)$projection['tables']),
+                'relationCount' => count((array)$projection['relations']),
+                'fieldCount' => array_reduce((array)$projection['tables'], static function (int $carry, $table): int {
                     return $carry + (is_array($table) ? count((array)($table['columns'] ?? [])) : 0);
                 }, 0),
-                'contractCount' => count((array)($contracts['contracts'] ?? [])),
+                'contractCount' => count((array)$contracts['contracts']),
                 'policyCount' => (int)($compilerBundle['report']['summary']['policyCount'] ?? 0),
                 'indexCount' => (int)($compilerBundle['report']['summary']['indexCount'] ?? 0),
                 'checkConstraintCount' => (int)($compilerBundle['report']['summary']['checkConstraintCount'] ?? 0),
@@ -4606,7 +4606,7 @@ class SchemaStudioController extends BaseController
     private function forbiddenMigrationStatement(string $sql): ?string
     {
         if (preg_match('/\b(TRUNCATE|DELETE|UPDATE|INSERT|COPY|VACUUM|ANALYZE|REINDEX|GRANT|REVOKE|ALTER\s+SYSTEM|CREATE\s+ROLE|ALTER\s+ROLE|DROP\s+ROLE|SET\s+ROLE|DO|CALL|EXECUTE)\b/i', $sql, $matches)) {
-            return strtoupper((string)($matches[1] ?? ''));
+            return strtoupper((string)$matches[1]);
         }
 
         return null;
@@ -5588,7 +5588,7 @@ class SchemaStudioController extends BaseController
 
         $this->success([
             'schema' => $schema,
-            'revisions' => $this->currentDesignRevisions((string)($schema['_meta']['id'] ?? 'workspace')),
+            'revisions' => $this->currentDesignRevisions((string)$schema['_meta']['id']),
             'save_policy' => $this->savePolicy(),
         ]);
     }
@@ -5761,7 +5761,7 @@ class SchemaStudioController extends BaseController
             $this->auditLog('schema_studio_reverse_engineer', ['table_count' => count($schema['tables'])], (string)($user['username'] ?? ''));
             $this->success([
                 'schema' => $schema,
-                'revisions' => $this->currentDesignRevisions((string)($schema['_meta']['id'] ?? 'workspace')),
+                'revisions' => $this->currentDesignRevisions((string)$schema['_meta']['id']),
                 'save_policy' => $this->savePolicy(),
             ]);
         } catch (Throwable $e) {
@@ -5892,7 +5892,7 @@ class SchemaStudioController extends BaseController
             $actualRowCount = count($rows);
             $syntheticSample = false;
 
-            if ($totalRows === 0 && $columns) {
+            if ($totalRows === 0) {
                 $rows = [$this->buildSampleRow($columns)];
                 $syntheticSample = true;
             }
@@ -6403,7 +6403,7 @@ class SchemaStudioController extends BaseController
         );
         $artifact['commandCenter'] = $commandCenterReport;
         $artifact['round7'] = $round7Report;
-        $artifact['summary'] = array_merge((array)($artifact['summary'] ?? []), (array)($round7Report['summary'] ?? []));
+        $artifact['summary'] = array_merge((array)$artifact['summary'], (array)$round7Report['summary']);
 
         if (($body['persist_artifacts'] ?? true) !== false) {
             $this->writeJsonFile($this->registryDirPath() . '/schema-studio-diagnostics.json', $artifact);
@@ -6527,7 +6527,7 @@ class SchemaStudioController extends BaseController
             $report = $this->buildSchemaReport($schema);
             $diff = $this->buildTypedDiff($baseline, $schema);
             $health = $this->buildHealthDiagnostics($schema, $baseline);
-            $experience = $this->buildExperienceArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
+            $experience = $this->buildExperienceArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff);
             $operations = $this->buildOperationsArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
             $commandCenter = $this->buildCommandCenterArtifact($designId, (string)($schema['_meta']['name'] ?? $designId), $health, $report, $diff, (string)($user['username'] ?? 'system'));
             $round7 = $this->buildRound7Artifact($designId, (string)($schema['_meta']['name'] ?? $designId), $schema, $health, $report, $diff, (string)($user['username'] ?? 'system'));
@@ -6544,7 +6544,7 @@ class SchemaStudioController extends BaseController
                 'experienceSummary' => (array)($experience['summary'] ?? []),
                 'operationsSummary' => (array)($operations['summary'] ?? []),
                 'commandCenterSummary' => (array)($commandCenter['summary'] ?? []),
-                'round7Summary' => is_array($round7 ?? null) ? (array)($round7['summary'] ?? []) : [],
+                'round7Summary' => (array)($round7['summary'] ?? []),
             ];
         }
 

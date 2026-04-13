@@ -1,15 +1,15 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-04-13T16:49:20+00:00",
-        "authoritative_schema_source": "database/migrations/*.sql (001–108)",
+        "declared_at": "2026-04-13T23:08:41+00:00",
+        "authoritative_schema_source": "database/migrations/*.sql (001–110)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",
-        "table_count": 750,
-        "migration_range": "001–108",
-        "migration_count": 109,
-        "schema_snapshot_create_table_count": 738,
-        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–108",
+        "table_count": 758,
+        "migration_range": "001–110",
+        "migration_count": 111,
+        "schema_snapshot_create_table_count": 772,
+        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–110",
         "snapshot_role": "generated_aggregate — built by build_schema_snapshot.php from migrations, for quick reference only",
         "snapshot_generator": "database/build_schema_snapshot.php",
         "reference_sql_artifacts": [

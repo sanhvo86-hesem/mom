@@ -9,6 +9,7 @@
 
 var _subTab = 'templates';
 var _graphicsRefreshStarted = false;
+var _graphicsLiveMessage = '';
 
 function T(k){
   var en={
@@ -120,6 +121,12 @@ function L(vi, en){
   return (typeof lang!=='undefined'&&lang==='en') ? (en || vi) : vi;
 }
 
+function announceGraphics(message){
+  _graphicsLiveMessage = String(message || '');
+  var live = document.getElementById('adm-graphics-live');
+  if(live) live.textContent = _graphicsLiveMessage;
+}
+
 function esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(v==null?'':String(v))); return d.innerHTML; }
 function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; }
 function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? parseFloat(v) : def; }
@@ -131,9 +138,15 @@ function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? pars
  */
 window._hmSet = function(cssVar, path, value){
   if(cssVar && HmTheme.setPreviewVar) HmTheme.setPreviewVar(cssVar, value);          /* instant CSS preview */
-  else if(cssVar && typeof showToast === 'function') showToast(L('Theme preview runtime is stale; CSS preview was not applied.', 'Theme preview runtime is stale; CSS preview was not applied.'), 'warning');
+  else if(cssVar && typeof showToast === 'function') {
+    announceGraphics(L('Theme preview runtime is stale; CSS preview was not applied.', 'Theme preview runtime is stale; CSS preview was not applied.'));
+    showToast(L('Theme preview runtime is stale; CSS preview was not applied.', 'Theme preview runtime is stale; CSS preview was not applied.'), 'warning');
+  }
   if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep(path, value);
-  else if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; change was not persisted.', 'Theme preview runtime is stale; change was not persisted.'), 'warning');
+  else if(typeof showToast === 'function') {
+    announceGraphics(L('Theme preview runtime is stale; change was not persisted.', 'Theme preview runtime is stale; change was not persisted.'));
+    showToast(L('Theme preview runtime is stale; change was not persisted.', 'Theme preview runtime is stale; change was not persisted.'), 'warning');
+  }
   if(typeof window._admGraphicsMarkChange === 'function'){
     window._admGraphicsMarkChange(
       /^components\./.test(String(path || '')) ? 'component-contract' : 'token',
@@ -153,6 +166,7 @@ window._admAppearanceSetTab = function(key){
   _subTab = normalizeSubTab(key || _subTab);
   window._appSubTab = _subTab;
   renderAdminAppearance();
+  announceGraphics(L('Đã chuyển tab quản trị đồ họa: ', 'Graphics governance tab changed: ') + _subTab);
 };
 
 window._admAppearanceTabKeydown = function(event){
@@ -1032,6 +1046,10 @@ var _templateView = 'gallery';
 var _templateThemePreview = 'professional-light';
 var _waiverSubject = '';
 var _waiverReason = '';
+var _waiverOwner = 'Admin Appearance';
+var _waiverApprover = 'QA Governance';
+var _waiverRiskClass = 'high';
+var _waiverExpiresAt = '';
 
 var TEMPLATE_SEED = {
   overview: [
@@ -1342,7 +1360,7 @@ function graphicsSnapshot(){
   if(svc && typeof svc.getSnapshot === 'function') return svc.getSnapshot(BASE_TEMPLATE_PRESETS);
   return {
     version:'fallback',
-    registryAuthority:'frontend-fallback',
+    registryAuthority:'backend-unavailable-preview-seed',
     backendAvailable:false,
     endpointStatus:{},
     templates:BASE_TEMPLATE_PRESETS.map(function(tpl){
@@ -1567,6 +1585,7 @@ function refreshImpactPanel(){
   var el = document.getElementById('adm-graphics-impact-panel');
   if(!el) return;
   el.innerHTML = renderImpactAnalysisPanel(false);
+  announceGraphics(L('Impact analysis preview đã cập nhật.', 'Impact analysis preview updated.'));
 }
 
 window._admGraphicsMarkChange = function(kind, target, value){
@@ -1575,13 +1594,22 @@ window._admGraphicsMarkChange = function(kind, target, value){
   if(value !== undefined && value !== null && value !== '') label += ' = ' + String(value).slice(0, 48);
   if(svc && typeof svc.markChange === 'function') svc.markChange({ kind:kind, target:target, path:target, label:label }, BASE_TEMPLATE_PRESETS);
   refreshImpactPanel();
+  announceGraphics(L('Đã ghi nhận thay đổi đồ họa, cần impact analysis: ', 'Graphics change recorded; impact analysis required: ') + label);
 };
 
 window._admGraphicsRunImpact = function(kind, target){
   var svc = graphicsSvc();
   var change = { kind:kind, target:target, path:target, label:kind + ': ' + target };
   if(svc && typeof svc.analyzeImpact === 'function'){
-    svc.analyzeImpact(change, BASE_TEMPLATE_PRESETS).then(function(){ renderAdminAppearance(); });
+    announceGraphics(L('Đang chạy impact analysis backend cho ', 'Running backend impact analysis for ') + change.label);
+    svc.analyzeImpact(change, BASE_TEMPLATE_PRESETS).then(function(){
+      announceGraphics(L('Impact analysis backend đã cập nhật cho ', 'Backend impact analysis updated for ') + change.label);
+      renderAdminAppearance();
+    }).catch(function(err){
+      announceGraphics(L('Impact analysis không hoàn tất; publish/apply vẫn bị chặn.', 'Impact analysis did not complete; publish/apply remains blocked.'));
+      if(typeof showToast === 'function') showToast(String(err && err.message || err || 'impact_failed'), 'warning');
+      renderAdminAppearance();
+    });
     refreshImpactPanel();
     return;
   }
@@ -1595,7 +1623,15 @@ window._admGraphicsRunPolicyPackImpact = function(policyPack){
   var svc = graphicsSvc();
   var pack = String(policyPack || '');
   if(svc && typeof svc.analyzePolicyPackImpact === 'function'){
-    svc.analyzePolicyPackImpact(pack, { policyPack:pack }).then(function(){ renderAdminAppearance(); });
+    announceGraphics(L('Đang chạy impact analysis cho policy pack ', 'Running impact analysis for policy pack ') + pack);
+    svc.analyzePolicyPackImpact(pack, { policyPack:pack }).then(function(){
+      announceGraphics(L('Policy pack impact analysis đã cập nhật: ', 'Policy pack impact analysis updated: ') + pack);
+      renderAdminAppearance();
+    }).catch(function(err){
+      announceGraphics(L('Policy pack impact analysis không hoàn tất; rollout vẫn bị chặn.', 'Policy pack impact analysis did not complete; rollout remains blocked.'));
+      if(typeof showToast === 'function') showToast(String(err && err.message || err || 'impact_failed'), 'warning');
+      renderAdminAppearance();
+    });
     refreshImpactPanel();
     return;
   }
@@ -1608,18 +1644,25 @@ window._admGraphicsTemplateAction = function(action, id){
   var svc = graphicsSvc();
   if(action === 'preview'){
     if(svc && typeof svc.saveTemplatePreview === 'function') svc.saveTemplatePreview(tpl);
+    announceGraphics(L('Preview cache đã lưu; backend authority không đổi.', 'Preview cache saved; backend authority unchanged.'));
     if(typeof showToast === 'function') showToast(L('Đã lưu cache xem trước, chưa thay authority', 'Preview cache saved; authority unchanged'), 'success');
     renderAdminAppearance();
     return;
   }
   if(!svc || typeof svc.templateAction !== 'function'){
+    announceGraphics(L('Graphics governance service chưa sẵn sàng; workflow bị chặn.', 'Graphics governance service is not ready; workflow blocked.'));
     if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng', 'Graphics governance service is not ready'), 'error');
     return;
   }
   svc.templateAction(action, tpl.templateId || tpl.id, { template:tpl }).then(function(result){
+    announceGraphics((result && result.message) ? result.message : (L('Workflow template đã ghi nhận: ', 'Template workflow recorded: ') + action));
     if(typeof showToast === 'function'){
       showToast(result && result.message ? result.message : (L('Đã ghi nhận workflow', 'Workflow recorded') + ': ' + action), result && result.ok === false ? 'warning' : 'success');
     }
+    renderAdminAppearance();
+  }).catch(function(err){
+    announceGraphics(L('Workflow template thất bại; authority không đổi.', 'Template workflow failed; authority unchanged.'));
+    if(typeof showToast === 'function') showToast(String(err && err.message || err || 'workflow_failed'), 'error');
     renderAdminAppearance();
   });
 };
@@ -1629,9 +1672,11 @@ window._admGraphicsStageCanary = function(id){
   if(!tpl) return;
   var svc = graphicsSvc();
   if(!svc || typeof svc.stageGraphicsRollout !== 'function'){
+    announceGraphics(L('Graphics governance service chưa sẵn sàng; không thể stage canary.', 'Graphics governance service is not ready; cannot stage canary.'));
     if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng', 'Graphics governance service is not ready'), 'error');
     return;
   }
+  announceGraphics(L('Đang stage canary rollout cho template ', 'Staging canary rollout for template ') + (tpl.templateId || tpl.id));
   svc.stageGraphicsRollout({
     templateId: tpl.templateId || tpl.id,
     impactType:'template',
@@ -1646,9 +1691,14 @@ window._admGraphicsStageCanary = function(id){
       uri:'mom/data/registry/graphics-governance-registry.json'
     }]
   }).then(function(result){
+    announceGraphics((result && result.message) ? result.message : L('Canary rollout đã được stage.', 'Canary rollout staged.'));
     if(typeof showToast === 'function'){
       showToast(result && result.message ? result.message : L('Đã stage canary rollout', 'Canary rollout staged'), result && result.ok === false ? 'warning' : 'success');
     }
+    renderAdminAppearance();
+  }).catch(function(err){
+    announceGraphics(L('Stage canary rollout thất bại; apply vẫn bị chặn.', 'Canary rollout staging failed; apply remains blocked.'));
+    if(typeof showToast === 'function') showToast(String(err && err.message || err || 'rollout_failed'), 'error');
     renderAdminAppearance();
   });
 };
@@ -1656,28 +1706,54 @@ window._admGraphicsStageCanary = function(id){
 window._admGraphicsSetWaiver = function(field, value){
   if(field === 'subject') _waiverSubject = value || '';
   if(field === 'reason') _waiverReason = value || '';
+  if(field === 'owner') _waiverOwner = value || '';
+  if(field === 'approver') _waiverApprover = value || '';
+  if(field === 'riskClass') _waiverRiskClass = value || 'high';
+  if(field === 'expiresAt') _waiverExpiresAt = value || '';
 };
 
 window._admGraphicsRequestWaiver = function(){
   var svc = graphicsSvc();
-  if(!svc || typeof svc.requestWaiver !== 'function') return;
+  if(!svc || typeof svc.requestWaiver !== 'function'){
+    announceGraphics(L('Graphics governance service chưa sẵn sàng; không thể gửi waiver.', 'Graphics governance service is not ready; cannot request waiver.'));
+    return;
+  }
+  var target = _waiverSubject || 'G19-graphics-governance';
+  var waiverScope = (target === 'G19-graphics-governance' || target === 'graphics-governance') ? 'graphics-governance' : (/^T\d+/i.test(target) ? 'template' : 'module');
+  var expiresAt = _waiverExpiresAt ? (new Date(_waiverExpiresAt + 'T23:59:59Z')).toISOString() : (function(){ var d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString(); })();
+  announceGraphics(L('Đang gửi waiver governance cho ', 'Submitting governance waiver for ') + target);
   svc.requestWaiver({
-    subjectId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
-    targetId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
+    subjectId: target,
+    targetId: target,
     reason: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
     reasonText: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
-    risk: 'medium graphics governance exception',
-    riskClass: 'medium',
+    risk: (_waiverRiskClass || 'high') + ' graphics governance exception',
+    riskClass: _waiverRiskClass || 'high',
     compensatingControl: L('Giữ rollback plan và evidence snapshot cho đến khi quay lại shared token/component authority.', 'Keep rollback plan and evidence snapshot until the change returns to shared token/component authority.'),
-    owner: 'Admin Appearance',
-    approver: '',
-    expiresAt: (function(){ var d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString(); })(),
+    owner: _waiverOwner || 'Admin Appearance',
+    approver: _waiverApprover || 'QA Governance',
+    expiresAt: expiresAt,
     requestedBy: 'Admin Appearance',
-    scope: 'graphics-governance'
+    scope: waiverScope,
+    releaseManifestRefs: [{
+      refType:'release_manifest',
+      refId:'graphics-waiver-request',
+      uri:'mom/data/registry/graphics-governance-registry.json'
+    }],
+    documentControlRefs: [{
+      refType:'document',
+      refId:'document-graphics-governance-2026-04-05',
+      uri:'mom/docs/document-graphics-governance-2026-04-05.md'
+    }]
   }).then(function(result){
+    announceGraphics((result && result.message) ? result.message : L('Waiver request đã gửi vào backend governance.', 'Waiver request submitted to backend governance.'));
     if(typeof showToast === 'function'){
       showToast(result && result.message ? result.message : L('Đã gửi yêu cầu waiver', 'Waiver request submitted'), result && result.ok === false ? 'warning' : 'success');
     }
+    renderAdminAppearance();
+  }).catch(function(err){
+    announceGraphics(L('Waiver request thất bại; blocker vẫn active.', 'Waiver request failed; blocker remains active.'));
+    if(typeof showToast === 'function') showToast(String(err && err.message || err || 'waiver_failed'), 'error');
     renderAdminAppearance();
   });
 };
@@ -2144,9 +2220,13 @@ function renderReleaseLinkagePanel(){
   }).join('');
   return sect(
     L('Waiver / exception governance', 'Waiver / exception governance'),
-    '<div style="display:grid;grid-template-columns:minmax(240px,1fr) minmax(240px,1fr);gap:10px;margin-bottom:12px">'
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px">'
       + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Subject', 'Subject'))+'<input class="hm-input" value="'+esc(_waiverSubject || (_selectedTemplate || ''))+'" oninput="_admGraphicsSetWaiver(\'subject\',this.value)" placeholder="templateId / moduleId / selector"></label>'
       + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Reason text', 'Reason text'))+'<input class="hm-input" value="'+esc(_waiverReason)+'" oninput="_admGraphicsSetWaiver(\'reason\',this.value)" placeholder="'+esc(L('Lý do ngoại lệ, thời hạn, owner', 'Exception reason, expiry, owner'))+'"></label>'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Owner', 'Owner'))+'<input class="hm-input" value="'+esc(_waiverOwner)+'" oninput="_admGraphicsSetWaiver(\'owner\',this.value)" placeholder="Admin Appearance"></label>'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Approver', 'Approver'))+'<input class="hm-input" value="'+esc(_waiverApprover)+'" oninput="_admGraphicsSetWaiver(\'approver\',this.value)" placeholder="QA Governance"></label>'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">Risk class<select class="hm-input" onchange="_admGraphicsSetWaiver(\'riskClass\',this.value)"><option value="high"'+(_waiverRiskClass==='high'?' selected':'')+'>high</option><option value="regulated"'+(_waiverRiskClass==='regulated'?' selected':'')+'>regulated</option><option value="shopfloor-critical"'+(_waiverRiskClass==='shopfloor-critical'?' selected':'')+'>shopfloor-critical</option></select></label>'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">Expires at<input class="hm-input" type="date" value="'+esc(_waiverExpiresAt)+'" oninput="_admGraphicsSetWaiver(\'expiresAt\',this.value)"></label>'
       + '</div>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsRequestWaiver()">'+esc(L('Request waiver', 'Request waiver'))+'</button>'
       + '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px"><thead><tr>'
@@ -2277,12 +2357,13 @@ window._admTplCreate = function(){
   clone.controlMode = 'draft-cache';
   clone.owner = 'HESEM Platform Architecture';
   clone.version = '0.1.0';
-  cacheUnsavedTemplateDraftRecord(clone);
-  _selectedTemplate = clone.id;
-  _templateView = 'editor';
-  if(typeof showToast === 'function') showToast(L('Đã tạo template mới','Template created'), 'success');
-  renderAdminAppearance();
-};
+	  cacheUnsavedTemplateDraftRecord(clone);
+	  _selectedTemplate = clone.id;
+	  _templateView = 'editor';
+	  announceGraphics(L('Template draft-only mới đã tạo trong local draft cache; backend authority chưa đổi.', 'New draft-only template created in local draft cache; backend authority unchanged.'));
+	  if(typeof showToast === 'function') showToast(L('Đã tạo template mới','Template created'), 'success');
+	  renderAdminAppearance();
+	};
 
 window._admTplClone = function(id){
   var tpl = getTemplateById(id);
@@ -2297,20 +2378,22 @@ window._admTplClone = function(id){
   clone.controlMode = 'draft-cache';
   clone.owner = tpl.owner || 'HESEM Platform Architecture';
   clone.version = '0.1.0';
-  cacheUnsavedTemplateDraftRecord(clone);
-  _selectedTemplate = clone.id;
-  _templateView = 'detail';
-  if(typeof showToast === 'function') showToast(L('Đã nhân bản template','Template cloned'), 'success');
-  renderAdminAppearance();
-};
+	  cacheUnsavedTemplateDraftRecord(clone);
+	  _selectedTemplate = clone.id;
+	  _templateView = 'detail';
+	  announceGraphics(L('Template đã clone vào draft cache; cần save draft backend để thành controlled draft.', 'Template cloned into draft cache; backend save draft is required for controlled draft.'));
+	  if(typeof showToast === 'function') showToast(L('Đã nhân bản template','Template cloned'), 'success');
+	  renderAdminAppearance();
+	};
 
 window._admTplDelete = function(id){
-  if(!id) return;
-  deleteUnsavedTemplateDraftRecord(id);
-  if(_selectedTemplate === id){ _selectedTemplate = null; _templateView = 'gallery'; }
-  if(typeof showToast === 'function') showToast(L('Đã xóa draft cache của template','Template draft cache removed'), 'success');
-  renderAdminAppearance();
-};
+	  if(!id) return;
+	  deleteUnsavedTemplateDraftRecord(id);
+	  if(_selectedTemplate === id){ _selectedTemplate = null; _templateView = 'gallery'; }
+	  announceGraphics(L('Đã xóa template draft cache; controlled registry không đổi.', 'Template draft cache removed; controlled registry unchanged.'));
+	  if(typeof showToast === 'function') showToast(L('Đã xóa draft cache của template','Template draft cache removed'), 'success');
+	  renderAdminAppearance();
+	};
 
 window._admTplSaveField = function(id, field, value){
   var tpl = cloneTemplateData(getTemplateById(id));
@@ -2346,21 +2429,87 @@ window._admTplApplyTheme = function(themeId){
   if(typeof HmTheme.applyVisualTheme === 'function'){
     applied = HmTheme.applyVisualTheme(themeId) === true;
   }
-  if(!applied){
-    var theme = VISUAL_THEMES.find(function(item){ return item.id === themeId; });
-    if(!theme) return;
+	  if(!applied){
+	    var theme = VISUAL_THEMES.find(function(item){ return item.id === themeId; });
+	    if(!theme) return;
     window._hmSet('--brand', 'brand.dark', theme.colors.brand);
     window._hmSet('--brand-2', 'brand.primary', theme.colors.brand2);
     window._hmSet('--accent', 'brand.accent', theme.colors.accent);
     window._hmSet('--bg-page-light', 'colorsLight.bgPage', theme.colors.bgPage);
-    window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
-    if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep('appearance.visualThemePreset', themeId);
-    else if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'), 'warning');
-  }
-  if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
-  window._admGraphicsMarkChange('theme-preset', themeId, themeId);
-  renderAdminAppearance();
-};
+	    window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
+	    if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep('appearance.visualThemePreset', themeId);
+	    else {
+	      announceGraphics(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'));
+	      if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'), 'warning');
+	    }
+	  }
+	  announceGraphics(L('Preset giao diện đã áp dụng trong preview; impact analysis được ghi nhận.', 'Visual theme preset applied in preview; impact analysis recorded.'));
+	  if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
+	  window._admGraphicsMarkChange('theme-preset', themeId, themeId);
+	  renderAdminAppearance();
+	};
+
+	window._admExportTheme = function(){
+	  var j = HmTheme.exportTheme();
+	  var b = new Blob([j], { type:'application/json' });
+	  var a = document.createElement('a');
+	  a.href = URL.createObjectURL(b);
+	  a.download = 'hesem-theme.json';
+	  a.click();
+	  announceGraphics(L('Đã export theme JSON; đây không phải template registry authority.', 'Theme JSON exported; this is not template registry authority.'));
+	};
+
+	window._admImportTheme = function(){
+	  var i = document.createElement('input');
+	  i.type = 'file';
+	  i.accept = '.json';
+	  i.onchange = function(){
+	    var r = new FileReader();
+	    r.onload = function(){
+	      if(HmTheme.importTheme(r.result)){
+	        announceGraphics(L('Theme đã import vào preview/user preference; cần save backend để thành admin config.', 'Theme imported into preview/user preference; backend save is required for admin config authority.'));
+	        renderAdminAppearance();
+	        if(typeof showToast === 'function') showToast('Theme imported', 'success');
+	      } else {
+	        announceGraphics(L('Theme JSON import thất bại.', 'Theme JSON import failed.'));
+	      }
+	    };
+	    r.readAsText(i.files[0]);
+	  };
+	  i.click();
+	};
+
+	window._admExportDraftCache = function(){
+	  var j = JSON.stringify(readDraftCache(), null, 2);
+	  var b = new Blob([j], { type:'application/json' });
+	  var a = document.createElement('a');
+	  a.href = URL.createObjectURL(b);
+	  a.download = 'hesem-template-draft-cache.json';
+	  a.click();
+	  announceGraphics(L('Đã export template draft cache; backend authority không đổi.', 'Template draft cache exported; backend authority unchanged.'));
+	};
+
+	window._admImportDraftCache = function(){
+	  var i = document.createElement('input');
+	  i.type = 'file';
+	  i.accept = '.json';
+	  i.onchange = function(){
+	    var r = new FileReader();
+	    r.onload = function(){
+	      try {
+	        writeDraftCache(JSON.parse(r.result || '{}'));
+	        announceGraphics(L('Đã nhập draft cache; backend authority không đổi.', 'Draft cache imported; backend authority unchanged.'));
+	        renderAdminAppearance();
+	        if(typeof showToast === 'function') showToast(L('Đã nhập draft cache; chưa thay authority','Draft cache imported; authority unchanged'), 'success');
+	      } catch(e) {
+	        announceGraphics(L('JSON draft cache không hợp lệ.', 'Draft cache JSON is invalid.'));
+	        if(typeof showToast === 'function') showToast(L('JSON không hợp lệ','Invalid JSON'), 'error');
+	      }
+	    };
+	    r.readAsText(i.files[0]);
+	  };
+	  i.click();
+	};
 
 function renderTemplateCard(tpl){
   var modulesUsing = getGovernedModulesForTemplate(tpl);
@@ -2603,12 +2752,13 @@ function render(el, subTab, currentLang){
   var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
 
   /* Title */
-  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+(typeof lang!=='undefined'&&lang==='en'?'Graphics Control Plane':'Graphics Control Plane')+'</h3>';
-  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + Admin/shared token layer. Local template cache is preview/draft only.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
-  h += '</div>';
+	  h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
+	  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+(typeof lang!=='undefined'&&lang==='en'?'Graphics Control Plane':'Graphics Control Plane')+'</h3>';
+	  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + Admin/shared token layer. Local template cache is preview/draft only.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
+	  h += '</div>';
+	  h += '<div id="adm-graphics-live" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">'+esc(_graphicsLiveMessage)+'</div>';
 
-  /* Sub-tab bar */
+	  /* Sub-tab bar */
   h += '<div class="hm-tabs" role="tablist" aria-label="'+esc(L('Admin Appearance sections', 'Admin Appearance sections'))+'" onkeydown="_admAppearanceTabKeydown(event)" style="margin-bottom:16px">';
   tabs.forEach(function(t){
     var active = _subTab===t.key;
@@ -2643,7 +2793,9 @@ function render(el, subTab, currentLang){
 /* ── Save all ────────────────────────────────────────────────────────────── */
 window._saveAllAppearance = function(){
   var cfg = HmTheme.getFullConfig();
+  announceGraphics(L('Đang lưu design config qua backend admin authority.', 'Saving design config through backend admin authority.'));
   HmTheme.saveAdminConfig(cfg, function(ok){
+    announceGraphics(ok ? L('Design config đã lưu qua backend authority.', 'Design config saved through backend authority.') : L('Lưu design config thất bại; authority không đổi.', 'Design config save failed; authority unchanged.'));
     if(typeof showToast==='function') showToast(T(ok?'saved':'error'), ok?'success':'error');
   });
 };
@@ -3556,12 +3708,12 @@ function renderAdvanced(){
   h += renderAuditHistoryPanel(8);
   h += renderApiContractPanel();
 
-  h += sect('📤 '+T('importExport'),
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=HmTheme.exportTheme();var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-theme.json\';a.click()})()">📥 Export JSON</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){if(HmTheme.importTheme(r.result)){renderAdminAppearance();if(typeof showToast===\'function\')showToast(\'Theme imported\',\'success\')}};r.readAsText(i.files[0])};i.click()})()">📤 Import JSON</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=JSON.stringify(readDraftCache(),null,2);var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-template-draft-cache.json\';a.click()})()">🧾 '+esc(L('Export draft cache', 'Export draft cache'))+'</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){try{writeDraftCache(JSON.parse(r.result||\'{}\'));renderAdminAppearance();if(typeof showToast===\'function\')showToast(\''+L('Đã nhập draft cache; chưa thay authority','Draft cache imported; authority unchanged')+'\',\'success\')}catch(e){if(typeof showToast===\'function\')showToast(\''+L('JSON không hợp lệ','Invalid JSON')+'\',\'error\')}};r.readAsText(i.files[0])};i.click()})()">📂 '+esc(L('Import draft cache', 'Import draft cache'))+'</button>'
+	  h += sect('📤 '+T('importExport'),
+	    '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+	    +'<button class="hm-btn hm-btn-secondary" onclick="_admExportTheme()">📥 Export JSON</button>'
+	    +'<button class="hm-btn hm-btn-secondary" onclick="_admImportTheme()">📤 Import JSON</button>'
+	    +'<button class="hm-btn hm-btn-secondary" onclick="_admExportDraftCache()">🧾 '+esc(L('Export draft cache', 'Export draft cache'))+'</button>'
+	    +'<button class="hm-btn hm-btn-secondary" onclick="_admImportDraftCache()">📂 '+esc(L('Import draft cache', 'Import draft cache'))+'</button>'
     +'</div>'
     +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry_get.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry_get.'))+'</div>'
   , true);

@@ -504,10 +504,6 @@ class EvidenceController extends BaseController
 
         try {
             $custody = $this->evidenceService()->getCustodyLog($id);
-            if ($custody === null) {
-                $this->error('not_found', 404, "Evidence {$id} not found.");
-            }
-
             $this->success(['chain_of_custody' => $custody]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -775,7 +771,13 @@ class EvidenceController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->evidenceService()->search($q, $type);
+            $allItems = $this->evidenceService()->search($q);
+            if ($type !== null) {
+                $typeFilter = strtolower(trim($type));
+                $allItems = array_values(array_filter($allItems, static function (array $item) use ($typeFilter): bool {
+                    return strtolower(trim((string)($item['type'] ?? $item['evidence_type'] ?? ''))) === $typeFilter;
+                }));
+            }
             $total    = count($allItems);
             $items    = array_slice($allItems, $offset, $limit);
 

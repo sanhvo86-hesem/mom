@@ -21,6 +21,7 @@ use RuntimeException;
 class RegistryService
 {
     private string $registryDir;
+    private string $controlledRegistryDir;
 
     /** @var array<string, array> Per-request in-memory cache */
     private array $cache = [];
@@ -28,6 +29,7 @@ class RegistryService
     public function __construct(string $dataDir)
     {
         $this->registryDir = rtrim($dataDir, '/\\') . '/registry';
+        $this->controlledRegistryDir = dirname(__DIR__, 2) . '/contracts';
     }
 
     /* ── Loading ──────────────────────────────────────────────────────── */
@@ -45,7 +47,12 @@ class RegistryService
             return $this->cache[$name] = $this->loadDataFieldsRegistry();
         }
 
-        return $this->cache[$name] = $this->readJsonFile($this->registryDir . '/' . $name . '.json');
+        $runtimeRegistry = $this->readJsonFile($this->registryDir . '/' . $name . '.json');
+        if ($runtimeRegistry !== []) {
+            return $this->cache[$name] = $runtimeRegistry;
+        }
+
+        return $this->cache[$name] = $this->readJsonFile($this->controlledRegistryDir . '/' . $name . '.json');
     }
 
     /**
@@ -356,7 +363,7 @@ class RegistryService
 
             $statusSet = trim((string)($wf['statusSet'] ?? ''));
             $allowedStates = array_values(array_filter(array_map(
-                static fn(array $option): string => (string)($option['value'] ?? ''),
+                static fn(array $option): string => (string)$option['value'],
                 $this->statusSet($statusSet)
             )));
 

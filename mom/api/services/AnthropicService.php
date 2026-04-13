@@ -456,7 +456,7 @@ PROMPT;
 
                     // Chờ trước khi thử lại (exponential backoff)
                     if ($attempt < self::MAX_RETRIES - 1) {
-                        $delay = self::RETRY_DELAYS[$attempt] ?? 4;
+                        $delay = self::RETRY_DELAYS[$attempt];
                         usleep($delay * 1_000_000);
                         continue;
                     }
@@ -474,14 +474,14 @@ PROMPT;
 
                 // Chờ trước khi thử lại
                 if ($attempt < self::MAX_RETRIES - 1) {
-                    $delay = self::RETRY_DELAYS[$attempt] ?? 4;
+                    $delay = self::RETRY_DELAYS[$attempt];
                     usleep($delay * 1_000_000);
                 }
             }
         }
 
         // Tất cả các lần thử đều thất bại
-        return $lastError ?? $this->errorResponse('All retry attempts exhausted.', 0);
+        return $lastError;
     }
 
     /**

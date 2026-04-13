@@ -50,6 +50,15 @@ final class SchedulingService
 
     private ?object $db = null;
 
+    private function conflictType(string $type): string
+    {
+        if (!in_array($type, self::CONFLICT_TYPES, true)) {
+            throw new RuntimeException("Invalid conflict type: {$type}");
+        }
+
+        return $type;
+    }
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -356,7 +365,7 @@ final class SchedulingService
                 ) {
                     $conflicts[] = [
                         'conflict_id'    => $this->generateUuidV4(),
-                        'conflict_type'  => 'machine_overlap',
+                        'conflict_type'  => $this->conflictType('machine_overlap'),
                         'severity'       => 'warning',
                         'slot_id_a'      => $a['slot_id'] ?? null,
                         'slot_id_b'      => $b['slot_id'] ?? null,
@@ -384,7 +393,7 @@ final class SchedulingService
                 ) {
                     $conflicts[] = [
                         'conflict_id'    => $this->generateUuidV4(),
-                        'conflict_type'  => 'operator_overlap',
+                        'conflict_type'  => $this->conflictType('operator_overlap'),
                         'severity'       => 'warning',
                         'slot_id_a'      => $a['slot_id'] ?? null,
                         'slot_id_b'      => $b['slot_id'] ?? null,
@@ -413,7 +422,7 @@ final class SchedulingService
                     ) {
                         $conflicts[] = [
                             'conflict_id'    => $this->generateUuidV4(),
-                            'conflict_type'  => 'maintenance_window',
+                            'conflict_type'  => $this->conflictType('maintenance_window'),
                             'severity'       => 'critical',
                             'slot_id_a'      => $a['slot_id'] ?? null,
                             'slot_id_b'      => $b['slot_id'] ?? null,
@@ -480,8 +489,8 @@ final class SchedulingService
         $slots   = $this->readJsonFile($this->slotsFile) ?? [];
         $heatmap = [];
 
-        // Default available minutes per machine per day (3 shifts = 1440 min)
-        $defaultAvailable = 1440.0;
+        // Default available minutes per machine per day (3 shifts = 1440 min).
+        $defaultAvailable = (float)array_sum(array_column(self::SHIFTS, 'minutes'));
 
         foreach ($slots as $slot) {
             if (!is_array($slot)) {
@@ -499,6 +508,8 @@ final class SchedulingService
                 $heatmap[$machine][$date] = [
                     'scheduled_minutes' => 0.0,
                     'available_minutes' => $defaultAvailable,
+                    'utilization_pct' => 0.0,
+                    'color' => 'green',
                 ];
             }
 
@@ -513,9 +524,7 @@ final class SchedulingService
         // Calculate utilisation and assign colour
         foreach ($heatmap as $machine => &$dates) {
             foreach ($dates as $date => &$info) {
-                $pct = $info['available_minutes'] > 0
-                    ? round(($info['scheduled_minutes'] / $info['available_minutes']) * 100, 1)
-                    : 0.0;
+                $pct = round(($info['scheduled_minutes'] / $info['available_minutes']) * 100, 1);
 
                 $info['utilization_pct'] = $pct;
 
@@ -605,9 +614,7 @@ final class SchedulingService
         $availableMinutes = 1440.0; // 24 hours
 
         foreach ($machineData as $machine => $data) {
-            $utilPct = $availableMinutes > 0
-                ? round(($data['scheduled_minutes'] / $availableMinutes) * 100, 1)
-                : 0.0;
+            $utilPct = round(($data['scheduled_minutes'] / $availableMinutes) * 100, 1);
 
             $snapshots[] = [
                 'snapshot_id'         => $this->generateUuidV4(),
@@ -971,7 +978,7 @@ final class SchedulingService
                     if ($altUtil < $minUtil) {
                         // Move lowest-priority slot from overloaded machine / Chuyển slot ưu tiên thấp nhất
                         $group = &$productionByMachine[$machine];
-                        if (!empty($group)) {
+                        if (count($group) > 0) {
                             // Find unlocked, lowest priority slot on this date
                             $moveIdx = null;
                             $lowestPri = PHP_INT_MAX;
@@ -1241,7 +1248,7 @@ final class SchedulingService
             if (($existing['machine_id'] ?? '') === ($newSlot['machine_id'] ?? '')) {
                 $conflicts[] = [
                     'conflict_id'   => $this->generateUuidV4(),
-                    'conflict_type' => 'machine_overlap',
+                    'conflict_type' => $this->conflictType('machine_overlap'),
                     'severity'      => 'warning',
                     'slot_id_a'     => $newSlot['slot_id'] ?? null,
                     'slot_id_b'     => $existingId,
@@ -1263,7 +1270,7 @@ final class SchedulingService
             ) {
                 $conflicts[] = [
                     'conflict_id'   => $this->generateUuidV4(),
-                    'conflict_type' => 'operator_overlap',
+                    'conflict_type' => $this->conflictType('operator_overlap'),
                     'severity'      => 'warning',
                     'slot_id_a'     => $newSlot['slot_id'] ?? null,
                     'slot_id_b'     => $existingId,

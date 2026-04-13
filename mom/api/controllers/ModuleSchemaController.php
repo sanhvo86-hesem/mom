@@ -81,7 +81,7 @@ class ModuleSchemaController extends BaseController
                 }
             }
             usort($schemas, static function(array $a, array $b): int {
-                return strcmp((string)($b['updatedAt'] ?? ''), (string)($a['updatedAt'] ?? ''));
+                return strcmp((string)$b['updatedAt'], (string)$a['updatedAt']);
             });
             $this->success(['schemas' => $schemas]);
         } catch (Throwable $e) {

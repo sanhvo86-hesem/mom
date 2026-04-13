@@ -31,6 +31,11 @@ final class EpicorInboundWorker
 
         $policy = \load_epicor_integration_policy();
         $runtime = \load_epicor_runtime_store();
+        $runtime += [
+            'sync_runs' => [],
+            'checkpoints' => [],
+            'health' => [],
+        ];
         $userId = trim((string)($options['user_id'] ?? 'scheduled_job')) ?: 'scheduled_job';
 
         $requestedDomains = array_values(array_filter(array_map(
@@ -39,9 +44,9 @@ final class EpicorInboundWorker
         )));
         $domains = $this->resolveDomains($policy, $requestedDomains);
 
-        $runtime['sync_runs'] = array_values((array)($runtime['sync_runs'] ?? []));
-        $runtime['checkpoints'] = array_values((array)($runtime['checkpoints'] ?? []));
-        $runtime['health'] = is_array($runtime['health'] ?? null) ? $runtime['health'] : [];
+        $runtime['sync_runs'] = array_values((array)$runtime['sync_runs']);
+        $runtime['checkpoints'] = array_values((array)$runtime['checkpoints']);
+        $runtime['health'] = is_array($runtime['health']) ? $runtime['health'] : [];
 
         $processed = 0;
         $succeeded = 0;

@@ -88,6 +88,31 @@ final class OrderWorkflowRepositoryBoundaryTest extends TestCase
 
         $this->assertTrue($result->ok, $result->message);
     }
+
+    public function testEveryPostReleaseFieldRequiresReleasedChangeAuthority(): void
+    {
+        $repository = new InMemoryOrderWorkflowRepository([
+            'sales_orders' => [],
+            'job_orders' => [[
+                'jo_number' => 'JO-AUTH-002',
+                'status' => 'active',
+                'due_date' => '2026-05-01',
+            ]],
+            'work_orders' => [],
+        ]);
+        $service = new OrderWorkflowService(sys_get_temp_dir(), repository: $repository);
+
+        $result = $service->validateFieldEdit(
+            'jo',
+            'JO-AUTH-002',
+            'due_date',
+            '2026-05-02',
+            'qa_manager',
+        );
+
+        $this->assertFalse($result->ok);
+        $this->assertContains($result->errorCode, ['change_authority_required', 'change_authority_unavailable']);
+    }
 }
 
 final class InMemoryOrderWorkflowRepository implements OrderWorkflowRepository

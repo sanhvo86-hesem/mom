@@ -185,10 +185,6 @@ class ApqpController extends BaseController
 
         try {
             $record = $this->apqpService()->getDetail($apqpId);
-            if ($record === null) {
-                $this->error('not_found', 404, "APQP project {$apqpId} not found.");
-            }
-
             $this->success(['project' => $record]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -265,10 +261,6 @@ class ApqpController extends BaseController
 
         try {
             $updated = $this->apqpService()->updateProject($apqpId, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "APQP project {$apqpId} not found.");
-            }
-
             $this->auditLog('apqp_update_project', [
                 'apqp_id' => $apqpId,
                 'fields'  => array_keys($body),
@@ -305,13 +297,7 @@ class ApqpController extends BaseController
         $userId      = $this->userId($user);
 
         try {
-            $result = $this->apqpService()->advancePhase($apqpId, $targetPhase, $userId, [
-                'justification' => trim((string)($body['justification'] ?? '')),
-            ]);
-
-            if ($result === null) {
-                $this->error('phase_advance_failed', 400, "Cannot advance APQP {$apqpId} to phase {$targetPhase}.");
-            }
+            $result = $this->apqpService()->advancePhase($apqpId, $targetPhase, $userId);
 
             $this->auditLog('apqp_advance_phase', [
                 'apqp_id'      => $apqpId,
@@ -356,11 +342,7 @@ class ApqpController extends BaseController
                 'findings'    => trim((string)($body['findings'] ?? '')),
                 'attachments' => (array)($body['attachments'] ?? []),
                 'submitted_by' => $userId,
-            ]);
-
-            if ($review === null) {
-                $this->error('gate_review_failed', 400, "Cannot submit gate review for APQP {$apqpId} phase {$phase}.");
-            }
+            ], $userId);
 
             $this->auditLog('apqp_submit_gate_review', [
                 'apqp_id'   => $apqpId,
@@ -401,10 +383,6 @@ class ApqpController extends BaseController
 
         try {
             $result = $this->apqpService()->approveGate($apqpId, $reviewId, $userId, $comment);
-            if ($result === null) {
-                $this->error('gate_approve_failed', 400, "Cannot approve gate review {$reviewId}.");
-            }
-
             $this->auditLog('apqp_approve_gate', [
                 'apqp_id'   => $apqpId,
                 'review_id' => $reviewId,
@@ -443,10 +421,6 @@ class ApqpController extends BaseController
 
         try {
             $result = $this->apqpService()->rejectGate($apqpId, $reviewId, $userId, $reason);
-            if ($result === null) {
-                $this->error('gate_reject_failed', 400, "Cannot reject gate review {$reviewId}.");
-            }
-
             $this->auditLog('apqp_reject_gate', [
                 'apqp_id'   => $apqpId,
                 'review_id' => $reviewId,
@@ -484,19 +458,20 @@ class ApqpController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $submission = $this->apqpService()->createPpapSubmission([
-                'apqp_id'           => trim((string)($body['apqp_id'] ?? '')),
-                'ppap_level'        => (int)($body['ppap_level'] ?? 3),
+            $apqpId = trim((string)($body['apqp_id'] ?? ''));
+            $submissionLevel = (int)($body['ppap_level'] ?? 3);
+            $submission = $this->apqpService()->createPpapSubmission($apqpId, [
+                'submission_level'  => 'level' . $submissionLevel,
                 'customer_id'       => trim((string)($body['customer_id'] ?? '')),
                 'part_number'       => trim((string)($body['part_number'] ?? '')),
                 'submission_reason' => trim((string)($body['submission_reason'] ?? '')),
                 'created_by'        => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('apqp_create_ppap_submission', [
                 'submission_id' => $submission['id'],
-                'apqp_id'       => $body['apqp_id'],
-                'ppap_level'    => $body['ppap_level'],
+                'apqp_id'       => $apqpId,
+                'ppap_level'    => $submissionLevel,
             ], $userId);
 
             $this->success(['submission' => $submission], 201);
@@ -532,15 +507,12 @@ class ApqpController extends BaseController
         $userId       = $this->userId($user);
 
         try {
-            $updated = $this->apqpService()->updatePpapElement($submissionId, $element, [
-                'status' => $newStatus,
-                'notes'  => trim((string)($body['notes'] ?? '')),
-                'updated_by' => $userId,
-            ]);
-
-            if ($updated === null) {
-                $this->error('not_found', 404, "PPAP submission {$submissionId} or element {$element} not found.");
-            }
+            $updated = $this->apqpService()->updatePpapElement(
+                $submissionId,
+                $element,
+                $newStatus,
+                trim((string)($body['ref'] ?? $body['reference'] ?? '')) ?: null
+            );
 
             $this->auditLog('apqp_update_ppap_element', [
                 'submission_id' => $submissionId,
@@ -580,17 +552,11 @@ class ApqpController extends BaseController
         $userId       = $this->userId($user);
 
         try {
-            $result = $this->apqpService()->recordCustomerResponse($submissionId, [
-                'decision'      => strtolower(trim((string)($body['decision'] ?? ''))),
-                'customer_name' => trim((string)($body['customer_name'] ?? '')),
-                'comments'      => trim((string)($body['comments'] ?? '')),
-                'response_date' => trim((string)($body['response_date'] ?? gmdate('Y-m-d'))),
-                'recorded_by'   => $userId,
-            ]);
-
-            if ($result === null) {
-                $this->error('not_found', 404, "PPAP submission {$submissionId} not found.");
-            }
+            $result = $this->apqpService()->recordCustomerResponse(
+                $submissionId,
+                strtolower(trim((string)($body['decision'] ?? ''))),
+                trim((string)($body['response_date'] ?? gmdate('Y-m-d')))
+            );
 
             $this->auditLog('apqp_record_customer_response', [
                 'submission_id' => $submissionId,

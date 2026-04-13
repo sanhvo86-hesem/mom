@@ -342,6 +342,7 @@ class KnowledgeController extends BaseController
             $file  = $this->kbDir() . '/tips.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
@@ -362,6 +363,9 @@ class KnowledgeController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Knowledge tip {$id} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('knowledge_update_failed', 500, 'Knowledge update result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);
@@ -408,6 +412,7 @@ class KnowledgeController extends BaseController
             $file  = $this->kbDir() . '/tips.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $updated = null;
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $tipId) {
@@ -426,6 +431,9 @@ class KnowledgeController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Knowledge tip {$tipId} not found.");
+            }
+            if (!is_array($updated)) {
+                $this->error('knowledge_vote_failed', 500, 'Knowledge vote result was not materialized.');
             }
 
             $this->writeJsonFile($file, $all);

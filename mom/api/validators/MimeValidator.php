@@ -149,6 +149,53 @@ class MimeValidator {
     }
 
     /**
+     * Validate a file that has already been moved into server-controlled storage.
+     *
+     * @param string $path Absolute path to the staged file
+     * @return ValidationResult
+     */
+    public static function validateFile(string $path): ValidationResult {
+        if (!is_file($path) || !is_readable($path)) {
+            return new ValidationResult(false, 'Invalid file: file not found or not readable.');
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if (in_array($ext, self::BLOCKED_EXTENSIONS, true)) {
+            return new ValidationResult(false, "Blocked file type: .{$ext} is not allowed.");
+        }
+
+        if (!array_key_exists($ext, self::ALLOWED_MIMES)) {
+            return new ValidationResult(
+                false,
+                "Unsupported file extension: .{$ext}. Allowed: " . implode(', ', array_keys(self::ALLOWED_MIMES)) . '.'
+            );
+        }
+
+        $detectedMime = self::detectMimeViaFinfo($path);
+        if ($detectedMime !== '' && !in_array($detectedMime, self::ALLOWED_MIMES[$ext], true)) {
+            return new ValidationResult(
+                false,
+                "MIME mismatch for .{$ext}: finfo '{$detectedMime}'.",
+                $detectedMime
+            );
+        }
+
+        if (array_key_exists($ext, self::MAGIC_SIGNATURES)) {
+            $magic = self::getFileMagicBytes($path);
+            $expected = self::MAGIC_SIGNATURES[$ext];
+            if (!str_starts_with($magic, $expected)) {
+                return new ValidationResult(
+                    false,
+                    "File signature mismatch for .{$ext}: expected {$expected}..., got {$magic}.",
+                    $detectedMime
+                );
+            }
+        }
+
+        return new ValidationResult(true, 'OK', $detectedMime);
+    }
+
+    /**
      * Read the first 8 bytes of a file and return them as a lowercase hex string.
      *
      * @param  string $path  Absolute path to the file

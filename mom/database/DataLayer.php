@@ -729,7 +729,7 @@ class DataLayer
         $entryId = $data['entry_id'] ?? ($code . '-' . (string)round(microtime(true) * 1000));
 
         $this->write(
-            jsonWriter: function () use ($code, $data, $entryId): bool {
+            jsonWriter: function () use ($code, $data): bool {
                 $entriesDir = $this->dataDir . '/online-forms/entries';
                 if (!is_dir($entriesDir)) {
                     @mkdir($entriesDir, 0755, true);
@@ -1943,6 +1943,7 @@ class DataLayer
             self::MODE_POSTGRES_PRIMARY => $this->pgWithFallback($pgReader, $jsonReader),
 
             self::MODE_POSTGRES_ONLY => $this->pgRead($pgReader),
+            default => throw new RuntimeException("Unsupported data layer read mode: {$this->mode}"),
         };
     }
 
@@ -1983,6 +1984,7 @@ class DataLayer
 
             self::MODE_POSTGRES_PRIMARY,
             self::MODE_POSTGRES_ONLY => $pgWriter(),
+            default => throw new RuntimeException("Unsupported data layer write mode: {$this->mode}"),
         };
     }
 
@@ -2638,11 +2640,11 @@ class DataLayer
             $payload['entity_type'] = (string)($row['entity_type'] ?? ($payload['entity_type'] ?? ''));
             $payload['entity_id'] = (string)($row['entity_id'] ?? ($payload['entity_id'] ?? ''));
             $payload['created_at'] = (string)($row['created_at'] ?? ($payload['created_at'] ?? $payload['first_queued_at'] ?? ''));
-            $payload['first_queued_at'] = (string)($payload['first_queued_at'] ?? $payload['created_at'] ?? ($row['created_at'] ?? ''));
+            $payload['first_queued_at'] = (string)($payload['first_queued_at'] ?? $payload['created_at']);
             $payload['sent_at'] = (string)($row['sent_at'] ?? ($payload['sent_at'] ?? $payload['last_attempt_at'] ?? ''));
-            $payload['last_attempt_at'] = (string)($payload['last_attempt_at'] ?? $payload['sent_at'] ?? ($row['sent_at'] ?? ''));
+            $payload['last_attempt_at'] = (string)($payload['last_attempt_at'] ?? $payload['sent_at']);
             $payload['send_status'] = (string)($row['send_status'] ?? ($payload['send_status'] ?? $payload['publish_status'] ?? ''));
-            $payload['publish_status'] = (string)($payload['publish_status'] ?? $payload['send_status'] ?? ($row['send_status'] ?? ''));
+            $payload['publish_status'] = (string)($payload['publish_status'] ?? $payload['send_status']);
             $payload['error_message'] = (string)($row['error_message'] ?? ($payload['error_message'] ?? ''));
             $payload['retry_count'] = (int)($row['retry_count'] ?? ($payload['retry_count'] ?? 0));
             $payload['erp_response'] = $erpResponse;
@@ -2801,14 +2803,4 @@ class DataLayer
         return gmdate('Y-m-d\TH:i:s\Z');
     }
 
-    /**
-     * Generate a UUID v4.
-     */
-    private function generateUuid(): string
-    {
-        $data = random_bytes(16);
-        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40); // version 4
-        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80); // variant
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
 }

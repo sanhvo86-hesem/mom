@@ -649,6 +649,9 @@ function init(callback){
 function get(key){ return _resolve(key); }
 function getDeep(path){ return _resolveDeep(path); }
 
+/** Persist a personal runtime preference only.
+    This is not template/design authority and must not be used for governed
+    registry, publish, compliance, waiver, or rollout state. */
 function set(key, value){
   _loadUserPrefs();
   _userPrefs[key] = value;
@@ -704,6 +707,8 @@ function clearPreviewOverrides(){
     ROOT.style.setProperty(varName, value);
   }
 
+/** Persist personal appearance preferences only; Admin authority saves must use
+    saveAdminConfig()/graphics-governance backend endpoints. */
 function setAll(prefs){
   _loadUserPrefs();
   _deepMerge(_userPrefs, prefs);
@@ -1010,14 +1015,16 @@ function applyVisualTheme(themeId){
 /* ── EXPOSE ────────────────────────────────────────────────────────────── */
 window.HmTheme = {
   init: init,
-  get: get,
-  getDeep: getDeep,
-  set: set,
-  setPreviewDeep: setPreviewDeep,
-  setPreviewAll: setPreviewAll,
-  setPreviewVar: setPreviewVar,
-  clearPreviewOverrides: clearPreviewOverrides,
-  setAll: setAll,
+	  get: get,
+	  getDeep: getDeep,
+	  set: set,
+	  setUserPreference: set,
+	  setPreviewDeep: setPreviewDeep,
+	  setPreviewAll: setPreviewAll,
+	  setPreviewVar: setPreviewVar,
+	  clearPreviewOverrides: clearPreviewOverrides,
+	  setAll: setAll,
+	  setAllUserPreferences: setAll,
   getAll: getAll,
   getFullConfig: getFullConfig,
   reset: reset,

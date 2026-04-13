@@ -252,7 +252,7 @@ final class EpicorIntegrationService
 
         $exceptionQueue = [];
         foreach ($domainRows as $row) {
-            if (($row['status'] ?? 'ready') === 'ready') {
+            if ($row['status'] === 'ready') {
                 continue;
             }
             $exceptionQueue[] = [
@@ -313,7 +313,7 @@ final class EpicorIntegrationService
             ];
         }
 
-        usort($exceptionQueue, static fn($a, $b) => strcmp((string)($b['updated_at'] ?? ''), (string)($a['updated_at'] ?? '')));
+        usort($exceptionQueue, static fn($a, $b) => strcmp((string)$b['updated_at'], (string)$a['updated_at']));
 
         return [
             'system_name' => (string)($policy['system_name'] ?? 'Epicor Kinetic'),
@@ -321,7 +321,7 @@ final class EpicorIntegrationService
             'kpis' => [
                 'domains_total' => count($domainRows),
                 'domains_degraded' => $degraded,
-                'sync_failures_open' => count(array_filter($exceptionQueue, static fn($row) => ($row['type'] ?? '') === 'domain_health' && ($row['severity'] ?? '') === 'critical')),
+                'sync_failures_open' => count(array_filter($exceptionQueue, static fn($row) => $row['type'] === 'domain_health' && $row['severity'] === 'critical')),
                 'reconciliation_open' => $reconciliationOpen,
                 'outbox_pending' => $outboxPending,
                 'avg_latency_ms' => $latencies ? (int)round(array_sum($latencies) / count($latencies)) : 0,

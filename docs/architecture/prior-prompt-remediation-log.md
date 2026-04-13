@@ -2,7 +2,7 @@
 
 Audited branch: `main`
 
-Date: 2026-04-13
+Date: 2026-04-14
 
 This log records prior deliverables from the Phase 1 CNC shopfloor execution prompts and the status after this pass.
 
@@ -21,6 +21,13 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Mobile inspection DB bridge | Fixed now | `MobileWorkQueueService` mirrors accepted captures to `mobile_inspection_captures`; migration `108_mobile_inspection_execution_bridge.sql` adds replay/context columns. |
 | Offline inspection replay safety | Fixed now | Offline inspection uses client/idempotency/fingerprint matching; divergent replay is rejected. |
 | AI feedback advisory write control | Fixed now | `AiSchedulingController::aiFeedbackSubmit()` requires CSRF and idempotency. |
+| AI NLQ and RCA write-like surface control | Fixed now | `aiNlQuery()` is role-scoped, CSRF-protected, audited, and read-only; `aiRcaAnalyze()` now requires CSRF. |
+| AI NLQ PostgreSQL runtime safety | Fixed now | `NaturalLanguageQueryService::executeSafeQuery()` begins a read-only transaction before `SET LOCAL statement_timeout`. |
+| AI prediction schema grounding | Fixed now | NLQ prompt uses the same prediction types as `AiPredictionPipeline`; migration `110_ai_advisory_boundary_comments.sql` replaces legacy autonomous-action comments with advisory-boundary comments. |
+| Evidence upload validation | Fixed now | `EvidenceVaultService` validates server-side size and byte-detected MIME; extension fallback cannot override concrete dangerous MIME content. |
+| Operational override role governance | Fixed now | `OperationalOverrideController` keeps permission gating and now uses canonical elevated roles through `userHasAnyRole()`. |
+| FMEA role governance | Fixed now | `FmeaController` uses migrated roles and quality/engineering/production buckets instead of a single unmigrated role string. |
+| COPQ cost-rate configurability | Fixed now | `CopqEngine` reads optional `copq_cost_rates` from exception policy config and falls back to safe defaults. |
 | API-key write controls | Fixed now | API key create/revoke/JWT generation now require auth/admin and CSRF; revoke accepts route alias `keyId`. |
 | Local storage first-write reliability | Fixed now | `LocalStorageDriver` creates directories before realpath validation and rejects absolute/traversal paths. |
 | Required docs under requested names | Fixed now | Added `canonical-execution-source-of-truth.md`, `prior-prompt-remediation-log.md`, and `shopfloor-execution-contracts.md`; updated benchmark doc. |
@@ -34,7 +41,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Full skill/certification matching on dispatch report submission | Staged | Mobile task start uses qualification gate, but dispatch report matching needs governed machine-operation-skill policy data. |
 | Full NCR/CAPA/SPC workflow enforcement | Staged | First-piece and inspection capture are now linked, but nonconformance disposition/CAPA/SPC enforcement needs EQMS workflow integration. |
 | Full genealogy edge emission from every report | Staged | Trace-ready fields exist, but serial/lot/traveler edge policy needs product/lot/operation governance before automatic edge creation. |
-| AI projection unification | Fixed for Phase 1 ETL, staged for full copilot registry | AI predictions are DB-first with JSON fallback, recommendation records are explicitly advisory/pending, and `AiDataEtlService` now exposes `shopfloor_execution` features from accepted MOM/MES execution facts. A full semantic copilot registry remains a later analytics migration. |
+| AI projection unification | Fixed for Phase 1 ETL and NLQ safety, staged for full copilot registry | AI predictions are DB-first with JSON fallback, recommendation records are explicitly advisory/pending, `AiDataEtlService` exposes `shopfloor_execution`, and NLQ is now CSRF/role guarded. A full semantic copilot registry remains a later analytics migration. |
 | MTConnect/OPC UA runtime ingestion | Staged | Phase 1 is human-input-first. This patch preserves machine/equipment/timestamp semantics but does not ingest or command machines. |
 
 ## Completed incorrectly or superficially before this pass
@@ -45,6 +52,13 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | First-piece mobile capture | Capture could be accepted with no structured measurement evidence. | First-piece capture now requires measurements and normalized result. |
 | Offline mobile inspection sync | Replay could append duplicate facts or accept conflicting data under the same client token. | Replay now returns the existing fact or rejects conflict. |
 | AI feedback endpoint | Advisory feedback write lacked CSRF/idempotency consistency. | Added CSRF and idempotency wrapper. |
+| AI NLQ/RCA endpoints | NLQ POST wrote conversation history without CSRF or scoped roles; RCA POST lacked CSRF. | Added scoped role gate, CSRF, audit hash, and CSRF on RCA. |
+| AI NLQ transaction order | `SET LOCAL statement_timeout` ran before `BEGIN TRANSACTION READ ONLY`, which is invalid for PostgreSQL transaction-local settings. | Transaction now begins first, then sets the local timeout. |
+| AI recommendation schema comments | Migration 099 described recommendation rows as automated actions. | Migration 110 clarifies advisory-only, human-review semantics without changing enum compatibility. |
+| Evidence MIME validation | Extension fallback could allow an allowed filename extension to override disallowed byte-detected content. | Fallback now only applies to generic/ambiguous MIME detection. |
+| Operational override elevated roles | Generic `manager/director/admin` gate could block real repository roles. | Replaced with canonical elevated role list plus `admin_roles()` and role migration. |
+| FMEA authorization | Role gates used a single unmigrated `role` string. | Added migrated multi-role checks and role buckets. |
+| COPQ configuration | A TODO documented hardcoded cost rates without remediation. | Added config-driven rates with defaults and tests. |
 | Required documentation names | Previous docs existed under related names but not all requested names. | Added exact required documents and updated the benchmark doc. |
 
 ## Still blocked by evidence
@@ -53,4 +67,4 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full qualification enforcement is blocked by missing governed machine/operation/skill policy for dispatch reports.
 - Full genealogy automation is blocked by unresolved serial/lot/traveler edge semantics.
 - Full EQMS enforcement is blocked by the need to connect inspection results to NCR, disposition, CAPA, and SPC workflows.
-- Full AI/copilot grounding is blocked by fragmented advisory stores and should follow execution-source reconciliation.
+- Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.

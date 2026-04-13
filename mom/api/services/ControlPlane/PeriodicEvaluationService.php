@@ -81,6 +81,65 @@ final class PeriodicEvaluationService
         return $this->decodeJsonColumns($row);
     }
 
+    /**
+     * @param array<string, mixed> $request
+     * @return array<string, mixed>
+     */
+    public function close(array $request): array
+    {
+        $this->requireDb();
+        $target = $this->state($request['evaluation_state'] ?? $request['target_state'] ?? '');
+        if (!in_array($target, ['passed', 'failed', 'waived'], true)) {
+            throw new RuntimeException('periodic_evaluation_terminal_state_required');
+        }
+
+        $id = $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null);
+        $scope = $this->nullableText($request['evaluation_scope'] ?? null);
+        $scopeRef = $this->nullableText($request['scope_ref'] ?? null);
+        if ($id === null && ($scope === null || $scopeRef === null)) {
+            throw new RuntimeException('periodic_evaluation_identity_required');
+        }
+
+        if ($target === 'waived' && $this->nullableText($request['waiver_signature_event_id'] ?? null) === null) {
+            throw new RuntimeException('waiver_signature_event_required');
+        }
+        if (in_array($target, ['passed', 'failed'], true)
+            && $this->nullableText($request['integrity_digest_id'] ?? null) === null
+            && $this->nullableText($request['audit_pack_export_id'] ?? null) === null) {
+            throw new RuntimeException('periodic_evaluation_closure_evidence_required');
+        }
+
+        $row = $this->db->queryOne(
+            "UPDATE periodic_evaluations
+             SET evaluation_state = :evaluation_state,
+                 started_at = COALESCE(started_at, now()),
+                 completed_at = now(),
+                 result_payload = COALESCE(result_payload, '{}'::jsonb) || CAST(:result_payload AS jsonb),
+                 integrity_digest_id = COALESCE(CAST(:integrity_digest_id AS uuid), integrity_digest_id),
+                 audit_pack_export_id = COALESCE(CAST(:audit_pack_export_id AS uuid), audit_pack_export_id),
+                 waiver_signature_event_id = COALESCE(CAST(:waiver_signature_event_id AS uuid), waiver_signature_event_id),
+                 updated_at = now()
+             WHERE (:periodic_evaluation_id IS NOT NULL AND periodic_evaluation_id::text = :periodic_evaluation_id)
+                OR (:evaluation_scope IS NOT NULL AND :scope_ref IS NOT NULL AND evaluation_scope = :evaluation_scope AND scope_ref = :scope_ref)
+             RETURNING *",
+            [
+                ':evaluation_state' => $target,
+                ':periodic_evaluation_id' => $id,
+                ':evaluation_scope' => $scope,
+                ':scope_ref' => $scopeRef,
+                ':result_payload' => json_encode((array)($request['result_payload'] ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':integrity_digest_id' => $this->nullableUuid($request['integrity_digest_id'] ?? null),
+                ':audit_pack_export_id' => $this->nullableUuid($request['audit_pack_export_id'] ?? null),
+                ':waiver_signature_event_id' => $this->nullableUuid($request['waiver_signature_event_id'] ?? null),
+            ],
+        );
+
+        if (!is_array($row)) {
+            throw new RuntimeException('periodic_evaluation_not_found');
+        }
+        return $this->decodeJsonColumns($row);
+    }
+
     private function requireDb(): void
     {
         if ($this->db === null || !method_exists($this->db, 'query')) {
@@ -131,5 +190,16 @@ final class PeriodicEvaluationService
         }
         $text = trim((string)$value);
         return $text === '' ? null : $text;
+    }
+
+    private function nullableUuid(mixed $value): ?string
+    {
+        $text = $this->nullableText($value);
+        return $text !== null && preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    private function state(mixed $value): string
+    {
+        return strtolower(trim(is_scalar($value) ? (string)$value : ''));
     }
 }

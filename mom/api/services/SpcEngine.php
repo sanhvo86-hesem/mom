@@ -997,7 +997,7 @@ final class SpcEngine
         }
 
         $c4 = self::C4[$subgroupSize] ?? 0.9400;
-        $sigmaWithin = $c4 > 0 ? $sBar / $c4 : 0;
+        $sigmaWithin = $sBar / $c4;
 
         return new ControlChartData(
             chartType:  'xbar_s',
@@ -1245,6 +1245,6 @@ final class SpcEngine
         $rBar   = $this->mean($ranges);
         $d2     = self::D2[$subgroupSize] ?? 2.326;
 
-        return $d2 > 0 ? $rBar / $d2 : $this->stdDev($measurements);
+        return $rBar / $d2;
     }
 }
