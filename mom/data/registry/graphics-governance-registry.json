@@ -1,0 +1,3485 @@
+{
+    "_meta": {
+        "generatedAt": "2026-04-13T10:18:11+00:00",
+        "source": "graphics_governance_backend",
+        "authorityLayer": "system_contract_registry",
+        "authority": "mom/design/template-registry.json",
+        "workspaceDraftUsed": false,
+        "schemaAuthorityModel": "mom/docs/schema-authority-model.md"
+    },
+    "templateRegistry": {
+        "version": "2026.04.11-p0",
+        "etag": "sha256:7cb80a3cb5e2d3af555ed925eb559b03",
+        "sourcePath": "mom/design/template-registry.json",
+        "templates": [
+            {
+                "templateId": "T13",
+                "canonicalId": "T-list-report-sales-order-control",
+                "legacyCode": "T13",
+                "aliases": [
+                    "T13",
+                    "sales-order-control",
+                    "M2-orders-default"
+                ],
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "moduleArchetype": "list-report-workspace",
+                "description": {
+                    "vi": "Workspace điều hành đơn hàng có KPI, bộ lọc, bảng chính, form phát hành, cây truy xuất, lifecycle và timeline.",
+                    "en": "Order-control workspace with KPIs, filters, primary register, release forms, traceability tree, lifecycle, and timeline."
+                },
+                "zones": [
+                    {
+                        "zoneId": "notice",
+                        "type": "contextual-guidance",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "summary",
+                        "type": "kpi-summary",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "filter",
+                        "type": "query-controls",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "primary",
+                        "type": "primary-work-surface",
+                        "required": true
+                    },
+                    {
+                        "zoneId": "form",
+                        "type": "transaction-entry",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "detail",
+                        "type": "record-detail",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "workflow",
+                        "type": "state-transition",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "actions",
+                        "type": "command-surface",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "timeline",
+                        "type": "activity-history",
+                        "required": false
+                    }
+                ],
+                "allowedBlocksByZone": {
+                    "notice": [
+                        "info-banner"
+                    ],
+                    "summary": [
+                        "kpi-row"
+                    ],
+                    "filter": [
+                        "filter-bar"
+                    ],
+                    "primary": [
+                        "data-table",
+                        "data-tree"
+                    ],
+                    "form": [
+                        "form-standard"
+                    ],
+                    "detail": [
+                        "data-detail"
+                    ],
+                    "workflow": [
+                        "action-status-flow"
+                    ],
+                    "actions": [
+                        "action-toolbar"
+                    ],
+                    "timeline": [
+                        "data-timeline"
+                    ]
+                },
+                "defaultDensity": "default",
+                "supportedDensities": [
+                    "compact",
+                    "default",
+                    "comfortable",
+                    "shopfloor"
+                ],
+                "themePolicy": {
+                    "modes": [
+                        "light",
+                        "dark",
+                        "high-contrast"
+                    ],
+                    "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
+                    "inlineStylePolicy": "forbidden-after-P0-exception-window",
+                    "requiredTokenGroups": [
+                        "color",
+                        "surface",
+                        "spacing",
+                        "radius",
+                        "shadow",
+                        "type",
+                        "state"
+                    ]
+                },
+                "responsivePolicy": {
+                    "breakpoints": [
+                        "320",
+                        "390",
+                        "768",
+                        "1024",
+                        "1440",
+                        "1920"
+                    ],
+                    "zoomLevels": [
+                        "100",
+                        "200",
+                        "400"
+                    ],
+                    "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "gateRef": "mom/design/qa-gates.json",
+                    "validator": "mom/tools/design/validate-frontend-contracts.mjs",
+                    "lastReviewedAt": "2026-04-11T00:00:00+07:00"
+                }
+            },
+            {
+                "templateId": "T29",
+                "canonicalId": "T-list-report-purchasing-po-control",
+                "legacyCode": "T29",
+                "aliases": [
+                    "T29",
+                    "purchasing-po-control",
+                    "M4-purchasing-default"
+                ],
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "moduleArchetype": "list-report-workspace",
+                "description": {
+                    "vi": "Workspace mua hàng có chuẩn nhập liệu supplier PO, danh sách PO, PO line, receiving/IQC, lifecycle và traceability.",
+                    "en": "Purchasing workspace for supplier PO governance, PO register, PO lines, receiving/IQC, lifecycle, and traceability."
+                },
+                "zones": [
+                    {
+                        "zoneId": "notice",
+                        "type": "contextual-guidance",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "summary",
+                        "type": "kpi-summary",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "filter",
+                        "type": "query-controls",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "primary",
+                        "type": "primary-work-surface",
+                        "required": true
+                    },
+                    {
+                        "zoneId": "form",
+                        "type": "transaction-entry",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "detail",
+                        "type": "record-detail",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "workflow",
+                        "type": "state-transition",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "actions",
+                        "type": "command-surface",
+                        "required": false
+                    },
+                    {
+                        "zoneId": "timeline",
+                        "type": "activity-history",
+                        "required": false
+                    }
+                ],
+                "allowedBlocksByZone": {
+                    "notice": [
+                        "info-banner"
+                    ],
+                    "summary": [
+                        "kpi-row"
+                    ],
+                    "filter": [
+                        "filter-bar"
+                    ],
+                    "primary": [
+                        "data-table",
+                        "data-tree"
+                    ],
+                    "form": [
+                        "form-standard"
+                    ],
+                    "detail": [
+                        "data-detail"
+                    ],
+                    "workflow": [
+                        "action-status-flow"
+                    ],
+                    "actions": [
+                        "action-toolbar"
+                    ],
+                    "timeline": [
+                        "data-timeline"
+                    ]
+                },
+                "defaultDensity": "default",
+                "supportedDensities": [
+                    "compact",
+                    "default",
+                    "comfortable",
+                    "shopfloor"
+                ],
+                "themePolicy": {
+                    "modes": [
+                        "light",
+                        "dark",
+                        "high-contrast"
+                    ],
+                    "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
+                    "inlineStylePolicy": "forbidden-after-P0-exception-window",
+                    "requiredTokenGroups": [
+                        "color",
+                        "surface",
+                        "spacing",
+                        "radius",
+                        "shadow",
+                        "type",
+                        "state"
+                    ]
+                },
+                "responsivePolicy": {
+                    "breakpoints": [
+                        "320",
+                        "390",
+                        "768",
+                        "1024",
+                        "1440",
+                        "1920"
+                    ],
+                    "zoomLevels": [
+                        "100",
+                        "200",
+                        "400"
+                    ],
+                    "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "gateRef": "mom/design/qa-gates.json",
+                    "validator": "mom/tools/design/validate-frontend-contracts.mjs",
+                    "lastReviewedAt": "2026-04-11T00:00:00+07:00"
+                }
+            }
+        ]
+    },
+    "componentContractRegistry": {
+        "_meta": {
+            "generatedAt": "2026-04-13T10:18:11+00:00",
+            "authority": "mom/design/block-contracts",
+            "authorityRole": "component_contract_registry",
+            "componentModel": "frontend_block_contracts"
+        },
+        "contracts": [
+            {
+                "blockType": "action-status-flow",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "workflow"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "workflow",
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "title",
+                        "visibleWhen",
+                        "confirmation",
+                        "diagram"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET",
+                        "POST"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "workflow.transitionApi",
+                        "workflow.stateField"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "state-transition-requested",
+                        "state-transition-confirmed",
+                        "state-transition-rejected"
+                    ],
+                    "consumes": [
+                        "record-selected"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show disabled transition buttons and busy status.",
+                    "empty": "Show no selectable record message.",
+                    "error": "Show transition error with retry affordance.",
+                    "readonly": "Show current state and hide mutation actions.",
+                    "disabled": "Disable transitions and preserve state labels.",
+                    "permissionDenied": "Show permission-safe message without exposing hidden transitions."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "transition"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "disclosure-or-toolbar",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Use block title or workflow entity name.",
+                    "keyboard": {
+                        "tab": "Move through available transitions in DOM order.",
+                        "enterSpace": "Open confirmation or submit transition.",
+                        "escape": "Close confirmation and restore focus to originating action."
+                    },
+                    "focus": {
+                        "entry": "Focus first enabled transition after record selection only when user requested the flow.",
+                        "restore": "Return focus to triggering transition after confirmation closes.",
+                        "visibleIndicator": "Use --brand-2 outline with at least 3:1 non-text contrast."
+                    },
+                    "announcements": {
+                        "success": "Announce completed state change through polite live region.",
+                        "failure": "Announce failed transition through assertive live region."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "aria-errormessage on confirmation inputs when reason/comment validation fails."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem in compact density; larger where space allows."
+                    },
+                    "contrast": {
+                        "nonTextMinimum": "3:1",
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedConnectors": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-valid-attr",
+                        "button-name",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Keyboard execute allowed transition",
+                        "Keyboard cancel confirmation",
+                        "Screen reader announces new state"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Stack state chips above actions.",
+                    "desktop": "Show horizontal flow when width permits.",
+                    "overflow": "Never hide a required transition without an overflow menu."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--brand-2",
+                        "--text-primary",
+                        "--border",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print current state, transition history summary and approval evidence.",
+                    "export": [
+                        "current_state",
+                        "last_transition_at",
+                        "last_transition_by"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-action-status-flow",
+                    "transitionButton": "status-transition-action",
+                    "liveRegion": "status-flow-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G08",
+                        "G13",
+                        "G14"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/action-status-flow.json"
+            },
+            {
+                "blockType": "action-toolbar",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "actions"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "buttons"
+                    ],
+                    "optional": [
+                        "alignment",
+                        "overflow",
+                        "sticky",
+                        "density"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "none",
+                    "allowedMethods": [],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "action-click",
+                        "navigate-tab",
+                        "command-submitted"
+                    ],
+                    "consumes": [
+                        "selection-changed",
+                        "permission-changed"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable mutating buttons and preserve navigation buttons if safe.",
+                    "empty": "Show only create/navigation actions.",
+                    "error": "Keep safe actions available and expose retry where configured.",
+                    "readonly": "Hide or disable mutating actions.",
+                    "disabled": "Disable all actions with visible reason.",
+                    "permissionDenied": "Remove disallowed actions from tab order."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "button.action or binding action"
+                },
+                "a11yContract": {
+                    "role": "toolbar",
+                    "apgPattern": "toolbar",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "2.5.8",
+                        "4.1.2"
+                    ],
+                    "accessibleName": "Toolbar label from block title or module title.",
+                    "keyboard": {
+                        "tab": "Enter and leave toolbar.",
+                        "arrowKeys": "Move between toolbar buttons when roving tabindex is enabled.",
+                        "enterSpace": "Activate focused command."
+                    },
+                    "focus": {
+                        "entry": "First enabled visible button.",
+                        "restore": "Return to invoking button after dialogs or navigation failure.",
+                        "visibleIndicator": "Tokenized focus ring visible in light, dark and forced-colors."
+                    },
+                    "announcements": {
+                        "actionStarted": "Announce async action start only for long-running operations.",
+                        "actionCompleted": "Announce success/failure through shared live region."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "If a command opens a form, form contract owns field errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem in compact density"
+                    },
+                    "contrast": {
+                        "nonTextMinimum": "3:1",
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedOverflow": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "button-name",
+                        "aria-allowed-attr",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Tab into toolbar",
+                        "Activate primary action",
+                        "Verify hidden permission action is not focusable"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Collapse low-priority commands into accessible overflow menu.",
+                    "desktop": "Show primary and secondary actions inline.",
+                    "overflow": "Overflow menu must be keyboard reachable."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--brand",
+                        "--brand-2",
+                        "--button-bg",
+                        "--button-text",
+                        "--focus-ring"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Toolbar is omitted from print unless configured as evidence actions.",
+                    "export": []
+                },
+                "testIds": {
+                    "root": "block-action-toolbar",
+                    "button": "toolbar-action",
+                    "overflow": "toolbar-overflow"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G08",
+                        "G13"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/action-toolbar.json"
+            },
+            {
+                "blockType": "data-detail",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "detail"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource",
+                        "fields"
+                    ],
+                    "optional": [
+                        "layout",
+                        "detail",
+                        "visibleWhen",
+                        "emptyMessage"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "detail-loaded",
+                        "detail-error"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show skeleton rows with aria-busy.",
+                    "empty": "Show select-record or no-record message.",
+                    "error": "Show error summary with retry.",
+                    "readonly": "Render values only.",
+                    "disabled": "Keep values readable and disable embedded actions.",
+                    "permissionDenied": "Show redacted state without leaking field values."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "detail"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "description-list",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "1.4.10",
+                        "2.4.6",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Detail title or selected record label.",
+                    "keyboard": {
+                        "tab": "Move through interactive detail fields and links.",
+                        "shortcuts": "No custom shortcut without visible help."
+                    },
+                    "focus": {
+                        "entry": "Do not steal focus after passive record selection.",
+                        "restore": "Return focus to selected table row when detail closes.",
+                        "visibleIndicator": "Visible on links and copy buttons."
+                    },
+                    "announcements": {
+                        "loaded": "Announce selected record title when detail changes after user action."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "Inline editable fields delegate to form-standard contract."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for copy/open controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedExpand": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "region",
+                        "color-contrast",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Select record",
+                        "Read detail heading",
+                        "Verify no focus loss on refresh"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column label/value stack.",
+                    "desktop": "Grid layout allowed with logical reading order.",
+                    "overflow": "Long values wrap unless explicitly marked as code."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--border",
+                        "--bg-surface"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print all visible fields with labels.",
+                    "export": [
+                        "field_key",
+                        "field_label",
+                        "field_value"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-detail",
+                    "field": "detail-field",
+                    "retry": "detail-retry"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-detail.json"
+            },
+            {
+                "blockType": "data-table",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "primary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource",
+                        "columns"
+                    ],
+                    "optional": [
+                        "rowActions",
+                        "selection",
+                        "pagination",
+                        "emptyState",
+                        "stickyColumns"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "row-select",
+                        "row-action",
+                        "sort-change",
+                        "page-change"
+                    ],
+                    "consumes": [
+                        "filters-changed",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show skeleton rows, keep header visible and set aria-busy.",
+                    "empty": "Show empty state with optional create action.",
+                    "error": "Show table-level error and retry.",
+                    "readonly": "Hide mutating row actions.",
+                    "disabled": "Disable selection and row actions.",
+                    "permissionDenied": "Hide table data and show permission-safe message."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "grid",
+                    "apgPattern": "grid",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "1.4.10",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "2.5.8",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Use table title or module entity name.",
+                    "keyboard": {
+                        "tab": "Enter table controls and leave grid.",
+                        "arrowKeys": "Move between cells when grid navigation is enabled.",
+                        "enter": "Select row or activate focused row action.",
+                        "homeEnd": "Move to first or last cell in row."
+                    },
+                    "focus": {
+                        "entry": "First row or first table control.",
+                        "restore": "Return to selected row after detail panel closes.",
+                        "visibleIndicator": "Cell and row focus indicator must meet 3:1 non-text contrast."
+                    },
+                    "announcements": {
+                        "sort": "Announce column sort direction.",
+                        "filter": "Debounce result-count announcements by 500ms.",
+                        "selection": "Announce selected row count."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Editable grid cells must use aria-invalid and aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for row actions and selection controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedRowInsert": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "JAWS/Chrome",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-required-children",
+                        "aria-required-parent",
+                        "color-contrast",
+                        "button-name"
+                    ],
+                    "manualTestScript": [
+                        "Keyboard sort column",
+                        "Select row and open detail",
+                        "Verify result-count live region after filter"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Preserve key columns, expose remaining fields through row detail.",
+                    "desktop": "Allow pinned columns and horizontal scroll with visible affordance.",
+                    "overflow": "Horizontal scroll region must be keyboard reachable and labelled."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--table-header-bg",
+                        "--table-row-hover",
+                        "--border",
+                        "--focus-ring",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print current filters, visible columns and record count.",
+                    "export": [
+                        "visible_columns",
+                        "sort",
+                        "filters",
+                        "selected_rows"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-table",
+                    "row": "data-table-row",
+                    "sortButton": "data-table-sort",
+                    "liveRegion": "data-table-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-table.json"
+            },
+            {
+                "blockType": "data-timeline",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "timeline"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "title",
+                        "groupBy",
+                        "timeField",
+                        "actorField",
+                        "eventRenderer"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "timeline-event-click",
+                        "range-change"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show timeline skeleton and aria-busy.",
+                    "empty": "Show no activity message.",
+                    "error": "Show error with retry.",
+                    "readonly": "Default mode; no mutation controls.",
+                    "disabled": "Render entries but disable interactive drill-down.",
+                    "permissionDenied": "Hide restricted activity details."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "feed",
+                    "apgPattern": "feed",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.10",
+                        "2.1.1",
+                        "2.4.6",
+                        "4.1.2"
+                    ],
+                    "accessibleName": "Timeline title.",
+                    "keyboard": {
+                        "tab": "Move through interactive events.",
+                        "enterSpace": "Open event detail."
+                    },
+                    "focus": {
+                        "entry": "Do not steal focus on passive refresh.",
+                        "restore": "Return to event item after detail closes.",
+                        "visibleIndicator": "Event focus ring uses tokenized outline."
+                    },
+                    "announcements": {
+                        "newEvents": "Announce newly loaded events only when user requested refresh."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No field-level errors in read-only timeline."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for event actions"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedConnectors": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "region",
+                        "color-contrast",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read event order",
+                        "Open event detail by keyboard",
+                        "Verify refresh announcement"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column chronological list.",
+                    "desktop": "Vertical timeline with labels; chronological order remains DOM order.",
+                    "overflow": "Long notes wrap."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--border",
+                        "--timeline-marker"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print visible timeline events in chronological order.",
+                    "export": [
+                        "event_at",
+                        "event_type",
+                        "actor",
+                        "description"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-timeline",
+                    "event": "timeline-event",
+                    "retry": "timeline-retry"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-timeline.json"
+            },
+            {
+                "blockType": "data-tree",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "primary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "nodeLabel",
+                        "nodeId",
+                        "childrenKey",
+                        "selectionMode",
+                        "expandDepth"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "node-expand",
+                        "node-collapse",
+                        "node-select"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show tree skeleton and aria-busy.",
+                    "empty": "Show no hierarchy message.",
+                    "error": "Show error with retry.",
+                    "readonly": "Allow navigation, disable mutation.",
+                    "disabled": "Disable selection but keep hierarchy readable.",
+                    "permissionDenied": "Hide restricted nodes and show redaction reason."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "tree",
+                    "apgPattern": "treeview",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Tree title or hierarchy name.",
+                    "keyboard": {
+                        "arrowRight": "Expand node or move to first child.",
+                        "arrowLeft": "Collapse node or move to parent.",
+                        "arrowUpDown": "Move between visible nodes.",
+                        "enterSpace": "Select focused node."
+                    },
+                    "focus": {
+                        "entry": "Selected node or first root node.",
+                        "restore": "Return to selected node after detail closes.",
+                        "visibleIndicator": "Node focus indicator visible in all themes."
+                    },
+                    "announcements": {
+                        "selection": "Announce selected node and level.",
+                        "expandCollapse": "Expose aria-expanded state."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No inline field errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for expand/collapse controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedExpand": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-required-children",
+                        "aria-required-parent",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Expand and collapse by keyboard",
+                        "Select child node",
+                        "Verify aria-level and aria-expanded"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Horizontal indent remains readable; provide detail drill-in for deep trees.",
+                    "desktop": "Tree may sit beside detail panel.",
+                    "overflow": "Do not truncate node labels without accessible full label."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--tree-indent",
+                        "--focus-ring",
+                        "--text-primary",
+                        "--border"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print expanded hierarchy path for selected record.",
+                    "export": [
+                        "node_id",
+                        "parent_id",
+                        "level",
+                        "label"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-tree",
+                    "node": "tree-node",
+                    "toggle": "tree-toggle"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-tree.json"
+            },
+            {
+                "blockType": "filter-bar",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "filter"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "filters"
+                    ],
+                    "optional": [
+                        "showApply",
+                        "showReset",
+                        "savedViews",
+                        "density"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "filter-change",
+                        "filter-apply",
+                        "filter-reset",
+                        "filter-save"
+                    ],
+                    "consumes": [
+                        "saved-filter-selected"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable async option fields only.",
+                    "empty": "Render configured filters; empty applies to downstream result.",
+                    "error": "Show option-load error per field.",
+                    "readonly": "Render selected filters as chips.",
+                    "disabled": "Disable all filter controls.",
+                    "permissionDenied": "Hide filters for fields user cannot query."
+                },
+                "permissionContract": {
+                    "requiresPermission": false,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "search",
+                    "apgPattern": "form",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.6",
+                        "2.5.8",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Filter controls for current module.",
+                    "keyboard": {
+                        "tab": "Move through controls in visual order.",
+                        "enter": "Submit search only where expected.",
+                        "escape": "Close dropdowns without clearing values."
+                    },
+                    "focus": {
+                        "entry": "First filter only when user jumps to filter landmark.",
+                        "restore": "Return to field after async option load.",
+                        "visibleIndicator": "Field focus ring uses tokenized outline."
+                    },
+                    "announcements": {
+                        "resultCount": "Debounce result-count live region by 500ms after filter changes.",
+                        "reset": "Announce filters reset."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Field errors use aria-invalid and aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for controls and clear buttons"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedDropdown": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "label",
+                        "form-field-multiple-labels",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Apply filter by keyboard",
+                        "Reset filters",
+                        "Verify live result-count debounce"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Collapse into filter drawer with labelled trigger.",
+                    "desktop": "Inline controls with wrapping.",
+                    "overflow": "No hidden active filter; active filters show as removable chips."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--input-bg",
+                        "--input-border",
+                        "--focus-ring",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print active filters above result set.",
+                    "export": [
+                        "filter_key",
+                        "filter_value"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-filter-bar",
+                    "field": "filter-field",
+                    "apply": "filter-apply",
+                    "liveRegion": "filter-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/filter-bar.json"
+            },
+            {
+                "blockType": "form-standard",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "form"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "fields"
+                    ],
+                    "optional": [
+                        "submit",
+                        "validation",
+                        "layout",
+                        "draftSave",
+                        "successAction"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH"
+                    ],
+                    "requiredBindings": [
+                        "submit.api when submit is configured"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "form-submit",
+                        "form-success",
+                        "form-error",
+                        "field-change"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "draft-loaded"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable submit and show busy state.",
+                    "empty": "Render blank form with required field guidance.",
+                    "error": "Show form summary and field-level errors.",
+                    "readonly": "Render read-only values and hide submit.",
+                    "disabled": "Disable controls while preserving values.",
+                    "permissionDenied": "Hide form fields or render no-permission state."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "create or update"
+                },
+                "a11yContract": {
+                    "role": "form",
+                    "apgPattern": "form",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.6",
+                        "2.5.8",
+                        "3.3.1",
+                        "3.3.2",
+                        "3.3.3",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Form title.",
+                    "keyboard": {
+                        "tab": "Move through fields in logical order.",
+                        "enter": "Submit only where form policy allows.",
+                        "escape": "Close dropdowns or cancel dialog without losing data."
+                    },
+                    "focus": {
+                        "entry": "First invalid field after validation, otherwise first editable field.",
+                        "restore": "Return focus to submit after save success unless navigation is configured.",
+                        "visibleIndicator": "Every interactive control has visible focus."
+                    },
+                    "announcements": {
+                        "validation": "Announce error summary in assertive region.",
+                        "success": "Announce save success in polite region."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Every invalid field uses aria-invalid and aria-errormessage pointing to role=alert error text."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for controls in compact density"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedValidation": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "JAWS/Chrome",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "label",
+                        "aria-valid-attr",
+                        "aria-errormessage",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Submit empty form",
+                        "Navigate error summary",
+                        "Correct field and resubmit"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column fields and sticky submit area only when it does not obscure content.",
+                    "desktop": "Two-column layout allowed with DOM order matching reading order.",
+                    "overflow": "Error text wraps and never clips."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--input-bg",
+                        "--input-border",
+                        "--focus-ring",
+                        "--state-danger",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print submitted values and audit metadata when configured.",
+                    "export": [
+                        "field_key",
+                        "field_value",
+                        "validation_status"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-form-standard",
+                    "field": "form-field",
+                    "error": "form-field-error",
+                    "submit": "form-submit"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08",
+                        "G13",
+                        "G14"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/form-standard.json"
+            },
+            {
+                "blockType": "info-banner",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "notice"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "text"
+                    ],
+                    "optional": [
+                        "type",
+                        "dismissable",
+                        "icon",
+                        "visibleWhen",
+                        "actions"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "none",
+                    "allowedMethods": [],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "banner-dismiss",
+                        "banner-action"
+                    ],
+                    "consumes": [
+                        "context-changed"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Render static content unless text binding depends on loading context.",
+                    "empty": "Banner may be hidden when text resolves empty.",
+                    "error": "Show safe fallback text.",
+                    "readonly": "Default mode.",
+                    "disabled": "Dismiss/action controls disabled.",
+                    "permissionDenied": "Do not render restricted contextual data."
+                },
+                "permissionContract": {
+                    "requiresPermission": false,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "view"
+                },
+                "a11yContract": {
+                    "role": "note",
+                    "apgPattern": "alert-or-status",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.3",
+                        "2.4.6",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Banner type and first text sentence.",
+                    "keyboard": {
+                        "tab": "Only focus dismiss/action controls.",
+                        "enterSpace": "Activate focused banner action."
+                    },
+                    "focus": {
+                        "entry": "Banner never steals focus.",
+                        "restore": "After dismiss, move focus to next logical control.",
+                        "visibleIndicator": "Dismiss/action focus visible."
+                    },
+                    "announcements": {
+                        "dynamic": "Use role=status for non-critical updates and role=alert only for urgent errors."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "Banner may summarize form errors but fields own aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for dismiss/action controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedDismiss": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "color-contrast",
+                        "button-name",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read banner by screen reader",
+                        "Dismiss by keyboard",
+                        "Verify no unexpected focus jump"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Wrap text and keep actions below content.",
+                    "desktop": "Inline icon, text and actions allowed.",
+                    "overflow": "Never truncate warning or error text."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--state-info",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print non-dismissed warning/error banners.",
+                    "export": [
+                        "banner_type",
+                        "text"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-info-banner",
+                    "dismiss": "info-banner-dismiss",
+                    "action": "info-banner-action"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/info-banner.json"
+            },
+            {
+                "blockType": "kpi-row",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "summary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "items"
+                    ],
+                    "optional": [
+                        "dataSource",
+                        "layout",
+                        "trend",
+                        "drilldown"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api when dynamic"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "kpi-click",
+                        "drill-down"
+                    ],
+                    "consumes": [
+                        "filters-changed",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show KPI skeleton cards and aria-busy.",
+                    "empty": "Show no KPI data message or zero state where business-approved.",
+                    "error": "Show KPI-level error and retry.",
+                    "readonly": "Default mode.",
+                    "disabled": "Disable drill-down actions.",
+                    "permissionDenied": "Hide sensitive KPIs or show redacted card."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "group",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.3",
+                        "1.4.10",
+                        "2.4.6",
+                        "2.5.8",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "KPI group title.",
+                    "keyboard": {
+                        "tab": "Focus only drillable KPI cards.",
+                        "enterSpace": "Open KPI drilldown."
+                    },
+                    "focus": {
+                        "entry": "First drillable KPI only on user navigation.",
+                        "restore": "Return to KPI card after drilldown closes.",
+                        "visibleIndicator": "KPI card focus outline visible."
+                    },
+                    "announcements": {
+                        "refresh": "Announce changed KPI values only after user-triggered refresh."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No field-level errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for drilldown actions"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedCounters": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "color-contrast",
+                        "button-name",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read KPI label/value/unit",
+                        "Open drilldown by keyboard",
+                        "Verify changed value announcement"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Two-column or single-column cards with stable height.",
+                    "desktop": "Responsive row with equal card widths.",
+                    "overflow": "Long labels wrap and values stay visible."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--kpi-bg",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print KPI label, value, unit, period and threshold state.",
+                    "export": [
+                        "kpi_key",
+                        "value",
+                        "unit",
+                        "threshold_state"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-kpi-row",
+                    "item": "kpi-item",
+                    "drilldown": "kpi-drilldown"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/kpi-row.json"
+            }
+        ],
+        "contractsByType": {
+            "action-status-flow": {
+                "blockType": "action-status-flow",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "workflow"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "workflow",
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "title",
+                        "visibleWhen",
+                        "confirmation",
+                        "diagram"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET",
+                        "POST"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "workflow.transitionApi",
+                        "workflow.stateField"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "state-transition-requested",
+                        "state-transition-confirmed",
+                        "state-transition-rejected"
+                    ],
+                    "consumes": [
+                        "record-selected"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show disabled transition buttons and busy status.",
+                    "empty": "Show no selectable record message.",
+                    "error": "Show transition error with retry affordance.",
+                    "readonly": "Show current state and hide mutation actions.",
+                    "disabled": "Disable transitions and preserve state labels.",
+                    "permissionDenied": "Show permission-safe message without exposing hidden transitions."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "transition"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "disclosure-or-toolbar",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Use block title or workflow entity name.",
+                    "keyboard": {
+                        "tab": "Move through available transitions in DOM order.",
+                        "enterSpace": "Open confirmation or submit transition.",
+                        "escape": "Close confirmation and restore focus to originating action."
+                    },
+                    "focus": {
+                        "entry": "Focus first enabled transition after record selection only when user requested the flow.",
+                        "restore": "Return focus to triggering transition after confirmation closes.",
+                        "visibleIndicator": "Use --brand-2 outline with at least 3:1 non-text contrast."
+                    },
+                    "announcements": {
+                        "success": "Announce completed state change through polite live region.",
+                        "failure": "Announce failed transition through assertive live region."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "aria-errormessage on confirmation inputs when reason/comment validation fails."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem in compact density; larger where space allows."
+                    },
+                    "contrast": {
+                        "nonTextMinimum": "3:1",
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedConnectors": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-valid-attr",
+                        "button-name",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Keyboard execute allowed transition",
+                        "Keyboard cancel confirmation",
+                        "Screen reader announces new state"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Stack state chips above actions.",
+                    "desktop": "Show horizontal flow when width permits.",
+                    "overflow": "Never hide a required transition without an overflow menu."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--brand-2",
+                        "--text-primary",
+                        "--border",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print current state, transition history summary and approval evidence.",
+                    "export": [
+                        "current_state",
+                        "last_transition_at",
+                        "last_transition_by"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-action-status-flow",
+                    "transitionButton": "status-transition-action",
+                    "liveRegion": "status-flow-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G08",
+                        "G13",
+                        "G14"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/action-status-flow.json"
+            },
+            "action-toolbar": {
+                "blockType": "action-toolbar",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "actions"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "buttons"
+                    ],
+                    "optional": [
+                        "alignment",
+                        "overflow",
+                        "sticky",
+                        "density"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "none",
+                    "allowedMethods": [],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "action-click",
+                        "navigate-tab",
+                        "command-submitted"
+                    ],
+                    "consumes": [
+                        "selection-changed",
+                        "permission-changed"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable mutating buttons and preserve navigation buttons if safe.",
+                    "empty": "Show only create/navigation actions.",
+                    "error": "Keep safe actions available and expose retry where configured.",
+                    "readonly": "Hide or disable mutating actions.",
+                    "disabled": "Disable all actions with visible reason.",
+                    "permissionDenied": "Remove disallowed actions from tab order."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "button.action or binding action"
+                },
+                "a11yContract": {
+                    "role": "toolbar",
+                    "apgPattern": "toolbar",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "2.5.8",
+                        "4.1.2"
+                    ],
+                    "accessibleName": "Toolbar label from block title or module title.",
+                    "keyboard": {
+                        "tab": "Enter and leave toolbar.",
+                        "arrowKeys": "Move between toolbar buttons when roving tabindex is enabled.",
+                        "enterSpace": "Activate focused command."
+                    },
+                    "focus": {
+                        "entry": "First enabled visible button.",
+                        "restore": "Return to invoking button after dialogs or navigation failure.",
+                        "visibleIndicator": "Tokenized focus ring visible in light, dark and forced-colors."
+                    },
+                    "announcements": {
+                        "actionStarted": "Announce async action start only for long-running operations.",
+                        "actionCompleted": "Announce success/failure through shared live region."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "If a command opens a form, form contract owns field errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem in compact density"
+                    },
+                    "contrast": {
+                        "nonTextMinimum": "3:1",
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedOverflow": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "button-name",
+                        "aria-allowed-attr",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Tab into toolbar",
+                        "Activate primary action",
+                        "Verify hidden permission action is not focusable"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Collapse low-priority commands into accessible overflow menu.",
+                    "desktop": "Show primary and secondary actions inline.",
+                    "overflow": "Overflow menu must be keyboard reachable."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--brand",
+                        "--brand-2",
+                        "--button-bg",
+                        "--button-text",
+                        "--focus-ring"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Toolbar is omitted from print unless configured as evidence actions.",
+                    "export": []
+                },
+                "testIds": {
+                    "root": "block-action-toolbar",
+                    "button": "toolbar-action",
+                    "overflow": "toolbar-overflow"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G08",
+                        "G13"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/action-toolbar.json"
+            },
+            "data-detail": {
+                "blockType": "data-detail",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "detail"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource",
+                        "fields"
+                    ],
+                    "optional": [
+                        "layout",
+                        "detail",
+                        "visibleWhen",
+                        "emptyMessage"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "detail-loaded",
+                        "detail-error"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show skeleton rows with aria-busy.",
+                    "empty": "Show select-record or no-record message.",
+                    "error": "Show error summary with retry.",
+                    "readonly": "Render values only.",
+                    "disabled": "Keep values readable and disable embedded actions.",
+                    "permissionDenied": "Show redacted state without leaking field values."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "detail"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "description-list",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "1.4.10",
+                        "2.4.6",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Detail title or selected record label.",
+                    "keyboard": {
+                        "tab": "Move through interactive detail fields and links.",
+                        "shortcuts": "No custom shortcut without visible help."
+                    },
+                    "focus": {
+                        "entry": "Do not steal focus after passive record selection.",
+                        "restore": "Return focus to selected table row when detail closes.",
+                        "visibleIndicator": "Visible on links and copy buttons."
+                    },
+                    "announcements": {
+                        "loaded": "Announce selected record title when detail changes after user action."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "Inline editable fields delegate to form-standard contract."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for copy/open controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedExpand": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "region",
+                        "color-contrast",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Select record",
+                        "Read detail heading",
+                        "Verify no focus loss on refresh"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column label/value stack.",
+                    "desktop": "Grid layout allowed with logical reading order.",
+                    "overflow": "Long values wrap unless explicitly marked as code."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--border",
+                        "--bg-surface"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print all visible fields with labels.",
+                    "export": [
+                        "field_key",
+                        "field_label",
+                        "field_value"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-detail",
+                    "field": "detail-field",
+                    "retry": "detail-retry"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-detail.json"
+            },
+            "data-table": {
+                "blockType": "data-table",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "primary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource",
+                        "columns"
+                    ],
+                    "optional": [
+                        "rowActions",
+                        "selection",
+                        "pagination",
+                        "emptyState",
+                        "stickyColumns"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "row-select",
+                        "row-action",
+                        "sort-change",
+                        "page-change"
+                    ],
+                    "consumes": [
+                        "filters-changed",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show skeleton rows, keep header visible and set aria-busy.",
+                    "empty": "Show empty state with optional create action.",
+                    "error": "Show table-level error and retry.",
+                    "readonly": "Hide mutating row actions.",
+                    "disabled": "Disable selection and row actions.",
+                    "permissionDenied": "Hide table data and show permission-safe message."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "grid",
+                    "apgPattern": "grid",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "1.4.10",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "2.5.8",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Use table title or module entity name.",
+                    "keyboard": {
+                        "tab": "Enter table controls and leave grid.",
+                        "arrowKeys": "Move between cells when grid navigation is enabled.",
+                        "enter": "Select row or activate focused row action.",
+                        "homeEnd": "Move to first or last cell in row."
+                    },
+                    "focus": {
+                        "entry": "First row or first table control.",
+                        "restore": "Return to selected row after detail panel closes.",
+                        "visibleIndicator": "Cell and row focus indicator must meet 3:1 non-text contrast."
+                    },
+                    "announcements": {
+                        "sort": "Announce column sort direction.",
+                        "filter": "Debounce result-count announcements by 500ms.",
+                        "selection": "Announce selected row count."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Editable grid cells must use aria-invalid and aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for row actions and selection controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedRowInsert": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "JAWS/Chrome",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-required-children",
+                        "aria-required-parent",
+                        "color-contrast",
+                        "button-name"
+                    ],
+                    "manualTestScript": [
+                        "Keyboard sort column",
+                        "Select row and open detail",
+                        "Verify result-count live region after filter"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Preserve key columns, expose remaining fields through row detail.",
+                    "desktop": "Allow pinned columns and horizontal scroll with visible affordance.",
+                    "overflow": "Horizontal scroll region must be keyboard reachable and labelled."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--table-header-bg",
+                        "--table-row-hover",
+                        "--border",
+                        "--focus-ring",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print current filters, visible columns and record count.",
+                    "export": [
+                        "visible_columns",
+                        "sort",
+                        "filters",
+                        "selected_rows"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-table",
+                    "row": "data-table-row",
+                    "sortButton": "data-table-sort",
+                    "liveRegion": "data-table-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-table.json"
+            },
+            "data-timeline": {
+                "blockType": "data-timeline",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "timeline"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "title",
+                        "groupBy",
+                        "timeField",
+                        "actorField",
+                        "eventRenderer"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "timeline-event-click",
+                        "range-change"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show timeline skeleton and aria-busy.",
+                    "empty": "Show no activity message.",
+                    "error": "Show error with retry.",
+                    "readonly": "Default mode; no mutation controls.",
+                    "disabled": "Render entries but disable interactive drill-down.",
+                    "permissionDenied": "Hide restricted activity details."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "feed",
+                    "apgPattern": "feed",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.10",
+                        "2.1.1",
+                        "2.4.6",
+                        "4.1.2"
+                    ],
+                    "accessibleName": "Timeline title.",
+                    "keyboard": {
+                        "tab": "Move through interactive events.",
+                        "enterSpace": "Open event detail."
+                    },
+                    "focus": {
+                        "entry": "Do not steal focus on passive refresh.",
+                        "restore": "Return to event item after detail closes.",
+                        "visibleIndicator": "Event focus ring uses tokenized outline."
+                    },
+                    "announcements": {
+                        "newEvents": "Announce newly loaded events only when user requested refresh."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No field-level errors in read-only timeline."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for event actions"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedConnectors": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "region",
+                        "color-contrast",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read event order",
+                        "Open event detail by keyboard",
+                        "Verify refresh announcement"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column chronological list.",
+                    "desktop": "Vertical timeline with labels; chronological order remains DOM order.",
+                    "overflow": "Long notes wrap."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--border",
+                        "--timeline-marker"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print visible timeline events in chronological order.",
+                    "export": [
+                        "event_at",
+                        "event_type",
+                        "actor",
+                        "description"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-timeline",
+                    "event": "timeline-event",
+                    "retry": "timeline-retry"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-timeline.json"
+            },
+            "data-tree": {
+                "blockType": "data-tree",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "primary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "dataSource"
+                    ],
+                    "optional": [
+                        "nodeLabel",
+                        "nodeId",
+                        "childrenKey",
+                        "selectionMode",
+                        "expandDepth"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "required",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api",
+                        "dataSource.dataKey"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "node-expand",
+                        "node-collapse",
+                        "node-select"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show tree skeleton and aria-busy.",
+                    "empty": "Show no hierarchy message.",
+                    "error": "Show error with retry.",
+                    "readonly": "Allow navigation, disable mutation.",
+                    "disabled": "Disable selection but keep hierarchy readable.",
+                    "permissionDenied": "Hide restricted nodes and show redaction reason."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "tree",
+                    "apgPattern": "treeview",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.7",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Tree title or hierarchy name.",
+                    "keyboard": {
+                        "arrowRight": "Expand node or move to first child.",
+                        "arrowLeft": "Collapse node or move to parent.",
+                        "arrowUpDown": "Move between visible nodes.",
+                        "enterSpace": "Select focused node."
+                    },
+                    "focus": {
+                        "entry": "Selected node or first root node.",
+                        "restore": "Return to selected node after detail closes.",
+                        "visibleIndicator": "Node focus indicator visible in all themes."
+                    },
+                    "announcements": {
+                        "selection": "Announce selected node and level.",
+                        "expandCollapse": "Expose aria-expanded state."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No inline field errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for expand/collapse controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedExpand": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "aria-required-children",
+                        "aria-required-parent",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Expand and collapse by keyboard",
+                        "Select child node",
+                        "Verify aria-level and aria-expanded"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Horizontal indent remains readable; provide detail drill-in for deep trees.",
+                    "desktop": "Tree may sit beside detail panel.",
+                    "overflow": "Do not truncate node labels without accessible full label."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--tree-indent",
+                        "--focus-ring",
+                        "--text-primary",
+                        "--border"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print expanded hierarchy path for selected record.",
+                    "export": [
+                        "node_id",
+                        "parent_id",
+                        "level",
+                        "label"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-data-tree",
+                    "node": "tree-node",
+                    "toggle": "tree-toggle"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/data-tree.json"
+            },
+            "filter-bar": {
+                "blockType": "filter-bar",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "filter"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "filters"
+                    ],
+                    "optional": [
+                        "showApply",
+                        "showReset",
+                        "savedViews",
+                        "density"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "filter-change",
+                        "filter-apply",
+                        "filter-reset",
+                        "filter-save"
+                    ],
+                    "consumes": [
+                        "saved-filter-selected"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable async option fields only.",
+                    "empty": "Render configured filters; empty applies to downstream result.",
+                    "error": "Show option-load error per field.",
+                    "readonly": "Render selected filters as chips.",
+                    "disabled": "Disable all filter controls.",
+                    "permissionDenied": "Hide filters for fields user cannot query."
+                },
+                "permissionContract": {
+                    "requiresPermission": false,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "search",
+                    "apgPattern": "form",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.6",
+                        "2.5.8",
+                        "3.3.1",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Filter controls for current module.",
+                    "keyboard": {
+                        "tab": "Move through controls in visual order.",
+                        "enter": "Submit search only where expected.",
+                        "escape": "Close dropdowns without clearing values."
+                    },
+                    "focus": {
+                        "entry": "First filter only when user jumps to filter landmark.",
+                        "restore": "Return to field after async option load.",
+                        "visibleIndicator": "Field focus ring uses tokenized outline."
+                    },
+                    "announcements": {
+                        "resultCount": "Debounce result-count live region by 500ms after filter changes.",
+                        "reset": "Announce filters reset."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Field errors use aria-invalid and aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for controls and clear buttons"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedDropdown": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "label",
+                        "form-field-multiple-labels",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Apply filter by keyboard",
+                        "Reset filters",
+                        "Verify live result-count debounce"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Collapse into filter drawer with labelled trigger.",
+                    "desktop": "Inline controls with wrapping.",
+                    "overflow": "No hidden active filter; active filters show as removable chips."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--input-bg",
+                        "--input-border",
+                        "--focus-ring",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print active filters above result set.",
+                    "export": [
+                        "filter_key",
+                        "filter_value"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-filter-bar",
+                    "field": "filter-field",
+                    "apply": "filter-apply",
+                    "liveRegion": "filter-live-region"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/filter-bar.json"
+            },
+            "form-standard": {
+                "blockType": "form-standard",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "form"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "fields"
+                    ],
+                    "optional": [
+                        "submit",
+                        "validation",
+                        "layout",
+                        "draftSave",
+                        "successAction"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH"
+                    ],
+                    "requiredBindings": [
+                        "submit.api when submit is configured"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "form-submit",
+                        "form-success",
+                        "form-error",
+                        "field-change"
+                    ],
+                    "consumes": [
+                        "record-selected",
+                        "draft-loaded"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Disable submit and show busy state.",
+                    "empty": "Render blank form with required field guidance.",
+                    "error": "Show form summary and field-level errors.",
+                    "readonly": "Render read-only values and hide submit.",
+                    "disabled": "Disable controls while preserving values.",
+                    "permissionDenied": "Hide form fields or render no-permission state."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "create or update"
+                },
+                "a11yContract": {
+                    "role": "form",
+                    "apgPattern": "form",
+                    "wcagCriteria": [
+                        "1.3.1",
+                        "2.1.1",
+                        "2.4.3",
+                        "2.4.6",
+                        "2.5.8",
+                        "3.3.1",
+                        "3.3.2",
+                        "3.3.3",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Form title.",
+                    "keyboard": {
+                        "tab": "Move through fields in logical order.",
+                        "enter": "Submit only where form policy allows.",
+                        "escape": "Close dropdowns or cancel dialog without losing data."
+                    },
+                    "focus": {
+                        "entry": "First invalid field after validation, otherwise first editable field.",
+                        "restore": "Return focus to submit after save success unless navigation is configured.",
+                        "visibleIndicator": "Every interactive control has visible focus."
+                    },
+                    "announcements": {
+                        "validation": "Announce error summary in assertive region.",
+                        "success": "Announce save success in polite region."
+                    },
+                    "errorAssociation": {
+                        "required": true,
+                        "pattern": "Every invalid field uses aria-invalid and aria-errormessage pointing to role=alert error text."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for controls in compact density"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedValidation": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "JAWS/Chrome",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "label",
+                        "aria-valid-attr",
+                        "aria-errormessage",
+                        "color-contrast"
+                    ],
+                    "manualTestScript": [
+                        "Submit empty form",
+                        "Navigate error summary",
+                        "Correct field and resubmit"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Single-column fields and sticky submit area only when it does not obscure content.",
+                    "desktop": "Two-column layout allowed with DOM order matching reading order.",
+                    "overflow": "Error text wraps and never clips."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--input-bg",
+                        "--input-border",
+                        "--focus-ring",
+                        "--state-danger",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print submitted values and audit metadata when configured.",
+                    "export": [
+                        "field_key",
+                        "field_value",
+                        "validation_status"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-form-standard",
+                    "field": "form-field",
+                    "error": "form-field-error",
+                    "submit": "form-submit"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G08",
+                        "G13",
+                        "G14"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/form-standard.json"
+            },
+            "info-banner": {
+                "blockType": "info-banner",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "notice"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "text"
+                    ],
+                    "optional": [
+                        "type",
+                        "dismissable",
+                        "icon",
+                        "visibleWhen",
+                        "actions"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "none",
+                    "allowedMethods": [],
+                    "requiredBindings": []
+                },
+                "eventContract": {
+                    "emits": [
+                        "banner-dismiss",
+                        "banner-action"
+                    ],
+                    "consumes": [
+                        "context-changed"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Render static content unless text binding depends on loading context.",
+                    "empty": "Banner may be hidden when text resolves empty.",
+                    "error": "Show safe fallback text.",
+                    "readonly": "Default mode.",
+                    "disabled": "Dismiss/action controls disabled.",
+                    "permissionDenied": "Do not render restricted contextual data."
+                },
+                "permissionContract": {
+                    "requiresPermission": false,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "view"
+                },
+                "a11yContract": {
+                    "role": "note",
+                    "apgPattern": "alert-or-status",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.3",
+                        "2.4.6",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "Banner type and first text sentence.",
+                    "keyboard": {
+                        "tab": "Only focus dismiss/action controls.",
+                        "enterSpace": "Activate focused banner action."
+                    },
+                    "focus": {
+                        "entry": "Banner never steals focus.",
+                        "restore": "After dismiss, move focus to next logical control.",
+                        "visibleIndicator": "Dismiss/action focus visible."
+                    },
+                    "announcements": {
+                        "dynamic": "Use role=status for non-critical updates and role=alert only for urgent errors."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "Banner may summarize form errors but fields own aria-errormessage."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for dismiss/action controls"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedDismiss": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "color-contrast",
+                        "button-name",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read banner by screen reader",
+                        "Dismiss by keyboard",
+                        "Verify no unexpected focus jump"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Wrap text and keep actions below content.",
+                    "desktop": "Inline icon, text and actions allowed.",
+                    "overflow": "Never truncate warning or error text."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--state-info",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger",
+                        "--text-primary"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print non-dismissed warning/error banners.",
+                    "export": [
+                        "banner_type",
+                        "text"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-info-banner",
+                    "dismiss": "info-banner-dismiss",
+                    "action": "info-banner-action"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/info-banner.json"
+            },
+            "kpi-row": {
+                "blockType": "kpi-row",
+                "version": "1.0.0",
+                "status": "approved",
+                "owner": "Frontend Architecture Council",
+                "allowedZones": [
+                    "summary"
+                ],
+                "propsSchema": {
+                    "required": [
+                        "items"
+                    ],
+                    "optional": [
+                        "dataSource",
+                        "layout",
+                        "trend",
+                        "drilldown"
+                    ]
+                },
+                "dataSourceContract": {
+                    "mode": "optional",
+                    "allowedMethods": [
+                        "GET"
+                    ],
+                    "requiredBindings": [
+                        "dataSource.api when dynamic"
+                    ]
+                },
+                "eventContract": {
+                    "emits": [
+                        "kpi-click",
+                        "drill-down"
+                    ],
+                    "consumes": [
+                        "filters-changed",
+                        "refresh-requested"
+                    ]
+                },
+                "stateContract": {
+                    "loading": "Show KPI skeleton cards and aria-busy.",
+                    "empty": "Show no KPI data message or zero state where business-approved.",
+                    "error": "Show KPI-level error and retry.",
+                    "readonly": "Default mode.",
+                    "disabled": "Disable drill-down actions.",
+                    "permissionDenied": "Hide sensitive KPIs or show redacted card."
+                },
+                "permissionContract": {
+                    "requiresPermission": true,
+                    "permissionSource": "runtime-access-policy.json",
+                    "action": "list"
+                },
+                "a11yContract": {
+                    "role": "region",
+                    "apgPattern": "group",
+                    "wcagCriteria": [
+                        "1.1.1",
+                        "1.3.1",
+                        "1.4.3",
+                        "1.4.10",
+                        "2.4.6",
+                        "2.5.8",
+                        "4.1.2",
+                        "4.1.3"
+                    ],
+                    "accessibleName": "KPI group title.",
+                    "keyboard": {
+                        "tab": "Focus only drillable KPI cards.",
+                        "enterSpace": "Open KPI drilldown."
+                    },
+                    "focus": {
+                        "entry": "First drillable KPI only on user navigation.",
+                        "restore": "Return to KPI card after drilldown closes.",
+                        "visibleIndicator": "KPI card focus outline visible."
+                    },
+                    "announcements": {
+                        "refresh": "Announce changed KPI values only after user-triggered refresh."
+                    },
+                    "errorAssociation": {
+                        "required": false,
+                        "pattern": "No field-level errors."
+                    },
+                    "targetSize": {
+                        "minimum": "1.5rem by 1.5rem for drilldown actions"
+                    },
+                    "contrast": {
+                        "textMinimum": "4.5:1",
+                        "nonTextMinimum": "3:1"
+                    },
+                    "forcedColors": {
+                        "required": true
+                    },
+                    "reducedMotion": {
+                        "disableAnimatedCounters": true
+                    },
+                    "screenReaderMatrix": [
+                        "NVDA/Firefox",
+                        "VoiceOver/Safari"
+                    ],
+                    "automatedRules": [
+                        "color-contrast",
+                        "button-name",
+                        "aria-valid-attr"
+                    ],
+                    "manualTestScript": [
+                        "Read KPI label/value/unit",
+                        "Open drilldown by keyboard",
+                        "Verify changed value announcement"
+                    ]
+                },
+                "responsiveContract": {
+                    "compact": "Two-column or single-column cards with stable height.",
+                    "desktop": "Responsive row with equal card widths.",
+                    "overflow": "Long labels wrap and values stay visible."
+                },
+                "themeContract": {
+                    "tokensOnly": true,
+                    "requiredTokens": [
+                        "--text-primary",
+                        "--text-secondary",
+                        "--kpi-bg",
+                        "--state-success",
+                        "--state-warning",
+                        "--state-danger"
+                    ]
+                },
+                "printExportContract": {
+                    "print": "Print KPI label, value, unit, period and threshold state.",
+                    "export": [
+                        "kpi_key",
+                        "value",
+                        "unit",
+                        "threshold_state"
+                    ]
+                },
+                "testIds": {
+                    "root": "block-kpi-row",
+                    "item": "kpi-item",
+                    "drilldown": "kpi-drilldown"
+                },
+                "qaEvidence": {
+                    "status": "IMPLEMENTED",
+                    "requiredGates": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G07",
+                        "G10"
+                    ]
+                },
+                "_sourcePath": "mom/design/block-contracts/kpi-row.json"
+            }
+        },
+        "count": 10
+    },
+    "moduleGraphicsCompliance": {
+        "matrix": [
+            {
+                "moduleId": "M2-orders",
+                "route": "/orders",
+                "templateId": "T13",
+                "templateVersion": "1.0.0",
+                "buildPacket": "mom/design/build-packets/M2-orders.json",
+                "regulated": true,
+                "shopfloor": true,
+                "screens": [
+                    "overview",
+                    "create-so",
+                    "release-jo",
+                    "release-wo",
+                    "hierarchy",
+                    "contract-review",
+                    "shipping",
+                    "detail"
+                ],
+                "blockFamilies": [
+                    "kpi-row",
+                    "filter-bar",
+                    "data-table",
+                    "action-toolbar",
+                    "form-standard",
+                    "info-banner",
+                    "data-tree",
+                    "data-detail",
+                    "action-status-flow",
+                    "data-timeline"
+                ],
+                "gateState": {
+                    "requiredNow": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G06",
+                        "G13",
+                        "G17"
+                    ],
+                    "knownOpen": [
+                        "G04",
+                        "G05",
+                        "G07",
+                        "G08",
+                        "G09",
+                        "G10",
+                        "G14",
+                        "G18",
+                        "G19"
+                    ],
+                    "auditReady": false,
+                    "shopfloorReady": false,
+                    "releaseManifestRequired": true
+                },
+                "findings": [
+                    {
+                        "code": "regulated_audit_evidence_missing",
+                        "severity": "blocker"
+                    },
+                    {
+                        "code": "shopfloor_accessibility_evidence_missing",
+                        "severity": "blocker"
+                    }
+                ],
+                "compliant": false
+            },
+            {
+                "moduleId": "M4-purchasing",
+                "route": "/purchasing",
+                "templateId": "T29",
+                "templateVersion": "1.0.0",
+                "buildPacket": "mom/design/build-packets/M4-purchasing.json",
+                "regulated": true,
+                "shopfloor": true,
+                "screens": [
+                    "overview",
+                    "create-po",
+                    "po-lines",
+                    "receiving"
+                ],
+                "blockFamilies": [
+                    "info-banner",
+                    "filter-bar",
+                    "data-table",
+                    "data-detail",
+                    "action-status-flow",
+                    "action-toolbar",
+                    "form-standard"
+                ],
+                "gateState": {
+                    "requiredNow": [
+                        "G01",
+                        "G02",
+                        "G03",
+                        "G06",
+                        "G13",
+                        "G17"
+                    ],
+                    "knownOpen": [
+                        "G04",
+                        "G05",
+                        "G07",
+                        "G08",
+                        "G09",
+                        "G10",
+                        "G14",
+                        "G18",
+                        "G19"
+                    ],
+                    "auditReady": false,
+                    "shopfloorReady": false,
+                    "releaseManifestRequired": true
+                },
+                "findings": [
+                    {
+                        "code": "regulated_audit_evidence_missing",
+                        "severity": "blocker"
+                    },
+                    {
+                        "code": "shopfloor_accessibility_evidence_missing",
+                        "severity": "blocker"
+                    }
+                ],
+                "compliant": false
+            }
+        ],
+        "summary": {
+            "moduleCount": 2,
+            "compliantCount": 0,
+            "nonCompliantCount": 2
+        },
+        "version": "2026.04.11-p0",
+        "etag": "sha256:7cb80a3cb5e2d3af555ed925eb559b03"
+    },
+    "persistence": {
+        "canonicalTemplateRegistry": "mom/design/template-registry.json",
+        "canonicalBlockContracts": "mom/design/block-contracts/*.json",
+        "moduleBuildPackets": "mom/design/build-packets/*.json",
+        "runtimeRegistryMirror": "mom/data/registry/graphics-governance-registry.json",
+        "draftStore": "mom/data/graphics-governance/template-drafts/*.json",
+        "waiverRegister": "mom/data/graphics-governance/waivers.json",
+        "rolloutRegister": "mom/data/graphics-governance/rollouts.json",
+        "authorityPolicy": "Registry/design artifacts are backend authority; browser localStorage is cache only.",
+        "workspaceDraftAuthority": false
+    }
+}

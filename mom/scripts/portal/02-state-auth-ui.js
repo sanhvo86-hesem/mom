@@ -5115,7 +5115,7 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   activity:{search:'',actor:'',eventType:'',aggregateType:''}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
-const ADMIN_RUNTIME_ASSET_VERSION = '20260411l';
+const ADMIN_RUNTIME_ASSET_VERSION = '20260413a';
 const ADMIN_MANUAL_MACHINE_ENTITIES = Object.freeze([
   'work_centers',
   'machines',

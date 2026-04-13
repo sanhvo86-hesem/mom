@@ -26,6 +26,7 @@ WORKFLOW_LIBRARY = REGISTRY_DIR / "workflow-library.json"
 SCHEMA_AUTHORITY = REGISTRY_DIR / "schema-authority-summary.json"
 GLOBAL_CAPABILITY_AUDIT = REGISTRY_DIR / "global-erp-mom-capability-audit.json"
 REGISTRY_MANIFEST = REGISTRY_DIR / "registry-manifest.json"
+GRAPHICS_GOVERNANCE = REGISTRY_DIR / "graphics-governance-registry.json"
 
 RUNTIME_PROJECTIONS = REGISTRY_DIR / "system-contract-runtime-projections.json"
 REGISTRY_CONTRACTS = REGISTRY_DIR / "system-contract-registry-contracts.json"
@@ -43,6 +44,15 @@ def load_json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"Authority file must contain a JSON object: {path}")
+    return data
+
+
+def load_optional_json(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"Optional authority file must contain a JSON object: {path}")
     return data
 
 
@@ -211,6 +221,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
     schema_authority = load_json(SCHEMA_AUTHORITY)
     global_audit = load_json(GLOBAL_CAPABILITY_AUDIT)
     registry_manifest = load_json(REGISTRY_MANIFEST)
+    graphics_governance = load_optional_json(GRAPHICS_GOVERNANCE)
 
     tables = table_registry.get("tables", {})
     relation_entities = relation_map.get("entities", {})
@@ -230,6 +241,8 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         source_path(GLOBAL_CAPABILITY_AUDIT),
         source_path(REGISTRY_MANIFEST),
     ]
+    if graphics_governance:
+        source_files.append(source_path(GRAPHICS_GOVERNANCE))
     base_meta = {
         "generatedAt": now,
         "source": "system_contract_authority_generator",
@@ -412,6 +425,8 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "warningCount": len(warnings),
         "capabilityCount": int(global_summary.get("capability_count") or 0),
         "capabilityBlockingGapCount": capability_blocking_gap_count,
+        "graphicsTemplateCount": len(graphics_governance.get("templateRegistry", {}).get("templates", [])) if graphics_governance else 0,
+        "graphicsComponentContractCount": int(graphics_governance.get("componentContractRegistry", {}).get("count") or 0) if graphics_governance else 0,
         "releaseReadinessScore": 100 if len(critical_gaps) == 0 else max(0, 100 - (len(critical_gaps) * 20)),
     }
 
@@ -432,6 +447,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "workflowBindings": workflow_bindings,
         "endpointBindings": endpoint_bindings,
         "domains": domains,
+        "graphicsGovernance": graphics_governance,
     }
 
     registry_contracts = {
@@ -466,6 +482,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "schemaAuthorityMatchesRegistry": schema_authority_count == 0 or schema_authority_count == len(tables),
             "globalCapabilityBlockingGapsClosed": capability_blocking_gap_count == 0,
             "workspaceDraftUsed": False,
+            "graphicsGovernanceRegistryPresent": bool(graphics_governance),
         },
     }
 
@@ -495,6 +512,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "registryContracts": source_path(REGISTRY_CONTRACTS),
             "diagnostics": source_path(DIAGNOSTICS),
             "manifest": source_path(MANIFEST),
+            "graphicsGovernance": source_path(GRAPHICS_GOVERNANCE) if graphics_governance else "",
         },
         "sourceAuthority": {
             "databaseSchema": "public",
@@ -504,6 +522,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             "workflowSource": source_path(WORKFLOW_LIBRARY),
             "relationSource": source_path(RELATION_MAP),
             "registryManifestRunId": scalar(registry_manifest.get("_meta", {}).get("publication_run_id")),
+            "graphicsGovernanceSource": source_path(GRAPHICS_GOVERNANCE) if graphics_governance else "",
         },
         "deletePolicy": {
             "canDelete": False,

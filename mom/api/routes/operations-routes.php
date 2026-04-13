@@ -248,9 +248,15 @@ return static function (Router $router, string $dataDir): void {
     $router->actions([
         'manufacturing_event_timeline' => [ManufacturingEventController::class, 'timeline'],
         'manufacturing_event_probe'    => [ManufacturingEventController::class, 'probe'],
+        'manufacturing_history_packet' => [ManufacturingEventController::class, 'productionHistory'],
+        'manufacturing_spine_model'    => [ManufacturingSpineController::class, 'model'],
+        'manufacturing_spine_probe'    => [ManufacturingSpineController::class, 'probe'],
     ]);
     $router->get('/api/manufacturing-events/timeline', ManufacturingEventController::class, 'timeline');
     $router->get('/api/manufacturing-events/probe', ManufacturingEventController::class, 'probe');
+    $router->get('/api/manufacturing-events/production-history', ManufacturingEventController::class, 'productionHistory');
+    $router->get('/api/manufacturing-spine/model', ManufacturingSpineController::class, 'model');
+    $router->get('/api/manufacturing-spine/probe', ManufacturingSpineController::class, 'probe');
     
     // AI Quality Scheduling
     $router->actions([

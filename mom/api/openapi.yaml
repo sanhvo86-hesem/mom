@@ -120,6 +120,11 @@ tags:
       Read-only backend contract registry for frontend and AI tooling: table registry,
       endpoint catalog, workflows, status options, compliance crosswalk and global ERP+MOM audit.
       Hop dong backend read-only de frontend/AI khong phai doan logic he thong.
+  - name: Graphics Governance
+    description: |
+      Backend authority for design config, template registry, component contracts,
+      graphics compliance, impact analysis, rollout, rollback, audit and waivers.
+      Browser localStorage is cache only; the backend registry/design artifacts are authority.
 
 paths:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -3668,6 +3673,593 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+
+  /api/graphics/design-config:
+    get:
+      operationId: graphicsDesignConfigGet
+      tags: [Graphics Governance]
+      summary: Read backend-authoritative design config
+      description: |
+        Returns the governed design configuration with version and ETag.
+
+        **Legacy action:** `graphics_design_config_get`
+      responses:
+        '200':
+          description: Design config returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesignConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: graphicsDesignConfigSave
+      tags: [Graphics Governance]
+      summary: Save backend-authoritative design config
+      description: |
+        Persists design config on the backend. Requires optimistic concurrency
+        using `If-Match` or `expectedVersion`.
+
+        **Legacy action:** `graphics_design_config_save`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DesignConfigSaveRequest'
+      responses:
+        '200':
+          description: Design config saved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DesignConfigResponse'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+
+  /api/graphics/templates:
+    get:
+      operationId: graphicsTemplateRegistryGet
+      tags: [Graphics Governance]
+      summary: Read the template registry collection
+      description: |
+        Returns the canonical template registry and component contract index.
+
+        **Legacy action:** `graphics_template_registry_get`
+      responses:
+        '200':
+          description: Template registry returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateRegistryCollectionResponse'
+
+  /api/graphics/templates/{templateId}:
+    get:
+      operationId: graphicsTemplateGet
+      tags: [Graphics Governance]
+      summary: Read one template by ID or alias
+      description: |
+        **Legacy action:** `graphics_template_get`
+      parameters:
+        - $ref: '#/components/parameters/TemplateIdPath'
+      responses:
+        '200':
+          description: Template returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateEntryResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/graphics/templates/draft:
+    post:
+      operationId: graphicsTemplateDraftSave
+      tags: [Graphics Governance]
+      summary: Save a governed template draft
+      description: |
+        Persists a draft under backend governance. Drafts are controlled work
+        products, not production authority until publish.
+
+        **Legacy action:** `graphics_template_draft_save`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateDraftSaveRequest'
+      responses:
+        '200':
+          description: Draft saved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateDraftResponse'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/graphics/templates/{templateId}/clone:
+    post:
+      operationId: graphicsTemplateClone
+      tags: [Graphics Governance]
+      summary: Clone a template into a governed draft
+      description: |
+        **Legacy action:** `graphics_template_clone`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/TemplateIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateCloneRequest'
+      responses:
+        '200':
+          description: Draft clone created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateDraftResponse'
+
+  /api/graphics/templates/{templateId}/deprecate:
+    post:
+      operationId: graphicsTemplateDeprecate
+      tags: [Graphics Governance]
+      summary: Deprecate or retire a template
+      description: |
+        Requires migration plan when modules currently use the template.
+
+        **Legacy action:** `graphics_template_deprecate`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/TemplateIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateDeprecateRequest'
+      responses:
+        '200':
+          description: Template deprecated or retired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateEntryResponse'
+
+  /api/graphics/templates/{templateId}/validate:
+    post:
+      operationId: graphicsTemplateValidate
+      tags: [Graphics Governance]
+      summary: Validate a draft or registry template
+      description: |
+        Runs backend validation for unique template IDs, semantic version,
+        valid zones, allowed blocks, module references and compatibility rules.
+
+        **Legacy action:** `graphics_template_validate`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/TemplateIdPath'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateValidateRequest'
+      responses:
+        '200':
+          description: Validation result returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateValidationResponse'
+
+  /api/graphics/templates/{templateId}/publish:
+    post:
+      operationId: graphicsTemplatePublish
+      tags: [Graphics Governance]
+      summary: Publish an approved template version
+      description: |
+        Blocks publish when validation fails, impact blockers are unresolved,
+        required gate evidence is missing, release evidence is missing, or the
+        registry version check fails.
+
+        **Legacy action:** `graphics_template_publish`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/TemplateIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsPublishRequest'
+      responses:
+        '200':
+          description: Template published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsPublishResultResponse'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/graphics/templates/{templateId}/modules:
+    get:
+      operationId: graphicsTemplateModulesGet
+      tags: [Graphics Governance]
+      summary: List modules using a template
+      description: |
+        **Legacy action:** `graphics_template_modules`
+      parameters:
+        - $ref: '#/components/parameters/TemplateIdPath'
+      responses:
+        '200':
+          description: Module usage returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateModulesResponse'
+
+  /api/graphics/components/contracts:
+    get:
+      operationId: graphicsComponentContractsGet
+      tags: [Graphics Governance]
+      summary: Read component/block contract registry
+      description: |
+        **Legacy action:** `graphics_component_contract_registry`
+      responses:
+        '200':
+          description: Component contract registry returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentContractRegistryResponse'
+
+  /api/graphics/compliance/modules:
+    get:
+      operationId: graphicsComplianceMatrixGet
+      tags: [Graphics Governance]
+      summary: Read module graphics compliance matrix
+      description: |
+        **Legacy action:** `graphics_compliance_matrix`
+      responses:
+        '200':
+          description: Compliance matrix returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsComplianceMatrixResponse'
+
+  /api/graphics/compliance/non-compliant-modules:
+    get:
+      operationId: graphicsNonCompliantModulesGet
+      tags: [Graphics Governance]
+      summary: List non-compliant modules
+      description: |
+        **Legacy action:** `graphics_non_compliant_modules`
+      responses:
+        '200':
+          description: Non-compliant modules returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsNonCompliantModulesResponse'
+
+  /api/graphics/compliance/bridge-alias-debt:
+    get:
+      operationId: graphicsBridgeAliasDebtGet
+      tags: [Graphics Governance]
+      summary: Read bridge alias debt
+      description: |
+        **Legacy action:** `graphics_bridge_alias_debt`
+      responses:
+        '200':
+          description: Bridge alias debt returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsDebtResponse'
+
+  /api/graphics/compliance/private-css-debt:
+    get:
+      operationId: graphicsPrivateCssDebtGet
+      tags: [Graphics Governance]
+      summary: Read private CSS debt
+      description: |
+        **Legacy action:** `graphics_private_css_debt`
+      responses:
+        '200':
+          description: Private CSS debt returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsDebtResponse'
+
+  /api/graphics/compliance/token-adoption-coverage:
+    get:
+      operationId: graphicsTokenAdoptionCoverageGet
+      tags: [Graphics Governance]
+      summary: Read token adoption coverage
+      description: |
+        **Legacy action:** `graphics_token_adoption_coverage`
+      responses:
+        '200':
+          description: Token coverage returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenAdoptionCoverageResponse'
+
+  /api/graphics/drift:
+    get:
+      operationId: graphicsDriftGet
+      tags: [Graphics Governance]
+      summary: Read graphics drift report
+      description: |
+        **Legacy action:** `graphics_drift_report`
+      responses:
+        '200':
+          description: Drift report returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsDriftResponse'
+
+  /api/graphics/impact/token:
+    post:
+      operationId: graphicsTokenImpactAnalyze
+      tags: [Graphics Governance]
+      summary: Analyze token impact
+      description: |
+        **Legacy action:** `graphics_impact_token`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenImpactRequest'
+      responses:
+        '200':
+          description: Token impact report returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsImpactReportResponse'
+
+  /api/graphics/impact/template:
+    post:
+      operationId: graphicsTemplateImpactAnalyze
+      tags: [Graphics Governance]
+      summary: Analyze template impact
+      description: |
+        **Legacy action:** `graphics_impact_template`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateImpactRequest'
+      responses:
+        '200':
+          description: Template impact report returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsImpactReportResponse'
+
+  /api/graphics/impact/component:
+    post:
+      operationId: graphicsComponentImpactAnalyze
+      tags: [Graphics Governance]
+      summary: Analyze component impact
+      description: |
+        **Legacy action:** `graphics_impact_component`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComponentImpactRequest'
+      responses:
+        '200':
+          description: Component impact report returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsImpactReportResponse'
+
+  /api/graphics/rollouts/stage:
+    post:
+      operationId: graphicsRolloutStage
+      tags: [Graphics Governance]
+      summary: Stage graphics governance rollout
+      description: |
+        **Legacy action:** `graphics_rollout_stage`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsRolloutRequest'
+      responses:
+        '200':
+          description: Rollout staged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsRolloutResponse'
+
+  /api/graphics/rollouts/apply:
+    post:
+      operationId: graphicsRolloutApply
+      tags: [Graphics Governance]
+      summary: Apply staged graphics rollout
+      description: |
+        **Legacy action:** `graphics_rollout_apply`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsRolloutApplyRequest'
+      responses:
+        '200':
+          description: Rollout applied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsRolloutResponse'
+
+  /api/graphics/rollouts/rollback:
+    post:
+      operationId: graphicsRolloutRollback
+      tags: [Graphics Governance]
+      summary: Roll back a graphics rollout
+      description: |
+        **Legacy action:** `graphics_rollout_rollback`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsRollbackRequest'
+      responses:
+        '200':
+          description: Rollout rolled back.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsRolloutResponse'
+
+  /api/graphics/audit:
+    get:
+      operationId: graphicsAuditHistoryGet
+      tags: [Graphics Governance]
+      summary: Read graphics governance audit history
+      description: |
+        **Legacy action:** `graphics_audit_history`
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 200
+      responses:
+        '200':
+          description: Audit history returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsAuditHistoryResponse'
+
+  /api/graphics/waivers:
+    post:
+      operationId: graphicsWaiverCreate
+      tags: [Graphics Governance]
+      summary: Create graphics governance waiver
+      description: |
+        **Legacy action:** `graphics_waiver_create`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphicsWaiver'
+      responses:
+        '200':
+          description: Waiver created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsWaiverResponse'
+
+  /api/graphics/waivers/{waiverId}/approve:
+    post:
+      operationId: graphicsWaiverApprove
+      tags: [Graphics Governance]
+      summary: Approve graphics governance waiver
+      description: |
+        **Legacy action:** `graphics_waiver_approve`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/WaiverIdPath'
+      responses:
+        '200':
+          description: Waiver approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsWaiverResponse'
+
+  /api/graphics/waivers/{waiverId}/expire:
+    post:
+      operationId: graphicsWaiverExpire
+      tags: [Graphics Governance]
+      summary: Expire graphics governance waiver
+      description: |
+        **Legacy action:** `graphics_waiver_expire`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/WaiverIdPath'
+      responses:
+        '200':
+          description: Waiver expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsWaiverResponse'
+
+  /api/graphics/waivers/active:
+    get:
+      operationId: graphicsActiveWaiversGet
+      tags: [Graphics Governance]
+      summary: List active graphics governance waivers
+      description: |
+        **Legacy action:** `graphics_waivers_active`
+      responses:
+        '200':
+          description: Active waivers returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsActiveWaiversResponse'
 
   /api/runtime/{domain}/{table}:
     get:

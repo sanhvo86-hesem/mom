@@ -353,6 +353,7 @@ class RegistryController extends BaseController
             $systemContractDiagnostics = $this->rawRegistryDocument('system-contract-diagnostics');
             $systemContractRuntimeProjections = $this->rawRegistryDocument('system-contract-runtime-projections');
             $systemContractRegistryContracts = $this->rawRegistryDocument('system-contract-registry-contracts');
+            $graphicsGovernance = $this->rawRegistryDocument('graphics-governance-registry');
             $objectIndex = $this->rawContractDocument('object-index.json');
             $packageIndex = $this->rawContractDocument('package-index.json');
             $authorityReport = $this->rawContractDocument('authority-report.json');
@@ -369,6 +370,8 @@ class RegistryController extends BaseController
                 'globalCapabilityCount' => (int)($globalAudit['summary']['capability_count'] ?? 0),
                 'globalCapabilityBlockingGapCount' => (int)($globalAudit['summary']['blocking_gap_count'] ?? 0),
                 'systemContractCriticalGapCount' => (int)($systemContractDiagnostics['summary']['criticalGapCount'] ?? 0),
+                'graphicsTemplateCount' => count((array)($graphicsGovernance['templateRegistry']['templates'] ?? [])),
+                'graphicsComponentContractCount' => (int)($graphicsGovernance['componentContractRegistry']['count'] ?? 0),
             ];
 
             $this->success([
@@ -392,6 +395,7 @@ class RegistryController extends BaseController
                         'diagnostics' => $systemContractDiagnostics,
                         'runtime_projections' => $systemContractRuntimeProjections,
                         'registry_contracts' => $systemContractRegistryContracts,
+                        'graphics_governance' => $graphicsGovernance,
                     ],
                     'business_contracts' => [
                         'authority_report' => $authorityReport,
@@ -454,6 +458,7 @@ class RegistryController extends BaseController
                 'identifier_patterns' => $registry->raw('identifier-patterns'),
                 'computed_formulas' => $registry->raw('computed-formulas'),
                 'iot_connectors' => $registry->raw('iot-connectors'),
+                'graphics_governance' => $registry->raw('graphics-governance-registry'),
             ];
             $this->success([
                 'data' => $data,
@@ -476,6 +481,7 @@ class RegistryController extends BaseController
                 'identifier_patterns' => $data['identifier_patterns'],
                 'computed_formulas' => $data['computed_formulas'],
                 'iot_connectors' => $data['iot_connectors'],
+                'graphics_governance' => $data['graphics_governance'],
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);

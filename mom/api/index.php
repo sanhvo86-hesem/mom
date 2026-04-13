@@ -163,6 +163,7 @@ $routeModules = [
     __DIR__ . '/routes/core-routes.php',
     __DIR__ . '/routes/operations-routes.php',
     __DIR__ . '/routes/platform-routes.php',
+    __DIR__ . '/routes/graphics-governance-routes.php',
     __DIR__ . '/routes/generic-runtime-routes.php',
     __DIR__ . '/routes/frontend-alias-routes.php',
     __DIR__ . '/routes/rest-routes.php',

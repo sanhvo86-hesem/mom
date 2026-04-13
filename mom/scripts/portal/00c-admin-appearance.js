@@ -1,12 +1,14 @@
 ﻿/* ============================================================================
-   HESEM MOM — Admin Appearance Editor v2.0
-   Enterprise-grade template + appearance studio with 6 sub-tabs, 150+ controls.
+   HESEM MOM — Admin Appearance / Graphics Control Plane v3.0
+   Enterprise-grade graphics governance studio with 6 sub-tabs, control flow,
+   impact analysis, compliance, rollout, rollback, audit and waiver shells.
    Loaded on-demand when admin navigates to Appearance tab.
    ============================================================================ */
 (function(){
 'use strict';
 
 var _subTab = 'templates';
+var _graphicsRefreshStarted = false;
 
 function T(k){
   var en={
@@ -129,6 +131,13 @@ function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? pars
 window._hmSet = function(cssVar, path, value){
   HmTheme.setVar(cssVar, value);          /* instant CSS update */
   HmTheme.setDeep(path, value);           /* persist to localStorage */
+  if(typeof window._admGraphicsMarkChange === 'function'){
+    window._admGraphicsMarkChange(
+      /^components\./.test(String(path || '')) ? 'component-contract' : 'token',
+      path || cssVar,
+      value
+    );
+  }
 };
 window._hmSetWithUnit = function(cssVar, path, value, unit){
   var raw = value == null ? '' : String(value);
@@ -984,14 +993,16 @@ function previewBreadcrumb(){
 /* ── TEMPLATE STUDIO DATA + STORAGE ────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
-var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates';
-var TEMPLATE_BINDING_KEY = 'hesem_module_template_binding';
+var TEMPLATE_DRAFT_CACHE_KEY = 'hesem_graphics_template_draft_cache';
+var TEMPLATE_PREVIEW_CACHE_KEY = 'hesem_graphics_template_preview_cache';
 var _templateSearch = '';
 var _templateCategory = 'all';
 var _templateSort = 'name';
 var _selectedTemplate = null;
 var _templateView = 'gallery';
 var _templateThemePreview = 'professional-light';
+var _waiverSubject = '';
+var _waiverReason = '';
 
 var TEMPLATE_SEED = {
   overview: [
@@ -1253,16 +1264,83 @@ function buildTemplatePresets(){
 var TEMPLATE_PRESETS = buildTemplatePresets();
 var BASE_TEMPLATE_PRESETS = TEMPLATE_PRESETS;
 
-function readTemplateStore(){
+function graphicsSvc(){
+  return window.HmGraphicsGovernance || null;
+}
+
+function readDraftCache(){
   try {
-    if(window.HmTheme && typeof HmTheme.getTemplates === 'function') return HmTheme.getTemplates() || {};
-    var raw = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+    var svc = graphicsSvc();
+    if(svc && typeof svc.getDraftCache === 'function') return svc.getDraftCache() || {};
+    var raw = localStorage.getItem(TEMPLATE_DRAFT_CACHE_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch(e){ return {}; }
 }
 
-function writeTemplateStore(store){
-  try { localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(store || {})); } catch(e){}
+function writeDraftCache(store){
+  try {
+    var svc = graphicsSvc();
+    if(svc && typeof svc.replaceDraftCache === 'function'){
+      svc.replaceDraftCache(store || {});
+      return;
+    }
+    localStorage.setItem(TEMPLATE_DRAFT_CACHE_KEY, JSON.stringify(store || {}));
+  } catch(e){}
+}
+
+function readPreviewCache(){
+  try {
+    var svc = graphicsSvc();
+    if(svc && typeof svc.getPreviewCache === 'function') return svc.getPreviewCache() || {};
+    var raw = localStorage.getItem(TEMPLATE_PREVIEW_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+
+function writePreviewCache(store){
+  try {
+    var svc = graphicsSvc();
+    if(svc && typeof svc.replacePreviewCache === 'function'){
+      svc.replacePreviewCache(store || {});
+      return;
+    }
+    localStorage.setItem(TEMPLATE_PREVIEW_CACHE_KEY, JSON.stringify(store || {}));
+  } catch(e){}
+}
+
+function graphicsSnapshot(){
+  var svc = graphicsSvc();
+  if(svc && typeof svc.getSnapshot === 'function') return svc.getSnapshot(BASE_TEMPLATE_PRESETS);
+  return {
+    version:'fallback',
+    registryAuthority:'frontend-fallback',
+    backendAvailable:false,
+    endpointStatus:{},
+    templates:BASE_TEMPLATE_PRESETS.map(function(tpl){
+      var c = cloneTemplateData(tpl);
+      c.templateId = c.id;
+      c.version = c.version || '1.0.0';
+      c.status = c.source === 'custom' ? 'draft-only' : 'legacy-bridged';
+      c.owner = c.owner || 'HESEM Platform Architecture';
+      c.governedModules = c.modules || [];
+      c.controlMode = c.status === 'legacy-bridged' ? 'bridged' : 'draft-cache';
+      return c;
+    }),
+    modules:[],
+    compliance:[],
+    audit:[],
+    waivers:[],
+    impact:null
+  };
+}
+
+function ensureGraphicsRefresh(){
+  var svc = graphicsSvc();
+  if(_graphicsRefreshStarted || !svc || typeof svc.refresh !== 'function') return;
+  _graphicsRefreshStarted = true;
+  svc.refresh(BASE_TEMPLATE_PRESETS).then(function(){
+    if(typeof renderAdminAppearance === 'function') renderAdminAppearance();
+  }).catch(function(){});
 }
 
 function cloneTemplateData(tpl){
@@ -1271,40 +1349,43 @@ function cloneTemplateData(tpl){
 
 function saveTemplateRecord(tpl){
   if(!tpl || !tpl.id) return;
-  if(window.HmTheme && typeof HmTheme.saveTemplate === 'function'){
-    HmTheme.saveTemplate(tpl.id, cloneTemplateData(tpl));
+  var svc = graphicsSvc();
+  var payload = cloneTemplateData(tpl);
+  payload.templateId = payload.templateId || payload.id;
+  if(svc && typeof svc.saveTemplateDraft === 'function'){
+    svc.saveTemplateDraft(payload);
     return;
   }
-  var store = readTemplateStore();
+  var store = readDraftCache();
   store[tpl.id] = cloneTemplateData(tpl);
-  writeTemplateStore(store);
+  writeDraftCache(store);
 }
 
 function deleteTemplateRecord(id){
-  if(window.HmTheme && typeof HmTheme.deleteTemplate === 'function'){
-    HmTheme.deleteTemplate(id);
+  var svc = graphicsSvc();
+  if(svc && typeof svc.deleteTemplateDraft === 'function'){
+    svc.deleteTemplateDraft(id);
     return;
   }
-  var store = readTemplateStore();
+  var store = readDraftCache();
   delete store[id];
-  writeTemplateStore(store);
+  writeDraftCache(store);
 }
 
 function getAllTemplates(){
-  var store = readTemplateStore();
-  var map = {};
-  BASE_TEMPLATE_PRESETS.forEach(function(tpl){ map[tpl.id] = cloneTemplateData(tpl); });
-  Object.keys(store).forEach(function(id){
-    if(map[id]){
-      var base = map[id];
-      var custom = store[id];
-      Object.keys(custom).forEach(function(k){ base[k] = custom[k]; });
-      map[id] = base;
-    } else {
-      map[id] = cloneTemplateData(store[id]);
-    }
+  var snapshot = graphicsSnapshot();
+  return (snapshot.templates || []).map(function(tpl){
+    var out = cloneTemplateData(tpl);
+    out.id = out.id || out.templateId;
+    out.templateId = out.templateId || out.id;
+    out.version = out.version || '1.0.0';
+    out.owner = out.owner || 'HESEM Platform Architecture';
+    out.status = out.status || 'legacy-bridged';
+    out.governedModules = out.governedModules || out.modules || [];
+    out.modules = out.governedModules.slice ? out.governedModules.slice() : [];
+    out.zoneCount = out.zoneCount || (out.zones || []).length;
+    return out;
   });
-  return Object.keys(map).map(function(id){ return map[id]; });
 }
 
 function getTemplates(){
@@ -1325,28 +1406,377 @@ function getTemplates(){
 }
 
 function getTemplateById(id){
-  return getAllTemplates().find(function(tpl){ return tpl.id === id; }) || null;
-}
-
-function getModuleTemplateBinding(){
-  try {
-    var raw = localStorage.getItem(TEMPLATE_BINDING_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch(e){ return {}; }
+  return getAllTemplates().find(function(tpl){ return tpl.id === id || tpl.templateId === id; }) || null;
 }
 
 function getModulesUsingTemplate(tpl){
-  var found = {};
-  (tpl.modules || []).forEach(function(m){ found[m] = true; });
-  var binding = getModuleTemplateBinding();
-  Object.keys(binding || {}).forEach(function(key){
-    if(Array.isArray(binding[key]) && key === tpl.id){
-      binding[key].forEach(function(m){ found[m] = true; });
-      return;
+  var svc = graphicsSvc();
+  if(svc && typeof svc.getModulesForTemplate === 'function'){
+    return (svc.getModulesForTemplate(tpl.templateId || tpl.id, BASE_TEMPLATE_PRESETS) || []).map(function(m){ return m.moduleId || m.route || ''; }).filter(Boolean);
+  }
+  return (tpl.governedModules || tpl.modules || []).slice();
+}
+
+function templateDisplayName(tpl){
+  if(!tpl) return '';
+  var name = tpl.name || {};
+  return String((lang === 'en' ? name.en : name.vi) || name.vi || name.en || tpl.templateId || tpl.id || '');
+}
+
+function templateStatusLabel(status){
+  var map = {
+    'draft-only': L('Draft only', 'Draft only'),
+    'controlled-draft': L('Controlled draft', 'Controlled draft'),
+    validated: L('Validated', 'Validated'),
+    'publish-blocked': L('Publish blocked', 'Publish blocked'),
+    published: L('Published', 'Published'),
+    deprecated: L('Deprecated', 'Deprecated'),
+    'legacy-bridged': L('Legacy bridged', 'Legacy bridged')
+  };
+  return map[String(status || '')] || esc(status || '-');
+}
+
+function statusKindForTemplate(status){
+  if(status === 'published' || status === 'validated') return 'full';
+  if(status === 'publish-blocked' || status === 'deprecated') return 'partial';
+  if(status === 'legacy-bridged') return 'admin';
+  return 'preview';
+}
+
+function templateStatusChip(tpl){
+  return statusChip(statusKindForTemplate(tpl.status), templateStatusLabel(tpl.status));
+}
+
+function templateControlBadge(tpl){
+  var mode = String(tpl.controlMode || '').toLowerCase();
+  if(mode === 'controlled') return statusChip('full', L('Controlled', 'Controlled'));
+  if(mode === 'bridged') return statusChip('admin', L('Bridged', 'Bridged'));
+  if(mode === 'draft-cache') return statusChip('preview', L('Draft cache', 'Draft cache'));
+  return statusChip('partial', L('Legacy', 'Legacy'));
+}
+
+function templateStateMachine(){
+  var states = [
+    ['draft-only', L('Cache xem trước / nháp chưa kiểm soát', 'Preview cache or unsaved draft only')],
+    ['controlled-draft', L('Backend đã nhận draft có owner/version', 'Backend has accepted owner/versioned draft')],
+    ['validated', L('Schema, zone, block và token gates đã qua', 'Schema, zone, block, and token gates passed')],
+    ['publish-blocked', L('Có blocker hoặc endpoint authority chưa sẵn sàng', 'A blocker exists or authority endpoint is unavailable')],
+    ['published', L('Được phép dùng production và rollback được', 'Production-allowed and rollback-capable')],
+    ['deprecated', L('Không cho module mới, cần migration plan', 'Blocked for new modules; migration plan required')],
+    ['legacy-bridged', L('Template cũ chỉ bridge về shared tokens', 'Legacy template bridged back to shared tokens')]
+  ];
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px">'
+    + states.map(function(row, idx){
+      return '<div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
+        + '<div style="display:flex;align-items:center;gap:8px">'
+        + '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">'+String(idx + 1)+'</span>'
+        + statusChip(statusKindForTemplate(row[0]), templateStatusLabel(row[0]))
+        + '</div>'
+        + '<div style="margin-top:7px;font-size:11px;line-height:1.55;color:var(--text-secondary)">'+esc(row[1])+'</div>'
+        + '</div>';
+    }).join('')
+    + '</div>';
+}
+
+function smallMeta(label, value){
+  return '<div style="min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface-alt,var(--bg-hover))">'
+    + '<div style="font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text-tertiary)">'+esc(label)+'</div>'
+    + '<div style="margin-top:4px;font-size:12px;font-weight:700;color:var(--text-primary);word-break:break-word">'+esc(value == null || value === '' ? '-' : String(value))+'</div>'
+    + '</div>';
+}
+
+function refreshImpactPanel(){
+  var el = document.getElementById('adm-graphics-impact-panel');
+  if(!el) return;
+  el.innerHTML = renderImpactAnalysisPanel(false);
+}
+
+window._admGraphicsMarkChange = function(kind, target, value){
+  var svc = graphicsSvc();
+  var label = String(target || kind || '');
+  if(value !== undefined && value !== null && value !== '') label += ' = ' + String(value).slice(0, 48);
+  if(svc && typeof svc.markChange === 'function') svc.markChange({ kind:kind, target:target, path:target, label:label }, BASE_TEMPLATE_PRESETS);
+  refreshImpactPanel();
+};
+
+window._admGraphicsRunImpact = function(kind, target){
+  if(graphicsSvc() && typeof graphicsSvc().markChange === 'function'){
+    graphicsSvc().markChange({ kind:kind, target:target, path:target, label:kind + ': ' + target }, BASE_TEMPLATE_PRESETS);
+  }
+  renderAdminAppearance();
+};
+
+window._admGraphicsTemplateAction = function(action, id){
+  var tpl = getTemplateById(id);
+  if(!tpl) return;
+  var svc = graphicsSvc();
+  if(action === 'preview'){
+    if(svc && typeof svc.saveTemplatePreview === 'function') svc.saveTemplatePreview(tpl);
+    if(typeof showToast === 'function') showToast(L('Đã lưu cache xem trước, chưa thay authority', 'Preview cache saved; authority unchanged'), 'success');
+    renderAdminAppearance();
+    return;
+  }
+  if(!svc || typeof svc.templateAction !== 'function'){
+    if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng', 'Graphics governance service is not ready'), 'error');
+    return;
+  }
+  svc.templateAction(action, tpl.templateId || tpl.id, { template:tpl }).then(function(result){
+    if(typeof showToast === 'function'){
+      showToast(result && result.message ? result.message : (L('Đã ghi nhận workflow', 'Workflow recorded') + ': ' + action), result && result.ok === false ? 'warning' : 'success');
     }
-    if(binding[key] === tpl.id) found[key] = true;
+    renderAdminAppearance();
   });
-  return Object.keys(found);
+};
+
+window._admGraphicsSetWaiver = function(field, value){
+  if(field === 'subject') _waiverSubject = value || '';
+  if(field === 'reason') _waiverReason = value || '';
+};
+
+window._admGraphicsRequestWaiver = function(){
+  var svc = graphicsSvc();
+  if(!svc || typeof svc.requestWaiver !== 'function') return;
+  svc.requestWaiver({
+    subjectId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
+    reasonText: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
+    requestedBy: 'Admin Appearance',
+    scope: 'graphics-governance'
+  }).then(function(result){
+    if(typeof showToast === 'function'){
+      showToast(result && result.message ? result.message : L('Đã gửi yêu cầu waiver', 'Waiver request submitted'), result && result.ok === false ? 'warning' : 'success');
+    }
+    renderAdminAppearance();
+  });
+};
+
+function joinList(items, emptyText){
+  items = items || [];
+  return items.length ? items.map(esc).join(', ') : esc(emptyText || '-');
+}
+
+function renderAuthorityStatusPanel(){
+  var snap = graphicsSnapshot();
+  var endpointRows = Object.keys(snap.endpoints || {}).map(function(key){
+    var ep = snap.endpoints[key];
+    var state = snap.endpointStatus && snap.endpointStatus[key] ? snap.endpointStatus[key] : 'not checked';
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(key)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(ep.method + ' api.php?action=' + ep.action)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip(state === 'online' ? 'full' : 'partial', state)+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Authority status', 'Authority status'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard('Standard 36', L('Production authority cho template, block, token, QA gate và release evidence.', 'Production authority for templates, blocks, tokens, QA gates, and release evidence.'), 'full')
+      + infoCard(L('Graphics governance', 'Graphics governance'), L('Admin Appearance là token editor + governance console; không thêm controls cho decoration một lần.', 'Admin Appearance is token editor plus governance console; no one-off decoration controls.'), 'full')
+      + infoCard(L('Registry authority', 'Registry authority'), snap.backendAvailable ? L('Backend endpoint online', 'Backend endpoint online') : L('Backend chưa online; local cache không được promote thành authority.', 'Backend is not online; local cache is not promoted to authority.'), snap.backendAvailable ? 'full' : 'partial')
+      + infoCard(L('Local cache policy', 'Local cache policy'), L('Chỉ dùng `hesem_graphics_template_preview_cache` và `hesem_graphics_template_draft_cache` cho preview/draft.', 'Only `hesem_graphics_template_preview_cache` and `hesem_graphics_template_draft_cache` are used for preview/draft.'), 'preview')
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Contract</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Expected endpoint</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Status</th>'
+      + '</tr></thead><tbody>'+endpointRows+'</tbody></table>',
+    true,
+    statusChip(snap.backendAvailable ? 'full' : 'partial', snap.registryAuthority || 'fallback')
+  );
+}
+
+function renderControlledRegistrySummary(){
+  var templates = getAllTemplates();
+  var counts = {};
+  templates.forEach(function(tpl){ counts[tpl.status] = (counts[tpl.status] || 0) + 1; });
+  return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px">'
+    + infoCard(L('Controlled registry', 'Controlled registry'), String(templates.length) + ' ' + T('templateCount'), 'full')
+    + infoCard('Published', String(counts.published || 0), 'full')
+    + infoCard('Validated', String(counts.validated || 0), 'full')
+    + infoCard('Draft only', String(counts['draft-only'] || 0), 'preview')
+    + infoCard('Legacy bridged', String(counts['legacy-bridged'] || 0), 'admin')
+    + infoCard('Publish blocked', String(counts['publish-blocked'] || 0), counts['publish-blocked'] ? 'partial' : 'neutral')
+    + '</div>';
+}
+
+function renderImpactAnalysisPanel(wrap){
+  var snap = graphicsSnapshot();
+  var impact = snap.impact || (graphicsSvc() && graphicsSvc().computeImpact ? graphicsSvc().computeImpact(snap.lastChange || {}, BASE_TEMPLATE_PRESETS) : null) || {};
+  var content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
+    + infoCard(L('Affected modules', 'Affected modules'), String((impact.affectedModules || []).length), (impact.affectedModules || []).length ? 'partial' : 'neutral')
+    + infoCard(L('Affected routes', 'Affected routes'), String((impact.affectedRoutes || []).length), 'preview')
+    + infoCard(L('Affected screens', 'Affected screens'), String((impact.affectedScreens || []).length), 'preview')
+    + infoCard(L('Block families', 'Block families'), String((impact.affectedBlockFamilies || []).length), 'admin')
+    + infoCard(L('Regulated touched', 'Regulated touched'), String((impact.regulatedModules || []).length), (impact.regulatedModules || []).length ? 'partial' : 'full')
+    + infoCard(L('Shopfloor touched', 'Shopfloor touched'), String((impact.shopfloorModules || []).length), (impact.shopfloorModules || []).length ? 'partial' : 'full')
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:10px">'
+    + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
+    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Impact scope', 'Impact scope'))+'</div>'
+    + '<div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'
+    + '<strong>'+esc(L('Change', 'Change'))+':</strong> '+esc((impact.kind || '-') + ' / ' + (impact.target || '-'))+'<br>'
+    + '<strong>'+esc(L('Modules', 'Modules'))+':</strong> '+joinList(impact.affectedModules)+'<br>'
+    + '<strong>'+esc(L('Routes', 'Routes'))+':</strong> '+joinList(impact.affectedRoutes)+'<br>'
+    + '<strong>'+esc(L('Screens', 'Screens'))+':</strong> '+joinList((impact.affectedScreens || []).slice(0, 10), '-')+'<br>'
+    + '<strong>'+esc(L('Block families', 'Block families'))+':</strong> '+joinList(impact.affectedBlockFamilies)
+    + '</div></div>'
+    + '<div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface)">'
+    + '<div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:8px">'+esc(L('Release blockers', 'Release blockers'))+'</div>'
+    + '<div style="font-size:11px;line-height:1.75;color:var(--text-secondary)">'
+    + '<strong>'+esc(L('Gates cần rerun', 'Gates to rerun'))+':</strong> '+joinList(impact.gatesToRerun)+'<br>'
+    + '<strong>'+esc(L('Regulated modules', 'Regulated modules'))+':</strong> '+joinList(impact.regulatedModules)+'<br>'
+    + '<strong>'+esc(L('Shopfloor modules', 'Shopfloor modules'))+':</strong> '+joinList(impact.shopfloorModules)+'<br>'
+    + '<strong>'+esc(L('Summary', 'Summary'))+':</strong> '+esc(impact.releaseBlockerSummary || '-')
+    + '</div></div>'
+    + '</div>';
+  if(wrap === false) return content;
+  return '<div id="adm-graphics-impact-panel">'+content+'</div>';
+}
+
+function renderRolloutControls(tpl){
+  var id = tpl && (tpl.templateId || tpl.id) || (_selectedTemplate || '');
+  var disabled = id ? '' : ' disabled';
+  return sect(
+    L('Publish / Apply / Rollback', 'Publish / Apply / Rollback'),
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'preview\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Preview only', 'Preview only'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'saveDraft\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Save draft', 'Save draft'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'validate\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Validate', 'Validate'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'stage\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Stage rollout', 'Stage rollout'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-primary" onclick="_admGraphicsTemplateAction(\'apply\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Apply globally', 'Apply globally'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'rollback\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Rollback', 'Rollback'))+'</button>'
+      + '</div>'
+      + '<div style="font-size:11px;line-height:1.7;color:var(--text-secondary)">'
+      + esc(L('Apply globally và rollback chỉ được promote khi backend authority endpoint xác nhận. Nếu endpoint chưa online, UI ghi audit và giữ trạng thái publish blocked.', 'Apply globally and rollback are promoted only when the backend authority endpoint attests them. If the endpoint is offline, the UI records audit and keeps publish blocked.'))
+      + '</div>',
+    true,
+    statusChip(tpl && tpl.status === 'published' ? 'full' : 'partial', tpl ? templateStatusLabel(tpl.status) : L('No template selected', 'No template selected'))
+  );
+}
+
+function renderAuditHistoryPanel(limit){
+  var snap = graphicsSnapshot();
+  var rows = (snap.audit || []).slice(0, limit || 8).map(function(row){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;white-space:nowrap">'+esc(row.at || '-').replace('T',' ').slice(0, 19)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.actor || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(row.action || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subject || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.result || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Audit history', 'Audit history'),
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Time</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Actor</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Action</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Subject</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Result</th>'
+      + '</tr></thead><tbody>'+(rows || '<tr><td colspan="5" style="padding:12px;color:var(--text-secondary)">No audit events</td></tr>')+'</tbody></table>',
+    false,
+    statusChip('preview', L('View audit history', 'View audit history'))
+  );
+}
+
+function renderComplianceMatrixPanel(){
+  var snap = graphicsSnapshot();
+  var rows = (snap.compliance || []).map(function(row){
+    var ok = row.linkageStatus === 'full-admin-controlled';
+    var blocked = row.linkageStatus === 'blocked' || row.linkageStatus === 'legacy-private-css';
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top"><strong>'+esc(row.moduleId)+'</strong><div style="font-size:11px;color:var(--text-secondary)">'+esc(row.route || '-')+'</div></td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top">'+statusChip(ok ? 'full' : (blocked ? 'partial' : 'admin'), row.linkageStatus || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top;font-family:var(--font-mono);font-size:11px">'+esc(String(row.selectorDebt || 0))+' / '+esc(String(row.privateTokenDebt || 0))+' / '+esc(String(row.hardcodedStyleDebt || 0))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top">'+(row.consumesHmComponents ? statusChip('full','hm-*') : statusChip('partial','no hm-*'))+' '+(row.consumesSharedTokens ? statusChip('full','tokens') : statusChip('partial','no tokens'))+' '+(row.usesPrivateCssShell ? statusChip('partial','private shell') : statusChip('full','no private shell'))+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-secondary);line-height:1.55">'+esc(row.reason || '-')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Graphics compliance matrix', 'Graphics compliance matrix'),
+    '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">'+esc(L('Debt columns: selector debt / private token debt / hardcoded style debt.', 'Debt columns: selector debt / private token debt / hardcoded style debt.'))+'</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Module</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Linkage status</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Debt</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Consumers</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Reason</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table>',
+    true,
+    statusChip('full', L('Module linkage visible', 'Module linkage visible'))
+  );
+}
+
+function renderDriftDetectorPanel(){
+  var compliance = graphicsSnapshot().compliance || [];
+  var selectorDebt = 0;
+  var privateTokenDebt = 0;
+  var hardcodedDebt = 0;
+  var blocked = 0;
+  compliance.forEach(function(row){
+    selectorDebt += Number(row.selectorDebt || 0);
+    privateTokenDebt += Number(row.privateTokenDebt || 0);
+    hardcodedDebt += Number(row.hardcodedStyleDebt || 0);
+    if(row.linkageStatus === 'blocked' || row.linkageStatus === 'legacy-private-css') blocked++;
+  });
+  return sect(
+    L('Drift detector', 'Drift detector'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
+      + infoCard(L('Selector debt', 'Selector debt'), String(selectorDebt), selectorDebt ? 'partial' : 'full')
+      + infoCard(L('Private token debt', 'Private token debt'), String(privateTokenDebt), privateTokenDebt ? 'partial' : 'full')
+      + infoCard(L('Hardcoded style debt', 'Hardcoded style debt'), String(hardcodedDebt), hardcodedDebt ? 'partial' : 'full')
+      + infoCard(L('Blocked modules', 'Blocked modules'), String(blocked), blocked ? 'partial' : 'full')
+      + '</div>'
+      + '<div style="font-size:11px;line-height:1.7;color:var(--text-secondary)">'
+      + esc(L('Detector ưu tiên các dấu hiệu vi phạm Standard 36: private visual shell, token riêng, hardcoded style, component không dùng hm-* và module không có reason text.', 'Detector prioritizes Standard 36 violations: private visual shell, private tokens, hardcoded style, non-hm components, and modules without reason text.'))
+      + '</div>',
+    true,
+    statusChip(blocked ? 'partial' : 'full', blocked ? L('Drift found', 'Drift found') : L('No blocked module', 'No blocked module'))
+  );
+}
+
+function renderWaiverGovernancePanel(){
+  var snap = graphicsSnapshot();
+  var waiverRows = (snap.waivers || []).slice(0, 5).map(function(row){
+    return '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.waiverId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td></tr>';
+  }).join('');
+  return sect(
+    L('Waiver / exception governance', 'Waiver / exception governance'),
+    '<div style="display:grid;grid-template-columns:minmax(240px,1fr) minmax(240px,1fr);gap:10px;margin-bottom:12px">'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Subject', 'Subject'))+'<input class="hm-input" value="'+esc(_waiverSubject || (_selectedTemplate || ''))+'" oninput="_admGraphicsSetWaiver(\'subject\',this.value)" placeholder="templateId / moduleId / selector"></label>'
+      + '<label style="display:grid;gap:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Reason text', 'Reason text'))+'<input class="hm-input" value="'+esc(_waiverReason)+'" oninput="_admGraphicsSetWaiver(\'reason\',this.value)" placeholder="'+esc(L('Lý do ngoại lệ, thời hạn, owner', 'Exception reason, expiry, owner'))+'"></label>'
+      + '</div>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsRequestWaiver()">'+esc(L('Request waiver', 'Request waiver'))+'</button>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Waiver</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Subject</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Status</th>'
+      + '</tr></thead><tbody>'+(waiverRows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No waiver requests in current snapshot</td></tr>')+'</tbody></table>',
+    false,
+    statusChip('preview', L('Exception path', 'Exception path'))
+  );
+}
+
+function renderApiContractPanel(){
+  var snap = graphicsSnapshot();
+  var rows = Object.keys(snap.endpoints || {}).map(function(key){
+    var ep = snap.endpoints[key];
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(key)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(ep.method)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">api.php?action='+esc(ep.action)+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc((snap.endpointStatus || {})[key] || 'pending backend')+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('API client contract expected by frontend', 'API client contract expected by frontend'),
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Client method</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">HTTP</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Endpoint</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Runtime status</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table>',
+    false,
+    statusChip('admin', 'backend-ready')
+  );
 }
 
 function densityChipStyle(density){
@@ -1439,6 +1869,10 @@ window._admTplCreate = function(){
   clone.name.en = clone.name.en + ' Copy';
   clone.modules = [];
   clone.source = 'custom';
+  clone.status = 'draft-only';
+  clone.controlMode = 'draft-cache';
+  clone.owner = 'HESEM Platform Architecture';
+  clone.version = '0.1.0';
   saveTemplateRecord(clone);
   _selectedTemplate = clone.id;
   _templateView = 'editor';
@@ -1455,6 +1889,10 @@ window._admTplClone = function(id){
   clone.name.en = clone.name.en + ' Copy';
   clone.modules = [];
   clone.source = 'custom';
+  clone.status = 'draft-only';
+  clone.controlMode = 'draft-cache';
+  clone.owner = tpl.owner || 'HESEM Platform Architecture';
+  clone.version = '0.1.0';
   saveTemplateRecord(clone);
   _selectedTemplate = clone.id;
   _templateView = 'detail';
@@ -1466,7 +1904,7 @@ window._admTplDelete = function(id){
   if(!id) return;
   deleteTemplateRecord(id);
   if(_selectedTemplate === id){ _selectedTemplate = null; _templateView = 'gallery'; }
-  if(typeof showToast === 'function') showToast(L('Đã xóa template lưu cục bộ','Template removed from local storage'), 'success');
+  if(typeof showToast === 'function') showToast(L('Đã xóa draft cache của template','Template draft cache removed'), 'success');
   renderAdminAppearance();
 };
 
@@ -1478,13 +1916,19 @@ window._admTplSaveField = function(id, field, value){
   if(field === 'desc.vi') tpl.desc.vi = value;
   if(field === 'themePreset') tpl.themePreset = value;
   saveTemplateRecord(tpl);
+  window._admGraphicsMarkChange('template-zone', id, field);
 };
 
 window._admTplSaveZone = function(id, index, key, value){
   var tpl = cloneTemplateData(getTemplateById(id));
   if(!tpl || !tpl.zoneSettings || !tpl.zoneSettings[index]) return;
   tpl.zoneSettings[index][key] = value;
+  if(key === 'allowed'){
+    tpl.allowedBlocks = tpl.allowedBlocks || {};
+    tpl.allowedBlocks[tpl.zoneSettings[index].name] = value;
+  }
   saveTemplateRecord(tpl);
+  window._admGraphicsMarkChange(key === 'allowed' ? 'template-allowed-blocks' : 'template-zone', id, tpl.zoneSettings[index].name + '.' + key);
 };
 
 window._admTplApplyTheme = function(themeId){
@@ -1505,22 +1949,34 @@ window._admTplApplyTheme = function(themeId){
     HmTheme.setDeep('appearance.visualThemePreset', themeId);
   }
   if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
+  window._admGraphicsMarkChange('theme-preset', themeId, themeId);
   renderAdminAppearance();
 };
 
 function renderTemplateCard(tpl){
+  var modulesUsing = getModulesUsingTemplate(tpl);
   return '<div class="tpl-gallery-card"'
+    +' role="button" tabindex="0" aria-label="'+esc((tpl.templateId || tpl.id) + ' ' + templateDisplayName(tpl))+'"'
     +' onclick="_admTplPick(\''+tpl.id+'\')"'
+    +' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_admTplPick(\''+tpl.id+'\')}"'
     +' onmouseover="this.style.borderColor=\'var(--brand-2)\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'var(--shadow-lg)\'"'
     +' onmouseout="this.style.borderColor=\'var(--border)\';this.style.transform=\'\';this.style.boxShadow=\'\'">'
     + '<div class="tpl-gallery-thumb">'+renderTemplateSvg(tpl)+'</div>'
     + '<div class="tpl-gallery-info">'
-    +   '<div class="tpl-gallery-name">'+esc(tpl.id+' '+tpl.name.vi)+'</div>'
-    +   '<div class="tpl-gallery-desc">'+esc(tpl.name.en)+'</div>'
+    +   '<div class="tpl-gallery-name">'+esc((tpl.templateId || tpl.id)+' '+templateDisplayName(tpl))+'</div>'
+    +   '<div class="tpl-gallery-desc">'+esc((tpl.name && tpl.name.en) || '')+'</div>'
     +   '<div class="tpl-gallery-desc" style="margin-top:4px;color:var(--text-tertiary)">'+esc(tpl.desc.vi)+'</div>'
     +   '<div class="tpl-gallery-chips">'
-    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+tpl.zoneCount+' zones</span>'
+    +     templateStatusChip(tpl)
+    +     templateControlBadge(tpl)
+    +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
     +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
+    +   '</div>'
+    +   '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px">'
+    +     smallMeta('version', tpl.version || '1.0.0')
+    +     smallMeta('owner', tpl.owner || '-')
+    +     smallMeta('modules', modulesUsing.length)
+    +     smallMeta('authority', tpl.sourceAuthority || tpl.controlMode || '-')
     +   '</div>'
     + '</div>'
     + '</div>';
@@ -1528,7 +1984,12 @@ function renderTemplateCard(tpl){
 
 function renderTemplateGallery(){
   var templates = getTemplates();
-  var h = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;position:sticky;top:0;z-index:10;background:var(--bg-surface);padding:8px 0">';
+  var h = renderAuthorityStatusPanel();
+  h += sect(L('Template governance state machine', 'Template governance state machine'), templateStateMachine(), false, statusChip('admin', 'Standard 36'));
+  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
+  h += renderRolloutControls(_selectedTemplate ? getTemplateById(_selectedTemplate) : null);
+  h += renderControlledRegistrySummary();
+  h += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;position:sticky;top:0;z-index:10;background:var(--bg-surface);padding:8px 0">';
   h += '<input type="text" placeholder="'+esc(T('templateSearchHint'))+'" value="'+esc(_templateSearch)+'" oninput="_admTplSetState(\'search\',this.value)" style="flex:1;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-surface)">';
   h += '<select onchange="_admTplSetState(\'category\',this.value)" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface)">';
   h += '<option value="all">'+esc(T('allCategories'))+'</option>';
@@ -1541,13 +2002,13 @@ function renderTemplateGallery(){
   h += '<option value="zones" '+(_templateSort === 'zones' ? 'selected' : '')+'>'+esc(T('sortByZones'))+'</option>';
   h += '<option value="category" '+(_templateSort === 'category' ? 'selected' : '')+'>'+esc(T('sortByCategory'))+'</option>';
   h += '</select>';
-  h += '<button class="hm-btn hm-btn-secondary" onclick="_admTplCreate()">'+T('createTemplate')+'</button>';
+  h += '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admTplCreate()">'+T('createTemplate')+'</button>';
   h += '</div>';
   if(!templates.length){
     h += '<div class="hm-empty">'+esc(T('noTemplatesFound'))+'</div>';
     return h;
   }
-  h += '<div class="tpl-gallery-grid">';
+  h += '<div class="tpl-gallery-grid" role="list" aria-label="'+esc(L('Controlled template registry', 'Controlled template registry'))+'">';
   templates.forEach(function(tpl){ h += renderTemplateCard(tpl); });
   h += '</div>';
   return h;
@@ -1559,17 +2020,29 @@ function renderTemplateDetail(id){
   var modulesUsing = getModulesUsingTemplate(tpl);
   var cat = TEMPLATE_CATEGORIES.find(function(item){ return item.key === tpl.category; });
   var canDelete = /^C/.test(tpl.id) || tpl.source === 'custom';
-  var h = '<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">';
-  h += '<div><div style="font-size:18px;font-weight:800;color:var(--text-primary)">'+esc(tpl.id+' '+tpl.name.vi)+'</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px">'+esc(tpl.name.en)+'</div><div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;max-width:780px">'+esc(tpl.desc.vi)+'</div></div>';
+  if(graphicsSvc() && typeof graphicsSvc().markChange === 'function') graphicsSvc().markChange({ kind:'template-zone', target:tpl.templateId || tpl.id, label:'Template detail selected' }, BASE_TEMPLATE_PRESETS);
+  var h = '<div id="adm-graphics-impact-panel" style="margin-bottom:14px">'+renderImpactAnalysisPanel(false)+'</div>';
+  h += renderRolloutControls(tpl);
+  h += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">';
+  h += '<div><div style="font-size:18px;font-weight:800;color:var(--text-primary)">'+esc((tpl.templateId || tpl.id)+' '+templateDisplayName(tpl))+'</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px">'+esc((tpl.name && tpl.name.en) || '')+'</div><div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;max-width:780px">'+esc(tpl.desc.vi)+'</div></div>';
   h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplClone(\''+tpl.id+'\')">'+T('cloneTemplate')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'<button class="hm-btn hm-btn-primary" onclick="_admTplEdit(\''+tpl.id+'\')">'+T('editTemplate')+'</button></div>';
   h += '</div>';
   h += '<div class="tpl-detail-header" style="display:grid;grid-template-columns:minmax(280px,360px) 1fr;align-items:stretch">';
   h += '<div class="tpl-detail-preview" style="width:auto"><div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center">'+renderTemplateSvg(tpl)+'</div></div>';
-  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+tpl.zoneCount+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div><div style="font-size:11px;color:var(--text-secondary);margin-top:10px;line-height:1.6"><strong>'+esc(T('layoutContract'))+':</strong> '+esc(tpl.layoutMeta)+'</div><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6"><strong>'+esc(T('modulesUsing'))+':</strong> '+esc(modulesUsing.join(', ') || '-')+'</div></div>';
+  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span>'+templateStatusChip(tpl)+templateControlBadge(tpl)+'<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px">'
+    + smallMeta('templateId', tpl.templateId || tpl.id)
+    + smallMeta('version', tpl.version || '1.0.0')
+    + smallMeta('status', templateStatusLabel(tpl.status))
+    + smallMeta('owner', tpl.owner || '-')
+    + smallMeta('zone count', tpl.zoneCount || 0)
+    + smallMeta('governed modules', modulesUsing.length)
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--text-secondary);margin-top:10px;line-height:1.6"><strong>'+esc(T('layoutContract'))+':</strong> '+esc(tpl.layoutMeta)+'</div><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.6"><strong>'+esc(T('modulesUsing'))+':</strong> '+esc(modulesUsing.join(', ') || '-')+'</div></div>';
   h += '</div>';
   h += '<div class="zone-scrollable" style="display:grid;gap:14px;max-height:620px;padding-right:4px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>'+renderZoneMiniDiagram(tpl)+'</div>';
-  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr></table></div>';
+  h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('templateUsage'))+'</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tr><td style="padding:6px 0;color:var(--text-secondary)">templateId</td><td style="padding:6px 0;text-align:right;color:var(--text-primary);font-family:var(--font-mono)">'+esc(tpl.templateId || tpl.id)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">version</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.version || '1.0.0')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">status</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+templateStatusChip(tpl)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">owner</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(tpl.owner || '-')+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('templateCategory'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('zoneCount'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(tpl.zoneCount))+'</td></tr><tr><td style="padding:6px 0;color:var(--text-secondary)">'+esc(T('modulesUsing'))+'</td><td style="padding:6px 0;text-align:right;color:var(--text-primary)">'+esc(String(modulesUsing.length))+'</td></tr></table></div>';
   h += '</div></div>';
   return h;
 }
@@ -1578,10 +2051,21 @@ function renderTemplateEditor(id){
   var tpl = getTemplateById(id);
   if(!tpl) return '<div class="hm-empty">'+esc(T('noTemplate'))+'</div>';
   var canDelete = /^C/.test(tpl.id) || tpl.source === 'custom';
-  var h = '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><div style="font-size:16px;font-weight:800;color:var(--text-primary)">'+esc(T('templateEditor'))+': '+tpl.id+' '+tpl.name.vi+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplPick(\''+tpl.id+'\')">'+T('detail')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'</div></div>';
+  if(graphicsSvc() && typeof graphicsSvc().markChange === 'function') graphicsSvc().markChange({ kind:'template-zone', target:tpl.templateId || tpl.id, label:'Template editor selected' }, BASE_TEMPLATE_PRESETS);
+  var h = '<div id="adm-graphics-impact-panel" style="margin-bottom:14px">'+renderImpactAnalysisPanel(false)+'</div>';
+  h += renderRolloutControls(tpl);
+  h += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><div><div style="font-size:16px;font-weight:800;color:var(--text-primary)">'+esc(T('templateEditor'))+': '+(tpl.templateId || tpl.id)+' '+templateDisplayName(tpl)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+templateStatusChip(tpl)+templateControlBadge(tpl)+statusChip('preview', tpl.sourceAuthority || 'draft cache')+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" onclick="_admTplPick(\''+tpl.id+'\')">'+T('detail')+'</button><button class="hm-btn hm-btn-secondary" onclick="_admTplBack()">'+T('backToGallery')+'</button>'+(canDelete ? '<button class="hm-btn hm-btn-secondary" onclick="_admTplDelete(\''+tpl.id+'\')">'+T('deleteTemplate')+'</button>' : '')+'</div></div>';
   h += '<div style="display:grid;grid-template-columns:minmax(320px,40%) 1fr;gap:14px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">';
   h += '<div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--text-primary)">'+esc(T('zoneConfig'))+'</div>';
+  h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px">'
+    + smallMeta('templateId', tpl.templateId || tpl.id)
+    + smallMeta('version', tpl.version || '1.0.0')
+    + smallMeta('status', templateStatusLabel(tpl.status))
+    + smallMeta('owner', tpl.owner || '-')
+    + smallMeta('zone count', tpl.zoneCount || 0)
+    + smallMeta('governed modules', getModulesUsingTemplate(tpl).length)
+    + '</div>';
   h += textInput(L('Tên template (VI)','Template name (VI)'), '', 'template.editor.nameVi', tpl.name.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.nameVi\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.vi\',this.value)"');
   h += textInput(L('Tên template (EN)','Template name (EN)'), '', 'template.editor.nameEn', tpl.name.en, '').replace('oninput="_hmSet(\'\',\'template.editor.nameEn\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.en\',this.value)"');
   h += textInput(L('Mô tả ngắn','Short description'), '', 'template.editor.desc', tpl.desc.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.desc\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'desc.vi\',this.value)"');
@@ -1593,7 +2077,7 @@ function renderTemplateEditor(id){
     h += '<input type="text" value="'+esc(zone.type || zone.name)+'" oninput="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'type\',this.value)" style="height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)">';
     h += '<select onchange="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'scroll\',this.value)" style="height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)"><option value="sticky" '+((zone.scroll || '') === 'sticky' ? 'selected' : '')+'>sticky</option><option value="data-only" '+((zone.scroll || '') === 'data-only' ? 'selected' : '')+'>data-only</option><option value="none" '+((zone.scroll || '') === 'none' ? 'selected' : '')+'>none</option></select>';
     h += '</div>';
-    h += '<input type="text" value="'+esc(zone.allowed || '')+'" oninput="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'allowed\',this.value)" style="margin-top:8px;width:100%;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)">';
+    h += '<label style="display:grid;gap:4px;margin-top:8px;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text-tertiary)">'+esc(L('Allowed blocks', 'Allowed blocks'))+'<input type="text" aria-label="'+esc(zone.name+' allowed blocks')+'" value="'+esc(zone.allowed || '')+'" oninput="_admTplSaveZone(\''+tpl.id+'\','+idx+',\'allowed\',this.value)" style="width:100%;height:30px;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-surface)"></label>';
     h += '</div>';
   });
   h += '</div>';
@@ -1609,12 +2093,13 @@ function renderTemplateEditor(id){
 }
 
 function renderTemplates(){
+  ensureGraphicsRefresh();
   var count = getAllTemplates().length;
   var selected = _selectedTemplate ? getTemplateById(_selectedTemplate) : null;
   var intro = sectionLead(
-    L('Template Studio là tab lõi của hệ mới', 'Template Studio is the core tab of the new system'),
-    L('Mọi module phải bắt đầu từ template preset. Gallery dùng để chọn preset, detail để audit contract, editor để tinh chỉnh zone và preview theme/device trước khi sang builder.', 'Every module must start from a template preset. Use the gallery to choose, detail to audit the contract, and editor to adjust zones and preview theme/device before entering the builder.'),
-    statusChip('admin', count + ' ' + T('templateCount')) + (selected ? statusChip('preview', selected.id) : '')
+    L('Graphics Control Plane cho template registry', 'Graphics Control Plane for template registry'),
+    L('Tab này quản trị authority status, controlled registry, impact analysis, validation, rollout, rollback và audit trail. Local cache chỉ phục vụ preview hoặc nháp chưa lưu authority.', 'This tab governs authority status, controlled registry, impact analysis, validation, rollout, rollback, and audit trail. Local cache is only for preview or unsaved drafts.'),
+    statusChip('admin', count + ' ' + T('templateCount')) + (selected ? templateStatusChip(selected) : '') + (selected ? statusChip('preview', selected.id) : '')
   );
   if(!_selectedTemplate && _templateView !== 'gallery') _templateView = 'gallery';
   if(_templateView === 'detail' && _selectedTemplate) return intro + renderTemplateDetail(_selectedTemplate);
@@ -1625,9 +2110,10 @@ function renderTemplates(){
 function renderTokens(){
   var h = sectionLead(
     L('Token hệ thống gom Typography + Colors + Layout', 'System Tokens merge Typography + Colors + Layout'),
-    L('Prompt 5 gộp ba tab cũ thành một tab Tokens để token cascade rõ hơn. Toàn bộ controls và preview cũ được giữ lại, chỉ thay lớp điều hướng bên trên.', 'Prompt 5 merges the former Typography, Colors, and Layout tabs into one Tokens tab. Existing controls and previews remain, only the orchestration layer changes.'),
-    statusChip('full', L('Merged tab', 'Merged tab'))
+    L('Mỗi chỉnh sửa token được ghi nhận thành change context để impact analysis xác định module, route, screen, block family và gates cần chạy lại.', 'Each token edit is recorded as a change context so impact analysis can identify modules, routes, screens, block families, and gates to rerun.'),
+    statusChip('full', L('Merged tab', 'Merged tab')) + statusChip('admin', L('Impact-aware', 'Impact-aware'))
   );
+  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
   h += renderTypography();
   h += renderColors();
   h += renderLayout();
@@ -1639,6 +2125,7 @@ function renderTokens(){
 /* ══════════════════════════════════════════════════════════════════════════ */
 
 function render(el, subTab, currentLang){
+  ensureGraphicsRefresh();
   _subTab = normalizeSubTab(subTab || _subTab);
 
   var tabs = [
@@ -1654,15 +2141,15 @@ function render(el, subTab, currentLang){
 
   /* Title */
   h += '<div class="hm-page-header" style="align-items:flex-start;margin-bottom:16px">';
-  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">📐 '+(typeof lang!=='undefined'&&lang==='en'?'Template & Appearance Studio':'Template & Giao diện Studio')+'</h3>';
-  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">💡 '+T('liveHint')+'</div></div>';
+  h += '<div style="width:100%"><h3 class="hm-page-title" style="margin:0;font-size:18px">'+(typeof lang!=='undefined'&&lang==='en'?'Graphics Control Plane':'Graphics Control Plane')+'</h3>';
+  h += '<div style="margin-top:6px;padding:5px 10px;background:var(--bg-surface-alt,var(--bg-hover));border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-secondary)">'+esc(L('Authority: Standard 36 + Admin/shared token layer. Local template cache is preview/draft only.', 'Authority: Standard 36 + admin/shared token layer. Local template cache is preview/draft only.'))+'</div></div>';
   h += '</div>';
 
   /* Sub-tab bar */
-  h += '<div class="hm-tabs" style="margin-bottom:16px">';
+  h += '<div class="hm-tabs" role="tablist" aria-label="'+esc(L('Admin Appearance sections', 'Admin Appearance sections'))+'" style="margin-bottom:16px">';
   tabs.forEach(function(t){
     var active = _subTab===t.key;
-    h += '<button type="button" class="hm-tab'+(active?' active':'')+'" onclick="_appSubTab=\''+t.key+'\';renderAdminAppearance()"><span class="hm-tab-icon">'+t.icon+'</span><span class="hm-tab-label">'+esc(t.label)+'</span></button>';
+    h += '<button type="button" role="tab" aria-selected="'+(active?'true':'false')+'" class="hm-tab'+(active?' active':'')+'" onclick="_appSubTab=\''+t.key+'\';renderAdminAppearance()"><span class="hm-tab-icon">'+t.icon+'</span><span class="hm-tab-label">'+esc(t.label)+'</span></button>';
   });
   h += '</div>';
 
@@ -2070,7 +2557,12 @@ function renderLayout(){
 /* ── SUB-TAB 5: EFFECTS ─────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderEffects(){
-  var h = '';
+  var h = sectionLead(
+    L('Hiệu ứng có kiểm soát', 'Governed effects'),
+    L('Motion, focus, overlay và skeleton phải vẫn đi qua shared token layer, đồng thời impact analysis ghi nhận module dùng hiệu ứng hoặc focus contract.', 'Motion, focus, overlay, and skeleton remain on the shared token layer, while impact analysis tracks modules consuming effects or focus contracts.'),
+    statusChip('admin', L('Impact-aware', 'Impact-aware'))
+  );
+  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
 
   h += sect('⚡ '+T('motion'),
     slider('Fast', '--transition-fast', 'effects.motionFast', 0, 300, 100, 'ms')
@@ -2133,9 +2625,10 @@ function renderComponents(){
 
   h += sectionLead(
     L('Core controls', 'Core controls'),
-    L('Nhóm này nên là nơi chỉnh thường xuyên nhất vì ảnh hưởng trực tiếp tới hành vi nút, input, tab và điều hướng dùng shared token trong portal.', 'This is the group you should tune most often because it directly affects buttons, inputs, tabs, and navigation that already use shared tokens across the portal.'),
-    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide'))
+    L('Nhóm này chỉnh component contract dùng chung. Mọi thay đổi button, input, table, tab, modal hoặc field đều được đưa vào impact analysis trước rollout.', 'This group edits shared component contracts. Button, input, table, tab, modal, or field changes feed impact analysis before rollout.'),
+    statusChip('full', L('Ưu tiên cao', 'High priority')) + statusChip('full', L('Áp dụng rộng', 'System-wide')) + statusChip('admin', L('Impact-aware', 'Impact-aware'))
   );
+  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
 
   /* BUTTON */
   h += sect('🔘 '+T('btnSettings'),
@@ -2405,6 +2898,18 @@ function renderGovernance(){
   ];
 
   h += sectionLead(
+    L('Graphics governance control plane', 'Graphics governance control plane'),
+    L('Khu vực này tổng hợp authority status, impact analysis, compliance matrix, drift detector, audit history và waiver workflow theo Standard 36.', 'This area centralizes authority status, impact analysis, compliance matrix, drift detector, audit history, and waiver workflow under Standard 36.'),
+    statusChip('admin', 'Standard 36') + statusChip('full', L('Governed behaviors', 'Governed behaviors'))
+  );
+  h += renderAuthorityStatusPanel();
+  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
+  h += renderComplianceMatrixPanel();
+  h += renderDriftDetectorPanel();
+  h += renderAuditHistoryPanel(10);
+  h += renderWaiverGovernancePanel();
+
+  h += sectionLead(
     L('Governance theo template đã được kích hoạt', 'Template-centric governance is now active'),
     L('Tab này tổng hợp mức sử dụng template, compliance matrix cho contract mới, WCAG snapshot và bộ theme presets để preview/apply ngay trong studio.', 'This tab now centralizes template usage, compliance checks for the new contract, WCAG snapshots, and the visual themes library for direct preview/apply flows.'),
     statusChip('full', allTemplates.length + ' ' + T('templateCount')) + statusChip('preview', customTemplates.length + ' custom')
@@ -2565,15 +3070,16 @@ function renderGovernance(){
 /* ── SUB-TAB 8: ADVANCED ────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderAdvanced(){
-  var h = '';
+  var h = renderApiContractPanel();
 
   h += sect('📤 '+T('importExport'),
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=HmTheme.exportTheme();var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-theme.json\';a.click()})()">📥 Export JSON</button>'
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){if(HmTheme.importTheme(r.result)){renderAdminAppearance();if(typeof showToast===\'function\')showToast(\'Theme imported\',\'success\')}};r.readAsText(i.files[0])};i.click()})()">📤 Import JSON</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=JSON.stringify(readTemplateStore(),null,2);var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-templates.json\';a.click()})()">🧾 '+T('exportTemplates')+'</button>'
-    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){try{writeTemplateStore(JSON.parse(r.result||\'{}\'));renderAdminAppearance();if(typeof showToast===\'function\')showToast(\''+L('Đã nhập templates','Templates imported')+'\',\'success\')}catch(e){if(typeof showToast===\'function\')showToast(\''+L('JSON không hợp lệ','Invalid JSON')+'\',\'error\')}};r.readAsText(i.files[0])};i.click()})()">📂 '+T('importTemplates')+'</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=JSON.stringify(readDraftCache(),null,2);var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-template-draft-cache.json\';a.click()})()">🧾 '+esc(L('Export draft cache', 'Export draft cache'))+'</button>'
+    +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){try{writeDraftCache(JSON.parse(r.result||\'{}\'));renderAdminAppearance();if(typeof showToast===\'function\')showToast(\''+L('Đã nhập draft cache; chưa thay authority','Draft cache imported; authority unchanged')+'\',\'success\')}catch(e){if(typeof showToast===\'function\')showToast(\''+L('JSON không hợp lệ','Invalid JSON')+'\',\'error\')}};r.readAsText(i.files[0])};i.click()})()">📂 '+esc(L('Import draft cache', 'Import draft cache'))+'</button>'
     +'</div>'
+    +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry.'))+'</div>'
   , true);
 
   h += sect('🖊️ '+T('customCSS'),
@@ -2619,7 +3125,7 @@ function renderAdvanced(){
 }
 
 /* ── Expose ──────────────────────────────────────────────────────────────── */
-window._renderAdminAppearanceFullVersion = '20260410e';
+window._renderAdminAppearanceFullVersion = '20260413a';
 window._renderAdminAppearanceFull = render;
 
 })();

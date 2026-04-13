@@ -5,6 +5,8 @@
    Architecture (SAP Fiori + Atlassian + Material Theme Builder pattern):
      Admin org defaults → data/config/design-system-config.json
      User prefs → localStorage hesem_user_appearance
+     Template registry authority → backend graphics governance endpoints
+     Template preview cache → localStorage hesem_graphics_template_preview_cache
      Applied as: data-* attributes + CSS custom properties on <html>
 
    Cascade: System CSS defaults → Admin config → User prefs → inline override
@@ -15,7 +17,7 @@
 
 var STORAGE_KEY = 'hesem_user_appearance';
 var ADMIN_STORAGE_KEY = 'hesem_admin_appearance_cache';
-var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates';
+var TEMPLATE_PREVIEW_CACHE_KEY = 'hesem_graphics_template_preview_cache';
 var ROOT = document.documentElement;
 
 /* ── Default values ─────────────────────────────────────────────────────── */
@@ -50,10 +52,10 @@ function _saveUserPrefs(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_userPrefs || {})); } catch(e){}
 }
 
-function _loadTemplates(){
+function _loadTemplatePreviewCache(){
   if(_templateStore) return _templateStore;
   try {
-    var raw = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+    var raw = localStorage.getItem(TEMPLATE_PREVIEW_CACHE_KEY);
     _templateStore = raw ? JSON.parse(raw) : {};
   } catch(e){
     _templateStore = {};
@@ -61,8 +63,8 @@ function _loadTemplates(){
   return _templateStore;
 }
 
-function _saveTemplates(){
-  try { localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(_templateStore || {})); } catch(e){}
+function _saveTemplatePreviewCache(){
+  try { localStorage.setItem(TEMPLATE_PREVIEW_CACHE_KEY, JSON.stringify(_templateStore || {})); } catch(e){}
 }
 
 function _loadAdminConfig(callback){
@@ -834,34 +836,48 @@ var VISUAL_THEME_PRESETS = {
   }
 };
 
-function getTemplates(){
-  return _loadTemplates();
+function getTemplatePreviewCache(){
+  return _loadTemplatePreviewCache();
 }
 
-function saveTemplate(templateId, config){
+function saveTemplatePreview(templateId, config){
   if(!templateId) return false;
-  var templates = _loadTemplates();
+  var templates = _loadTemplatePreviewCache();
   templates[String(templateId)] = config || {};
-  _saveTemplates();
-  _emit('template-change', { action: 'save', templateId: String(templateId), config: config || {} });
+  _saveTemplatePreviewCache();
+  _emit('template-preview-cache-change', { action: 'save', templateId: String(templateId), config: config || {} });
   return true;
 }
 
-function deleteTemplate(templateId){
+function deleteTemplatePreview(templateId){
   if(!templateId) return false;
-  var templates = _loadTemplates();
+  var templates = _loadTemplatePreviewCache();
   delete templates[String(templateId)];
-  _saveTemplates();
-  _emit('template-change', { action: 'delete', templateId: String(templateId) });
+  _saveTemplatePreviewCache();
+  _emit('template-preview-cache-change', { action: 'delete', templateId: String(templateId) });
   return true;
 }
 
 function resolveWithTemplate(templateId){
   var base = getFullConfig();
-  var templates = _loadTemplates();
+  var templates = _loadTemplatePreviewCache();
   var tpl = templates[String(templateId || '')];
   if(!tpl || !tpl.tokenOverrides || typeof tpl.tokenOverrides !== 'object') return base;
   return _deepMerge(base, tpl.tokenOverrides);
+}
+
+/* Backward-compatible aliases. These expose preview cache only; they are not
+   template registry authority. */
+function getTemplates(){
+  return getTemplatePreviewCache();
+}
+
+function saveTemplate(templateId, config){
+  return saveTemplatePreview(templateId, config);
+}
+
+function deleteTemplate(templateId){
+  return deleteTemplatePreview(templateId);
 }
 
 function applyVisualTheme(themeId){
@@ -920,6 +936,9 @@ window.HmTheme = {
   contrastRatio: contrastRatio,
   exportTheme: exportTheme,
   importTheme: importTheme,
+  getTemplatePreviewCache: getTemplatePreviewCache,
+  saveTemplatePreview: saveTemplatePreview,
+  deleteTemplatePreview: deleteTemplatePreview,
   getTemplates: getTemplates,
   saveTemplate: saveTemplate,
   deleteTemplate: deleteTemplate,
