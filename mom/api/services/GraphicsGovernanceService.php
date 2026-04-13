@@ -908,6 +908,7 @@ class GraphicsGovernanceService
     public function publishRuntimeRegistry(): array
     {
         $registry = $this->normalizedTemplateRegistry();
+        $designConfig = $this->repo->readDesignConfig();
         $componentRegistry = $this->getComponentContractRegistry()['componentContractRegistry'];
         $matrix = $this->complianceMatrix();
         $payload = [
@@ -924,6 +925,12 @@ class GraphicsGovernanceService
                 'etag' => $this->etag($registry),
                 'sourcePath' => 'mom/design/template-registry.json',
                 'templates' => (array)($registry['templates'] ?? []),
+            ],
+            'designConfig' => [
+                'version' => $this->documentVersion($designConfig),
+                'etag' => $this->etag($designConfig),
+                'sourcePath' => 'mom/data/config/design-system-config.json',
+                'config' => $designConfig,
             ],
             'componentContractRegistry' => $componentRegistry,
             'moduleGraphicsCompliance' => $matrix,

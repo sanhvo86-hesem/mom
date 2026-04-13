@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T10:18:11+00:00",
+        "generatedAt": "2026-04-13T10:24:18+00:00",
         "source": "graphics_governance_backend",
         "authorityLayer": "system_contract_registry",
         "authority": "mom/design/template-registry.json",
@@ -298,9 +298,205 @@
             }
         ]
     },
+    "designConfig": {
+        "version": "2.0",
+        "etag": "sha256:c12127d2fd6f43bf6f647ba0e2780798",
+        "sourcePath": "mom/data/config/design-system-config.json",
+        "config": {
+            "density": "compact",
+            "colorMode": "light",
+            "radius": "rounded",
+            "motion": "normal",
+            "fontSize": 0,
+            "typography": {
+                "display": {
+                    "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
+                    "weight": 700
+                },
+                "heading": {
+                    "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
+                    "weight": 600
+                },
+                "body": {
+                    "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
+                    "weight": 400
+                },
+                "label": {
+                    "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
+                    "weight": 600,
+                    "spacing": "0.05em",
+                    "transform": "uppercase"
+                },
+                "mono": {
+                    "family": "'JetBrains Mono', 'Fira Code', monospace"
+                }
+            },
+            "fontScale": {
+                "xs": "11px",
+                "sm": 13,
+                "base": 14,
+                "md": 16,
+                "lg": 18,
+                "xl": 20,
+                "2xl": 24,
+                "3xl": "32px"
+            },
+            "lineHeight": {
+                "tight": 1.25,
+                "normal": 1.5,
+                "relaxed": 1.75
+            },
+            "brand": {
+                "primary": "#1565c0",
+                "light": "#1e88e5",
+                "dark": "#0c2d48",
+                "darkest": "#0a1e32",
+                "accent": "#f9a825",
+                "accentLight": "#fdd835",
+                "sidebarBg": "#0c2d48"
+            },
+            "statusColors": {
+                "success": "#16a34a",
+                "error": "#dc2626",
+                "warning": "#d97706",
+                "info": "#2563eb",
+                "purple": "#7c3aed",
+                "cyan": "#0891b2"
+            },
+            "statusColorsDark": {
+                "success": "#22c55e",
+                "error": "#f87171",
+                "warning": "#fbbf24",
+                "info": "#60a5fa",
+                "purple": "#a78bfa",
+                "cyan": "#22d3ee"
+            },
+            "colorsLight": {
+                "bgPage": "#f8fafc",
+                "bgSurface": "#ffffff",
+                "bgSurfaceAlt": "#f1f5f9",
+                "bgHeader": "#ffffff",
+                "bgModal": "#ffffff",
+                "bgHover": "#f8fafc",
+                "textPrimary": "#1e293b",
+                "textSecondary": "#64748b",
+                "textTertiary": "#94a3b8",
+                "textLink": "#1565c0",
+                "textInverse": "#ffffff",
+                "border": "#e2e8f0",
+                "borderFocus": "#1565c0",
+                "borderError": "#dc2626",
+                "borderSuccess": "#16a34a"
+            },
+            "colorsDark": {
+                "bgPage": "#0f172a",
+                "bgSurface": "#1e293b",
+                "bgSurfaceAlt": "#162032",
+                "bgHeader": "#1e293b",
+                "bgHover": "#263348",
+                "sidebarBg": "#0a1628",
+                "textPrimary": "#f1f5f9",
+                "textSecondary": "#94a3b8",
+                "textTertiary": "#64748b",
+                "textLink": "#60a5fa",
+                "border": "#334155",
+                "borderFocus": "#60a5fa"
+            },
+            "layout": {
+                "sidebarW": 260,
+                "sidebarCollapsed": 56,
+                "headerH": 52,
+                "contentMaxW": 1400,
+                "modalMaxW": 800,
+                "modalSmMaxW": 480
+            },
+            "effects": {
+                "focusRingWidth": 3,
+                "focusRingColor": "rgba(21,101,192,0.12)",
+                "focusRingOffset": 0,
+                "selectionBg": "#3b82f6",
+                "selectionColor": "#ffffff",
+                "caretColor": "#1565c0",
+                "placeholderColor": "#94a3b8",
+                "disabledOpacity": 0.5,
+                "scrollbarWidth": 8,
+                "scrollbarTrack": "#f1f5f9",
+                "scrollbarThumb": "#cbd5e1",
+                "scrollbarRadius": 4,
+                "backdropBlur": "0px",
+                "overlayOpacity": "0.4px",
+                "motionFast": 100,
+                "motionNormal": 150,
+                "motionSlow": 250,
+                "motionSpring": 300
+            },
+            "shadows": "default",
+            "advanced": {
+                "printBgWhite": true,
+                "highContrast": false
+            },
+            "components": {
+                "btn": {
+                    "paddingX": "8px",
+                    "gap": "2px",
+                    "paddingY": "2px",
+                    "borderWidth": "1px",
+                    "minWidth": "12px",
+                    "letterSpacing": "0.02em"
+                },
+                "tab": {
+                    "paddingY": "6px",
+                    "paddingX": "12px",
+                    "radius": "8px",
+                    "fontSize": "12px",
+                    "gap": "4px",
+                    "borderWidth": "2px"
+                },
+                "table": {
+                    "borderWidth": "1px",
+                    "headerFontWeight": "800px",
+                    "headerLetterSpacing": "0.05em"
+                },
+                "card": {
+                    "borderWidth": "0px",
+                    "headerPadding": "8px",
+                    "bodyPadding": "8px"
+                },
+                "badge": {
+                    "letterSpacing": "0.06em",
+                    "borderWidth": "1px",
+                    "minWidth": "0px",
+                    "fontWeight": "800px"
+                },
+                "input": {
+                    "paddingY": "3px",
+                    "borderWidth": "1px"
+                },
+                "icon": {
+                    "onlyScale": "1.5px",
+                    "leadingEdgeTrim": "8px",
+                    "leadingScale": "1.25px",
+                    "onlyInset": "1px"
+                },
+                "pagination": {
+                    "btnSize": "34px"
+                },
+                "isoNote": {
+                    "iconSize": "22px",
+                    "fontSize": "12px"
+                }
+            },
+            "_meta": {
+                "version": "2.0",
+                "description": "Admin-configurable design system.",
+                "updatedAt": "2026-04-07T20:15:42+07:00",
+                "updatedBy": "sanh.vo"
+            }
+        }
+    },
     "componentContractRegistry": {
         "_meta": {
-            "generatedAt": "2026-04-13T10:18:11+00:00",
+            "generatedAt": "2026-04-13T10:24:18+00:00",
             "authority": "mom/design/block-contracts",
             "authorityRole": "component_contract_registry",
             "componentModel": "frontend_block_contracts"

@@ -14,16 +14,21 @@ var DRAFT_CACHE_KEY = 'hesem_graphics_template_draft_cache';
 var VERSION = '20260413a';
 
 var ENDPOINTS = {
-  templateRegistry:  { method:'GET',  action:'graphics_template_registry' },
+  templateRegistry:  { method:'GET',  action:'graphics_template_registry_get' },
   templateDraftSave: { method:'POST', action:'graphics_template_draft_save' },
   templateValidate:  { method:'POST', action:'graphics_template_validate' },
-  impactAnalysis:   { method:'POST', action:'graphics_impact_analysis' },
+  templatePublish:   { method:'POST', action:'graphics_template_publish' },
+  impactToken:       { method:'POST', action:'graphics_impact_token' },
+  impactTemplate:    { method:'POST', action:'graphics_impact_template' },
+  impactComponent:   { method:'POST', action:'graphics_impact_component' },
   complianceMatrix: { method:'GET',  action:'graphics_compliance_matrix' },
+  driftReport:       { method:'GET',  action:'graphics_drift_report' },
   rolloutStage:     { method:'POST', action:'graphics_rollout_stage' },
-  publishApply:     { method:'POST', action:'graphics_publish_apply' },
-  rollback:         { method:'POST', action:'graphics_rollback' },
+  publishApply:     { method:'POST', action:'graphics_rollout_apply' },
+  rollback:         { method:'POST', action:'graphics_rollout_rollback' },
   auditHistory:     { method:'GET',  action:'graphics_audit_history' },
-  waiverRequest:    { method:'POST', action:'graphics_waiver_request' }
+  waiverRequest:    { method:'POST', action:'graphics_waiver_create' },
+  activeWaivers:    { method:'GET',  action:'graphics_waivers_active' }
 };
 
 var TEMPLATE_STATES = [
@@ -46,8 +51,10 @@ var _state = {
   templates: [],
   modules: [],
   compliance: [],
+  drift: null,
   audit: [],
   waivers: [],
+  rolloutsByTemplate: {},
   lastChange: {
     kind: 'template-registry',
     target: 'T13',
@@ -371,6 +378,83 @@ function defaultAudit(){
   ];
 }
 
+function firstArray(){
+  for(var i = 0; i < arguments.length; i++){
+    if(Array.isArray(arguments[i])) return arguments[i];
+  }
+  return null;
+}
+
+function normalizeComplianceRows(remote){
+  var rows = firstArray(
+    remote,
+    remote && remote.matrix,
+    remote && remote.modules,
+    remote && remote.rows
+  );
+  if(!rows) return null;
+  return rows.map(function(row){
+    row = row || {};
+    var findings = Array.isArray(row.findings) ? row.findings : [];
+    var findingCodes = findings.map(function(f){ return f && (f.code || f.message) || ''; }).filter(Boolean);
+    var blocker = row.linkageStatus === 'blocked' || findings.some(function(f){
+      return String(f && f.severity || '').toLowerCase() === 'blocker';
+    });
+    var linkage = row.linkageStatus || (row.compliant === true ? 'full-admin-controlled' : (blocker ? 'blocked' : 'bridged-to-shared-tokens'));
+    var blockFamilies = Array.isArray(row.blockFamilies) ? row.blockFamilies : [];
+    return Object.assign({}, row, {
+      moduleId: String(row.moduleId || row.module || ''),
+      route: String(row.route || ''),
+      linkageStatus: linkage,
+      selectorDebt: Number(row.selectorDebt || (row.compliant === false ? findings.length || 1 : 0)),
+      privateTokenDebt: Number(row.privateTokenDebt || 0),
+      hardcodedStyleDebt: Number(row.hardcodedStyleDebt || 0),
+      consumesHmComponents: row.consumesHmComponents !== undefined ? !!row.consumesHmComponents : blockFamilies.length > 0,
+      consumesSharedTokens: row.consumesSharedTokens !== undefined ? !!row.consumesSharedTokens : row.compliant === true,
+      usesPrivateCssShell: row.usesPrivateCssShell !== undefined ? !!row.usesPrivateCssShell : linkage === 'legacy-private-css',
+      reason: row.reason || (findingCodes.length ? findingCodes.join(', ') : (row.compliant === true ? 'Backend compliance matrix reports no findings.' : 'Backend compliance matrix reports unresolved graphics findings.'))
+    });
+  });
+}
+
+function normalizeAuditRows(remote){
+  var rows = firstArray(
+    remote,
+    remote && remote.events,
+    remote && remote.audit,
+    remote && remote.rows
+  );
+  if(!rows) return null;
+  return rows.map(function(row){
+    row = row || {};
+    return {
+      at: row.at || row.createdAt || row.created_at || row.timestamp || row.time || '',
+      actor: row.actor || row.actorName || row.actor_name || row.user || row.username || '-',
+      action: row.action || row.event || row.eventType || row.event_type || row.name || '-',
+      subject: row.subject || row.aggregateId || row.aggregate_id || row.targetId || row.target_id || '-',
+      result: row.result || row.status || row.outcome || 'recorded'
+    };
+  });
+}
+
+function normalizeWaiverRows(remote){
+  var rows = firstArray(
+    remote,
+    remote && remote.waivers,
+    remote && remote.rows
+  );
+  if(!rows) return null;
+  return rows.map(function(row){
+    row = row || {};
+    return Object.assign({}, row, {
+      waiverId: row.waiverId || row.id || '',
+      subjectId: row.subjectId || row.targetId || row.templateId || row.moduleId || '',
+      reasonText: row.reasonText || row.reason || '',
+      status: row.status || 'recorded'
+    });
+  });
+}
+
 function apiUrl(endpoint){
   return 'api.php?action=' + encodeURIComponent(endpoint.action);
 }
@@ -415,13 +499,20 @@ function refresh(seedTemplates){
 
   var registry = callEndpoint('templateRegistry', {}).catch(function(){ return null; });
   var compliance = callEndpoint('complianceMatrix', {}).catch(function(){ return null; });
+  var drift = callEndpoint('driftReport', {}).catch(function(){ return null; });
   var audit = callEndpoint('auditHistory', {}).catch(function(){ return null; });
+  var waivers = callEndpoint('activeWaivers', {}).catch(function(){ return null; });
 
-  return Promise.all([registry, compliance, audit, localModules]).then(function(parts){
+  return Promise.all([registry, compliance, drift, audit, waivers, localModules]).then(function(parts){
     var remoteRegistry = parts[0];
     var remoteCompliance = parts[1];
-    var remoteAudit = parts[2];
-    var localSchemas = parts[3];
+    var remoteDrift = parts[2];
+    var remoteAudit = parts[3];
+    var remoteWaivers = parts[4];
+    var localSchemas = parts[5];
+    var complianceRows = normalizeComplianceRows(remoteCompliance);
+    var auditRows = normalizeAuditRows(remoteAudit);
+    var waiverRows = normalizeWaiverRows(remoteWaivers);
     if(remoteRegistry && Array.isArray(remoteRegistry.templates)){
       _state.templates = remoteRegistry.templates.map(normalizeTemplate);
       _state.registryAuthority = 'backend';
@@ -430,8 +521,10 @@ function refresh(seedTemplates){
       _state.registryAuthority = 'fallback-seed';
     }
     _state.modules = mergeModules(remoteRegistry && remoteRegistry.modules ? remoteRegistry.modules : localSchemas);
-    _state.compliance = Array.isArray(remoteCompliance) ? remoteCompliance : fallbackCompliance(_state.modules);
-    _state.audit = Array.isArray(remoteAudit) ? remoteAudit : defaultAudit();
+    _state.compliance = complianceRows || fallbackCompliance(_state.modules);
+    _state.drift = remoteDrift && remoteDrift.drift ? remoteDrift.drift : (remoteDrift || null);
+    _state.audit = auditRows || defaultAudit();
+    _state.waivers = waiverRows || _state.waivers || [];
     _state.loaded = true;
     _state.loading = false;
     _state.lastLoadedAt = nowIso();
@@ -440,6 +533,7 @@ function refresh(seedTemplates){
   }).catch(function(){
     _state.modules = mergeModules([]);
     _state.compliance = fallbackCompliance(_state.modules);
+    _state.drift = null;
     _state.audit = defaultAudit();
     _state.loaded = true;
     _state.loading = false;
@@ -465,8 +559,10 @@ function getSnapshot(seedTemplates){
     templates: templates,
     modules: clone(_state.modules),
     compliance: clone(_state.compliance),
+    drift: clone(_state.drift),
     audit: clone(_state.audit),
     waivers: clone(_state.waivers),
+    rolloutsByTemplate: clone(_state.rolloutsByTemplate),
     lastChange: clone(_state.lastChange),
     impact: clone(_state.lastImpact || computeImpact(_state.lastChange, seedTemplates || []))
   };
@@ -554,6 +650,68 @@ function computeImpact(change, seedTemplates){
   };
 }
 
+function impactEndpointForChange(change){
+  var kind = String(change && change.kind || '');
+  if(kind === 'component-contract') return 'impactComponent';
+  if(kind.indexOf('template') === 0) return 'impactTemplate';
+  if(kind === 'theme-preset' || kind === 'token') return 'impactToken';
+  return '';
+}
+
+function impactPayloadForChange(change){
+  change = change || {};
+  var kind = String(change.kind || '');
+  var target = String(change.target || '');
+  if(kind === 'component-contract') return { componentId: target, blockType: target };
+  if(kind.indexOf('template') === 0) return { templateId: target, impactType: 'template' };
+  return {
+    tokenKeys: target ? [target] : [],
+    tokenGroups: String(change.path || target || '').split('.').filter(Boolean).slice(0, 1),
+    impactType: 'token'
+  };
+}
+
+function normalizeBackendImpact(remote, change, localImpact){
+  localImpact = localImpact || {};
+  if(!remote || typeof remote !== 'object') return localImpact;
+  var affectedModules = remote.affectedModules || [];
+  var moduleIds = affectedModules.map(function(row){
+    return typeof row === 'string' ? row : String(row && row.moduleId || '');
+  }).filter(Boolean);
+  return Object.assign({}, localImpact || {}, {
+    kind: change && change.kind || remote.analysisType || localImpact.kind,
+    target: change && change.target || (remote.subject && (remote.subject.templateId || remote.subject.componentId || (remote.subject.tokenKeys || [])[0])) || localImpact.target,
+    label: change && change.label || localImpact.label,
+    affectedModules: moduleIds.length ? moduleIds : (localImpact.affectedModules || []),
+    affectedRoutes: remote.affectedRoutes || localImpact.affectedRoutes || [],
+    affectedScreens: remote.affectedScreens || localImpact.affectedScreens || [],
+    affectedBlockFamilies: remote.affectedBlockFamilies || localImpact.affectedBlockFamilies || [],
+    regulatedModules: remote.regulatedModulesTouched || remote.regulatedModules || localImpact.regulatedModules || [],
+    shopfloorModules: remote.shopfloorModulesTouched || remote.shopfloorModules || localImpact.shopfloorModules || [],
+    gatesToRerun: remote.gatesToRerun || localImpact.gatesToRerun || [],
+    releaseBlockerSummary: remote.blockers && remote.blockers.length
+      ? remote.blockers.map(function(item){ return item.code || item.message || 'backend_blocker'; }).join(', ')
+      : (localImpact.releaseBlockerSummary || 'No backend blocker detected.'),
+    impactId: remote.impactId || localImpact.impactId || '',
+    computedAt: remote.generatedAt || nowIso(),
+    backendAttested: true
+  });
+}
+
+function analyzeImpact(change, seedTemplates){
+  var localImpact = markChange(change, seedTemplates || []);
+  var endpointName = impactEndpointForChange(_state.lastChange);
+  if(!endpointName) return Promise.resolve(localImpact);
+  return callEndpoint(endpointName, impactPayloadForChange(_state.lastChange)).then(function(remote){
+    _state.lastImpact = normalizeBackendImpact(remote, _state.lastChange, localImpact);
+    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'backend-attested', { impactId:_state.lastImpact.impactId || '' });
+    return clone(_state.lastImpact);
+  }).catch(function(){
+    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'frontend-fallback');
+    return clone(localImpact);
+  });
+}
+
 function recordAudit(action, subject, result, extra){
   _state.audit = _state.audit || defaultAudit();
   _state.audit.unshift(Object.assign({
@@ -616,14 +774,39 @@ function templateAction(action, templateId, payload){
   var endpointMap = {
     saveDraft:'templateDraftSave',
     validate:'templateValidate',
+    publish:'templatePublish',
     stage:'rolloutStage',
     apply:'publishApply',
     rollback:'rollback'
   };
   var endpointName = endpointMap[action];
+  if(!endpointName) return Promise.resolve({ ok:false, status:'publish-blocked', message:'Unsupported graphics governance action: ' + action });
   var body = Object.assign({ templateId:id }, payload || {});
+  if(action === 'stage'){
+    body.impactType = body.impactType || 'template';
+    body.scope = body.scope || { templates:[id] };
+  }
+  if(action === 'publish'){
+    body.impactAnalysisId = body.impactAnalysisId || (_state.lastImpact && _state.lastImpact.impactId) || 'frontend-impact-fallback';
+    body.blockersResolved = body.blockersResolved !== undefined ? body.blockersResolved : true;
+  }
+  if((action === 'apply' || action === 'rollback') && !body.rolloutId){
+    body.rolloutId = _state.rolloutsByTemplate[id] || '';
+  }
+  if((action === 'apply' || action === 'rollback') && !body.rolloutId){
+    recordAudit('template-' + action, id, 'blocked-rollout-not-staged');
+    return Promise.resolve({
+      ok:false,
+      status:'publish-blocked',
+      message:'Stage rollout first; backend apply/rollback requires rolloutId.'
+    });
+  }
   return callEndpoint(endpointName, body).then(function(data){
-    var resultStatus = data && data.status ? canonicalState(data.status) : (action === 'validate' ? 'validated' : action === 'apply' ? 'published' : 'controlled-draft');
+    var rollout = data && data.rollout ? data.rollout : null;
+    if(rollout && rollout.rolloutId) _state.rolloutsByTemplate[id] = rollout.rolloutId;
+    var resultStatus = data && data.status ? canonicalState(data.status)
+      : (data && data.template && data.template.status ? canonicalState(data.template.status)
+      : (action === 'validate' ? 'validated' : (action === 'apply' || action === 'publish') ? 'published' : action === 'rollback' ? 'validated' : 'controlled-draft'));
     recordAudit('template-' + action, id, resultStatus);
     _state.templates = (_state.templates || []).map(function(tpl){
       if(String(tpl.templateId || tpl.id) === id){
@@ -646,13 +829,28 @@ function templateAction(action, templateId, payload){
 }
 
 function requestWaiver(payload){
+  payload = payload || {};
+  var targetId = payload.targetId || payload.subjectId || payload.templateId || payload.moduleId || '';
+  var expires = payload.expiresAt;
+  if(!expires){
+    var d = new Date();
+    d.setDate(d.getDate() + 30);
+    expires = d.toISOString();
+  }
   var waiver = Object.assign({
     waiverId:'WV-' + String(Date.now()).slice(-8),
     at: nowIso(),
+    scope: payload.scope || 'graphics-governance',
+    targetId: targetId || 'graphics-control-plane',
+    subjectId: targetId || payload.subjectId || 'graphics-control-plane',
+    reason: payload.reason || payload.reasonText || 'Graphics exception requires review before rollout.',
+    reasonText: payload.reasonText || payload.reason || 'Graphics exception requires review before rollout.',
+    expiresAt: expires,
     status:'requested'
-  }, payload || {});
+  }, payload);
   return callEndpoint('waiverRequest', waiver).then(function(data){
-    _state.waivers.unshift(Object.assign({}, waiver, data || {}, { status:'submitted' }));
+    var backendWaiver = data && data.waiver ? data.waiver : {};
+    _state.waivers.unshift(Object.assign({}, waiver, backendWaiver, normalizeWaiverRows([Object.assign({}, waiver, backendWaiver)])[0], { status:(backendWaiver.status || 'submitted') }));
     recordAudit('waiver-requested', waiver.subjectId || waiver.templateId || waiver.moduleId || waiver.waiverId, 'submitted');
     return { ok:true, waiver:waiver };
   }).catch(function(){
@@ -673,6 +871,7 @@ window.HmGraphicsGovernance = {
   getComplianceMatrix: function(){ return clone(_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(mergeModules([]))); },
   computeImpact: computeImpact,
   markChange: markChange,
+  analyzeImpact: analyzeImpact,
   saveTemplateDraft: saveTemplateDraft,
   saveTemplatePreview: saveTemplatePreview,
   deleteTemplateDraft: deleteTemplateDraft,

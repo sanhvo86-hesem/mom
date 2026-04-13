@@ -10,6 +10,8 @@ return static function (Router $router, string $dataDir): void {
     $router->actions([
         'graphics_design_config_get'          => [GraphicsGovernanceController::class, 'getDesignConfig'],
         'graphics_design_config_save'         => [GraphicsGovernanceController::class, 'saveDesignConfig'],
+        'admin_design_config'                 => [GraphicsGovernanceController::class, 'getDesignConfig'],
+        'admin_design_config_save'            => [GraphicsGovernanceController::class, 'saveDesignConfig'],
         'graphics_template_registry_get'      => [GraphicsGovernanceController::class, 'listTemplates'],
         'graphics_template_get'               => [GraphicsGovernanceController::class, 'getTemplate'],
         'graphics_template_draft_save'        => [GraphicsGovernanceController::class, 'saveDraftTemplate'],

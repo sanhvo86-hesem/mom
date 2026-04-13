@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.local/schemas/graphics-governance.schema.json",
+  "title": "HESEM Graphics Governance Backend Contracts",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "DesignConfig": { "$ref": "#/$defs/DesignConfig" },
+    "TemplateRegistryEntry": { "$ref": "#/$defs/TemplateRegistryEntry" },
+    "TemplateRegistryCollection": { "$ref": "#/$defs/TemplateRegistryCollection" },
+    "TemplateDraft": { "$ref": "#/$defs/TemplateDraft" },
+    "TemplateValidationResult": { "$ref": "#/$defs/TemplateValidationResult" },
+    "GraphicsImpactReport": { "$ref": "#/$defs/GraphicsImpactReport" },
+    "ModuleGraphicsComplianceEntry": { "$ref": "#/$defs/ModuleGraphicsComplianceEntry" },
+    "GraphicsPublishRequest": { "$ref": "#/$defs/GraphicsPublishRequest" },
+    "GraphicsPublishResult": { "$ref": "#/$defs/GraphicsPublishResult" },
+    "GraphicsRollbackRequest": { "$ref": "#/$defs/GraphicsRollbackRequest" },
+    "GraphicsAuditEvent": { "$ref": "#/$defs/GraphicsAuditEvent" },
+    "GraphicsWaiver": { "$ref": "#/$defs/GraphicsWaiver" },
+    "GraphicsReleaseManifestRef": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+  },
+  "$defs": {
+    "DesignConfig": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "_meta": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "version": { "type": "string" },
+            "updatedAt": { "type": "string" },
+            "updatedBy": { "type": "string" },
+            "authority": { "type": "string" },
+            "localStorageAuthority": { "const": false }
+          }
+        }
+      }
+    },
+    "TemplateRegistryEntry": {
+      "type": "object",
+      "required": [
+        "templateId",
+        "canonicalId",
+        "version",
+        "status",
+        "owner",
+        "moduleArchetype",
+        "zones",
+        "allowedBlocksByZone",
+        "defaultDensity",
+        "supportedDensities",
+        "themePolicy",
+        "responsivePolicy",
+        "qaEvidence"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "templateId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{1,120}$" },
+        "canonicalId": { "type": "string" },
+        "legacyCode": { "type": "string" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9_.-]+)?$" },
+        "status": { "enum": ["approved", "draft", "deprecated", "retired"] },
+        "owner": { "type": "string" },
+        "moduleArchetype": { "type": "string" },
+        "zones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["zoneId", "type", "required"],
+            "additionalProperties": true,
+            "properties": {
+              "zoneId": { "type": "string" },
+              "type": { "type": "string" },
+              "required": { "type": "boolean" }
+            }
+          }
+        },
+        "allowedBlocksByZone": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          }
+        },
+        "defaultDensity": { "enum": ["compact", "default", "comfortable", "shopfloor"] },
+        "supportedDensities": {
+          "type": "array",
+          "items": { "enum": ["compact", "default", "comfortable", "shopfloor"] }
+        },
+        "themePolicy": { "type": "object" },
+        "responsivePolicy": { "type": "object" },
+        "qaEvidence": { "type": "object" },
+        "releaseManifestRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+        },
+        "waiverIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "TemplateRegistryCollection": {
+      "type": "object",
+      "required": ["_meta", "templates"],
+      "additionalProperties": true,
+      "properties": {
+        "_meta": { "type": "object" },
+        "templates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TemplateRegistryEntry" }
+        }
+      }
+    },
+    "TemplateDraft": {
+      "allOf": [
+        { "$ref": "#/$defs/TemplateRegistryEntry" },
+        {
+          "type": "object",
+          "properties": {
+            "_draft": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "savedAt": { "type": "string" },
+                "savedBy": { "type": "string" },
+                "baseRegistryVersion": { "type": "string" },
+                "baseRegistryEtag": { "type": "string" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TemplateValidationResult": {
+      "type": "object",
+      "required": ["valid", "errors", "warnings", "checkedAt"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "templateId": { "type": "string" },
+        "checkedAt": { "type": "string" },
+        "errors": { "type": "array", "items": { "type": "object" } },
+        "warnings": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "GraphicsImpactReport": {
+      "type": "object",
+      "required": [
+        "impactId",
+        "analysisType",
+        "affectedModules",
+        "affectedRoutes",
+        "affectedScreens",
+        "affectedBlockFamilies",
+        "regulatedModulesTouched",
+        "shopfloorModulesTouched",
+        "gatesToRerun",
+        "blockers",
+        "machineReadable"
+      ],
+      "properties": {
+        "impactId": { "type": "string" },
+        "analysisType": { "enum": ["token", "template", "component", "rollout"] },
+        "subject": { "type": "object" },
+        "affectedModules": { "type": "array", "items": { "type": "object" } },
+        "affectedRoutes": { "type": "array", "items": { "type": "string" } },
+        "affectedScreens": { "type": "array", "items": { "type": "string" } },
+        "affectedBlockFamilies": { "type": "array", "items": { "type": "string" } },
+        "regulatedModulesTouched": { "type": "array", "items": { "type": "string" } },
+        "shopfloorModulesTouched": { "type": "array", "items": { "type": "string" } },
+        "gatesToRerun": { "type": "array", "items": { "type": "string" } },
+        "blockers": { "type": "array", "items": { "type": "object" } },
+        "machineReadable": { "const": true }
+      }
+    },
+    "ModuleGraphicsComplianceEntry": {
+      "type": "object",
+      "required": ["moduleId", "templateId", "compliant", "findings"],
+      "additionalProperties": true,
+      "properties": {
+        "moduleId": { "type": "string" },
+        "route": { "type": "string" },
+        "templateId": { "type": "string" },
+        "templateVersion": { "type": "string" },
+        "regulated": { "type": "boolean" },
+        "shopfloor": { "type": "boolean" },
+        "screens": { "type": "array", "items": { "type": "string" } },
+        "blockFamilies": { "type": "array", "items": { "type": "string" } },
+        "findings": { "type": "array", "items": { "type": "object" } },
+        "compliant": { "type": "boolean" }
+      }
+    },
+    "GraphicsPublishRequest": {
+      "type": "object",
+      "required": ["expectedVersion", "impactAnalysisId", "gateEvidence", "releaseManifestRefs"],
+      "properties": {
+        "expectedVersion": { "type": "string" },
+        "templateId": { "type": "string" },
+        "template": { "$ref": "#/$defs/TemplateDraft" },
+        "impactAnalysisId": { "type": "string" },
+        "blockersResolved": { "type": "boolean" },
+        "gateEvidence": { "type": ["object", "array"] },
+        "releaseManifestRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+        },
+        "waiverIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "GraphicsPublishResult": {
+      "type": "object",
+      "required": ["publishId", "template", "registryVersion", "registryEtag", "status"],
+      "properties": {
+        "publishId": { "type": "string" },
+        "status": { "const": "published" },
+        "template": { "$ref": "#/$defs/TemplateRegistryEntry" },
+        "validation": { "$ref": "#/$defs/TemplateValidationResult" },
+        "impact": { "$ref": "#/$defs/GraphicsImpactReport" },
+        "releaseManifestRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+        },
+        "registryVersion": { "type": "string" },
+        "registryEtag": { "type": "string" }
+      }
+    },
+    "GraphicsRollbackRequest": {
+      "type": "object",
+      "required": ["expectedVersion", "rolloutId"],
+      "properties": {
+        "expectedVersion": { "type": "string" },
+        "rolloutId": { "type": "string" },
+        "targetSnapshotId": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "GraphicsAuditEvent": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "event_type": { "type": "string" },
+        "aggregate_type": { "const": "graphics_governance" },
+        "aggregate_id": { "type": "string" },
+        "actor_name": { "type": "string" },
+        "payload": { "type": "object" },
+        "metadata": { "type": "object" },
+        "recorded_at": { "type": "string" }
+      }
+    },
+    "GraphicsWaiver": {
+      "type": "object",
+      "required": ["scope", "targetId", "reason", "expiresAt"],
+      "additionalProperties": true,
+      "properties": {
+        "waiverId": { "type": "string" },
+        "scope": { "enum": ["template", "module", "component", "token", "release_gate"] },
+        "targetId": { "type": "string" },
+        "reason": { "type": "string" },
+        "riskClass": { "enum": ["low", "medium", "high", "regulated"] },
+        "status": { "enum": ["draft", "approved", "expired"] },
+        "documentControlRefs": { "type": "array", "items": { "type": "string" } },
+        "releaseManifestRefs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GraphicsReleaseManifestRef" }
+        },
+        "expiresAt": { "type": "string" }
+      }
+    },
+    "GraphicsReleaseManifestRef": {
+      "type": "object",
+      "required": ["refType", "refId"],
+      "properties": {
+        "refType": { "enum": ["document", "dcr", "evidence", "release_manifest", "test_report", "approval"] },
+        "refId": { "type": "string" },
+        "uri": { "type": "string" }
+      }
+    }
+  }
+}

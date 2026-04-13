@@ -1433,7 +1433,7 @@ function templateStatusLabel(status){
     deprecated: L('Deprecated', 'Deprecated'),
     'legacy-bridged': L('Legacy bridged', 'Legacy bridged')
   };
-  return map[String(status || '')] || esc(status || '-');
+  return map[String(status || '')] || String(status || '-');
 }
 
 function statusKindForTemplate(status){
@@ -1500,8 +1500,15 @@ window._admGraphicsMarkChange = function(kind, target, value){
 };
 
 window._admGraphicsRunImpact = function(kind, target){
-  if(graphicsSvc() && typeof graphicsSvc().markChange === 'function'){
-    graphicsSvc().markChange({ kind:kind, target:target, path:target, label:kind + ': ' + target }, BASE_TEMPLATE_PRESETS);
+  var svc = graphicsSvc();
+  var change = { kind:kind, target:target, path:target, label:kind + ': ' + target };
+  if(svc && typeof svc.analyzeImpact === 'function'){
+    svc.analyzeImpact(change, BASE_TEMPLATE_PRESETS).then(function(){ renderAdminAppearance(); });
+    refreshImpactPanel();
+    return;
+  }
+  if(svc && typeof svc.markChange === 'function'){
+    svc.markChange(change, BASE_TEMPLATE_PRESETS);
   }
   renderAdminAppearance();
 };
@@ -1538,7 +1545,10 @@ window._admGraphicsRequestWaiver = function(){
   if(!svc || typeof svc.requestWaiver !== 'function') return;
   svc.requestWaiver({
     subjectId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
+    targetId: _waiverSubject || (_selectedTemplate || 'graphics-control-plane'),
+    reason: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
     reasonText: _waiverReason || L('Cần đánh giá ngoại lệ đồ họa trước rollout.', 'Graphics exception requires review before rollout.'),
+    expiresAt: (function(){ var d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString(); })(),
     requestedBy: 'Admin Appearance',
     scope: 'graphics-governance'
   }).then(function(result){
@@ -1624,6 +1634,7 @@ function renderImpactAnalysisPanel(wrap){
     + '<strong>'+esc(L('Gates cần rerun', 'Gates to rerun'))+':</strong> '+joinList(impact.gatesToRerun)+'<br>'
     + '<strong>'+esc(L('Regulated modules', 'Regulated modules'))+':</strong> '+joinList(impact.regulatedModules)+'<br>'
     + '<strong>'+esc(L('Shopfloor modules', 'Shopfloor modules'))+':</strong> '+joinList(impact.shopfloorModules)+'<br>'
+    + '<strong>'+esc(L('Attestation', 'Attestation'))+':</strong> '+esc(impact.backendAttested ? L('Backend attested', 'Backend attested') : L('Frontend estimate', 'Frontend estimate'))+'<br>'
     + '<strong>'+esc(L('Summary', 'Summary'))+':</strong> '+esc(impact.releaseBlockerSummary || '-')
     + '</div></div>'
     + '</div>';
@@ -1634,18 +1645,22 @@ function renderImpactAnalysisPanel(wrap){
 function renderRolloutControls(tpl){
   var id = tpl && (tpl.templateId || tpl.id) || (_selectedTemplate || '');
   var disabled = id ? '' : ' disabled';
+  var snap = graphicsSnapshot();
+  var stagedRolloutId = id && snap.rolloutsByTemplate ? snap.rolloutsByTemplate[id] : '';
   return sect(
     L('Publish / Apply / Rollback', 'Publish / Apply / Rollback'),
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'preview\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Preview only', 'Preview only'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'saveDraft\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Save draft', 'Save draft'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'validate\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Validate', 'Validate'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'publish\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Publish template', 'Publish template'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'stage\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Stage rollout', 'Stage rollout'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-primary" onclick="_admGraphicsTemplateAction(\'apply\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Apply globally', 'Apply globally'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'rollback\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Rollback', 'Rollback'))+'</button>'
       + '</div>'
       + '<div style="font-size:11px;line-height:1.7;color:var(--text-secondary)">'
       + esc(L('Apply globally và rollback chỉ được promote khi backend authority endpoint xác nhận. Nếu endpoint chưa online, UI ghi audit và giữ trạng thái publish blocked.', 'Apply globally and rollback are promoted only when the backend authority endpoint attests them. If the endpoint is offline, the UI records audit and keeps publish blocked.'))
+      + '<br><strong>'+esc(L('Staged rollout', 'Staged rollout'))+':</strong> '+esc(stagedRolloutId || L('Chưa stage trong phiên này', 'Not staged in this session'))
       + '</div>',
     true,
     statusChip(tpl && tpl.status === 'published' ? 'full' : 'partial', tpl ? templateStatusLabel(tpl.status) : L('No template selected', 'No template selected'))
@@ -1706,7 +1721,9 @@ function renderComplianceMatrixPanel(){
 }
 
 function renderDriftDetectorPanel(){
-  var compliance = graphicsSnapshot().compliance || [];
+  var snap = graphicsSnapshot();
+  var compliance = snap.compliance || [];
+  var drift = snap.drift || {};
   var selectorDebt = 0;
   var privateTokenDebt = 0;
   var hardcodedDebt = 0;
@@ -1717,6 +1734,9 @@ function renderDriftDetectorPanel(){
     hardcodedDebt += Number(row.hardcodedStyleDebt || 0);
     if(row.linkageStatus === 'blocked' || row.linkageStatus === 'legacy-private-css') blocked++;
   });
+  if(drift.bridgeAliasDebt) selectorDebt = Number(drift.bridgeAliasDebt.debtCount || selectorDebt);
+  if(drift.privateCssDebt) hardcodedDebt = Number(drift.privateCssDebt.totalDebtScore || hardcodedDebt);
+  if(drift.moduleCompliance) blocked = Number(drift.moduleCompliance.nonCompliantCount || blocked);
   return sect(
     L('Drift detector', 'Drift detector'),
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">'
@@ -1736,7 +1756,7 @@ function renderDriftDetectorPanel(){
 function renderWaiverGovernancePanel(){
   var snap = graphicsSnapshot();
   var waiverRows = (snap.waivers || []).slice(0, 5).map(function(row){
-    return '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.waiverId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td></tr>';
+    return '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.waiverId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || row.targetId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td></tr>';
   }).join('');
   return sect(
     L('Waiver / exception governance', 'Waiver / exception governance'),
@@ -3079,7 +3099,7 @@ function renderAdvanced(){
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var j=JSON.stringify(readDraftCache(),null,2);var b=new Blob([j],{type:\'application/json\'});var a=document.createElement(\'a\');a.href=URL.createObjectURL(b);a.download=\'hesem-template-draft-cache.json\';a.click()})()">🧾 '+esc(L('Export draft cache', 'Export draft cache'))+'</button>'
     +'<button class="hm-btn hm-btn-secondary" onclick="(function(){var i=document.createElement(\'input\');i.type=\'file\';i.accept=\'.json\';i.onchange=function(){var r=new FileReader();r.onload=function(){try{writeDraftCache(JSON.parse(r.result||\'{}\'));renderAdminAppearance();if(typeof showToast===\'function\')showToast(\''+L('Đã nhập draft cache; chưa thay authority','Draft cache imported; authority unchanged')+'\',\'success\')}catch(e){if(typeof showToast===\'function\')showToast(\''+L('JSON không hợp lệ','Invalid JSON')+'\',\'error\')}};r.readAsText(i.files[0])};i.click()})()">📂 '+esc(L('Import draft cache', 'Import draft cache'))+'</button>'
     +'</div>'
-    +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry.'))+'</div>'
+    +'<div style="font-size:11px;line-height:1.7;color:var(--text-secondary);margin-top:8px">'+esc(L('Template export/import ở đây chỉ thao tác draft cache. Controlled registry phải đến từ backend graphics_template_registry_get.', 'Template export/import here only touches draft cache. The controlled registry must come from backend graphics_template_registry_get.'))+'</div>'
   , true);
 
   h += sect('🖊️ '+T('customCSS'),
