@@ -117,6 +117,26 @@ function normalizeTitle(value, fallback){
   return { vi:String(value || fallback || ''), en:String(value || fallback || '') };
 }
 
+function normalizeDensity(value){
+  var density = String(value || 'default').toLowerCase();
+  if(density === 'dense') return 'compact';
+  if(['compact','default','comfortable','shopfloor'].indexOf(density) >= 0) return density;
+  return 'default';
+}
+
+function zoneIdOf(zone){
+  if(zone && typeof zone === 'object') return String(zone.zoneId || zone.name || zone.id || zone.type || '').trim();
+  return String(zone || '').trim();
+}
+
+function allowedBlocksForZone(tpl, zoneId){
+  var source = tpl && tpl.allowedBlocksByZone && tpl.allowedBlocksByZone[zoneId] !== undefined
+    ? tpl.allowedBlocksByZone[zoneId]
+    : (tpl && tpl.allowedBlocks && tpl.allowedBlocks[zoneId] !== undefined ? tpl.allowedBlocks[zoneId] : '');
+  if(Array.isArray(source)) return source.map(String).filter(Boolean);
+  return String(source || '').split(/[,;|]/).map(function(item){ return item.trim(); }).filter(Boolean);
+}
+
 function ownerForTemplate(tpl){
   var cat = String(tpl.category || '').toLowerCase();
   if(tpl.owner) return tpl.owner;
@@ -133,17 +153,39 @@ function normalizeTemplate(tpl){
   out.id = templateId;
   out.templateId = templateId;
   out.legacyCode = out.legacyCode || (/^T\d+$/i.test(templateId) ? templateId : '');
-  out.name = normalizeTitle(out.name, templateId);
-  out.desc = normalizeTitle(out.desc, out.name.vi || templateId);
+  out.name = normalizeTitle(out.name || out.title || out.displayName, out.canonicalId || templateId);
+  out.desc = normalizeTitle(out.desc || out.description, out.name.vi || templateId);
   out.version = String(out.version || out.templateVersion || '1.0.0');
   out.owner = ownerForTemplate(out);
-  out.governedModules = (out.governedModules || out.modules || []).slice();
+  var adoptionModules = out.adoption && (out.adoption.modules || out.adoption);
+  out.governedModules = (out.governedModules || out.modules || adoptionModules || []).slice();
   out.modules = out.governedModules.slice();
-  out.zoneCount = Number(out.zoneCount || (out.zones || []).length || 0);
+  var rawZones = Array.isArray(out.zones) ? out.zones.slice() : [];
+  var zoneNames = rawZones.map(zoneIdOf).filter(Boolean);
+  var zoneSettings = Array.isArray(out.zoneSettings) && out.zoneSettings.length
+    ? out.zoneSettings.map(function(zone){ return Object.assign({}, zone); })
+    : rawZones.map(function(zone){
+        var zoneId = zoneIdOf(zone);
+        var type = zone && typeof zone === 'object' ? String(zone.type || zoneId) : zoneId;
+        return {
+          name: zoneId,
+          type: type,
+          scroll: (zoneId === 'main' || zoneId === 'primary' || zoneId === 'sidebar') ? 'data-only' : 'sticky',
+          allowed: allowedBlocksForZone(out, zoneId).join(', ')
+        };
+      });
+  out.zones = zoneNames;
+  out.zoneSettings = zoneSettings;
+  out.zoneCount = Number(out.zoneCount || zoneNames.length || 0);
   out.allowedBlocks = out.allowedBlocks || {};
   (out.zoneSettings || []).forEach(function(zone){
     if(zone && zone.name) out.allowedBlocks[zone.name] = zone.allowed || out.allowedBlocks[zone.name] || '';
   });
+  out.defaultDensity = normalizeDensity(out.defaultDensity || out.density);
+  out.density = out.density || out.defaultDensity;
+  out.supportedDensities = Array.isArray(out.supportedDensities) && out.supportedDensities.length
+    ? out.supportedDensities.map(normalizeDensity)
+    : ['compact','default','comfortable','shopfloor'];
   if(!out.status){
     if(out.source === 'custom' || /^C\d+/i.test(templateId)) out.status = 'draft-only';
     else if(templateId === 'T13' || templateId === 'T29') out.status = 'published';
@@ -170,6 +212,67 @@ function normalizeTemplate(tpl){
   return out;
 }
 
+function backendStatusForTemplate(status, action){
+  var s = canonicalState(status);
+  if(action === 'publish' || s === 'published') return 'approved';
+  if(s === 'deprecated') return 'deprecated';
+  if(s === 'legacy-bridged') return 'deprecated';
+  return 'draft';
+}
+
+function toBackendTemplate(template, action){
+  var tpl = normalizeTemplate(template);
+  var zoneSettings = Array.isArray(tpl.zoneSettings) && tpl.zoneSettings.length
+    ? tpl.zoneSettings
+    : (tpl.zones || []).map(function(zone){ return { name:zoneIdOf(zone), type:zoneIdOf(zone), allowed:'' }; });
+  var allowedBlocksByZone = {};
+  var zones = zoneSettings.map(function(zone){
+    var zoneId = zoneIdOf(zone.name || zone.zoneId || zone);
+    allowedBlocksByZone[zoneId] = allowedBlocksForZone(tpl, zoneId);
+    if(!allowedBlocksByZone[zoneId].length && zone.allowed) allowedBlocksByZone[zoneId] = allowedBlocksForZone({ allowedBlocks:{ [zoneId]:zone.allowed } }, zoneId);
+    return {
+      zoneId: zoneId,
+      type: String(zone.type || zoneId),
+      required: zone.required === true
+    };
+  }).filter(function(zone){ return zone.zoneId; });
+  return Object.assign({}, tpl, {
+    status: backendStatusForTemplate(tpl.status, action),
+    description: tpl.description || tpl.desc || tpl.name,
+    zones: zones,
+    allowedZones: zones.map(function(zone){ return zone.zoneId; }),
+    allowedBlocksByZone: allowedBlocksByZone,
+    allowedBlocks: Object.keys(allowedBlocksByZone).reduce(function(acc, zoneId){
+      allowedBlocksByZone[zoneId].forEach(function(block){ if(acc.indexOf(block) < 0) acc.push(block); });
+      return acc;
+    }, []),
+    defaultDensity: normalizeDensity(tpl.defaultDensity || tpl.density),
+    supportedDensities: (tpl.supportedDensities || ['compact','default','comfortable','shopfloor']).map(normalizeDensity),
+    themePolicy: tpl.themePolicy || {
+      modes:['light','dark','high-contrast'],
+      tokenSource:'admin/shared-token-layer',
+      inlineStylePolicy:'forbidden-without-waiver',
+      requiredTokenGroups:['color','surface','spacing','radius','shadow','type','state']
+    },
+    responsivePolicy: tpl.responsivePolicy || {
+      breakpoints:['320','390','768','1024','1440','1920'],
+      zoomLevels:['100','200','400'],
+      reflowRequirement:'No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls.'
+    },
+    qaEvidence: tpl.qaEvidence || {
+      status:'IMPLEMENTED',
+      gateRef:'mom/design/qa-gates.json',
+      validator:'mom/tools/design/validate-frontend-contracts.mjs'
+    },
+    governedModules: tpl.governedModules || [],
+    regulatedCompatibility: tpl.regulatedCompatibility || 'not-regulated',
+    shopfloorCompatibility: tpl.shopfloorCompatibility || 'standard-compatible',
+    updatedBy: tpl.updatedBy || 'Admin Appearance',
+    updatedAt: tpl.updatedAt || nowIso(),
+    evidenceRefs: tpl.evidenceRefs || []
+  });
+}
+
 function archetypeForTemplate(tpl){
   var meta = String(tpl.layoutMeta || '').toLowerCase();
   if(meta.indexOf('wizard') >= 0 || meta.indexOf('stepper') >= 0) return 'wizard';
@@ -187,6 +290,11 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
     if(normalized.templateId) map[normalized.templateId] = normalized;
   });
 
+  (_state.templates || []).forEach(function(tpl){
+    var normalized = normalizeTemplate(tpl);
+    if(normalized.templateId) map[normalized.templateId] = Object.assign({}, map[normalized.templateId] || {}, normalized);
+  });
+
   var preview = safeRead(PREVIEW_CACHE_KEY);
   Object.keys(preview || {}).forEach(function(id){
     var tpl = normalizeTemplate(preview[id]);
@@ -202,11 +310,6 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
     tpl.controlMode = 'draft-cache';
     tpl.sourceAuthority = 'unsaved-draft-cache';
     map[id] = Object.assign({}, map[id] || {}, tpl);
-  });
-
-  (_state.templates || []).forEach(function(tpl){
-    var normalized = normalizeTemplate(tpl);
-    if(normalized.templateId) map[normalized.templateId] = Object.assign({}, map[normalized.templateId] || {}, normalized);
   });
 
   return Object.keys(map).sort(function(a, b){ return a.localeCompare(b); }).map(function(id){ return map[id]; });
@@ -857,7 +960,7 @@ function cacheUnsavedTemplateDraft(template){
 
 function saveTemplateDraft(template){
   if(!template || !(template.templateId || template.id)) return Promise.resolve({ ok:false, status:'publish-blocked', message:'Missing templateId' });
-  var tpl = normalizeTemplate(template);
+  var tpl = toBackendTemplate(template, 'saveDraft');
   return templateAction('saveDraft', tpl.templateId, { template:tpl });
 }
 
@@ -900,6 +1003,7 @@ function templateAction(action, templateId, payload){
   var endpointName = endpointMap[action];
   if(!endpointName) return Promise.resolve({ ok:false, status:'publish-blocked', message:'Unsupported graphics governance action: ' + action });
   var body = Object.assign({ templateId:id }, payload || {});
+  if(body.template) body.template = toBackendTemplate(body.template, action);
   if(action === 'stage'){
     body.impactType = body.impactType || 'template';
     body.scope = body.scope || { templates:[id] };
@@ -930,7 +1034,9 @@ function templateAction(action, templateId, payload){
   return callEndpoint(endpointName, body).then(function(data){
     var rollout = data && data.rollout ? data.rollout : null;
     if(rollout && rollout.rolloutId) _state.rolloutsByTemplate[id] = rollout.rolloutId;
-    var resultStatus = data && data.status ? canonicalState(data.status)
+    var validationFailed = data && data.validation && data.validation.valid === false;
+    var resultStatus = validationFailed ? 'publish-blocked'
+      : data && data.status ? canonicalState(data.status)
       : (data && data.template && data.template.status ? canonicalState(data.template.status)
       : (action === 'validate' ? 'validated' : (action === 'apply' || action === 'publish') ? 'published' : action === 'rollback' ? 'validated' : 'controlled-draft'));
     recordAudit('template-' + action, id, resultStatus);
@@ -941,15 +1047,19 @@ function templateAction(action, templateId, payload){
       }
       return tpl;
     });
-    return { ok:true, status:resultStatus, data:data || null };
-  }).catch(function(){
-    var blocked = action === 'apply' || action === 'stage' || action === 'rollback' || action === 'saveDraft';
-    var resultStatus = blocked ? 'publish-blocked' : 'validated';
-    recordAudit('template-' + action, id, blocked ? 'blocked-backend-unavailable' : resultStatus);
     return {
-      ok: !blocked,
+      ok: !validationFailed,
       status: resultStatus,
-      message: blocked ? 'Backend authority endpoint unavailable; local cache was not promoted to authority.' : 'Frontend validation completed without backend attestation.'
+      data: data || null,
+      message: validationFailed ? 'Backend validation failed; publish remains blocked.' : ''
+    };
+  }).catch(function(err){
+    var resultStatus = 'publish-blocked';
+    recordAudit('template-' + action, id, 'blocked-backend-governance');
+    return {
+      ok: false,
+      status: resultStatus,
+      message: err && err.message ? ('Backend governance blocked action: ' + err.message) : 'Backend authority endpoint unavailable; local cache was not promoted to authority.'
     };
   });
 }

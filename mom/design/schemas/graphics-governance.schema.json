@@ -53,12 +53,20 @@
         "owner",
         "moduleArchetype",
         "zones",
+        "allowedZones",
+        "allowedBlocks",
         "allowedBlocksByZone",
+        "governedModules",
+        "regulatedCompatibility",
+        "shopfloorCompatibility",
         "defaultDensity",
         "supportedDensities",
         "themePolicy",
         "responsivePolicy",
-        "qaEvidence"
+        "qaEvidence",
+        "updatedBy",
+        "updatedAt",
+        "evidenceRefs"
       ],
       "additionalProperties": true,
       "properties": {
@@ -97,11 +105,16 @@
           "items": { "type": "string" }
         },
         "allowedBlocks": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "array",
-            "items": { "type": "string" }
-          }
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          ]
         },
         "governedModules": { "type": "array", "items": { "type": "string" } },
         "regulatedCompatibility": { "type": "string" },

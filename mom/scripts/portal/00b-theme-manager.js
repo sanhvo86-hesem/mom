@@ -730,12 +730,10 @@ function saveAdminConfig(config, callback){
     if(xhr.status >= 200 && xhr.status < 300){
       try {
         var resp = JSON.parse(xhr.responseText);
-        var data = resp && resp.data ? resp.data : resp;
-        if(data && data.config){
-          _adminConfig = data.config;
-          _adminConfigVersion = String(data.version || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
-          _adminConfigEtag = String(data.etag || '');
-        }
+        var nextConfig = resp && resp.config ? resp.config : (resp && resp.data ? resp.data : config);
+        _adminConfig = nextConfig || config;
+        _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
+        _adminConfigEtag = String((resp && resp.etag) || _adminConfigEtag || '');
       } catch(e){}
     }
     _apply();

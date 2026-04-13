@@ -393,10 +393,6 @@ class DispatchController extends BaseController
                 $logs[] = $log;
             }
 
-            $this->writeJsonFile($tFile, $targets);
-            $this->writeJsonFile($logFile, $logs);
-            $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
-
             // Auto-complete target if achievement >= 100%
             if ($log['achievement_pct'] >= 100) {
                 foreach ($targets as &$t2) {
@@ -408,8 +404,11 @@ class DispatchController extends BaseController
                     }
                 }
                 unset($t2);
-                $this->writeJsonFile($tFile, $targets);
             }
+
+            $this->writeJsonFile($logFile, $logs);
+            $this->writeJsonFile($tFile, $targets);
+            $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             $this->auditLog('dispatch_report_production', [
                 'target_id' => $target['target_id'],

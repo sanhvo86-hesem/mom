@@ -746,6 +746,9 @@ class GraphicsGovernanceService
             if (!is_array($row)) {
                 continue;
             }
+            if ((string)($row['code'] ?? '') === 'module_graphics_non_compliant') {
+                continue;
+            }
             $targetId = (string)($row['id'] ?? $row['targetId'] ?? $row['scope'] ?? 'graphics');
             $waived = isset($approvedWaiverTargets[$targetId]);
             $blockers[] = [
@@ -961,6 +964,12 @@ class GraphicsGovernanceService
                 'current_etag' => $this->etag($registry),
             ]);
         }
+        $releaseBlockers = $this->releaseBlockers();
+        if ((bool)($releaseBlockers['summary']['releaseBlocked'] ?? false)) {
+            throw new GraphicsGovernanceException(422, 'release_blockers_active', 'Rollout cannot be applied while graphics release blockers are active', [], [
+                'releaseBlockers' => $releaseBlockers,
+            ]);
+        }
 
         $snapshotId = $this->snapshotRegistry('before_apply_rollout_' . $rolloutId, $registry, $username);
         $rollout['status'] = 'applied';
@@ -1000,7 +1009,7 @@ class GraphicsGovernanceService
         if ($snapshot === null || !is_array($snapshot['registry'] ?? null)) {
             throw new GraphicsGovernanceException(404, 'rollback_snapshot_not_found', 'Rollback target snapshot not found or invalid');
         }
-        $targetRegistry = (array)$snapshot['registry'];
+        $targetRegistry = $this->normalizeRegistryAuthorityFields((array)$snapshot['registry']);
         $validation = $this->validateRegistryDocument($targetRegistry);
         if (!$validation['valid']) {
             throw new GraphicsGovernanceException(422, 'rollback_target_invalid', 'Rollback target registry is invalid', (array)$validation['errors']);
@@ -1150,6 +1159,7 @@ class GraphicsGovernanceService
             ],
             'componentContractRegistry' => $componentRegistry,
             'moduleGraphicsCompliance' => $matrix,
+            'releaseBlockers' => $this->releaseBlockers(),
             'persistence' => $this->persistenceModel(),
         ];
         $this->repo->writeRuntimeGraphicsRegistry($payload);
@@ -1161,14 +1171,95 @@ class GraphicsGovernanceService
      */
     private function normalizedTemplateRegistry(): array
     {
-        $registry = $this->repo->readTemplateRegistry();
+        return $this->normalizeRegistryAuthorityFields($this->repo->readTemplateRegistry());
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<string, mixed>
+     */
+    private function normalizeRegistryAuthorityFields(array $registry): array
+    {
         if (!isset($registry['_meta']) || !is_array($registry['_meta'])) {
             $registry['_meta'] = [];
         }
         if (!isset($registry['templates']) || !is_array($registry['templates'])) {
             $registry['templates'] = [];
         }
+        $registryMeta = is_array($registry['_meta'] ?? null) ? (array)$registry['_meta'] : [];
+        foreach ((array)$registry['templates'] as $index => $template) {
+            if (is_array($template)) {
+                $registry['templates'][$index] = $this->normalizeTemplateAuthorityFields($template, $registryMeta);
+            }
+        }
         return $registry;
+    }
+
+    /**
+     * @param array<string, mixed> $template
+     * @return array<string, mixed>
+     */
+    private function normalizeTemplateAuthorityFields(array $template, array $registryMeta = []): array
+    {
+        $templateId = (string)($template['templateId'] ?? '');
+        $allowedZones = array_values(array_filter(array_map(
+            static fn($zone): string => is_array($zone) ? (string)($zone['zoneId'] ?? $zone['name'] ?? '') : (string)$zone,
+            (array)($template['zones'] ?? $template['allowedZones'] ?? [])
+        )));
+        if (!isset($template['allowedZones']) || !is_array($template['allowedZones']) || $template['allowedZones'] === []) {
+            $template['allowedZones'] = $allowedZones;
+        }
+
+        $allowedBlocks = [];
+        foreach ((array)($template['allowedBlocksByZone'] ?? []) as $blocks) {
+            foreach ((array)$blocks as $blockType) {
+                $blockType = trim((string)$blockType);
+                if ($blockType !== '') {
+                    $allowedBlocks[$blockType] = true;
+                }
+            }
+        }
+        if (!isset($template['allowedBlocks']) || $template['allowedBlocks'] === []) {
+            $template['allowedBlocks'] = array_keys($allowedBlocks);
+        }
+
+        $governedModules = array_values(array_filter(array_map('strval', (array)($template['governedModules'] ?? []))));
+        if (is_array($template['adoption'] ?? null)) {
+            $governedModules = array_merge($governedModules, array_values(array_map('strval', (array)($template['adoption']['modules'] ?? []))));
+        }
+        $moduleRows = $this->modulesUsingTemplateRows($templateId);
+        $governedModules = array_values(array_unique(array_filter(array_merge(
+            $governedModules,
+            array_map(static fn(array $row): string => (string)($row['moduleId'] ?? ''), $moduleRows)
+        ))));
+        $template['governedModules'] = $governedModules;
+
+        $regulated = array_filter($moduleRows, static fn(array $row): bool => (bool)($row['regulated'] ?? false));
+        $shopfloor = array_filter($moduleRows, static fn(array $row): bool => (bool)($row['shopfloor'] ?? false));
+        if (trim((string)($template['regulatedCompatibility'] ?? '')) === '') {
+            $template['regulatedCompatibility'] = $regulated !== [] ? 'explicit-required' : 'not-regulated';
+        }
+        if (trim((string)($template['shopfloorCompatibility'] ?? '')) === '') {
+            $template['shopfloorCompatibility'] = $shopfloor !== [] ? 'explicit-required' : 'standard-compatible';
+        }
+
+        $meta = is_array($template['_meta'] ?? null) ? (array)$template['_meta'] : [];
+        $template['updatedBy'] = (string)($template['updatedBy'] ?? $meta['updatedBy'] ?? $registryMeta['updatedBy'] ?? $template['owner'] ?? 'Frontend Architecture Council');
+        $template['updatedAt'] = (string)($template['updatedAt'] ?? $meta['updatedAt'] ?? $registryMeta['updatedAt'] ?? $registryMeta['generatedAt'] ?? gmdate('c'));
+        if (!isset($template['evidenceRefs']) || !is_array($template['evidenceRefs'])) {
+            $refs = [];
+            foreach (['gateRef', 'validator', 'lastReviewedAt'] as $key) {
+                if (isset($template['qaEvidence'][$key]) && is_scalar($template['qaEvidence'][$key])) {
+                    $refs[] = (string)$template['qaEvidence'][$key];
+                }
+            }
+            foreach ((array)($template['releaseManifestRefs'] ?? []) as $ref) {
+                $refs[] = is_array($ref) ? (string)($ref['refId'] ?? $ref['uri'] ?? '') : (string)$ref;
+            }
+            $template['evidenceRefs'] = array_values(array_unique(array_filter($refs)));
+        }
+
+        return $template;
     }
 
     /**
@@ -1315,12 +1406,20 @@ class GraphicsGovernanceService
             'owner',
             'moduleArchetype',
             'zones',
+            'allowedZones',
+            'allowedBlocks',
             'allowedBlocksByZone',
+            'governedModules',
+            'regulatedCompatibility',
+            'shopfloorCompatibility',
             'defaultDensity',
             'supportedDensities',
             'themePolicy',
             'responsivePolicy',
             'qaEvidence',
+            'updatedBy',
+            'updatedAt',
+            'evidenceRefs',
         ];
         foreach ($required as $field) {
             if (!array_key_exists($field, $template) || $template[$field] === '' || $template[$field] === null) {

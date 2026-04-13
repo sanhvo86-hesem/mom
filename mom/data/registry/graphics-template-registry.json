@@ -1,10 +1,10 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T10:24:18+00:00",
+        "generatedAt": "2026-04-13T12:23:48+00:00",
         "source": "graphics_governance_backend",
         "authority": "mom/design/template-registry.json",
         "registryVersion": "2026.04.11-p0",
-        "registryEtag": "sha256:7cb80a3cb5e2d3af555ed925eb559b03"
+        "registryEtag": "sha256:136e36f950c87af3c578bc2622732a03"
     },
     "templates": [
         {
@@ -147,7 +147,42 @@
                 "gateRef": "mom/design/qa-gates.json",
                 "validator": "mom/tools/design/validate-frontend-contracts.mjs",
                 "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-            }
+            },
+            "allowedZones": [
+                "notice",
+                "summary",
+                "filter",
+                "primary",
+                "form",
+                "detail",
+                "workflow",
+                "actions",
+                "timeline"
+            ],
+            "allowedBlocks": [
+                "info-banner",
+                "kpi-row",
+                "filter-bar",
+                "data-table",
+                "data-tree",
+                "form-standard",
+                "data-detail",
+                "action-status-flow",
+                "action-toolbar",
+                "data-timeline"
+            ],
+            "governedModules": [
+                "M2-orders"
+            ],
+            "regulatedCompatibility": "explicit-required",
+            "shopfloorCompatibility": "explicit-required",
+            "updatedBy": "Frontend Architecture Council",
+            "updatedAt": "2026-04-11T00:00:00+07:00",
+            "evidenceRefs": [
+                "mom/design/qa-gates.json",
+                "mom/tools/design/validate-frontend-contracts.mjs",
+                "2026-04-11T00:00:00+07:00"
+            ]
         },
         {
             "templateId": "T29",
@@ -289,7 +324,42 @@
                 "gateRef": "mom/design/qa-gates.json",
                 "validator": "mom/tools/design/validate-frontend-contracts.mjs",
                 "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-            }
+            },
+            "allowedZones": [
+                "notice",
+                "summary",
+                "filter",
+                "primary",
+                "form",
+                "detail",
+                "workflow",
+                "actions",
+                "timeline"
+            ],
+            "allowedBlocks": [
+                "info-banner",
+                "kpi-row",
+                "filter-bar",
+                "data-table",
+                "data-tree",
+                "form-standard",
+                "data-detail",
+                "action-status-flow",
+                "action-toolbar",
+                "data-timeline"
+            ],
+            "governedModules": [
+                "M4-purchasing"
+            ],
+            "regulatedCompatibility": "explicit-required",
+            "shopfloorCompatibility": "explicit-required",
+            "updatedBy": "Frontend Architecture Council",
+            "updatedAt": "2026-04-11T00:00:00+07:00",
+            "evidenceRefs": [
+                "mom/design/qa-gates.json",
+                "mom/tools/design/validate-frontend-contracts.mjs",
+                "2026-04-11T00:00:00+07:00"
+            ]
         }
     ]
 }

@@ -125,8 +125,9 @@ function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; 
 function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? parseFloat(v) : def; }
 
 /**
- * _hmSet: Apply CSS variable instantly AND persist to localStorage.
- * This is the CORE function — every control must call this, not setVar alone.
+ * _hmSet applies preview CSS variables and user preference cache only.
+ * Backend graphics authority is promoted through HmGraphicsGovernance contracts,
+ * never through this local runtime preview path.
  */
 window._hmSet = function(cssVar, path, value){
   HmTheme.setVar(cssVar, value);          /* instant CSS update */
@@ -1700,6 +1701,7 @@ function renderRolloutControls(tpl){
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'preview\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Preview only', 'Preview only'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'saveDraft\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Save draft', 'Save draft'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'validate\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Validate', 'Validate'))+'</button>'
+      + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsRunImpact(\'template-zone\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Run impact analysis', 'Run impact analysis'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'publish\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Publish template', 'Publish template'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-secondary" onclick="_admGraphicsTemplateAction(\'stage\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Stage rollout', 'Stage rollout'))+'</button>'
       + '<button type="button" class="hm-btn hm-btn-primary" onclick="_admGraphicsTemplateAction(\'apply\',\''+esc(id)+'\')"'+disabled+'>'+esc(L('Apply globally', 'Apply globally'))+'</button>'
@@ -2038,9 +2040,13 @@ window._admTplSaveField = function(id, field, value){
   if(field === 'name.vi') tpl.name.vi = value;
   if(field === 'name.en') tpl.name.en = value;
   if(field === 'desc.vi') tpl.desc.vi = value;
+  if(field === 'version') tpl.version = value;
+  if(field === 'owner') tpl.owner = value;
+  if(field === 'regulatedCompatibility') tpl.regulatedCompatibility = value;
+  if(field === 'shopfloorCompatibility') tpl.shopfloorCompatibility = value;
   if(field === 'themePreset') tpl.themePreset = value;
   saveTemplateRecord(tpl);
-  window._admGraphicsMarkChange('template-zone', id, field);
+  window._admGraphicsMarkChange(/Compatibility|version|owner/.test(field) ? 'template-contract' : 'template-zone', id, field);
 };
 
 window._admTplSaveZone = function(id, index, key, value){
@@ -2204,6 +2210,13 @@ function renderTemplateEditor(id){
   h += textInput(L('Tên template (VI)','Template name (VI)'), '', 'template.editor.nameVi', tpl.name.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.nameVi\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.vi\',this.value)"');
   h += textInput(L('Tên template (EN)','Template name (EN)'), '', 'template.editor.nameEn', tpl.name.en, '').replace('oninput="_hmSet(\'\',\'template.editor.nameEn\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'name.en\',this.value)"');
   h += textInput(L('Mô tả ngắn','Short description'), '', 'template.editor.desc', tpl.desc.vi, '').replace('oninput="_hmSet(\'\',\'template.editor.desc\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'desc.vi\',this.value)"');
+  h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px">';
+  h += textInput('Version', '', 'template.editor.version', tpl.version || '1.0.0', '').replace('oninput="_hmSet(\'\',\'template.editor.version\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'version\',this.value)"');
+  h += textInput('Owner', '', 'template.editor.owner', tpl.owner || '', '').replace('oninput="_hmSet(\'\',\'template.editor.owner\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'owner\',this.value)"');
+  h += textInput(L('Regulated compatibility','Regulated compatibility'), '', 'template.editor.regulatedCompatibility', templateCompatibility(tpl, 'regulatedCompatibility'), '').replace('oninput="_hmSet(\'\',\'template.editor.regulatedCompatibility\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'regulatedCompatibility\',this.value)"');
+  h += textInput(L('Shopfloor compatibility','Shopfloor compatibility'), '', 'template.editor.shopfloorCompatibility', templateCompatibility(tpl, 'shopfloorCompatibility'), '').replace('oninput="_hmSet(\'\',\'template.editor.shopfloorCompatibility\',this.value)"','oninput="_admTplSaveField(\''+tpl.id+'\',\'shopfloorCompatibility\',this.value)"');
+  h += '</div>';
+  h += '<div style="font-size:11px;line-height:1.6;color:var(--text-secondary);margin:8px 0 4px">'+esc(L('Save draft lên backend yêu cầu version lớn hơn bản published hiện tại; chỉnh version trước khi promote controlled draft.', 'Backend draft save requires a version greater than the current published template; update version before promoting a controlled draft.'))+'</div>';
   h += '<div style="margin:12px 0 8px;font-size:12px;font-weight:700;color:var(--text-secondary)">'+esc(T('templateZones'))+'</div>';
   (tpl.zoneSettings || []).forEach(function(zone, idx){
     h += '<div style="padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-surface-alt,#f8fafc);margin-bottom:8px">';

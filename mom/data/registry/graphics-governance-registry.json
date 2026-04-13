@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-13T10:24:18+00:00",
+        "generatedAt": "2026-04-13T12:23:48+00:00",
         "source": "graphics_governance_backend",
         "authorityLayer": "system_contract_registry",
         "authority": "mom/design/template-registry.json",
@@ -9,7 +9,7 @@
     },
     "templateRegistry": {
         "version": "2026.04.11-p0",
-        "etag": "sha256:7cb80a3cb5e2d3af555ed925eb559b03",
+        "etag": "sha256:136e36f950c87af3c578bc2622732a03",
         "sourcePath": "mom/design/template-registry.json",
         "templates": [
             {
@@ -152,7 +152,42 @@
                     "gateRef": "mom/design/qa-gates.json",
                     "validator": "mom/tools/design/validate-frontend-contracts.mjs",
                     "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-                }
+                },
+                "allowedZones": [
+                    "notice",
+                    "summary",
+                    "filter",
+                    "primary",
+                    "form",
+                    "detail",
+                    "workflow",
+                    "actions",
+                    "timeline"
+                ],
+                "allowedBlocks": [
+                    "info-banner",
+                    "kpi-row",
+                    "filter-bar",
+                    "data-table",
+                    "data-tree",
+                    "form-standard",
+                    "data-detail",
+                    "action-status-flow",
+                    "action-toolbar",
+                    "data-timeline"
+                ],
+                "governedModules": [
+                    "M2-orders"
+                ],
+                "regulatedCompatibility": "explicit-required",
+                "shopfloorCompatibility": "explicit-required",
+                "updatedBy": "Frontend Architecture Council",
+                "updatedAt": "2026-04-11T00:00:00+07:00",
+                "evidenceRefs": [
+                    "mom/design/qa-gates.json",
+                    "mom/tools/design/validate-frontend-contracts.mjs",
+                    "2026-04-11T00:00:00+07:00"
+                ]
             },
             {
                 "templateId": "T29",
@@ -294,7 +329,42 @@
                     "gateRef": "mom/design/qa-gates.json",
                     "validator": "mom/tools/design/validate-frontend-contracts.mjs",
                     "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-                }
+                },
+                "allowedZones": [
+                    "notice",
+                    "summary",
+                    "filter",
+                    "primary",
+                    "form",
+                    "detail",
+                    "workflow",
+                    "actions",
+                    "timeline"
+                ],
+                "allowedBlocks": [
+                    "info-banner",
+                    "kpi-row",
+                    "filter-bar",
+                    "data-table",
+                    "data-tree",
+                    "form-standard",
+                    "data-detail",
+                    "action-status-flow",
+                    "action-toolbar",
+                    "data-timeline"
+                ],
+                "governedModules": [
+                    "M4-purchasing"
+                ],
+                "regulatedCompatibility": "explicit-required",
+                "shopfloorCompatibility": "explicit-required",
+                "updatedBy": "Frontend Architecture Council",
+                "updatedAt": "2026-04-11T00:00:00+07:00",
+                "evidenceRefs": [
+                    "mom/design/qa-gates.json",
+                    "mom/tools/design/validate-frontend-contracts.mjs",
+                    "2026-04-11T00:00:00+07:00"
+                ]
             }
         ]
     },
@@ -496,7 +566,7 @@
     },
     "componentContractRegistry": {
         "_meta": {
-            "generatedAt": "2026-04-13T10:24:18+00:00",
+            "generatedAt": "2026-04-13T12:23:48+00:00",
             "authority": "mom/design/block-contracts",
             "authorityRole": "component_contract_registry",
             "componentModel": "frontend_block_contracts"
@@ -3665,7 +3735,54 @@
             "nonCompliantCount": 2
         },
         "version": "2026.04.11-p0",
-        "etag": "sha256:7cb80a3cb5e2d3af555ed925eb559b03"
+        "etag": "sha256:136e36f950c87af3c578bc2622732a03"
+    },
+    "releaseBlockers": {
+        "blockers": [
+            {
+                "blockerId": "graphics_module_M2-orders",
+                "scope": "module",
+                "targetId": "M2-orders",
+                "severity": "blocker",
+                "status": "active",
+                "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "releaseGate": "G19-graphics-governance",
+                "waiverAllowed": true
+            },
+            {
+                "blockerId": "graphics_module_M4-purchasing",
+                "scope": "module",
+                "targetId": "M4-purchasing",
+                "severity": "blocker",
+                "status": "active",
+                "reason": "regulated_audit_evidence_missing,shopfloor_accessibility_evidence_missing",
+                "releaseGate": "G19-graphics-governance",
+                "waiverAllowed": true
+            },
+            {
+                "blockerId": "graphics_drift_bridge_alias_debt",
+                "scope": "tokens",
+                "targetId": "bridge_alias_debt",
+                "severity": "blocker",
+                "status": "active",
+                "reason": "bridge_alias_raw_value_debt",
+                "releaseGate": "G19-graphics-governance",
+                "waiverAllowed": true
+            }
+        ],
+        "summary": {
+            "blockerCount": 3,
+            "waivedCount": 0,
+            "pendingImpactCount": 0,
+            "releaseBlocked": true
+        },
+        "evidence": {
+            "complianceMatrixVersion": "2026.04.11-p0",
+            "templateRegistryVersion": "2026.04.11-p0",
+            "templateRegistryEtag": "sha256:136e36f950c87af3c578bc2622732a03",
+            "driftReportGeneratedAt": "2026-04-13T12:23:48+00:00",
+            "authority": "mom/design/template-registry.json + mom/data/registry/graphics-governance-registry.json"
+        }
     },
     "persistence": {
         "canonicalTemplateRegistry": "mom/design/template-registry.json",

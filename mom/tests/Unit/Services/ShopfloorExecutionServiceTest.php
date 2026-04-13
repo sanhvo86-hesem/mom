@@ -71,6 +71,34 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('planned', $target['status']);
     }
 
+    public function testMachineEquipmentAliasesDoNotDriftOnCreateOrUpdate(): void
+    {
+        $service = $this->service();
+        $target = $service->normalizeTargetForCreate([
+            'wo_number' => 'WO-1002',
+            'machine_id' => 'MC-5AX-01',
+            'equipment_id' => '',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 4.5,
+            'target_quantity' => 100,
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('MC-5AX-01', $target['machine_id']);
+        $this->assertSame('MC-5AX-01', $target['equipment_id']);
+
+        $updatedByEquipment = $service->applyTargetUpdates($target, [
+            'equipment_id' => 'MC-5AX-02',
+        ], '2026-04-13T01:00:00Z');
+        $this->assertSame('MC-5AX-02', $updatedByEquipment['machine_id']);
+        $this->assertSame('MC-5AX-02', $updatedByEquipment['equipment_id']);
+
+        $updatedByMachine = $service->applyTargetUpdates($updatedByEquipment, [
+            'machine_id' => 'MC-5AX-03',
+        ], '2026-04-13T02:00:00Z');
+        $this->assertSame('MC-5AX-03', $updatedByMachine['machine_id']);
+        $this->assertSame('MC-5AX-03', $updatedByMachine['equipment_id']);
+    }
+
     public function testReportValidationRejectsMissingReasonCodesForBadOutputAndDowntime(): void
     {
         $target = $this->target();
@@ -95,6 +123,55 @@ final class ShopfloorExecutionServiceTest extends TestCase
         } catch (InvalidArgumentException $e) {
             $this->assertSame('missing_downtime_reason_code', $e->getMessage());
         }
+    }
+
+    public function testReportValidationRejectsReasonCodesWithoutMatchingQuantityOrMinutes(): void
+    {
+        $target = $this->target();
+        $service = $this->service();
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 8,
+                'ng_reason_codes' => ['DEF-DIM'],
+            ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('NG reason code without NG quantity should fail.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('ng_reason_without_quantity', $e->getMessage());
+        }
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 8,
+                'rework_reason_codes' => ['DEF-SURF'],
+            ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('Rework reason code without rework quantity should fail.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('rework_reason_without_quantity', $e->getMessage());
+        }
+
+        try {
+            $service->buildProductionLog([
+                'quantity_good' => 8,
+                'downtime_reason_code' => 'DT-TOOL-LIFE',
+            ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+            $this->fail('Downtime reason code without downtime minutes should fail.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('downtime_reason_without_minutes', $e->getMessage());
+        }
+    }
+
+    public function testBlankDowntimeRowsAreIgnoredInsteadOfStoredAsEmptyEvents(): void
+    {
+        $log = $this->service()->buildProductionLog([
+            'quantity_good' => 8,
+            'downtime_events' => [
+                [],
+            ],
+        ], $this->target(), null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertSame([], $log['downtime_events']);
+        $this->assertSame([], $log['reason_codes']['downtime']);
     }
 
     public function testReportActorGuardBlocksUnassignedOperatorWithoutPlannerOverride(): void
@@ -132,7 +209,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
                 ['defect_code' => 'DEF-SURF', 'quantity' => 1],
             ],
             'downtime_events' => [
-                ['reason_code' => 'DT-TOOL-LIFE', 'minutes' => 20, 'resolution_code' => 'tool_replaced'],
+                ['reason_code' => 'DT-TOOL-LIFE', 'minutes' => 20, 'resolution_code' => 'TOOL_REPLACED'],
             ],
             'blocking_issues' => [
                 ['reason_code' => 'DT-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
@@ -141,6 +218,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
 
         $this->assertSame(83, $log['quantity_total']);
         $this->assertSame(['DT-TOOL-LIFE'], $log['reason_codes']['downtime']);
+        $this->assertSame('tool_replaced', $log['downtime_events'][0]['resolution_code']);
         $this->assertSame(['DEF-DIM'], $log['reason_codes']['ng']);
         $this->assertSame(['DEF-SURF'], $log['reason_codes']['rework']);
         $this->assertSame(['DT-MATL-WAIT'], $log['reason_codes']['blocking']);

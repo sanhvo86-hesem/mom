@@ -4736,7 +4736,7 @@ components:
 
     TemplateRegistryEntry:
       type: object
-      required: [templateId, canonicalId, version, status, owner, moduleArchetype, zones, allowedBlocksByZone, defaultDensity, supportedDensities, themePolicy, responsivePolicy, qaEvidence]
+      required: [templateId, canonicalId, version, status, owner, moduleArchetype, zones, allowedZones, allowedBlocks, allowedBlocksByZone, governedModules, regulatedCompatibility, shopfloorCompatibility, defaultDensity, supportedDensities, themePolicy, responsivePolicy, qaEvidence, updatedBy, updatedAt, evidenceRefs]
       additionalProperties: true
       properties:
         templateId:
@@ -4781,6 +4781,36 @@ components:
             type: array
             items:
               type: string
+        allowedZones:
+          type: array
+          items:
+            type: string
+        allowedBlocks:
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+        governedModules:
+          type: array
+          items:
+            type: string
+        regulatedCompatibility:
+          type: string
+        shopfloorCompatibility:
+          type: string
+        updatedBy:
+          type: string
+        updatedAt:
+          type: string
+        evidenceRefs:
+          type: array
+          items:
+            type: string
         defaultDensity:
           type: string
           enum: [compact, default, comfortable, shopfloor]

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-13T11:33:41.088Z",
+    "generatedAt": "2026-04-13T12:23:49.092Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -44,9 +44,9 @@
     "graphicsTemplateCount": 2,
     "graphicsComponentContractCount": 10,
     "graphicsNonCompliantModuleCount": 2,
-    "graphicsReleaseBlockerCount": 2,
+    "graphicsReleaseBlockerCount": 3,
     "graphicsGovernanceReleaseBlocked": true,
-    "releaseReadinessScore": 90
+    "releaseReadinessScore": 85
   },
   "contracts": [
     {

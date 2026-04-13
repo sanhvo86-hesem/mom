@@ -90,6 +90,7 @@ Validation:
 
 - `shift_date` must be `YYYY-MM-DD`.
 - `shift_code` must be `morning`, `afternoon`, or `night`.
+- If only one of `machine_id` or `equipment_id` is supplied, the dispatch target mirrors it into the other field to avoid machine/equipment alias drift.
 - `target_quantity`, `dispatch_sequence`, and `shift_duration_minutes` must be positive.
 - Quantity and time assumptions cannot be negative.
 - `setup_time_minutes` cannot exceed `shift_duration_minutes`.
@@ -175,6 +176,11 @@ Validation:
 - Downtime resolution codes must exist in `downtime_resolution_codes`.
 - `actual_end` cannot be earlier than `actual_start`.
 - Detail quantities cannot exceed the reported category quantity.
+- NG and rework reason codes are rejected unless the matching NG or rework quantity is greater than zero.
+- Downtime reason codes are rejected unless downtime/idle minutes are also supplied or derived from a downtime event.
+- Blank downtime rows are ignored; non-empty downtime rows require a known reason code.
+
+`client_report_id` and `idempotency_key` are captured for replay diagnostics and later DB-backed conflict checks. The current file-backed dispatch store still preserves the existing one-log-per-target overwrite behavior.
 
 ## Advisory Projection
 
