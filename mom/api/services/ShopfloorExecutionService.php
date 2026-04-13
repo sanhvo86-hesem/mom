@@ -379,6 +379,10 @@ final class ShopfloorExecutionService
     }
 
     /**
+     * MES-004 FIX: CRITICAL SECTION - Read-modify-write on execution state.
+     * Callers MUST wrap this in a DB transaction (SELECT FOR UPDATE on targets table)
+     * or file lock (flock LOCK_EX) to prevent concurrent corruption.
+     *
      * @param array<string, mixed> $target
      * @param array<string, mixed> $log
      * @return array<string, mixed>

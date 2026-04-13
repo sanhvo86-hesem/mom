@@ -11,9 +11,12 @@ use MOM\Services\ControlPlane\EqmsControlPlaneStateMachine;
 use MOM\Services\ControlPlane\EqmsFormExecutionService;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
+use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Publication\PublicationMonitorService;
+use MOM\Services\Traceability\GenealogyGraphService;
 use MOM\Services\Traceability\UnifiedEvidenceGraphService;
 
 final class EqmsControlPlaneController extends BaseController
@@ -197,6 +200,88 @@ final class EqmsControlPlaneController extends BaseController
         $this->success(['release_gate' => $result]);
     }
 
+    public function createChangeRequest(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['title']);
+
+        try {
+            $this->success([
+                'change_request' => (new ChangeLifecycleCommandService($this->data))->createChangeRequest(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function transitionChangeRequest(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        if (!isset($body['change_request_id'])) {
+            $body['change_request_id'] = (string)$this->query('change_request_id', '');
+        }
+        $this->requireFields($body, ['change_request_id', 'target_status']);
+
+        try {
+            $this->success([
+                'change_request' => (new ChangeLifecycleCommandService($this->data))->transitionChangeRequest(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function createChangeOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['title']);
+
+        try {
+            $this->success([
+                'change_order' => (new ChangeLifecycleCommandService($this->data))->createChangeOrder(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function transitionChangeOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        if (!isset($body['change_order_id'])) {
+            $body['change_order_id'] = (string)$this->query('change_order_id', '');
+        }
+        $this->requireFields($body, ['change_order_id', 'target_status']);
+
+        try {
+            $this->success([
+                'change_order' => (new ChangeLifecycleCommandService($this->data))->transitionChangeOrder(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function publicationRetryPlan(): never
     {
         $this->requireAuth();
@@ -242,22 +327,117 @@ final class EqmsControlPlaneController extends BaseController
 
     public function buildAuditPackManifest(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
         $body = $this->jsonBody();
         $this->requireFields($body, ['scope']);
 
         try {
+            // GOV-008: Cross-org audit pack filtering - verify all records are from user's org
+            $userOrgId = $_SESSION['org_id'] ?? null;
+            if ($userOrgId === null) {
+                $this->error('org_context_required', 400);
+            }
+
+            // Filter evidence packages by org_id
+            $evidencePackages = (array)($body['evidence_packages'] ?? []);
+            $filteredEvidencePackages = [];
+            foreach ($evidencePackages as $pkg) {
+                $pkgOrgId = is_array($pkg) ? ($pkg['org_id'] ?? null) : null;
+                if ($pkgOrgId === $userOrgId) {
+                    $filteredEvidencePackages[] = $pkg;
+                }
+            }
+
+            // Filter audit events by org_id
+            $auditEvents = (array)($body['audit_events'] ?? []);
+            $filteredAuditEvents = [];
+            foreach ($auditEvents as $event) {
+                $eventOrgId = is_array($event) ? ($event['org_id'] ?? null) : null;
+                if ($eventOrgId === $userOrgId) {
+                    $filteredAuditEvents[] = $event;
+                }
+            }
+
+            // Filter change authorities by org_id
+            $changeAuthorities = (array)($body['change_authorities'] ?? []);
+            $filteredChangeAuthorities = [];
+            foreach ($changeAuthorities as $auth) {
+                $authOrgId = is_array($auth) ? ($auth['org_id'] ?? null) : null;
+                if ($authOrgId === $userOrgId) {
+                    $filteredChangeAuthorities[] = $auth;
+                }
+            }
+
+            // Filter genealogy links by org_id
+            $genealogyLinks = (array)($body['genealogy_links'] ?? []);
+            $filteredGenealogyLinks = [];
+            foreach ($genealogyLinks as $link) {
+                $linkOrgId = is_array($link) ? ($link['org_id'] ?? null) : null;
+                if ($linkOrgId === $userOrgId) {
+                    $filteredGenealogyLinks[] = $link;
+                }
+            }
+
             $manifest = (new AuditPackExporter())->buildManifest(
                 (array)$body['scope'],
-                (array)($body['evidence_packages'] ?? []),
-                (array)($body['audit_events'] ?? []),
-                (array)($body['change_authorities'] ?? []),
-                (array)($body['genealogy_links'] ?? []),
+                $filteredEvidencePackages,
+                $filteredAuditEvents,
+                $filteredChangeAuthorities,
+                $filteredGenealogyLinks,
             );
+
+            // GOV-008: Final assertion - verify no cross-org records made it through
+            if (!$this->assertAuditPackIsOrgScoped($manifest, $userOrgId)) {
+                $this->error('audit_pack_scope_violation', 403, 'Audit pack contains records from multiple organizations.');
+            }
+
             if ($manifest['export_state'] !== 'ready') {
                 $this->error('audit_pack_incomplete', 409, 'Audit pack manifest is incomplete.', ['audit_pack_manifest' => $manifest]);
             }
             $this->success(['audit_pack_manifest' => $manifest]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    /**
+     * Verify audit pack contains only records from the specified org_id.
+     */
+    private function assertAuditPackIsOrgScoped(array $manifest, ?string $expectedOrgId): bool
+    {
+        // Check all evidence packages have the expected org_id
+        $packages = is_array($manifest['evidence_packages'] ?? null) ? $manifest['evidence_packages'] : [];
+        foreach ($packages as $pkg) {
+            if (is_array($pkg) && ($pkg['org_id'] ?? null) !== $expectedOrgId) {
+                return false;
+            }
+        }
+
+        // Check all audit events have the expected org_id
+        $events = is_array($manifest['audit_timeline'] ?? null) ? $manifest['audit_timeline'] : [];
+        foreach ($events as $event) {
+            if (is_array($event) && ($event['org_id'] ?? null) !== $expectedOrgId) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function finalizeEvidencePackage(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['subject_type', 'subject_id', 'canonical_payload']);
+        if (!isset($body['actor_id'])) {
+            $body['actor_id'] = (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user');
+        }
+
+        try {
+            $this->success([
+                'evidence_finalization' => (new EvidenceFinalizationService($this->dataDir, $this->data))->finalize($body),
+            ], 201);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
         }
@@ -269,6 +449,63 @@ final class EqmsControlPlaneController extends BaseController
         $body = $this->jsonBody();
         $this->requireFields($body, ['evidence_record_id']);
         $this->success(['graph' => (new UnifiedEvidenceGraphService())->buildEvidenceContextGraph($body)]);
+    }
+
+    public function recordGenealogyFact(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['edge_fact_type', 'from_object_type', 'from_object_id', 'to_object_type', 'to_object_id']);
+
+        try {
+            $fact = (new GenealogyGraphService($this->data))->recordEdgeFact(
+                $body,
+                (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+            );
+            $this->success(['genealogy_edge_fact' => $fact], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function evaluate5MGate(): never
+    {
+        $this->requireAuth();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['operation_class', 'object_type', 'object_id']);
+
+        try {
+            $result = (new GenealogyGraphService($this->data))->evaluateAndPersist5M($body);
+            if (!$result['allowed']) {
+                $this->error('traceability_5m_gate_blocked', 409, 'Required 5M traceability context is incomplete.', ['traceability_5m_gate' => $result]);
+            }
+            $this->success(['traceability_5m_gate' => $result]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function asManufacturedThread(): never
+    {
+        $this->requireAuth();
+        $subjectType = (string)$this->query('subject_type', '');
+        $subjectId = (string)$this->query('subject_id', '');
+        if ($subjectType === '' || $subjectId === '') {
+            $this->error('genealogy_subject_required', 400);
+        }
+
+        try {
+            $this->success([
+                'as_manufactured_thread' => (new GenealogyGraphService($this->data))->asManufacturedThread(
+                    $subjectType,
+                    $subjectId,
+                    (int)$this->query('limit', '200'),
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
     }
 
     public function repoBoundaryScan(): never
@@ -305,6 +542,20 @@ final class EqmsControlPlaneController extends BaseController
             $this->success([
                 'periodic_evaluation' => (new PeriodicEvaluationService($this->data))->schedule($body),
             ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function closePeriodicEvaluation(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        try {
+            $this->success([
+                'periodic_evaluation' => (new PeriodicEvaluationService($this->data))->close($body),
+            ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
         }

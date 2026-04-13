@@ -89,6 +89,7 @@ final class TraceabilityGenealogyController extends BaseController
      */
     private function filters(): array
     {
+        // MES-003 FIX: Prevent user-supplied scope bypass by deriving scope from session
         $fields = [
             'lot_number',
             'serial_number',
@@ -110,11 +111,7 @@ final class TraceabilityGenealogyController extends BaseController
             'enterprise_id',
             'company_id',
             'site_id',
-            'plant_id',
-            'org_company_code',
-            'org_legal_entity_code',
-            'org_plant_id',
-            'org_site_id',
+            // MES-003: Removed plant_id and org_* fields from user input to prevent scope bypass
         ];
 
         $filters = [];
@@ -122,6 +119,42 @@ final class TraceabilityGenealogyController extends BaseController
             $value = $this->input($field);
             if ($value !== null && trim($value) !== '') {
                 $filters[$field] = trim($value);
+            }
+        }
+
+        // MES-003 FIX: Enforce session-derived scope, ignore user input for scope fields
+        $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+        $userOrgId = (string)($_SESSION['org_id'] ?? '');
+        $userCompanyCode = (string)($_SESSION['org_company_code'] ?? '');
+        $userLegalEntity = (string)($_SESSION['org_legal_entity_code'] ?? '');
+        $userSiteId = (string)($_SESSION['org_site_id'] ?? '');
+
+        if ($userPlantId !== '') {
+            $filters['org_plant_id'] = $userPlantId;
+            $filters['plant_id'] = $userPlantId;
+        }
+        if ($userOrgId !== '') {
+            // Legacy field support
+        }
+        if ($userCompanyCode !== '') {
+            $filters['org_company_code'] = $userCompanyCode;
+        }
+        if ($userLegalEntity !== '') {
+            $filters['org_legal_entity_code'] = $userLegalEntity;
+        }
+        if ($userSiteId !== '') {
+            $filters['org_site_id'] = $userSiteId;
+        }
+
+        // MES-003 FIX: If user tries to pass conflicting scope parameters, reject with 403
+        foreach (['plant_id', 'org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $scopeField) {
+            $userInput = $this->input($scopeField);
+            if ($userInput !== null && trim($userInput) !== '') {
+                $userInputTrimmed = trim($userInput);
+                $currentValue = $filters[$scopeField] ?? '';
+                if ($currentValue !== '' && $currentValue !== $userInputTrimmed) {
+                    $this->error('unauthorized_scope_bypass_attempt', 403, "User attempted to access unauthorized genealogy scope.");
+                }
             }
         }
 

@@ -1423,17 +1423,21 @@ class DataLayer
             $entry['metadata'] = $metadata;
         }
 
-        // Always write to JSON audit log
-        $logDir = $this->dataDir . '/audit';
-        if (!is_dir($logDir)) {
-            @mkdir($logDir, 0775, true);
+        // Regulated audit authority is singular when Postgres is enabled.
+        // JSONL is only a non-Postgres migration fallback and must never
+        // become a competing governed audit sink.
+        if (!$this->usesPostgres()) {
+            $logDir = $this->dataDir . '/audit';
+            if (!is_dir($logDir)) {
+                @mkdir($logDir, 0775, true);
+            }
+            $logFile = $logDir . '/audit_' . date('Y-m') . '.jsonl';
+            @file_put_contents(
+                $logFile,
+                json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n",
+                FILE_APPEND | LOCK_EX,
+            );
         }
-        $logFile = $logDir . '/audit_' . date('Y-m') . '.jsonl';
-        @file_put_contents(
-            $logFile,
-            json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n",
-            FILE_APPEND | LOCK_EX,
-        );
 
         if (!$this->usesPostgres() && \function_exists('portal_system_audit_shadow_write')) {
             \portal_system_audit_shadow_write($entry);

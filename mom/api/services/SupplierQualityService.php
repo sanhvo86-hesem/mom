@@ -184,19 +184,21 @@ final class SupplierQualityService
             }
         }
 
+        // COM-008: Guard against division by zero
         $incomingQualityScore = $qtyReceived > 0.0
             ? round((1 - min(1.0, $qtyRejected / $qtyReceived)) * 100, 1)
             : ($lotsReceived > 0
-                ? round((1 - $lotsRejected / $lotsReceived) * 100, 1)
+                ? round((1 - ($lotsRejected > 0 ? $lotsRejected / $lotsReceived : 0)) * 100, 1)
                 : 100.0);
         $ppm = $qtyReceived > 0.0
             ? round(($qtyRejected / $qtyReceived) * 1000000, 1)
-            : ($lotsReceived > 0 ? round(($lotsRejected / $lotsReceived) * 1000000, 1) : 0.0);
+            : ($lotsReceived > 0 ? round((($lotsRejected > 0 ? $lotsRejected / $lotsReceived : 0)) * 1000000, 1) : 0.0);
 
         $risk = $this->calculateSupplierRiskAdjustments($vendorId, $period);
 
         $qualityScore   = round(max(0.0, $incomingQualityScore - $risk['scar_severity_penalty']), 1);
 
+        // COM-008: Guard against division by zero
         $deliveryScore  = $totalDeliveries > 0
             ? round(($onTimeCount / $totalDeliveries) * 100, 1)
             : 100.0;
@@ -410,17 +412,31 @@ final class SupplierQualityService
     /**
      * List scorecards with optional filters (vendor_id, period).
      */
+    /**
+     * List scorecards with optional filters.
+     * COM-007: Add supplier_id scoping to prevent IDOR
+     */
     public function listScorecards(array $filters = []): array
     {
         $scorecards = $this->loadFile('scorecards');
         $result     = [];
 
+        // COM-007: If scoping supplier is set, filter to that supplier only
+        $allowedSupplier = $filters['allowed_supplier_id'] ?? null;
+
         foreach ($scorecards as $sc) {
             if (!is_array($sc)) {
                 continue;
             }
+
+            // COM-007: Enforce supplier scoping if auth context is present
+            $vendorId = (string)($sc['vendor_id'] ?? '');
+            if ($allowedSupplier !== null && $vendorId !== $allowedSupplier) {
+                continue; // Skip if user is only authorized for a specific supplier
+            }
+
             if (isset($filters['vendor_id']) && $filters['vendor_id'] !== '') {
-                if (($sc['vendor_id'] ?? '') !== $filters['vendor_id']) {
+                if ($vendorId !== $filters['vendor_id']) {
                     continue;
                 }
             }
@@ -440,8 +456,22 @@ final class SupplierQualityService
     /**
      * Get scorecard detail for a specific vendor and period.
      */
-    public function getScorecardDetail(string $vendorId, string $period): ?array
+    /**
+     * Get scorecard detail for a vendor in a specific period.
+     * COM-007: Add supplier_id scoping to prevent IDOR
+     *
+     * @param string      $vendorId    Vendor identifier
+     * @param string      $period      Period (YYYY-MM)
+     * @param string|null $allowedSupplier Supplier ID from session/auth context (for scoping)
+     * @return array|null Scorecard data if accessible, null otherwise
+     */
+    public function getScorecardDetail(string $vendorId, string $period, ?string $allowedSupplier = null): ?array
     {
+        // COM-007: If scoping is enabled, verify the requesting user/supplier has access
+        if ($allowedSupplier !== null && $allowedSupplier !== $vendorId) {
+            return null; // Forbidden: user can only view their own vendor's scorecard
+        }
+
         $scorecards = $this->loadFile('scorecards');
         foreach ($scorecards as $sc) {
             if (is_array($sc) && ($sc['vendor_id'] ?? '') === $vendorId && ($sc['period'] ?? '') === $period) {

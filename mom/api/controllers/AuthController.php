@@ -144,8 +144,13 @@ class AuthController extends BaseController
 
         // Rate limiting
         $rlDir = $this->dataDir . '/ratelimit';
+        // Per-IP rate limiting
         rate_limit_check('login_' . $this->clientIp(), 30, 300, $rlDir);
+        // Per-username rate limiting
         rate_limit_check('login_u_' . $username, 30, 300, $rlDir);
+        // Combined global IP rate limiting: prevent attackers from trying many usernames
+        // Max 20 failed attempts per IP across all usernames in 15 minutes (900 seconds)
+        rate_limit_check('login_combined_' . $this->clientIp(), 20, 900, $rlDir);
 
         if (!is_array($this->store)) {
             $this->error('system_not_initialized', 500);

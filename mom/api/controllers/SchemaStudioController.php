@@ -89,11 +89,11 @@ class SchemaStudioController extends BaseController
 
     private function normalizeDesignId(string $designId): string
     {
+        // SECURITY FIX (INF-002): Return the actual sanitized ID, not a constant
+        // This ensures each unique design ID maps to a unique storage key
         $id = $this->safeId($designId, self::SYSTEM_DESIGN_ID);
-        if ($id === self::SYSTEM_REGISTRY_DESIGN_ID) {
-            return self::SYSTEM_REGISTRY_DESIGN_ID;
-        }
-        return self::SYSTEM_DESIGN_ID;
+        // Allow system_contract_registry as a special read-only design, but return the actual ID
+        return $id;
     }
 
     private function isReadOnlyDesignId(string $designId): bool

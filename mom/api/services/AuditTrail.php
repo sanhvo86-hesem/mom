@@ -401,6 +401,22 @@ final class AuditTrail
     }
 
     /**
+     * SECURITY FIX (INF-007): Prevent deletion of audit trail entries.
+     * Audit trail entries must be immutable and append-only. Any attempt to delete
+     * an entry will result in an exception.
+     *
+     * Note: Full hash chaining implementation is already in place (prev_hash and event_hash).
+     * This method provides an explicit guard against deletion operations.
+     *
+     * @param string $eventId The event ID to attempt to delete.
+     * @throws RuntimeException Always throws, as audit entries cannot be deleted.
+     */
+    public function deleteEntry(string $eventId): never
+    {
+        throw new \LogicException('Audit trail entries cannot be deleted. The audit trail is append-only and immutable.');
+    }
+
+    /**
      * Export events to CSV format.
      *
      * @param array  $filters Same filters as getEvents().

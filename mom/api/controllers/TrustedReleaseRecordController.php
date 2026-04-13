@@ -14,7 +14,10 @@ final class TrustedReleaseRecordController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['release_record' => $this->service()->assemble($this->criteria())]);
+            // MES-002 FIX: Add plant scoping to criteria
+            $criteria = $this->criteria();
+            $this->addUserPlantToCriteria($criteria);
+            $this->success(['release_record' => $this->service()->assemble($criteria)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('release_record_assembly_failed', 500, $e->getMessage());
@@ -27,7 +30,10 @@ final class TrustedReleaseRecordController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['release_readiness' => $this->service()->readiness($this->criteria())]);
+            // MES-002 FIX: Add plant scoping to criteria
+            $criteria = $this->criteria();
+            $this->addUserPlantToCriteria($criteria);
+            $this->success(['release_readiness' => $this->service()->readiness($criteria)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('release_record_readiness_failed', 500, $e->getMessage());
@@ -43,7 +49,10 @@ final class TrustedReleaseRecordController extends BaseController
             $body = $this->jsonBody();
             $decision = is_array($body['decision'] ?? null) ? $body['decision'] : [];
             $decision['released_by'] = (string)($user['username'] ?? $user['id'] ?? 'system');
-            $this->success(['release_record' => $this->service()->release($this->criteria(), $decision)]);
+            // MES-002 FIX: Add plant scoping to criteria
+            $criteria = $this->criteria();
+            $this->addUserPlantToCriteria($criteria);
+            $this->success(['release_record' => $this->service()->release($criteria, $decision)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $status = $e->getMessage() === 'release_record_blocked' ? 409 : 500;
@@ -65,6 +74,8 @@ final class TrustedReleaseRecordController extends BaseController
             if ($packet === null) {
                 $this->error('release_record_not_found', 404);
             }
+            // MES-002 FIX: Verify packet belongs to user's plant
+            $this->verifyPacketScope($packet, $user);
             $this->success(['release_record' => $packet]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -82,6 +93,12 @@ final class TrustedReleaseRecordController extends BaseController
             if ($packetId === '') {
                 $this->error('missing_packet_id', 400);
             }
+            // MES-002 FIX: Verify packet exists and belongs to user's plant before returning provenance
+            $packet = $this->service()->get($packetId);
+            if ($packet === null) {
+                $this->error('release_record_not_found', 404);
+            }
+            $this->verifyPacketScope($packet, $user);
             $this->success(['release_provenance' => $this->service()->provenance($packetId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -95,7 +112,10 @@ final class TrustedReleaseRecordController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['release_rollup' => $this->service()->enterpriseRollup($this->criteria())]);
+            // MES-002 FIX: Add plant scoping to criteria
+            $criteria = $this->criteria();
+            $this->addUserPlantToCriteria($criteria);
+            $this->success(['release_rollup' => $this->service()->enterpriseRollup($criteria)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('release_record_rollup_failed', 500, $e->getMessage());
@@ -179,6 +199,41 @@ final class TrustedReleaseRecordController extends BaseController
                 'it_admin',
             ],
         )));
+    }
+
+    /**
+     * MES-002 FIX: Verify release record packet belongs to user's authorized plant.
+     *
+     * @param array<string, mixed> $packet
+     * @param array<string, mixed> $user
+     * @return void
+     * @throws RuntimeException
+     */
+    private function verifyPacketScope(array $packet, array $user): void
+    {
+        $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+
+        // If user has a plant restriction, verify packet matches
+        if ($userPlantId !== '') {
+            $packetPlantId = (string)($packet['org_plant_id'] ?? $packet['plant_id'] ?? '');
+            if ($packetPlantId !== '' && $packetPlantId !== $userPlantId) {
+                throw new \RuntimeException('unauthorized_plant_scope');
+            }
+        }
+    }
+
+    /**
+     * MES-002 FIX: Add user's plant_id to release record criteria to restrict scope.
+     *
+     * @param array<string, mixed> &$criteria
+     * @return void
+     */
+    private function addUserPlantToCriteria(array &$criteria): void
+    {
+        $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+        if ($userPlantId !== '' && empty($criteria['org_plant_id'])) {
+            $criteria['org_plant_id'] = $userPlantId;
+        }
     }
 }
 

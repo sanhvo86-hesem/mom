@@ -43,6 +43,21 @@ mom/data/sessions/**
 mom/data/log-archive/**
 !mom/data/log-archive/README.md
 
+# Environment configuration (SECURITY FIX: Never commit secrets)
+.env
+.env.*
+!.env.example
+!.env.schema
+*.local.php
+
+# Runtime data and sensitive files
+mom/data/
+storage/
+queue/
+rate-limit/
+*.log
+*.jsonl
+
 # Runtime-generated portal data (keep README markers tracked)
 01-QMS-Portal/qms-data/audit.log
 01-QMS-Portal/qms-data/php_error.log

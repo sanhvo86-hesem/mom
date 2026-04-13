@@ -1074,28 +1074,40 @@ class GenericCrudController extends BaseController
         return $statusColumn !== '' || $workflowId !== '';
     }
 
-    private function governedGenericMutationOverrideEnabled(): bool
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function governedGenericMutationOverrideEnabled(array $user): bool
     {
         $configured = strtolower(trim((string)(getenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION') ?: '')));
         if ($configured !== 'break_glass_for_migration_only') {
             return false;
         }
 
-        $token = trim((string)($this->requestHeader('X-HESEM-Internal-Generic-Override') ?? ''));
+        $roles = array_map('strval', (array)($user['roles'] ?? []));
+        $role = trim((string)($user['role'] ?? ''));
+        if ($role !== '') {
+            $roles[] = $role;
+        }
+
+        $isAdmin = in_array('admin', $roles, true) || in_array('it_admin', $roles, true);
+        if (!$isAdmin) {
+            return false;
+        }
+
         $releaseManifest = trim((string)($this->requestHeader('X-HESEM-Release-Manifest') ?? ''));
         $commandId = trim((string)($this->requestHeader('X-HESEM-Command-Id') ?? ''));
 
-        return hash_equals('domain-command-backfill', $token)
-            && preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
+        return preg_match('/^REL-[A-Z0-9._:-]+$/', $releaseManifest) === 1
             && preg_match('/^[a-f0-9-]{36}$/i', $commandId) === 1;
     }
 
     /**
      * @param array<string, mixed> $ctx
      */
-    private function enforceDomainCommandBoundary(array $ctx): void
+    private function enforceDomainCommandBoundary(array $ctx, array $user): void
     {
-        if (!$this->requiresDomainCommand($ctx) || $this->governedGenericMutationOverrideEnabled()) {
+        if (!$this->requiresDomainCommand($ctx) || $this->governedGenericMutationOverrideEnabled($user)) {
             return;
         }
 
@@ -1122,7 +1134,7 @@ class GenericCrudController extends BaseController
         }
 
         if (user_is_admin($user)) {
-            $this->enforceDomainCommandBoundary($ctx);
+            $this->enforceDomainCommandBoundary($ctx, $user);
             return;
         }
 
@@ -1132,17 +1144,17 @@ class GenericCrudController extends BaseController
 
         if ($this->userPermissionMatrixConfigured($user)) {
             $this->requireAnyPermission($user, $permissions, false);
-            $this->enforceDomainCommandBoundary($ctx);
+            $this->enforceDomainCommandBoundary($ctx, $user);
             return;
         }
 
         if ($policyRoles !== null) {
             if (in_array('authenticated', $policyRoles, true)) {
-                $this->enforceDomainCommandBoundary($ctx);
+                $this->enforceDomainCommandBoundary($ctx, $user);
                 return;
             }
             if ($policyRoles !== [] && $this->userHasAnyRole($user, $policyRoles)) {
-                $this->enforceDomainCommandBoundary($ctx);
+                $this->enforceDomainCommandBoundary($ctx, $user);
                 return;
             }
             $this->error('forbidden', 403, 'Denied by runtime access policy', [

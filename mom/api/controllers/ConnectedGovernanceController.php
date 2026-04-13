@@ -17,6 +17,18 @@ final class ConnectedGovernanceController extends BaseController
 
         try {
             $body = $this->jsonBody();
+
+            // GOV-004: Verify the governance record's org_id matches the user's org
+            $userOrgId = $_SESSION['org_id'] ?? null;
+            $governanceOrgId = is_array($body['scope'] ?? null)
+                ? ($body['scope']['org_id'] ?? null)
+                : ($body['org_id'] ?? null);
+
+            if ($userOrgId === null || $governanceOrgId === null || $userOrgId !== $governanceOrgId) {
+                // Cross-org release not allowed
+                $this->error('governance_scope_mismatch', 403);
+            }
+
             $body['released_by'] = (string)($body['released_by'] ?? $user['username'] ?? $user['id'] ?? 'system');
             $this->success(['connected_governance' => $this->service()->releaseControlledRevision($body)], 201);
         } catch (Throwable $e) {
@@ -48,6 +60,15 @@ final class ConnectedGovernanceController extends BaseController
             if ($actorId === '') {
                 $this->error('missing_actor_id', 400);
             }
+
+            // GOV-003: IDOR protection - validate user is authorized to query this actor's data
+            $isAdmin = $this->userHasAnyRole($user, admin_roles());
+            $requestedUserId = (string)($user['user_id'] ?? $user['id'] ?? '');
+            if (!$isAdmin && $actorId !== $requestedUserId && $actorId !== $user['username']) {
+                // Non-admin users can only query their own actor data
+                $this->error('actor_authorization_required', 403);
+            }
+
             $criteria = $this->criteria();
             $this->success(['operator_readiness' => $this->service()->checkExecutionEntitlement($actorId, $criteria, [
                 'action' => $this->input('action', 'dispatch.report_production') ?? 'dispatch.report_production',
@@ -99,6 +120,15 @@ final class ConnectedGovernanceController extends BaseController
             if ($actorId === '') {
                 $this->error('missing_actor_id', 400);
             }
+
+            // GOV-003: IDOR protection - validate user is authorized to query this actor's data
+            $isAdmin = $this->userHasAnyRole($user, admin_roles());
+            $requestedUserId = (string)($user['user_id'] ?? $user['id'] ?? '');
+            if (!$isAdmin && $actorId !== $requestedUserId && $actorId !== $user['username']) {
+                // Non-admin users can only query their own actor data
+                $this->error('actor_authorization_required', 403);
+            }
+
             $this->success(['execution_blockers' => $this->service()->executionBlockers($actorId, $this->criteria(), [
                 'action' => $this->input('action', 'dispatch.report_production') ?? 'dispatch.report_production',
                 'request_id' => $this->input('request_id', '') ?? '',

@@ -260,6 +260,13 @@ class CncProgramController extends BaseController
             $approvals = $this->readJsonFile($this->cncDir() . '/approvals.json') ?? [];
             $setupSheets = $this->readJsonFile($this->cncDir() . '/setup-sheets.json') ?? [];
 
+            // SECURITY: Filter by plant_id from session
+            $plantId = $_SESSION['plant_id'] ?? null;
+            if ($plantId !== null) {
+                $all = array_filter($all, fn(array $p) => ($p['plant_id'] ?? '') === $plantId);
+                $setupSheets = array_filter($setupSheets, fn(array $s) => ($s['plant_id'] ?? '') === $plantId);
+            }
+
             $machine = $this->input('machine');
             if ($machine !== null && $machine !== '') {
                 $all = array_filter($all, fn(array $p) => ($p['machine'] ?? '') === $machine);
@@ -367,6 +374,12 @@ class CncProgramController extends BaseController
 
             if ($program === null) {
                 $this->error('not_found', 404, "CNC program {$id} not found.");
+            }
+
+            // SECURITY: Verify plant_id matches session
+            $plantId = $_SESSION['plant_id'] ?? null;
+            if ($plantId !== null && ($program['plant_id'] ?? '') !== $plantId) {
+                $this->error('forbidden', 403, "Access to CNC program in different plant is not allowed.");
             }
 
             // Attach version history

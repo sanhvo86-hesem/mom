@@ -49,8 +49,11 @@ class CorsMiddleware
         bool $credentials = true,
     ) {
         $this->allowedOrigins = $allowedOrigins ?: [
+            // SECURITY FIX: Use explicit domain whitelist instead of wildcard patterns.
             'https://qms.hesem.com.vn',
-            'https://*.hesem.com.vn',
+            'https://portal.hesem.com.vn',
+            'https://app.hesem.com.vn',
+            'https://admin.hesem.com.vn',
         ];
         $this->allowedMethods = $allowedMethods;
         $this->allowedHeaders = $allowedHeaders;
@@ -68,6 +71,19 @@ class CorsMiddleware
         $self = $this;
 
         return static function (string $action, callable $next) use ($self): void {
+            // SECURITY FIX: Set security headers to prevent common attacks.
+            // These headers must be set early in the middleware pipeline.
+            if (!headers_sent()) {
+                // Prevent MIME type sniffing (XSS protection)
+                header('X-Content-Type-Options: nosniff');
+                // Prevent clickjacking attacks
+                header('X-Frame-Options: DENY');
+                // Control referrer information leakage
+                header('Referrer-Policy: strict-origin-when-cross-origin');
+                // Legacy XSS protection (modern browsers ignore, but good for defense-in-depth)
+                header('X-XSS-Protection: 1; mode=block');
+            }
+
             $origin = (string)($_SERVER['HTTP_ORIGIN'] ?? '');
 
             if ($origin !== '' && $self->isOriginAllowed($origin)) {

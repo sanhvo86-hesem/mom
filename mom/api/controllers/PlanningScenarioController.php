@@ -30,7 +30,9 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['planning_scenario_detail' => $this->service()->scenarioDetail($this->scenarioId())]);
+            // SECURITY: Pass org_id from session to verify cross-org access
+            $orgId = $_SESSION['org_id'] ?? null;
+            $this->success(['planning_scenario_detail' => $this->service()->scenarioDetail($this->scenarioId(), $orgId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_detail_failed', 500, $e->getMessage());
@@ -43,7 +45,9 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['planning_feasibility' => $this->service()->feasibility($this->scenarioId())]);
+            // SECURITY: Pass org_id from session to verify cross-org access
+            $orgId = $_SESSION['org_id'] ?? null;
+            $this->success(['planning_feasibility' => $this->service()->feasibility($this->scenarioId(), $orgId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_feasibility_failed', 500, $e->getMessage());
@@ -56,7 +60,9 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['planning_capacity_load' => $this->service()->capacityLoad($this->scenarioId())]);
+            // SECURITY: Pass org_id from session to verify cross-org access
+            $orgId = $_SESSION['org_id'] ?? null;
+            $this->success(['planning_capacity_load' => $this->service()->capacityLoad($this->scenarioId(), $orgId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_capacity_failed', 500, $e->getMessage());
@@ -70,9 +76,11 @@ final class PlanningScenarioController extends BaseController
         $this->requireCsrf();
 
         try {
+            // SECURITY: Pass org_id from session to verify cross-org access
+            $orgId = $_SESSION['org_id'] ?? null;
             $this->success(['planning_scenario' => $this->service()->approveScenario($this->scenarioId(), [
                 'approved_by' => (string)($user['username'] ?? $user['id'] ?? 'planner'),
-            ])]);
+            ], $orgId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_approve_failed', 500, $e->getMessage());
@@ -86,9 +94,11 @@ final class PlanningScenarioController extends BaseController
         $this->requireCsrf();
 
         try {
+            // SECURITY: Pass org_id from session to verify cross-org access
+            $orgId = $_SESSION['org_id'] ?? null;
             $this->success(['planning_scenario' => $this->service()->publishScenario($this->scenarioId(), [
                 'published_by' => (string)($user['username'] ?? $user['id'] ?? 'planner'),
-            ])]);
+            ], $orgId)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_publish_failed', 500, $e->getMessage());

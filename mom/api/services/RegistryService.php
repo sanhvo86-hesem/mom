@@ -88,7 +88,13 @@ class RegistryService
                 continue;
             }
 
-            $payload = $this->readJsonFile($this->registryDir . '/' . $file);
+            // SECURITY FIX (INF-006): Validate file path to prevent path traversal
+            $fullPath = realpath($this->registryDir . '/' . $file);
+            if ($fullPath === false || !str_starts_with($fullPath, realpath($this->registryDir))) {
+                continue; // Skip invalid paths
+            }
+
+            $payload = $this->readJsonFile($fullPath);
             foreach ($payload as $key => $value) {
                 if ($key === '_meta') {
                     continue;
@@ -168,6 +174,11 @@ class RegistryService
 
         foreach (array_merge($preferred, $fallback) as $part) {
             $file = trim((string)($part['file'] ?? ''));
+            if ($file === '') {
+                continue;
+            }
+            // SECURITY FIX (INF-006): Validate filename to prevent path traversal in loadDataFieldsPart
+            $file = basename($file); // Use only the filename, reject directory traversal
             if ($file === '') {
                 continue;
             }

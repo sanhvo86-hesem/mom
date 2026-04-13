@@ -60,7 +60,7 @@ final class LocalImmutableStorageAdapter implements ImmutableStorageAdapter
         }
 
         $hash = hash_file('sha256', $sourcePath);
-        if (!is_string($hash) || $hash === '') {
+        if (!is_string($hash)) {
             throw new RuntimeException('Unable to hash source artifact.');
         }
 
@@ -97,7 +97,20 @@ final class LocalImmutableStorageAdapter implements ImmutableStorageAdapter
             $safeName = 'artifact.bin';
         }
 
-        return $this->baseDir . '/' . substr($hash, 0, 2) . '/' . $hash . '_' . $safeName;
+        $baseDirReal = realpath($this->baseDir);
+        if ($baseDirReal === false) {
+            throw new RuntimeException('Immutable evidence base directory is unavailable.');
+        }
+
+        $targetPath = $baseDirReal . '/' . substr($hash, 0, 2) . '/' . $hash . '_' . $safeName;
+
+        // GOV-006: Path traversal protection without requiring the hash
+        // subdirectory to exist before ensureParent() creates it.
+        if (!str_starts_with($targetPath, rtrim($baseDirReal, '/') . '/')) {
+            throw new RuntimeException('Path traversal detected: target path escapes base directory.');
+        }
+
+        return $targetPath;
     }
 
     private function ensureParent(string $target): void

@@ -330,7 +330,8 @@ class MobileController extends BaseController
         $this->requireFields($body, ['entry_id', 'qty_completed']);
 
         $entryId    = trim((string)($body['entry_id'] ?? ''));
-        $employeeId = $this->resolveEmployeeId($user);
+        // SECURITY: Always use session user, never accept operator_id from request body
+        $operatorId = $this->resolveEmployeeId($user);
         $userId     = $this->userId($user);
 
         try {
@@ -338,12 +339,12 @@ class MobileController extends BaseController
                 $entryId,
                 (int)($body['qty_completed'] ?? 0),
                 (int)($body['qty_scrap'] ?? 0),
-                $employeeId,
+                $operatorId,  // Always use authenticated session user
             );
 
             $this->auditLog('mobile_clock_out', [
                 'entry_id'      => $entryId,
-                'employee_id'   => $employeeId,
+                'employee_id'   => $operatorId,
                 'qty_completed' => $body['qty_completed'],
                 'qty_scrap'     => $body['qty_scrap'] ?? 0,
             ], $userId);

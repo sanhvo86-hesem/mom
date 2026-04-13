@@ -26,6 +26,17 @@ $envBool = static function (string $name, bool $default): bool {
     return $parsed ?? $default;
 };
 
+// SECURITY FIX: Validate DB_PASSWORD is set in production/staging mode.
+// Do not allow empty passwords to silently fall through.
+$dbPassword = getenv('DB_PASSWORD');
+$appEnv = strtolower(trim((string)(getenv('APP_ENV') ?: 'production')));
+if (($dbPassword === false || $dbPassword === '' || $dbPassword === null)
+    && in_array($appEnv, ['production', 'staging'], true)) {
+    throw new \RuntimeException(
+        'DB_PASSWORD environment variable is required and must not be empty in ' . $appEnv . ' environment'
+    );
+}
+
 return [
     // Connection
     'driver'   => 'pgsql',
@@ -33,7 +44,7 @@ return [
     'port'     => (int)(getenv('DB_PORT') ?: 5432),
     'database' => getenv('DB_NAME') ?: 'mom',
     'username' => getenv('DB_USER') ?: 'mom_app',
-    'password' => getenv('DB_PASS') ?: '',
+    'password' => $dbPassword !== false ? $dbPassword : '',
     'charset'  => 'utf8',
     'schema'   => 'public',
     'sslmode'  => getenv('DB_SSL') ?: 'prefer',

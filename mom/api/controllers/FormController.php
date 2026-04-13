@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Services\ChangeControl\ChangeAuthorityService;
+use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use Throwable;
 
 /**
@@ -18,6 +19,16 @@ use Throwable;
  */
 class FormController extends BaseController
 {
+    private function denyLegacyFormWrite(string $operation): void
+    {
+        $decision = (new LegacyWriteSurfacePolicy())->assess('online_form_json', $operation);
+        $this->error($decision['error_code'], $decision['status'], $decision['message'], [
+            'canonical_path' => $decision['canonical_path'],
+            'legacy_surface' => $decision['surface'],
+            'legacy_operation' => $decision['operation'],
+        ]);
+    }
+
     /**
      * GET list â€” List available online forms.
      *
@@ -80,6 +91,7 @@ class FormController extends BaseController
 
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyFormWrite('submit_entry');
 
         $data = $this->jsonBody();
         $code = $this->normalizeFormCode((string)($data['code'] ?? ''));
@@ -190,6 +202,7 @@ class FormController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyFormWrite('consume_record_id');
 
         $data = $this->jsonBody();
         $type = strtoupper(trim((string)($data['type'] ?? '')));
@@ -321,6 +334,7 @@ class FormController extends BaseController
 
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyFormWrite('upload_offline_draft');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
@@ -736,6 +750,7 @@ class FormController extends BaseController
         if ($this->method() !== 'POST') $this->error('method_not_allowed', 405);
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyFormWrite('save_online_draft');
 
         $body = $this->jsonBody();
         $code = $this->normalizeFormCode((string)($body['code'] ?? ''));

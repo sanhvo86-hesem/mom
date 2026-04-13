@@ -105,7 +105,7 @@ final class FinanceControlService
      * @param array<string, mixed> $context
      * @return array<string, mixed>
      */
-    public function transitionPeriodClose(string $periodCloseId, string $transition, string $userId, array $context = []): array
+    public function transitionPeriodClose(string $periodCloseId, string $transition, string $userId, array $context = [], ?string $orgId = null): array
     {
         $transition = strtolower(trim($transition));
         if ($transition === '') {
@@ -119,6 +119,12 @@ final class FinanceControlService
         }
 
         $row = (array)$rows[$index];
+
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($row['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('Period close access denied');
+        }
+
         $currentStatus = trim((string)($row['close_status'] ?? 'closed'));
         $targetStatus = match ($transition) {
             'reopen' => 'reopened',

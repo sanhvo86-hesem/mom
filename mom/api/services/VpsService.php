@@ -120,7 +120,7 @@ final class VpsService
             ? array_values(array_filter($config['operational_findings'], 'is_array'))
             : $this->defaultOperationalFindings();
         $config['control_assets'] = $this->listControlAssets();
-        $config['metrics']['hardening_findings'] = count((array)($config['operational_findings'] ?? []));
+        $config['metrics']['hardening_findings'] = count($config['operational_findings']);
 
         return $config;
     }
@@ -331,7 +331,7 @@ final class VpsService
         $assets = [];
         $seen = [];
         foreach ($candidates as $candidate) {
-            $rawPath = trim((string)($candidate['path'] ?? ''));
+            $rawPath = trim((string)$candidate['path']);
             if ($rawPath === '') {
                 continue;
             }
@@ -349,8 +349,8 @@ final class VpsService
 
             $ext = strtolower(trim((string)pathinfo($relativePath, PATHINFO_EXTENSION)));
             $assets[] = [
-                'id' => (string)($candidate['id'] ?? $relativePath),
-                'label' => (string)($candidate['label'] ?? basename($relativePath)),
+                'id' => (string)$candidate['id'],
+                'label' => (string)$candidate['label'],
                 'path' => $rawPath,
                 'relative_path' => $relativePath,
                 'absolute_path' => $this->rootDir . '/' . $relativePath,
@@ -1815,8 +1815,8 @@ PHP;
             'containers' => $containers['containers'],
             'ports' => $ports['ports'],
             'capabilities' => [
-                'systemctl' => (bool)($serviceStatuses['systemctl'] ?? false),
-                'docker' => (bool)($containers['docker'] ?? false),
+                'systemctl' => (bool)$serviceStatuses['systemctl'],
+                'docker' => (bool)$containers['docker'],
             ],
         ];
     }
@@ -1886,7 +1886,7 @@ BASH;
 
         return [
             'statuses' => $statuses,
-            'systemctl' => count($statuses) > 0 && !in_array('unavailable', array_map(static fn(array $row): string => (string)($row['status'] ?? ''), $statuses), true),
+            'systemctl' => count($statuses) > 0 && !in_array('unavailable', array_map(static fn(array $row): string => (string)$row['status'], $statuses), true),
         ];
     }
 
@@ -2257,11 +2257,10 @@ BASH;
         }
 
         if ($this->shellAvailable()) {
-            $exitCode = 1;
             try {
-                $raw = (string)\shell_run("bash -lc 'hostname -I 2>/dev/null || true'", $exitCode);
-                if ($exitCode === 0 && trim($raw) !== '') {
-                    $locals = array_merge($locals, preg_split('/\s+/', trim($raw)) ?: []);
+                $result = $this->runShellCommand("bash -lc 'hostname -I 2>/dev/null || true'");
+                if ($result['exit_code'] === 0 && trim($result['output']) !== '') {
+                    $locals = array_merge($locals, preg_split('/\s+/', trim($result['output'])) ?: []);
                 }
             } catch (\Throwable) {
             }
@@ -2311,14 +2310,13 @@ BASH;
             escapeshellarg($target . ':' . $remoteTmp),
         ]);
 
-        $exitCode = 1;
         try {
-            $output = (string)\shell_run($command, $exitCode);
+            $result = $this->runShellCommand($command);
         } catch (\Throwable $e) {
             throw new RuntimeException('upload_stage_failed:' . $e->getMessage());
         }
-        if ($exitCode !== 0) {
-            throw new RuntimeException('upload_stage_failed:' . trim($output));
+        if ($result['exit_code'] !== 0) {
+            throw new RuntimeException('upload_stage_failed:' . trim($result['output']));
         }
 
         return $remoteTmp;
@@ -2338,8 +2336,23 @@ BASH;
     /**
      * @return array<string, mixed>
      */
+    /**
+     * SVC-011 (CRITICAL): Validate command against allowlist before execution.
+     * Commands are retrieved from config files which may be writable.
+     */
     private function executeOnHost(array $host, string $command): array
     {
+        // Validate command is in the hardcoded allowlist
+        if (!$this->isAllowedCommand($command)) {
+            @error_log('[VpsService] Command rejected: not in allowlist: ' . substr($command, 0, 100));
+            return [
+                'ok' => false,
+                'exit_code' => 1,
+                'output' => '',
+                'error' => 'command_rejected:not_whitelisted',
+            ];
+        }
+
         $built = $this->buildCommand($host, $command);
         if ($built === null) {
             return [
@@ -2359,9 +2372,8 @@ BASH;
             ];
         }
 
-        $exitCode = 1;
         try {
-            $output = (string)\shell_run($built, $exitCode);
+            $result = $this->runShellCommand($built);
         } catch (\Throwable $e) {
             return [
                 'ok' => false,
@@ -2372,10 +2384,10 @@ BASH;
         }
 
         return [
-            'ok' => $exitCode === 0,
-            'exit_code' => $exitCode,
-            'output' => trim($output),
-            'error' => $exitCode === 0 ? '' : ($output !== '' ? trim($output) : 'command_failed'),
+            'ok' => $result['exit_code'] === 0,
+            'exit_code' => $result['exit_code'],
+            'output' => $result['output'],
+            'error' => $result['exit_code'] === 0 ? '' : ($result['output'] !== '' ? $result['output'] : 'command_failed'),
         ];
     }
 
@@ -2415,12 +2427,63 @@ BASH;
         if ($mode === 'ssh') {
             return 'ssh';
         }
-        return $mode !== '' ? $mode : 'local';
+        return $mode;
     }
 
     private function shellAvailable(): bool
     {
         return \function_exists('shell_exec_available') ? (bool)\shell_exec_available() : false;
+    }
+
+    /**
+     * @return array{output: string, exit_code: int}
+     */
+    private function runShellCommand(string $command): array
+    {
+        if (!$this->shellAvailable()) {
+            throw new RuntimeException('exec_unavailable');
+        }
+
+        $output = [];
+        $exitCode = 0;
+        \exec($command . ' 2>&1', $output, $exitCode);
+
+        return [
+            'output' => trim(implode("\n", $output)),
+            'exit_code' => $exitCode,
+        ];
+    }
+
+    /**
+     * SVC-011: Strict allowlist of permitted commands.
+     * Only these hardcoded command strings are permitted to execute.
+     * Commands from config files are validated against this list.
+     */
+    private function isAllowedCommand(string $command): bool
+    {
+        $allowedCommands = [
+            'hostname && echo && uptime && echo && df -h / && echo && (free -m 2>/dev/null || true)',
+            "if command -v docker >/dev/null 2>&1; then docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'; else echo 'docker_not_available'; fi",
+            'test -f /etc/nginx/nginx.conf && echo ok || echo not_found',
+            'test -f /etc/php-fpm.conf && echo ok || echo not_found',
+            'systemctl is-active nginx',
+            'systemctl is-active php-fpm',
+            'systemctl is-active docker',
+            'du -sh /var/lib/docker 2>/dev/null || echo 0',
+            'docker images --format \'table {{.Repository}}\t{{.Tag}}\t{{.Size}}\'' ,
+            'ls -la /opt/observability/ 2>/dev/null || echo none',
+            'curl -s http://127.0.0.1:19999/api/v1/info 2>/dev/null | head -1 || echo offline',
+            'curl -s http://127.0.0.1:3000/api/health 2>/dev/null | head -1 || echo offline',
+        ];
+
+        $command = trim($command);
+        foreach ($allowedCommands as $allowed) {
+            if ($command === trim($allowed)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -124,11 +124,30 @@ final class QuoteService
 
     /**
      * Update an existing quote (field edits).
+     * COM-005: Add explicit whitelist of allowed update fields
      */
     public function update(string $quoteId, array $updates, string $userId): array
     {
         $quotes = $this->loadQuotes();
         $now    = $this->nowIso();
+
+        // COM-005: Whitelist of allowed update fields (prevent mass assignment)
+        $whitelist = [
+            'line_items', 'lines',
+            'valid_until', 'validity_date',
+            'discount_pct', 'discount_percent', 'discount',
+            'notes', 'comment', 'remarks',
+            'terms', 'payment_terms', 'terms_conditions',
+            'contact_name', 'contact_email',
+            'currency',
+        ];
+
+        $filtered = [];
+        foreach ($whitelist as $field) {
+            if (isset($updates[$field])) {
+                $filtered[$field] = $updates[$field];
+            }
+        }
 
         foreach ($quotes as $idx => $rec) {
             if (!is_array($rec) || ($rec['quote_id'] ?? '') !== $quoteId) {
@@ -136,9 +155,9 @@ final class QuoteService
             }
 
             // Do not allow status change via update
-            unset($updates['status']);
+            unset($filtered['status']);
 
-            $quotes[$idx] = array_merge($rec, $updates, [
+            $quotes[$idx] = array_merge($rec, $filtered, [
                 'updated_at' => $now,
                 'updated_by' => $userId,
             ]);
@@ -178,7 +197,8 @@ final class QuoteService
     /**
      * List quotes with optional filters.
      *
-     * Supported filters: status, customer, date_from, date_to.
+     * Supported filters: status, customer, date_from, date_to, org_id.
+     * COM-002: Add org_id filtering for multi-org scoping
      */
     public function listQuotes(array $filters = []): array
     {
@@ -188,6 +208,13 @@ final class QuoteService
         foreach ($quotes as $rec) {
             if (!is_array($rec)) {
                 continue;
+            }
+
+            // COM-002: Filter by org_id if provided in filters
+            if (isset($filters['org_id']) && $filters['org_id'] !== null && $filters['org_id'] !== '') {
+                if (($rec['org_id'] ?? '') !== $filters['org_id']) {
+                    continue;
+                }
             }
 
             if (isset($filters['status']) && $filters['status'] !== '') {
@@ -399,6 +426,26 @@ final class QuoteService
             throw new RuntimeException("Quote {$quoteId} not found.");
         }
 
+        // COM-004: Verify quote is still in 'accepted' state to prevent race condition
+        // If status has changed since lock acquisition, another thread beat us to conversion
+        $currentStatus = strtolower($quote['status'] ?? '');
+        if ($currentStatus === 'converted') {
+            // Quote already converted, return the existing conversion result
+            $convertedTo = trim((string)($quote['converted_to'] ?? ''));
+            if ($convertedTo !== '') {
+                $orderService = new OrderService($this->dataDir);
+                $existingSo = $orderService->getSalesOrder($convertedTo);
+                if ($existingSo !== null) {
+                    return $this->quoteConversionResult($quoteId, $quote, $existingSo, true);
+                }
+            }
+            throw new RuntimeException("Quote {$quoteId} is already converted but the linked Sales Order was not found.");
+        }
+
+        if ($currentStatus !== 'accepted') {
+            throw new RuntimeException("Only accepted quotes can be converted. Current status: {$currentStatus}");
+        }
+
         $orderService = new OrderService($this->dataDir);
         $actingUser = trim($userId) !== '' ? trim($userId) : 'system';
         $resolvedCustomerPo = trim($customerPo);
@@ -419,20 +466,6 @@ final class QuoteService
             $this->saveQuotes($quotes);
 
             return $this->quoteConversionResult($quoteId, $quotes[$qIdx], $existingSo, true);
-        }
-
-        if (strtolower($quote['status'] ?? '') === 'converted') {
-            $convertedTo = trim((string)($quote['converted_to'] ?? ''));
-            $convertedSo = $convertedTo !== '' ? $orderService->getSalesOrder($convertedTo) : null;
-            if ($convertedSo !== null) {
-                return $this->quoteConversionResult($quoteId, $quote, $convertedSo, true);
-            }
-
-            throw new RuntimeException("Quote {$quoteId} is already converted but the linked Sales Order was not found.");
-        }
-
-        if (strtolower($quote['status'] ?? '') !== 'accepted') {
-            throw new RuntimeException("Only accepted quotes can be converted. Current status: " . ($quote['status'] ?? ''));
         }
 
         $soNumber = $orderService->generateOrderNumber('so');

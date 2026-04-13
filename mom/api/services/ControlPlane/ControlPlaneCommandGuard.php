@@ -89,8 +89,22 @@ final class ControlPlaneCommandGuard
             ]);
         }
 
-        if ($this->bool($envelope['generic_crud'] ?? false) && $this->bool($envelope['governed_object'] ?? true)) {
+        // GOV-007: Governance bypass fix - enforce governance rules regardless of governed_object flag
+        $isGenericCrud = $this->bool($envelope['generic_crud'] ?? false);
+        $isGovernedObject = $this->bool($envelope['governed_object'] ?? true);
+
+        // Deny generic CRUD operations on governed objects
+        if ($isGenericCrud && $isGovernedObject) {
             return $this->deny('domain_command_required', 'Governed records must be changed through process commands, not generic CRUD.');
+        }
+
+        // If governed_object is explicitly false, require explicit allowlisting via operation type
+        if (!$isGovernedObject && $isGenericCrud) {
+            // Generic CRUD on non-governed objects still requires domain_command context
+            $operation = strtolower($this->text($envelope['operation'] ?? ''));
+            if ($operation === '' || !in_array($operation, ['create', 'update'], true)) {
+                return $this->deny('governance_context_required', 'All mutations require governance context, even for non-governed objects.');
+            }
         }
 
         $publication = is_array($envelope['publication'] ?? null) ? $envelope['publication'] : [];
@@ -185,9 +199,22 @@ final class ControlPlaneCommandGuard
             ]);
         }
 
+        $fieldPath = $this->text($context['field_path'] ?? '');
+        if ($fieldPath === '') {
+            return $this->deny('field_path_required_for_change_authority', 'Final or released object mutation requires an exact governed field path.', [
+                'required_authority' => 'released_change_order',
+                'required_effect' => $effect,
+                'change_order_ref' => $changeRef,
+            ]);
+        }
+
         $authoritySource = strtolower($this->text($context['authority_source'] ?? ''));
+        $authorityContext = is_array($context['authority_context'] ?? null) ? $context['authority_context'] : [];
         $authorityVerified = $this->bool($context['authority_verified'] ?? false)
-            || $authoritySource === 'canonical_change_authority';
+            && $authoritySource === 'canonical_change_authority'
+            && $this->text($authorityContext['resolved_by'] ?? '') === 'ChangeAuthorityService'
+            && $this->text($authorityContext['resolution_status'] ?? '') === 'verified'
+            && $this->text($authorityContext['field_path'] ?? '') === $fieldPath;
         if (!$authorityVerified) {
             return $this->deny('change_authority_not_verified', 'Released change authority must be resolved from the canonical change authority service, not supplied only by the caller.', [
                 'required_authority_source' => 'canonical_change_authority',
@@ -195,9 +222,8 @@ final class ControlPlaneCommandGuard
             ]);
         }
 
-        $fieldPath = $this->text($context['field_path'] ?? '');
         $authorizedFields = $this->stringList($context['authorized_fields'] ?? []);
-        if ($fieldPath !== '' && $authorizedFields !== [] && !in_array('*', $authorizedFields, true) && !in_array($fieldPath, $authorizedFields, true)) {
+        if ($authorizedFields === [] || (!in_array('*', $authorizedFields, true) && !in_array($fieldPath, $authorizedFields, true))) {
             return $this->deny('change_effect_not_authorized', 'Released change order does not authorize the requested field.', [
                 'field_path' => $fieldPath,
                 'authorized_fields' => $authorizedFields,

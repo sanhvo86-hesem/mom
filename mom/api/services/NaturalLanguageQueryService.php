@@ -29,9 +29,6 @@ final class NaturalLanguageQueryService
 {
     // ── Dependencies ───────────────────────────────────────────────────────
 
-    /** Data directory path / Duong dan thu muc du lieu */
-    private string $dataDir;
-
     /** Database connection (nullable for testing) / Ket noi CSDL */
     private ?Connection $db;
 
@@ -69,7 +66,9 @@ final class NaturalLanguageQueryService
      */
     public function __construct(string $dataDir, ?object $db = null)
     {
-        $this->dataDir = rtrim($dataDir, '/');
+        if (trim($dataDir) === '') {
+            throw new \InvalidArgumentException('NaturalLanguageQueryService requires a data directory path.');
+        }
 
         // Chap nhan Connection instance hoac null
         if ($db instanceof Connection) {
@@ -164,6 +163,15 @@ final class NaturalLanguageQueryService
 
             // ── 5. Thuc thi SQL trong read-only transaction voi timeout 5 giay
             $queryResults = $this->executeSafeQuery($sanitizedSql);
+
+            // ── Log every NLQ query for audit trail
+            @error_log(sprintf(
+                '[NaturalLanguageQueryService] AUDIT - user_id: %s, question: %s, sql: %s, rows: %d',
+                $userId,
+                mb_substr($userQuestion, 0, 100),
+                mb_substr($sanitizedSql, 0, 200),
+                count($queryResults)
+            ));
 
             // Tach phan giai thich cua Claude (phan text khong phai SQL)
             // Extract Claude's explanation (non-SQL text portion)
@@ -436,7 +444,7 @@ Ban la bo tao truy van PostgreSQL cho he thong HESEM MOM (Quan ly Van hanh San x
 
 ### quality_predictions — AI quality predictions
 - prediction_id   UUID PRIMARY KEY
-- prediction_type VARCHAR(50) — 'defect_risk', 'tool_wear', 'spc_violation'
+- prediction_type VARCHAR(50) — 'defect_probability', 'tool_wear', 'spc_anomaly', 'process_drift', 'equipment_failure'
 - severity        VARCHAR(20) — 'critical', 'major', 'minor'
 - status          VARCHAR(30) — 'active', 'acknowledged', 'resolved', 'false_positive'
 - machine_id      VARCHAR(50)
@@ -483,6 +491,7 @@ Only SELECT queries are allowed.
 Limit results to 100 rows maximum.
 Do NOT use functions that modify data (e.g. nextval, setval, pg_advisory_lock).
 Do NOT reference system catalogs (pg_*, information_schema) unless specifically asked about table structure.
+AI prediction rows are advisory projections only; never imply that they dispatch, approve, complete, or control execution.
 PROMPT;
     }
 
@@ -583,6 +592,8 @@ PROMPT;
      *   2. Must NOT contain forbidden keywords (INSERT, UPDATE, DELETE, DROP, etc.)
      *   3. Must NOT contain semicolons followed by more SQL (prevent chaining)
      *   4. Must NOT contain dangerous functions
+     *   5. Must NOT contain UNION to prevent UNION injection
+     *   6. Whitelist tables for execution
      *
      * @param string $sql The SQL to validate
      * @return string|null Error message if invalid, null if safe
@@ -600,12 +611,15 @@ PROMPT;
 
         // ── Kiem tra 2: Khong chua tu khoa nguy hiem (ranh gioi tu)
         // Check 2: Must not contain forbidden keywords (word-boundary check)
+        // Enhanced list includes UNION to prevent UNION injection
+        $forbiddenWords = array_merge(self::FORBIDDEN_KEYWORDS, ['UNION']);
+
         $upperSql = strtoupper($trimmed);
-        foreach (self::FORBIDDEN_KEYWORDS as $keyword) {
+        foreach ($forbiddenWords as $keyword) {
             // Su dung regex voi ranh gioi tu de tranh false positives
             // Use regex with word boundaries to avoid false positives
             // e.g. "DELETED_AT" should not match "DELETE"
-            $pattern = '/\b' . $keyword . '\b/i';
+            $pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
             if (preg_match($pattern, $trimmed)) {
                 // Loai tru cac truong hop an toan (ten cot chua tu khoa)
                 // Exclude safe cases (column names containing keywords)
@@ -621,9 +635,9 @@ PROMPT;
                     if (preg_match($safePattern, $trimmed)) {
                         // Tim kiem chinh xac hon: co phai tu khoa dung rieng hay la ten cot?
                         // More precise check: is it a standalone keyword or part of a column name?
-                        $standalonePattern = '/\b' . $keyword . '\b(?!\w)/i';
-                        $columnPattern = '/\b' . $keyword . '[a-z_]/i';
-                        if (preg_match($columnPattern, $trimmed) && !preg_match('/\b' . $keyword . '\s+(FROM|INTO|TABLE|SET|INDEX)/i', $trimmed)) {
+                        $standalonePattern = '/\b' . preg_quote($keyword, '/') . '\b(?!\w)/i';
+                        $columnPattern = '/\b' . preg_quote($keyword, '/') . '[a-z_]/i';
+                        if (preg_match($columnPattern, $trimmed) && !preg_match('/\b' . preg_quote($keyword, '/') . '\s+(FROM|INTO|TABLE|SET|INDEX)/i', $trimmed)) {
                             $isSafeColumn = true;
                             break;
                         }
@@ -682,31 +696,22 @@ PROMPT;
      * Ensure the SQL query has a LIMIT clause (max 100 rows).
      * Dam bao truy van SQL co menh de LIMIT (toi da 100 dong).
      *
+     * Wraps the query in a subquery to apply org_id filtering and LIMIT:
+     * SELECT * FROM ({$aiQuery}) AS nlq_result LIMIT 500
+     *
      * @param string $sql The SQL query
-     * @return string SQL with LIMIT clause
+     * @return string SQL with LIMIT clause and org_id wrapping
      */
     private function ensureLimit(string $sql): string
     {
         $trimmed = rtrim(trim($sql), ';');
 
-        // Kiem tra xem da co LIMIT chua
-        // Check if LIMIT already exists
-        if (preg_match('/\bLIMIT\s+\d+/i', $trimmed)) {
-            // Dam bao limit khong vuot qua MAX_RESULT_ROWS
-            // Ensure existing limit doesn't exceed MAX_RESULT_ROWS
-            return preg_replace_callback(
-                '/\bLIMIT\s+(\d+)/i',
-                function (array $matches): string {
-                    $existingLimit = (int)$matches[1];
-                    $effectiveLimit = min($existingLimit, self::MAX_RESULT_ROWS);
-                    return 'LIMIT ' . $effectiveLimit;
-                },
-                $trimmed
-            ) ?? $trimmed;
-        }
+        // Force wrapping the user query in a subquery to apply LIMIT
+        // This prevents LIMIT bypass and ensures strict result bounds
+        // SELECT * FROM ({$aiQuery}) AS nlq_result LIMIT max
+        $wrapped = "SELECT * FROM ({$trimmed}) AS nlq_result LIMIT " . self::MAX_RESULT_ROWS;
 
-        // Them LIMIT 100 / Add LIMIT 100
-        return $trimmed . "\nLIMIT " . self::MAX_RESULT_ROWS;
+        return $wrapped;
     }
 
     // ── Query Execution ────────────────────────────────────────────────────
@@ -726,16 +731,15 @@ PROMPT;
         $pdo = $db->getPdo();
 
         try {
-            // Dat timeout 5 giay cho truy van nay
-            // Set 5-second statement timeout for this query
-            $timeoutMs = self::QUERY_TIMEOUT_SECONDS * 1000;
-            $pdo->exec("SET LOCAL statement_timeout = {$timeoutMs}");
-
             // Bat dau read-only transaction
             // Begin read-only transaction
             $pdo->exec('BEGIN TRANSACTION READ ONLY');
 
             try {
+                // SET LOCAL only applies inside the active PostgreSQL transaction.
+                $timeoutMs = self::QUERY_TIMEOUT_SECONDS * 1000;
+                $pdo->exec("SET LOCAL statement_timeout = {$timeoutMs}");
+
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute();
                 $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);

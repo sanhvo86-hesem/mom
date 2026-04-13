@@ -106,6 +106,14 @@ class UploadHardeningService
         $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $size = (int)($uploadedFile['size'] ?? 0);
 
+        // SVC-001: Check ALL extensions, not just the last one
+        // Prevent double-extension bypass like malicious.php.jpg
+        $extensionCheckResult = $this->validateAllExtensions($originalName);
+        if (!$extensionCheckResult['ok']) {
+            $this->logException('blocked_extension', $extensionCheckResult['message'], $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
+            return new QuarantineResult(false, '', '', $extensionCheckResult['message']);
+        }
+
         if (in_array($ext, self::BLOCKED_EXTENSIONS, true)) {
             $this->logException('blocked_extension', "Blocked file extension: .{$ext}", $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
             return new QuarantineResult(false, '', '', "Blocked file type: .{$ext} is not allowed.");
@@ -134,6 +142,15 @@ class UploadHardeningService
             return new QuarantineResult(false, '', '', 'Could not move the upload into quarantine.');
         }
 
+        // SVC-002: Re-validate moved file to prevent TOCTOU (Time-Of-Check-Time-Of-Use)
+        // The file could have been replaced between validation and move
+        $revalidationResult = MimeValidator::validateFile($quarantinePath);
+        if (!$revalidationResult->ok) {
+            @unlink($quarantinePath);
+            $this->logException('mime_rejected_after_move', $revalidationResult->message, $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
+            return new QuarantineResult(false, '', '', 'File validation failed after move: ' . $revalidationResult->message);
+        }
+
         $encoding = $this->inspectUtf8Encoding($quarantinePath, $ext);
         if (!$encoding['ok']) {
             @unlink($quarantinePath);
@@ -155,7 +172,7 @@ class UploadHardeningService
             'extra' => $extra,
         ];
         $sidecarPath = $this->quarantineDir . '/' . $quarantineId . '.json';
-        file_put_contents($sidecarPath, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $this->writeJsonFile($sidecarPath, $metadata, 'upload_quarantine_sidecar_write_failed');
 
         return new QuarantineResult(true, $quarantineId, $quarantinePath, 'OK', $metadata);
     }
@@ -285,7 +302,7 @@ class UploadHardeningService
         $meta['accepted_path'] = $destFile;
         $sidecarSrc = $this->quarantineDir . '/' . $quarantineId . '.json';
         $sidecarDst = $destDir . '/' . $quarantineId . '.json';
-        file_put_contents($sidecarDst, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $this->writeJsonFile($sidecarDst, $meta, 'upload_accept_sidecar_write_failed');
         @unlink($sidecarSrc);
 
         return $destFile;
@@ -304,8 +321,8 @@ class UploadHardeningService
         $ext = (string)($meta['extension'] ?? '');
         $srcFile = $this->quarantineDir . '/' . $quarantineId . ($ext !== '' ? ".{$ext}" : '');
         $destFile = $this->rejectedDir . '/' . $quarantineId . ($ext !== '' ? ".{$ext}" : '');
-        if (file_exists($srcFile)) {
-            @rename($srcFile, $destFile);
+        if (file_exists($srcFile) && !@rename($srcFile, $destFile)) {
+            throw new \RuntimeException("Could not move file into rejected storage: {$quarantineId}");
         }
 
         $meta['status'] = 'rejected';
@@ -313,7 +330,7 @@ class UploadHardeningService
         $meta['rejection_reason'] = $reason;
         $sidecarSrc = $this->quarantineDir . '/' . $quarantineId . '.json';
         $sidecarDst = $this->rejectedDir . '/' . $quarantineId . '.json';
-        file_put_contents($sidecarDst, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $this->writeJsonFile($sidecarDst, $meta, 'upload_reject_sidecar_write_failed');
         @unlink($sidecarSrc);
 
         $this->logException('rejected', $reason, (string)($meta['uploaded_by'] ?? 'unknown'), [
@@ -379,11 +396,137 @@ class UploadHardeningService
         return $purged;
     }
 
+    public function getHealth(): array
+    {
+        $directories = [
+            'uploads' => $this->directoryHealth($this->uploadsDir),
+            'quarantine' => $this->directoryHealth($this->quarantineDir),
+            'accepted' => $this->directoryHealth($this->acceptedDir),
+            'rejected' => $this->directoryHealth($this->rejectedDir),
+        ];
+        $activeWriteProbe = $this->activeWriteProbe($this->quarantineDir);
+        $exceptions = $this->loadExceptions();
+        $lastException = is_array(end($exceptions)) ? end($exceptions) : [];
+        $allWritable = true;
+        foreach ($directories as $state) {
+            if (empty($state['exists']) || empty($state['writable'])) {
+                $allWritable = false;
+                break;
+            }
+        }
+
+        return [
+            'ok' => $allWritable && (bool)($activeWriteProbe['ok'] ?? false),
+            'backend' => 'file_quarantine',
+            'directories' => $directories,
+            'active_write_probe' => $activeWriteProbe,
+            'exception_count' => count($exceptions),
+            'last_exception_type' => (string)($lastException['type'] ?? ''),
+            'last_exception_at' => (string)($lastException['timestamp'] ?? ''),
+        ];
+    }
+
+    /**
+     * SVC-001: Validate that NO component of the filename is a dangerous extension.
+     * Prevents double-extension bypass (e.g., malicious.php.jpg).
+     *
+     * @param string $filename The original filename
+     * @return array{ok: bool, message: string}
+     */
+    private function validateAllExtensions(string $filename): array
+    {
+        $filename = basename($filename);
+        if ($filename === '') {
+            return ['ok' => true, 'message' => ''];
+        }
+
+        // Dangerous extensions that could be executed
+        $dangerousExts = [
+            'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar',
+            'asp', 'aspx', 'asp.net', 'jsp', 'jspx',
+            'exe', 'bat', 'cmd', 'com', 'cpl', 'dll', 'drv', 'sys',
+            'sh', 'bash', 'ksh', 'csh', 'tcsh',
+            'py', 'rb', 'pl', 'pm', 'cgi', 'fcgi',
+            'vbs', 'vbe', 'ws', 'wsf', 'wsh', 'ps1', 'psc1', 'psd1', 'msh',
+            'scr', 'reg', 'js', 'jse', 'inf', 'msi', 'mst',
+            'html', 'htm', 'svg', 'xhtml', 'xml', 'xsl',
+        ];
+
+        // Split filename into all components (remove basename, check all extensions)
+        $parts = explode('.', $filename);
+
+        // If there's only one part (no extension), it's safe
+        if (count($parts) <= 1) {
+            return ['ok' => true, 'message' => ''];
+        }
+
+        // Remove the basename (first part) and check all remaining parts
+        array_shift($parts);
+
+        foreach ($parts as $part) {
+            $part = strtolower(trim($part));
+            if ($part === '') {
+                continue;
+            }
+
+            if (in_array($part, $dangerousExts, true)) {
+                return [
+                    'ok' => false,
+                    'message' => "Blocked file extension: .{$part} is not allowed (double-extension or dangerous type)."
+                ];
+            }
+        }
+
+        return ['ok' => true, 'message' => ''];
+    }
+
     private function ensureDirs(): void
     {
         foreach ([$this->uploadsDir, $this->quarantineDir, $this->acceptedDir, $this->rejectedDir] as $dir) {
-            if (!is_dir($dir)) {
-                @mkdir($dir, 0755, true);
+            $this->ensureWritableDir($dir, 'upload_storage_unavailable');
+        }
+    }
+
+    private function ensureWritableDir(string $dir, string $errorCode): void
+    {
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new \RuntimeException($errorCode . ':mkdir_failed');
+        }
+        if (!is_writable($dir)) {
+            throw new \RuntimeException($errorCode . ':not_writable');
+        }
+    }
+
+    private function directoryHealth(string $dir): array
+    {
+        clearstatcache(true, $dir);
+        return [
+            'path' => $dir,
+            'exists' => is_dir($dir),
+            'writable' => is_dir($dir) && is_writable($dir),
+        ];
+    }
+
+    private function activeWriteProbe(string $dir): array
+    {
+        if (!is_dir($dir) || !is_writable($dir)) {
+            return ['ok' => false, 'error' => 'directory_not_writable'];
+        }
+
+        $path = $dir . '/.health-probe-' . getmypid() . '-' . bin2hex(random_bytes(4)) . '.tmp';
+        $payload = 'upload-hardening-health:' . gmdate('c');
+        try {
+            if (@file_put_contents($path, $payload, LOCK_EX) === false) {
+                return ['ok' => false, 'error' => 'write_failed'];
+            }
+            $readBack = @file_get_contents($path);
+            if ($readBack !== $payload) {
+                return ['ok' => false, 'error' => 'readback_mismatch'];
+            }
+            return ['ok' => true, 'error' => ''];
+        } finally {
+            if (is_file($path)) {
+                @unlink($path);
             }
         }
     }
@@ -456,7 +599,7 @@ class UploadHardeningService
     private function loadSidecar(string $quarantineId): ?array
     {
         $path = $this->quarantineDir . '/' . $quarantineId . '.json';
-        if (!file_exists($path)) {
+        if (!is_file($path) || !is_readable($path)) {
             return null;
         }
         $data = json_decode((string)file_get_contents($path), true);
@@ -466,12 +609,12 @@ class UploadHardeningService
     private function saveSidecar(string $quarantineId, array $data): void
     {
         $path = $this->quarantineDir . '/' . $quarantineId . '.json';
-        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $this->writeJsonFile($path, $data, 'upload_sidecar_write_failed');
     }
 
     private function loadExceptions(): array
     {
-        if (!file_exists($this->exceptionsFile)) {
+        if (!is_file($this->exceptionsFile) || !is_readable($this->exceptionsFile)) {
             return [];
         }
         $data = json_decode((string)file_get_contents($this->exceptionsFile), true);
@@ -494,6 +637,25 @@ class UploadHardeningService
             $exceptions = array_slice($exceptions, -1000);
         }
 
-        file_put_contents($this->exceptionsFile, json_encode($exceptions, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        $this->writeJsonFile($this->exceptionsFile, $exceptions, 'upload_exception_log_write_failed');
+    }
+
+    private function writeJsonFile(string $path, array $data, string $errorCode): void
+    {
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (!is_string($json)) {
+            throw new \RuntimeException($errorCode . ':json_encode_failed');
+        }
+
+        $this->ensureWritableDir(dirname($path), $errorCode);
+        $tmp = $path . '.tmp.' . bin2hex(random_bytes(4));
+        if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
+            @unlink($tmp);
+            throw new \RuntimeException($errorCode . ':write_failed');
+        }
+        if (!@rename($tmp, $path)) {
+            @unlink($tmp);
+            throw new \RuntimeException($errorCode . ':rename_failed');
+        }
     }
 }

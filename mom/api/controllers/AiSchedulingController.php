@@ -88,11 +88,44 @@ class AiSchedulingController extends BaseController
     }
 
     /**
+     * Roles allowed to ask natural-language questions over governed MOM data.
+     *
+     * @return array<int, string>
+     */
+    private function aiReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'quality_engineer',
+                'quality_manager',
+                'qa_manager',
+                'production_planner',
+                'production_manager',
+                'production_director',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'supervisor',
+                'shift_leader',
+            ]
+        )));
+    }
+
+    /**
      * @return void
      */
     private function requireAiWriteAccess(array $user): void
     {
         $this->requireAnyRole($user, $this->aiWriteRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAiReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->aiReadRoles());
     }
 
     private function idempotency(): IdempotencyService
@@ -170,6 +203,20 @@ class AiSchedulingController extends BaseController
             @error_log('[AiScheduling] DB connection failed: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * P8: Convert time string (HH:MM) to minutes since midnight.
+     */
+    private function timeToMinutes(string $time): int
+    {
+        $parts = explode(':', trim($time));
+        if (count($parts) >= 2) {
+            $hours = (int)$parts[0];
+            $minutes = (int)$parts[1];
+            return $hours * 60 + $minutes;
+        }
+        return 0;
     }
 
     // -- Prediction Endpoints -------------------------------------------------
@@ -1013,6 +1060,33 @@ class AiSchedulingController extends BaseController
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
 
+            // P8: Check for overlapping slots on the same machine
+            $startMinutes = $this->timeToMinutes($startTime);
+            $endMinutes = $this->timeToMinutes($endTime);
+
+            foreach ($all as $existing) {
+                if (!is_array($existing)) continue;
+                if (($existing['machine_id'] ?? '') !== $machineId) continue;
+                if (($existing['date'] ?? '') !== $date) continue;
+
+                $existingStart = $this->timeToMinutes($existing['start_time'] ?? '');
+                $existingEnd = $this->timeToMinutes($existing['end_time'] ?? '');
+
+                // P8: Check for overlap: (start < existingEnd AND end > existingStart)
+                if ($startMinutes < $existingEnd && $endMinutes > $existingStart) {
+                    $this->error('schedule_conflict', 409, 'Schedule conflict: machine already booked for this time slot', [
+                        'machine_id' => $machineId,
+                        'date' => $date,
+                        'requested_time' => $startTime . '-' . $endTime,
+                        'existing_slot' => [
+                            'id' => $existing['id'] ?? '',
+                            'start_time' => $existing['start_time'] ?? '',
+                            'end_time' => $existing['end_time'] ?? '',
+                        ],
+                    ]);
+                }
+            }
+
             $slot = [
                 'id'         => 'SLOT-' . bin2hex(random_bytes(8)),
                 'machine_id' => $machineId,
@@ -1510,6 +1584,8 @@ class AiSchedulingController extends BaseController
     public function aiNlQuery(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['question']);
@@ -1526,6 +1602,11 @@ class AiSchedulingController extends BaseController
             }
 
             $result = $service->query($question, $userId, $context);
+
+            $this->auditLog('ai_nl_query', [
+                'context_type' => $contextType !== '' ? $contextType : null,
+                'question_hash' => hash('sha256', $question),
+            ], $this->userId($user));
 
             $this->success(['result' => $result]);
         } catch (Throwable $e) {
@@ -1549,6 +1630,7 @@ class AiSchedulingController extends BaseController
             admin_roles(),
             ['quality_manager', 'quality_engineer']
         ))));
+        $this->requireCsrf();
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['ncr_id']);

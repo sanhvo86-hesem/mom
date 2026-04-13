@@ -98,8 +98,9 @@ final class OrderWorkflowService
     // ── Field-edit rules (orderType => field => allowed states) ─────────
 
     /**
-     * Defines which states allow editing of specific fields.
-     * Fields not listed here are editable in any non-terminal state.
+     * Defines which states allow direct pre-release editing of specific fields.
+     * Once an order reaches a released/running state, every effective field
+     * change is governed by released change authority regardless of this table.
      */
     private const FIELD_EDIT_RULES = [
         'so' => [
@@ -151,16 +152,10 @@ final class OrderWorkflowService
     ];
 
     /**
-     * Fields that require an ECR (engineering change request) when edited
-     * after the order has been released.
+     * Statuses considered post-release. Any effective field edit in these
+     * states requires exact released change authority.
      */
-    private const ECR_FIELDS = ['part_revision', 'material_spec', 'routing_id'];
-
-    /**
-     * Statuses considered "post-release" where ECR is required for
-     * ECR_FIELDS edits.
-     */
-    private const POST_RELEASE_STATUSES = ['released', 'active', 'running', 'inspection'];
+    private const POST_RELEASE_STATUSES = ['released', 'active', 'running', 'inspection', 'in_production', 'setup', 'on_hold'];
 
     // ── Dependencies ────────────────────────────────────────────────────────
 
@@ -501,8 +496,7 @@ final class OrderWorkflowService
         }
 
         $currentStatus = strtolower((string)($record['status'] ?? ''));
-        $isPostReleaseEcrField = in_array($fieldName, self::ECR_FIELDS, true)
-            && in_array($currentStatus, self::POST_RELEASE_STATUSES, true);
+        $isPostReleaseField = in_array($currentStatus, self::POST_RELEASE_STATUSES, true);
 
         // Terminal status -- no edits
         if (in_array($currentStatus, self::TERMINAL_STATUSES, true)) {
@@ -513,7 +507,7 @@ final class OrderWorkflowService
         $rules = self::FIELD_EDIT_RULES[$orderType] ?? [];
         if (isset($rules[$fieldName])) {
             $allowedStates = $rules[$fieldName];
-            if (!in_array($currentStatus, $allowedStates, true) && !$isPostReleaseEcrField) {
+            if (!in_array($currentStatus, $allowedStates, true) && !$isPostReleaseField) {
                 return new EditResult(
                     false,
                     "Field '{$fieldName}' is locked in '{$currentStatus}' status.",
@@ -527,8 +521,8 @@ final class OrderWorkflowService
             }
         }
 
-        // ECR check for post-release edits
-        if ($isPostReleaseEcrField) {
+        // Exact released change authority check for every post-release edit.
+        if ($isPostReleaseField) {
             $decision = $this->changeAuthority()->assertFieldEditAllowed(
                 $orderType,
                 $orderId,

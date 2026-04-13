@@ -478,6 +478,10 @@ class DispatchController extends BaseController
         if ($operatorId !== $currentUserId && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
             $this->error('forbidden', 403);
         }
+
+        // P1: Verify operator belongs to the current plant/organization
+        $plantId = $_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? null;
+
         $date = $this->query('date') ?? date('Y-m-d');
         $shiftCode = $this->query('shift_code');
         $lockHandle = null;
@@ -503,13 +507,20 @@ class DispatchController extends BaseController
                 }
             }
 
+            // P1: Filter targets to only include those belonging to the current plant
             $myTasks = [];
+            $operatorFound = false;
             foreach ($targets as $t) {
                 $status = (string)($t['status'] ?? 'planned');
                 if (!in_array($status, ['dispatched', 'in_progress', 'completed'], true)) {
                     continue;
                 }
                 if (($t['operator_id'] ?? '') === $operatorId && ($t['shift_date'] ?? '') === $date) {
+                    // P1: Verify target belongs to current plant if plant_id is available
+                    if ($plantId !== null && ($t['plant_id'] ?? '') !== $plantId) {
+                        continue;
+                    }
+                    $operatorFound = true;
                     if ($shiftCode !== null && $shiftCode !== '' && ($t['shift_code'] ?? '') !== $shiftCode) {
                         continue;
                     }
@@ -518,6 +529,11 @@ class DispatchController extends BaseController
                     $task['production_log'] = $log;
                     $myTasks[] = $task;
                 }
+            }
+
+            // P1: Return 403 if trying to access an operator outside current plant
+            if ($operatorId !== $currentUserId && $plantId !== null && !$operatorFound) {
+                $this->error('forbidden', 403);
             }
 
             // Sort by dispatch_sequence, then priority
@@ -594,6 +610,27 @@ class DispatchController extends BaseController
             ]];
         }
 
+        // P6: Check idempotency - if already paused, return success
+        try {
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
+            $tFile   = $this->dispatchDir() . '/targets.json';
+            $targets = $this->readJsonFile($tFile) ?? [];
+            $targetId = trim((string)($body['target_id'] ?? ''));
+            foreach ($targets as $t) {
+                if (is_array($t) && ($t['target_id'] ?? '') === $targetId) {
+                    $currentState = (string)($t['execution_state'] ?? '');
+                    if ($currentState === 'paused') {
+                        $this->releaseExecutionStateLock($lockHandle);
+                        $this->success(['target' => $t, 'idempotent' => true, 'message' => 'Target already paused']);
+                    }
+                    break;
+                }
+            }
+            $this->releaseExecutionStateLock($lockHandle);
+        } catch (Throwable) {
+            // Continue to record the pause even if idempotency check fails
+        }
+
         $this->recordProductionReport($body, $user);
     }
 
@@ -613,6 +650,27 @@ class DispatchController extends BaseController
         }
         $body['execution_event_type'] = 'resume';
         $body['completion_intent'] = 'none';
+
+        // P6: Check idempotency - if already running, return success
+        try {
+            $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
+            $tFile   = $this->dispatchDir() . '/targets.json';
+            $targets = $this->readJsonFile($tFile) ?? [];
+            $targetId = trim((string)($body['target_id'] ?? ''));
+            foreach ($targets as $t) {
+                if (is_array($t) && ($t['target_id'] ?? '') === $targetId) {
+                    $currentState = (string)($t['execution_state'] ?? '');
+                    if ($currentState === 'running' || $currentState === 'in_progress') {
+                        $this->releaseExecutionStateLock($lockHandle);
+                        $this->success(['target' => $t, 'idempotent' => true, 'message' => 'Target already running']);
+                    }
+                    break;
+                }
+            }
+            $this->releaseExecutionStateLock($lockHandle);
+        } catch (Throwable) {
+            // Continue to record the resume even if idempotency check fails
+        }
 
         $this->recordProductionReport($body, $user);
     }
@@ -645,7 +703,13 @@ class DispatchController extends BaseController
             }
 
             if (!$target) $this->error('target_not_found', 404);
+
+            // P4: Verify the authenticated operator matches the target's assigned operator
             $hasPlannerOverride = $this->userHasAnyRole($user, $this->dispatchWriteRoles());
+            if (!$hasPlannerOverride && ($target['operator_id'] ?? '') !== $uid) {
+                $this->error('forbidden', 403);
+            }
+
             $this->shopfloor()->assertProductionReportGovernance($body, $target, $hasPlannerOverride, $now);
             $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $hasPlannerOverride, [
                 'action' => 'dispatch.report_production',

@@ -87,13 +87,21 @@ final class AiDataEtlService
      * applies date range filtering, and returns a summary with sample rows.
      *
      * @param string $modelType One of: tool_wear, quality_prediction, scheduling, shopfloor_execution
-     * @param array  $options   Optional keys: date_from, date_to (Y-m-d strings)
+     * @param array  $options   Optional keys: date_from, date_to (Y-m-d strings), org_id (required for security)
      * @return array{model_type: string, row_count: int, features: list<string>, date_range: array{from: string, to: string}, sample_rows: list<array>, projection_only: bool, source_authority: string}
-     * @throws \InvalidArgumentException If modelType is invalid / Nếu loại mô hình không hợp lệ
+     * @throws \InvalidArgumentException If modelType is invalid or org_id is missing / Nếu loại mô hình không hợp lệ
      */
     public function extractTrainingData(string $modelType, array $options = []): array
     {
         $this->validateModelType($modelType);
+
+        // ── Require org_id for security / Yêu cầu org_id để bảo mật ──
+        $orgId = $options['org_id'] ?? null;
+        if ($orgId === null || trim((string)$orgId) === '') {
+            throw new \InvalidArgumentException(
+                'org_id is required for secure training data extraction. / org_id là bắt buộc để trích xuất dữ liệu huấn luyện an toàn.'
+            );
+        }
 
         // ── Resolve date range / Xác định khoảng thời gian ──
         $dateTo   = $this->normalizeDate($options['date_to'] ?? date('Y-m-d'), 'date_to');
@@ -110,10 +118,10 @@ final class AiDataEtlService
 
         // ── Build and execute query / Xây dựng và thực thi truy vấn ──
         $rows = match ($modelType) {
-            'tool_wear'           => $this->extractToolWear($dateFrom, $dateTo),
-            'quality_prediction'  => $this->extractQualityPrediction($dateFrom, $dateTo),
-            'scheduling'          => $this->extractScheduling($dateFrom, $dateTo),
-            'shopfloor_execution' => $this->extractShopfloorExecution($dateFrom, $dateTo),
+            'tool_wear'           => $this->extractToolWear($dateFrom, $dateTo, $orgId),
+            'quality_prediction'  => $this->extractQualityPrediction($dateFrom, $dateTo, $orgId),
+            'scheduling'          => $this->extractScheduling($dateFrom, $dateTo, $orgId),
+            'shopfloor_execution' => $this->extractShopfloorExecution($dateFrom, $dateTo, $orgId),
             default               => throw new \InvalidArgumentException("Invalid model_type '{$modelType}'."),
         };
 
@@ -136,13 +144,20 @@ final class AiDataEtlService
      * ai_training_datasets table, and returns the dataset record.
      *
      * @param string $modelType One of: tool_wear, quality_prediction, scheduling, shopfloor_execution
+     * @param string|null $orgId Organization ID for security scoping (required)
      * @return array Dataset metadata record / Bản ghi siêu dữ liệu tập dữ liệu
-     * @throws \InvalidArgumentException If modelType is invalid / Nếu loại mô hình không hợp lệ
+     * @throws \InvalidArgumentException If modelType is invalid or org_id is missing / Nếu loại mô hình không hợp lệ
      * @throws \RuntimeException On database failure / Khi lỗi cơ sở dữ liệu
      */
-    public function snapshotForModel(string $modelType): array
+    public function snapshotForModel(string $modelType, ?string $orgId = null): array
     {
         $this->validateModelType($modelType);
+
+        if ($orgId === null || trim((string)$orgId) === '') {
+            throw new \InvalidArgumentException(
+                'org_id is required for secure snapshot creation. / org_id là bắt buộc để tạo bản chụp an toàn.'
+            );
+        }
 
         // ── Extract data for last 90 days / Trích xuất dữ liệu 90 ngày gần nhất ──
         $dateTo   = date('Y-m-d');
@@ -151,6 +166,7 @@ final class AiDataEtlService
         $extracted = $this->extractTrainingData($modelType, [
             'date_from' => $dateFrom,
             'date_to'   => $dateTo,
+            'org_id'    => $orgId,
         ]);
 
         // ── Store metadata in ai_training_datasets / Lưu siêu dữ liệu vào ai_training_datasets ──
@@ -248,9 +264,10 @@ final class AiDataEtlService
      * Extract tool wear telemetry features.
      * Trích xuất đặc trưng đo lường mòn dao.
      *
+     * @param string $orgId Organization ID for security scoping
      * @return list<array>
      */
-    private function extractToolWear(string $dateFrom, string $dateTo): array
+    private function extractToolWear(string $dateFrom, string $dateTo, string $orgId): array
     {
         try {
             return $this->db->query(
@@ -262,8 +279,9 @@ final class AiDataEtlService
                  FROM machine_telemetry_extended mt
                  WHERE mt.timestamp BETWEEN :date_from AND :date_to
                    AND mt.tool_id IS NOT NULL
+                   AND mt.org_id = :org_id
                  ORDER BY mt.machine_id, mt.tool_id, mt.timestamp",
-                ['date_from' => $dateFrom, 'date_to' => $dateTo]
+                ['date_from' => $dateFrom, 'date_to' => $dateTo, 'org_id' => $orgId]
             );
         } catch (\Throwable $e) {
             @error_log('[AiDataEtlService] extractToolWear error: ' . $e->getMessage());
@@ -275,9 +293,10 @@ final class AiDataEtlService
      * Extract quality prediction history with NCR correlation.
      * Trích xuất lịch sử dự đoán chất lượng với tương quan NCR.
      *
+     * @param string $orgId Organization ID for security scoping
      * @return list<array>
      */
-    private function extractQualityPrediction(string $dateFrom, string $dateTo): array
+    private function extractQualityPrediction(string $dateFrom, string $dateTo, string $orgId): array
     {
         try {
             return $this->db->query(
@@ -287,6 +306,7 @@ final class AiDataEtlService
                     (SELECT COUNT(*) FROM ncr_records nr
                      WHERE nr.created_at BETWEEN qp.created_at - INTERVAL '7 days'
                                              AND qp.created_at + INTERVAL '7 days'
+                       AND nr.org_id = :org_id
                        AND (
                             (qp.job_number IS NULL AND qp.wo_number IS NULL)
                             OR (qp.job_number IS NOT NULL AND (
@@ -298,8 +318,9 @@ final class AiDataEtlService
                  FROM quality_predictions qp
                  WHERE qp.created_at BETWEEN :date_from::date
                                          AND (:date_to::date + INTERVAL '1 day')
+                   AND qp.org_id = :org_id
                  ORDER BY qp.created_at",
-                ['date_from' => $dateFrom, 'date_to' => $dateTo]
+                ['date_from' => $dateFrom, 'date_to' => $dateTo, 'org_id' => $orgId]
             );
         } catch (\Throwable $e) {
             @error_log('[AiDataEtlService] extractQualityPrediction error: ' . $e->getMessage());
@@ -311,9 +332,10 @@ final class AiDataEtlService
      * Extract production scheduling slot features.
      * Trích xuất đặc trưng slot lịch trình sản xuất.
      *
+     * @param string $orgId Organization ID for security scoping
      * @return list<array>
      */
-    private function extractScheduling(string $dateFrom, string $dateTo): array
+    private function extractScheduling(string $dateFrom, string $dateTo, string $orgId): array
     {
         try {
             return $this->db->query(
@@ -323,8 +345,9 @@ final class AiDataEtlService
                     EXTRACT(EPOCH FROM (ps.end_time - ps.start_time))/3600 AS duration_hours
                  FROM production_schedule_slots ps
                  WHERE ps.slot_date BETWEEN :date_from AND :date_to
+                   AND ps.org_id = :org_id
                  ORDER BY ps.machine_id, ps.start_time",
-                ['date_from' => $dateFrom, 'date_to' => $dateTo]
+                ['date_from' => $dateFrom, 'date_to' => $dateTo, 'org_id' => $orgId]
             );
         } catch (\Throwable $e) {
             @error_log('[AiDataEtlService] extractScheduling error: ' . $e->getMessage());
@@ -336,9 +359,10 @@ final class AiDataEtlService
      * Extract canonical manual shopfloor execution facts for advisory AI features.
      * These rows are read-only projections from MOM/MES execution truth.
      *
+     * @param string $orgId Organization ID for security scoping
      * @return list<array>
      */
-    private function extractShopfloorExecution(string $dateFrom, string $dateTo): array
+    private function extractShopfloorExecution(string $dateFrom, string $dateTo, string $orgId): array
     {
         try {
             return $this->db->query(
@@ -367,11 +391,13 @@ final class AiDataEtlService
                         MAX(occurred_at) AS last_report_event_at
                     FROM shift_production_report_events
                     WHERE occurred_at BETWEEN :date_from::date AND (:date_to::date + INTERVAL '1 day')
+                      AND org_id = :org_id
                     GROUP BY log_source_record_id
                  ) spe ON spe.log_source_record_id = spl.source_record_id
                  WHERE spl.shift_date BETWEEN :date_from::date AND :date_to::date
+                   AND spl.org_id = :org_id
                  ORDER BY spl.shift_date, spl.machine_id, spl.wo_number, spl.created_at",
-                ['date_from' => $dateFrom, 'date_to' => $dateTo]
+                ['date_from' => $dateFrom, 'date_to' => $dateTo, 'org_id' => $orgId]
             );
         } catch (\Throwable $e) {
             @error_log('[AiDataEtlService] extractShopfloorExecution error: ' . $e->getMessage());

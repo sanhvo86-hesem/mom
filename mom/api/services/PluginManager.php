@@ -163,13 +163,36 @@ final class PluginManager
             }
         }
 
-        // Require entry point
+        // SECURITY FIX (INF-004): Validate plugin name and entry point to prevent arbitrary PHP loading
+        // Plugin names must be alphanumeric, hyphens, and underscores only
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $manifest->name)) {
+            throw new \RuntimeException("Invalid plugin name (alphanumeric, hyphens, underscores only): {$manifest->name}");
+        }
+        // Entry point filename must be alphanumeric, hyphens, dots, and underscores
+        if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $manifest->entryPoint)) {
+            throw new \RuntimeException("Invalid entry point filename: {$manifest->entryPoint}");
+        }
+
+        // Verify the plugin directory is within the plugins directory
+        $realPluginDir = realpath($this->pluginDir);
+        $realManifestDir = realpath($manifest->directory);
+        if ($realPluginDir === false || $realManifestDir === false || !str_starts_with($realManifestDir, $realPluginDir)) {
+            throw new \RuntimeException("Plugin directory is outside the plugins directory");
+        }
+
+        // Require entry point with validated path
         $entryFile = $manifest->directory . '/' . $manifest->entryPoint;
         if (!is_file($entryFile)) {
             throw new \RuntimeException("Entry point not found: {$manifest->entryPoint}");
         }
 
-        require_once $entryFile;
+        // Final validation: ensure the resolved entry file is within the plugin directory
+        $realEntryFile = realpath($entryFile);
+        if ($realEntryFile === false || !str_starts_with($realEntryFile, $realManifestDir)) {
+            throw new \RuntimeException("Entry point is outside the plugin directory");
+        }
+
+        require_once $realEntryFile;
 
         // Determine class name
         $className = $manifest->className;

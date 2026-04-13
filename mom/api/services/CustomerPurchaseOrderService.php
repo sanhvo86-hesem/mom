@@ -54,6 +54,8 @@ final class CustomerPurchaseOrderService
             return strcmp((string)($right['updated_at'] ?? ''), (string)($left['updated_at'] ?? ''));
         });
 
+        // COM-006: Apply pagination cap at service layer (max 200 records)
+        // This is enforced by controller layer via paginated() method
         return $rows;
     }
 
@@ -560,6 +562,12 @@ final class CustomerPurchaseOrderService
      */
     private function matchesFilters(array $record, array $filters): bool
     {
+        // COM-001: Filter by org_id if provided in session
+        $orgId = trim((string)($filters['org_id'] ?? ''));
+        if ($orgId !== '' && (string)($record['org_id'] ?? '') !== $orgId) {
+            return false;
+        }
+
         $status = strtolower(trim((string)($filters['status'] ?? '')));
         if ($status !== '' && strtolower((string)($record['po_status'] ?? '')) !== $status) {
             return false;

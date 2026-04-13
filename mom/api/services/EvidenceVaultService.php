@@ -95,11 +95,48 @@ final class EvidenceVaultService
      */
     public function pgWriteProbe(): array
     {
-        return array_merge($this->pgWriteProbe, [
+        $live = $this->livePostgresProbe();
+        $enabled = $this->pgWriteEnabled();
+        $degraded = (bool)($this->pgWriteProbe['degraded'] ?? false)
+            || ($enabled && !($live['postgres_reachable'] ?? false));
+
+        return array_merge($this->pgWriteProbe, $live, [
             'enabled' => $this->pgWriteEnabled(),
             'mode' => $this->dataLayerMode(),
             'authoritative_required' => $this->pgAuthoritativeWriteRequired(),
+            'ok' => !$enabled || !$degraded,
+            'available' => !$enabled || (bool)($live['postgres_reachable'] ?? false),
+            'degraded' => $degraded,
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function livePostgresProbe(): array
+    {
+        if ($this->dataLayer === null || !$this->pgWriteEnabled()) {
+            return [
+                'database_configured' => false,
+                'postgres_reachable' => false,
+                'postgres_error' => '',
+            ];
+        }
+
+        try {
+            $summary = $this->dataLayer->getModeSummary();
+            return [
+                'database_configured' => (bool)($summary['database_configured'] ?? false),
+                'postgres_reachable' => (bool)($summary['postgres_reachable'] ?? false),
+                'postgres_error' => (string)($summary['postgres_error'] ?? $summary['database_probe_error'] ?? ''),
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'database_configured' => true,
+                'postgres_reachable' => false,
+                'postgres_error' => $e->getMessage(),
+            ];
+        }
     }
 
     private function requiresControlledArtifactHash(array $evidence): bool
@@ -154,9 +191,22 @@ final class EvidenceVaultService
                 throw new RuntimeException('evidence_upload_temp_unreadable');
             }
 
+            // Validate file size server-side (max 50MB = 52428800 bytes)
+            $fileSize = (int)($file['size'] ?? 0);
+            $maxFileSize = 52428800; // 50MB
+            if ($fileSize <= 0 || $fileSize > $maxFileSize) {
+                throw new RuntimeException('evidence_upload_file_size_invalid');
+            }
+
             $fileHash = hash_file('sha256', $tmpPath);
             if ($fileHash === false) {
                 throw new RuntimeException('evidence_upload_hash_failed');
+            }
+
+            // Detect actual MIME type from file bytes (not client-provided)
+            $detectedMimeType = $this->detectMimeType($tmpPath, $originalName);
+            if ($detectedMimeType === null) {
+                throw new RuntimeException('evidence_upload_mime_type_not_allowed');
             }
 
             $uploadDir = $this->dataDir . '/uploads/evidence';
@@ -173,8 +223,8 @@ final class EvidenceVaultService
                 'filename'    => $originalName,
                 'file_hash'   => $fileHash,
                 'stored_path' => $storedPath,
-                'mime_type'   => $file['type'] ?? 'application/octet-stream',
-                'file_size'   => $file['size'] ?? 0,
+                'mime_type'   => $detectedMimeType,
+                'file_size'   => $fileSize,
             ]);
         } else {
             // Called as store($evidence, $userId) — legacy/programmatic path
@@ -557,7 +607,7 @@ final class EvidenceVaultService
             $stmt->execute([':en' => $entityName, ':eid' => $entityId]);
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Throwable $e) {
-            return [];
+            throw new RuntimeException('governance_attachment_list_read_failed', 0, $e);
         }
     }
 
@@ -580,7 +630,7 @@ final class EvidenceVaultService
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             return is_array($row) ? $row : null;
         } catch (\Throwable $e) {
-            return null;
+            throw new RuntimeException('governance_attachment_read_failed', 0, $e);
         }
     }
 
@@ -593,11 +643,22 @@ final class EvidenceVaultService
     {
         $originalName = $file['name'] ?? 'unknown';
         $tmpPath = $file['tmp_name'] ?? '';
-        $contentType = $file['type'] ?? 'application/octet-stream';
-        $fileSize = $file['size'] ?? 0;
+        $fileSize = (int)($file['size'] ?? 0);
 
         if (!is_string($tmpPath) || $tmpPath === '' || !is_file($tmpPath)) {
             throw new \RuntimeException('governance_attachment_temp_unreadable');
+        }
+
+        // Validate file size server-side (max 50MB = 52428800 bytes)
+        $maxFileSize = 52428800; // 50MB
+        if ($fileSize <= 0 || $fileSize > $maxFileSize) {
+            throw new \RuntimeException('governance_attachment_file_size_invalid');
+        }
+
+        // Detect actual MIME type from file bytes (not client-provided)
+        $contentType = $this->detectMimeType($tmpPath, $originalName);
+        if ($contentType === null) {
+            throw new \RuntimeException('governance_attachment_mime_type_not_allowed');
         }
 
         $checksum = hash_file('sha256', $tmpPath);
@@ -825,10 +886,13 @@ final class EvidenceVaultService
         }
         $raw = @file_get_contents($path);
         if ($raw === false) {
-            return null;
+            throw new RuntimeException('evidence_vault_json_read_failed:' . basename($path));
         }
         $decoded = json_decode($raw, true);
-        return is_array($decoded) ? $decoded : null;
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+            throw new RuntimeException('evidence_vault_json_decode_failed:' . basename($path));
+        }
+        return $decoded;
     }
 
     private function writeJson(string $path, array $data): void
@@ -1039,6 +1103,80 @@ final class EvidenceVaultService
             throw new RuntimeException('evidence_pg_write_failed:' . $operation, 0, $error);
         }
         error_log('[EvidenceVaultService] PG ' . $operation . ' write degraded: ' . $error->getMessage());
+    }
+
+    /**
+     * Detect actual MIME type from file bytes and validate against allowlist.
+     *
+     * Uses mime_content_type() on actual file bytes, then validates against
+     * an explicit allowlist. Falls back to extension check if mime_content_type
+     * is not available.
+     *
+     * @param string $tmpPath     Temporary file path
+     * @param string $originalName Original filename for extension fallback
+     * @return string|null MIME type if allowed, null if not allowed
+     */
+    private function detectMimeType(string $tmpPath, string $originalName): ?string
+    {
+        // Allowlist of permitted MIME types
+        $allowedMimes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/plain',
+        ];
+
+        // Whitelist of allowed file extensions (lowercase)
+        $allowedExtensions = [
+            'jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt',
+        ];
+
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $genericMimes = [
+            'application/octet-stream',
+            'application/zip',
+            'application/x-zip',
+            'application/x-zip-compressed',
+        ];
+
+        // Try mime_content_type() first (actual bytes)
+        if (function_exists('mime_content_type')) {
+            $detectedMime = @mime_content_type($tmpPath);
+            if ($detectedMime !== false && in_array($detectedMime, $allowedMimes, true)) {
+                return $detectedMime;
+            }
+            if ($detectedMime !== false && !in_array($detectedMime, $genericMimes, true)) {
+                return null;
+            }
+            if ($detectedMime !== false
+                && str_contains((string)$detectedMime, 'zip')
+                && !in_array($ext, ['docx', 'xlsx'], true)
+            ) {
+                return null;
+            }
+        }
+
+        // Fallback only for generic/ambiguous byte detection, never for a concrete disallowed MIME.
+        if ($ext !== '' && in_array($ext, $allowedExtensions, true)) {
+            // Return a sensible MIME type based on extension
+            $extMimeMap = [
+                'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
+                'gif' => 'image/gif', 'webp' => 'image/webp', 'pdf' => 'application/pdf',
+                'doc' => 'application/msword', 'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'xls' => 'application/vnd.ms-excel', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'txt' => 'text/plain',
+            ];
+            return $extMimeMap[$ext];
+        }
+
+        // Not in allowlist
+        return null;
     }
 
     /**

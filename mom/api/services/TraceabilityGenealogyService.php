@@ -485,6 +485,8 @@ final class TraceabilityGenealogyService
     }
 
     /**
+     * MES-007 FIX: Bounded graph traversal with cycle detection and depth limit.
+     *
      * @param array<string, mixed> $filters
      * @return array<string, mixed>
      */
@@ -497,7 +499,9 @@ final class TraceabilityGenealogyService
         $frontier = [$start['node_key']];
         $traceEdges = [];
         $edgeSeen = [];
+        // MES-007 FIX: Enforce max depth limit (default 20, cap 50) to prevent unbounded traversal
         $maxDepth = min(50, max(1, (int)($filters['max_depth'] ?? 20)));
+        $truncated = false;
 
         for ($depth = 0; $depth < $maxDepth && $frontier !== []; $depth++) {
             $next = [];
@@ -511,6 +515,7 @@ final class TraceabilityGenealogyService
                     $traceEdges[] = $edge;
                     $edgeSeen[$edge['edge_id']] = true;
                 }
+                // MES-007 FIX: Cycle detection - only visit unvisited nodes to prevent infinite loops
                 if (!isset($visited[$to])) {
                     $node = $direction === 'upstream' ? $edge['parent_node'] : $edge['child_node'];
                     $visited[$to] = $node;
@@ -519,6 +524,10 @@ final class TraceabilityGenealogyService
             }
             sort($next);
             $frontier = array_values(array_unique($next));
+            // MES-007 FIX: Flag truncation if we hit max depth with unexplored frontier
+            if ($depth === $maxDepth - 1 && $frontier !== []) {
+                $truncated = true;
+            }
         }
 
         usort($traceEdges, static function (array $left, array $right): int {
@@ -527,6 +536,7 @@ final class TraceabilityGenealogyService
         });
         ksort($visited);
 
+        // MES-007 FIX: Include truncation flag in response when max_depth is reached
         return [
             'generated_at' => gmdate(DATE_ATOM),
             'direction' => $direction,
@@ -534,6 +544,8 @@ final class TraceabilityGenealogyService
             'start_node' => $start,
             'node_count' => count($visited),
             'edge_count' => count($traceEdges),
+            'max_depth' => $maxDepth,
+            'truncated' => $truncated,
             'nodes' => array_values($visited),
             'edges' => array_values($traceEdges),
             'provenance' => [

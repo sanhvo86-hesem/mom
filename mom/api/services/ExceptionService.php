@@ -255,12 +255,26 @@ final class ExceptionService
      * @param string|null $reason       Optional reason.
      * @return array Updated record.
      */
+    /**
+     * Transition an exception to a new status.
+     * Q6: Supports optimistic locking via expectedUpdatedAt parameter to detect concurrent updates.
+     *
+     * @param string $type              Exception type
+     * @param string $id                Exception ID
+     * @param string $targetStatus      Target status
+     * @param string $userId            User making the transition
+     * @param string|null $reason       Reason for transition
+     * @param string|null $expectedUpdatedAt  For optimistic locking - if provided and doesn't match current updated_at, throws conflict
+     * @return array Updated exception record
+     * @throws RuntimeException On invalid transition or optimistic lock conflict
+     */
     public function transitionException(
         string  $type,
         string  $id,
         string  $targetStatus,
         string  $userId,
         ?string $reason = null,
+        ?string $expectedUpdatedAt = null,
     ): array {
         if (!in_array($type, self::TYPES, true)) {
             throw new RuntimeException("Invalid exception type: {$type}");
@@ -278,6 +292,11 @@ final class ExceptionService
                 continue;
             }
 
+            // Q6: Check optimistic lock if expectedUpdatedAt is provided
+            if ($expectedUpdatedAt !== null && ($rec['updated_at'] ?? '') !== $expectedUpdatedAt) {
+                throw new RuntimeException('concurrent_update_detected');
+            }
+
             $currentStatus = strtolower($rec['status'] ?? '');
             $allowed = self::TRANSITIONS[$type][$currentStatus] ?? [];
 
@@ -285,6 +304,14 @@ final class ExceptionService
                 throw new RuntimeException(
                     "Transition from '{$currentStatus}' to '{$targetStatus}' not allowed for {$type}."
                 );
+            }
+
+            // Q2: Before allowing transition to 'closed' or 'resolved', verify disposition is set
+            if (in_array($targetStatus, ['closed', 'resolved'], true)) {
+                $disposition = $rec['disposition'] ?? null;
+                if (empty($disposition)) {
+                    throw new \InvalidArgumentException('Cannot close exception without disposition');
+                }
             }
 
             $records[$idx]['status']     = $targetStatus;

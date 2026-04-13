@@ -62,12 +62,27 @@ final class TranslationService
     {
         if (self::$instance === null) {
             $dataDir = $GLOBALS['DATA_DIR'] ?? dirname(__DIR__, 2) . '/data';
-            $locale = $_GET['lang'] ?? $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en';
-            // Extract primary language from Accept-Language header
-            if (str_contains($locale, ',')) {
-                $locale = substr($locale, 0, 2);
+            // SECURITY FIX (INF-005): Validate locale against whitelist before using it
+            $locale = 'en'; // Default
+
+            // 1. Try GET parameter (with strict validation)
+            if (!empty($_GET['lang'])) {
+                $getLocale = strtolower(trim((string)$_GET['lang']));
+                if (in_array($getLocale, self::SUPPORTED_LOCALES, true)) {
+                    $locale = $getLocale;
+                }
             }
-            self::$instance = new self($dataDir, strtolower(substr($locale, 0, 2)));
+
+            // 2. Fall back to Accept-Language header if GET didn't match
+            if ($locale === 'en' && !empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+                $primary = strtolower(substr($acceptLang, 0, 2));
+                if (in_array($primary, self::SUPPORTED_LOCALES, true)) {
+                    $locale = $primary;
+                }
+            }
+
+            self::$instance = new self($dataDir, $locale);
         }
         return self::$instance;
     }
@@ -231,6 +246,12 @@ final class TranslationService
      */
     private function loadLocale(string $locale): void
     {
+        // SECURITY FIX (INF-005): Validate locale against whitelist to prevent path traversal
+        if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
+            $this->translations[$locale] = [];
+            return;
+        }
+
         if (isset($this->translations[$locale])) {
             return; // Already loaded
         }
@@ -241,7 +262,15 @@ final class TranslationService
             return;
         }
 
-        $raw = @file_get_contents($file);
+        // Additional path validation: ensure the resolved path is within i18nDir
+        $realFile = realpath($file);
+        $reali18nDir = realpath($this->i18nDir);
+        if ($realFile === false || $reali18nDir === false || !str_starts_with($realFile, $reali18nDir)) {
+            $this->translations[$locale] = [];
+            return;
+        }
+
+        $raw = @file_get_contents($realFile);
         if ($raw === false) {
             $this->translations[$locale] = [];
             return;

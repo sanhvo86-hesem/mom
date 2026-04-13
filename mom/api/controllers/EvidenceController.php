@@ -7,6 +7,7 @@ namespace MOM\Api\Controllers;
 use MOM\Api\Controllers\BaseController;
 use MOM\Api\Services\IdempotencyService;
 use MOM\Api\Services\RecordConflictException;
+use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use MOM\Services\EvidenceVaultService;
 use Throwable;
 
@@ -32,6 +33,16 @@ class EvidenceController extends BaseController
     /** @var array|null Cached evidence access-control config. */
     private ?array $evidenceConfig = null;
     private ?IdempotencyService $idempotencyService = null;
+
+    private function denyLegacyEvidenceWrite(string $operation): void
+    {
+        $decision = (new LegacyWriteSurfacePolicy())->assess('evidence_vault_json', $operation);
+        $this->error($decision['error_code'], $decision['status'], $decision['message'], [
+            'canonical_path' => $decision['canonical_path'],
+            'legacy_surface' => $decision['surface'],
+            'legacy_operation' => $decision['operation'],
+        ]);
+    }
 
     // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -355,6 +366,7 @@ class EvidenceController extends BaseController
         $user = $this->requireAuth();
         $this->requireCsrf();
         $this->requireEvidencePermission($user, 'ev_write');
+        $this->denyLegacyEvidenceWrite('upload');
 
         $file = $this->uploadedFile('file');
         if ($file === null) {
@@ -440,6 +452,7 @@ class EvidenceController extends BaseController
         $user = $this->requireAuth();
         $this->requireCsrf();
         $this->requireEvidencePermission($user, 'ev_link');
+        $this->denyLegacyEvidenceWrite('link');
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['evidence_id', 'record_id', 'record_type']);

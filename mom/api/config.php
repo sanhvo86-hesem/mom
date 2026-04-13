@@ -31,10 +31,16 @@ return [
     ],
     'cors' => [
         'allowed_origins' => $envList('QMS_API_ALLOWED_ORIGINS', [
+            // SECURITY FIX: Replace wildcard patterns with explicit domain list.
+            // Wildcard subdomains (*.hesem.com.vn) are too permissive and allow potentially compromised subdomains.
+            // Only list known trusted frontend domains.
             'https://eqms.hesemeng.com',
-            'https://*.hesemeng.com',
+            'https://portal.hesemeng.com',
             'https://qms.hesem.com.vn',
-            'https://*.hesem.com.vn',
+            'https://portal.hesem.com.vn',
+            'https://app.hesem.com.vn',
+            'https://admin.hesem.com.vn',
+            // Development/local origins
             'http://localhost:3000',
             'http://127.0.0.1:3000',
             'http://localhost:4173',

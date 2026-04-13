@@ -36,6 +36,11 @@ final class NotificationGateway
 
     /**
      * Send a notification to one or more recipients.
+     *
+     * SVC-013: Validate recipients before sending.
+     * - User recipients must exist in the system
+     * - Cross-org notifications require elevated privileges
+     * - Same-org notifications verified for both parties
      */
     public function send(
         string $category,
@@ -48,6 +53,16 @@ final class NotificationGateway
         ?string $sourceId = null,
         array  $metadata = [],
     ): array {
+        // SVC-013: Validate user recipients exist
+        if (!empty($recipientUsers)) {
+            $this->validateRecipientUsers($recipientUsers);
+        }
+
+        // SVC-013: Validate cross-org notifications require authorization
+        if (!empty($recipientUsers) && !empty($metadata)) {
+            $this->validateCrossOrgNotification($recipientUsers, $metadata);
+        }
+
         $now = (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
 
         $notification = [
@@ -159,5 +174,108 @@ final class NotificationGateway
     private function generateId(): string
     {
         return 'NOTIF-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+    }
+
+    /**
+     * SVC-013: Validate that all recipient user IDs exist in the system.
+     *
+     * @param array<string|int> $recipientUsers User IDs to validate
+     * @throws \RuntimeException If any user_id doesn't exist
+     */
+    private function validateRecipientUsers(array $recipientUsers): void
+    {
+        if ($this->db === null || empty($recipientUsers)) {
+            return;
+        }
+
+        try {
+            foreach ($recipientUsers as $userId) {
+                $userId = (string)$userId;
+                if ($userId === '') {
+                    throw new \RuntimeException('invalid_recipient:empty_user_id');
+                }
+
+                $row = $this->db->queryOne(
+                    'SELECT user_id FROM users WHERE user_id = :user_id LIMIT 1',
+                    [':user_id' => $userId]
+                );
+
+                if (!is_array($row)) {
+                    @error_log('[NotificationGateway] Attempted to notify non-existent user: ' . $userId);
+                    throw new \RuntimeException('invalid_recipient:user_not_found:' . $userId);
+                }
+            }
+        } catch (\Throwable $e) {
+            @error_log('[NotificationGateway] Recipient validation failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * SVC-013: Validate cross-org notifications.
+     * Same-org: Both parties must be in the same org_id.
+     * Cross-org: Sender must have admin/manager role.
+     *
+     * @param array<string|int> $recipientUsers Recipient user IDs
+     * @param array            $metadata       Notification metadata
+     * @throws \RuntimeException If cross-org notification is not authorized
+     */
+    private function validateCrossOrgNotification(array $recipientUsers, array $metadata): void
+    {
+        if ($this->db === null || empty($_SESSION['user_id']) || empty($recipientUsers)) {
+            return;
+        }
+
+        try {
+            $senderId = (string)($_SESSION['user_id'] ?? '');
+            $senderOrgId = (string)($_SESSION['org_id'] ?? '');
+
+            if ($senderId === '' || $senderOrgId === '') {
+                return; // Can't validate without sender context
+            }
+
+            foreach ($recipientUsers as $recipientId) {
+                $recipientId = (string)$recipientId;
+                $recipientRow = $this->db->queryOne(
+                    'SELECT org_id FROM users WHERE user_id = :user_id LIMIT 1',
+                    [':user_id' => $recipientId]
+                );
+
+                if (!is_array($recipientRow)) {
+                    continue;
+                }
+
+                $recipientOrgId = (string)($recipientRow['org_id'] ?? '');
+
+                // Same org: always allowed
+                if ($recipientOrgId === $senderOrgId) {
+                    continue;
+                }
+
+                // Cross-org: require admin or manager role
+                $senderRole = $this->db->queryOne(
+                    'SELECT r.role_code FROM user_roles ur
+                     JOIN roles r ON ur.role_id = r.role_id
+                     WHERE ur.user_id = :user_id AND ur.valid_to IS NULL
+                     LIMIT 1',
+                    [':user_id' => $senderId]
+                );
+
+                $roleCode = strtolower((string)($senderRole['role_code'] ?? ''));
+                if (!in_array($roleCode, ['admin', 'manager'], true)) {
+                    @error_log(
+                        '[NotificationGateway] Cross-org notification rejected: ' .
+                        "sender={$senderId} recipient={$recipientId} " .
+                        "sender_org={$senderOrgId} recipient_org={$recipientOrgId} role={$roleCode}"
+                    );
+                    throw new \RuntimeException(
+                        'cross_org_notification_denied:insufficient_role:' . $roleCode
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            @error_log('[NotificationGateway] Cross-org validation failed: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

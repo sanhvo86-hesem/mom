@@ -79,7 +79,13 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            $payload = $this->readJsonFile($this->registryDir() . '/' . $file) ?? [];
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            $baseDir = $this->registryDir();
+            $fullPath = realpath($baseDir . '/' . $file);
+            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+                throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
+            }
+            $payload = $this->readJsonFile($fullPath) ?? [];
             if (isset($payload[$endpointKey]) && is_array($payload[$endpointKey])) {
                 return array_values((array)$payload[$endpointKey]);
             }
@@ -108,13 +114,18 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            $path = $this->registryDir() . '/' . $file;
-            $payload = $this->readJsonFile($path) ?? [];
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            $baseDir = $this->registryDir();
+            $fullPath = realpath($baseDir . '/' . $file);
+            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+                throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
+            }
+            $payload = $this->readJsonFile($fullPath) ?? [];
             if (!array_key_exists($endpointKey, $payload)) {
                 continue;
             }
             $payload[$endpointKey] = $fields;
-            $this->writeJsonFile($path, $payload);
+            $this->writeJsonFile($fullPath, $payload);
             $updated = true;
             break;
         }
@@ -123,10 +134,15 @@ final class AdminMetadataStudioController extends BaseController
             $last = $parts[count($parts) - 1];
             $file = trim((string)($last['file'] ?? ''));
             if ($file !== '') {
-                $path = $this->registryDir() . '/' . $file;
-                $payload = $this->readJsonFile($path) ?? [];
+                // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+                $baseDir = $this->registryDir();
+                $fullPath = realpath($baseDir . '/' . $file);
+                if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+                    throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
+                }
+                $payload = $this->readJsonFile($fullPath) ?? [];
                 $payload[$endpointKey] = $fields;
-                $this->writeJsonFile($path, $payload);
+                $this->writeJsonFile($fullPath, $payload);
                 $updated = true;
             }
         }
@@ -293,10 +309,15 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            $path = $this->registryDir() . '/' . $file;
-            $payload = $this->readJsonFile($path) ?? [];
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            $baseDir = $this->registryDir();
+            $fullPath = realpath($baseDir . '/' . $file);
+            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+                throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
+            }
+            $payload = $this->readJsonFile($fullPath) ?? [];
             if (isset($payload[$endpointKey]) && is_array($payload[$endpointKey])) {
-                return $path;
+                return $fullPath;
             }
         }
 

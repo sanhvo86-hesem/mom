@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use Throwable;
 
 /**
@@ -49,9 +50,14 @@ class ProductPassportController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    private function legacyPassportWritesEnabled(): bool
+    private function denyLegacyPassportWrite(string $operation): void
     {
-        return in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_PASSPORT_WRITES')), ['1', 'true', 'yes'], true);
+        $decision = (new LegacyWriteSurfacePolicy())->assess('product_passport_json', $operation);
+        $this->error($decision['error_code'], $decision['status'], $decision['message'], [
+            'canonical_path' => $decision['canonical_path'],
+            'legacy_surface' => $decision['surface'],
+            'legacy_operation' => $decision['operation'],
+        ]);
     }
 
     /**
@@ -172,6 +178,8 @@ class ProductPassportController extends BaseController
     /**
      * GET listPassports - List passports with optional filters.
      *
+     * MES-001 FIX: Filter by authenticated user's plant/org scope
+     *
      * @return never
      */
     public function listPassports(): never
@@ -183,6 +191,13 @@ class ProductPassportController extends BaseController
             $file = $this->passportDir() . '/passports.json';
             $all  = $this->readJsonFile($file) ?? [];
             $events = $this->readJsonFile($this->passportDir() . '/events.json') ?? [];
+
+            // MES-001 FIX: Enforce org/plant scoping
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+            if ($userPlantId !== '' || $userOrgId !== '') {
+                $all = array_filter($all, fn(array $passport) => $this->passportBelongsToUserScope($passport, $userPlantId, $userOrgId));
+            }
 
             $partId = $this->input('part_id');
             if (($partId === null || $partId === '') && ($this->input('part') ?? '') !== '') {
@@ -231,6 +246,8 @@ class ProductPassportController extends BaseController
     /**
      * GET getDetail - Get full passport with lifecycle events.
      *
+     * MES-001 FIX: Verify passport belongs to user's org/plant scope
+     *
      * @return never
      */
     public function getDetail(): never
@@ -260,6 +277,13 @@ class ProductPassportController extends BaseController
                 $this->error('not_found', 404, "Passport {$id} not found.");
             }
 
+            // MES-001 FIX: Enforce org/plant scoping
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+            if (($userPlantId !== '' || $userOrgId !== '') && !$this->passportBelongsToUserScope($passport, $userPlantId, $userOrgId)) {
+                $this->error('unauthorized_scope', 403, "Access denied to passport {$id}.");
+            }
+
             $eventsFile = $this->passportDir() . '/events.json';
             $allEvents  = $this->readJsonFile($eventsFile) ?? [];
             $events = array_values(array_map(
@@ -285,6 +309,8 @@ class ProductPassportController extends BaseController
     /**
      * POST create - Create a digital product passport.
      *
+     * MES-001 FIX: Associate passport with user's org/plant scope
+     *
      * @return never
      */
     public function create(): never
@@ -292,14 +318,7 @@ class ProductPassportController extends BaseController
         $user = $this->requireAuth();
         $this->requirePassportWriteAccess($user);
         $this->requireCsrf();
-
-        if (!$this->legacyPassportWritesEnabled()) {
-            $this->error(
-                'canonical_genealogy_command_required',
-                410,
-                'Product passport writes are no longer authoritative through JSON files. Use the canonical genealogy/digital-thread command API.'
-            );
-        }
+        $this->denyLegacyPassportWrite('create');
 
         $body = $this->jsonBody();
         if (!isset($body['part_id']) && isset($body['item_id'])) $body['part_id'] = $body['item_id'];
@@ -325,6 +344,10 @@ class ProductPassportController extends BaseController
                 }
             }
 
+            // MES-001 FIX: Capture user's scope at creation time
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+
             $passport = [
                 'id'              => 'DPP-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
                 'passport_number' => 'DPP-' . gmdate('YmdHis'),
@@ -341,6 +364,8 @@ class ProductPassportController extends BaseController
                 'customer_name'   => trim((string)($body['customer_name'] ?? $body['customer'] ?? $body['customer_id'] ?? '')),
                 'notes'           => trim((string)($body['notes'] ?? '')),
                 'status'          => 'active',
+                'plant_id'        => $userPlantId,
+                'org_id'          => $userOrgId,
                 'created_by'      => $userId,
                 'created_at'      => $this->nowIso(),
                 'updated_at'      => $this->nowIso(),
@@ -364,6 +389,8 @@ class ProductPassportController extends BaseController
     /**
      * POST addEvent - Add a lifecycle event to a passport.
      *
+     * MES-001 FIX: Verify passport belongs to user's org/plant scope before adding event
+     *
      * @return never
      */
     public function addEvent(): never
@@ -371,14 +398,7 @@ class ProductPassportController extends BaseController
         $user = $this->requireAuth();
         $this->requirePassportWriteAccess($user);
         $this->requireCsrf();
-
-        if (!$this->legacyPassportWritesEnabled()) {
-            $this->error(
-                'canonical_genealogy_command_required',
-                410,
-                'Product passport lifecycle events must be written through the canonical genealogy/digital-thread command API.'
-            );
-        }
+        $this->denyLegacyPassportWrite('add_event');
 
         $body = $this->jsonBody();
         if (!isset($body['passport_id']) && isset($body['id'])) $body['passport_id'] = $body['id'];
@@ -399,6 +419,10 @@ class ProductPassportController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            // MES-001 FIX: Get user scope for verification
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+
             $passportFile = $this->passportDir() . '/passports.json';
             $passports = $this->readJsonFile($passportFile) ?? [];
             $passportId = trim((string)($body['passport_id'] ?? ''));
@@ -407,6 +431,10 @@ class ProductPassportController extends BaseController
             foreach ($passports as &$passport) {
                 if (($passport['id'] ?? '') !== $passportId) {
                     continue;
+                }
+                // MES-001 FIX: Verify scope match
+                if (($userPlantId !== '' || $userOrgId !== '') && !$this->passportBelongsToUserScope($passport, $userPlantId, $userOrgId)) {
+                    $this->error('unauthorized_scope', 403, "Access denied to passport {$passportId}.");
                 }
                 $passportFound = true;
                 if (isset($body['status']) && trim((string)($body['status'] ?? '')) !== '') {
@@ -462,6 +490,8 @@ class ProductPassportController extends BaseController
     /**
      * GET trace - Forward/backward genealogy trace.
      *
+     * MES-001 FIX: Verify passport belongs to user's org/plant scope
+     *
      * @return never
      */
     public function trace(): never
@@ -478,6 +508,10 @@ class ProductPassportController extends BaseController
         $direction = strtolower(trim($this->input('direction', 'both') ?? 'both'));
 
         try {
+            // MES-001 FIX: Get user scope for verification
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+
             $passportsFile = $this->passportDir() . '/passports.json';
             $allPassports  = $this->readJsonFile($passportsFile) ?? [];
             $eventsFile    = $this->passportDir() . '/events.json';
@@ -486,6 +520,11 @@ class ProductPassportController extends BaseController
             $target = $this->findPassport($allPassports, $lookup);
             if ($target === null) {
                 $this->error('not_found', 404, "Passport {$lookup} not found.");
+            }
+
+            // MES-001 FIX: Verify scope match
+            if (($userPlantId !== '' || $userOrgId !== '') && !$this->passportBelongsToUserScope($target, $userPlantId, $userOrgId)) {
+                $this->error('unauthorized_scope', 403, "Access denied to passport {$lookup}.");
             }
 
             $targetId = (string)($target['id'] ?? '');
@@ -561,6 +600,8 @@ class ProductPassportController extends BaseController
     /**
      * GET getQrData - QR code data for a passport.
      *
+     * MES-001 FIX: Verify passport belongs to user's org/plant scope
+     *
      * @return never
      */
     public function getQrData(): never
@@ -575,6 +616,10 @@ class ProductPassportController extends BaseController
         $id = trim($id);
 
         try {
+            // MES-001 FIX: Get user scope for verification
+            $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+            $userOrgId = (string)($_SESSION['org_id'] ?? '');
+
             $file = $this->passportDir() . '/passports.json';
             $all  = $this->readJsonFile($file) ?? [];
 
@@ -588,6 +633,11 @@ class ProductPassportController extends BaseController
 
             if ($passport === null) {
                 $this->error('not_found', 404, "Passport {$id} not found.");
+            }
+
+            // MES-001 FIX: Enforce org/plant scoping
+            if (($userPlantId !== '' || $userOrgId !== '') && !$this->passportBelongsToUserScope($passport, $userPlantId, $userOrgId)) {
+                $this->error('unauthorized_scope', 403, "Access denied to passport {$id}.");
             }
 
             $passport = $this->normalizePassportRecord($passport);
@@ -606,5 +656,36 @@ class ProductPassportController extends BaseController
             $this->rethrowResponse($e);
             $this->error('passport_qr_data_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * MES-001 FIX: Verify passport belongs to user's org/plant scope.
+     *
+     * @param array<string, mixed> $passport
+     * @param string $userPlantId
+     * @param string $userOrgId
+     * @return bool
+     */
+    private function passportBelongsToUserScope(array $passport, string $userPlantId, string $userOrgId): bool
+    {
+        $passportPlantId = (string)($passport['plant_id'] ?? '');
+        $passportOrgId = (string)($passport['org_id'] ?? '');
+
+        // If passport has no scope set, allow access (legacy support)
+        if ($passportPlantId === '' && $passportOrgId === '') {
+            return true;
+        }
+
+        // If user has plant_id, it must match
+        if ($userPlantId !== '' && $passportPlantId !== '' && $passportPlantId !== $userPlantId) {
+            return false;
+        }
+
+        // If user has org_id, it must match
+        if ($userOrgId !== '' && $passportOrgId !== '' && $passportOrgId !== $userOrgId) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -167,6 +167,7 @@ final class FmeaService
 
     /**
      * List FMEA records with optional filters (fmea_type, status, item_id).
+     * Q5: Pagination is enforced at the controller level with max limit of 200 rows.
      */
     public function listFmeas(array $filters = []): array
     {

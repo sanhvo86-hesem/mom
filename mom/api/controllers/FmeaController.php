@@ -70,6 +70,51 @@ class FmeaController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function fmeaElevatedRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'ceo',
+                'it_admin',
+                'qa_manager',
+                'quality_manager',
+                'production_director',
+                'engineering_manager',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function fmeaPermissionRoles(array $user): array
+    {
+        $rawRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? 'viewer')];
+        $roles = [];
+        foreach ($rawRoles as $role) {
+            $normalized = migrate_role(strtolower(trim((string)$role)));
+            if ($normalized === '') {
+                continue;
+            }
+            $roles[] = $normalized;
+            if (str_starts_with($normalized, 'quality') || str_starts_with($normalized, 'qa_') || str_starts_with($normalized, 'qms_')) {
+                $roles[] = 'quality';
+            }
+            if (str_starts_with($normalized, 'engineering') || in_array($normalized, ['process_engineer', 'cam_nc_programmer'], true)) {
+                $roles[] = 'engineering';
+            }
+            if (str_starts_with($normalized, 'production') || in_array($normalized, ['cnc_workshop_manager', 'shift_leader', 'supervisor'], true)) {
+                $roles[] = 'production';
+            }
+        }
+
+        return array_values(array_unique($roles));
+    }
+
+    /**
      * Check if the user has a specific FMEA permission.
      *
      * @param array  $user       User record.
@@ -78,14 +123,20 @@ class FmeaController extends BaseController
      */
     private function hasFmeaPermission(array $user, string $permission): bool
     {
-        $role = (string)($user['role'] ?? 'viewer');
-        if (in_array($role, ['ceo', 'it_admin', 'qa_manager', 'production_director', 'engineering_manager'], true)) {
+        if ($this->userHasAnyRole($user, $this->fmeaElevatedRoles())) {
             return true;
         }
         $config = $this->loadFmeaConfig();
         $roles  = $config['roles'] ?? [];
-        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
-        return in_array($permission, $perms, true);
+        foreach ($this->fmeaPermissionRoles($user) as $role) {
+            $perms = $roles[$role] ?? null;
+            if (is_array($perms) && in_array($permission, $perms, true)) {
+                return true;
+            }
+        }
+
+        $viewerPerms = $roles['viewer'] ?? [];
+        return is_array($viewerPerms) && in_array($permission, $viewerPerms, true);
     }
 
     /**
@@ -111,6 +162,31 @@ class FmeaController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    /**
+     * Q4: Check if user has access to a specific FMEA record.
+     * Users with elevated roles (qa_manager, engineering_manager, ceo, it_admin, production_director)
+     * can access any FMEA. Other users can only access FMEAs they created or are team lead for.
+     *
+     * @param array $user User record
+     * @param array $fmea FMEA record
+     * @return void Throws 403 error if unauthorized
+     */
+    private function requireFmeaAccess(array $user, array $fmea): void
+    {
+        if ($this->userHasAnyRole($user, $this->fmeaElevatedRoles())) {
+            return;
+        }
+
+        // Regular users can only access FMEAs they created or are team lead for
+        $userId = $this->userId($user);
+        $createdBy = (string)($fmea['created_by'] ?? '');
+        $teamLead = (string)($fmea['team_lead'] ?? '');
+
+        if ($userId !== $createdBy && $userId !== $teamLead) {
+            $this->error('forbidden', 403, 'You do not have access to this FMEA record');
+        }
     }
 
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -186,9 +262,7 @@ class FmeaController extends BaseController
 
         try {
             $record = $this->fmeaService()->getDetail($fmeaId);
-            if ($record === null) {
-                $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
-            }
+            $this->requireFmeaAccess($user, $record);
 
             $this->success(['fmea' => $record]);
         } catch (Throwable $e) {
@@ -264,10 +338,10 @@ class FmeaController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            $original = $this->fmeaService()->getDetail($fmeaId);
+            $this->requireFmeaAccess($user, $original);
+
             $updated = $this->fmeaService()->updateFmea($fmeaId, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
-            }
 
             $this->auditLog('fmea_update', [
                 'fmea_id' => $fmeaId,
@@ -309,26 +383,37 @@ class FmeaController extends BaseController
         $fmeaId = trim((string)($body['fmea_id'] ?? ''));
         $userId = $this->userId($user);
 
+        // Q3: Validate that severity, occurrence, detection are all provided and in range 1-10
+        $severity = (int)($body['severity'] ?? 0);
+        $occurrence = (int)($body['occurrence'] ?? 0);
+        $detection = (int)($body['detection'] ?? 0);
+
+        if ($severity < 1 || $severity > 10) {
+            $this->error('invalid_severity', 400, 'Severity must be an integer between 1 and 10');
+        }
+        if ($occurrence < 1 || $occurrence > 10) {
+            $this->error('invalid_occurrence', 400, 'Occurrence must be an integer between 1 and 10');
+        }
+        if ($detection < 1 || $detection > 10) {
+            $this->error('invalid_detection', 400, 'Detection must be an integer between 1 and 10');
+        }
+
         try {
             $failureMode = $this->fmeaService()->addFailureMode($fmeaId, [
                 'function'         => trim((string)($body['function'] ?? '')),
                 'failure_mode'     => trim((string)($body['failure_mode'] ?? '')),
                 'failure_effect'   => trim((string)($body['failure_effect'] ?? '')),
-                'severity'         => (int)($body['severity'] ?? 0),
+                'severity'         => $severity,
                 'failure_cause'    => trim((string)($body['failure_cause'] ?? '')),
-                'occurrence'       => (int)($body['occurrence'] ?? 0),
+                'occurrence'       => $occurrence,
                 'current_controls' => trim((string)($body['current_controls'] ?? '')),
-                'detection'        => (int)($body['detection'] ?? 0),
+                'detection'        => $detection,
                 'created_by'       => $userId,
             ]);
 
-            if ($failureMode === null) {
-                $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
-            }
-
             $this->auditLog('fmea_add_failure_mode', [
                 'fmea_id'         => $fmeaId,
-                'failure_mode_id' => $failureMode['id'],
+                'failure_mode_id' => $failureMode['failure_mode_id'] ?? '',
             ], $userId);
 
             $this->success(['failure_mode' => $failureMode], 201);
@@ -360,10 +445,8 @@ class FmeaController extends BaseController
         $userId        = $this->userId($user);
 
         try {
-            $updated = $this->fmeaService()->updateFailureMode($failureModeId, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "Failure mode {$failureModeId} not found.");
-            }
+            $body['updated_by'] = $userId;
+            $updated = $this->fmeaService()->updateFailureMode($failureModeId, $body);
 
             $this->auditLog('fmea_update_failure_mode', [
                 'failure_mode_id' => $failureModeId,
@@ -410,13 +493,9 @@ class FmeaController extends BaseController
                 'created_by'  => $userId,
             ]);
 
-            if ($action === null) {
-                $this->error('not_found', 404, "Failure mode {$failureModeId} not found.");
-            }
-
             $this->auditLog('fmea_add_action', [
                 'failure_mode_id' => $failureModeId,
-                'action_id'       => $action['id'],
+                'action_id'       => $action['action_id'] ?? '',
             ], $userId);
 
             $this->success(['action' => $action], 201);
@@ -450,18 +529,29 @@ class FmeaController extends BaseController
         $actionId = trim((string)($body['action_id'] ?? ''));
         $userId   = $this->userId($user);
 
+        // Q3: Validate that new_severity, new_occurrence, new_detection are all provided and in range 1-10
+        $newSeverity = (int)($body['new_severity'] ?? 0);
+        $newOccurrence = (int)($body['new_occurrence'] ?? 0);
+        $newDetection = (int)($body['new_detection'] ?? 0);
+
+        if ($newSeverity < 1 || $newSeverity > 10) {
+            $this->error('invalid_new_severity', 400, 'New severity must be an integer between 1 and 10');
+        }
+        if ($newOccurrence < 1 || $newOccurrence > 10) {
+            $this->error('invalid_new_occurrence', 400, 'New occurrence must be an integer between 1 and 10');
+        }
+        if ($newDetection < 1 || $newDetection > 10) {
+            $this->error('invalid_new_detection', 400, 'New detection must be an integer between 1 and 10');
+        }
+
         try {
             $result = $this->fmeaService()->completeAction($actionId, [
-                'new_severity'   => (int)($body['new_severity'] ?? 0),
-                'new_occurrence' => (int)($body['new_occurrence'] ?? 0),
-                'new_detection'  => (int)($body['new_detection'] ?? 0),
+                'new_severity'   => $newSeverity,
+                'new_occurrence' => $newOccurrence,
+                'new_detection'  => $newDetection,
                 'notes'          => trim((string)($body['notes'] ?? '')),
                 'completed_by'   => $userId,
-            ]);
-
-            if ($result === null) {
-                $this->error('not_found', 404, "Action {$actionId} not found.");
-            }
+            ], $userId);
 
             $this->auditLog('fmea_complete_action', [
                 'action_id' => $actionId,
@@ -496,14 +586,11 @@ class FmeaController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $controlPlan = $this->fmeaService()->generateControlPlanFromFmea($fmeaId, $userId);
-            if ($controlPlan === null) {
-                $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
-            }
+            $controlPlan = $this->fmeaService()->generateControlPlanFromFmea($fmeaId);
 
             $this->auditLog('fmea_generate_control_plan', [
                 'fmea_id'         => $fmeaId,
-                'control_plan_id' => $controlPlan['id'],
+                'control_plan_id' => $controlPlan['control_plan_id'] ?? '',
             ], $userId);
 
             $this->success(['control_plan' => $controlPlan], 201);
@@ -637,9 +724,6 @@ class FmeaController extends BaseController
 
         try {
             $trend = $this->fmeaService()->getRpnTrend($fmeaId);
-            if ($trend === null) {
-                $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
-            }
 
             $this->success(['rpn_trend' => $trend]);
         } catch (Throwable $e) {
@@ -671,10 +755,11 @@ class FmeaController extends BaseController
         $userId        = $this->userId($user);
 
         try {
-            $link = $this->fmeaService()->linkToNcr($ncrId, $failureModeId, $userId);
-            if ($link === null) {
-                $this->error('link_failed', 400, "Cannot link NCR {$ncrId} to failure mode {$failureModeId}.");
-            }
+            $this->fmeaService()->linkToNcr($ncrId, $failureModeId);
+            $link = [
+                'ncr_id' => $ncrId,
+                'failure_mode_id' => $failureModeId,
+            ];
 
             $this->auditLog('fmea_link_ncr', [
                 'ncr_id'          => $ncrId,

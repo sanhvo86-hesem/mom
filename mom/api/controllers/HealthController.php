@@ -8,6 +8,7 @@ use MOM\Api\Services\CacheService;
 use MOM\Api\Services\QueueService;
 use MOM\Api\Services\LogTransport;
 use MOM\Api\Services\RuntimeAuthorityService;
+use MOM\Services\EvidenceVaultService;
 
 /**
  * HealthController - Kubernetes-ready health check endpoints.
@@ -36,6 +37,8 @@ class HealthController extends BaseController
     /**
      * GET /api/health/ready - Readiness probe.
      * Returns 200 if the service can handle requests (DB, cache accessible).
+     * SECURITY FIX (INF-003): This endpoint is unauthenticated; sanitize error responses
+     * to avoid leaking internal hostnames, ports, and credentials.
      */
     public function ready(): void
     {
@@ -56,10 +59,11 @@ class HealthController extends BaseController
         try {
             $authority = (new RuntimeAuthorityService($this->data, $dataDir))->report();
         } catch (\Throwable $e) {
-            $authority = ['ok' => false, 'error' => $e->getMessage()];
+            // SECURITY FIX (INF-003): Only return ok flag, not error message
+            $authority = ['ok' => false];
         }
 
-        $infra = $this->collectInfrastructureHealth($dataDir);
+        $infra = $this->collectInfrastructureHealthSanitized($dataDir);
         $componentOk = $this->evaluateComponents($infra, $authority);
         foreach ($componentOk as $component => $ok) {
             $checks[$component] = $ok;
@@ -68,11 +72,11 @@ class HealthController extends BaseController
             }
         }
 
+        // SECURITY FIX (INF-003): Return only safe status and check results, no error details
         $this->json([
             'ok'          => $allOk,
-            'status'      => $allOk ? 'ready' : 'not_ready',
+            'status'      => $allOk ? 'ready' : 'degraded',
             'checks'      => $checks,
-            'authority'   => $authority,
             'degraded_components' => array_values(array_keys(array_filter(
                 $componentOk,
                 static fn(bool $ok): bool => !$ok,
@@ -164,6 +168,83 @@ class HealthController extends BaseController
             $infra['logging'] = ['available' => false, 'error' => $e->getMessage()];
         }
 
+        try {
+            $infra['evidence_vault'] = (new EvidenceVaultService($dataDir, $this->data))->pgWriteProbe();
+        } catch (\Throwable $e) {
+            $infra['evidence_vault'] = ['available' => false, 'error' => $e->getMessage()];
+        }
+
+        try {
+            require_once dirname(__DIR__) . '/services/UploadHardeningService.php';
+            $infra['upload_hardening'] = (new \UploadHardeningService($dataDir))->getHealth();
+        } catch (\Throwable $e) {
+            $infra['upload_hardening'] = ['available' => false, 'error' => $e->getMessage()];
+        }
+
+        return $infra;
+    }
+
+    /**
+     * SECURITY FIX (INF-003): Sanitized version of collectInfrastructureHealth
+     * that removes error messages to prevent information disclosure on the
+     * unauthenticated /health/ready endpoint.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function collectInfrastructureHealthSanitized(string $dataDir): array
+    {
+        $infra = [];
+
+        try {
+            $cache = new CacheService($dataDir);
+            $health = $cache->getHealth();
+            // Remove error message
+            unset($health['error']);
+            $infra['redis'] = $health;
+        } catch (\Throwable $e) {
+            $infra['redis'] = ['available' => false];
+        }
+
+        try {
+            $queue = new QueueService($dataDir);
+            $health = $queue->getHealth();
+            $queue->close();
+            // Remove error message
+            unset($health['error']);
+            $infra['rabbitmq'] = $health;
+        } catch (\Throwable $e) {
+            $infra['rabbitmq'] = ['available' => false];
+        }
+
+        try {
+            $log = new LogTransport($dataDir);
+            $health = $log->getHealth();
+            // Remove error message
+            unset($health['error']);
+            $infra['logging'] = $health;
+        } catch (\Throwable $e) {
+            $infra['logging'] = ['available' => false];
+        }
+
+        try {
+            $health = (new EvidenceVaultService($dataDir, $this->data))->pgWriteProbe();
+            // Remove error message
+            unset($health['error']);
+            $infra['evidence_vault'] = $health;
+        } catch (\Throwable $e) {
+            $infra['evidence_vault'] = ['available' => false];
+        }
+
+        try {
+            require_once dirname(__DIR__) . '/services/UploadHardeningService.php';
+            $health = (new \UploadHardeningService($dataDir))->getHealth();
+            // Remove error message
+            unset($health['error']);
+            $infra['upload_hardening'] = $health;
+        } catch (\Throwable $e) {
+            $infra['upload_hardening'] = ['available' => false];
+        }
+
         return $infra;
     }
 
@@ -178,6 +259,8 @@ class HealthController extends BaseController
             'redis' => $this->componentHealthy($infra['redis'] ?? []),
             'rabbitmq' => $this->componentHealthy($infra['rabbitmq'] ?? []),
             'logging' => $this->componentHealthy($infra['logging'] ?? []),
+            'evidence_vault' => $this->componentHealthy($infra['evidence_vault'] ?? []),
+            'upload_hardening' => $this->componentHealthy($infra['upload_hardening'] ?? []),
             'runtime_authority' => (bool)($authority['ok'] ?? false)
                 && (bool)($authority['summary']['idempotency_expected_authority_met'] ?? true),
         ];
@@ -205,6 +288,9 @@ class HealthController extends BaseController
             return false;
         }
         if (isset($payload['fallback_mode']) && !in_array((string)$payload['fallback_mode'], ['', 'none'], true)) {
+            return false;
+        }
+        if (isset($payload['degraded']) && $payload['degraded'] === true) {
             return false;
         }
 

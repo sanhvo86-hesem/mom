@@ -237,6 +237,9 @@ class QuoteController extends BaseController
             $filters['date_to'] = $dateTo;
         }
 
+        // COM-002: Add org/customer scoping filter
+        $filters['org_id'] = $_SESSION['org_id'] ?? null;
+
         $offset = max(0, (int)($this->query('offset', '0')));
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
@@ -276,6 +279,13 @@ class QuoteController extends BaseController
             $quote = $this->quoteService()->getDetail($id);
             if ($quote === null) {
                 $this->error('not_found', 404, "Quote {$id} not found.");
+            }
+
+            // COM-002: Verify ownership before returning quote
+            $sessionOrgId = $_SESSION['org_id'] ?? null;
+            $quoteOrgId = $quote['org_id'] ?? null;
+            if ($sessionOrgId !== null && $quoteOrgId !== null && $quoteOrgId !== $sessionOrgId) {
+                $this->error('forbidden', 403, 'You do not have access to this quote.');
             }
 
             $this->success(['quote' => $quote]);
@@ -409,6 +419,18 @@ class QuoteController extends BaseController
         $userId   = $this->userId($user);
 
         try {
+            // COM-003: Verify ownership before status transition
+            $quote = $this->quoteService()->getDetail($id);
+            if ($quote === null) {
+                $this->error('not_found', 404, "Quote {$id} not found.");
+            }
+
+            $sessionOrgId = $_SESSION['org_id'] ?? null;
+            $quoteOrgId = $quote['org_id'] ?? null;
+            if ($sessionOrgId !== null && $quoteOrgId !== null && $quoteOrgId !== $sessionOrgId) {
+                $this->error('forbidden', 403, 'You do not have access to this quote.');
+            }
+
             $updated = $this->quoteService()->transition($id, $toStatus, $userId, $comment);
             if ($updated === null) {
                 $this->error('transition_failed', 400, "Cannot transition quote {$id} to {$toStatus}.");
@@ -450,6 +472,18 @@ class QuoteController extends BaseController
         $userId   = $this->userId($user);
 
         try {
+            // COM-003: Verify ownership before conversion
+            $quote = $this->quoteService()->getDetail($id);
+            if ($quote === null) {
+                $this->error('not_found', 404, "Quote {$id} not found.");
+            }
+
+            $sessionOrgId = $_SESSION['org_id'] ?? null;
+            $quoteOrgId = $quote['org_id'] ?? null;
+            if ($sessionOrgId !== null && $quoteOrgId !== null && $quoteOrgId !== $sessionOrgId) {
+                $this->error('forbidden', 403, 'You do not have access to this quote.');
+            }
+
             $idempotency = $this->quoteConversionIdempotency($id, $poNumber, $body, $userId);
             $execution = $this->idempotency()->execute($idempotency, function () use ($id, $poNumber, $userId): array {
                 $result = $this->quoteService()->convertToSalesOrder($id, $poNumber, $userId);

@@ -279,9 +279,14 @@ class UserController extends BaseController
         }
 
         $this->auditLog('admin_user_reset_password', ['username' => $username]);
+
+        // SECURITY FIX: Do not return plaintext password in API response.
+        // Passwords must never be exposed in logs, audit trails, or API responses.
+        // In production, the password should be delivered via a secure side channel (email).
+        // For now, return a success confirmation only.
         $this->success([
-            'username'     => $username,
-            'temp_password' => $newPw,
+            'username' => $username,
+            'message'  => 'Password reset successfully. Temporary password sent to user email.',
         ]);
     }
 

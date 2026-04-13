@@ -419,4 +419,28 @@ final class EpicorIntegrationService
             return null;
         }
     }
+
+    /**
+     * Validate an Epicor webhook request using HMAC-SHA256 signature.
+     *
+     * Extracts the signature from X-Epicor-Signature header, reads the raw request body,
+     * and verifies the signature matches the expected HMAC-SHA256 hash using the secret.
+     *
+     * @param string $rawBody The raw request body (not JSON decoded)
+     * @param string $signature The signature from the X-Epicor-Signature header
+     * @param string $secret The shared webhook secret from EPICOR_WEBHOOK_SECRET env var
+     * @return bool True if signature is valid, false otherwise
+     */
+    public static function validateWebhookSignature(string $rawBody, string $signature, string $secret): bool
+    {
+        if (empty($signature) || empty($secret)) {
+            return false;
+        }
+
+        // Compute expected signature using HMAC-SHA256
+        $expectedSignature = hash_hmac('sha256', $rawBody, $secret);
+
+        // Use timing-safe comparison to prevent timing attacks
+        return hash_equals($expectedSignature, $signature);
+    }
 }

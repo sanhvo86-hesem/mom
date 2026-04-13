@@ -23,27 +23,54 @@ class EventStreamController extends BaseController
      */
     public function stream(): void
     {
+        // GOV-001: Require authentication before allowing event stream subscription
+        $user = $this->requireAuth();
+
         // Parse requested channels from query parameter
         $channelsParam = trim($_GET['channels'] ?? 'workflow,notifications,mes,dashboard,dispatch,ai');
         $requestedChannels = array_filter(
             array_map('trim', explode(',', $channelsParam))
         );
 
-        // Map short names to full channel names
+        // Map short names to full channel names with required role mapping
+        // GOV-001: Validate user is authorized for requested channels
         $channelMap = [
-            'workflow'      => 'mom:realtime:workflow',
-            'notifications' => 'mom:realtime:notifications',
-            'mes'           => 'mom:realtime:mes',
-            'dashboard'     => 'mom:realtime:dashboard',
-            'dispatch'      => 'mom:realtime:dispatch',
-            'ai'            => \MOM\Api\Services\EventBroadcaster::CHANNEL_AI,
+            'workflow'      => ['channel' => 'mom:realtime:workflow', 'required_roles' => ['admin', 'it_admin', 'production_manager', 'production_director', 'process_engineer']],
+            'notifications' => ['channel' => 'mom:realtime:notifications', 'required_roles' => []],  // All authenticated users
+            'mes'           => ['channel' => 'mom:realtime:mes', 'required_roles' => ['admin', 'it_admin', 'production_manager', 'shift_leader', 'cnc_workshop_manager']],
+            'dashboard'     => ['channel' => 'mom:realtime:dashboard', 'required_roles' => ['admin', 'it_admin', 'production_manager', 'production_director']],
+            'dispatch'      => ['channel' => 'mom:realtime:dispatch', 'required_roles' => ['admin', 'it_admin', 'production_manager', 'shift_leader', 'quality_manager']],
+            'ai'            => ['channel' => \MOM\Api\Services\EventBroadcaster::CHANNEL_AI, 'required_roles' => ['admin', 'it_admin', 'engineering_lead', 'process_engineer']],
         ];
+
+        // Get user's org_id for channel scoping (GOV-002)
+        $orgId = $_SESSION['org_id'] ?? null;
+        if ($orgId === null) {
+            $this->json(['ok' => false, 'error' => 'org_context_required'], 400);
+            return;
+        }
 
         $channels = [];
         foreach ($requestedChannels as $ch) {
-            if (isset($channelMap[$ch])) {
-                $channels[] = $channelMap[$ch];
+            if (!isset($channelMap[$ch])) {
+                continue;
             }
+
+            $channelSpec = $channelMap[$ch];
+            $requiredRoles = $channelSpec['required_roles'];
+
+            // GOV-001: If channel has role restrictions, verify user has at least one required role
+            if (!empty($requiredRoles)) {
+                if (!$this->userHasAnyRole($user, $requiredRoles)) {
+                    // Return 403 Forbidden for channels user is not authorized for
+                    $this->json(['ok' => false, 'error' => 'channel_authorization_required', 'channel' => $ch], 403);
+                    return;
+                }
+            }
+
+            // GOV-002: Append org_id to channel name for organization scoping
+            $scopedChannel = $channelSpec['channel'] . '.' . $orgId;
+            $channels[] = $scopedChannel;
         }
 
         if (empty($channels)) {

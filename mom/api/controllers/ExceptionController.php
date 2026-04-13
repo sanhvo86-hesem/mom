@@ -704,7 +704,17 @@ class ExceptionController extends BaseController
         $userId   = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->transitionException($type, $id, $toStatus, $userId, $comment);
+            // Q6: Optional optimistic lock check using updated_at from request
+            $expectedUpdatedAt = !empty($body['updated_at']) ? trim((string)$body['updated_at']) : null;
+
+            $updated = $this->exceptionService()->transitionException(
+                $type,
+                $id,
+                $toStatus,
+                $userId,
+                $comment,
+                $expectedUpdatedAt
+            );
             if ($updated === null) {
                 $this->error('transition_failed', 400, "Cannot transition {$type}/{$id} to {$toStatus}.");
             }
@@ -718,6 +728,10 @@ class ExceptionController extends BaseController
 
             $this->success(['exception' => $updated]);
         } catch (Throwable $e) {
+            // Q6: Detect concurrent update conflict
+            if ($e->getMessage() === 'concurrent_update_detected') {
+                $this->error('conflict', 409, 'This record was modified by another user. Please refresh and try again.');
+            }
             $this->rethrowResponse($e);
             $this->error('transition_failed', 500, $e->getMessage());
         }

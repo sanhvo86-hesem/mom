@@ -242,10 +242,19 @@ final class CustomerPurchaseOrderController extends BaseController
             'customer_id' => $this->query('customer_id'),
             'so_number' => $this->query('so_number'),
             'search' => $this->query('search') ?? $this->query('q'),
+            'org_id' => $_SESSION['org_id'] ?? null,
         ];
 
+        // Apply pagination limit: max 200 records per request (COM-006)
+        $offset = max(0, (int)($this->query('offset', '0')));
+        $limit = min(200, max(1, (int)($this->query('limit', '50'))));
+
         try {
-            $this->success(['customer_purchase_orders' => $this->customerPurchaseOrders()->listPurchaseOrders($filters)]);
+            $allPOs = $this->customerPurchaseOrders()->listPurchaseOrders($filters);
+            $total = count($allPOs);
+            $pagedPOs = array_slice($allPOs, $offset, $limit);
+
+            $this->paginated('customer_purchase_orders', array_values($pagedPOs), $total, $offset, $limit);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('customer_purchase_order_list_failed', 500, $e->getMessage());
@@ -266,6 +275,13 @@ final class CustomerPurchaseOrderController extends BaseController
             $record = $this->customerPurchaseOrders()->getPurchaseOrder($customerPoId);
             if ($record === null) {
                 $this->error('customer_purchase_order_not_found', 404);
+            }
+
+            // COM-001: Verify ownership before returning record (org/customer scoping)
+            $sessionOrgId = $_SESSION['org_id'] ?? null;
+            $recordOrgId = $record['org_id'] ?? null;
+            if ($sessionOrgId !== null && $recordOrgId !== null && $recordOrgId !== $sessionOrgId) {
+                $this->error('forbidden', 403, 'You do not have access to this customer purchase order.');
             }
 
             $this->success(['customer_purchase_order' => $record]);
@@ -314,6 +330,18 @@ final class CustomerPurchaseOrderController extends BaseController
         }
 
         try {
+            // COM-001: Verify ownership before transition
+            $record = $this->customerPurchaseOrders()->getPurchaseOrder($customerPoId);
+            if ($record === null) {
+                $this->error('customer_purchase_order_not_found', 404);
+            }
+
+            $sessionOrgId = $_SESSION['org_id'] ?? null;
+            $recordOrgId = $record['org_id'] ?? null;
+            if ($sessionOrgId !== null && $recordOrgId !== null && $recordOrgId !== $sessionOrgId) {
+                $this->error('forbidden', 403, 'You do not have access to this customer purchase order.');
+            }
+
             $body = $this->jsonBody();
             $transition = trim((string)($body['transition'] ?? ''));
             if ($transition === '') {

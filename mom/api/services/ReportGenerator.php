@@ -132,6 +132,7 @@ final class ReportGenerator
      *   - date_from:  string (ISO date, default 90 days ago)
      *   - date_to:    string (ISO date, default today)
      *   - department: string (optional department filter)
+     *   - org_id:     string (optional org_id filter, required for multi-tenant)
      *   - no_cache:   bool   (bypass cache, default false)
      * @return ReportResult
      *
@@ -148,10 +149,12 @@ final class ReportGenerator
         $dateFrom = $params['date_from'] ?? date('Y-m-d', strtotime('-90 days'));
         $dateTo = $params['date_to'] ?? date('Y-m-d');
         $department = $params['department'] ?? null;
+        // SVC-010: Require and validate org_id from session or parameter
+        $orgId = $this->getOrgIdFromSession($params);
         $noCache = (bool) ($params['no_cache'] ?? false);
 
         // Check cache
-        $cacheKey = $this->buildCacheKey($type, $format, $dateFrom, $dateTo, $department);
+        $cacheKey = $this->buildCacheKey($type, $format, $dateFrom, $dateTo, $department, $orgId);
         if (!$noCache) {
             $cached = $this->readCache($cacheKey);
             if ($cached !== null) {
@@ -162,14 +165,14 @@ final class ReportGenerator
         // Generate report data
         $startTime = microtime(true);
         $data = match ($type) {
-            ReportType::NCR_SUMMARY         => $this->generateNcrSummary($dateFrom, $dateTo, $department),
-            ReportType::CAPA_STATUS         => $this->generateCapaStatus($dateFrom, $dateTo, $department),
-            ReportType::CALIBRATION_SCHEDULE => $this->generateCalibrationSchedule($dateFrom, $dateTo),
-            ReportType::TRAINING_MATRIX     => $this->generateTrainingMatrix($dateFrom, $dateTo, $department),
-            ReportType::AUDIT_SCHEDULE      => $this->generateAuditSchedule($dateFrom, $dateTo),
-            ReportType::KPI_DASHBOARD       => $this->generateKpiDashboard($dateFrom, $dateTo, $department),
-            ReportType::MANAGEMENT_REVIEW   => $this->generateManagementReview($dateFrom, $dateTo),
-            ReportType::SUPPLIER_SCORECARD  => $this->generateSupplierScorecard($dateFrom, $dateTo),
+            ReportType::NCR_SUMMARY         => $this->generateNcrSummary($dateFrom, $dateTo, $department, $orgId),
+            ReportType::CAPA_STATUS         => $this->generateCapaStatus($dateFrom, $dateTo, $department, $orgId),
+            ReportType::CALIBRATION_SCHEDULE => $this->generateCalibrationSchedule($dateFrom, $dateTo, $orgId),
+            ReportType::TRAINING_MATRIX     => $this->generateTrainingMatrix($dateFrom, $dateTo, $department, $orgId),
+            ReportType::AUDIT_SCHEDULE      => $this->generateAuditSchedule($dateFrom, $dateTo, $orgId),
+            ReportType::KPI_DASHBOARD       => $this->generateKpiDashboard($dateFrom, $dateTo, $department, $orgId),
+            ReportType::MANAGEMENT_REVIEW   => $this->generateManagementReview($dateFrom, $dateTo, $orgId),
+            ReportType::SUPPLIER_SCORECARD  => $this->generateSupplierScorecard($dateFrom, $dateTo, $orgId),
         };
         $generationMs = round((microtime(true) - $startTime) * 1000, 1);
 
@@ -230,9 +233,9 @@ final class ReportGenerator
     /**
      * NCR Summary: open/closed NCRs by period, department, type.
      */
-    private function generateNcrSummary(string $dateFrom, string $dateTo, ?string $department): array
+    private function generateNcrSummary(string $dateFrom, string $dateTo, ?string $department, string $orgId = ''): array
     {
-        $records = $this->loadWorkflowStates('NCR', $dateFrom, $dateTo, $department);
+        $records = $this->loadWorkflowStates('NCR', $dateFrom, $dateTo, $department, $orgId);
 
         $byStatus = [];
         $byDepartment = [];
@@ -273,9 +276,9 @@ final class ReportGenerator
     /**
      * CAPA Status: tracking with closure rates.
      */
-    private function generateCapaStatus(string $dateFrom, string $dateTo, ?string $department): array
+    private function generateCapaStatus(string $dateFrom, string $dateTo, ?string $department, string $orgId = ''): array
     {
-        $records = $this->loadWorkflowStates('CAPA', $dateFrom, $dateTo, $department);
+        $records = $this->loadWorkflowStates('CAPA', $dateFrom, $dateTo, $department, $orgId);
 
         $byStatus = [];
         $overdueCount = 0;
@@ -332,7 +335,7 @@ final class ReportGenerator
     /**
      * Calibration Schedule: upcoming calibrations.
      */
-    private function generateCalibrationSchedule(string $dateFrom, string $dateTo): array
+    private function generateCalibrationSchedule(string $dateFrom, string $dateTo, string $orgId = ''): array
     {
         $records = $this->loadWorkflowStates('CAL', $dateFrom, $dateTo);
 
@@ -378,7 +381,7 @@ final class ReportGenerator
     /**
      * Training Matrix: employee training status.
      */
-    private function generateTrainingMatrix(string $dateFrom, string $dateTo, ?string $department): array
+    private function generateTrainingMatrix(string $dateFrom, string $dateTo, ?string $department, string $orgId = ''): array
     {
         $records = $this->loadWorkflowStates('TRN', $dateFrom, $dateTo, $department);
 
@@ -411,7 +414,7 @@ final class ReportGenerator
     /**
      * Audit Schedule: audit plan and findings.
      */
-    private function generateAuditSchedule(string $dateFrom, string $dateTo): array
+    private function generateAuditSchedule(string $dateFrom, string $dateTo, string $orgId = ''): array
     {
         $records = $this->loadWorkflowStates('AUD', $dateFrom, $dateTo);
 
@@ -436,7 +439,7 @@ final class ReportGenerator
     /**
      * KPI Dashboard: key metrics summary across all record types.
      */
-    private function generateKpiDashboard(string $dateFrom, string $dateTo, ?string $department): array
+    private function generateKpiDashboard(string $dateFrom, string $dateTo, ?string $department, string $orgId = ''): array
     {
         $ncr = $this->generateNcrSummary($dateFrom, $dateTo, $department);
         $capa = $this->generateCapaStatus($dateFrom, $dateTo, $department);
@@ -469,7 +472,7 @@ final class ReportGenerator
     /**
      * Management Review: MR input data package (ISO 9001 clause 9.3).
      */
-    private function generateManagementReview(string $dateFrom, string $dateTo): array
+    private function generateManagementReview(string $dateFrom, string $dateTo, string $orgId = ''): array
     {
         // Collect all sub-reports for MR input
         $kpi = $this->generateKpiDashboard($dateFrom, $dateTo, null);
@@ -503,7 +506,7 @@ final class ReportGenerator
     /**
      * Supplier Scorecard: vendor performance metrics.
      */
-    private function generateSupplierScorecard(string $dateFrom, string $dateTo): array
+    private function generateSupplierScorecard(string $dateFrom, string $dateTo, string $orgId = ''): array
     {
         $scars = $this->loadWorkflowStates('SCAR', $dateFrom, $dateTo);
 
@@ -550,12 +553,14 @@ final class ReportGenerator
         string $dateFrom,
         string $dateTo,
         ?string $department = null,
+        string $orgId = '',
     ): array {
         // Try PostgreSQL
         if ($this->db !== null && $this->db->isConnected()) {
             try {
-                $where = 'record_type = :type AND created_at >= :dfrom AND created_at <= :dto';
-                $params = [':type' => $recordType, ':dfrom' => $dateFrom, ':dto' => $dateTo . 'T23:59:59Z'];
+                // SVC-010: Always include org_id filter for data isolation
+                $where = 'record_type = :type AND created_at >= :dfrom AND created_at <= :dto AND org_id = :org_id';
+                $params = [':type' => $recordType, ':dfrom' => $dateFrom, ':dto' => $dateTo . 'T23:59:59Z', ':org_id' => $orgId];
 
                 $sql = "SELECT state_data FROM workflow_states WHERE {$where} ORDER BY created_at DESC";
                 $rows = $this->db->query($sql, $params);
@@ -583,17 +588,19 @@ final class ReportGenerator
         }
 
         // JSON fallback: scan state files
-        return $this->loadStatesFromJson($recordType, $dateFrom, $dateTo, $department);
+        return $this->loadStatesFromJson($recordType, $dateFrom, $dateTo, $department, $orgId);
     }
 
     /**
      * Load workflow states from JSON files.
+     * SVC-010: Include org_id filtering when loading from JSON.
      */
     private function loadStatesFromJson(
         string $recordType,
         string $dateFrom,
         string $dateTo,
         ?string $department,
+        string $orgId = '',
     ): array {
         if (!is_dir($this->stateDir)) {
             return [];
@@ -621,6 +628,14 @@ final class ReportGenerator
             $created = $data['created_at'] ?? '';
             if ($created < $dateFrom || $created > $dateTo . 'T23:59:59Z') {
                 continue;
+            }
+
+            // SVC-010: Filter by org_id (required)
+            if ($orgId !== '') {
+                $dataOrgId = $data['org_id'] ?? $data['data']['org_id'] ?? '';
+                if ($dataOrgId !== $orgId) {
+                    continue;
+                }
             }
 
             // Filter by department
@@ -846,6 +861,34 @@ final class ReportGenerator
     // ── Caching ─────────────────────────────────────────────────────────────
 
     /**
+     * SVC-010: Get org_id from session (authoritative) or parameter.
+     * Ensures all reports are scoped to the user's organization.
+     *
+     * @throws RuntimeException If org_id is not available
+     */
+    private function getOrgIdFromSession(array $params): string
+    {
+        // First, try to get org_id from session (most secure)
+        if (isset($_SESSION['org_id']) && is_string($_SESSION['org_id'])) {
+            $sessionOrgId = trim($_SESSION['org_id']);
+            if ($sessionOrgId !== '') {
+                return $sessionOrgId;
+            }
+        }
+
+        // Fall back to parameter if provided (should be validated by controller)
+        if (isset($params['org_id']) && is_string($params['org_id'])) {
+            $paramOrgId = trim($params['org_id']);
+            if ($paramOrgId !== '') {
+                return $paramOrgId;
+            }
+        }
+
+        // If we can't find an org_id, fail safely
+        throw new RuntimeException('org_id_not_found:reports_require_org_context');
+    }
+
+    /**
      * Build a cache key for a report.
      */
     private function buildCacheKey(
@@ -854,8 +897,9 @@ final class ReportGenerator
         string $dateFrom,
         string $dateTo,
         ?string $department,
+        string $orgId = '',
     ): string {
-        $parts = [$type->value, $format->value, $dateFrom, $dateTo, $department ?? 'ALL'];
+        $parts = [$type->value, $format->value, $dateFrom, $dateTo, $department ?? 'ALL', $orgId];
         return md5(implode('|', $parts));
     }
 

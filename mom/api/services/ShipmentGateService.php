@@ -48,6 +48,7 @@ final class ShipmentGateService
         ['code' => 'SG-08', 'label' => 'Export control cleared (if required)',    'label_vi' => 'Kiem soat xuat khau da thong qua',    'required' => false],
         ['code' => 'SG-09', 'label' => 'Packing/labeling spec confirmed',        'label_vi' => 'Quy cach dong goi/nhan da xac nhan', 'required' => true],
         ['code' => 'SG-10', 'label' => 'Customer source inspection completed',   'label_vi' => 'Kiem tra nguon khach hang hoan thanh', 'required' => false],
+        ['code' => 'SG-11', 'label' => 'OQC inspection passed',                  'label_vi' => 'Kiem tra OQC da thanh cong',          'required' => true],
     ];
 
     // ── Construction ────────────────────────────────────────────────────────
@@ -489,6 +490,9 @@ final class ShipmentGateService
             case 'SG-10':
                 return $this->checkCustomerSourceInspection($so);
 
+            case 'SG-11':
+                return $this->checkOqcPassed($soNumber);
+
             default:
                 return ['status' => 'na', 'detail' => 'Unknown gate code'];
         }
@@ -700,6 +704,55 @@ final class ShipmentGateService
         }
 
         return ['status' => 'fail', 'detail' => 'Customer source inspection not completed. Status: ' . $csiStatus];
+    }
+
+    /** SG-11: OQC inspection passed (P2 fix). */
+    private function checkOqcPassed(string $soNumber): array
+    {
+        $oqcFile = $this->dataDir . '/logistics/oqc.json';
+        $oqcRecords = $this->readJson($oqcFile) ?? [];
+
+        // Find OQC records for this SO
+        $passedOqc = false;
+        $failedOqc = [];
+
+        foreach ($oqcRecords as $oqc) {
+            if (!is_array($oqc)) {
+                continue;
+            }
+            $oqcSo = $oqc['so_number'] ?? $oqc['sales_order'] ?? '';
+            if ($oqcSo !== $soNumber) {
+                continue;
+            }
+
+            $result = strtolower($oqc['result'] ?? '');
+            $status = strtolower($oqc['status'] ?? '');
+
+            // P2: Check that OQC result is 'pass' AND status is 'completed'
+            if ($result === 'pass' && $status === 'completed') {
+                $passedOqc = true;
+            } elseif ($result === 'fail' || ($status === 'completed' && $result !== 'pass')) {
+                $failedOqc[] = [
+                    'id' => $oqc['id'] ?? $oqc['oqc_number'] ?? '',
+                    'result' => $result,
+                    'status' => $status,
+                ];
+            }
+        }
+
+        // If any OQC failed, reject the shipment
+        if (!empty($failedOqc)) {
+            $failCount = count($failedOqc);
+            return ['status' => 'fail', 'detail' => "OQC inspection has not passed: {$failCount} failed inspection(s) for this lot"];
+        }
+
+        // If passed, allow
+        if ($passedOqc) {
+            return ['status' => 'pass', 'detail' => 'OQC inspection passed'];
+        }
+
+        // If no OQC records at all, fail
+        return ['status' => 'fail', 'detail' => 'OQC inspection has not passed for this lot'];
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────────

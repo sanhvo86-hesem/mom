@@ -67,7 +67,8 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
     public function probe(): array
     {
         try {
-            $row = $this->db->queryOne("SELECT to_regclass('" . self::TABLE . "') AS table_name");
+            // GOV-005: Use parameterized query for table existence check
+            $row = $this->db->queryOne("SELECT to_regclass(:table_name) AS table_name", [':table_name' => self::TABLE]);
             $available = trim((string)($row['table_name'] ?? '')) !== '';
             $count = $available ? (int)$this->db->queryScalar('SELECT COUNT(*) FROM ' . self::TABLE) : 0;
 

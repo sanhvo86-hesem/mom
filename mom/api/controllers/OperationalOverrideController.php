@@ -42,6 +42,39 @@ final class OperationalOverrideController extends BaseController
         $this->requireAnyPermission($user, ['governance.override_control.create']);
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function overrideElevatedRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'supervisor',
+                'shift_leader',
+                'production_manager',
+                'production_director',
+                'cnc_workshop_manager',
+                'quality_manager',
+                'qa_manager',
+                'engineering_manager',
+                'qms_engineer',
+                'manager',
+                'director',
+            ]
+        )));
+    }
+
+    /**
+     * Require a real elevated operating role after the permission gate passes.
+     */
+    private function requireElevatedRole(array $user): void
+    {
+        if (!$this->userHasAnyRole($user, $this->overrideElevatedRoles())) {
+            $this->error('forbidden', 403, 'Operational overrides require supervisor or higher role');
+        }
+    }
+
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
@@ -207,6 +240,7 @@ final class OperationalOverrideController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireOverrideWrite($user);
+        $this->requireElevatedRole($user);
         $this->requireCsrf();
 
         try {
@@ -222,7 +256,7 @@ final class OperationalOverrideController extends BaseController
                 }
             );
 
-            $this->success((array)($execution['payload'] ?? []), (int)($execution['status_code'] ?? 201));
+            $this->success((array)$execution['payload'], (int)$execution['status_code']);
         } catch (RecordConflictException $e) {
             $this->error('override_control_idempotency_conflict', 409, $e->getMessage());
         } catch (Throwable $e) {
@@ -235,6 +269,7 @@ final class OperationalOverrideController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireOverrideWrite($user);
+        $this->requireElevatedRole($user);
         $this->requireCsrf();
 
         $overrideId = trim((string)($this->query('overrideId') ?? ''));
@@ -265,7 +300,7 @@ final class OperationalOverrideController extends BaseController
                 }
             );
 
-            $this->success((array)($execution['payload'] ?? []), (int)($execution['status_code'] ?? 200));
+            $this->success((array)$execution['payload'], (int)$execution['status_code']);
         } catch (RecordConflictException $e) {
             $this->error('override_control_transition_idempotency_conflict', 409, $e->getMessage());
         } catch (Throwable $e) {

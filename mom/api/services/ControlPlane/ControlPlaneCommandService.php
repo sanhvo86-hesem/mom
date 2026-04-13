@@ -6,6 +6,7 @@ namespace MOM\Services\ControlPlane;
 
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
+use MOM\Services\ChangeControl\ChangeAuthorityService;
 use RuntimeException;
 
 /**
@@ -36,14 +37,15 @@ final class ControlPlaneCommandService
     {
         $this->requireDb();
 
-        $decision = $this->guard->validateEnvelope($envelope);
-        $commandName = $this->text($envelope['command_name'] ?? '');
-        $idempotencyKey = $this->text($envelope['idempotency_key'] ?? '');
-        $actorRef = $this->text($envelope['actor_ref'] ?? $envelope['actor_id'] ?? '');
-        $scopeKey = $this->scopeKey($envelope);
+        $guardEnvelope = $this->withCanonicalAuthorityResolution($envelope);
+        $decision = $this->guard->validateEnvelope($guardEnvelope);
+        $commandName = $this->text($guardEnvelope['command_name'] ?? '');
+        $idempotencyKey = $this->text($guardEnvelope['idempotency_key'] ?? '');
+        $actorRef = $this->text($guardEnvelope['actor_ref'] ?? $guardEnvelope['actor_id'] ?? '');
+        $scopeKey = $this->scopeKey($guardEnvelope);
         $requestHash = $this->hashJson($this->canonicalRequest($envelope));
         $authorityContext = array_merge(
-            is_array($envelope['authority_context'] ?? null) ? $envelope['authority_context'] : [],
+            is_array($guardEnvelope['authority_context'] ?? null) ? $guardEnvelope['authority_context'] : [],
             ['guard_decision' => $decision->toArray()],
         );
 
@@ -53,7 +55,7 @@ final class ControlPlaneCommandService
             $actorRef,
             $scopeKey,
             $requestHash,
-            $envelope,
+            $guardEnvelope,
             $authorityContext,
             $decision,
         );
@@ -72,10 +74,10 @@ final class ControlPlaneCommandService
                 ],
                 [
                     'idempotency_key' => $idempotencyKey,
-                    'correlation_id' => $this->text($envelope['correlation_id'] ?? ''),
-                    'causation_id' => $this->text($envelope['causation_id'] ?? ''),
-                    'handler_key' => $this->handlerKey($commandName, $envelope),
-                    'payload_schema_version' => (string)($envelope['payload_schema_version'] ?? 'control_plane_command.v1'),
+                    'correlation_id' => $this->text($guardEnvelope['correlation_id'] ?? ''),
+                    'causation_id' => $this->text($guardEnvelope['causation_id'] ?? ''),
+                    'handler_key' => $this->handlerKey($commandName, $guardEnvelope),
+                    'payload_schema_version' => (string)($guardEnvelope['payload_schema_version'] ?? 'control_plane_command.v1'),
                     'dedupe_key' => hash('sha256', $commandName . '|' . $idempotencyKey),
                 ],
             );
@@ -86,6 +88,87 @@ final class ControlPlaneCommandService
             'decision' => $decision->toArray(),
             'command' => $this->normalizeRow($row),
         ];
+    }
+
+    /**
+     * Resolve released change authority server-side and strip caller-forged
+     * authority proof before the guard evaluates final/released mutations.
+     *
+     * @param array<string, mixed> $envelope
+     * @return array<string, mixed>
+     */
+    private function withCanonicalAuthorityResolution(array $envelope): array
+    {
+        $clean = $envelope;
+        foreach (['authority_source', 'authority_verified', 'authorized_fields', 'change_order_state'] as $field) {
+            unset($clean[$field]);
+        }
+
+        $operation = strtolower($this->text($clean['operation'] ?? ''));
+        if (!in_array($operation, ['update', 'amend', 'transition'], true)) {
+            return $clean;
+        }
+
+        $state = strtolower($this->text($clean['lifecycle_state'] ?? $clean['record_state'] ?? ''));
+        if (!in_array($state, ['approved', 'released', 'finalized', 'locked', 'published', 'retained', 'legal_hold', 'closed'], true)) {
+            return $clean;
+        }
+
+        $fieldPath = $this->text($clean['field_path'] ?? '');
+        $changeRef = $this->text($clean['change_order_id'] ?? $clean['change_order_ref'] ?? '');
+        $scope = is_array($clean['scope'] ?? null) ? $clean['scope'] : [];
+        $objectType = $this->text($scope['object_type'] ?? $clean['object_type'] ?? '');
+        $objectId = $this->text($scope['object_id'] ?? $clean['object_id'] ?? '');
+        if ($fieldPath === '' || $changeRef === '' || $objectType === '' || $objectId === '') {
+            return $clean;
+        }
+
+        $payload = is_array($clean['payload'] ?? null) ? $clean['payload'] : [];
+        $decision = (new ChangeAuthorityService($this->db))->assertFieldEditAllowed(
+            $objectType,
+            $objectId,
+            $fieldPath,
+            $payload['old_value'] ?? null,
+            $payload['new_value'] ?? '__changed__',
+            $state,
+            [
+                'change_order_id' => $changeRef,
+                'change_order_ref' => $changeRef,
+                'change_order_number' => $changeRef,
+                'requested_effect' => (string)($clean['requested_effect'] ?? $operation),
+                'effectivity' => is_array($clean['effectivity'] ?? null) ? $clean['effectivity'] : [],
+            ],
+        );
+
+        $authorityContext = is_array($clean['authority_context'] ?? null) ? $clean['authority_context'] : [];
+        if (!$decision->allowed) {
+            $clean['authority_context'] = array_merge($authorityContext, [
+                'resolved_by' => 'ChangeAuthorityService',
+                'resolution_status' => 'denied',
+                'resolution_error_code' => $decision->errorCode,
+                'resolution_message' => $decision->message,
+                'object_type' => $objectType,
+                'object_id' => $objectId,
+                'field_path' => $fieldPath,
+            ]);
+            return $clean;
+        }
+
+        $clean['change_order_state'] = 'released';
+        $clean['authority_source'] = 'canonical_change_authority';
+        $clean['authority_verified'] = true;
+        $clean['authorized_fields'] = [$fieldPath];
+        $clean['authority_context'] = array_merge($authorityContext, [
+            'resolved_by' => 'ChangeAuthorityService',
+            'resolution_status' => 'verified',
+            'object_type' => $objectType,
+            'object_id' => $objectId,
+            'field_path' => $fieldPath,
+            'change_order_ref' => $changeRef,
+            'decision_data' => $decision->data,
+        ]);
+
+        return $clean;
     }
 
     /**

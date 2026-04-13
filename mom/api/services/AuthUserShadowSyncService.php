@@ -92,10 +92,19 @@ class AuthUserShadowSyncService
         }
 
         try {
-            $this->db->transactional(function () use ($user, $username, $employeeId, $email, $emailSource): void {
+                $this->db->transactional(function () use ($user, $username, $employeeId, $email, $emailSource): void {
                 $linkage = $this->resolveUserLinkage($user);
                 $deptCode = $linkage['dept_code'];
-                $roleCode = trim((string)($user['role'] ?? ''));
+                $positionTitle = trim((string)$linkage['position_title']);
+                if ($positionTitle === '') {
+                    $positionTitle = trim((string)($user['title'] ?? ''));
+                }
+
+                // SVC-021 (CRITICAL): Privilege escalation prevention
+                // Check the current DB role before accepting JSON role
+                $currentRole = $this->getCurrentUserRole($username);
+                $requestedRoleCode = trim((string)($user['role'] ?? ''));
+                $roleCode = $this->validateRoleEscalation($currentRole, $requestedRoleCode, $username);
                 $roleId = $roleCode !== '' ? $this->roleIdForCode($roleCode) : null;
                 $status = !empty($user['active']) ? 'active' : 'inactive';
                 $fullName = trim((string)($user['name'] ?? $user['full_name'] ?? $username));
@@ -109,7 +118,7 @@ class AuthUserShadowSyncService
                 }
 
                 $userMetadata = [
-                    'title' => (string)($linkage['position_title'] ?? $user['title'] ?? ''),
+                    'title' => $positionTitle,
                     'phone' => (string)($user['phone'] ?? ''),
                     'cccd' => (string)($user['cccd'] ?? ''),
                     'jd_code' => (string)($user['jd_code'] ?? ''),
@@ -310,7 +319,7 @@ class AuthUserShadowSyncService
                         ':user_id_code' => $username,
                         ':user_id' => (string)($userRow['user_id'] ?? ''),
                         ':role_code' => $roleCode !== '' ? $roleCode : null,
-                        ':role_label' => (string)($linkage['position_title'] ?? $user['title'] ?? ''),
+                        ':role_label' => $positionTitle,
                         ':dept_code' => $deptCode,
                         ':shift' => null,
                         ':is_active' => !empty($user['active']),
@@ -385,7 +394,7 @@ class AuthUserShadowSyncService
                         ':payload_schema_version' => '1.0',
                         ':metadata' => json_encode([
                             'source' => 'users.json',
-                            'title' => (string)($linkage['position_title'] ?? $user['title'] ?? ''),
+                            'title' => $positionTitle,
                             'dept' => (string)($deptCode ?? $user['dept'] ?? ''),
                             'email_source' => $emailSource,
                             'assignment_linkage_source' => (($user['hcm_position_id'] ?? '') !== '' || ($user['hcm_org_unit_id'] ?? '') !== '') ? 'explicit_hcm_reference' : 'legacy_text_fallback',
@@ -726,7 +735,7 @@ class AuthUserShadowSyncService
         $sql .= ' ORDER BY CASE WHEN status = \'active\' THEN 0 ELSE 1 END, updated_at DESC';
 
         $rows = $this->db->query($sql, $params);
-        return is_array($rows) ? $rows : [];
+        return $rows;
     }
 
     private function normalizeComparableTitle(string $title): string
@@ -764,5 +773,73 @@ class AuthUserShadowSyncService
             return null;
         }
         return preg_match('/^[0-9a-fA-F-]{36}$/', $value) === 1 ? strtolower($value) : null;
+    }
+
+    /**
+     * SVC-021 (CRITICAL): Get the current role from the authoritative DB source.
+     * Only the DB is the source of truth for user roles during sync.
+     *
+     * @return ?string The current role_code from database, or null if user doesn't exist
+     */
+    private function getCurrentUserRole(string $username): ?string
+    {
+        try {
+            $row = $this->db->queryOne(
+                'SELECT r.role_code
+                   FROM users u
+                   LEFT JOIN user_roles ur ON u.user_id = ur.user_id AND ur.valid_to IS NULL
+                   LEFT JOIN roles r ON ur.role_id = r.role_id
+                  WHERE u.username = :username
+                  LIMIT 1',
+                [':username' => $username]
+            );
+            if (!is_array($row)) {
+                return null;
+            }
+            return trim((string)($row['role_code'] ?? '')) ?: null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * SVC-021 (CRITICAL): Prevent role escalation from JSON source.
+     * Only allow role change if:
+     * 1. User doesn't exist yet (no current role)
+     * 2. Requested role is same as current role
+     * 3. Requested role is lower privilege
+     * Never allow promotion via JSON sync.
+     *
+     * @param ?string $currentRole  The current DB role (authoritative), or null if new user
+     * @param string  $requestedRoleCode The role from JSON (untrusted)
+     * @param string  $username     For logging
+     * @return string The safe role code to use (empty string if rejected)
+     */
+    private function validateRoleEscalation(?string $currentRole, string $requestedRoleCode, string $username): string
+    {
+        $requestedRoleCode = trim($requestedRoleCode);
+
+        // New user: accept any role from JSON
+        if ($currentRole === null) {
+            return $requestedRoleCode;
+        }
+
+        // Existing user: only allow same role or lower privilege
+        // Define privilege hierarchy: admin > manager > operator > viewer
+        $hierarchy = ['admin' => 4, 'manager' => 3, 'operator' => 2, 'viewer' => 1];
+        $currentLevel = $hierarchy[strtolower($currentRole)] ?? 0;
+        $requestedLevel = $hierarchy[strtolower($requestedRoleCode)] ?? 0;
+
+        if ($requestedLevel > $currentLevel) {
+            // Privilege escalation attempt detected
+            @error_log(
+                '[AuthUserShadowSyncService] Role escalation blocked: ' .
+                "user={$username} current_role={$currentRole} requested_role={$requestedRoleCode} " .
+                "current_level={$currentLevel} requested_level={$requestedLevel}"
+            );
+            return $currentRole; // Keep current role instead
+        }
+
+        return $requestedRoleCode; // Allow downgrade or same role
     }
 }

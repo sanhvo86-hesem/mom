@@ -31,6 +31,9 @@ final class EpicorTransportAdapter
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->policy = $this->loadPolicy();
 
+        // Validate Epicor endpoint URLs to prevent SSRF attacks
+        $this->validateEndpointUrls();
+
         $stateDir = $this->dataDir . '/state';
         $circuitCache = new CacheService($this->dataDir, 'mom:circuitbreaker:');
         $this->circuitBreaker = new CircuitBreaker($stateDir, 'epicor', 3, 60, 1, $circuitCache);
@@ -292,21 +295,30 @@ final class EpicorTransportAdapter
     /** @return array<string, mixed> */
     private function httpRequest(string $method, string $url, array $headers, ?string $body, int $timeoutSeconds, bool $verifyTls): array
     {
+        // Get CAINFO if configured
+        $config = $this->transportConfig();
+        $caInfo = trim((string)($config['cainfo'] ?? ''));
+
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
             if ($ch === false) {
                 throw new RuntimeException('epicor_transport_curl_init_failed');
             }
-            curl_setopt_array($ch, [
+            $opts = [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CUSTOMREQUEST => strtoupper($method),
                 CURLOPT_HTTPHEADER => $headers,
                 CURLOPT_CONNECTTIMEOUT => max(3, $timeoutSeconds),
                 CURLOPT_TIMEOUT => max(3, $timeoutSeconds),
-                CURLOPT_SSL_VERIFYPEER => $verifyTls,
-                CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_HEADER => true,
-            ]);
+            ];
+            // Allow custom CA bundle if specified
+            if ($caInfo !== '' && is_file($caInfo)) {
+                $opts[CURLOPT_CAINFO] = $caInfo;
+            }
+            curl_setopt_array($ch, $opts);
             if ($body !== null) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
             }
@@ -328,6 +340,15 @@ final class EpicorTransportAdapter
             ];
         }
 
+        $sslOpts = [
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+        ];
+        // Allow custom CA bundle if specified
+        if ($caInfo !== '' && is_file($caInfo)) {
+            $sslOpts['cafile'] = $caInfo;
+        }
+
         $context = stream_context_create([
             'http' => [
                 'method' => strtoupper($method),
@@ -336,10 +357,7 @@ final class EpicorTransportAdapter
                 'ignore_errors' => true,
                 'timeout' => max(3, $timeoutSeconds),
             ],
-            'ssl' => [
-                'verify_peer' => $verifyTls,
-                'verify_peer_name' => $verifyTls,
-            ],
+            'ssl' => $sslOpts,
         ]);
 
         $rawBody = @file_get_contents($url, false, $context);
@@ -375,10 +393,10 @@ final class EpicorTransportAdapter
         $transport['company'] = (string)(getenv('EPICOR_COMPANY') ?: ($transport['company'] ?? ''));
         $transport['plant'] = (string)(getenv('EPICOR_PLANT') ?: ($transport['plant'] ?? ''));
         $transport['timeout_seconds'] = max(5, (int)(getenv('EPICOR_TIMEOUT_SECONDS') ?: ($transport['timeout_seconds'] ?? 20)));
-        $transport['verify_tls'] = filter_var(getenv('EPICOR_VERIFY_TLS') ?: ($transport['verify_tls'] ?? true), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        if ($transport['verify_tls'] === null) {
-            $transport['verify_tls'] = true;
-        }
+        // TLS verification is always enabled. Disabling via env var is not permitted.
+        // Only allow custom CA bundle via EPICOR_CAINFO env var for special cases.
+        $transport['verify_tls'] = true;
+        $transport['cainfo'] = (string)(getenv('EPICOR_CAINFO') ?: ($transport['cainfo'] ?? ''));
         $transport['dry_run_when_unconfigured'] = filter_var(getenv('EPICOR_DRY_RUN') ?: ($transport['dry_run_when_unconfigured'] ?? true), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         if ($transport['dry_run_when_unconfigured'] === null) {
             $transport['dry_run_when_unconfigured'] = true;
@@ -415,5 +433,61 @@ final class EpicorTransportAdapter
         $raw = file_get_contents($file);
         $data = is_string($raw) ? json_decode($raw, true) : null;
         return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Validate Epicor endpoint URLs to prevent SSRF attacks.
+     *
+     * Ensures that configured URLs:
+     * - Parse correctly as valid URLs
+     * - Use HTTPS protocol
+     * - Do not resolve to RFC 1918 private addresses
+     * - Do not resolve to loopback addresses
+     *
+     * @throws RuntimeException if endpoint validation fails
+     */
+    private function validateEndpointUrls(): void
+    {
+        $config = $this->transportConfig();
+        $baseUrl = trim((string)($config['base_url'] ?? ''));
+        $tokenUrl = trim((string)($config['token_url'] ?? ''));
+
+        foreach ([$baseUrl => 'base_url', $tokenUrl => 'token_url'] as $url => $name) {
+            if ($url === '') {
+                continue; // URL is optional at this point
+            }
+
+            // Validate URL format
+            $parsed = parse_url($url);
+            if ($parsed === false || empty($parsed['host'])) {
+                throw new RuntimeException("Invalid Epicor {$name}: malformed URL");
+            }
+
+            // Require HTTPS
+            if (($parsed['scheme'] ?? '') !== 'https') {
+                throw new RuntimeException("Invalid Epicor {$name}: must use HTTPS protocol");
+            }
+
+            // Check for SSRF: resolve hostname and verify it's not private/loopback
+            $hostname = (string)($parsed['host'] ?? '');
+            $ip = @gethostbyname($hostname);
+
+            // gethostbyname returns the hostname unchanged if resolution fails
+            if ($ip === $hostname) {
+                // DNS resolution failed — this is acceptable, but log warning
+                @error_log("[EpicorTransportAdapter] DNS resolution failed for {$name}: {$hostname}");
+                continue;
+            }
+
+            // Check for loopback (127.x.x.x, ::1)
+            if ($ip === '127.0.0.1' || $ip === '::1' || str_starts_with($ip, '127.')) {
+                throw new RuntimeException("Invalid Epicor {$name}: resolves to loopback address");
+            }
+
+            // Check for RFC 1918 private addresses
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === false) {
+                throw new RuntimeException("Invalid Epicor {$name}: resolves to private/reserved address");
+            }
+        }
     }
 }

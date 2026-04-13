@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
-use RuntimeException;
-
 /**
  * Cost of Poor Quality (COPQ) Engine for HESEM MOM Portal.
  *
@@ -21,7 +19,7 @@ final class CopqEngine
     private readonly string $dataDir;
     private readonly string $exceptionsDir;
     private readonly string $ordersFile;
-    private ?object $db = null;
+    private ?array $costRates = null;
 
     /** Default material cost per unit when unknown (USD). */
     private const DEFAULT_MATERIAL_COST_PER_UNIT = 50.0;
@@ -42,7 +40,7 @@ final class CopqEngine
         $this->dataDir       = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->exceptionsDir = $this->dataDir . '/exceptions';
         $this->ordersFile    = $this->dataDir . '/orders/orders.json';
-        $this->db            = $db;
+        unset($db); // Retained for constructor compatibility with older callers.
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -103,8 +101,8 @@ final class CopqEngine
 
             $isRework = !empty($wo['is_rework']) || strtolower($wo['wo_type'] ?? '') === 'rework';
             if ($isRework) {
-                $hours = (float)($wo['rework_hours'] ?? self::DEFAULT_REWORK_HOURS);
-                $rate  = (float)($wo['labor_rate'] ?? self::DEFAULT_LABOR_RATE);
+                $hours = (float)($wo['rework_hours'] ?? $this->costRate('default_rework_hours', self::DEFAULT_REWORK_HOURS));
+                $rate  = (float)($wo['labor_rate'] ?? $this->costRate('default_labor_rate', self::DEFAULT_LABOR_RATE));
                 $total += $hours * $rate;
             }
         }
@@ -154,7 +152,7 @@ final class CopqEngine
             }
             $inspPeriod = substr($insp['inspection_date'] ?? $insp['created_at'] ?? '', 0, 7);
             if ($inspPeriod === $period) {
-                $cost = (float)($insp['inspection_cost'] ?? self::DEFAULT_INSPECTION_COST_PER_LOT);
+                $cost = (float)($insp['inspection_cost'] ?? $this->costRate('default_inspection_cost_per_lot', self::DEFAULT_INSPECTION_COST_PER_LOT));
                 $total += $cost;
             }
         }
@@ -255,8 +253,8 @@ final class CopqEngine
                     }
                     $isRework = !empty($wo['is_rework']) || strtolower($wo['wo_type'] ?? '') === 'rework';
                     if ($isRework) {
-                        $hours = (float)($wo['rework_hours'] ?? self::DEFAULT_REWORK_HOURS);
-                        $rate  = (float)($wo['labor_rate'] ?? self::DEFAULT_LABOR_RATE);
+                        $hours = (float)($wo['rework_hours'] ?? $this->costRate('default_rework_hours', self::DEFAULT_REWORK_HOURS));
+                        $rate  = (float)($wo['labor_rate'] ?? $this->costRate('default_labor_rate', self::DEFAULT_LABOR_RATE));
                         $items[] = [
                             'sub_category' => 'rework',
                             'reference'    => $wo['wo_number'] ?? '',
@@ -296,7 +294,7 @@ final class CopqEngine
                     }
                     $inspPeriod = substr($insp['inspection_date'] ?? $insp['created_at'] ?? '', 0, 7);
                     if ($inspPeriod === $period) {
-                        $cost = (float)($insp['inspection_cost'] ?? self::DEFAULT_INSPECTION_COST_PER_LOT);
+                        $cost = (float)($insp['inspection_cost'] ?? $this->costRate('default_inspection_cost_per_lot', self::DEFAULT_INSPECTION_COST_PER_LOT));
                         $items[] = [
                             'sub_category' => 'incoming_inspection',
                             'reference'    => $insp['id'] ?? $insp['inspection_id'] ?? '',
@@ -345,7 +343,34 @@ final class CopqEngine
             }
         }
 
-        return self::DEFAULT_MATERIAL_COST_PER_UNIT;
+        return $this->costRate('default_material_cost_per_unit', self::DEFAULT_MATERIAL_COST_PER_UNIT);
+    }
+
+    private function costRate(string $key, float $fallback): float
+    {
+        $rates = $this->loadCostRates();
+        $value = $rates[$key] ?? null;
+        if (is_numeric($value) && (float)$value > 0) {
+            return (float)$value;
+        }
+
+        return $fallback;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadCostRates(): array
+    {
+        if ($this->costRates !== null) {
+            return $this->costRates;
+        }
+
+        $policy = $this->readJson($this->dataDir . '/config/exception_management_policy.json') ?? [];
+        $rates = $policy['copq_cost_rates'] ?? [];
+        $this->costRates = is_array($rates) ? $rates : [];
+
+        return $this->costRates;
     }
 
     /**
@@ -388,49 +413,4 @@ final class CopqEngine
         return is_array($decoded) ? $decoded : null;
     }
 
-    private function writeJson(string $path, array $data): void
-    {
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
-        }
-        $tmp  = $path . '.tmp.' . getmypid();
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        if ($json === false) {
-            throw new RuntimeException('Failed to encode JSON for ' . basename($path));
-        }
-        if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
-            @unlink($tmp);
-            throw new RuntimeException('Cannot write ' . basename($path));
-        }
-        if (file_exists($path)) {
-            @unlink($path);
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new RuntimeException('Failed to atomically replace ' . basename($path));
-        }
-    }
-
-    private function nowIso(): string
-    {
-        return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
-    }
-
-    // ── PostgreSQL dual-write ──────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[CopqEngine] Shadow write to {$table} failed: " . $e->getMessage());
-        }
-    }
 }

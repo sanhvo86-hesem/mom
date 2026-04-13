@@ -164,79 +164,123 @@ final class MobileWorkQueueService
 
     /**
      * Start a task (set started_at, status = in_progress).
+     * Uses file locking to prevent race conditions in multi-process environments.
      */
     public function startTask(string $queueId, string $operatorId): array
     {
-        $queue = $this->loadFile('work_queue');
-        $now   = $this->nowIso();
-
-        foreach ($queue as $idx => $task) {
-            if (!is_array($task)) {
-                continue;
-            }
-            if (($task['queue_id'] ?? '') !== $queueId) {
-                continue;
-            }
-            if (($task['operator_id'] ?? '') !== $operatorId) {
-                throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
-            }
-            $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
-
-            $queue[$idx] = array_merge($task, [
-                'task_status' => self::TASK_STATUSES[1],
-                'started_at'  => $now,
-                'updated_at'  => $now,
-                'qualification_gate' => $qualification,
-            ]);
-
-            $this->saveFile('work_queue', $queue);
-            return $queue[$idx];
+        $lockPath = $this->mobileDir . '/work_queue.lock';
+        $lockHandle = fopen($lockPath, 'c');
+        if ($lockHandle === false) {
+            throw new RuntimeException("Cannot open lock file: {$lockPath}");
         }
 
-        throw new RuntimeException("Work queue task {$queueId} not found.");
+        try {
+            // Acquire exclusive lock — blocks until available
+            if (!flock($lockHandle, LOCK_EX)) {
+                throw new RuntimeException("Cannot acquire exclusive lock on work queue.");
+            }
+
+            try {
+                // Read data inside lock to prevent TOCTOU
+                $queue = $this->loadFile('work_queue');
+                $now   = $this->nowIso();
+
+                foreach ($queue as $idx => $task) {
+                    if (!is_array($task)) {
+                        continue;
+                    }
+                    if (($task['queue_id'] ?? '') !== $queueId) {
+                        continue;
+                    }
+                    if (($task['operator_id'] ?? '') !== $operatorId) {
+                        throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
+                    }
+                    $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
+
+                    $queue[$idx] = array_merge($task, [
+                        'task_status' => self::TASK_STATUSES[1],
+                        'started_at'  => $now,
+                        'updated_at'  => $now,
+                        'qualification_gate' => $qualification,
+                    ]);
+
+                    // Write data while still holding lock
+                    $this->saveFile('work_queue', $queue);
+                    return $queue[$idx];
+                }
+
+                throw new RuntimeException("Work queue task {$queueId} not found.");
+            } finally {
+                flock($lockHandle, LOCK_UN);
+            }
+        } finally {
+            fclose($lockHandle);
+        }
     }
 
     /**
      * Complete a task (set completed_at, actual_minutes, status = completed).
+     * Uses file locking to prevent race conditions in multi-process environments.
      */
     public function completeTask(string $queueId, string $operatorId, array $result): array
     {
-        $queue = $this->loadFile('work_queue');
-        $now   = $this->nowIso();
-
-        foreach ($queue as $idx => $task) {
-            if (!is_array($task)) {
-                continue;
-            }
-            if (($task['queue_id'] ?? '') !== $queueId) {
-                continue;
-            }
-            if (($task['operator_id'] ?? '') !== $operatorId) {
-                throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
-            }
-
-            // Calculate actual minutes if started_at is set
-            $actualMinutes = $result['actual_minutes'] ?? null;
-            if ($actualMinutes === null && !empty($task['started_at'])) {
-                $startedAt = new \DateTimeImmutable($task['started_at']);
-                $nowDt     = new \DateTimeImmutable($now);
-                $diff      = $nowDt->getTimestamp() - $startedAt->getTimestamp();
-                $actualMinutes = round($diff / 60, 2);
-            }
-
-            $queue[$idx] = array_merge($task, [
-                'task_status'    => self::TASK_STATUSES[2],
-                'completed_at'   => $now,
-                'actual_minutes'  => $actualMinutes,
-                'notes'          => $result['notes'] ?? $task['notes'],
-                'updated_at'     => $now,
-            ]);
-
-            $this->saveFile('work_queue', $queue);
-            return $queue[$idx];
+        $lockPath = $this->mobileDir . '/work_queue.lock';
+        $lockHandle = fopen($lockPath, 'c');
+        if ($lockHandle === false) {
+            throw new RuntimeException("Cannot open lock file: {$lockPath}");
         }
 
-        throw new RuntimeException("Work queue task {$queueId} not found.");
+        try {
+            // Acquire exclusive lock — blocks until available
+            if (!flock($lockHandle, LOCK_EX)) {
+                throw new RuntimeException("Cannot acquire exclusive lock on work queue.");
+            }
+
+            try {
+                // Read data inside lock to prevent TOCTOU
+                $queue = $this->loadFile('work_queue');
+                $now   = $this->nowIso();
+
+                foreach ($queue as $idx => $task) {
+                    if (!is_array($task)) {
+                        continue;
+                    }
+                    if (($task['queue_id'] ?? '') !== $queueId) {
+                        continue;
+                    }
+                    if (($task['operator_id'] ?? '') !== $operatorId) {
+                        throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
+                    }
+
+                    // Calculate actual minutes if started_at is set
+                    $actualMinutes = $result['actual_minutes'] ?? null;
+                    if ($actualMinutes === null && !empty($task['started_at'])) {
+                        $startedAt = new \DateTimeImmutable($task['started_at']);
+                        $nowDt     = new \DateTimeImmutable($now);
+                        $diff      = $nowDt->getTimestamp() - $startedAt->getTimestamp();
+                        $actualMinutes = round($diff / 60, 2);
+                    }
+
+                    $queue[$idx] = array_merge($task, [
+                        'task_status'    => self::TASK_STATUSES[2],
+                        'completed_at'   => $now,
+                        'actual_minutes'  => $actualMinutes,
+                        'notes'          => $result['notes'] ?? $task['notes'],
+                        'updated_at'     => $now,
+                    ]);
+
+                    // Write data while still holding lock
+                    $this->saveFile('work_queue', $queue);
+                    return $queue[$idx];
+                }
+
+                throw new RuntimeException("Work queue task {$queueId} not found.");
+            } finally {
+                flock($lockHandle, LOCK_UN);
+            }
+        } finally {
+            fclose($lockHandle);
+        }
     }
 
     // ── Time Entries ──────────────────────────────────────────────────────

@@ -231,7 +231,26 @@ final class PostgresPlanningScenarioRepository implements PlanningScenarioReposi
 
     private function tableAvailable(string $table): bool
     {
-        $row = $this->db->queryOne("SELECT to_regclass('{$table}') AS table_name");
+        // GOV-005: SQL injection protection - validate table name against whitelist regex
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]{0,62}$/', $table)) {
+            return false;
+        }
+
+        // Only allow known tables in the schema
+        $allowedTables = [
+            'aps_planning_scenarios',
+            'aps_scenario_operations',
+            'aps_scenario_allocations',
+            'aps_scenario_demands',
+            'aps_scenario_supplies',
+        ];
+
+        if (!in_array($table, $allowedTables, true)) {
+            return false;
+        }
+
+        // Use parameterized query with to_regclass for safety
+        $row = $this->db->queryOne("SELECT to_regclass(:table_name) AS table_name", [':table_name' => $table]);
         return trim((string)($row['table_name'] ?? '')) !== '';
     }
 

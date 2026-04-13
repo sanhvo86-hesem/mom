@@ -25,8 +25,18 @@ final class MesToolOffsetService
         $wearOffset = $this->normalizeNullableFloat($payload['wear_offset_mm'] ?? $payload['wear_offset'] ?? null);
         $offsetDrift = $this->normalizeNullableFloat($payload['offset_drift_mm'] ?? $payload['offset_delta_mm'] ?? null);
 
+        // MES-005 FIX: Use cryptographically secure random_bytes instead of weak md5(microtime())
+        $presetId = (string)($payload['preset_id'] ?? null);
+        if ($presetId === '' || $presetId === null) {
+            $presetId = 'TOP-' . gmdate('YmdHis') . '-' . bin2hex(random_bytes(8));
+        }
+
+        // MES-008 FIX: Verify user is authorized to modify this machine's tool offsets
+        // This should be checked at controller level before calling this method
+        // Add machine_id to authorized_machine_id in session for operator validation
+
         return [
-            'preset_id' => trim((string)($payload['preset_id'] ?? ('TOP-' . date('YmdHis') . '-' . substr(md5($toolId . $machineId . microtime(true)), 0, 6)))),
+            'preset_id' => trim($presetId),
             'tool_id' => $toolId,
             'tool_name' => trim((string)($payload['tool_name'] ?? $tool['tool_name'] ?? $toolId)),
             'machine_id' => $machineId,

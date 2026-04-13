@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use RuntimeException;
 use Throwable;
 
@@ -18,6 +19,16 @@ use Throwable;
  */
 class DocumentController extends BaseController
 {
+    private function denyLegacyDocumentWrite(string $operation): void
+    {
+        $decision = (new LegacyWriteSurfacePolicy())->assess('document_files', $operation);
+        $this->error($decision['error_code'], $decision['status'], $decision['message'], [
+            'canonical_path' => $decision['canonical_path'],
+            'legacy_surface' => $decision['surface'],
+            'legacy_operation' => $decision['operation'],
+        ]);
+    }
+
     /**
      * POST create â€” Create a new document with initial draft.
      *
@@ -29,6 +40,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('create');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         if (!role_can_create_docs($me, $rolePermsFile)) {
@@ -183,6 +195,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('save_draft');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
@@ -258,6 +271,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('submit_review');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
@@ -324,6 +338,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('approve_release');
         require_doc_workflow_approver($me);
 
         $data         = $this->jsonBody();
@@ -432,6 +447,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('reject_review');
         require_doc_workflow_approver($me);
 
         $data   = $this->jsonBody();
@@ -489,6 +505,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('update_metadata');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
@@ -531,6 +548,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('delete_drafts');
         $this->requireAdmin($me);
 
         $data = $this->jsonBody();
@@ -597,6 +615,7 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('delete_version');
         $this->requireAdmin($me);
 
         $data    = $this->jsonBody();

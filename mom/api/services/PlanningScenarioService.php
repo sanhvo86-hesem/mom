@@ -243,17 +243,22 @@ final class PlanningScenarioService
     /**
      * @return array<string, mixed>
      */
-    public function scenarioDetail(string $scenarioIdOrKey): array
+    public function scenarioDetail(string $scenarioIdOrKey, ?string $orgId = null): array
     {
         $scenario = $this->repository->findScenario($scenarioIdOrKey);
         if ($scenario === null) {
             throw new RuntimeException('planning_scenario_not_found');
         }
 
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($scenario['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('planning_scenario_access_denied');
+        }
+
         return [
             'generated_at' => gmdate(DATE_ATOM),
             'scenario' => $scenario,
-            'feasibility' => $this->feasibility($scenarioIdOrKey),
+            'feasibility' => $this->feasibility($scenarioIdOrKey, $orgId),
             'capacity_load' => (array)($scenario['capacity_load'] ?? []),
         ];
     }
@@ -261,11 +266,16 @@ final class PlanningScenarioService
     /**
      * @return array<string, mixed>
      */
-    public function feasibility(string $scenarioIdOrKey): array
+    public function feasibility(string $scenarioIdOrKey, ?string $orgId = null): array
     {
         $scenario = $this->repository->findScenario($scenarioIdOrKey);
         if ($scenario === null) {
             throw new RuntimeException('planning_scenario_not_found');
+        }
+
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($scenario['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('planning_scenario_access_denied');
         }
 
         $blockers = is_array($scenario['blockers'] ?? null) ? $scenario['blockers'] : [];
@@ -293,11 +303,16 @@ final class PlanningScenarioService
     /**
      * @return array<string, mixed>
      */
-    public function capacityLoad(string $scenarioIdOrKey): array
+    public function capacityLoad(string $scenarioIdOrKey, ?string $orgId = null): array
     {
         $scenario = $this->repository->findScenario($scenarioIdOrKey);
         if ($scenario === null) {
             throw new RuntimeException('planning_scenario_not_found');
+        }
+
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($scenario['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('planning_scenario_access_denied');
         }
 
         return [
@@ -310,12 +325,18 @@ final class PlanningScenarioService
      * @param array<string, mixed> $context
      * @return array<string, mixed>
      */
-    public function approveScenario(string $scenarioIdOrKey, array $context = []): array
+    public function approveScenario(string $scenarioIdOrKey, array $context = [], ?string $orgId = null): array
     {
         $scenario = $this->repository->findScenario($scenarioIdOrKey);
         if ($scenario === null) {
             throw new RuntimeException('planning_scenario_not_found');
         }
+
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($scenario['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('planning_scenario_access_denied');
+        }
+
         if ((string)($scenario['scenario_state'] ?? '') !== 'calculated' || count((array)($scenario['blockers'] ?? [])) > 0) {
             throw new RuntimeException('planning_scenario_not_approvable');
         }
@@ -333,12 +354,18 @@ final class PlanningScenarioService
      * @param array<string, mixed> $context
      * @return array<string, mixed>
      */
-    public function publishScenario(string $scenarioIdOrKey, array $context = []): array
+    public function publishScenario(string $scenarioIdOrKey, array $context = [], ?string $orgId = null): array
     {
         $scenario = $this->repository->findScenario($scenarioIdOrKey);
         if ($scenario === null) {
             throw new RuntimeException('planning_scenario_not_found');
         }
+
+        // SECURITY: Verify org_id matches session if provided
+        if ($orgId !== null && ($scenario['org_id'] ?? null) !== $orgId) {
+            throw new RuntimeException('planning_scenario_access_denied');
+        }
+
         if ((string)($scenario['scenario_state'] ?? '') !== 'approved') {
             $this->metrics['publish_block']++;
             throw new RuntimeException('planning_scenario_not_approved');
