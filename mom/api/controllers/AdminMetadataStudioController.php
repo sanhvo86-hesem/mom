@@ -79,10 +79,15 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal.
+            // realpath() returns false for non-existent files — treat that as a missing
+            // part (skip), not as a traversal attempt.
             $baseDir = $this->registryDir();
             $fullPath = realpath($baseDir . '/' . $file);
-            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+            if ($fullPath === false) {
+                continue; // Part file does not exist; skip gracefully
+            }
+            if (!str_starts_with($fullPath, realpath($baseDir) ?: $baseDir)) {
                 throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
             }
             $payload = $this->readJsonFile($fullPath) ?? [];
@@ -114,10 +119,14 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal.
+            // realpath() returns false for non-existent files — treat that as skip.
             $baseDir = $this->registryDir();
             $fullPath = realpath($baseDir . '/' . $file);
-            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+            if ($fullPath === false) {
+                continue; // Part file does not exist; skip
+            }
+            if (!str_starts_with($fullPath, realpath($baseDir) ?: $baseDir)) {
                 throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
             }
             $payload = $this->readJsonFile($fullPath) ?? [];
@@ -134,12 +143,17 @@ final class AdminMetadataStudioController extends BaseController
             $last = $parts[count($parts) - 1];
             $file = trim((string)($last['file'] ?? ''));
             if ($file !== '') {
-                // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+                // SECURITY FIX (INF-001): Validate file path to prevent path traversal.
+                // For write-to-last-part, the file may not exist yet. Resolve the parent
+                // dir and reconstruct the full path to guard against traversal without
+                // requiring the target file to exist.
                 $baseDir = $this->registryDir();
-                $fullPath = realpath($baseDir . '/' . $file);
-                if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+                $resolvedBase = realpath($baseDir) ?: $baseDir;
+                $resolvedDir = realpath(dirname($baseDir . '/' . $file)) ?: dirname($baseDir . '/' . $file);
+                if (!str_starts_with($resolvedDir . '/', $resolvedBase . '/')) {
                     throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
                 }
+                $fullPath = $resolvedDir . '/' . basename($file);
                 $payload = $this->readJsonFile($fullPath) ?? [];
                 $payload[$endpointKey] = $fields;
                 $this->writeJsonFile($fullPath, $payload);
@@ -309,10 +323,14 @@ final class AdminMetadataStudioController extends BaseController
             if ($file === '') {
                 continue;
             }
-            // SECURITY FIX (INF-001): Validate file path to prevent path traversal
+            // SECURITY FIX (INF-001): Validate file path to prevent path traversal.
+            // realpath() returns false for non-existent files — treat that as skip.
             $baseDir = $this->registryDir();
             $fullPath = realpath($baseDir . '/' . $file);
-            if ($fullPath === false || !str_starts_with($fullPath, realpath($baseDir))) {
+            if ($fullPath === false) {
+                continue; // Part file does not exist; skip gracefully
+            }
+            if (!str_starts_with($fullPath, realpath($baseDir) ?: $baseDir)) {
                 throw new \RuntimeException('Invalid file path in data fields index: path traversal detected');
             }
             $payload = $this->readJsonFile($fullPath) ?? [];
