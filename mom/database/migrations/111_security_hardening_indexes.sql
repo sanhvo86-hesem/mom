@@ -185,6 +185,6 @@ CREATE INDEX IF NOT EXISTS idx_audit_events_actor_type_recorded ON audit_events(
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_warehouse_item ON inventory_transactions(warehouse_id, item_id, recorded_at DESC);
 CREATE INDEX IF NOT EXISTS idx_sales_order_lines_so_item ON sales_order_lines(sales_order_id, item_id);
 CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_po_item ON purchase_order_lines(po_id, item_id);
-CREATE INDEX IF NOT EXISTS idx_inspection_results_item_created ON inspection_results(item_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_item_created ON inspection_results(item_id, recorded_at DESC);
 
 COMMIT;
