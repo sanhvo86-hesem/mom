@@ -1,0 +1,7231 @@
+{
+  "_meta": {
+    "generated_at": "2026-04-14T05:24:09Z",
+    "source": "ai-index/route-map.json",
+    "total_endpoints": 604,
+    "action_routes": 451,
+    "rest_routes": 153
+  },
+  "rows": [
+    {
+      "key": "status",
+      "path": "?action=status",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "status",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_login",
+      "path": "?action=auth_login",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "login",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_mfa_verify",
+      "path": "?action=auth_mfa_verify",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "mfaVerify",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_enroll_verify",
+      "path": "?action=auth_enroll_verify",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "enrollVerify",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_logout",
+      "path": "?action=auth_logout",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "logout",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_create_api_key",
+      "path": "?action=auth_create_api_key",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "create",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_list_api_keys",
+      "path": "?action=auth_list_api_keys",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "list",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_revoke_api_key",
+      "path": "?action=auth_revoke_api_key",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "revoke",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "auth_generate_jwt",
+      "path": "?action=auth_generate_jwt",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "generateJwt",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_create",
+      "path": "?action=doc_create",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "create",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_save_draft",
+      "path": "?action=doc_save_draft",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "saveDraft",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_submit_review",
+      "path": "?action=doc_submit_review",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "submitReview",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_approve",
+      "path": "?action=doc_approve",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "approve",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_reject",
+      "path": "?action=doc_reject",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "reject",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_update_meta",
+      "path": "?action=doc_update_meta",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "updateMeta",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_delete_drafts",
+      "path": "?action=doc_delete_drafts",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "deleteDrafts",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_delete_version",
+      "path": "?action=doc_delete_version",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "deleteVersion",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_versions_list",
+      "path": "?action=doc_versions_list",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "listVersions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_start_new_revision",
+      "path": "?action=doc_start_new_revision",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "startNewRevision",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_stream",
+      "path": "?action=doc_stream",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "stream",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "docs_custom_list",
+      "path": "?action=docs_custom_list",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "listCustom",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "doc_descriptions_get",
+      "path": "?action=doc_descriptions_get",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "getDescriptions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "save_doc_description",
+      "path": "?action=save_doc_description",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "saveDescription",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "docs_visibility_get",
+      "path": "?action=docs_visibility_get",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "getVisibility",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_docs_visibility_save",
+      "path": "?action=admin_docs_visibility_save",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "saveVisibility",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "docs_snapshot",
+      "path": "?action=docs_snapshot",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "docsSnapshot",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "online_form_list",
+      "path": "?action=online_form_list",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "list",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "online_form_schema",
+      "path": "?action=online_form_schema",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "getSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "online_form_submit",
+      "path": "?action=online_form_submit",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "submit",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "online_form_entries",
+      "path": "?action=online_form_entries",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "getEntries",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "config_record_types",
+      "path": "?action=config_record_types",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "configRecordTypes",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "record_id_registry",
+      "path": "?action=record_id_registry",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "getIdRegistry",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "record_id_next",
+      "path": "?action=record_id_next",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "getNextId",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "record_id_peek",
+      "path": "?action=record_id_peek",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "peekNextId",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "form_version_stream",
+      "path": "?action=form_version_stream",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "streamVersion",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "form_upload_draft",
+      "path": "?action=form_upload_draft",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "uploadDraft",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "form_draft_save",
+      "path": "?action=form_draft_save",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "saveDraft",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "form_draft_get",
+      "path": "?action=form_draft_get",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "getDraft",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "form_draft_list",
+      "path": "?action=form_draft_list",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "listDrafts",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "scan_folders",
+      "path": "?action=scan_folders",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "scanFolders",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "create_folder",
+      "path": "?action=create_folder",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "createFolder",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "rename_folder",
+      "path": "?action=rename_folder",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "renameFolder",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "delete_folder",
+      "path": "?action=delete_folder",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "deleteFolder",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "move_doc",
+      "path": "?action=move_doc",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "moveDoc",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "delete_doc",
+      "path": "?action=delete_doc",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "deleteDoc",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "rename_doc",
+      "path": "?action=rename_doc",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "renameDoc",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "folder_descriptions",
+      "path": "?action=folder_descriptions",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "getFolderDescriptions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_users_list",
+      "path": "?action=admin_users_list",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "list",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "admin_user_upsert",
+      "path": "?action=admin_user_upsert",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "upsert",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "admin_user_delete",
+      "path": "?action=admin_user_delete",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "delete",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "admin_user_reset_password",
+      "path": "?action=admin_user_reset_password",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "resetPassword",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "role_perms_get",
+      "path": "?action=role_perms_get",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "getPermissions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "admin_role_perms_save",
+      "path": "?action=admin_role_perms_save",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "savePermissions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "admin_git_sync",
+      "path": "?action=admin_git_sync",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "gitSync",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_git_status",
+      "path": "?action=admin_git_status",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "gitStatus",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_git_pull",
+      "path": "?action=admin_git_pull",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "gitPull",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_git_discard_local",
+      "path": "?action=admin_git_discard_local",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "gitDiscardLocal",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_clear_site_cache",
+      "path": "?action=admin_clear_site_cache",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "clearCache",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "get_data_settings",
+      "path": "?action=get_data_settings",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getSettings",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "save_data_settings",
+      "path": "?action=save_data_settings",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "saveSettings",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_portal_display_config_get",
+      "path": "?action=admin_portal_display_config_get",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getPortalConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_portal_display_config_save",
+      "path": "?action=admin_portal_display_config_save",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "savePortalConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "module_access_get",
+      "path": "?action=module_access_get",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getModuleAccessConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_module_access_save",
+      "path": "?action=admin_module_access_save",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "saveModuleAccessConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_audit_trail_list",
+      "path": "?action=admin_audit_trail_list",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getAuditTrail",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "user_doc_overrides_get",
+      "path": "?action=user_doc_overrides_get",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getUserDocumentOverrides",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_user_doc_overrides_save",
+      "path": "?action=admin_user_doc_overrides_save",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "saveUserDocumentOverrides",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_mfa_settings_get",
+      "path": "?action=admin_mfa_settings_get",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getMfaSettings",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_mfa_settings_save",
+      "path": "?action=admin_mfa_settings_save",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "saveMfaSettings",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_metadata_studio_summary",
+      "path": "?action=admin_metadata_studio_summary",
+      "method": "POST",
+      "controller": "AdminMetadataStudioController",
+      "handler": "getSummary",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "admin_metadata_studio_detail",
+      "path": "?action=admin_metadata_studio_detail",
+      "method": "POST",
+      "controller": "AdminMetadataStudioController",
+      "handler": "getDetail",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "admin_metadata_studio_save",
+      "path": "?action=admin_metadata_studio_save",
+      "method": "POST",
+      "controller": "AdminMetadataStudioController",
+      "handler": "saveDetail",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "dict_list",
+      "path": "?action=dict_list",
+      "method": "POST",
+      "controller": "DictController",
+      "handler": "list",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dict_upsert",
+      "path": "?action=dict_upsert",
+      "method": "POST",
+      "controller": "DictController",
+      "handler": "upsert",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dict_delete",
+      "path": "?action=dict_delete",
+      "method": "POST",
+      "controller": "DictController",
+      "handler": "delete",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dashboard_executive",
+      "path": "?action=dashboard_executive",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "executive",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "dashboard_quality",
+      "path": "?action=dashboard_quality",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "quality",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "dashboard_production",
+      "path": "?action=dashboard_production",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "production",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "dashboard_supplier",
+      "path": "?action=dashboard_supplier",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "supplier",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "dashboard_department",
+      "path": "?action=dashboard_department",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "department",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "dashboard_widget",
+      "path": "?action=dashboard_widget",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "widget",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "kpi_get",
+      "path": "?action=kpi_get",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "kpiGet",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "kpi_trend",
+      "path": "?action=kpi_trend",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "kpiTrend",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "kpi_alerts",
+      "path": "?action=kpi_alerts",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "kpiAlerts",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "spc_capability",
+      "path": "?action=spc_capability",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "spcCapability",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "spc_chart",
+      "path": "?action=spc_chart",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "spcChart",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "spc_summary",
+      "path": "?action=spc_summary",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "spcSummary",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "spc_alerts",
+      "path": "?action=spc_alerts",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "spcAlerts",
+      "domain": "analytics",
+      "type": "action",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "vps_control_overview",
+      "path": "?action=vps_control_overview",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "overview",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_control_host",
+      "path": "?action=vps_control_host",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "host",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_control_action",
+      "path": "?action=vps_control_action",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "runAction",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_control_asset",
+      "path": "?action=vps_control_asset",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "asset",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_file_list",
+      "path": "?action=vps_file_list",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "fileList",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_file_search",
+      "path": "?action=vps_file_search",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "fileSearch",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_file_read",
+      "path": "?action=vps_file_read",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "fileRead",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_file_mutate",
+      "path": "?action=vps_file_mutate",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "fileMutate",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_file_upload",
+      "path": "?action=vps_file_upload",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "fileUpload",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_terminal_auth",
+      "path": "?action=vps_terminal_auth",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "terminalAuth",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "vps_observability_auth",
+      "path": "?action=vps_observability_auth",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "observabilityAuth",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "allocation_allocate",
+      "path": "?action=allocation_allocate",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "allocate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "allocation_history",
+      "path": "?action=allocation_history",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "getHistory",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "allocation_void",
+      "path": "?action=allocation_void",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "void",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_check_duplicate",
+      "path": "?action=record_id_check_duplicate",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "checkDuplicate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "upload_allocation_status",
+      "path": "?action=upload_allocation_status",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "getStatus",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_download_txt",
+      "path": "?action=record_id_download_txt",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "downloadTxt",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_types_expanded",
+      "path": "?action=record_id_types_expanded",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "getExpandedTypes",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_preview",
+      "path": "?action=record_id_preview",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "preview",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_generate",
+      "path": "?action=record_id_generate",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "allocate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_history",
+      "path": "?action=record_id_history",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "getHistory",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "record_id_void",
+      "path": "?action=record_id_void",
+      "method": "POST",
+      "controller": "AllocationController",
+      "handler": "void",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "AllocationService"
+      ]
+    },
+    {
+      "key": "order_so_list",
+      "path": "?action=order_so_list",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "listSalesOrders",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_so_detail",
+      "path": "?action=order_so_detail",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getSalesOrderDetail",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_so_create",
+      "path": "?action=order_so_create",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "createSalesOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_so_update",
+      "path": "?action=order_so_update",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "updateSalesOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_jo_list",
+      "path": "?action=order_jo_list",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "listJobOrders",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_jo_detail",
+      "path": "?action=order_jo_detail",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getJobOrderDetail",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_jo_create",
+      "path": "?action=order_jo_create",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "createJobOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_jo_update",
+      "path": "?action=order_jo_update",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "updateJobOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_wo_create",
+      "path": "?action=order_wo_create",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "createWorkOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_wo_update",
+      "path": "?action=order_wo_update",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "updateWorkOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_transition",
+      "path": "?action=order_transition",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "transition",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_contract_review",
+      "path": "?action=order_contract_review",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "contractReview",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_hold_set",
+      "path": "?action=order_hold_set",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "setHold",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_hold_release",
+      "path": "?action=order_hold_release",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "releaseHold",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_note_add",
+      "path": "?action=order_note_add",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "addNote",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_hierarchy",
+      "path": "?action=order_hierarchy",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getHierarchy",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_timeline",
+      "path": "?action=order_timeline",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getTimeline",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_dashboard_stats",
+      "path": "?action=order_dashboard_stats",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getDashboardStats",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_dashboard_kpi",
+      "path": "?action=order_dashboard_kpi",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getDashboardKpi",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_search",
+      "path": "?action=order_search",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "search",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_link_form",
+      "path": "?action=order_link_form",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "linkForm",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_shipment_gate",
+      "path": "?action=order_shipment_gate",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "checkShipmentReadiness",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_shipment_gate_override",
+      "path": "?action=order_shipment_gate_override",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "overrideShipmentGate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_shipment_gate_overrides",
+      "path": "?action=order_shipment_gate_overrides",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "listShipmentGateOverrides",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_schedule_get",
+      "path": "?action=order_schedule_get",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getSchedule",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_schedule_slot",
+      "path": "?action=order_schedule_slot",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "createScheduleSlot",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_schedule_update",
+      "path": "?action=order_schedule_update",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "updateScheduleSlot",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_capacity_heatmap",
+      "path": "?action=order_capacity_heatmap",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getCapacityHeatmap",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_promise_suggest",
+      "path": "?action=order_promise_suggest",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "suggestPromiseDate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "exception_dashboard",
+      "path": "?action=exception_dashboard",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "dashboard",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_list",
+      "path": "?action=exception_list",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "listAll",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_detail",
+      "path": "?action=exception_detail",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "detail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_complaint_create",
+      "path": "?action=exception_complaint_create",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "createComplaint",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_complaint_update",
+      "path": "?action=exception_complaint_update",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateComplaint",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_mrb_create",
+      "path": "?action=exception_mrb_create",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "createMrb",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_mrb_update",
+      "path": "?action=exception_mrb_update",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateMrb",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_deviation_create",
+      "path": "?action=exception_deviation_create",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "createDeviation",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_deviation_update",
+      "path": "?action=exception_deviation_update",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateDeviation",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_concession_create",
+      "path": "?action=exception_concession_create",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "createConcession",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_concession_update",
+      "path": "?action=exception_concession_update",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateConcession",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_transition",
+      "path": "?action=exception_transition",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "transition",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_copq_summary",
+      "path": "?action=exception_copq_summary",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "copqSummary",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_trends",
+      "path": "?action=exception_trends",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "trends",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "exception_escalate",
+      "path": "?action=exception_escalate",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "escalate",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "finance_period_close_list",
+      "path": "?action=finance_period_close_list",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "listPeriodCloses",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_period_close_create",
+      "path": "?action=finance_period_close_create",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "createPeriodClose",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_period_close_transition",
+      "path": "?action=finance_period_close_transition",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "transitionPeriodClose",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_backdate_exception_list",
+      "path": "?action=finance_backdate_exception_list",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "listBackdateExceptions",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_backdate_exception_create",
+      "path": "?action=finance_backdate_exception_create",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "createBackdateException",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_backdate_exception_transition",
+      "path": "?action=finance_backdate_exception_transition",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "transitionBackdateException",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_credit_memo_list",
+      "path": "?action=finance_credit_memo_list",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "listCreditMemos",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_credit_memo_create",
+      "path": "?action=finance_credit_memo_create",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "createCreditMemo",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_debit_memo_list",
+      "path": "?action=finance_debit_memo_list",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "listDebitMemos",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "finance_debit_memo_create",
+      "path": "?action=finance_debit_memo_create",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "createDebitMemo",
+      "domain": "finance",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "customer_purchase_order_list",
+      "path": "?action=customer_purchase_order_list",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "listPurchaseOrders",
+      "domain": "unknown",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "customer_purchase_order_detail",
+      "path": "?action=customer_purchase_order_detail",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "getPurchaseOrder",
+      "domain": "unknown",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "customer_purchase_order_create",
+      "path": "?action=customer_purchase_order_create",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "createPurchaseOrder",
+      "domain": "unknown",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "customer_purchase_order_transition",
+      "path": "?action=customer_purchase_order_transition",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "transitionPurchaseOrder",
+      "domain": "unknown",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "supplier_dashboard",
+      "path": "?action=supplier_dashboard",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "dashboard",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scorecard_list",
+      "path": "?action=supplier_scorecard_list",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "listScorecards",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scorecard_detail",
+      "path": "?action=supplier_scorecard_detail",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "scorecardDetail",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scorecard_calc",
+      "path": "?action=supplier_scorecard_calc",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "calculateScorecard",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_incoming_list",
+      "path": "?action=supplier_incoming_list",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "listIncoming",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_incoming_create",
+      "path": "?action=supplier_incoming_create",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "createIncoming",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_incoming_update",
+      "path": "?action=supplier_incoming_update",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "updateIncoming",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_skip_lot_status",
+      "path": "?action=supplier_skip_lot_status",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "skipLotStatus",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_skip_lot_update",
+      "path": "?action=supplier_skip_lot_update",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "updateSkipLot",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_asl_list",
+      "path": "?action=supplier_asl_list",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "listAsl",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_asl_upsert",
+      "path": "?action=supplier_asl_upsert",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "upsertAsl",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scar_list",
+      "path": "?action=supplier_scar_list",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "listScar",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scar_create",
+      "path": "?action=supplier_scar_create",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "createScar",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scar_update",
+      "path": "?action=supplier_scar_update",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "updateScar",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_scar_transition",
+      "path": "?action=supplier_scar_transition",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "scarTransition",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_audit_list",
+      "path": "?action=supplier_audit_list",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "listAudits",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_audit_upsert",
+      "path": "?action=supplier_audit_upsert",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "upsertAudit",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "quote_list",
+      "path": "?action=quote_list",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "listQuotes",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_detail",
+      "path": "?action=quote_detail",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "detail",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_create",
+      "path": "?action=quote_create",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "create",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_update",
+      "path": "?action=quote_update",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "update",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_transition",
+      "path": "?action=quote_transition",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "transition",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_convert_to_so",
+      "path": "?action=quote_convert_to_so",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "convertToSo",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_estimate_cycle",
+      "path": "?action=quote_estimate_cycle",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "estimateCycleTime",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_estimate_material",
+      "path": "?action=quote_estimate_material",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "estimateMaterial",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_dashboard",
+      "path": "?action=quote_dashboard",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "dashboard",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "evidence_list",
+      "path": "?action=evidence_list",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "listEvidence",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_detail",
+      "path": "?action=evidence_detail",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "detail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_upload",
+      "path": "?action=evidence_upload",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "upload",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_link",
+      "path": "?action=evidence_link",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "link",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_chain_custody",
+      "path": "?action=evidence_chain_custody",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "chainOfCustody",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_verify_chain",
+      "path": "?action=evidence_verify_chain",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "verifyChain",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "evidence_search",
+      "path": "?action=evidence_search",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "search",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "fmea_list",
+      "path": "?action=fmea_list",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "listFmeas",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_detail",
+      "path": "?action=fmea_detail",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "getFmeaDetail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_create",
+      "path": "?action=fmea_create",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "createFmea",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_update",
+      "path": "?action=fmea_update",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "updateFmea",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_add_failure_mode",
+      "path": "?action=fmea_add_failure_mode",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "addFailureMode",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_update_failure_mode",
+      "path": "?action=fmea_update_failure_mode",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "updateFailureMode",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_add_action",
+      "path": "?action=fmea_add_action",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "addAction",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_complete_action",
+      "path": "?action=fmea_complete_action",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "completeAction",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_generate_cp",
+      "path": "?action=fmea_generate_cp",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "generateControlPlan",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_control_plans",
+      "path": "?action=fmea_control_plans",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "listControlPlans",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_cp_detail",
+      "path": "?action=fmea_cp_detail",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "getControlPlanDetail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_rpn_trend",
+      "path": "?action=fmea_rpn_trend",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "getRpnTrend",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "fmea_link_ncr",
+      "path": "?action=fmea_link_ncr",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "linkNcrToFmea",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "apqp_list",
+      "path": "?action=apqp_list",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "listProjects",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_detail",
+      "path": "?action=apqp_detail",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "getProjectDetail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_create",
+      "path": "?action=apqp_create",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "createProject",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_update",
+      "path": "?action=apqp_update",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "updateProject",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_advance_phase",
+      "path": "?action=apqp_advance_phase",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "advancePhase",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_gate_review",
+      "path": "?action=apqp_gate_review",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "submitGateReview",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_gate_approve",
+      "path": "?action=apqp_gate_approve",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "approveGate",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_gate_reject",
+      "path": "?action=apqp_gate_reject",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "rejectGate",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_ppap_create",
+      "path": "?action=apqp_ppap_create",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "createPpapSubmission",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_ppap_element",
+      "path": "?action=apqp_ppap_element",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "updatePpapElement",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_ppap_response",
+      "path": "?action=apqp_ppap_response",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "recordCustomerResponse",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_deliverables",
+      "path": "?action=apqp_deliverables",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "getPhaseDeliverables",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "apqp_dashboard",
+      "path": "?action=apqp_dashboard",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "getDashboard",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "mobile_my_queue",
+      "path": "?action=mobile_my_queue",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getMyQueue",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_start_task",
+      "path": "?action=mobile_start_task",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "startTask",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_complete_task",
+      "path": "?action=mobile_complete_task",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "completeTask",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_clock_in",
+      "path": "?action=mobile_clock_in",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "clockIn",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_clock_out",
+      "path": "?action=mobile_clock_out",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "clockOut",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_capture_inspection",
+      "path": "?action=mobile_capture_inspection",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "captureInspection",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_sync_batch",
+      "path": "?action=mobile_sync_batch",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "submitOfflineBatch",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_sync_status",
+      "path": "?action=mobile_sync_status",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getSyncStatus",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_resolve_conflict",
+      "path": "?action=mobile_resolve_conflict",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "resolveConflict",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_shop_overview",
+      "path": "?action=mobile_shop_overview",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getShopFloorOverview",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_dashboard",
+      "path": "?action=mobile_dashboard",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getOperatorDashboard",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "master_data_list",
+      "path": "?action=master_data_list",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listRecords",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_detail",
+      "path": "?action=master_data_detail",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "getDetail",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_create",
+      "path": "?action=master_data_create",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "createRecord",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_update",
+      "path": "?action=master_data_update",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "updateRecord",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_delete",
+      "path": "?action=master_data_delete",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "deleteRecord",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_status",
+      "path": "?action=master_data_status",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "changeStatus",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_history",
+      "path": "?action=master_data_history",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "getHistory",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_entities",
+      "path": "?action=master_data_entities",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listEntities",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "master_data_snapshot",
+      "path": "?action=master_data_snapshot",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listRecords",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_list",
+      "path": "?action=shift_list",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listShifts",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_save",
+      "path": "?action=shift_save",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "saveShift",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_assignments",
+      "path": "?action=shift_assignments",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listShiftAssignments",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_assign",
+      "path": "?action=shift_assign",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "saveShiftAssignment",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_holidays",
+      "path": "?action=shift_holidays",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "listHolidays",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "shift_holiday_save",
+      "path": "?action=shift_holiday_save",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "saveHoliday",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "dispatch_timeline",
+      "path": "?action=dispatch_timeline",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "getTimeline",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_dashboard",
+      "path": "?action=dispatch_dashboard",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "getDashboard",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_list_targets",
+      "path": "?action=dispatch_list_targets",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "listTargets",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_create_target",
+      "path": "?action=dispatch_create_target",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "createTarget",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_update_target",
+      "path": "?action=dispatch_update_target",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "updateTarget",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_send",
+      "path": "?action=dispatch_send",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "dispatchTarget",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_operator_tasks",
+      "path": "?action=dispatch_operator_tasks",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "getOperatorDispatch",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "dispatch_report_production",
+      "path": "?action=dispatch_report_production",
+      "method": "POST",
+      "controller": "DispatchController",
+      "handler": "reportProduction",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "subcontract_list",
+      "path": "?action=subcontract_list",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "subcontract_list",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "subcontract_create",
+      "path": "?action=subcontract_create",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "subcontract_create",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "subcontract_update",
+      "path": "?action=subcontract_update",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "subcontract_update",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "subcontract_receive",
+      "path": "?action=subcontract_receive",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "subcontract_receive",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "oqc_list",
+      "path": "?action=oqc_list",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "oqc_list",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "oqc_create",
+      "path": "?action=oqc_create",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "oqc_create",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "oqc_update",
+      "path": "?action=oqc_update",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "oqc_update",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "packing_list",
+      "path": "?action=packing_list",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "packing_list",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "packing_create",
+      "path": "?action=packing_create",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "packing_create",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "packing_update",
+      "path": "?action=packing_update",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "packing_update",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "delivery_confirm",
+      "path": "?action=delivery_confirm",
+      "method": "POST",
+      "controller": "LogisticsController",
+      "handler": "delivery_confirm",
+      "domain": "inventory_logistics",
+      "type": "action",
+      "services": [
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "cnc_program_list",
+      "path": "?action=cnc_program_list",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "listPrograms",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_detail",
+      "path": "?action=cnc_program_detail",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "getDetail",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_create",
+      "path": "?action=cnc_program_create",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "create",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_update",
+      "path": "?action=cnc_program_update",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "update",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_upload_version",
+      "path": "?action=cnc_program_upload_version",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "addVersion",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_approve",
+      "path": "?action=cnc_program_approve",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "approve",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_setup_sheets",
+      "path": "?action=cnc_program_setup_sheets",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "listSetupSheets",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_setup_create",
+      "path": "?action=cnc_program_setup_create",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "createSetupSheet",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_list",
+      "path": "?action=product_passport_list",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "listPassports",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_detail",
+      "path": "?action=product_passport_detail",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "getDetail",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_create",
+      "path": "?action=product_passport_create",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "create",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_add_event",
+      "path": "?action=product_passport_add_event",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "addEvent",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_trace",
+      "path": "?action=product_passport_trace",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "trace",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_qr",
+      "path": "?action=product_passport_qr",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "getQrData",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_prediction_list",
+      "path": "?action=ai_prediction_list",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "listPredictions",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_prediction_acknowledge",
+      "path": "?action=ai_prediction_acknowledge",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "acknowledgePrediction",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_prediction_resolve",
+      "path": "?action=ai_prediction_resolve",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "resolvePrediction",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_spc_anomalies",
+      "path": "?action=ai_spc_anomalies",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getSpcAnomalies",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_tool_wear",
+      "path": "?action=ai_tool_wear",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getToolWearPredictions",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_dashboard",
+      "path": "?action=ai_dashboard",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getDashboard",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_get",
+      "path": "?action=schedule_get",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getSchedule",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_slot_create",
+      "path": "?action=schedule_slot_create",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "createSlot",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_slot_update",
+      "path": "?action=schedule_slot_update",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "updateSlot",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_conflicts",
+      "path": "?action=schedule_conflicts",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getConflicts",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_capacity",
+      "path": "?action=schedule_capacity",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getCapacityHeatmap",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_promise",
+      "path": "?action=schedule_promise",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "suggestPromiseDate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_users",
+      "path": "?action=customer_portal_users",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "listUsers",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_user_create",
+      "path": "?action=customer_portal_user_create",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "createUser",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_user_update",
+      "path": "?action=customer_portal_user_update",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "updateUser",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_access_list",
+      "path": "?action=customer_portal_access_list",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "listAccessGrants",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_access_grant",
+      "path": "?action=customer_portal_access_grant",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "grantAccess",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_access_revoke",
+      "path": "?action=customer_portal_access_revoke",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "revokeAccess",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_complaints",
+      "path": "?action=customer_portal_complaints",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "listComplaints",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_documents",
+      "path": "?action=customer_portal_documents",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "listDocAccess",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_analytics",
+      "path": "?action=customer_portal_analytics",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "getAnalytics",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "compliance_report_types",
+      "path": "?action=compliance_report_types",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "listReportTypes",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_generate",
+      "path": "?action=compliance_report_generate",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "generateReport",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_history",
+      "path": "?action=compliance_report_history",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getHistory",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_management_review",
+      "path": "?action=compliance_report_management_review",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getManagementReviewData",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_customer_quality",
+      "path": "?action=compliance_report_customer_quality",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getCustomerQualityData",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_supplier_review",
+      "path": "?action=compliance_report_supplier_review",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getSupplierReviewData",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_copq",
+      "path": "?action=compliance_report_copq",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getCopqData",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "compliance_report_evidence_package",
+      "path": "?action=compliance_report_evidence_package",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "getEvidencePackage",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "knowledge_list",
+      "path": "?action=knowledge_list",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "listTips",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "knowledge_detail",
+      "path": "?action=knowledge_detail",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "getDetail",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "knowledge_create",
+      "path": "?action=knowledge_create",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "create",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "knowledge_update",
+      "path": "?action=knowledge_update",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "update",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "knowledge_vote",
+      "path": "?action=knowledge_vote",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "vote",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "knowledge_comment",
+      "path": "?action=knowledge_comment",
+      "method": "POST",
+      "controller": "KnowledgeController",
+      "handler": "addComment",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_dashboard",
+      "path": "?action=ci_dashboard",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "dashboard",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_suggestion_list",
+      "path": "?action=ci_suggestion_list",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "listSuggestions",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_suggestion_create",
+      "path": "?action=ci_suggestion_create",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "createSuggestion",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_project_list",
+      "path": "?action=ci_project_list",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "listProjects",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_project_create",
+      "path": "?action=ci_project_create",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "createProject",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_project_update",
+      "path": "?action=ci_project_update",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "updateProject",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_project_transition",
+      "path": "?action=ci_project_transition",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "transitionProject",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ci_roi_summary",
+      "path": "?action=ci_roi_summary",
+      "method": "POST",
+      "controller": "CiController",
+      "handler": "getRoiSummary",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "energy_overview",
+      "path": "?action=energy_overview",
+      "method": "POST",
+      "controller": "EnergyController",
+      "handler": "getOverview",
+      "domain": "maintenance_ehs",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "energy_machine_detail",
+      "path": "?action=energy_machine_detail",
+      "method": "POST",
+      "controller": "EnergyController",
+      "handler": "getMachineDetail",
+      "domain": "maintenance_ehs",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "energy_per_part",
+      "path": "?action=energy_per_part",
+      "method": "POST",
+      "controller": "EnergyController",
+      "handler": "getPerPartEnergy",
+      "domain": "maintenance_ehs",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "energy_cost_trend",
+      "path": "?action=energy_cost_trend",
+      "method": "POST",
+      "controller": "EnergyController",
+      "handler": "getCostTrend",
+      "domain": "maintenance_ehs",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "module_schema_list",
+      "path": "?action=module_schema_list",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "listSchemas",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "module_schema_get",
+      "path": "?action=module_schema_get",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "getSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "module_schema_save",
+      "path": "?action=module_schema_save",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "saveSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "module_schema_delete",
+      "path": "?action=module_schema_delete",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "deleteSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "module_schema_reset",
+      "path": "?action=module_schema_reset",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "resetSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "module_api_catalog",
+      "path": "?action=module_api_catalog",
+      "method": "POST",
+      "controller": "ModuleSchemaController",
+      "handler": "apiCatalog",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "schema_studio_list",
+      "path": "?action=schema_studio_list",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "listDesigns",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_get",
+      "path": "?action=schema_studio_get",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getDesign",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_save",
+      "path": "?action=schema_studio_save",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "saveDesign",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_delete",
+      "path": "?action=schema_studio_delete",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "deleteDesign",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_set_baseline",
+      "path": "?action=schema_studio_set_baseline",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "setBaseline",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_reverse_engineer",
+      "path": "?action=schema_studio_reverse_engineer",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "reverseEngineer",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_load_registry",
+      "path": "?action=schema_studio_load_registry",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "loadFromRegistry",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_validate",
+      "path": "?action=schema_studio_validate",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "validateSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_apply_migration",
+      "path": "?action=schema_studio_apply_migration",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "applyMigration",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_table_preview",
+      "path": "?action=schema_studio_table_preview",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "previewTableData",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_table_row_save",
+      "path": "?action=schema_studio_table_row_save",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "saveTableRow",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_list_releases",
+      "path": "?action=schema_studio_list_releases",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "listReleaseBundles",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_compile_registry",
+      "path": "?action=schema_studio_compile_registry",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "compileRegistryBundle",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_release_bundle",
+      "path": "?action=schema_studio_release_bundle",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "createReleaseBundle",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_diagnose",
+      "path": "?action=schema_studio_diagnose",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "diagnoseSchema",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_operations_report",
+      "path": "?action=schema_studio_operations_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getOperationsReport",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_command_center_report",
+      "path": "?action=schema_studio_command_center_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getCommandCenterReport",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round6_report",
+      "path": "?action=schema_studio_round6_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound6Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round7_report",
+      "path": "?action=schema_studio_round7_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound7Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round9_report",
+      "path": "?action=schema_studio_round9_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound9Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round10_report",
+      "path": "?action=schema_studio_round10_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound10Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round11_report",
+      "path": "?action=schema_studio_round11_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound11Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_round12_report",
+      "path": "?action=schema_studio_round12_report",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "getRound12Report",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "schema_studio_export",
+      "path": "?action=schema_studio_export",
+      "method": "POST",
+      "controller": "SchemaStudioController",
+      "handler": "export",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "DataSchemaService"
+      ]
+    },
+    {
+      "key": "registry_data_fields",
+      "path": "?action=registry_data_fields",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getDataFields",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_api_params",
+      "path": "?action=registry_api_params",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getApiParams",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_field_types",
+      "path": "?action=registry_field_types",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getFieldTypes",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_status_options",
+      "path": "?action=registry_status_options",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getStatusOptions",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_computed_formulas",
+      "path": "?action=registry_computed_formulas",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getComputedFormulas",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_validation_rules",
+      "path": "?action=registry_validation_rules",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getValidationRules",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_workflow_library",
+      "path": "?action=registry_workflow_library",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getWorkflowLibrary",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_domain_field_packs",
+      "path": "?action=registry_domain_field_packs",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getDomainFieldPacks",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_relation_map",
+      "path": "?action=registry_relation_map",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getRelationMap",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_endpoint_catalog",
+      "path": "?action=registry_endpoint_catalog",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getEndpointCatalog",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_table_registry",
+      "path": "?action=registry_table_registry",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getTableRegistry",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_manifest",
+      "path": "?action=registry_manifest",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getRegistryManifest",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_compliance_crosswalk",
+      "path": "?action=registry_compliance_crosswalk",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getComplianceCrosswalk",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_global_capability_audit",
+      "path": "?action=registry_global_capability_audit",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getGlobalCapabilityAudit",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_system_contract",
+      "path": "?action=registry_system_contract",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getSystemContract",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_iot_connectors",
+      "path": "?action=registry_iot_connectors",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getIotConnectors",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_full",
+      "path": "?action=registry_full",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "getFull",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "registry_update",
+      "path": "?action=registry_update",
+      "method": "POST",
+      "controller": "RegistryController",
+      "handler": "updateRegistry",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "admin_design_config",
+      "path": "?action=admin_design_config",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "getDesignConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "admin_design_config_save",
+      "path": "?action=admin_design_config_save",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "saveDesignConfig",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "registerOrganizationNode",
+      "path": "?action=registerOrganizationNode",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerOrganizationNode",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "amendOrganizationNode",
+      "path": "?action=amendOrganizationNode",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "amendOrganizationNode",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "reparentOrganizationNode",
+      "path": "?action=reparentOrganizationNode",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "reparentOrganizationNode",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "deactivateOrganizationNode",
+      "path": "?action=deactivateOrganizationNode",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "deactivateOrganizationNode",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "registerParty",
+      "path": "?action=registerParty",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerParty",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "amendPartyIdentity",
+      "path": "?action=amendPartyIdentity",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "amendPartyIdentity",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "assignPartyRole",
+      "path": "?action=assignPartyRole",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "assignPartyRole",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "registerPartySite",
+      "path": "?action=registerPartySite",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerPartySite",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "registerPartyContact",
+      "path": "?action=registerPartyContact",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerPartyContact",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "registerCalendar",
+      "path": "?action=registerCalendar",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerCalendar",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "registerShift",
+      "path": "?action=registerShift",
+      "method": "POST",
+      "controller": "MasterDataController",
+      "handler": "registerShiftEntry",
+      "domain": "master_data",
+      "type": "action",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "requestApproval",
+      "path": "?action=requestApproval",
+      "method": "POST",
+      "controller": "ApprovalGroupController",
+      "handler": "requestApproval",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "ApprovalGroupService"
+      ]
+    },
+    {
+      "key": ".list",
+      "path": "?action=.list",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "listRecords",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": ".create",
+      "path": "?action=.create",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "createRecord",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": ".detail",
+      "path": "?action=.detail",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "getDetail",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": ".update",
+      "path": "?action=.update",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "updateRecord",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": ".delete",
+      "path": "?action=.delete",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "deleteRecord",
+      "domain": "core_infrastructure",
+      "type": "action",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "quality_exception_list",
+      "path": "?action=quality_exception_list",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "listAll",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_kpi",
+      "path": "?action=quality_exception_kpi",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "dashboard",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_copq",
+      "path": "?action=quality_exception_copq",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "copqSummary",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_trends",
+      "path": "?action=quality_exception_trends",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "trends",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_create",
+      "path": "?action=quality_exception_create",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "createComplaint",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_transition",
+      "path": "?action=quality_exception_transition",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "transition",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_save_8d",
+      "path": "?action=quality_exception_save_8d",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateComplaint",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "quality_exception_mrb_disposition",
+      "path": "?action=quality_exception_mrb_disposition",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "updateMrb",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "supplier_quality_data",
+      "path": "?action=supplier_quality_data",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "dashboard",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_asl_create",
+      "path": "?action=supplier_asl_create",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "upsertAsl",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_asl_suspend",
+      "path": "?action=supplier_asl_suspend",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "upsertAsl",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_audit_create",
+      "path": "?action=supplier_audit_create",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "upsertAudit",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "supplier_incoming_disposition",
+      "path": "?action=supplier_incoming_disposition",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "updateIncoming",
+      "domain": "procurement_supplier_quality",
+      "type": "action",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "quote_kpi",
+      "path": "?action=quote_kpi",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "dashboard",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "quote_save",
+      "path": "?action=quote_save",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "create",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "customer_portal_data",
+      "path": "?action=customer_portal_data",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "getAdminData",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_grant_access",
+      "path": "?action=customer_portal_grant_access",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "grantAccess",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_revoke_access",
+      "path": "?action=customer_portal_revoke_access",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "revokeAccess",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_complaint_update",
+      "path": "?action=customer_portal_complaint_update",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "updateComplaintStatus",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_resend_verification",
+      "path": "?action=customer_portal_resend_verification",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "resendVerification",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "customer_portal_revoke_doc",
+      "path": "?action=customer_portal_revoke_doc",
+      "method": "POST",
+      "controller": "CustomerPortalController",
+      "handler": "revokeDocument",
+      "domain": "commercial_customer",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_data",
+      "path": "?action=cnc_program_data",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "listPrograms",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_program_compare",
+      "path": "?action=cnc_program_compare",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "getDetail",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "cnc_setup_sheet_create",
+      "path": "?action=cnc_setup_sheet_create",
+      "method": "POST",
+      "controller": "CncProgramController",
+      "handler": "createSetupSheet",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_data",
+      "path": "?action=product_passport_data",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "listPassports",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "product_passport_transition",
+      "path": "?action=product_passport_transition",
+      "method": "POST",
+      "controller": "ProductPassportController",
+      "handler": "addEvent",
+      "domain": "traceability_serialization",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_quality_scheduling_data",
+      "path": "?action=ai_quality_scheduling_data",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getDashboard",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "ai_prediction_false_positive",
+      "path": "?action=ai_prediction_false_positive",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "resolvePrediction",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_promise_calculate",
+      "path": "?action=schedule_promise_calculate",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "suggestPromiseDate",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_slot_breakdown",
+      "path": "?action=schedule_slot_breakdown",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getSchedule",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "schedule_slot_detail",
+      "path": "?action=schedule_slot_detail",
+      "method": "POST",
+      "controller": "AiSchedulingController",
+      "handler": "getSchedule",
+      "domain": "planning_production",
+      "type": "action",
+      "services": []
+    },
+    {
+      "key": "compliance_report_list",
+      "path": "?action=compliance_report_list",
+      "method": "POST",
+      "controller": "ComplianceReportController",
+      "handler": "listReportTypes",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "GenericCrudService"
+      ]
+    },
+    {
+      "key": "fmea_save",
+      "path": "?action=fmea_save",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "createFmea",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "cp_detail",
+      "path": "?action=cp_detail",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "getControlPlanDetail",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "cp_add_characteristic",
+      "path": "?action=cp_add_characteristic",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "updateFmea",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "cp_auto_generate",
+      "path": "?action=cp_auto_generate",
+      "method": "POST",
+      "controller": "FmeaController",
+      "handler": "generateControlPlan",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "FmeaService"
+      ]
+    },
+    {
+      "key": "apqp_toggle_deliverable",
+      "path": "?action=apqp_toggle_deliverable",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "submitGateReview",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "ppap_create",
+      "path": "?action=ppap_create",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "createPpapSubmission",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "ppap_update_element",
+      "path": "?action=ppap_update_element",
+      "method": "POST",
+      "controller": "ApqpController",
+      "handler": "updatePpapElement",
+      "domain": "quality_improvement",
+      "type": "action",
+      "services": [
+        "ApqpPpapService"
+      ]
+    },
+    {
+      "key": "mobile_queue",
+      "path": "?action=mobile_queue",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getMyQueue",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_create_ncr",
+      "path": "?action=mobile_create_ncr",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "captureInspection",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_inspection_plan",
+      "path": "?action=mobile_inspection_plan",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "getMyQueue",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_submit_first_piece",
+      "path": "?action=mobile_submit_first_piece",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "captureInspection",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_submit_inprocess",
+      "path": "?action=mobile_submit_inprocess",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "captureInspection",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "mobile_sync",
+      "path": "?action=mobile_sync",
+      "method": "POST",
+      "controller": "MobileController",
+      "handler": "submitOfflineBatch",
+      "domain": "mes_execution",
+      "type": "action",
+      "services": [
+        "MobileWorkQueueService"
+      ]
+    },
+    {
+      "key": "order_detail",
+      "path": "?action=order_detail",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getSalesOrderDetail",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_update_fields",
+      "path": "?action=order_update_fields",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "updateSalesOrder",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_so_update_status",
+      "path": "?action=order_so_update_status",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "transition",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_jo_update_status",
+      "path": "?action=order_jo_update_status",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "transition",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_wo_update_status",
+      "path": "?action=order_wo_update_status",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "transition",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "order_get_linked_forms",
+      "path": "?action=order_get_linked_forms",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "getHierarchy",
+      "domain": "planning_production",
+      "type": "action",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/auth/api-keys",
+      "path": "/api/auth/api-keys",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/api-keys",
+      "path": "/api/auth/api-keys",
+      "method": "GET",
+      "controller": "ApiKeyController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/api-keys/{keyId}",
+      "path": "/api/auth/api-keys/{keyId}",
+      "method": "DELETE",
+      "controller": "ApiKeyController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/jwt",
+      "path": "/api/auth/jwt",
+      "method": "POST",
+      "controller": "ApiKeyController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/events/stream",
+      "path": "/api/events/stream",
+      "method": "GET",
+      "controller": "EventStreamController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/health/live",
+      "path": "/api/health/live",
+      "method": "GET",
+      "controller": "HealthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "CacheService",
+        "QueueService"
+      ]
+    },
+    {
+      "key": "/api/health/ready",
+      "path": "/api/health/ready",
+      "method": "GET",
+      "controller": "HealthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "CacheService",
+        "QueueService"
+      ]
+    },
+    {
+      "key": "/api/health/status",
+      "path": "/api/health/status",
+      "method": "GET",
+      "controller": "HealthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "CacheService",
+        "QueueService"
+      ]
+    },
+    {
+      "key": "/api/documents",
+      "path": "/api/documents",
+      "method": "GET",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/documents",
+      "path": "/api/documents",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/documents/{code}/versions",
+      "path": "/api/documents/{code}/versions",
+      "method": "GET",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/documents/stream",
+      "path": "/api/documents/stream",
+      "method": "GET",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/documents/visibility",
+      "path": "/api/documents/visibility",
+      "method": "GET",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms",
+      "path": "/api/forms",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/{code}/schema",
+      "path": "/api/forms/{code}/schema",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/{code}/entries",
+      "path": "/api/forms/{code}/entries",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/{code}/entries",
+      "path": "/api/forms/{code}/entries",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/records/registry",
+      "path": "/api/records/registry",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/records/next-id",
+      "path": "/api/records/next-id",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/users",
+      "path": "/api/users",
+      "method": "GET",
+      "controller": "UserController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "/api/users",
+      "path": "/api/users",
+      "method": "POST",
+      "controller": "UserController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "AuthUserShadowSyncService"
+      ]
+    },
+    {
+      "key": "/api/auth/status",
+      "path": "/api/auth/status",
+      "method": "GET",
+      "controller": "AuthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/login",
+      "path": "/api/auth/login",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/mfa",
+      "path": "/api/auth/mfa",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/enroll",
+      "path": "/api/auth/enroll",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/auth/logout",
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "controller": "AuthController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/dictionary",
+      "path": "/api/dictionary",
+      "method": "GET",
+      "controller": "DictController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/dictionary",
+      "path": "/api/dictionary",
+      "method": "POST",
+      "controller": "DictController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/dictionary",
+      "path": "/api/dictionary",
+      "method": "DELETE",
+      "controller": "DictController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/meta/catalog",
+      "path": "/api/meta/catalog",
+      "method": "GET",
+      "controller": "ModuleSchemaController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/system/contracts",
+      "path": "/api/system/contracts",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/table-registry",
+      "path": "/api/registry/table-registry",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/endpoint-catalog",
+      "path": "/api/registry/endpoint-catalog",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/workflow-library",
+      "path": "/api/registry/workflow-library",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/status-options",
+      "path": "/api/registry/status-options",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/relation-map",
+      "path": "/api/registry/relation-map",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/compliance-crosswalk",
+      "path": "/api/registry/compliance-crosswalk",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/global-capability-audit",
+      "path": "/api/registry/global-capability-audit",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/registry/manifest",
+      "path": "/api/registry/manifest",
+      "method": "GET",
+      "controller": "RegistryController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "RegistryService"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}",
+      "path": "/api/runtime/{domain}/{table}",
+      "method": "GET",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}/{id}",
+      "path": "/api/runtime/{domain}/{table}/{id}",
+      "method": "GET",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}",
+      "path": "/api/runtime/{domain}/{table}",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}/{id}",
+      "path": "/api/runtime/{domain}/{table}/{id}",
+      "method": "PUT",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}/{id}",
+      "path": "/api/runtime/{domain}/{table}/{id}",
+      "method": "DELETE",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/runtime/{domain}/{table}/{id}/transition",
+      "path": "/api/runtime/{domain}/{table}/{id}/transition",
+      "method": "POST",
+      "controller": "GenericCrudController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "GenericCrudService",
+        "IdempotencyService",
+        "WorkflowBridgeRequiredException"
+      ]
+    },
+    {
+      "key": "/api/v1/foundation/organizations",
+      "path": "/api/v1/foundation/organizations",
+      "method": "GET",
+      "controller": "MasterDataController",
+      "handler": "",
+      "domain": "master_data",
+      "type": "rest",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "/api/v1/foundation/parties",
+      "path": "/api/v1/foundation/parties",
+      "method": "GET",
+      "controller": "MasterDataController",
+      "handler": "",
+      "domain": "master_data",
+      "type": "rest",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "/api/v1/foundation/calendars",
+      "path": "/api/v1/foundation/calendars",
+      "method": "GET",
+      "controller": "MasterDataController",
+      "handler": "",
+      "domain": "master_data",
+      "type": "rest",
+      "services": [
+        "MasterDataService",
+        "FoundationGovernanceService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/approval-groups",
+      "path": "/api/v1/governance/approval-groups",
+      "method": "GET",
+      "controller": "ApprovalGroupController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "ApprovalGroupService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/approval-groups/{approvalGroupId}",
+      "path": "/api/v1/governance/approval-groups/{approvalGroupId}",
+      "method": "GET",
+      "controller": "ApprovalGroupController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "ApprovalGroupService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/approval-groups/{approvalGroupId}:decide",
+      "path": "/api/v1/governance/approval-groups/{approvalGroupId}:decide",
+      "method": "POST",
+      "controller": "ApprovalGroupController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "ApprovalGroupService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/approval-groups/{approvalGroupId}/timeline",
+      "path": "/api/v1/governance/approval-groups/{approvalGroupId}/timeline",
+      "method": "GET",
+      "controller": "ApprovalGroupController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "ApprovalGroupService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/approval-groups/{approvalGroupId}/attachments",
+      "path": "/api/v1/governance/approval-groups/{approvalGroupId}/attachments",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/attachments/{attachmentId}",
+      "path": "/api/v1/governance/attachments/{attachmentId}",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/attachments",
+      "path": "/api/v1/governance/attachments",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/override-controls",
+      "path": "/api/v1/governance/override-controls",
+      "method": "GET",
+      "controller": "OperationalOverrideController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "OperationalOverrideService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/override-controls/{overrideId}",
+      "path": "/api/v1/governance/override-controls/{overrideId}",
+      "method": "GET",
+      "controller": "OperationalOverrideController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "OperationalOverrideService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/override-controls",
+      "path": "/api/v1/governance/override-controls",
+      "method": "POST",
+      "controller": "OperationalOverrideController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "OperationalOverrideService"
+      ]
+    },
+    {
+      "key": "/api/v1/governance/override-controls/{overrideId}:transition",
+      "path": "/api/v1/governance/override-controls/{overrideId}:transition",
+      "method": "POST",
+      "controller": "OperationalOverrideController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "OperationalOverrideService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/period-closes",
+      "path": "/api/v1/finance/period-closes",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/period-closes/{periodCloseId}",
+      "path": "/api/v1/finance/period-closes/{periodCloseId}",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/period-closes",
+      "path": "/api/v1/finance/period-closes",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/period-closes/{periodCloseId}:transition",
+      "path": "/api/v1/finance/period-closes/{periodCloseId}:transition",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/backdate-exceptions",
+      "path": "/api/v1/finance/backdate-exceptions",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}",
+      "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/backdate-exceptions",
+      "path": "/api/v1/finance/backdate-exceptions",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
+      "path": "/api/v1/finance/backdate-exceptions/{backdateExceptionId}:transition",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/credit-memos",
+      "path": "/api/v1/finance/credit-memos",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/credit-memos/{creditMemoId}",
+      "path": "/api/v1/finance/credit-memos/{creditMemoId}",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/credit-memos",
+      "path": "/api/v1/finance/credit-memos",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/debit-memos",
+      "path": "/api/v1/finance/debit-memos",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/debit-memos/{debitMemoId}",
+      "path": "/api/v1/finance/debit-memos/{debitMemoId}",
+      "method": "GET",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/finance/debit-memos",
+      "path": "/api/v1/finance/debit-memos",
+      "method": "POST",
+      "controller": "FinanceController",
+      "handler": "",
+      "domain": "finance",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "FinanceControlService"
+      ]
+    },
+    {
+      "key": "/api/v1/commercial/customer-purchase-orders",
+      "path": "/api/v1/commercial/customer-purchase-orders",
+      "method": "GET",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "",
+      "domain": "unknown",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "/api/v1/commercial/customer-purchase-orders/{customerPoId}",
+      "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}",
+      "method": "GET",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "",
+      "domain": "unknown",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "/api/v1/commercial/customer-purchase-orders",
+      "path": "/api/v1/commercial/customer-purchase-orders",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "",
+      "domain": "unknown",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
+      "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition",
+      "method": "POST",
+      "controller": "CustomerPurchaseOrderController",
+      "handler": "",
+      "domain": "unknown",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "CustomerPurchaseOrderService"
+      ]
+    },
+    {
+      "key": "/api/folders",
+      "path": "/api/folders",
+      "method": "GET",
+      "controller": "FileController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/folders",
+      "path": "/api/folders",
+      "method": "POST",
+      "controller": "FileController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/admin/git/sync",
+      "path": "/api/admin/git/sync",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/admin/git/pull",
+      "path": "/api/admin/git/pull",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/admin/cache/clear",
+      "path": "/api/admin/cache/clear",
+      "method": "POST",
+      "controller": "AdminController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/documents/snapshot",
+      "path": "/api/documents/snapshot",
+      "method": "POST",
+      "controller": "DocumentController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/upload-draft",
+      "path": "/api/forms/upload-draft",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/drafts",
+      "path": "/api/forms/drafts",
+      "method": "POST",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/drafts",
+      "path": "/api/forms/drafts",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/forms/{code}/draft",
+      "path": "/api/forms/{code}/draft",
+      "method": "GET",
+      "controller": "FormController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": []
+    },
+    {
+      "key": "/api/dashboard/executive",
+      "path": "/api/dashboard/executive",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/dashboard/quality",
+      "path": "/api/dashboard/quality",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/dashboard/production",
+      "path": "/api/dashboard/production",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/dashboard/supplier",
+      "path": "/api/dashboard/supplier",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/dashboard/department",
+      "path": "/api/dashboard/department",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/dashboard/widget",
+      "path": "/api/dashboard/widget",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/vps/overview",
+      "path": "/api/vps/overview",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/host",
+      "path": "/api/vps/host",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/action",
+      "path": "/api/vps/action",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/files",
+      "path": "/api/vps/files",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/files/search",
+      "path": "/api/vps/files/search",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/files/read",
+      "path": "/api/vps/files/read",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/files/mutate",
+      "path": "/api/vps/files/mutate",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/files/upload",
+      "path": "/api/vps/files/upload",
+      "method": "POST",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/terminal/auth",
+      "path": "/api/vps/terminal/auth",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/vps/observability/auth",
+      "path": "/api/vps/observability/auth",
+      "method": "GET",
+      "controller": "VpsController",
+      "handler": "",
+      "domain": "core_infrastructure",
+      "type": "rest",
+      "services": [
+        "VpsService"
+      ]
+    },
+    {
+      "key": "/api/kpi/alerts",
+      "path": "/api/kpi/alerts",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/kpi/{metricCode}",
+      "path": "/api/kpi/{metricCode}",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/kpi/{metricCode}/trend",
+      "path": "/api/kpi/{metricCode}/trend",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/spc/capability",
+      "path": "/api/spc/capability",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/spc/chart",
+      "path": "/api/spc/chart",
+      "method": "POST",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/spc/alerts",
+      "path": "/api/spc/alerts",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/spc/summary",
+      "path": "/api/spc/summary",
+      "method": "GET",
+      "controller": "DashboardController",
+      "handler": "",
+      "domain": "analytics",
+      "type": "rest",
+      "services": [
+        "KpiEngine",
+        "SpcEngine",
+        "DashboardService"
+      ]
+    },
+    {
+      "key": "/api/orders/sales",
+      "path": "/api/orders/sales",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/sales",
+      "path": "/api/orders/sales",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/sales/{soNumber}",
+      "path": "/api/orders/sales/{soNumber}",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/sales/{soNumber}",
+      "path": "/api/orders/sales/{soNumber}",
+      "method": "PUT",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/jobs",
+      "path": "/api/orders/jobs",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/jobs",
+      "path": "/api/orders/jobs",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/jobs/{joNumber}",
+      "path": "/api/orders/jobs/{joNumber}",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/jobs/{joNumber}",
+      "path": "/api/orders/jobs/{joNumber}",
+      "method": "PUT",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/work",
+      "path": "/api/orders/work",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/work/{woNumber}",
+      "path": "/api/orders/work/{woNumber}",
+      "method": "PUT",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/transition",
+      "path": "/api/orders/transition",
+      "method": "POST",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/hierarchy",
+      "path": "/api/orders/hierarchy",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/timeline",
+      "path": "/api/orders/timeline",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/dashboard",
+      "path": "/api/orders/dashboard",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/orders/search",
+      "path": "/api/orders/search",
+      "method": "GET",
+      "controller": "OrderController",
+      "handler": "",
+      "domain": "planning_production",
+      "type": "rest",
+      "services": [
+        "CustomerPurchaseOrderService",
+        "OrderService",
+        "OrderWorkflowService",
+        "ShipmentGateService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/dashboard",
+      "path": "/api/exceptions/dashboard",
+      "method": "GET",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions",
+      "path": "/api/exceptions",
+      "method": "GET",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/{id}",
+      "path": "/api/exceptions/{id}",
+      "method": "GET",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/complaints",
+      "path": "/api/exceptions/complaints",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/mrb",
+      "path": "/api/exceptions/mrb",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/deviations",
+      "path": "/api/exceptions/deviations",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/concessions",
+      "path": "/api/exceptions/concessions",
+      "method": "POST",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/copq",
+      "path": "/api/exceptions/copq",
+      "method": "GET",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/exceptions/trends",
+      "path": "/api/exceptions/trends",
+      "method": "GET",
+      "controller": "ExceptionController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "ExceptionService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/dashboard",
+      "path": "/api/suppliers/dashboard",
+      "method": "GET",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/scorecards",
+      "path": "/api/suppliers/scorecards",
+      "method": "GET",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/incoming",
+      "path": "/api/suppliers/incoming",
+      "method": "GET",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/incoming",
+      "path": "/api/suppliers/incoming",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/asl",
+      "path": "/api/suppliers/asl",
+      "method": "GET",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/scar",
+      "path": "/api/suppliers/scar",
+      "method": "GET",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/suppliers/scar",
+      "path": "/api/suppliers/scar",
+      "method": "POST",
+      "controller": "SupplierController",
+      "handler": "",
+      "domain": "procurement_supplier_quality",
+      "type": "rest",
+      "services": [
+        "SupplierQualityService"
+      ]
+    },
+    {
+      "key": "/api/quotes",
+      "path": "/api/quotes",
+      "method": "GET",
+      "controller": "QuoteController",
+      "handler": "",
+      "domain": "commercial_customer",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "/api/quotes",
+      "path": "/api/quotes",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "",
+      "domain": "commercial_customer",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "/api/quotes/{id}",
+      "path": "/api/quotes/{id}",
+      "method": "GET",
+      "controller": "QuoteController",
+      "handler": "",
+      "domain": "commercial_customer",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "/api/quotes/{id}",
+      "path": "/api/quotes/{id}",
+      "method": "PUT",
+      "controller": "QuoteController",
+      "handler": "",
+      "domain": "commercial_customer",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "/api/quotes/{id}/convert",
+      "path": "/api/quotes/{id}/convert",
+      "method": "POST",
+      "controller": "QuoteController",
+      "handler": "",
+      "domain": "commercial_customer",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "QuoteService"
+      ]
+    },
+    {
+      "key": "/api/evidence",
+      "path": "/api/evidence",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence",
+      "path": "/api/evidence",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence/{id}",
+      "path": "/api/evidence/{id}",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence/{id}/link",
+      "path": "/api/evidence/{id}/link",
+      "method": "POST",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence/{id}/custody",
+      "path": "/api/evidence/{id}/custody",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence/verify",
+      "path": "/api/evidence/verify",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    },
+    {
+      "key": "/api/evidence/search",
+      "path": "/api/evidence/search",
+      "method": "GET",
+      "controller": "EvidenceController",
+      "handler": "",
+      "domain": "quality_improvement",
+      "type": "rest",
+      "services": [
+        "IdempotencyService",
+        "EvidenceVaultService"
+      ]
+    }
+  ]
+}

@@ -5769,18 +5769,42 @@ class SchemaStudioController extends BaseController
                 WHERE table_schema NOT IN ('pg_catalog','information_schema','pg_toast')
                 ORDER BY table_schema, table_name, ordinal_position
             ")->fetchAll(PDO::FETCH_ASSOC);
+            // Use pg_catalog instead of information_schema.constraint_column_usage:
+            // the information_schema view is O(n²) on large schemas (760+ tables)
+            // and times out. pg_catalog resolves the same data in milliseconds.
             $fks = $pdo->query("
-                SELECT tc.constraint_name, kcu.table_schema, kcu.table_name, kcu.column_name,
-                       ccu.table_schema AS ref_table_schema, ccu.table_name AS ref_table_name, ccu.column_name AS ref_column_name,
-                       rc.update_rule, rc.delete_rule
-                FROM information_schema.table_constraints tc
-                JOIN information_schema.key_column_usage kcu
-                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-                JOIN information_schema.referential_constraints rc
-                  ON tc.constraint_name = rc.constraint_name AND tc.table_schema = rc.constraint_schema
-                JOIN information_schema.constraint_column_usage ccu
-                  ON rc.unique_constraint_name = ccu.constraint_name AND rc.unique_constraint_schema = ccu.table_schema
-                WHERE tc.constraint_type = 'FOREIGN KEY'
+                SELECT con.conname AS constraint_name,
+                       ns_from.nspname AS table_schema,
+                       cl_from.relname AS table_name,
+                       att_from.attname AS column_name,
+                       ns_to.nspname AS ref_table_schema,
+                       cl_to.relname AS ref_table_name,
+                       att_to.attname AS ref_column_name,
+                       CASE con.confupdtype
+                           WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT'
+                           WHEN 'c' THEN 'CASCADE'   WHEN 'n' THEN 'SET NULL'
+                           WHEN 'd' THEN 'SET DEFAULT' ELSE 'NO ACTION'
+                       END AS update_rule,
+                       CASE con.confdeltype
+                           WHEN 'a' THEN 'NO ACTION' WHEN 'r' THEN 'RESTRICT'
+                           WHEN 'c' THEN 'CASCADE'   WHEN 'n' THEN 'SET NULL'
+                           WHEN 'd' THEN 'SET DEFAULT' ELSE 'NO ACTION'
+                       END AS delete_rule,
+                       k.ord AS col_ordinal
+                FROM pg_constraint con
+                JOIN pg_class cl_from ON con.conrelid = cl_from.oid
+                JOIN pg_namespace ns_from ON cl_from.relnamespace = ns_from.oid
+                JOIN pg_class cl_to ON con.confrelid = cl_to.oid
+                JOIN pg_namespace ns_to ON cl_to.relnamespace = ns_to.oid
+                CROSS JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(col_num, ord)
+                CROSS JOIN LATERAL unnest(con.confkey) WITH ORDINALITY AS fk(col_num, ord)
+                JOIN pg_attribute att_from
+                  ON att_from.attrelid = con.conrelid AND att_from.attnum = k.col_num AND k.ord = fk.ord
+                JOIN pg_attribute att_to
+                  ON att_to.attrelid = con.confrelid AND att_to.attnum = fk.col_num
+                WHERE con.contype = 'f'
+                  AND ns_from.nspname NOT IN ('pg_catalog','information_schema','pg_toast')
+                ORDER BY ns_from.nspname, cl_from.relname, con.conname, k.ord
             ")->fetchAll(PDO::FETCH_ASSOC);
             $pkRows = $pdo->query("
                 SELECT kcu.table_schema, kcu.table_name, kcu.column_name, kcu.ordinal_position
@@ -5881,7 +5905,7 @@ class SchemaStudioController extends BaseController
                     continue;
                 }
                 $schema['relations'][] = [
-                    'id' => 'rel_' . substr(md5($fk['constraint_name']), 0, 10),
+                    'id' => 'rel_' . substr(md5($fk['constraint_name'] . '_' . ($fk['col_ordinal'] ?? '1')), 0, 10),
                     'from_table_id' => $fromTableId,
                     'from_col_id' => $fromColId,
                     'to_table_id' => $toTableId,
