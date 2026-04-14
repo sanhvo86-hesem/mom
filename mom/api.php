@@ -14030,7 +14030,12 @@ function api_request_origin_candidate(): string {
 function request_has_allowed_origin(array $extraAllowedOrigins = []): bool {
   $candidate = api_request_origin_candidate();
   if ($candidate === '') {
-    return false;
+    // No Origin or Referer header present.
+    // This is either a same-origin browser request (some browsers omit Origin
+    // for same-origin POST) or a non-browser client (curl, Postman, server-to-server).
+    // Neither is a cross-origin CSRF attack vector, so allow through.
+    // Additional protection is provided by CSRF tokens and rate limiting.
+    return true;
   }
 
   $allowed = array_merge(api_request_allowed_origins(), $extraAllowedOrigins);

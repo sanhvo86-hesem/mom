@@ -154,12 +154,25 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
             "complianceMatrixVersion": "",
             "templateRegistryVersion": "",
             "templateRegistryChecksum": "",
+            "blockerCount": 1,
             "changeSetPresent": False,
             "lineageGraphPresent": False,
             "runtimeBeaconPresent": False,
             "debtObservatoryPresent": False,
             "environmentPolicyPacksPresent": False,
             "releaseDashboardPresent": False,
+            "runtimeBeaconSummary": {},
+            "debtSummary": {},
+            "evidenceBundleRequirements": [
+                "affectedModulesSnapshot",
+                "complianceMatrixSnapshot",
+                "debtDriftSnapshot",
+                "runtimeBeaconSnapshot",
+                "rolloutDecision",
+                "rollbackPlan",
+                "waiverRegisterSnapshot",
+            ],
+            "generatedAt": "",
         }
 
     template_registry = graphics_governance.get("templateRegistry", {})
@@ -184,11 +197,14 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
     template_meta = template_registry.get("_meta", {}) if isinstance(template_registry, dict) else {}
     release_link = graphics_governance.get("graphicsReleaseLink", {}) if isinstance(graphics_governance.get("graphicsReleaseLink"), dict) else {}
     drift_report = graphics_governance.get("graphicsDriftReport", {}) if isinstance(graphics_governance.get("graphicsDriftReport"), dict) else {}
+    runtime_beacon = graphics_governance.get("runtimeGraphicsComplianceBeacon", {}) if isinstance(graphics_governance.get("runtimeGraphicsComplianceBeacon"), dict) else {}
+    debt_observatory = graphics_governance.get("visualDebtObservatory", {}) if isinstance(graphics_governance.get("visualDebtObservatory"), dict) else {}
     return {
         "templateCount": len(template_registry.get("templates", [])) if isinstance(template_registry.get("templates"), list) else 0,
         "componentContractCount": int(component_registry.get("count") or 0) if isinstance(component_registry, dict) else 0,
         "nonCompliantModuleCount": non_compliant,
         "releaseBlockerCount": blocker_count,
+        "blockerCount": int(release_link.get("blockerCount") or blocker_count),
         "releaseBlocked": blocker_count > 0,
         "complianceMatrixVersion": scalar(compliance.get("version")) if isinstance(compliance, dict) else "",
         "templateRegistryVersion": scalar(template_registry.get("version") or template_meta.get("version") or template_meta.get("governanceRevision")),
@@ -202,6 +218,30 @@ def graphics_release_summary(graphics_governance: dict[str, Any]) -> dict[str, A
         "releaseDashboardPresent": isinstance(graphics_governance.get("graphicsReleaseDashboard"), dict),
         "multiSitePlantBrandingPresent": isinstance(graphics_governance.get("multiSitePlantBrandingGovernance"), dict),
         "controlledEmergencyOverridePresent": isinstance(graphics_governance.get("controlledEmergencyOverridePath"), dict),
+        "runtimeBeaconSummary": (
+            release_link.get("runtimeBeaconSummary")
+            if isinstance(release_link.get("runtimeBeaconSummary"), dict)
+            else runtime_beacon.get("summary", {})
+            if isinstance(runtime_beacon.get("summary"), dict)
+            else {}
+        ),
+        "debtSummary": (
+            release_link.get("debtSummary")
+            if isinstance(release_link.get("debtSummary"), dict)
+            else debt_observatory.get("summary", {})
+            if isinstance(debt_observatory.get("summary"), dict)
+            else {}
+        ),
+        "evidenceBundleRequirements": release_link.get("evidenceBundleRequirements") if isinstance(release_link.get("evidenceBundleRequirements"), list) else [
+            "affectedModulesSnapshot",
+            "complianceMatrixSnapshot",
+            "debtDriftSnapshot",
+            "runtimeBeaconSnapshot",
+            "rolloutDecision",
+            "rollbackPlan",
+            "waiverRegisterSnapshot",
+        ],
+        "generatedAt": scalar(release_link.get("generatedAt")),
     }
 
 
@@ -528,7 +568,12 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "rolloutDecisionRef": "data/graphics-governance/rollouts.json#/rollouts" if graphics_governance else "",
         "rollbackPlanRef": "data/graphics-governance/snapshots" if graphics_governance else "",
         "driftReportGeneratedAt": graphics_summary["driftReportGeneratedAt"],
+        "blockerCount": graphics_summary["blockerCount"],
         "releaseBlockerCount": graphics_summary["releaseBlockerCount"],
+        "runtimeBeaconSummary": graphics_summary["runtimeBeaconSummary"],
+        "debtSummary": graphics_summary["debtSummary"],
+        "evidenceBundleRequirements": graphics_summary["evidenceBundleRequirements"],
+        "generatedAt": graphics_summary["generatedAt"],
         "releaseBlocked": graphics_summary["releaseBlocked"],
     }
 

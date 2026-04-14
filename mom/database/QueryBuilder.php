@@ -425,10 +425,13 @@ class QueryBuilder
     {
         $phKey = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
-        // DB-005: Use parameterized key to prevent injection
-        // Use ?? to escape PDO's ? placeholder; PDO sends single ? to PostgreSQL
+        // DB-005: Use jsonb_exists() function instead of the ? operator to avoid
+        // PDO parsing ambiguity. The ? operator conflicts with PDO positional
+        // placeholders even in named-parameter mode on some driver versions.
+        // jsonb_exists(col, key) is semantically equivalent to col ? key and is
+        // completely PDO-safe with named parameters.
         $this->wheres[] = [
-            'sql'       => "{$safeCol} ?? {$phKey}",
+            'sql'       => "jsonb_exists({$safeCol}, {$phKey})",
             'params'    => [$phKey => (string)$key],
             'connector' => 'AND',
         ];

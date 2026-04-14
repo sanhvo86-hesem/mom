@@ -82,8 +82,9 @@ class AuthController extends BaseController
             ]);
         }
 
-        // Clean up expired enrollment state
-        if ($enrollUser !== '' || $enrollSecret !== '' || $enrollStarted > 0) {
+        // Clean up expired enrollment state (only when user is not already logged in;
+        // set_authenticated_session() already clears enroll vars on successful auth)
+        if (!$logged && ($enrollUser !== '' || $enrollSecret !== '' || $enrollStarted > 0)) {
             clear_pending_auth_session_state();
             $authExpired = 'enroll';
         }
