@@ -76,6 +76,7 @@ mom/data/registry/*
 !mom/data/registry/data-fields.json
 !mom/data/registry/data-fields-index.json
 !mom/data/registry/data-fields-part1.json
+!mom/data/registry/data-fields-part2.json
 !mom/data/registry/destructive-endpoint-quarantine.json
 !mom/data/registry/domain-architecture.json
 !mom/data/registry/domain-field-packs.json
@@ -85,6 +86,7 @@ mom/data/registry/*
 !mom/data/registry/enterprise-registry-doctor-report.json
 !mom/data/registry/field-types.json
 !mom/data/registry/migration-gap-report.json
+!mom/data/registry/orphan-resolution.json
 !mom/data/registry/relation-map.json
 !mom/data/registry/runtime-access-policy.json
 !mom/data/registry/schema-authority-summary.json

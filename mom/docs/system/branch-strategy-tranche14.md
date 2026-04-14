@@ -58,8 +58,8 @@ Required final checks:
 
 ## Actual Final Result
 
-- `main` contains merge commit `46807f6f`.
-- `origin/main` was updated from `4e94d566` to `46807f6f`.
+- `main` contains merge commit `46807f6f` plus final post-merge documentation and generator-artifact closure commits.
+- `origin/main` was updated from `4e94d566` through the final Tranche 14 head.
 - Tranche14 helper/integration worktrees were removed.
 - Tranche14 helper/integration branches were deleted locally.
 - No remote `codex/tranche14*` heads were present after cleanup.

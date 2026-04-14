@@ -1,18 +1,18 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T09:37:20.889Z",
-    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "generatedAt": "2026-04-14T10:13:48.095Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 769,
+    "total_frontend_entities": 771,
     "canonical_resources": 67,
     "implemented_canonical_resources": 67,
     "planned_canonical_resources": 0,
     "core_value_stream_entities": 74,
-    "governed_support_entities": 683,
+    "governed_support_entities": 685,
     "conditional_extension_entities": 6,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 6,
@@ -1815,7 +1815,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 431,
+        "relation_count": 435,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -5874,7 +5874,7 @@
         "profile": "governed_case",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 34,
+        "relation_count": 35,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6558,6 +6558,17 @@
         "archive_candidate": false,
         "relation_count": 5,
         "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.e_signature_auth_challenges",
+        "entity": "e_signature_auth_challenges",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -8086,6 +8097,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "traceability_serialization.traceability_5m_policy_rules",
+        "entity": "traceability_5m_policy_rules",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []

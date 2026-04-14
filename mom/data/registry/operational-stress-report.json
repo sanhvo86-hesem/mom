@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T09:37:28.410Z",
-    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "generatedAt": "2026-04-14T10:13:54.515Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
   "summary": {
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 21998,
+    "idempotency_mentions": 22085,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -45,13 +45,13 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 21998,
-      "optimistic_concurrency_mentions": 8296,
-      "if_match_mentions": 3379,
-      "row_version_mentions": 26845,
+      "idempotency_mentions": 22085,
+      "optimistic_concurrency_mentions": 8320,
+      "if_match_mentions": 3391,
+      "row_version_mentions": 26942,
       "compensation_markers": 5,
       "correction_markers": 2259,
-      "effective_dating_markers": 812,
+      "effective_dating_markers": 834,
       "override_mentions": 139,
       "waiver_mentions": 124,
       "heartbeat_mentions": 33,
@@ -61,19 +61,19 @@
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
       "backdate_exception_mentions": 35,
-      "archive_mentions": 27424,
-      "snapshot_mentions": 1447,
-      "esign_mentions": 260,
+      "archive_mentions": 27502,
+      "snapshot_mentions": 1454,
+      "esign_mentions": 344,
       "cycle_count_mentions": 342
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2644,
-      "idempotent_endpoint_count": 2644,
+      "mutating_endpoint_count": 2652,
+      "idempotent_endpoint_count": 2652,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2644,
+      "default_retry_safe_endpoint_count": 2652,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2644
+      "response_replay_documented_count": 2652
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -105,16 +105,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21998,
-        "if_match_mentions": 3379,
-        "row_version_mentions": 26845,
-        "mutating_endpoint_count": 2644,
-        "idempotent_endpoint_count": 2644,
+        "idempotency_mentions": 22085,
+        "if_match_mentions": 3391,
+        "row_version_mentions": 26942,
+        "mutating_endpoint_count": 2652,
+        "idempotent_endpoint_count": 2652,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2644,
+        "default_retry_safe_endpoint_count": 2652,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2644
+        "response_replay_documented_count": 2652
       },
       "required_controls": []
     },
@@ -163,8 +163,8 @@
         "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
       ],
       "evidence": {
-        "effective_dating_markers": 812,
-        "snapshot_mentions": 1447,
+        "effective_dating_markers": 834,
+        "snapshot_mentions": 1454,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
           "analytics.mes-oee-snapshots",
@@ -201,7 +201,7 @@
       "evidence": {
         "override_mentions": 139,
         "waiver_mentions": 124,
-        "esign_mentions": 260,
+        "esign_mentions": 344,
         "override_resources": [
           "quality_improvement.concessions",
           "quality_improvement.deviations",
@@ -223,7 +223,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 21998,
+        "idempotency_mentions": 22085,
         "compensation_markers": 5,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -240,9 +240,9 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 27424,
+        "archive_mentions": 27502,
         "correction_markers": 2259,
-        "esign_mentions": 260
+        "esign_mentions": 344
       },
       "required_controls": []
     },

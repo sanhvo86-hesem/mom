@@ -2432,6 +2432,7 @@ function inferDomain(tableName, migration) {
   if (/^mdm_/.test(tableName)) return 'master_data_governance';
   if (/^com_/.test(tableName)) return 'commercial_contracts';
   if (/^trace_/.test(tableName)) return 'traceability_serialization';
+  if (/^traceability_/.test(tableName)) return 'traceability_serialization';
   if (/^osc_/.test(tableName)) return 'outsource_execution';
   if (/^trade_/.test(tableName)) return 'trade_compliance';
   if (/^calibration_/.test(tableName)) return 'calibration_equipment';

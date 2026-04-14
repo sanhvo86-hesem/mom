@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T09:37:28.354Z",
-    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "generatedAt": "2026-04-14T10:13:54.459Z",
+    "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
   "summary": {
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 15,
-    "idempotency_mentions": 21977,
+    "idempotency_mentions": 22064,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -183,10 +183,10 @@
     ],
     "unused_candidate_entities": [],
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2644,
-      "idempotent_endpoint_count": 2644,
+      "mutating_endpoint_count": 2652,
+      "idempotent_endpoint_count": 2652,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2644,
+      "default_retry_safe_endpoint_count": 2652,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0
     }
@@ -199,12 +199,12 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21977,
-        "optimistic_concurrency_mentions": 8296,
-        "mutating_endpoint_count": 2644,
-        "idempotent_endpoint_count": 2644,
+        "idempotency_mentions": 22064,
+        "optimistic_concurrency_mentions": 8320,
+        "mutating_endpoint_count": 2652,
+        "idempotent_endpoint_count": 2652,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2644,
+        "default_retry_safe_endpoint_count": 2652,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0
       },
@@ -219,9 +219,9 @@
         "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
       ],
       "evidence": {
-        "optimistic_concurrency_mentions": 8296,
-        "if_match_mentions": 3373,
-        "row_version_mentions": 26845
+        "optimistic_concurrency_mentions": 8320,
+        "if_match_mentions": 3385,
+        "row_version_mentions": 26942
       },
       "required_controls": []
     },
@@ -338,7 +338,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 21977
+        "idempotency_mentions": 22064
       },
       "required_controls": []
     },

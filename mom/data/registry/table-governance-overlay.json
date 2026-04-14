@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T16:59:08.508698+00:00",
+    "generatedAt": "2026-04-14T10:13:51.868315+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 750
+    "tableCount": 760
   },
   "summary": {
     "domains": {
@@ -45,20 +45,20 @@
       "mobile_operations": 3,
       "outsource_execution": 15,
       "plant_maintenance": 15,
-      "plm_change_control": 26,
+      "plm_change_control": 28,
       "production": 16,
       "project_management": 14,
       "purchasing": 14,
       "quality_lab": 16,
-      "quality_management": 36,
-      "record_system": 16,
+      "quality_management": 37,
+      "record_system": 20,
       "sales": 17,
       "service_warranty": 13,
       "shipping_compliance": 7,
       "supplier_relationship": 20,
       "system_infrastructure": 19,
       "tooling_lifecycle": 14,
-      "traceability_serialization": 19,
+      "traceability_serialization": 22,
       "trade_compliance": 12,
       "training_hr": 9,
       "transportation": 12,
@@ -71,10 +71,10 @@
       "governed_support": 24,
       "machine_runtime": 91,
       "platform_governance": 18,
-      "process_runtime": 464
+      "process_runtime": 474
     },
     "targetDeletionMode": {
-      "archive_only": 750
+      "archive_only": 760
     },
     "hardDeleteWaiverRequired": 0
   },
@@ -1507,7 +1507,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -1517,7 +1517,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -1601,7 +1602,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -1794,7 +1795,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -1887,7 +1888,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -1983,7 +1984,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -1991,7 +1992,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -2311,7 +2313,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -2510,7 +2512,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -2617,7 +2619,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -3740,7 +3742,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -3859,6 +3861,55 @@
       ],
       "uiSurfaces": [
         "admin_data_schema",
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "control_plane_command_handlers": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.control_plane_command_handlers.create",
+        "record_system.control_plane_command_handlers.delete",
+        "record_system.control_plane_command_handlers.detail",
+        "record_system.control_plane_command_handlers.list",
+        "record_system.control_plane_command_handlers.transition",
+        "record_system.control_plane_command_handlers.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:active_paused_retired",
+        "wf_control_plane_command_handler"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
         "process_command_workspace",
         "system_contract_registry"
       ],
@@ -4031,7 +4082,7 @@
       "dataClassification": "confidential_financial",
       "retentionClass": "financial_record_10y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -4695,7 +4746,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -5425,7 +5476,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -5471,7 +5522,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -5566,7 +5617,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -5615,7 +5666,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -6345,6 +6396,56 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "e_signature_auth_challenges": {
+      "systemOfRecord": "postgres_migration:106_eqms_world_class_control_plane.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "quality_data_steward",
+      "dataClassification": "regulated_quality_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "quality_management.e_signature_auth_challenges.create",
+        "quality_management.e_signature_auth_challenges.delete",
+        "quality_management.e_signature_auth_challenges.detail",
+        "quality_management.e_signature_auth_challenges.list",
+        "quality_management.e_signature_auth_challenges.transition",
+        "quality_management.e_signature_auth_challenges.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_e_signature_auth_challenge"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "effectivity_conflicts": {
       "systemOfRecord": "postgres_migration:108_world_class_control_plane_execution.sql",
       "authorityMode": "process_runtime",
@@ -6727,7 +6828,7 @@
       "dataClassification": "regulated_ehs_record",
       "retentionClass": "ehs_record_10y_or_legal_hold",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -7309,13 +7410,13 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
-    "employee_certifications": {
-      "systemOfRecord": "postgres_migration:013_training_hr.sql",
+    "emergency_change_controls": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
       "authorityMode": "process_runtime",
-      "ownerRole": "hr_manager",
-      "stewardRole": "training_data_steward",
-      "dataClassification": "confidential_personal",
-      "retentionClass": "hr_record_policy_based",
+      "ownerRole": "engineering_manager",
+      "stewardRole": "change_control_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
       "registryDeletionMode": "archive_only",
       "hardDeleteWaiverRequired": false,
@@ -7325,7 +7426,56 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "plm_change_control.emergency_change_controls.create",
+        "plm_change_control.emergency_change_controls.delete",
+        "plm_change_control.emergency_change_controls.detail",
+        "plm_change_control.emergency_change_controls.list",
+        "plm_change_control.emergency_change_controls.transition",
+        "plm_change_control.emergency_change_controls.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_emergency_change_control"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "employee_certifications": {
+      "systemOfRecord": "postgres_migration:013_training_hr.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "hr_manager",
+      "stewardRole": "training_data_steward",
+      "dataClassification": "confidential_personal",
+      "retentionClass": "hr_record_policy_based",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -7364,7 +7514,7 @@
       "dataClassification": "confidential_personal",
       "retentionClass": "hr_record_policy_based",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -8040,7 +8190,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -8068,7 +8218,6 @@
       ],
       "businessObjectRefs": [],
       "uiSurfaces": [
-        "process_command_workspace",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -9546,7 +9695,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -10118,7 +10267,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -10128,7 +10277,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -10163,7 +10313,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -11795,7 +11945,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -11883,7 +12033,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -11931,7 +12081,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -12313,6 +12463,54 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "genealogy_edge_facts": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "traceability_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "traceability_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "traceability_serialization.genealogy_edge_facts.create",
+        "traceability_serialization.genealogy_edge_facts.delete",
+        "traceability_serialization.genealogy_edge_facts.detail",
+        "traceability_serialization.genealogy_edge_facts.list",
+        "traceability_serialization.genealogy_edge_facts.transition",
+        "traceability_serialization.genealogy_edge_facts.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_genealogy_edge_fact"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "genealogy_edges": {
       "systemOfRecord": "postgres_migration:108_world_class_control_plane_execution.sql",
       "authorityMode": "domain_runtime",
@@ -12486,6 +12684,55 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "governed_route_registry": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.governed_route_registry.create",
+        "record_system.governed_route_registry.delete",
+        "record_system.governed_route_registry.detail",
+        "record_system.governed_route_registry.list",
+        "record_system.governed_route_registry.transition",
+        "record_system.governed_route_registry.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_governed_route_registry"
+      ],
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
@@ -13259,7 +13506,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -13569,7 +13816,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -13661,7 +13908,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -13988,7 +14235,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "traceability_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -13996,7 +14243,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -14421,7 +14669,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -14604,7 +14852,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -14794,7 +15042,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -14845,7 +15093,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -15520,6 +15768,55 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "legacy_authority_sunset": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.legacy_authority_sunset.create",
+        "record_system.legacy_authority_sunset.delete",
+        "record_system.legacy_authority_sunset.detail",
+        "record_system.legacy_authority_sunset.list",
+        "record_system.legacy_authority_sunset.transition",
+        "record_system.legacy_authority_sunset.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_legacy_authority_sunset"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "legal_holds": {
       "systemOfRecord": "postgres_migration:108_world_class_control_plane_execution.sql",
       "authorityMode": "process_runtime",
@@ -15669,7 +15966,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "traceability_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -15898,7 +16195,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -15948,7 +16245,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -19728,7 +20025,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -19880,7 +20177,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -22110,6 +22407,56 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "periodic_evaluations": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.periodic_evaluations.create",
+        "record_system.periodic_evaluations.delete",
+        "record_system.periodic_evaluations.detail",
+        "record_system.periodic_evaluations.list",
+        "record_system.periodic_evaluations.transition",
+        "record_system.periodic_evaluations.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_periodic_evaluation"
+      ],
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
@@ -24895,7 +25242,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -25377,7 +25724,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -25385,7 +25732,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -25425,7 +25773,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27009,7 +27357,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27055,7 +27403,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27349,7 +27697,7 @@
       "dataClassification": "regulated_audit_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27455,7 +27803,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27491,6 +27839,54 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "rollback_requirements": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "engineering_manager",
+      "stewardRole": "change_control_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "plm_change_control.rollback_requirements.create",
+        "plm_change_control.rollback_requirements.delete",
+        "plm_change_control.rollback_requirements.detail",
+        "plm_change_control.rollback_requirements.list",
+        "plm_change_control.rollback_requirements.transition",
+        "plm_change_control.rollback_requirements.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "routing_operations": {
       "systemOfRecord": "postgres_migration:006_erp_master_data.sql",
       "authorityMode": "asset_lifecycle",
@@ -27499,7 +27895,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27544,7 +27940,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27793,7 +28189,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -27801,7 +28197,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -27841,7 +28238,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -28082,7 +28479,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "traceability_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -28177,7 +28574,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -28827,7 +29224,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -28931,7 +29328,7 @@
       "dataClassification": "confidential_personal",
       "retentionClass": "hr_record_policy_based",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -28939,7 +29336,8 @@
           "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
-          "system_of_record_present"
+          "system_of_record_present",
+          "timezone_aware_timestamp"
         ]
       },
       "apiContractRefs": [
@@ -29518,7 +29916,7 @@
       "dataClassification": "regulated_quality_record",
       "retentionClass": "quality_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -31902,7 +32300,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -32554,7 +32952,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -33146,6 +33544,101 @@
       ],
       "aiAuthority": {
         "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "traceability_5m_obligations": {
+      "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "traceability_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "traceability_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "traceability_serialization.traceability_5m_obligations.create",
+        "traceability_serialization.traceability_5m_obligations.delete",
+        "traceability_serialization.traceability_5m_obligations.detail",
+        "traceability_serialization.traceability_5m_obligations.list",
+        "traceability_serialization.traceability_5m_obligations.transition",
+        "traceability_serialization.traceability_5m_obligations.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_traceability_5m_obligation"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "traceability_5m_policy_rules": {
+      "systemOfRecord": "postgres_migration:124_world_class_closure_authoritative_controls.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "traceability_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "traceability_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "traceability_serialization.traceability_5m_policy_rules.create",
+        "traceability_serialization.traceability_5m_policy_rules.delete",
+        "traceability_serialization.traceability_5m_policy_rules.detail",
+        "traceability_serialization.traceability_5m_policy_rules.list",
+        "traceability_serialization.traceability_5m_policy_rules.transition",
+        "traceability_serialization.traceability_5m_policy_rules.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_traceability_5m_policy_rule"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
         "mustNotInferFrom": [
           "workspace_design",
           "frontend_label",
@@ -33974,7 +34467,7 @@
       "dataClassification": "confidential_personal",
       "retentionClass": "hr_record_policy_based",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -34067,7 +34560,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -34111,7 +34604,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -34203,7 +34696,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -34247,7 +34740,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "operational_record_3y",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -34298,7 +34791,7 @@
       "dataClassification": "internal_operational",
       "retentionClass": "traceability_record_7y_or_customer_specific",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
@@ -35068,7 +35561,7 @@
       "dataClassification": "internal_master_data",
       "retentionClass": "master_data_lifecycle",
       "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",

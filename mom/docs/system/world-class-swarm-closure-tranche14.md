@@ -30,8 +30,9 @@ Date: 2026-04-14
 
 ## Implemented Fixes
 
-- Restored missing controlled generator inputs: `api-params.json` and `schema-library.json`.
-- Regenerated the publication/system-contract truth layer: `endpointCount=4180`, `tableCount=758`, `workflowCount=333`, `frontendEntities=769`, `ready=764`, `partial=5`, `blocked=0`.
+- Restored missing controlled generator inputs: `api-params.json`, `schema-library.json`, `orphan-resolution.json`, and `data-fields-part2.json`.
+- Regenerated the publication/system-contract truth layer: `endpointCount=4192`, `tableCount=760`, `workflowCount=335`, `frontendEntities=771`, `ready=766`, `partial=5`, `blocked=0`.
+- Fixed the publication orchestrator blocker by mapping `traceability_*` tables into the traceability serialization domain.
 - Removed fake publication-quality bridge inflation so quality truth follows generated blockers instead of synthetic increments.
 - Fixed generated publication/catalog generators to tolerate dict-or-string build questions and malformed canonical keys.
 - Added source-of-truth fields for legacy table isolation, compatibility aliases, projection lineage, override controls, and finance control-plane contracts.
@@ -64,7 +65,7 @@ Durable audit-pack export was selected after inherited backlog closure because i
 
 ## Verification Evidence
 
-- `python3 tools/registry/canonical_publication_orchestrator.py` on the integration branch -> Overall PASS.
+- `python3 tools/registry/canonical_publication_orchestrator.py` -> Overall PASS.
 - `python3 tools/registry/verify_publication_truth.py` -> 241/241 PASS.
 - `php tools/release/check_repo_boundary.php` -> repo boundary clean.
 - `APP_ENV=test DB_PASSWORD=test_password php -d display_errors=1 tests/backend_smoke.php` -> passed.
@@ -93,7 +94,7 @@ Durable audit-pack export was selected after inherited backlog closure because i
 
 ## Final Git Result
 
-- `main` merge commit: `46807f6f`.
+- `main` merge commit: `46807f6f`; final pushed head also includes post-merge docs and generator-artifact closure commits.
 - `origin/main` push: complete.
 - Local tranche14 branches deleted: `codex/tranche14-a1-*` through `codex/tranche14-a6-*`, plus `codex/tranche14-zero-trust-closure-20260414`.
 - Tranche14 worktrees removed: `/Users/a10/Documents/mom-tranche14-*`.
