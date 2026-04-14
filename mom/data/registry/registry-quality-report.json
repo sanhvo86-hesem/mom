@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:20:39.709Z",
-    "publication_run_id": "ce72481e-a4ef-4d69-b538-9c87b8b73a9e",
+    "generatedAt": "2026-04-14T05:25:47.940Z",
+    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
     "publication_scope": "platform_global",
     "slice_publication_pass": "foundation_governance_contract_slice"
   },
@@ -9,11 +9,15 @@
     "endpoint_count": 22,
     "workflow_engine_bridge_ready": 1,
     "workflow_engine_bridge_blocked": 0,
-    "publishability_ready": true
+    "publishability_ready": false,
+    "releaseReadinessState": "blocked-by-graphics-governance"
   },
   "gates": {
     "publishability": {
-      "ready": true
+      "ready": false,
+      "blockedBy": [
+        "graphics_release_blockers_active"
+      ]
     }
   }
 }

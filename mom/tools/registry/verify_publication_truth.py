@@ -324,6 +324,7 @@ def main() -> int:
               f"critical={diagnostics_summary.get('criticalGapCount')} blockers={diagnostics_summary.get('blockerCount')}")
 
     # Gate J3: Graphics governance authority contract
+    active_graphics_release_blockers = []
     print("\nGate J3: Graphics governance authority")
     graphics_path = REG / "graphics-governance-registry.json"
     check("graphics_governance_registry_exists", graphics_path.is_file(), f"Missing: {graphics_path}")
@@ -383,6 +384,22 @@ def main() -> int:
         }
         check("graphics_release_link_complete", isinstance(release_link, dict) and link_fields.issubset(release_link.keys()),
               f"keys={sorted(release_link.keys()) if isinstance(release_link, dict) else []}")
+        release_blockers = graphics.get("releaseBlockers", {}).get("blockers", [])
+        active_graphics_release_blockers = [
+            row for row in release_blockers
+            if isinstance(row, dict) and row.get("status") not in {"waived", "closed", "resolved"}
+        ]
+        release_blocked = bool(release_link.get("releaseBlocked")) if isinstance(release_link, dict) else False
+        link_blocker_count = int(release_link.get("blockerCount") or release_link.get("releaseBlockerCount") or 0) if isinstance(release_link, dict) else 0
+        if active_graphics_release_blockers:
+            check("graphics_active_blockers_mark_release_blocked",
+                  release_blocked and link_blocker_count == len(active_graphics_release_blockers)
+                  and release_link.get("releaseReadinessState") == "blocked-by-graphics-governance",
+                  f"active={len(active_graphics_release_blockers)} releaseBlocked={release_blocked} blockerCount={link_blocker_count} state={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
+        else:
+            check("graphics_no_active_blockers_mark_ready",
+                  (not release_blocked) and release_link.get("releaseReadinessState", "ready") == "ready",
+                  f"releaseBlocked={release_blocked} state={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")
@@ -398,6 +415,10 @@ def main() -> int:
         qr_ready = qrs.get("publishability_ready", qr.get("gates",{}).get("publishability",{}).get("ready"))
         check("truth_publishability_matches_qr", pub_ready == qr_ready,
               f"truth={pub_ready} qr={qr_ready}")
+        if active_graphics_release_blockers:
+            check("truth_publishability_blocked_by_graphics",
+                  pub_ready is False and "graphics_release_blockers_active" in (pt.get("publishability", {}).get("blockedBy") or []),
+                  f"truth_publishability={pt.get('publishability')}")
 
     # Gate L: Entity accounting
     print("\nGate L: Entity accounting")

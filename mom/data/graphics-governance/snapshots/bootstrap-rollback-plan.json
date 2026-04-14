@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T05:25:47.940Z",
+    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice",
+    "authority": "graphics_governance_rollback_plan"
+  },
+  "rollbackPlanId": "bootstrap-rollback-plan",
+  "state": "available",
+  "scope": "graphics-governance-bootstrap",
+  "restoreRefs": [
+    "mom/design/template-registry.json",
+    "mom/data/registry/graphics-governance-registry.json"
+  ],
+  "releaseReadinessState": "blocked-by-graphics-governance"
+}

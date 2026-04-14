@@ -5,7 +5,7 @@ This directory is the explicit semantic layer between:
 - storage authority in `database/migrations/*.sql`
 - generated runtime registry in `data/registry/*.json`
 
-Tranche 12 correction, 2026-04-14: this directory's authored business-contract bundle is present, but the generated runtime registry layer is not present in the checked-in `mom/data/registry` tree in this worktree. Do not treat contract bundle coverage as proof that publication/runtime registry artifacts are currently verified.
+Current correction, 2026-04-14: this directory's authored business-contract bundle is present, and the generated runtime registry layer is checked in under `mom/data/registry`. Do not treat contract bundle coverage alone as proof of release readiness; run `mom/tools/registry/verify_publication_truth.py` to verify artifact convergence and graphics release-blocker honesty for the current branch.
 
 Purpose:
 

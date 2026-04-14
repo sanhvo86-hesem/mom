@@ -797,20 +797,23 @@ Tạo file `mom/docs/tmp/v4.3-p6-runtime.html` chứa HTML của section `runtim
 - File JS: `mom/scripts/portal/00c-admin-appearance.js` dòng 996-1182 — TEMPLATE_SEED, VISUAL_THEMES
 - File JS: `mom/scripts/portal/00b-theme-manager.js` dòng 746-835 — VISUAL_THEME_PRESETS, _mergedConfig, localStorage keys
 
-### QUAN TRỌNG: Doc-vs-Code mismatches cần ghi nhận
+### Historical note: mismatches already closed or fenced
 ```
-MISMATCH 1: 00c-admin-appearance.js VISUAL_THEMES có 20 themes, nhưng 00b-theme-manager.js 
-VISUAL_THEME_PRESETS chỉ có 8 themes → 12 themes áp dụng sẽ silently fail.
+RESOLVED: 00c-admin-appearance.js VISUAL_THEMES có 20 themes và 00b-theme-manager.js
+VISUAL_THEME_PRESETS phải runtime-map đủ 20 Admin theme IDs. Runtime-only legacy aliases
+không được hiện trong Admin nếu không có controlled UI contract.
 
-MISMATCH 2: localStorage keys trong doc (section 50) khác hoàn toàn với code:
-  Doc: hesem_theme_prefs, hesem_layout_density, ...
-  Code: hesem_user_appearance, hesem_admin_appearance_cache, hesem_layout_templates
+FENCED: localStorage chỉ được dùng cho user preference, preview cache, unsaved draft
+cache, last-view/filter/sort. Forbidden legacy authority keys
+hesem_layout_templates và hesem_module_template_binding phải bị purge hoặc chỉ dùng
+làm read-only migration evidence, không được dùng làm production authority.
 
-MISMATCH 3: Theme IDs khác nhau giữa 00c và 00b:
-  00c: sunrise-warm, sunset-ember (không có trong 00b)
-  00b: ember-industrial, graphite-amber, slate-ice (không có trong 00c)
+CONTROLLED: Theme IDs khác nhau giữa Admin UI và runtime chỉ được tồn tại nếu runtime
+alias được khai báo rõ và không tạo silent fallback cho publish/apply.
 ```
-Section này phải GHI NHẬN mismatches và specify đúng cho tương lai.
+Section này là prompt lịch sử, không phải authority hiện hành. Authority hiện hành nằm trong
+`mom/docs/module-layout-template-design-system-v4.html`, `00b-theme-manager.js`, và backend
+graphics governance registry artifacts.
 
 ### Nội dung — 8 phần
 

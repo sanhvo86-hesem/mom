@@ -2,7 +2,7 @@
 
 This project separates database authority, generated system contracts, and editable design workspaces.
 
-Tranche 12 correction, 2026-04-14: the registry paths below describe the expected generated runtime contract layer. The current checked-in tree does not contain `mom/data/registry/table-registry.json` or the required publication artifacts, so the System Contract Registry layer is currently `UNPROVEN/BLOCKED` in-tree until the artifact set is restored or regenerated with the required environment credentials.
+Current correction, 2026-04-14: the registry paths below describe the generated runtime contract layer. The checked-in tree now contains `mom/data/registry/table-registry.json`, the system-contract artifacts, and `mom/data/registry/graphics-governance-registry.json`; `mom/tools/registry/verify_publication_truth.py` is the gate that proves whether the artifact set is fresh, converged, and release-honest for the current branch.
 
 ## Layers
 
@@ -10,14 +10,14 @@ Tranche 12 correction, 2026-04-14: the registry paths below describe the expecte
 | --- | --- | --- | --- | --- |
 | Physical DB schema | Runtime data storage in PostgreSQL | PostgreSQL schema `public` | Database writes only through application/runtime or governed migrations | Never delete from Schema Studio |
 | DB authority | Versioned structural source of truth | `database/migrations/*.sql` -> `database/schema.sql` | Governed migration review, deployment gate, rollback planning | Immutable history; supersede with a later migration |
-| System Contract Registry | Full backend contract for AI, frontend, API, workflow, and audit visibility | Expected: `data/registry/table-registry.json` and generated registry artifacts; current Tranche 12 state: missing from checked-in tree | Read-only generated artifact | Regenerate from authority; do not hand-edit or hard-delete |
+| System Contract Registry | Full backend contract for AI, frontend, API, workflow, and audit visibility | `data/registry/table-registry.json` and generated registry artifacts | Read-only generated artifact | Regenerate from authority; do not hand-edit or hard-delete |
 | Workspace Design Draft | Blank editable design surface for future controlled experiments only | `data/schema-studio/designs/workspace.json` | Editable with revision guard and audit trail | Archive or replace through a controlled change; do not hard-delete while Schema Studio needs an editable surface |
 
 ## Active Workspace State
 
 As of 2026-04-11, `data/schema-studio/designs/workspace.json` and `data/schema-studio/snapshots/workspace.baseline.json` are intentionally blank. They contain zero tables and zero relations by design.
 
-This prevents AI, frontend, and backend tools from mistaking an old curated 101-table draft for the real ERP+MOM schema. The target backend contract is the System Contract Registry, and the physical DB authority remains migrations plus the generated schema snapshot. In the current Tranche 12 worktree, the registry artifact layer itself is not checked in and must not be treated as verified runtime truth.
+This prevents AI, frontend, and backend tools from mistaking an old curated 101-table draft for the real ERP+MOM schema. The target backend contract is the System Contract Registry, and the physical DB authority remains migrations plus the generated schema snapshot. The registry artifact layer is checked in as machine-readable projection, but it is verified only when the publication-truth gate passes for the current branch.
 
 ## Runtime Contract Artifacts
 

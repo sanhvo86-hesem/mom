@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[3]
 MOM = ROOT / "mom"
 REG = MOM / "data" / "registry"
 CONTRACTS = MOM / "contracts"
+GRAPHICS_STATE_DIR = MOM / "data" / "graphics-governance"
+ROLLBACK_PLAN_REF = "mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json"
 
 REQUIRED_ARTIFACTS = [
     "endpoint-catalog.json",
@@ -173,6 +175,14 @@ def graphics_registry(run_id: str, generated_at: str, modules: list[dict[str, An
     existing = read_json(REG / "graphics-governance-registry.json", {})
     if isinstance(existing, dict) and existing.get("templateRegistry") and existing.get("moduleGraphicsCompliance"):
         existing["_meta"] = {**existing.get("_meta", {}), **meta(run_id, generated_at, authorityLayer="system_contract_registry")}
+        release_link = existing.setdefault("graphicsReleaseLink", {})
+        if isinstance(release_link, dict):
+            release_link["rollbackPlanRef"] = ROLLBACK_PLAN_REF
+            release_blocked = bool(release_link.get("releaseBlocked") or existing.get("releaseBlockers", {}).get("summary", {}).get("releaseBlocked"))
+            release_link["releaseReadinessState"] = "blocked-by-graphics-governance" if release_blocked else "ready"
+        release_evidence = existing.setdefault("releaseBlockers", {}).setdefault("evidence", {})
+        if isinstance(release_evidence, dict):
+            release_evidence["rollbackPlanRef"] = ROLLBACK_PLAN_REF
         return existing
 
     templates = read_json(MOM / "design" / "template-registry.json", {}).get("templates", [])
@@ -215,7 +225,8 @@ def graphics_registry(run_id: str, generated_at: str, modules: list[dict[str, An
         "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
         "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
         "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
-        "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+        "rollbackPlanRef": ROLLBACK_PLAN_REF,
+        "releaseReadinessState": "ready",
         "driftReportGeneratedAt": generated_at,
     }
     return {
@@ -269,9 +280,38 @@ def main() -> int:
 
     write_json(REG / "graphics-governance-registry.json", graphics_registry(run_id, generated_at, modules, packets))
     graphics = read_json(REG / "graphics-governance-registry.json", {})
+    release_blocked = bool((graphics.get("graphicsReleaseLink") or {}).get("releaseBlocked") or (graphics.get("releaseBlockers") or {}).get("summary", {}).get("releaseBlocked"))
+    release_state = "blocked-by-graphics-governance" if release_blocked else "ready"
     write_json(REG / "graphics-template-registry.json", {
         "_meta": meta(run_id, generated_at, source="graphics_governance_backend", authority="mom/design/template-registry.json"),
         "templates": graphics.get("templateRegistry", {}).get("templates", []),
+    })
+    write_json(GRAPHICS_STATE_DIR / "state.json", {
+        "_meta": meta(run_id, generated_at, authority="backend_graphics_governance_state"),
+        "pendingImpact": {},
+        "publishedImpacts": {},
+        "releaseReadinessState": release_state,
+    })
+    write_json(GRAPHICS_STATE_DIR / "waivers.json", {
+        "_meta": meta(run_id, generated_at, authority="graphics_governance_waiver_register"),
+        "waivers": [],
+        "releaseReadinessState": release_state,
+    })
+    write_json(GRAPHICS_STATE_DIR / "rollouts.json", {
+        "_meta": meta(run_id, generated_at, authority="graphics_governance_rollout_register"),
+        "rollouts": [],
+        "releaseReadinessState": release_state,
+    })
+    write_json(GRAPHICS_STATE_DIR / "snapshots" / "bootstrap-rollback-plan.json", {
+        "_meta": meta(run_id, generated_at, authority="graphics_governance_rollback_plan"),
+        "rollbackPlanId": "bootstrap-rollback-plan",
+        "state": "available",
+        "scope": "graphics-governance-bootstrap",
+        "restoreRefs": [
+            "mom/design/template-registry.json",
+            "mom/data/registry/graphics-governance-registry.json",
+        ],
+        "releaseReadinessState": release_state,
     })
 
     manifest_assets = {name: {"records": 1, "generatedAt": generated_at} for name in REQUIRED_ARTIFACTS}
@@ -288,8 +328,8 @@ def main() -> int:
     })
     write_json(REG / "registry-quality-report.json", {
         "_meta": meta(run_id, generated_at),
-        "summary": {"endpoint_count": len(endpoints), "workflow_engine_bridge_ready": 1, "workflow_engine_bridge_blocked": 0, "publishability_ready": True},
-        "gates": {"publishability": {"ready": True}},
+        "summary": {"endpoint_count": len(endpoints), "workflow_engine_bridge_ready": 1, "workflow_engine_bridge_blocked": 0, "publishability_ready": not release_blocked, "releaseReadinessState": release_state},
+        "gates": {"publishability": {"ready": not release_blocked, "blockedBy": ["graphics_release_blockers_active"] if release_blocked else []}},
     })
 
     write_json(REG / "wave0-governance-policy.json", build_question_policy(run_id, generated_at, 10, ["split_registry_path_or_split_write_model"]))
@@ -336,7 +376,7 @@ def main() -> int:
     write_json(REG / "system-contract-diagnostics.json", {"_meta": meta(run_id, generated_at), "summary": {"criticalGapCount": 0, "blockerCount": 0}, "diagnostics": []})
     write_json(REG / "system-contract-manifest.json", {"_meta": meta(run_id, generated_at, authorityLayer="system_contract_registry", designId="registry-authority", workspaceDraftUsed=False), "summary": {"tableCount": table_count, "relationCount": 0, "workflowCount": 0, "endpointCount": len(endpoints)}})
     write_json(REG / "wave-gap-ledger.json", {"_meta": meta(run_id, generated_at), "summary": {"partial": 0, "blocked": 0}, "entities": {}})
-    write_json(REG / "publication-truth-summary.json", {"_meta": meta(run_id, generated_at), "publication_truth": {"scope": "platform_global", "truth_model": "global_canonical_plus_slice_summary", "publishability": {"ready": True}}})
+    write_json(REG / "publication-truth-summary.json", {"_meta": meta(run_id, generated_at), "publication_truth": {"scope": "platform_global", "truth_model": "global_canonical_plus_slice_summary", "publishability": {"ready": not release_blocked, "blockedBy": ["graphics_release_blockers_active"] if release_blocked else []}, "releaseReadinessState": release_state}})
     write_json(REG / "publication-entity-accounting.json", {"_meta": meta(run_id, generated_at), "entity_accounting": {"schema_tables": {"count": table_count}, "frontend_entities": {"count": entity_catalog["summary"]["entity_count"]}}})
     write_json(REG / "foundation-governance-publication-summary.json", {"_meta": meta(run_id, generated_at), "slice_publication": {"scope": "foundation_governance_contract_slice", "slice_verdict": "PASS"}})
 

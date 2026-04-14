@@ -1,12 +1,12 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:20:39.709Z",
+    "generatedAt": "2026-04-14T05:25:47.940Z",
     "source": "graphics_governance_backend",
     "authorityLayer": "system_contract_registry",
     "authority": "mom/design/template-registry.json",
     "workspaceDraftUsed": false,
     "schemaAuthorityModel": "mom/docs/schema-authority-model.md",
-    "publication_run_id": "ce72481e-a4ef-4d69-b538-9c87b8b73a9e",
+    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
     "publication_scope": "platform_global",
     "slice_publication_pass": "foundation_governance_contract_slice"
   },
@@ -571,7 +571,7 @@
   },
   "componentContractRegistry": {
     "_meta": {
-      "generatedAt": "2026-04-14T05:15:14+00:00",
+      "generatedAt": "2026-04-14T05:25:47+00:00",
       "authority": "mom/design/block-contracts",
       "authorityRole": "component_contract_registry",
       "componentModel": "frontend_block_contracts"
@@ -4834,6 +4834,14 @@
             "severity": "high"
           },
           {
+            "file": "mom/scripts/portal/00b-theme-manager.js",
+            "rawColorCount": 276,
+            "inlineStyleCount": 0,
+            "privateVariableCount": 0,
+            "debtScore": 276,
+            "severity": "high"
+          },
+          {
             "file": "mom/scripts/portal/14-mes-control-center.js",
             "rawColorCount": 203,
             "inlineStyleCount": 48,
@@ -5047,14 +5055,6 @@
             "inlineStyleCount": 0,
             "privateVariableCount": 0,
             "debtScore": 97,
-            "severity": "high"
-          },
-          {
-            "file": "mom/scripts/portal/00b-theme-manager.js",
-            "rawColorCount": 96,
-            "inlineStyleCount": 0,
-            "privateVariableCount": 0,
-            "debtScore": 96,
             "severity": "high"
           },
           {
@@ -5348,13 +5348,13 @@
         ],
         "summary": {
           "fileCount": 75,
-          "totalDebtScore": 14582
+          "totalDebtScore": 14762
         }
       },
       "tokenAdoptionCoverage": {
         "coverage": {
           "tokenReferences": 11774,
-          "rawReferences": 28650,
+          "rawReferences": 28830,
           "coveragePercent": 29
         },
         "files": [
@@ -5367,7 +5367,7 @@
           {
             "file": "mom/scripts/portal/00b-theme-manager.js",
             "tokenReferences": 0,
-            "rawReferences": 96,
+            "rawReferences": 276,
             "coveragePercent": 0
           },
           {
@@ -5863,7 +5863,7 @@
         ],
         "globalSignals": {
           "bridgeAliasDebtCount": 0,
-          "privateCssDebtScore": 14582,
+          "privateCssDebtScore": 14762,
           "tokenCoveragePercent": 29
         },
         "summary": {
@@ -5874,7 +5874,7 @@
     },
     "summary": {
       "bridgeAliasDebtCount": 0,
-      "privateCssDebtScore": 14582,
+      "privateCssDebtScore": 14762,
       "privateCssFileCount": 75,
       "tokenCoveragePercent": 29,
       "uncontrolledLegacyShellDebt": 0
@@ -5897,11 +5897,11 @@
       },
       "privateCssDebt": {
         "fileCount": 75,
-        "totalDebtScore": 14582
+        "totalDebtScore": 14762
       },
       "tokenAdoptionCoverage": {
         "tokenReferences": 11774,
-        "rawReferences": 28650,
+        "rawReferences": 28830,
         "coveragePercent": 29
       }
     },
@@ -5917,7 +5917,7 @@
         "code": "module_graphics_non_compliant"
       }
     ],
-    "generatedAt": "2026-04-14T05:15:15+00:00"
+    "generatedAt": "2026-04-14T05:25:47+00:00"
   },
   "releaseBlockers": {
     "blockers": [
@@ -5971,7 +5971,7 @@
       "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
       "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
       "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
-      "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+      "rollbackPlanRef": "mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json",
       "releaseBlocked": true,
       "blockerCount": 2,
       "releaseBlockerCount": 2,
@@ -5984,12 +5984,12 @@
         "rollbackPlan",
         "waiverRegisterSnapshot"
       ],
-      "driftReportGeneratedAt": "2026-04-14T05:15:15+00:00",
-      "generatedAt": "2026-04-14T05:15:15+00:00"
+      "driftReportGeneratedAt": "2026-04-14T05:25:47+00:00",
+      "generatedAt": "2026-04-14T05:25:47+00:00"
     }
   },
   "changeSetModel": {
-    "changeSetId": "gcs_c2584a9e2e22",
+    "changeSetId": "gcs_fb9656e3fe14",
     "status": "preview-only",
     "source": "backend_graphics_governance_state",
     "edits": [],
@@ -5999,7 +5999,7 @@
       "authority": "mom/data/graphics-governance/state.json"
     },
     "impact": {
-      "impactId": "gia_20260414051515_ca9111f8",
+      "impactId": "gia_20260414052547_ca9111f8",
       "analysisType": "change-set",
       "subject": {
         "scope": "graphics-control-plane"
@@ -6017,12 +6017,12 @@
       "requiredEvidence": [
         {
           "evidenceType": "impact-snapshot",
-          "required": "true",
+          "required": true,
           "owner": "Frontend Platform"
         },
         {
           "evidenceType": "rollback-plan",
-          "required": "true",
+          "required": true,
           "owner": "Release Engineering"
         }
       ],
@@ -6061,7 +6061,7 @@
       ],
       "changeSetRef": "gcs_b3f0cfc804d6",
       "machineReadable": true,
-      "generatedAt": "2026-04-14T05:15:15+00:00"
+      "generatedAt": "2026-04-14T05:25:47+00:00"
     },
     "risk": {
       "severityClass": "low",
@@ -6097,12 +6097,12 @@
     "evidenceChecklist": [
       {
         "evidenceType": "impact-snapshot",
-        "required": "true",
+        "required": true,
         "owner": "Frontend Platform"
       },
       {
         "evidenceType": "rollback-plan",
-        "required": "true",
+        "required": true,
         "owner": "Release Engineering"
       }
     ]
@@ -6532,7 +6532,7 @@
         "driftHash": "842859daebd8bf6b",
         "complianceState": "blocked",
         "beaconStatus": "release-blocking",
-        "reportedAt": "2026-04-14T05:15:15+00:00"
+        "reportedAt": "2026-04-14T05:25:47+00:00"
       },
       {
         "moduleId": "M4-purchasing",
@@ -6545,7 +6545,7 @@
         "driftHash": "9a303f5bf138e49e",
         "complianceState": "blocked",
         "beaconStatus": "release-blocking",
-        "reportedAt": "2026-04-14T05:15:15+00:00"
+        "reportedAt": "2026-04-14T05:25:47+00:00"
       }
     ],
     "summary": {
@@ -6619,7 +6619,7 @@
     ],
     "globalSignals": {
       "bridgeAliasDebtCount": 0,
-      "privateCssDebtScore": 14582,
+      "privateCssDebtScore": 14762,
       "tokenCoveragePercent": 29
     },
     "summary": {
@@ -6858,7 +6858,7 @@
         "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
         "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
         "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
-        "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+        "rollbackPlanRef": "mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json",
         "releaseBlocked": true,
         "blockerCount": 2,
         "releaseBlockerCount": 2,
@@ -6871,14 +6871,14 @@
           "rollbackPlan",
           "waiverRegisterSnapshot"
         ],
-        "driftReportGeneratedAt": "2026-04-14T05:15:15+00:00",
-        "generatedAt": "2026-04-14T05:15:15+00:00"
+        "driftReportGeneratedAt": "2026-04-14T05:25:47+00:00",
+        "generatedAt": "2026-04-14T05:25:47+00:00"
       }
     },
     "waivers": {
       "waivers": [],
       "version": "1",
-      "etag": "sha256:5e6db40cce8aaff61b8b4f515523d265"
+      "etag": "sha256:75f1627b0129cd8e3dd02f0900292568"
     },
     "complianceSummary": {
       "moduleCount": 2,
@@ -6891,7 +6891,7 @@
     },
     "debtSummary": {
       "bridgeAliasDebtCount": 0,
-      "privateCssDebtScore": 14582,
+      "privateCssDebtScore": 14762,
       "privateCssFileCount": 75,
       "tokenCoveragePercent": 29,
       "uncontrolledLegacyShellDebt": 0
@@ -6933,7 +6933,7 @@
         ]
       },
       "releaseReadinessTrend": "blocked-until-evidence-or-waiver",
-      "nextReview": "2026-04-21T05:15:15+00:00"
+      "nextReview": "2026-04-21T05:25:47+00:00"
     },
     "emergencyOverridePath": {
       "status": "exception-only",
@@ -6972,7 +6972,7 @@
       "driftReportRequired": true,
       "evidenceBundleRequired": true
     },
-    "generatedAt": "2026-04-14T05:15:15+00:00"
+    "generatedAt": "2026-04-14T05:25:47+00:00"
   },
   "graphicsReleaseLink": {
     "graphicsAuthorityRefs": [
@@ -6995,7 +6995,7 @@
     "multiSitePlantBrandingGovernanceRef": "mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
     "controlledEmergencyOverridePathRef": "mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
     "rolloutDecisionRef": "mom/data/graphics-governance/rollouts.json#/rollouts",
-    "rollbackPlanRef": "mom/data/graphics-governance/snapshots",
+    "rollbackPlanRef": "mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json",
     "releaseBlocked": true,
     "blockerCount": 2,
     "releaseBlockerCount": 2,
@@ -7008,7 +7008,7 @@
       "moduleDebtCount": 2,
       "uncontrolledLegacyShellDebt": 0
     },
-    "driftReportGeneratedAt": "2026-04-14T05:15:15+00:00",
+    "driftReportGeneratedAt": "2026-04-14T05:25:47+00:00",
     "evidenceBundleRequirements": [
       "affectedModulesSnapshot",
       "complianceMatrixSnapshot",
@@ -7018,7 +7018,8 @@
       "rollbackPlan",
       "waiverRegisterSnapshot"
     ],
-    "generatedAt": "2026-04-14T05:15:15+00:00"
+    "generatedAt": "2026-04-14T05:25:47+00:00",
+    "releaseReadinessState": "blocked-by-graphics-governance"
   },
   "multiSitePlantBrandingGovernance": {
     "authority": "backend_graphics_policy_pack",
