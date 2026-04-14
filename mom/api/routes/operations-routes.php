@@ -203,6 +203,7 @@ return static function (Router $router, string $dataDir): void {
         'dispatch_create_target'     => [DispatchController::class, 'createTarget'],
         'dispatch_update_target'     => [DispatchController::class, 'updateTarget'],
         'dispatch_send'              => [DispatchController::class, 'dispatchTarget'],
+        'dispatch_bulk_send'         => [DispatchController::class, 'bulkDispatch'],
         'dispatch_operator_tasks'    => [DispatchController::class, 'getOperatorDispatch'],
         'dispatch_report_production' => [DispatchController::class, 'reportProduction'],
         'dispatch_pause_target'      => [DispatchController::class, 'pauseTarget'],

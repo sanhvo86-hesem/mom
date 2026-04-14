@@ -1233,4 +1233,98 @@ class DispatchController extends BaseController
             $this->releaseExecutionStateLock($lockHandle);
         }
     }
+
+    /**
+     * POST bulkDispatch — Dispatch multiple targets in a single request.
+     *
+     * Body: { target_ids: string[] }
+     * Response: { dispatched: int, failed: string[], results: object[] }
+     *
+     * Legacy action: `dispatch_bulk_send`
+     */
+    public function bulkDispatch(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireDispatchWriteAccess($user);
+        $this->requireCsrf();
+
+        $body      = $this->jsonBody();
+        $targetIds = array_values(array_filter(
+            array_map('strval', (array)($body['target_ids'] ?? [])),
+            static fn(string $id): bool => $id !== '',
+        ));
+
+        if (empty($targetIds)) {
+            $this->error('missing_target_ids', 400);
+        }
+
+        $uid       = $this->userId($user);
+        $now       = $this->nowIso();
+        $lockHandle = null;
+
+        try {
+            $lockHandle = $this->acquireExecutionStateLock();
+
+            $file    = $this->dispatchDir() . '/targets.json';
+            $targets = $this->readJsonFile($file) ?? [];
+            $originalTargets = $targets;
+            $eventFile = $this->dispatchExecutionEventFile();
+            $events    = $this->readJsonFile($eventFile) ?? [];
+            $originalEvents = $events;
+
+            $dispatched = 0;
+            $failed     = [];
+            $results    = [];
+
+            foreach ($targetIds as $targetId) {
+                $found = false;
+                foreach ($targets as &$t) {
+                    if (($t['target_id'] ?? '') === $targetId) {
+                        try {
+                            $this->shopfloor()->assertTargetDispatchable($t);
+                            $previousStatus = (string)($t['status'] ?? '');
+                            $t['status']        = 'dispatched';
+                            $t['dispatched_at'] = $now;
+                            $t['updated_at']    = $now;
+                            $dispatchEvent = $this->shopfloor()->buildTargetLifecycleEvent($t, 'dispatch.target_dispatched', $uid, $now, [
+                                'source_action'   => 'dispatch_bulk_send',
+                                'previous_status' => $previousStatus,
+                            ]);
+                            if (is_array($dispatchEvent)) {
+                                $events[] = $dispatchEvent;
+                            }
+                            $results[] = ['target_id' => $targetId, 'ok' => true];
+                            $dispatched++;
+                        } catch (InvalidArgumentException $e) {
+                            $results[] = ['target_id' => $targetId, 'ok' => false, 'error' => $e->getMessage()];
+                            $failed[]  = $targetId;
+                        }
+                        $found = true;
+                        break;
+                    }
+                }
+                unset($t);
+                if (!$found) {
+                    $results[] = ['target_id' => $targetId, 'ok' => false, 'error' => 'not_found'];
+                    $failed[]  = $targetId;
+                }
+            }
+
+            $this->writeTargetState($file, $targets, $eventFile, $events, $originalTargets, $originalEvents);
+            $this->releaseExecutionStateLock($lockHandle);
+            $lockHandle = null;
+
+            $this->auditLog('dispatch_bulk_send', ['target_ids' => $targetIds, 'dispatched' => $dispatched], $uid);
+            $this->success([
+                'dispatched' => $dispatched,
+                'failed'     => $failed,
+                'results'    => $results,
+            ]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('bulk_dispatch_failed', 500, $e->getMessage());
+        } finally {
+            $this->releaseExecutionStateLock($lockHandle);
+        }
+    }
 }

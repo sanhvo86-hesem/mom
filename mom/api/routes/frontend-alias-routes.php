@@ -62,11 +62,17 @@ return static function (Router $router, string $dataDir): void {
     
     // Module 22: ai-quality-scheduling.js aliases
     $router->actions([
-        'ai_quality_scheduling_data' => [AiSchedulingController::class, 'getDashboard'],
-        'ai_prediction_false_positive' => [AiSchedulingController::class, 'resolvePrediction'],
-        'schedule_promise_calculate' => [AiSchedulingController::class, 'suggestPromiseDate'],
-        'schedule_slot_breakdown'    => [AiSchedulingController::class, 'getSchedule'],
-        'schedule_slot_detail'       => [AiSchedulingController::class, 'getSchedule'],
+        'ai_quality_scheduling_data'  => [AiSchedulingController::class, 'getDashboard'],
+        'ai_prediction_false_positive'=> [AiSchedulingController::class, 'resolvePrediction'],
+        'schedule_promise_calculate'  => [AiSchedulingController::class, 'suggestPromiseDate'],
+        'schedule_slot_breakdown'     => [AiSchedulingController::class, 'getSchedule'],
+        'schedule_slot_detail'        => [AiSchedulingController::class, 'getSchedule'],
+        // schedule_slots: gantt load alias (was unreachable — not in any route)
+        'schedule_slots'              => [AiSchedulingController::class, 'getSchedule'],
+        // schedule_slot_move: AI recommendations drag-drop reschedule alias
+        'schedule_slot_move'          => [AiSchedulingController::class, 'updateSlot'],
+        // spc_chart_data: SPC overlay alias used by ai-quality-scheduling module
+        'spc_chart_data'              => [DashboardController::class, 'spcChart'],
     ]);
     
     // Module 23: compliance-reports.js aliases
