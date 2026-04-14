@@ -105,6 +105,14 @@ class MobileController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function inspectionOverrideRoles(): array
+    {
+        return $this->mobileOverviewRoles();
+    }
+
+    /**
      * @return void
      */
     private function requireMobileAccess(array $user): void
@@ -380,6 +388,19 @@ class MobileController extends BaseController
 
         $employeeId = $this->resolveEmployeeId($user);
         $userId     = $this->userId($user);
+        $inspectorId = trim((string)($body['inspector_id'] ?? $employeeId));
+        $inspectorOverrideReason = trim((string)($body['inspector_override_reason'] ?? ''));
+        if ($inspectorId === '') {
+            $inspectorId = $employeeId;
+        }
+        if ($inspectorId !== $employeeId) {
+            if (!$this->userHasAnyRole($user, $this->inspectionOverrideRoles())) {
+                $this->error('inspector_override_forbidden', 403);
+            }
+            if ($inspectorOverrideReason === '') {
+                $this->error('inspector_override_reason_required', 400);
+            }
+        }
 
         // MES-R6-002 FIX: Validate photo size to prevent DoS
         $photosArray = (array)($body['photos'] ?? []);
@@ -406,18 +427,32 @@ class MobileController extends BaseController
                 'machine_id' => trim((string)($body['machine_id'] ?? $body['equipment_id'] ?? '')),
                 'equipment_id' => trim((string)($body['equipment_id'] ?? $body['machine_id'] ?? '')),
                 'work_center_id' => trim((string)($body['work_center_id'] ?? '')),
+                'cnc_program_id' => trim((string)($body['cnc_program_id'] ?? $body['nc_program_id'] ?? '')),
+                'cnc_program_revision' => trim((string)($body['cnc_program_revision'] ?? $body['program_revision'] ?? '')),
+                'setup_sheet_id' => trim((string)($body['setup_sheet_id'] ?? '')),
+                'setup_sheet_revision' => trim((string)($body['setup_sheet_revision'] ?? '')),
+                'part_revision' => trim((string)($body['part_revision'] ?? '')),
+                'org_plant_id' => trim((string)($body['org_plant_id'] ?? $body['plant_id'] ?? $_SESSION['org_plant_id'] ?? $_SESSION['plant_id'] ?? '')),
+                'org_site_id' => trim((string)($body['org_site_id'] ?? $body['site_id'] ?? $_SESSION['org_site_id'] ?? '')),
                 'capture_type' => strtolower(trim((string)($body['capture_type'] ?? ''))),
                 'measurements' => (array)($body['measurements'] ?? []),
                 'overall_result' => array_key_exists('overall_result', $body) || array_key_exists('result', $body)
                     ? strtolower(trim((string)($body['overall_result'] ?? $body['result'] ?? '')))
                     : null,
-                'inspector_id' => trim((string)($body['inspector_id'] ?? $employeeId)),
+                'inspector_id' => $inspectorId,
                 'photos'       => (array)($body['photos'] ?? []),
                 'notes'        => trim((string)($body['notes'] ?? '')),
                 'offline_created' => $body['offline_created'] ?? false,
                 'sync_status' => trim((string)($body['sync_status'] ?? 'synced')),
                 'device_id' => trim((string)($body['device_id'] ?? '')),
-                'metadata' => is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
+                'metadata' => array_merge(
+                    is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
+                    $inspectorId !== $employeeId ? [
+                        'inspector_override' => true,
+                        'inspector_override_reason' => $inspectorOverrideReason,
+                        'override_actor_employee_id' => $employeeId,
+                    ] : [],
+                ),
             ]);
 
             $this->auditLog('mobile_capture_inspection', [
@@ -426,6 +461,8 @@ class MobileController extends BaseController
                 'wo_number'    => $body['wo_number'],
                 'capture_type' => $body['capture_type'],
                 'measurement_count' => count($body['measurements'] ?? []),
+                'inspector_id' => $inspectorId,
+                'inspector_override' => $inspectorId !== $employeeId ? '1' : '0',
             ], $userId);
 
             $this->success(['capture' => $capture], 201);
@@ -524,7 +561,8 @@ class MobileController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $result = $this->mobileService()->resolveConflict($entryId, $resolution);
+            $allowOverride = $this->userHasAnyRole($user, $this->mobileOverviewRoles());
+            $result = $this->mobileService()->resolveConflict($entryId, $resolution, $employeeId, $allowOverride);
 
             $this->auditLog('mobile_resolve_conflict', [
                 'entry_id'    => $entryId,

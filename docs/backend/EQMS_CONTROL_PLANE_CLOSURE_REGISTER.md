@@ -59,6 +59,44 @@ Verification evidence:
 - `./composer test`: 349 tests, 2002 assertions, 1 skipped, passed.
 - `./composer check`: PHPStan plus PHPUnit completed with no errors; 349 tests, 2002 assertions, 1 skipped.
 
+## 2026-04-14 10:02 Closure Re-Audit Cycle
+
+Branch: `codex/worldclass-closure-20260414-1002`
+
+Six-agent re-audit result before remediation:
+
+| Agent scope | P0 | P1 | P2 / residual |
+|---|---:|---:|---|
+| Platform governance / repo hygiene | 0 | 0 | Ignored tmp/prompt/package-boundary hygiene and promotion archive productization. |
+| Document / form / evidence control | 0 | 4 | Canonical document writer, canonical form issuance/submission writer, runtime template/schema split proof, and retention binding were not yet evidenced. |
+| Change authority / configuration control | 0 | 0 | Field-authority token one-shot consumption remains P2 unless used as a security token. |
+| MES / genealogy / digital thread | 0 | 0 | Productized explorer and broader graph ontology round-trip tests remain P2. |
+| Regulated records / data integrity | 0 | 0 | Legacy report provenance, route-level evidence-package test, and provider-backed WORM remain P2/waiver. |
+| Product capability benchmark | 0 | 0 | Cockpit/explorer surfaces remain P2 product roadmap. |
+
+Remediation implemented on the branch:
+
+| Finding closed | Closure evidence |
+|---|---|
+| Document control had schema but no canonical writer proof | `DocumentRevisionCommandService` writes `doc_families`, `doc_revisions`, `doc_effectivities`, and `doc_distributions`; `/api/v1/eqms/documents/revisions` exposes the governed route; `WorldClassControlPlaneExecutionTest::testDocumentRevisionCommandServicePersistsCanonicalDocumentControlRows` proves no legacy `docs_custom.json` write authority is used. |
+| Form issuance/submission had schema but no canonical writer proof | `FormIssuanceCommandService` writes `frm_issuances` and `frm_submission_attempts`; `/api/v1/eqms/forms/issuances` and `/api/v1/eqms/forms/submission-attempts` expose governed routes; `WorldClassControlPlaneExecutionTest::testFormIssuanceCommandServicePersistsIssuanceAndSubmissionAttemptWithoutLegacySchemas` proves runtime version semantics use `frm_template_revision_id` and `frm_schema_version_id`, not `form_schemas` or `record_counters.json`. |
+| Final evidence retention was modeled but not bound to the lifecycle | `RetentionLockService` creates an active `retention_locks` row during `EvidenceFinalizationService::finalize`; `CanonicalEvidenceReadService::package` now returns `retention_locks`; existing evidence finalization/read tests assert the retention lock path. |
+| Schema Studio system registry view depended on runtime registry files | `SchemaStudioController` falls back from `data/registry/*.json` to controlled `mom/contracts/*.json`; the portal exposes workspace and read-only `system_contract_registry` views distinctly; `SchemaStudioRegistryFallbackTest` proves contract fallback and relation restoration when runtime registry is missing. |
+| Static analysis gate was blocked by redundant enum fallback | `GenericCrudService` now treats registry `statusSet()` option `value` as required contract data instead of silently defaulting to an empty string; PHPStan passes. |
+
+Verification evidence for this cycle:
+
+- `php -l` passed for new document/form/retention services, changed evidence services, EQMS controller, and focused tests.
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit --filter WorldClassControlPlaneExecutionTest --testdox`: 28 tests, 162 assertions, passed.
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit --filter SchemaStudioRegistryFallbackTest --testdox`: 2 tests, 14 assertions, passed.
+- `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors.
+
+Current closure status after remediation:
+
+- P0 = 0.
+- Non-waived P1 = 0.
+- Remaining items are accepted waiver or planned P2 roadmap only.
+
 ## Accepted Waivers
 
 | Waiver | Severity | Owner | Review date | Rationale | Exit condition |
@@ -74,6 +112,9 @@ Verification evidence:
 | Legacy read compatibility cleanup | Write authority is closed; read compatibility can remain during migration. | Replace read models with canonical projections and remove JSON reads after migration sign-off. |
 | Durable downloadable audit-pack bundle | Manifest builder and package completeness checks exist; durable bundle storage/retrieval is product-surface depth, not a current authority blocker. | Add `AuditPackExportService`, persisted bundle metadata, retrieval endpoint, and hash-verifiable export artifact. |
 | Productized change impact/effectivity explorer | Backend gates and lifecycle rows exist; explorer UX/API depth remains roadmap. | Add impact-matrix query service over affected/resulting/effectivity/conflict/training/read-ack data. |
+| Release package boundary validator | Source boundary gate is P0/P1 clean; package-level archive validation of ignored tmp/prompt/vendor/cache paths remains hardening. | Add a release-pack validator that proves generated release bundles exclude ignored scratch/runtime lanes. |
+| Field authority token one-shot consume | Canonical change authority already blocks unauthorized post-release edits; if `eqms_field_change_authorization` is treated as a one-shot token, replay consumption should be explicit. | Add atomic `consumed_at` write and double-use denial test, or document the table as compatibility/reference evidence only. |
+| Productized canonical document/form cockpit | Backend writer routes now exist; full operator/auditor UX remains product surface. | Add dashboard/search/version UX over `doc_*` and `frm_*` canonical tables. |
 
 ## Operational Metrics Required
 

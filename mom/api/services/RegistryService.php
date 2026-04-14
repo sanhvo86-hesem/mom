@@ -52,7 +52,99 @@ class RegistryService
             return $this->cache[$name] = $runtimeRegistry;
         }
 
-        return $this->cache[$name] = $this->readJsonFile($this->controlledRegistryDir . '/' . $name . '.json');
+        $controlledRegistry = $this->readJsonFile($this->controlledRegistryDir . '/' . $name . '.json');
+        if ($controlledRegistry !== []) {
+            return $this->cache[$name] = $controlledRegistry;
+        }
+
+        if ($name === 'endpoint-catalog') {
+            return $this->cache[$name] = $this->buildEndpointCatalogFromTableRegistry();
+        }
+
+        return $this->cache[$name] = [];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildEndpointCatalogFromTableRegistry(): array
+    {
+        $tableRegistry = $this->load('table-registry');
+        $tables = is_array($tableRegistry['tables'] ?? null) ? $tableRegistry['tables'] : [];
+        $endpoints = [];
+        $generatedAt = gmdate('c');
+
+        foreach ($tables as $tableName => $tableMeta) {
+            if (!is_string($tableName) || !is_array($tableMeta)) {
+                continue;
+            }
+
+            $domain = strtolower(trim((string)($tableMeta['domain'] ?? 'default')));
+            $safeTable = strtolower(trim($tableName));
+            if (!preg_match('/^[a-z0-9_]+$/', $domain) || !preg_match('/^[a-z0-9_]+$/', $safeTable)) {
+                continue;
+            }
+
+            $primaryKey = $tableMeta['primaryKey'] ?? null;
+            $primaryKeyFields = is_array($primaryKey)
+                ? array_values(array_filter(array_map(static fn($value): string => trim((string)$value), $primaryKey), static fn(string $value): bool => $value !== ''))
+                : (trim((string)$primaryKey) !== '' ? [trim((string)$primaryKey)] : []);
+            $actions = [
+                'list' => ['handler' => 'listRecords', 'method' => 'GET', 'kind' => 'read'],
+                'create' => ['handler' => 'createRecord', 'method' => 'POST', 'kind' => 'create'],
+            ];
+            if ($primaryKeyFields !== []) {
+                $actions['detail'] = ['handler' => 'getDetail', 'method' => 'GET', 'kind' => 'read'];
+                $actions['update'] = ['handler' => 'updateRecord', 'method' => 'POST', 'kind' => 'update'];
+                $actions['delete'] = ['handler' => 'deleteRecord', 'method' => 'POST', 'kind' => 'delete'];
+            }
+            if ($primaryKeyFields !== [] && trim((string)($tableMeta['statusColumn'] ?? '')) !== '') {
+                $actions['transition'] = ['handler' => 'transitionRecord', 'method' => 'POST', 'kind' => 'transition'];
+            }
+
+            foreach ($actions as $action => $spec) {
+                $key = $domain . '.' . $safeTable . '.' . $action;
+                $endpoints[$key] = [
+                    'label' => $key,
+                    'labelEn' => $key,
+                    'module' => $domain,
+                    'moduleEn' => $domain,
+                    'method' => $spec['method'],
+                    'kind' => $spec['kind'],
+                    'domain' => $domain,
+                    'entity' => $safeTable,
+                    'path' => 'api/index.php?action=' . $key,
+                    'controller' => 'GenericCrudController',
+                    'handler' => $spec['handler'],
+                    'field_count' => count((array)($tableMeta['columns'] ?? [])),
+                    'security' => [
+                        'auth_required' => true,
+                        'csrf_required' => true,
+                        'permission_keys' => ['registry.read'],
+                    ],
+                    'workflow' => [
+                        'execution_mode' => 'registry_backed_generic_crud',
+                        'generic_runtime_safe' => true,
+                    ],
+                    'capabilities' => [
+                        'deletion' => [
+                            'mode' => $action === 'delete' ? 'governed_generic_delete' : 'not_applicable',
+                        ],
+                    ],
+                    'source' => 'contracts/table-registry.generated_endpoint_catalog_fallback',
+                ];
+            }
+        }
+
+        return [
+            '_meta' => [
+                'generatedAt' => $generatedAt,
+                'source' => 'contracts/table-registry.json',
+                'fallback' => true,
+                'endpointCount' => count($endpoints),
+            ],
+            'endpoints' => $endpoints,
+        ];
     }
 
     /**

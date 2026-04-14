@@ -8,12 +8,21 @@ use MOM\Api\Router;
 
 return static function (Router $router, string $dataDir): void {
     // Registry-backed generic CRUD
-    $tableRegistryPath = $dataDir . '/registry/table-registry.json';
     $tableRegistry = [];
-    if (is_file($tableRegistryPath)) {
+    $tableRegistryPaths = [
+        $dataDir . '/registry/table-registry.json',
+        dirname(__DIR__, 2) . '/contracts/table-registry.json',
+    ];
+    foreach ($tableRegistryPaths as $tableRegistryPath) {
+        if (!is_file($tableRegistryPath)) {
+            continue;
+        }
         $rawTableRegistry = @file_get_contents($tableRegistryPath);
         $decodedTableRegistry = $rawTableRegistry !== false ? json_decode($rawTableRegistry, true) : null;
         $tableRegistry = is_array($decodedTableRegistry['tables'] ?? null) ? $decodedTableRegistry['tables'] : [];
+        if ($tableRegistry !== []) {
+            break;
+        }
     }
     
     foreach ($tableRegistry as $tableName => $tableMeta) {

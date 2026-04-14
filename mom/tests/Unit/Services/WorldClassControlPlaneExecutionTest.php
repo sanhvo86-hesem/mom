@@ -16,9 +16,11 @@ use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ControlPlane\ReleaseGovernanceBuilder;
 use MOM\Services\ControlPlane\WorkflowStatusAuthorityService;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
+use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
+use MOM\Services\FormControl\FormIssuanceCommandService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Traceability\GenealogyGraphService;
@@ -404,6 +406,84 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('duplicate_submission', $validation['errors'][0]['error_code']);
     }
 
+    public function testDocumentRevisionCommandServicePersistsCanonicalDocumentControlRows(): void
+    {
+        $db = new DocumentFormControlFakeDb();
+
+        $result = (new DocumentRevisionCommandService($db))->createRevision([
+            'doc_code' => 'SOP-100',
+            'doc_type' => 'SOP',
+            'title' => 'Machine setup control',
+            'revision_label' => 'A',
+            'revision_sequence' => 1,
+            'lifecycle_state' => 'released',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000701',
+            'canonical_payload' => ['purpose' => 'controlled setup'],
+            'manifest_hash_sha256' => str_repeat('a', 64),
+            'effectivities' => [[
+                'effectivity_type' => 'date',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+                'effective_from' => '2026-04-14T00:00:00Z',
+            ]],
+            'distributions' => [[
+                'audience_type' => 'role',
+                'audience_ref' => 'operator',
+                'distribution_state' => 'ack_required',
+                'read_ack_required' => true,
+            ]],
+        ], 'qa-1');
+
+        $this->assertSame('canonical_document_control', $result['authority']);
+        $this->assertSame('DOCFAM-1', $result['doc_family']['doc_family_id']);
+        $this->assertSame('DOCREV-1', $result['doc_revision']['doc_revision_id']);
+        $this->assertCount(1, $result['doc_effectivities']);
+        $this->assertCount(1, $result['doc_distributions']);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('doc_families', $sql);
+        $this->assertStringContainsString('doc_revisions', $sql);
+        $this->assertStringContainsString('doc_effectivities', $sql);
+        $this->assertStringContainsString('doc_distributions', $sql);
+        $this->assertStringNotContainsString('docs_custom.json', $sql);
+    }
+
+    public function testFormIssuanceCommandServicePersistsIssuanceAndSubmissionAttemptWithoutLegacySchemas(): void
+    {
+        $db = new DocumentFormControlFakeDb();
+        $templateRevisionId = '00000000-0000-0000-0000-000000000801';
+        $schemaVersionId = '00000000-0000-0000-0000-000000000802';
+
+        $issuance = (new FormIssuanceCommandService($db))->issue([
+            'allocation_id' => 'ALLOC-100',
+            'issued_record_id' => 'FRM-100-0001',
+            'frm_template_revision_id' => $templateRevisionId,
+            'frm_schema_version_id' => $schemaVersionId,
+            'delivery_mode' => 'offline_excel',
+            'issued_to_ref' => 'operator-1',
+            'carrier_manifest_hash_sha256' => str_repeat('b', 64),
+            'idempotency_key' => 'form-issuance-100',
+        ], 'qa-1');
+
+        $attempt = (new FormIssuanceCommandService($db))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 1,
+            'attempt_state' => 'valid',
+            'submitted_by_ref' => 'operator-1',
+            'original_hash_sha256' => str_repeat('c', 64),
+            'parsed_payload' => ['result' => 'pass'],
+        ], 'operator-1');
+
+        $this->assertSame('canonical_form_control', $issuance['authority']);
+        $this->assertSame($templateRevisionId, $issuance['version_semantics']['template_revision_id']);
+        $this->assertSame($schemaVersionId, $issuance['version_semantics']['schema_version_id']);
+        $this->assertSame('FRMISS-1', $issuance['issuance']['frm_issuance_id']);
+        $this->assertSame('FRMATT-1', $attempt['submission_attempt']['frm_submission_attempt_id']);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('frm_issuances', $sql);
+        $this->assertStringContainsString('frm_submission_attempts', $sql);
+        $this->assertStringNotContainsString('form_schemas', $sql);
+        $this->assertStringNotContainsString('record_counters.json', $sql);
+    }
+
     public function testEffectivityGateBlocksReleaseForOpenConflictAndIncompleteTraining(): void
     {
         $result = (new EffectivityGateService())->evaluateChangeOrderRelease(
@@ -475,6 +555,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'canonical_payload' => ['result' => 'pass'],
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
+                'retention_class' => 'quality_record',
                 'signature_events' => [[
                     'signer_ref' => 'qa-1',
                     'signer_role' => 'qa_qms',
@@ -491,8 +572,10 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertArrayHasKey('readable_snapshot', $result['package']['artifacts']);
             $this->assertArrayHasKey('hash_signature_manifest', $result['package']['artifacts']);
             $this->assertCount(1, $result['canonical']['signature_events']);
+            $this->assertSame('RET-1', $result['canonical']['retention_lock']['retention_lock_id']);
             $this->assertTrue($db->sawSignatureEventInsert);
-            $this->assertGreaterThanOrEqual(8, count($db->queryOneCalls));
+            $this->assertTrue($db->sawRetentionLockInsert);
+            $this->assertGreaterThanOrEqual(9, count($db->queryOneCalls));
         } finally {
             $this->removeTree($dir);
         }
@@ -509,6 +592,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertNotEmpty($package['evidence_artifacts']);
         $this->assertNotEmpty($package['signature_events']);
         $this->assertNotEmpty($package['publication_records']);
+        $this->assertNotEmpty($package['retention_locks']);
     }
 
     public function testChangeLifecycleCommandServicePersistsRequestOrderAndImpactObjects(): void
@@ -905,6 +989,65 @@ final class CanonicalOutboxFakeDb
     }
 }
 
+final class DocumentFormControlFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        $trimmed = ltrim($sql);
+        if (str_starts_with($trimmed, 'INSERT INTO doc_families')) {
+            return ['doc_family_id' => 'DOCFAM-1', 'doc_code' => (string)$params[':doc_code']];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO doc_revisions')) {
+            return [
+                'doc_revision_id' => 'DOCREV-1',
+                'doc_family_id' => (string)$params[':doc_family_id'],
+                'revision_label' => (string)$params[':revision_label'],
+                'lifecycle_state' => (string)$params[':lifecycle_state'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO doc_effectivities')) {
+            return ['doc_effectivity_id' => 'DOCEFF-1', 'doc_revision_id' => (string)$params[':doc_revision_id']];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO doc_distributions')) {
+            return ['doc_distribution_id' => 'DOCDIST-1', 'doc_revision_id' => (string)$params[':doc_revision_id']];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO frm_issuances')) {
+            return [
+                'frm_issuance_id' => 'FRMISS-1',
+                'allocation_id' => (string)$params[':allocation_id'],
+                'frm_template_revision_id' => (string)$params[':frm_template_revision_id'],
+                'frm_schema_version_id' => (string)$params[':frm_schema_version_id'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO frm_submission_attempts')) {
+            return [
+                'frm_submission_attempt_id' => 'FRMATT-1',
+                'frm_issuance_id' => (string)$params[':frm_issuance_id'],
+                'attempt_state' => (string)$params[':attempt_state'],
+            ];
+        }
+        return [];
+    }
+
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
+    }
+}
+
 final class GenealogyGraphFakeDb
 {
     /**
@@ -1041,6 +1184,8 @@ final class EvidenceFinalizationFakeDb
 
     public bool $sawSignatureEventInsert = false;
 
+    public bool $sawRetentionLockInsert = false;
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>
@@ -1068,6 +1213,16 @@ final class EvidenceFinalizationFakeDb
                 'signed_object_id' => (string)$params[':signed_object_id'],
                 'signature_meaning' => (string)$params[':signature_meaning'],
                 'signature_hash_sha256' => (string)$params[':signature_hash_sha256'],
+            ];
+        }
+        if (str_starts_with(ltrim($sql), 'INSERT INTO retention_locks')) {
+            $this->sawRetentionLockInsert = true;
+            return [
+                'retention_lock_id' => 'RET-1',
+                'object_type' => 'evidence_record',
+                'object_id' => (string)$params[':object_id'],
+                'lock_type' => (string)$params[':lock_type'],
+                'lock_state' => 'active',
             ];
         }
         if (str_starts_with(ltrim($sql), 'UPDATE evidence_records')) {
@@ -1133,6 +1288,16 @@ final class CanonicalEvidenceReadFakeDb
                 'evidence_publication_id' => 'PUB-1',
                 'publication_state' => 'pending',
                 'publication_receipt' => '{}',
+                'metadata' => '{}',
+            ]];
+        }
+        if (str_contains($sql, 'FROM retention_locks')) {
+            return [[
+                'retention_lock_id' => 'RET-1',
+                'object_type' => 'evidence_record',
+                'object_id' => 'EVREC-1',
+                'lock_type' => 'retention_schedule',
+                'lock_state' => 'active',
                 'metadata' => '{}',
             ]];
         }

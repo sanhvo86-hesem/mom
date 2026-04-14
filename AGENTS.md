@@ -27,7 +27,7 @@ Run the maximum safe subset for every change:
 
 - `./composer analyse -- --memory-limit=1G`
 - `./composer test`
-- `./composer check -- --memory-limit=1G`
+- `./composer check`
 - Focused `php -l`, PHPUnit, PHPStan, migration, and grep checks for touched files when full-suite analysis is blocked by existing debt.
 
 ## Branch And Worktree Safety
@@ -36,6 +36,14 @@ Run the maximum safe subset for every change:
 - Inspect `git status`, current branch, diff stat, changed filenames, and merge-base before remediation.
 - Do not revert user or prior-agent changes unless explicitly instructed. Work with existing dirty files and keep unrelated changes intact.
 - When using audit agents or child worktrees, isolate their output and integrate only reviewed, intentional changes.
+- Agent branches must never merge directly to `main`; integrate reviewed changes into the root remediation branch first.
+
+## Merge To Main Cleanup
+
+- Merge to `main` only after remediation is integrated, validation is run or blocked with evidence, and the worktree is clean.
+- Prefer a fast-forward merge from the root remediation branch into local `main`; if it cannot be reconciled safely, stop and keep the remediation branch intact.
+- After a successful merge, delete the root remediation branch and temporary agent branches/worktrees created for that remediation.
+- Never delete `main` or the user's original branch.
 
 ## Citations And Research
 

@@ -1668,6 +1668,45 @@ class SchemaStudioController extends BaseController
         return [$this->designPath($id)];
     }
 
+    private function blankWorkspaceDesignDocument(): array
+    {
+        $now = $this->nowIso();
+        return [
+            '_meta' => [
+                'id' => self::SYSTEM_DESIGN_ID,
+                'name' => 'HESEM Workspace Design',
+                'displayName' => 'Workspace Design Draft',
+                'version' => '1.0.0',
+                'description' => 'Editable blank draft for controlled schema design. Runtime authority remains the System Contract Registry.',
+                'source' => 'generated_blank_workspace_fallback',
+                'designType' => 'workspace_design',
+                'authorityLayer' => 'design_workspace',
+                'authorityViewKind' => 'design_draft',
+                'authorityRole' => 'non_authoritative_editing_surface',
+                'runtimeAuthority' => self::SYSTEM_REGISTRY_DESIGN_ID,
+                'authoritySource' => 'data/schema-studio/designs/workspace.json',
+                'schemaName' => 'public',
+                'databaseName' => 'mom',
+                'physicalDbSchema' => 'public',
+                'purpose' => 'Editable design draft for controlled schema design, baseline, diff, compiler, and release review. It is not the physical DB schema.',
+                'writePolicy' => 'editable_with_revision_guard',
+                'deletePolicy' => 'archive_or_replace_do_not_hard_delete',
+                'dataLossImpact' => 'Deleting the workspace does not delete database rows, but it disables the editable Schema Studio surface until a replacement workspace is created.',
+                'blankDraft' => true,
+                'createdAt' => $now,
+                'updatedAt' => $now,
+                'author' => 'system',
+                'readOnly' => false,
+                'editable' => true,
+            ],
+            'enums' => [],
+            'tables' => [],
+            'relations' => [],
+            'groups' => [],
+            'notes' => [],
+        ];
+    }
+
     private function loadDesignDocument(string $designId): ?array
     {
         $id = $this->normalizeDesignId($designId);
@@ -1689,6 +1728,9 @@ class SchemaStudioController extends BaseController
             if (is_array($doc)) {
                 return $doc;
             }
+        }
+        if ($id === self::SYSTEM_DESIGN_ID) {
+            return $this->blankWorkspaceDesignDocument();
         }
         return null;
     }
@@ -1718,6 +1760,110 @@ class SchemaStudioController extends BaseController
         }
 
         return is_array($design) ? $design : ['_meta' => ['id' => $id . '_baseline'], 'tables' => [], 'relations' => [], 'groups' => [], 'notes' => []];
+    }
+
+    private function readRegistryDocumentWithFallback(string $name, ?string &$resolvedPath = null): array
+    {
+        $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '', trim($name));
+        if ($safeName === '') {
+            $resolvedPath = null;
+            return [];
+        }
+
+        $runtimePath = $this->dataDir . '/registry/' . $safeName . '.json';
+        $runtime = $this->readJsonFile($runtimePath) ?? [];
+        if ($runtime !== []) {
+            $resolvedPath = $runtimePath;
+            return $runtime;
+        }
+
+        $contractPath = $this->rootDir . '/mom/contracts/' . $safeName . '.json';
+        $contract = $this->readJsonFile($contractPath) ?? [];
+        if ($contract !== []) {
+            $resolvedPath = $contractPath;
+            return $contract;
+        }
+
+        $resolvedPath = null;
+        return [];
+    }
+
+    private function registrySourceLabel(?string $path, string $fallback): string
+    {
+        if ($path === null || $path === '') {
+            return $fallback;
+        }
+        return $this->relativeWorkspacePath($path);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function relationEdgesFromRelationMap(array $relationMap): array
+    {
+        if (is_array($relationMap['edges'] ?? null)) {
+            return array_values(array_filter($relationMap['edges'], 'is_array'));
+        }
+        if (is_array($relationMap['relations'] ?? null)) {
+            return array_values(array_filter($relationMap['relations'], 'is_array'));
+        }
+        if (array_is_list($relationMap)) {
+            return array_values(array_filter($relationMap, 'is_array'));
+        }
+        return [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function relationEdgesFromTableRegistry(array $tableRegistry): array
+    {
+        $edges = [];
+        $tables = is_array($tableRegistry['tables'] ?? null) ? $tableRegistry['tables'] : [];
+        foreach ($tables as $tableName => $tableDef) {
+            if (!is_string($tableName) || !is_array($tableDef)) {
+                continue;
+            }
+
+            $foreignKeys = is_array($tableDef['foreignKeys'] ?? null) ? $tableDef['foreignKeys'] : [];
+            foreach ($foreignKeys as $fk) {
+                if (!is_array($fk)) {
+                    continue;
+                }
+
+                $fromFields = $this->normalizeFieldList($fk['column'] ?? ($fk['columns'] ?? []));
+                $reference = is_scalar($fk['references'] ?? null) ? trim((string)$fk['references']) : '';
+                if ($fromFields === [] || $reference === '' || strpos($reference, '.') === false) {
+                    continue;
+                }
+
+                [$toTable, $toFieldSpec] = explode('.', $reference, 2);
+                $toTable = trim($toTable);
+                $toFields = $this->normalizeFieldList($toFieldSpec);
+                if ($toTable === '' || $toFields === []) {
+                    continue;
+                }
+
+                $edges[] = [
+                    'from' => [
+                        'entity' => $tableName,
+                        'field' => $fromFields,
+                    ],
+                    'to' => [
+                        'entity' => $toTable,
+                        'field' => $toFields,
+                    ],
+                    'label' => is_scalar($fk['label'] ?? null) ? (string)$fk['label'] : '',
+                    'cascadeActions' => [
+                        'delete' => 'RESTRICT',
+                        'update' => 'CASCADE',
+                    ],
+                    'source' => 'table-registry.foreignKeys',
+                ];
+            }
+        }
+
+        return $edges;
     }
 
     /**
@@ -4961,13 +5107,16 @@ class SchemaStudioController extends BaseController
      */
     private function buildRegistryDesignDocument(string $id, array $meta): array
     {
-        $registryPath = $this->dataDir . '/registry/table-registry.json';
-        $relationPath = $this->dataDir . '/registry/relation-map.json';
-        $domainPath = $this->dataDir . '/registry/domain-architecture.json';
-        $tableRegistry = $this->readJsonFile($registryPath) ?? [];
-        $relationMap = $this->readJsonFile($relationPath) ?? [];
-        $domainArch = $this->readJsonFile($domainPath) ?? [];
-        $registryUpdatedAt = is_file($registryPath) ? gmdate('c', (int)(filemtime($registryPath) ?: time())) : $this->nowIso();
+        $registryPath = null;
+        $relationPath = null;
+        $domainPath = null;
+        $tableRegistry = $this->readRegistryDocumentWithFallback('table-registry', $registryPath);
+        $relationMap = $this->readRegistryDocumentWithFallback('relation-map', $relationPath);
+        $domainArch = $this->readRegistryDocumentWithFallback('domain-architecture', $domainPath);
+        $registrySource = $this->registrySourceLabel($registryPath, 'data/registry/table-registry.json');
+        $registryUpdatedAt = $registryPath !== null && is_file($registryPath)
+            ? gmdate('c', (int)(filemtime($registryPath) ?: time()))
+            : $this->nowIso();
 
         $domainMap = [];
         foreach (($domainArch['domains'] ?? []) as $domainKey => $domainDef) {
@@ -4996,13 +5145,17 @@ class SchemaStudioController extends BaseController
                 'schemaName' => 'public',
                 'databaseName' => 'mom',
                 'storageAuthority' => 'database/migrations/*.sql -> database/schema.sql',
-                'registryAuthority' => 'data/registry/table-registry.json',
+                'registryAuthority' => $registrySource,
                 'createdAt' => (string)(($tableRegistry['_meta']['generatedAt'] ?? null) ?: $registryUpdatedAt),
                 'updatedAt' => (string)(($tableRegistry['_meta']['generatedAt'] ?? null) ?: $registryUpdatedAt),
                 'author' => 'registry',
                 'readOnly' => true,
                 'editable' => false,
-            ], $meta),
+            ], array_merge($meta, [
+                'source' => $registrySource,
+                'authoritySource' => 'database/migrations/*.sql -> database/schema.sql -> ' . $registrySource,
+                'registryFallbackActive' => $registryPath !== null && strpos($registrySource, 'mom/contracts/') === 0,
+            ])),
             'enums' => [],
             'tables' => [],
             'relations' => [],
@@ -5090,13 +5243,9 @@ class SchemaStudioController extends BaseController
             $tableIndex++;
         }
 
-        $edges = [];
-        if (is_array($relationMap['edges'] ?? null)) {
-            $edges = $relationMap['edges'];
-        } elseif (is_array($relationMap['relations'] ?? null)) {
-            $edges = $relationMap['relations'];
-        } elseif (is_array($relationMap)) {
-            $edges = $relationMap;
+        $edges = $this->relationEdgesFromRelationMap($relationMap);
+        if ($edges === []) {
+            $edges = $this->relationEdgesFromTableRegistry($tableRegistry);
         }
 
         foreach ($edges as $edge) {
@@ -5284,9 +5433,11 @@ class SchemaStudioController extends BaseController
         if (!$schema) {
             $this->error('not_found', 404);
         }
-        $schema = $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
+        $schema = $id === self::SYSTEM_REGISTRY_DESIGN_ID
+            ? $this->reconcileSchemaDocument($schema)
+            : $this->normalizeEnterpriseSchema($schema, (string)($user['username'] ?? 'system'));
         $baseline = $this->loadBaselineDocument($id, $schema);
-        if (is_array($baseline)) {
+        if (is_array($baseline) && $id !== self::SYSTEM_REGISTRY_DESIGN_ID) {
             $baseline = $this->normalizeEnterpriseSchema($baseline, (string)($user['username'] ?? 'system'));
         }
         $this->success([
@@ -5389,12 +5540,13 @@ class SchemaStudioController extends BaseController
         $user = $this->requireAuth();
         $this->requireReadAccess($user);
         $this->requireCsrf();
-        $registryPath = $this->dataDir . '/registry/table-registry.json';
-        $relationPath = $this->dataDir . '/registry/relation-map.json';
-        $domainPath = $this->dataDir . '/registry/domain-architecture.json';
-        $tableRegistry = $this->readJsonFile($registryPath) ?? [];
-        $relationMap = $this->readJsonFile($relationPath) ?? [];
-        $domainArch = $this->readJsonFile($domainPath) ?? [];
+        $registryPath = null;
+        $relationPath = null;
+        $domainPath = null;
+        $tableRegistry = $this->readRegistryDocumentWithFallback('table-registry', $registryPath);
+        $relationMap = $this->readRegistryDocumentWithFallback('relation-map', $relationPath);
+        $domainArch = $this->readRegistryDocumentWithFallback('domain-architecture', $domainPath);
+        $registrySource = $this->registrySourceLabel($registryPath, 'data/registry/table-registry.json');
 
         $domainMap = [];
         foreach (($domainArch['domains'] ?? []) as $domainKey => $domainDef) {
@@ -5410,7 +5562,7 @@ class SchemaStudioController extends BaseController
                 'name' => 'HESEM Workspace Design',
                 'version' => '1.0.0',
                 'description' => 'Editable workspace design imported from the generated system contract registry.',
-                'source' => 'workspace_registry_import',
+                'source' => 'workspace_registry_import:' . $registrySource,
                 'designType' => 'workspace_design',
                 'authorityLayer' => 'design_workspace',
                 'validation_profile' => 'logical_registry',
@@ -5495,16 +5647,15 @@ class SchemaStudioController extends BaseController
             $tableIndex++;
         }
 
-        $edges = [];
-        if (is_array($relationMap['edges'] ?? null)) {
-            $edges = $relationMap['edges'];
-        } elseif (is_array($relationMap['relations'] ?? null)) {
-            $edges = $relationMap['relations'];
-        } elseif (is_array($relationMap)) {
-            $edges = $relationMap;
+        $edges = $this->relationEdgesFromRelationMap($relationMap);
+        if ($edges === []) {
+            $edges = $this->relationEdgesFromTableRegistry($tableRegistry);
         }
 
         foreach ($edges as $edge) {
+            if (!is_array($edge)) {
+                continue;
+            }
             $fromTable = is_scalar($edge['from']['entity'] ?? null) ? trim((string)$edge['from']['entity']) : '';
             $toTable = is_scalar($edge['to']['entity'] ?? null) ? trim((string)$edge['to']['entity']) : '';
             $fromFields = $this->normalizeFieldList($edge['from']['field'] ?? '');
