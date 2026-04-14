@@ -6,7 +6,7 @@ Date: 2026-04-15
 
 | Standard / Regulator | Requirement Interpreted For This Repo | Official Source |
 | --- | --- | --- |
-| ISA-95 / IEC 62264 | Keep enterprise planning, MOM/MES execution, quality, and equipment/control boundaries explicit. | https://www.isa.org/standards-and-publications/isa-standards/isa-95 |
+| ISA-95 / IEC 62264 | Keep enterprise planning, MOM/MES execution, quality, and equipment/control boundaries explicit. Local schema/publication proof supports boundary discipline but is not conformance proof. | https://www.isa.org/standards-and-publications/isa-standards/isa-95 |
 | NIST SP 800-82 Rev. 3 | OT-adjacent systems should fail safely, preserve least privilege, and avoid uncontrolled machine actions. | https://csrc.nist.gov/pubs/sp/800/82/r3/final |
 | NIST SSDF SP 800-218 | Security-relevant changes need reviewable evidence, testing, and secure implementation practices. | https://csrc.nist.gov/pubs/sp/800/218/final |
 | 21 CFR Part 11 | Electronic records/signatures need trustworthy identity, auditability, linkage, and validation context. | https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11 |
@@ -32,7 +32,7 @@ World-class platforms do not rely on a dashboard saying "ready"; they bind runti
 
 | Gap | Closed In This Run | Evidence |
 | --- | --- | --- |
-| Runtime DB/schema proof drift visible in admin UI | Yes locally | Migration chain 001-132, schema authority 9/9, publication truth 256/256. |
+| Runtime DB/schema proof drift visible in admin UI | Yes locally | Migration chain 001-132, schema authority 9/9, publication truth 256/256. This is repo-local source-of-truth evidence, not ISA-95 certification or vendor-suite parity. |
 | E-signature records not relationally tied to challenges | Yes locally | Migration 132 FK with orphan precheck; migration test. |
 | Explicit field authority lookup lacked unconsumed proof index | Yes locally | Migration 132 index; change authority tests. |
 | Rate limiter could fail open on fallback state failure | Yes locally | Fail-closed 503 path and regression test. |
@@ -41,4 +41,3 @@ World-class platforms do not rely on a dashboard saying "ready"; they bind runti
 | Live OTel collector/exporter proof | No | External infrastructure required. |
 | Full Part 11 / validation / WORM archive proof | No | External validation, SOP, identity, retention, and audit process required. |
 | Full SAP/Siemens/Critical/ETQ/MasterControl parity | No | Product scope and deployed workflows remain beyond this tranche. |
-
