@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+require_once __DIR__ . '/CacheService.php';
 require_once __DIR__ . '/CircuitBreaker.php';
 
 use MOM\Api\Services\CacheService;

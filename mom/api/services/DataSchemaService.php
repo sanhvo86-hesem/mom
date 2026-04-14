@@ -496,27 +496,88 @@ final class DataSchemaService
 
     private function relativePath(string $path): string
     {
-        // INT-011 FIX: Prevent path traversal attacks by validating the resolved path
-        $normalizedPath = rtrim(str_replace('\\', '/', $path), '/');
-        $root = rtrim(str_replace('\\', '/', $this->rootDir), '/');
-
-        // Use realpath to resolve all .. and . components
-        $resolved = realpath($normalizedPath);
-        $rootResolved = realpath($root);
-
-        // Ensure the resolved path is within the root directory (prevent traversal)
-        if ($resolved === false || $rootResolved === false || strpos($resolved, $rootResolved) !== 0) {
+        $normalizedPath = $this->normalizeFilesystemPath($path);
+        $rootResolved = realpath($this->rootDir);
+        if ($rootResolved === false) {
             throw new \RuntimeException('Path traversal detected: ' . $path);
         }
 
-        if ($root !== '' && $root !== '.' && $normalizedPath === $root) {
-            return '';
-        }
-        if ($root !== '' && $root !== '.' && str_starts_with($normalizedPath, $root . '/')) {
-            return substr($normalizedPath, strlen($root) + 1);
+        $rootResolved = $this->normalizeFilesystemPath($rootResolved);
+        $resolved = realpath($normalizedPath);
+        $candidate = $resolved === false
+            ? $this->resolveMissingPath($normalizedPath, $rootResolved)
+            : $this->normalizeFilesystemPath($resolved);
+
+        if (!$this->isPathWithinRoot($candidate, $rootResolved)) {
+            throw new \RuntimeException('Path traversal detected: ' . $path);
         }
 
-        return ltrim($normalizedPath, '/');
+        if ($candidate === $rootResolved) {
+            return '';
+        }
+
+        return ltrim(substr($candidate, strlen($rootResolved) + 1), '/');
+    }
+
+    private function normalizeFilesystemPath(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+        if ($path !== '/') {
+            $path = rtrim($path, '/');
+        }
+
+        return $path;
+    }
+
+    /**
+     * Resolve the deepest existing parent, then append the missing tail.
+     *
+     * This keeps traversal protection effective for missing registry artifacts:
+     * symlinked parents and existing ".." parents are resolved with realpath(),
+     * while legitimate not-yet-generated files under the project root can still
+     * be represented in inventory payloads.
+     */
+    private function resolveMissingPath(string $path, string $rootResolved): string
+    {
+        $candidate = str_starts_with($path, '/') ? $path : $rootResolved . '/' . ltrim($path, '/');
+        $missingTail = [];
+
+        while (!file_exists($candidate)) {
+            $missingTail[] = basename($candidate);
+            $parent = dirname($candidate);
+            if ($parent === $candidate || $parent === '' || $parent === '.') {
+                break;
+            }
+            $candidate = $parent;
+        }
+
+        $existingParent = realpath($candidate);
+        if ($existingParent === false) {
+            throw new \RuntimeException('Path traversal detected: ' . $path);
+        }
+
+        $resolved = $this->normalizeFilesystemPath($existingParent);
+        foreach (array_reverse($missingTail) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+            if ($segment === '..') {
+                $resolved = $this->normalizeFilesystemPath(dirname($resolved));
+                continue;
+            }
+            $resolved .= '/' . $segment;
+        }
+
+        return $this->normalizeFilesystemPath($resolved);
+    }
+
+    private function isPathWithinRoot(string $path, string $root): bool
+    {
+        if ($root === '/') {
+            return str_starts_with($path, '/');
+        }
+
+        return $path === $root || str_starts_with($path, $root . '/');
     }
 
     private function readJson(string $path): array
