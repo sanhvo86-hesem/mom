@@ -98,7 +98,7 @@ final class WorkforceQualificationGateServiceTest extends TestCase
             $this->assertSame('blocked', $e->details()['status']);
         }
 
-        $current = $queue->getOperatorQueue('EMP-EXP', substr((string)$task['assigned_at'], 0, 10));
+        $current = $queue->getOperatorQueue('EMP-EXP');
         $packet = (new ProductionHistoryReadModelService(
             $events,
             new CanonicalManufacturingSpineService(QMS_TEST_BASE_DIR),
