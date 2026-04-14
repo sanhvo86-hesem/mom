@@ -405,6 +405,13 @@ class GraphicsGovernanceController extends BaseController
         $this->respond(fn(): array => $this->graphics()->graphicsReleaseLink());
     }
 
+    public function releaseEvidencePack(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => $this->graphics()->graphicsReleaseEvidencePack());
+    }
+
     /**
      * @param callable(): array<string, mixed> $fn
      */
@@ -434,9 +441,7 @@ class GraphicsGovernanceController extends BaseController
      */
     private function analyzeImpact(string $eventType, callable $fn): never
     {
-        $user = $this->requireAuth();
-        $this->requireCsrf();
-        $this->requireGraphicsRead($user);
+        $user = $this->requireWriteRequest();
         $body = $this->jsonBody();
         $username = (string)($user['username'] ?? '');
         $result = $this->call(fn(): array => $this->graphics()->recordImpactReport($fn($body), $username));

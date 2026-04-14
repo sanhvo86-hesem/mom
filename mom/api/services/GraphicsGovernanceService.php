@@ -886,6 +886,7 @@ class GraphicsGovernanceService
                 'debtObservatoryRef' => 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory',
                 'environmentPolicyPacksRef' => 'mom/data/registry/graphics-governance-registry.json#/environmentPolicyPacks',
                 'releaseDashboardRef' => 'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseDashboard',
+                'releaseEvidencePackRef' => 'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseEvidencePack',
                 'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
                 'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
@@ -1570,6 +1571,22 @@ class GraphicsGovernanceService
                 ['field' => 'expiresAt', 'message' => 'expiresAt must parse to a future date/time', 'code' => 'invalid_expiry'],
             ]);
         }
+        $documentControlRefs = array_values(array_filter(array_map('strval', (array)($input['documentControlRefs'] ?? []))));
+        $releaseManifestRefs = $this->normalizeReleaseManifestRefs((array)($input['releaseManifestRefs'] ?? []));
+        if (in_array($riskClass, ['high', 'regulated', 'shopfloor-critical'], true)) {
+            if ($documentControlRefs === []) {
+                throw new GraphicsGovernanceException(422, 'document_control_ref_required', 'High-risk waivers require controlled documentControlRefs at creation time', [
+                    ['field' => 'documentControlRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver creation', 'code' => 'required'],
+                ]);
+            }
+            if ($releaseManifestRefs === []) {
+                throw new GraphicsGovernanceException(422, 'release_manifest_required', 'High-risk waivers require releaseManifestRefs at creation time', [
+                    ['field' => 'releaseManifestRefs', 'message' => 'Required for high, regulated, or shopfloor-critical waiver creation', 'code' => 'required'],
+                ]);
+            }
+        }
+        $this->assertControlledEvidenceRefList('documentControlRefs', $documentControlRefs);
+        $this->assertControlledReleaseRefList('releaseManifestRefs', $releaseManifestRefs);
         $waiverId = (string)($input['waiverId'] ?? ('gwv_' . gmdate('YmdHis') . '_' . substr($this->hash(json_encode($input) ?: ''), 0, 8)));
         $waiver = [
             'waiverId' => $waiverId,
@@ -1582,8 +1599,8 @@ class GraphicsGovernanceService
             'approver' => (string)$input['approver'],
             'riskClass' => $riskClass,
             'status' => 'draft',
-            'documentControlRefs' => array_values(array_map('strval', (array)($input['documentControlRefs'] ?? []))),
-            'releaseManifestRefs' => $this->normalizeReleaseManifestRefs((array)($input['releaseManifestRefs'] ?? [])),
+            'documentControlRefs' => $documentControlRefs,
+            'releaseManifestRefs' => $releaseManifestRefs,
             'createdAt' => gmdate('c'),
             'createdBy' => $username,
             'expiresAt' => gmdate('c', $expiresAt),
@@ -1672,6 +1689,7 @@ class GraphicsGovernanceService
             'environmentPolicyPacks' => $this->environmentPolicyPacks()['policyPacks'],
             'graphicsReleaseDashboard' => $this->graphicsReleaseDashboard()['releaseDashboard'],
             'graphicsReleaseLink' => $releaseLink['releaseLink'],
+            'graphicsReleaseEvidencePack' => $this->graphicsReleaseEvidencePack()['evidencePack'],
             'multiSitePlantBrandingGovernance' => $this->multiSitePlantBrandingGovernance(),
             'controlledEmergencyOverridePath' => $this->controlledEmergencyOverridePath(),
             'persistence' => $this->persistenceModel(),
@@ -1710,6 +1728,7 @@ class GraphicsGovernanceService
                 'debtObservatoryRef' => 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory',
                 'environmentPolicyPacksRef' => 'mom/data/registry/graphics-governance-registry.json#/environmentPolicyPacks',
                 'releaseDashboardRef' => 'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseDashboard',
+                'releaseEvidencePackRef' => 'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseEvidencePack',
                 'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
                 'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
@@ -1729,6 +1748,36 @@ class GraphicsGovernanceService
                     'rollbackPlan',
                     'waiverRegisterSnapshot',
                 ],
+                'generatedAt' => gmdate('c'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function graphicsReleaseEvidencePack(): array
+    {
+        $link = $this->graphicsReleaseLink()['releaseLink'];
+        $dashboard = $this->graphicsReleaseDashboard()['releaseDashboard'];
+        $blockers = $this->releaseBlockers();
+        return [
+            'evidencePack' => [
+                'evidencePackId' => 'graphics-release-evidence-current',
+                'authority' => 'backend_graphics_release_evidence_pack',
+                'status' => (bool)($blockers['summary']['releaseBlocked'] ?? false) ? 'blocked' : 'ready',
+                'changeSetRef' => 'mom/data/registry/graphics-governance-registry.json#/changeSetModel',
+                'impactReportRef' => (string)($link['impactAnalysisRef'] ?? 'mom/data/graphics-governance/state.json#/pendingImpact'),
+                'complianceMatrixSnapshotRef' => (string)($link['complianceMatrixRef'] ?? 'mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance'),
+                'driftReportRef' => 'mom/data/registry/graphics-governance-registry.json#/graphicsDriftReport',
+                'runtimeLinkageProofRef' => (string)($link['runtimeBeaconRef'] ?? 'mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon'),
+                'debtObservatoryRef' => (string)($link['debtObservatoryRef'] ?? 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory'),
+                'rolloutDecisionRef' => (string)($link['rolloutDecisionRef'] ?? 'mom/data/graphics-governance/rollouts.json#/rollouts'),
+                'rollbackPackageRef' => (string)($link['rollbackPlanRef'] ?? 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json'),
+                'waiverRefs' => (string)($link['waiversRef'] ?? 'mom/data/graphics-governance/waivers.json#/waivers'),
+                'releaseBlockersStatus' => (string)($dashboard['readiness'] ?? ((bool)($blockers['summary']['releaseBlocked'] ?? false) ? 'blocked' : 'ready')),
+                'releaseBlockers' => $blockers,
+                'requiredArtifacts' => (array)($link['evidenceBundleRequirements'] ?? []),
                 'generatedAt' => gmdate('c'),
             ],
         ];
@@ -2265,11 +2314,19 @@ class GraphicsGovernanceService
     private function gateState(array $packet): array
     {
         $requiredNow = array_values(array_map('strval', (array)($packet['qa']['requiredNow'] ?? [])));
+        $evidenceRefs = (array)($packet['qa']['evidenceRefs'] ?? []);
+        $hasControlledGateEvidence = function (string $gate) use ($requiredNow, $evidenceRefs): bool {
+            $ref = trim((string)($evidenceRefs[$gate] ?? ''));
+            return in_array($gate, $requiredNow, true)
+                && $ref !== ''
+                && $this->repo->controlledArtifactExists($ref);
+        };
         return [
             'requiredNow' => $requiredNow,
             'knownOpen' => array_values(array_map('strval', (array)($packet['qa']['knownOpen'] ?? []))),
-            'auditReady' => in_array('G14', $requiredNow, true) || $this->isRegulatedPacket($packet) === false,
-            'shopfloorReady' => in_array('G07', $requiredNow, true) || in_array('G08', $requiredNow, true) || $this->isShopfloorPacket($packet) === false,
+            'evidenceRefs' => $evidenceRefs,
+            'auditReady' => $hasControlledGateEvidence('G14') || $this->isRegulatedPacket($packet) === false,
+            'shopfloorReady' => $hasControlledGateEvidence('G07') || $hasControlledGateEvidence('G08') || $this->isShopfloorPacket($packet) === false,
             'releaseManifestRequired' => true,
         ];
     }
@@ -2911,6 +2968,44 @@ class GraphicsGovernanceService
     }
 
     /**
+     * @param array<int, string> $refs
+     */
+    private function assertControlledEvidenceRefList(string $field, array $refs): void
+    {
+        foreach ($refs as $idx => $ref) {
+            $ref = trim((string)$ref);
+            if ($ref === '') {
+                continue;
+            }
+            if ($this->repo->controlledArtifactExists($ref)) {
+                continue;
+            }
+            throw new GraphicsGovernanceException(422, 'controlled_evidence_artifact_required', 'Evidence ref must resolve to an existing controlled graphics/release artifact', [
+                ['field' => $field . '/' . $idx, 'message' => 'Use an existing controlled evidence artifact, not an ad hoc string or boolean', 'code' => 'controlled_evidence_artifact_required'],
+            ], ['ref' => $ref]);
+        }
+    }
+
+    /**
+     * @param array<int, array<string, string>> $refs
+     */
+    private function assertControlledReleaseRefList(string $field, array $refs): void
+    {
+        foreach ($refs as $idx => $ref) {
+            $candidate = trim((string)($ref['uri'] ?? ''));
+            if ($candidate === '') {
+                $candidate = trim((string)($ref['refId'] ?? ''));
+            }
+            if ($candidate !== '' && $this->repo->controlledArtifactExists($candidate)) {
+                continue;
+            }
+            throw new GraphicsGovernanceException(422, 'controlled_release_artifact_required', 'Release/evidence ref must resolve to an existing controlled graphics/release artifact', [
+                ['field' => $field . '/' . $idx, 'message' => 'Use an existing controlled release artifact URI/refId', 'code' => 'controlled_release_artifact_required'],
+            ], ['ref' => $candidate]);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function multiSitePlantBrandingGovernance(): array
@@ -3126,8 +3221,24 @@ class GraphicsGovernanceService
                 $missing
             ));
         }
-        if ($this->normalizeReleaseManifestRefs((array)($request['releaseManifestRefs'] ?? $request['releaseEvidence'] ?? [])) === []) {
+        $releaseManifestRefs = $this->normalizeReleaseManifestRefs((array)($request['releaseManifestRefs'] ?? $request['releaseEvidence'] ?? []));
+        if ($releaseManifestRefs === []) {
             throw new GraphicsGovernanceException(422, 'release_manifest_required', 'Publish requires releaseManifestRefs');
+        }
+        $this->assertControlledReleaseRefList('releaseManifestRefs', $releaseManifestRefs);
+        $controlledGateRefs = [];
+        foreach ($evidence as $key => $value) {
+            if (is_array($value)) {
+                $ref = trim((string)($value['ref'] ?? $value['refId'] ?? $value['uri'] ?? ''));
+                if ($ref !== '') {
+                    $controlledGateRefs[] = $ref;
+                }
+            } elseif (is_string($value) && str_contains($value, '/')) {
+                $controlledGateRefs[] = $value;
+            }
+        }
+        if ($controlledGateRefs !== []) {
+            $this->assertControlledEvidenceRefList('gateEvidence', $controlledGateRefs);
         }
     }
 
@@ -3204,6 +3315,7 @@ class GraphicsGovernanceService
                     ['field' => 'releaseManifestRefs', 'message' => 'Required for waiver approval', 'code' => 'required'],
                 ]);
             }
+            $this->assertControlledReleaseRefList('releaseManifestRefs', $this->normalizeReleaseManifestRefs((array)($waiver['releaseManifestRefs'] ?? [])));
             $riskClass = (string)($waiver['riskClass'] ?? 'medium');
             if (in_array($riskClass, ['high', 'regulated', 'shopfloor-critical'], true)) {
                 if ((array)($waiver['documentControlRefs'] ?? []) === []) {
@@ -3212,6 +3324,7 @@ class GraphicsGovernanceService
                     ]);
                 }
             }
+            $this->assertControlledEvidenceRefList('documentControlRefs', array_values(array_map('strval', (array)($waiver['documentControlRefs'] ?? []))));
         }
         $waiver['status'] = $status;
         $waiver[$status === 'approved' ? 'approvedAt' : 'expiredAt'] = gmdate('c');

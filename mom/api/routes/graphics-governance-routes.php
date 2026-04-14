@@ -46,6 +46,7 @@ return static function (Router $router, string $dataDir): void {
         'graphics_environment_policy_packs_get'=> [GraphicsGovernanceController::class, 'environmentPolicyPacks'],
         'graphics_release_dashboard_get'       => [GraphicsGovernanceController::class, 'releaseDashboard'],
         'graphics_release_link_get'            => [GraphicsGovernanceController::class, 'releaseLink'],
+        'graphics_release_evidence_pack_get'   => [GraphicsGovernanceController::class, 'releaseEvidencePack'],
 
         'admin_template_registry_get'          => [GraphicsGovernanceController::class, 'listTemplates'],
         'admin_template_get'                   => [GraphicsGovernanceController::class, 'getTemplate'],
@@ -79,6 +80,7 @@ return static function (Router $router, string $dataDir): void {
         'admin_graphics_environment_policy_packs_get' => [GraphicsGovernanceController::class, 'environmentPolicyPacks'],
         'admin_graphics_release_dashboard_get' => [GraphicsGovernanceController::class, 'releaseDashboard'],
         'admin_graphics_release_link_get'      => [GraphicsGovernanceController::class, 'releaseLink'],
+        'admin_graphics_release_evidence_pack_get' => [GraphicsGovernanceController::class, 'releaseEvidencePack'],
     ]);
 
     $router->get('/api/graphics/design-config', GraphicsGovernanceController::class, 'getDesignConfig');
@@ -110,6 +112,7 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/graphics/environment-policy-packs', GraphicsGovernanceController::class, 'environmentPolicyPacks');
     $router->get('/api/graphics/release-dashboard', GraphicsGovernanceController::class, 'releaseDashboard');
     $router->get('/api/graphics/release-link', GraphicsGovernanceController::class, 'releaseLink');
+    $router->get('/api/graphics/release-evidence-pack', GraphicsGovernanceController::class, 'releaseEvidencePack');
 
     $router->post('/api/graphics/impact/token', GraphicsGovernanceController::class, 'analyzeTokenImpact');
     $router->post('/api/graphics/impact/template', GraphicsGovernanceController::class, 'analyzeTemplateImpact');

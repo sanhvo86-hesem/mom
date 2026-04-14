@@ -47,7 +47,8 @@ var ENDPOINTS = {
   debtObservatory:   { method:'GET',  action:'admin_graphics_debt_observatory_get' },
   environmentPacks:  { method:'GET',  action:'admin_graphics_environment_policy_packs_get' },
   releaseDashboard:  { method:'GET',  action:'admin_graphics_release_dashboard_get' },
-  releaseLink:       { method:'GET',  action:'admin_graphics_release_link_get' }
+  releaseLink:       { method:'GET',  action:'admin_graphics_release_link_get' },
+  releaseEvidencePack:{ method:'GET', action:'admin_graphics_release_evidence_pack_get' }
 };
 
 var TEMPLATE_STATES = [
@@ -86,6 +87,7 @@ var _state = {
   environmentPolicyPacks: null,
   releaseDashboard: null,
   releaseLink: null,
+  releaseEvidencePack: null,
   audit: [],
   waivers: [],
   rolloutsByTemplate: {},
@@ -710,6 +712,7 @@ function refresh(seedTemplates){
   var environmentPacks = callEndpoint('environmentPacks', {}).catch(function(){ return null; });
   var releaseDashboard = callEndpoint('releaseDashboard', {}).catch(function(){ return null; });
   var releaseLink = callEndpoint('releaseLink', {}).catch(function(){ return null; });
+  var releaseEvidencePack = callEndpoint('releaseEvidencePack', {}).catch(function(){ return null; });
   // Probe-only: populate endpointStatus for GET endpoints not consumed in the main flow.
   // nonCompliant is on-demand normally but should appear as probed in the contract panel.
   // designConfig is fetched separately via getDesignConfig() but probing here ensures the
@@ -732,6 +735,7 @@ function refresh(seedTemplates){
     environmentPacks,
     releaseDashboard,
     releaseLink,
+    releaseEvidencePack,
     localModules
   ]).then(function(parts){
     var remoteRegistry = parts[0];
@@ -748,7 +752,8 @@ function refresh(seedTemplates){
     var remoteEnvironmentPacks = parts[11];
     var remoteReleaseDashboard = parts[12];
     var remoteReleaseLink = parts[13];
-    var localSchemas = parts[14];
+    var remoteReleaseEvidencePack = parts[14];
+    var localSchemas = parts[15];
     var complianceRows = normalizeComplianceRows(remoteCompliance);
     var auditRows = normalizeAuditRows(remoteAudit);
     var waiverRows = normalizeWaiverRows(remoteWaivers);
@@ -777,6 +782,7 @@ function refresh(seedTemplates){
     _state.environmentPolicyPacks = remoteEnvironmentPacks && (remoteEnvironmentPacks.policyPacks || remoteEnvironmentPacks);
     _state.releaseDashboard = remoteReleaseDashboard && (remoteReleaseDashboard.releaseDashboard || remoteReleaseDashboard);
     _state.releaseLink = remoteReleaseLink && (remoteReleaseLink.releaseLink || remoteReleaseLink);
+    _state.releaseEvidencePack = remoteReleaseEvidencePack && (remoteReleaseEvidencePack.evidencePack || remoteReleaseEvidencePack.graphicsReleaseEvidencePack || remoteReleaseEvidencePack);
     _state.waiverVersion = String(remoteWaivers && remoteWaivers.version || '');
     _state.waiverEtag = String(remoteWaivers && remoteWaivers.etag || '');
     _state.loaded = true;
@@ -790,6 +796,7 @@ function refresh(seedTemplates){
     _state.environmentPolicyPacks = _state.environmentPolicyPacks || buildEnvironmentPolicyPacks();
     _state.releaseDashboard = _state.releaseDashboard || buildReleaseDashboard();
     _state.releaseLink = _state.releaseLink || buildReleaseLink();
+    _state.releaseEvidencePack = _state.releaseEvidencePack || buildReleaseEvidencePack();
     return getSnapshot(seedTemplates);
   }).catch(function(){
     _state.modules = mergeModules([]);
@@ -809,6 +816,7 @@ function refresh(seedTemplates){
     _state.environmentPolicyPacks = buildEnvironmentPolicyPacks();
     _state.releaseDashboard = buildReleaseDashboard();
     _state.releaseLink = buildReleaseLink();
+    _state.releaseEvidencePack = buildReleaseEvidencePack();
     return getSnapshot(seedTemplates);
   });
 }
@@ -844,6 +852,7 @@ function getSnapshot(seedTemplates){
     environmentPolicyPacks: clone(_state.environmentPolicyPacks || buildEnvironmentPolicyPacks()),
     releaseDashboard: clone(_state.releaseDashboard || buildReleaseDashboard()),
     releaseLink: clone(_state.releaseLink || buildReleaseLink()),
+    releaseEvidencePack: clone(_state.releaseEvidencePack || buildReleaseEvidencePack()),
     releaseBlockers: effectiveReleaseBlockers(),
     audit: clone(_state.audit),
     waivers: clone(_state.waivers),
@@ -1158,6 +1167,30 @@ function buildReleaseLink(){
       'rollbackPlan',
       'waiverRegisterSnapshot'
     ],
+    generatedAt:nowIso()
+  };
+}
+
+function buildReleaseEvidencePack(){
+  var link = _state.releaseLink || buildReleaseLink();
+  var dashboard = _state.releaseDashboard || buildReleaseDashboard();
+  var blockers = effectiveReleaseBlockers();
+  return {
+    evidencePackId:'graphics-release-evidence-current',
+    authority:'backend_graphics_release_evidence_pack',
+    status:blockers.some(function(row){ return String(row.status || '') === 'active'; }) ? 'blocked' : 'ready',
+    changeSetRef:'mom/data/registry/graphics-governance-registry.json#/changeSetModel',
+    impactReportRef:link.impactAnalysisRef || 'mom/data/graphics-governance/state.json#/pendingImpact',
+    complianceMatrixSnapshotRef:link.complianceMatrixRef || 'mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance',
+    driftReportRef:'mom/data/registry/graphics-governance-registry.json#/graphicsDriftReport',
+    runtimeLinkageProofRef:link.runtimeBeaconRef || 'mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon',
+    debtObservatoryRef:link.debtObservatoryRef || 'mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory',
+    rolloutDecisionRef:link.rolloutDecisionRef || 'mom/data/graphics-governance/rollouts.json#/rollouts',
+    rollbackPackageRef:link.rollbackPlanRef || 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json',
+    waiverRefs:link.waiversRef || 'mom/data/graphics-governance/waivers.json#/waivers',
+    releaseBlockersStatus:dashboard.readiness || (blockers.length ? 'blocked' : 'ready'),
+    blockerCount:blockers.filter(function(row){ return String(row.status || '') === 'active'; }).length,
+    requiredArtifacts:link.evidenceBundleRequirements || [],
     generatedAt:nowIso()
   };
 }
@@ -1778,6 +1811,7 @@ window.HmGraphicsGovernance = {
   getEnvironmentPolicyPacks: function(){ return clone(_state.environmentPolicyPacks || buildEnvironmentPolicyPacks()); },
   getGraphicsReleaseDashboard: function(){ return clone(_state.releaseDashboard || buildReleaseDashboard()); },
   getGraphicsReleaseLink: function(){ return clone(_state.releaseLink || buildReleaseLink()); },
+  getGraphicsReleaseEvidencePack: function(){ return clone(_state.releaseEvidencePack || buildReleaseEvidencePack()); },
   collectRuntimeDiagnostics: collectRuntimeDiagnostics,
   collectRuntimeBeacon: collectRuntimeBeacon,
   computeImpact: computeImpact,
