@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-closure-20260414-0807`
+Audited branch: `codex/worldclass-reaudit-20260414-102059`
 
 Date: 2026-04-14
 
@@ -30,3 +30,4 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - EQMS cannot be a side module. First-piece/in-process/final inspection, evidence, nonconformance, and release packets must be linked to work order/operation/machine/operator context.
 - CNC digital thread is the main remaining structural gap. Execution already preserves CNC references, but CNC program/setup-sheet authority is still file-backed while DB schema exists.
 - Security gaps in AI/NLQ are high-leverage because natural-language query surfaces can expose broad manufacturing data and write conversation history.
+- This remediation pass closed additional safe gaps: AI model/dashboard read access is now role-scoped, model internals are admin-only, AI dashboard MTTA is plant-scoped, generic EQMS exception updates cannot mutate lifecycle fields, JO/WO updates use explicit allowlists, and genealogy DB constraints now match the runtime ontology.

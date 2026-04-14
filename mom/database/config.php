@@ -26,11 +26,19 @@ $envBool = static function (string $name, bool $default): bool {
     return $parsed ?? $default;
 };
 
-// SECURITY FIX: Validate DB_PASSWORD is set in production/staging mode.
-// Do not allow empty passwords to silently fall through.
+// SECURITY FIX: Validate DB_PASSWORD when the PostgreSQL path is explicitly
+// enabled. JSON_ONLY deployments must still bootstrap without DB credentials
+// so read-only registry and compatibility surfaces can stay available.
 $dbPassword = getenv('DB_PASSWORD');
 $appEnv = strtolower(trim((string)(getenv('APP_ENV') ?: 'production')));
+$usePostgres = $envBool('USE_POSTGRES', false);
+$shadowWrite = $envBool('SHADOW_WRITE', false);
+$jsonFallback = $envBool('JSON_FALLBACK', false);
+$allowEmptyPassword = $envBool('DB_ALLOW_EMPTY_PASSWORD', false);
+$requirePassword = $envBool('DB_REQUIRE_PASSWORD', $usePostgres || $shadowWrite);
 if (($dbPassword === false || $dbPassword === '' || $dbPassword === null)
+    && !$allowEmptyPassword
+    && $requirePassword
     && in_array($appEnv, ['production', 'staging'], true)) {
     throw new \RuntimeException(
         'DB_PASSWORD environment variable is required and must not be empty in ' . $appEnv . ' environment'
@@ -48,7 +56,7 @@ return [
     'charset'  => 'utf8',
     'schema'   => 'public',
     'sslmode'  => getenv('DB_SSL') ?: 'prefer',
-    'allow_empty_password' => $envBool('DB_ALLOW_EMPTY_PASSWORD', false),
+    'allow_empty_password' => $allowEmptyPassword,
 
     // Connection Pool
     'connect_timeout' => (int)(getenv('DB_CONNECT_TIMEOUT') ?: 5),
@@ -57,9 +65,9 @@ return [
     'read_retry_delay_ms' => max(0, (int)(getenv('DB_READ_RETRY_DELAY_MS') ?: 150)),
 
     // Feature Flags
-    'use_postgres'  => $envBool('USE_POSTGRES', false),
-    'shadow_write'  => $envBool('SHADOW_WRITE', false),
-    'json_fallback' => $envBool('JSON_FALLBACK', false),
+    'use_postgres'  => $usePostgres,
+    'shadow_write'  => $shadowWrite,
+    'json_fallback' => $jsonFallback,
 
     // Logging
     'log_queries'  => $envBool('DB_LOG_QUERIES', false),

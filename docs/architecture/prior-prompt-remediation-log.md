@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-closure-20260414-0807`
+Audited branch: `codex/worldclass-reaudit-20260414-102059`
 
 Date: 2026-04-14
 
@@ -34,6 +34,13 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | API-key write controls | Fixed now | API key create/revoke/JWT generation now require auth/admin and CSRF; revoke accepts route alias `keyId`. |
 | Local storage first-write reliability | Fixed now | `LocalStorageDriver` creates directories before realpath validation and rejects absolute/traversal paths. |
 | Required docs under requested names | Fixed now | Added `canonical-execution-source-of-truth.md`, `prior-prompt-remediation-log.md`, and `shopfloor-execution-contracts.md`; updated benchmark doc. |
+| Six-agent global reaudit artifacts | Fixed now | Added `docs/audits/agent1-benchmark.md` through `agent6-ai-security.md` with current finding dispositions. |
+| AI model/dashboard read governance | Fixed now | `aiModelList()` and `aiDashboard()` require AI read access; non-admin model list output redacts config, metadata, and training source. |
+| EQMS generic update lifecycle bypass | Fixed now | Exception update routes now use field allowlists and reject lifecycle/status fields through generic update. |
+| JO/WO generic update field drift | Fixed now | `OrderController` now rejects unknown JO/WO update fields before workflow validation and validates WO schedule window order. |
+| Evidence replay-key contract drift | Fixed now | `EvidenceController` idempotency keys now follow the 16-128 character platform token contract without colon separators. |
+| Mobile task completion data quality | Fixed now | Mobile completion rejects scrap greater than completed quantity and requires a reason code for fail/partial/scrap outcomes. |
+| Genealogy runtime/DB ontology drift | Fixed now | Migration `121_genealogy_runtime_ontology_constraints.sql` aligns DB checks with `GenealogyGraphService::nodeType()`. |
 
 ## Partially completed or staged
 
@@ -74,3 +81,5 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full genealogy automation is blocked by unresolved serial/lot/traveler edge semantics.
 - Full EQMS enforcement is blocked by the need to connect inspection results to NCR, disposition, CAPA, and SPC workflows.
 - Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.
+- Full DB-backed CNC program/setup-sheet authority remains blocked by required JSON-to-DB reconciliation and compatibility testing.
+- Online mobile clock-in/task-completion idempotency and indexed mobile queue projections remain staged because they require a broader mobile replay-contract migration.

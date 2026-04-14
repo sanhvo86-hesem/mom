@@ -20,6 +20,87 @@ ini_set('log_errors', '1');
 @ini_set('expose_php', '0');
 error_reporting(E_ALL);
 
+if (!function_exists('mom_api_bootstrap_json')) {
+    /**
+     * Emit a minimal JSON error before legacy helpers or the MVC router exist.
+     *
+     * Schema Studio calls api/index.php directly, so bootstrap failures must
+     * still return JSON instead of PHP-FPM's default HTML 500 page.
+     *
+     * @param array<string, mixed> $extra
+     */
+    function mom_api_bootstrap_json(string $error, int $statusCode = 500, array $extra = []): never
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+        if (!headers_sent()) {
+            http_response_code($statusCode);
+            header('Content-Type: application/json; charset=utf-8');
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('X-Content-Type-Options: nosniff');
+            header('X-Frame-Options: SAMEORIGIN');
+            header('Referrer-Policy: same-origin');
+        }
+        $payload = array_merge([
+            'ok' => false,
+            'error' => $error,
+            'server_time' => gmdate('c'),
+        ], $extra);
+        $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo $encoded === false ? '{"ok":false,"error":"response_encode_failed"}' : $encoded;
+        exit;
+    }
+}
+
+if (!defined('MOM_API_INDEX_FAILSAFE_REGISTERED')) {
+    define('MOM_API_INDEX_FAILSAFE_REGISTERED', true);
+
+    set_exception_handler(static function (Throwable $e): void {
+        @error_log('[API index bootstrap] Uncaught: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        if (is_a($e, 'MOM\Api\Controllers\ExitException')) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                @session_write_close();
+            }
+            if (!headers_sent()) {
+                http_response_code($e->getStatusCode());
+                foreach ($e->getHeaders() as $name => $value) {
+                    header($name . ': ' . str_replace(["\r", "\n"], '', (string)$value));
+                }
+            }
+            echo $e->getBody();
+            exit;
+        }
+        mom_api_bootstrap_json('server_error', 500);
+    });
+
+    register_shutdown_function(static function (): void {
+        $error = error_get_last();
+        if (!is_array($error)) {
+            return;
+        }
+        $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
+        if (!in_array((int)($error['type'] ?? 0), $fatalTypes, true)) {
+            return;
+        }
+        @error_log('[API index bootstrap] Fatal: ' . json_encode($error, JSON_UNESCAPED_SLASHES));
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('X-Content-Type-Options: nosniff');
+        }
+        echo '{"ok":false,"error":"server_error","server_time":"' . gmdate('c') . '"}';
+    });
+
+    set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+        if (!(error_reporting() & $severity)) {
+            return false;
+        }
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
+}
+
 // â”€â”€ Paths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $BASE_DIR = dirname(__DIR__); // mom
@@ -40,15 +121,37 @@ if (!isset($DATA_DIR) || $DATA_DIR === '') {
 $LOG_FILE = $DATA_DIR . '/php_error.log';
 @ini_set('error_log', $LOG_FILE);
 
-$apiConfig = require __DIR__ . '/config.php';
+// Load legacy helpers early so direct api/index.php requests get the same
+// structured JSON exception handling as requests forwarded through api.php.
+if (!function_exists('api_json') && !defined('API_HELPERS_ONLY')) {
+    define('API_HELPERS_ONLY', true);
+    require_once $BASE_DIR . '/api.php';
+}
+
+try {
+    $apiConfig = require __DIR__ . '/config.php';
+    if (!is_array($apiConfig)) {
+        @error_log('[API index bootstrap] config.php did not return an array; using defaults');
+        $apiConfig = [];
+    }
+} catch (Throwable $e) {
+    @error_log('[API index bootstrap] config.php failed: ' . $e->getMessage());
+    $apiConfig = [];
+}
 
 // â”€â”€ Autoloader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Composer autoloader (includes PSR-4 mappings defined in composer.json)
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (is_file($composerAutoload)) {
-    require_once $composerAutoload;
-} else {
+    try {
+        require_once $composerAutoload;
+    } catch (Throwable $e) {
+        @error_log('[API index bootstrap] Composer autoload failed; using fallback autoloader: ' . $e->getMessage());
+    }
+}
+
+if (!class_exists('MOM\\Api\\Router')) {
     // Fallback: Simple PSR-4-like autoloader when Composer is not installed
     spl_autoload_register(function (string $class): void {
         $map = [
@@ -82,7 +185,7 @@ if (is_file($composerAutoload)) {
 // We include it in a way that loads the functions but does NOT execute the
 // action dispatch (the switch statement). We achieve this by requiring the
 // legacy file only if the functions are not yet defined.
-if (!function_exists('api_json')) {
+if (!function_exists('api_json') && !defined('API_HELPERS_ONLY')) {
     // Load the legacy api.php for its helper functions only.
     // The API_HELPERS_ONLY guard prevents the boot section and switch statement
     // from executing, so we can bootstrap the MVC router ourselves.

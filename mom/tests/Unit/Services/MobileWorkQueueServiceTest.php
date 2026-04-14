@@ -124,9 +124,10 @@ final class MobileWorkQueueServiceTest extends TestCase
             $this->assertSame('forbidden_conflict_operator', $e->getMessage());
         }
 
-        $resolved = $service->resolveConflict('entry-1', 'keep_server', 'operator-2', true);
+        $resolved = $service->resolveConflict('entry-1', 'keep_server', 'operator-2', true, 'supervisor_reconciled_tablet_sync');
         $this->assertSame('synced', $resolved['sync_status']);
         $this->assertSame('operator-2', $resolved['conflict_override']['resolved_by']);
+        $this->assertSame('supervisor_reconciled_tablet_sync', $resolved['conflict_override']['reason']);
     }
 
     public function testFirstPieceInspectionRequiresStructuredMeasurements(): void

@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-closure-20260414-0807`
+Audited branch: `codex/worldclass-reaudit-20260414-102059`
 
 Date: 2026-04-14
 
@@ -17,6 +17,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Dispatch target | Existing dispatch target store through `DispatchController` | `shift_targets` PostgreSQL bridge, analytics projections | Existing dispatch target path is live Phase 1 operational truth; DB is bridge until cutover. |
 | Operator assignment | Dispatch target `operator_id` plus dispatch actor checks | Mobile queue assignee fields | Reports require assigned operator or supervisor/planner override. Blank assignment is not open execution. |
 | Operator time entry | Mobile work queue service time-entry store | MES labor/time tables, production report actual times | Mobile time entry remains capture truth; report times are production-event context. |
+| Mobile task completion | Mobile work queue service task snapshot plus audit log | Dispatch production report events | Completion now persists result, quantities, and completion reason code for fail/partial/scrap outcomes; dispatch report remains production quantity truth. |
 | Production report event | `ShopfloorExecutionService` report event journal | Production log snapshot, DB bridge | Event journal is audit/replay truth. Snapshot is derived latest state. |
 | Production report snapshot | `production_logs.json` through dispatch reporting | `shift_production_log` bridge | Snapshot is a read model for dashboards and compatibility. |
 | Inspection capture | `MobileWorkQueueService::captureInspection()` with JSON compatibility and DB bridge | Dispatch report quality gate fields | Mobile capture is quality evidence truth for Phase 1 first-piece/in-process checks. |
@@ -31,8 +32,10 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
 | Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. |
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
+| AI model/dashboard read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list and dashboard require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
 | Evidence artifact | `EvidenceVaultService` custody/hash chain with DB bridge where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. |
+| Genealogy ontology | `GenealogyGraphService` runtime ontology plus migration 121 DB constraints | Older migration 108 constraints | Runtime and DB now agree on expanded MOM/MES/EQMS/PLM node and snapshot subject types. |
 
 ## Event vs snapshot rules
 
@@ -69,6 +72,8 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - First-piece gate override requires a structured `quality_override_reason`.
 - Completed/cancelled target edits are not silently reopened by a free-text note.
 - Offline/mobile replay is not an override path. Conflicting replay keys are rejected as data-integrity defects.
+- Generic EQMS exception updates cannot mutate status, status history, closure, approval, or rejection fields; those lifecycle movements must use transition/change-control paths.
+- Generic JO/WO update routes reject unknown top-level fields before workflow validation. This keeps planning lifecycle rules from being bypassed by uncontrolled JSON mutation.
 
 ## AI boundary rules
 

@@ -1,6 +1,6 @@
 # World-Class Gap Scorecard
 
-Audited branch: `codex/worldclass-closure-20260414-0807`
+Audited branch: `codex/worldclass-reaudit-20260414-102059`
 
 Date: 2026-04-14
 
@@ -8,22 +8,22 @@ Scale: 0 means absent or unsafe. 5 means benchmark-class, governed, tested, and 
 
 | category | before | after | target next | what changed in this pass |
 |---|---:|---:|---:|---|
-| Execution truth integrity | 3.2 | 3.3 | 4.2 | Documented JSON compatibility authority and DB bridge limits; no unsafe DB cutover. |
-| Transaction model / event history | 3.5 | 3.5 | 4.4 | Confirmed append-only report/dispatch event model remains; mutable snapshots are documented as read models. |
-| Planning-to-execution consistency | 3.2 | 3.5 | 4.2 | FMEA and override role checks use canonical role normalization; order schedule aliases now route to the existing scheduling owner; hold release checks source-order write permission. |
-| Quality / EQMS integration | 3.1 | 3.3 | 4.3 | Evidence upload MIME validation hardened; FMEA access control tightened; canonical exception/OQC drift remains staged. |
-| Inspection/SPC rigor | 3.2 | 3.2 | 4.2 | First-piece/mobile inspection gates remain in place; OQC JSON compatibility gate remains a known gap. |
-| Workforce qualification / authorization | 3.0 | 3.2 | 4.2 | Operational overrides and FMEA now respect canonical/elevated roles; dispatch-report skill matching remains staged. |
-| Reason-code governance | 3.6 | 3.6 | 4.3 | Reason code separation remains in shopfloor execution; quality exception reason registry remains staged. |
-| Digital thread continuity | 3.2 | 3.2 | 4.4 | Execution preserves operation/revision/CNC/setup/inspection references; CNC master authority still needs DB bridge/cutover. |
-| Traceability / genealogy | 3.1 | 3.1 | 4.3 | Traceability read model remains separated from authority; automatic edge emission remains staged. |
-| Multi-site / plant / site / work-center semantics | 3.0 | 3.0 | 4.0 | Existing payloads preserve plant/site/work-center; cross-operator/site membership still needs stronger policy. |
+| Execution truth integrity | 3.2 | 3.4 | 4.2 | JSON compatibility authority remains staged, but generic JO/WO and EQMS updates now reject uncontrolled fields. |
+| Transaction model / event history | 3.5 | 3.6 | 4.4 | Genealogy ontology constraints now match runtime graph types; event/snapshot separation remains explicit. |
+| Planning-to-execution consistency | 3.2 | 3.6 | 4.2 | JO/WO updates use allowlists, WO schedule windows reject end-before-start, and order schedule aliases remain routed to scheduling owner. |
+| Quality / EQMS integration | 3.1 | 3.5 | 4.3 | Exception updates cannot bypass lifecycle fields; evidence idempotency aligns with platform replay contract. |
+| Inspection/SPC rigor | 3.2 | 3.3 | 4.2 | First-piece/mobile inspection remains governed; ad hoc SPC is documented as non-authoritative analysis. |
+| Workforce qualification / authorization | 3.0 | 3.3 | 4.2 | Conflict override scope is narrowed; dispatch-report skill matching remains staged. |
+| Reason-code governance | 3.6 | 3.7 | 4.3 | Mobile task completion now requires a structured reason code for fail/partial/scrap outcomes. |
+| Digital thread continuity | 3.2 | 3.4 | 4.4 | WO contracts carry added plant/site/setup/CNC version hooks and genealogy DB constraints match runtime types. |
+| Traceability / genealogy | 3.1 | 3.4 | 4.3 | Migration 121 aligns `genealogy_nodes` and `as_manufactured_snapshots` constraints with runtime ontology. |
+| Multi-site / plant / site / work-center semantics | 3.0 | 3.2 | 4.0 | WO creation/update and dispatch/mobile payloads preserve plant/site context more consistently. |
 | Interoperability readiness | 3.1 | 3.1 | 4.2 | MTConnect/OPC UA-friendly machine/timestamp semantics preserved; no runtime connectivity expansion. |
-| AI / copilot architecture quality | 3.3 | 3.8 | 4.5 | NLQ and RCA POSTs require CSRF; NLQ is role-scoped and audited; prompt schema matches canonical prediction enums; migration 110 fixes advisory comments. |
-| OT/IT security and governance | 3.2 | 3.7 | 4.5 | AI write-like surfaces hardened; evidence MIME spoof fallback closed; override role gate aligned with real roles; hold release now enforces source-order write authority before mutation. |
-| Reliability / idempotency / offline resilience | 3.4 | 3.5 | 4.3 | AI feedback idempotency remains; NLQ transaction order fixed for PostgreSQL; full mobile queue indexing remains staged. |
+| AI / copilot architecture quality | 3.3 | 4.0 | 4.5 | AI model list/dashboard now require AI read roles, model internals are admin-only, and MTTA metrics are plant-scoped. |
+| OT/IT security and governance | 3.2 | 3.9 | 4.5 | AI read/write surfaces, evidence idempotency, exception lifecycle updates, and mobile conflict overrides are hardened. |
+| Reliability / idempotency / offline resilience | 3.4 | 3.6 | 4.3 | Evidence replay key contract is aligned; online mobile idempotency and indexed queues remain staged. |
 | Performance / scalability | 3.0 | 3.0 | 4.1 | No broad performance refactor; mobile JSON full-scan path remains a staged risk for 50+ machines. |
-| Developer architecture / maintainability | 3.3 | 3.7 | 4.3 | Added root `AGENTS.md`, required docs, targeted tests, corrected stale route aliases, and removed speculative COPQ TODO by adding configurable rates. |
+| Developer architecture / maintainability | 3.3 | 3.8 | 4.3 | Added root branch/cleanup rules, six audit artifacts, targeted regression tests, and current-branch provenance. |
 
 ## Confirmed defects and disposition
 
