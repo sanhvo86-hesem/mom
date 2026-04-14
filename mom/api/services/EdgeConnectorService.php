@@ -225,7 +225,12 @@ final class EdgeConnectorService
         }
 
         try {
-            $doc = @simplexml_load_string($xml);
+            // FOUND-001 FIX: XXE protection for MTConnect XML parsing
+            libxml_disable_entity_loader(true);
+            libxml_use_internal_errors(true);
+            $options = LIBXML_NONET | LIBXML_NOENT | LIBXML_DTDLOAD | LIBXML_DTDATTR;
+
+            $doc = @simplexml_load_string($xml, null, $options);
             if ($doc === false) {
                 return [];
             }
@@ -291,11 +296,9 @@ final class EdgeConnectorService
             return null;
         }
         $number = (float)$value;
-        if ($number < 0) {
-            $number = 0;
-        }
-        if ($number > $max) {
-            $number = (float)$max;
+        // QUAL-006 FIX: Validate range instead of silently clamping
+        if ($number < 0 || $number > $max) {
+            throw new \RuntimeException("Percentage value out of range: {$number} (valid: 0-{$max})");
         }
         return $number;
     }

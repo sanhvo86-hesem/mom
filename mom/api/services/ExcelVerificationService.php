@@ -509,6 +509,10 @@ final class ExcelVerificationService
         string $outputPath,
         array  $verifyData,
     ): void {
+        // FILE-001 (HIGH): XXE via Excel/XML upload - Disable external entity loading
+        libxml_disable_entity_loader(true);
+        libxml_use_internal_errors(true);
+
         $reader      = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($templatePath);
         $spreadsheet = $reader->load($templatePath);
 
@@ -577,6 +581,10 @@ final class ExcelVerificationService
     private function readHiddenSheetViaSpreadsheet(string $filePath): ?array
     {
         try {
+            // FILE-001 (HIGH): XXE via Excel/XML upload - Disable external entity loading
+            libxml_disable_entity_loader(true);
+            libxml_use_internal_errors(true);
+
             $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($filePath);
             $reader->setLoadSheetsOnly(null); // Load all sheets including hidden
             if (method_exists($reader, 'setReadDataOnly')) {

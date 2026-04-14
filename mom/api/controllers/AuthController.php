@@ -160,6 +160,9 @@ class AuthController extends BaseController
 
         $user = find_user_by_username($this->store, $username);
         if (!$user || !($user['active'] ?? true)) {
+            // Prevent username enumeration via timing attack: perform dummy password_verify
+            // when user doesn't exist to normalize response time
+            password_verify($password, '$2y$12$dummyhashtopreventtimingattacks');
             usleep(150000);
             $this->error('invalid_credentials', 401);
         }

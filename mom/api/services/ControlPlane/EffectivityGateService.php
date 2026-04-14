@@ -44,6 +44,14 @@ final class EffectivityGateService
         }
         if ($effectivities === []) {
             $blockers[] = $this->blocker('effectivity_required', 'Change order release requires an effectivity plan.');
+        } else {
+            // FOUND-004 FIX: Validate effectivity dates
+            foreach ($effectivities as $effectivity) {
+                $dateValidation = $this->validateEffectivityDates($effectivity);
+                if (!$dateValidation['ok']) {
+                    $blockers[] = $this->blocker($dateValidation['error'], $dateValidation['message'], $effectivity);
+                }
+            }
         }
 
         foreach ($conflicts as $conflict) {
@@ -172,5 +180,56 @@ final class EffectivityGateService
             return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'y'], true);
         }
         return false;
+    }
+
+    /**
+     * FOUND-004 FIX: Validate effectivity dates don't exceed 1 year retroactive or future
+     */
+    private function validateEffectivityDates(array $effectivity): array
+    {
+        $effectiveFrom = $this->text($effectivity['effective_from'] ?? $effectivity['effectiveFrom'] ?? '');
+        $effectiveUntil = $this->text($effectivity['effective_until'] ?? $effectivity['effectiveUntil'] ?? $effectivity['effective_to'] ?? '');
+
+        if ($effectiveFrom === '' && $effectiveUntil === '') {
+            return ['ok' => true];
+        }
+
+        try {
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            $maxPastWindow = $now->sub(new \DateInterval('P1Y'));
+            $maxFutureWindow = $now->add(new \DateInterval('P1Y'));
+
+            if ($effectiveFrom !== '') {
+                $fromDate = new \DateTimeImmutable($effectiveFrom);
+                if ($fromDate < $maxPastWindow) {
+                    return ['ok' => false, 'error' => 'effectivity_date_too_old', 'message' => 'Effective from date cannot be more than 1 year in the past.'];
+                }
+                if ($fromDate > $maxFutureWindow) {
+                    return ['ok' => false, 'error' => 'effectivity_date_too_far_future', 'message' => 'Effective from date cannot be more than 1 year in the future.'];
+                }
+            }
+
+            if ($effectiveUntil !== '') {
+                $untilDate = new \DateTimeImmutable($effectiveUntil);
+                if ($untilDate < $maxPastWindow) {
+                    return ['ok' => false, 'error' => 'effectivity_date_too_old', 'message' => 'Effective until date cannot be more than 1 year in the past.'];
+                }
+                if ($untilDate > $maxFutureWindow) {
+                    return ['ok' => false, 'error' => 'effectivity_date_too_far_future', 'message' => 'Effective until date cannot be more than 1 year in the future.'];
+                }
+            }
+
+            if ($effectiveFrom !== '' && $effectiveUntil !== '') {
+                $fromDate = new \DateTimeImmutable($effectiveFrom);
+                $untilDate = new \DateTimeImmutable($effectiveUntil);
+                if ($fromDate > $untilDate) {
+                    return ['ok' => false, 'error' => 'effectivity_date_range_invalid', 'message' => 'Effective from date must be before or equal to effective until date.'];
+                }
+            }
+
+            return ['ok' => true];
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'error' => 'effectivity_date_parse_error', 'message' => 'Invalid effectivity date format.'];
+        }
     }
 }

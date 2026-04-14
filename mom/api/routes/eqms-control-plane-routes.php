@@ -23,6 +23,7 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/v1/eqms/publications/monitor', EqmsControlPlaneController::class, 'publicationMonitor');
     $router->post('/api/v1/eqms/publications/actions', EqmsControlPlaneController::class, 'requestPublicationAction');
     $router->post('/api/v1/eqms/evidence/finalize', EqmsControlPlaneController::class, 'finalizeEvidencePackage');
+    $router->get('/api/v1/eqms/evidence/package', EqmsControlPlaneController::class, 'canonicalEvidencePackage');
     $router->post('/api/v1/eqms/audit-packs/manifest', EqmsControlPlaneController::class, 'buildAuditPackManifest');
     $router->post('/api/v1/eqms/evidence-graph/preview', EqmsControlPlaneController::class, 'evidenceGraphPreview');
     $router->post('/api/v1/eqms/genealogy/facts', EqmsControlPlaneController::class, 'recordGenealogyFact');

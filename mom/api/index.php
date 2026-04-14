@@ -108,6 +108,7 @@ use MOM\Api\Middleware\CorsMiddleware;
 use MOM\Api\Middleware\RateLimitMiddleware;
 use MOM\Api\Middleware\AuditMiddleware;
 use MOM\Api\Middleware\ApiKeyMiddleware;
+use MOM\Api\Middleware\CsrfMiddleware;
 use MOM\Api\Services\CacheService;
 use MOM\Api\Services\QueueService;
 use MOM\Api\Services\EventBroadcaster;
@@ -156,6 +157,7 @@ $router->use($corsMiddleware->handler());
 $router->use($apiKeyMiddleware->handler());  // API key/JWT checked before session auth
 $router->use($authMiddleware->handler());
 $router->use($rateLimitMiddleware->handler());
+$router->use(new CsrfMiddleware()->handler());  // CSRF validation after rate limiting
 $router->use($auditMiddleware->handler());
 
 // Route module order preserves legacy action alias precedence and REST matching.

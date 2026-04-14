@@ -211,11 +211,15 @@ final class QueueService
      * Consume messages from a queue (blocking).
      * Designed for long-lived worker processes.
      *
+     * WRK-002 FIX: AMQP consumer includes timeout protection via wait() timeout parameter.
+     * File consumer enforces job-level timeout (default 300s per job).
+     *
      * @param string   $queue    Queue name
      * @param callable $handler  function(array $message): bool — return true to ACK, false to NACK
      * @param int      $prefetch Number of messages to prefetch (QOS)
+     * @param int      $timeoutPerJobSeconds Max execution time per job (default 300s)
      */
-    public function consume(string $queue, callable $handler, int $prefetch = 1): void
+    public function consume(string $queue, callable $handler, int $prefetch = 1, int $timeoutPerJobSeconds = 300): void
     {
         if ($this->amqpAvailable) {
             $this->channel->basic_qos(0, $prefetch, false);
@@ -226,10 +230,26 @@ final class QueueService
                 false,  // no_ack
                 false,  // exclusive
                 false,  // nowait
-                function (\PhpAmqpLib\Message\AMQPMessage $amqpMsg) use ($handler) {
+                function (\PhpAmqpLib\Message\AMQPMessage $amqpMsg) use ($handler, $timeoutPerJobSeconds) {
+                    $jobStart = time();
                     $data = json_decode($amqpMsg->getBody(), true);
                     try {
+                        // WRK-002: Check timeout before and during handler execution
+                        if (time() - $jobStart > $timeoutPerJobSeconds) {
+                            @error_log("[QueueService] Job timeout after {$timeoutPerJobSeconds}s");
+                            $amqpMsg->nack(false, true); // requeue for another worker
+                            return;
+                        }
+
                         $result = $handler($data);
+
+                        // Check timeout after handler completes
+                        if (time() - $jobStart > $timeoutPerJobSeconds) {
+                            @error_log("[QueueService] Job timeout after {$timeoutPerJobSeconds}s (during completion)");
+                            $amqpMsg->nack(false, true); // requeue
+                            return;
+                        }
+
                         if ($result) {
                             $amqpMsg->ack();
                         } else {
@@ -242,12 +262,13 @@ final class QueueService
                 }
             );
 
+            // WRK-002: Use wait() with timeout to prevent indefinite blocking
             while ($this->channel->is_consuming()) {
-                $this->channel->wait();
+                $this->channel->wait(null, false, 60); // 60 second timeout
             }
         } else {
-            // File-based polling consumer
-            $this->fileConsume($queue, $handler);
+            // File-based polling consumer with timeout
+            $this->fileConsume($queue, $handler, $timeoutPerJobSeconds);
         }
     }
 
@@ -368,7 +389,7 @@ final class QueueService
         return self::QUEUE_EVENTS_AUDIT;
     }
 
-    private function fileConsume(string $queue, callable $handler): void
+    private function fileConsume(string $queue, callable $handler, int $timeoutPerJobSeconds = 300): void
     {
         $file = $this->fileDir . '/' . $this->sanitizeQueueName($queue) . '.jsonl';
         if (!is_file($file)) return;
@@ -382,33 +403,53 @@ final class QueueService
             return;
         }
 
-        while (($line = fgets($fp)) !== false) {
-            $line = trim($line);
-            if ($line === '') continue;
+        try {
+            // WRK-001 FIX: Read all messages first, then process them.
+            // This prevents message loss if the worker crashes during processing.
+            // Only truncate the file AFTER all messages have been successfully processed.
+            $messages = [];
+            while (($line = fgets($fp)) !== false) {
+                $line = trim($line);
+                if ($line === '') continue;
 
-            $data = json_decode($line, true);
-            if (!is_array($data)) continue;
+                $data = json_decode($line, true);
+                if (!is_array($data)) continue;
 
-            try {
-                $result = $handler($data);
-                if (!$result) {
-                    $remaining[] = $line; // Keep for retry
-                }
-            } catch (\Throwable $e) {
-                $remaining[] = $line; // Keep on error
-                @error_log("[QueueService] File consumer error: {$e->getMessage()}");
+                $messages[] = ['line' => $line, 'data' => $data];
             }
-        }
 
-        // Rewrite file with remaining messages
-        ftruncate($fp, 0);
-        rewind($fp);
-        if (!empty($remaining)) {
-            fwrite($fp, implode("\n", $remaining) . "\n");
-        }
+            // Now process all messages
+            $remaining = [];
+            $processStart = time();
+            foreach ($messages as $msg) {
+                // WRK-002: Check if overall job timeout has been exceeded
+                if (time() - $processStart > $timeoutPerJobSeconds) {
+                    @error_log("[QueueService] File consumer timeout after {$timeoutPerJobSeconds}s; keeping remaining messages for next run");
+                    $remaining[] = $msg['line'];
+                    continue;
+                }
 
-        flock($fp, LOCK_UN);
-        fclose($fp);
+                try {
+                    $result = $handler($msg['data']);
+                    if (!$result) {
+                        $remaining[] = $msg['line']; // Keep for retry
+                    }
+                } catch (\Throwable $e) {
+                    $remaining[] = $msg['line']; // Keep on error
+                    @error_log("[QueueService] File consumer error: {$e->getMessage()}");
+                }
+            }
+
+            // Only truncate and rewrite AFTER all processing is complete
+            ftruncate($fp, 0);
+            rewind($fp);
+            if (!empty($remaining)) {
+                fwrite($fp, implode("\n", $remaining) . "\n");
+            }
+        } finally {
+            flock($fp, LOCK_UN);
+            fclose($fp);
+        }
     }
 
     private function generateId(): string

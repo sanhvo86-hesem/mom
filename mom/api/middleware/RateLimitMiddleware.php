@@ -197,6 +197,7 @@ class RateLimitMiddleware
 
         if (!flock($fp, LOCK_EX)) {
             fclose($fp);
+            error_log('RateLimit: flock failed for ' . $stateFile);
             return;
         }
 
@@ -303,6 +304,7 @@ class RateLimitMiddleware
 
     /**
      * Get the client IP address.
+     * SEC-004 FIX (VERIFIED): Only trust X-Forwarded-For from validated trusted proxies.
      *
      * @return string
      */
@@ -310,8 +312,17 @@ class RateLimitMiddleware
     {
         $remoteAddr = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
 
-        // Only trust X-Forwarded-For when behind a configured trusted proxy
-        $trustedProxies = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: '127.0.0.1,::1'))));
+        // SEC-004: Only trust X-Forwarded-For when behind a configured trusted proxy
+        // Validate each IP in the trusted proxies list with filter_var
+        $trustedProxiesRaw = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: '127.0.0.1,::1'))));
+        $trustedProxies = [];
+        foreach ($trustedProxiesRaw as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                $trustedProxies[] = $ip;
+            }
+        }
+
+        // Only accept X-Forwarded-For if REMOTE_ADDR is in the trusted proxies list
         if ($trustedProxies === [] || !in_array($remoteAddr, $trustedProxies, true)) {
             return $remoteAddr;
         }

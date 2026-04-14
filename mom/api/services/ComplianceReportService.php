@@ -579,11 +579,17 @@ final class ComplianceReportService
     {
         $excDir = $this->dataDir . '/exceptions';
         $result = ['ncr' => [], 'capa' => []];
+        // QUAL-005 FIX: Filter by org_id from session to prevent cross-org data leakage
+        $orgId = $_SESSION['org_id'] ?? null;
 
         // NCR records
         $ncrIndex = $this->readJsonFile($excDir . '/ncr_index.json') ?? [];
         foreach (($ncrIndex['records'] ?? $ncrIndex) as $ncr) {
             if (!is_array($ncr)) continue;
+            // QUAL-005 FIX: Verify org_id matches before including
+            if ($orgId !== null && ($ncr['org_id'] ?? null) !== $orgId) {
+                continue;
+            }
             $ncrPeriod = substr($ncr['created_at'] ?? $ncr['date'] ?? '', 0, 7);
             if ($this->_periodMatches($ncrPeriod, $period)) {
                 $result['ncr'][] = $ncr;
@@ -594,6 +600,10 @@ final class ComplianceReportService
         $capaIndex = $this->readJsonFile($excDir . '/capa_index.json') ?? [];
         foreach (($capaIndex['records'] ?? $capaIndex) as $capa) {
             if (!is_array($capa)) continue;
+            // QUAL-005 FIX: Verify org_id matches before including
+            if ($orgId !== null && ($capa['org_id'] ?? null) !== $orgId) {
+                continue;
+            }
             $capaPeriod = substr($capa['created_at'] ?? $capa['date'] ?? '', 0, 7);
             if ($this->_periodMatches($capaPeriod, $period)) {
                 $result['capa'][] = $capa;

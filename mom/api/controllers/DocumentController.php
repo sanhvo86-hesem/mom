@@ -840,7 +840,27 @@ class DocumentController extends BaseController
             header('Content-Length: ' . (string)$size);
         }
 
-        readfile($absPath);
+        // FILE-004 (MEDIUM): Large file memory exhaustion prevention
+        // Use streaming for files > 10MB to avoid loading entire file into memory
+        $maxMemorySize = 10 * 1024 * 1024; // 10MB
+        if ($size !== false && $size > $maxMemorySize) {
+            // Stream large files in 8KB chunks to avoid memory exhaustion
+            $handle = @fopen($absPath, 'rb');
+            if ($handle !== false) {
+                while (!feof($handle)) {
+                    $chunk = fread($handle, 8192);
+                    if ($chunk === false || $chunk === '') {
+                        break;
+                    }
+                    echo $chunk;
+                    flush();
+                }
+                fclose($handle);
+            }
+        } else {
+            // For small files, use readfile as before
+            readfile($absPath);
+        }
         exit;
     }
 

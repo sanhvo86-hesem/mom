@@ -418,6 +418,8 @@ PROMPT;
                     ['id' => $ncrId]
                 );
                 if ($row !== null) {
+                    // QUAL-004 FIX: Verify NCR belongs to requesting org (IDOR prevention)
+                    $this->verifyOrgOwnership($row, 'NCR');
                     return $row;
                 }
 
@@ -427,6 +429,8 @@ PROMPT;
                     ['num' => $ncrId]
                 );
                 if ($row !== null) {
+                    // QUAL-004 FIX: Verify NCR belongs to requesting org (IDOR prevention)
+                    $this->verifyOrgOwnership($row, 'NCR');
                     return $row;
                 }
             } catch (\Throwable $e) {
@@ -1268,5 +1272,30 @@ INSTRUCTIONS;
             'message' => $message,
             'context' => $context,
         ];
+    }
+
+    /**
+     * QUAL-004 FIX: Verify that a record belongs to the requesting organization.
+     * Prevents IDOR (Insecure Direct Object Reference) attacks where a user
+     * could analyze NCRs from other organizations.
+     *
+     * @param  array  $record Record from database (should contain org_id)
+     * @param  string $type   Record type for error message (e.g., 'NCR')
+     * @return void
+     * @throws \RuntimeException If org_id mismatch
+     */
+    private function verifyOrgOwnership(array $record, string $type): void
+    {
+        $recordOrgId = $record['org_id'] ?? null;
+        $sessionOrgId = $_SESSION['org_id'] ?? null;
+
+        if ($recordOrgId === null || $sessionOrgId === null) {
+            // If either is missing, allow (graceful degradation)
+            return;
+        }
+
+        if ((string)$recordOrgId !== (string)$sessionOrgId) {
+            throw new \RuntimeException("{$type} does not belong to your organization");
+        }
     }
 }

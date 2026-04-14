@@ -103,7 +103,7 @@ final class InputSanitizer
             'hcm_position_id'      => (string)($user['hcm_position_id'] ?? ''),
             'cccd'                 => self::maskPii((string)($user['cccd'] ?? '')),
             'phone'                => self::maskPii((string)($user['phone'] ?? '')),
-            'personal_email'       => (string)($user['personal_email'] ?? ''),
+            'personal_email'       => self::maskEmail((string)($user['personal_email'] ?? '')),
             'org_company_code'     => (string)($user['org_company_code'] ?? ''),
             'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
             'org_plant_id'         => (string)($user['org_plant_id'] ?? ''),
@@ -128,5 +128,41 @@ final class InputSanitizer
             return str_repeat('*', $len);
         }
         return str_repeat('*', $len - $visibleChars) . mb_substr($value, -$visibleChars);
+    }
+
+    /**
+     * Mask email address for safe display.
+     * Format: keep first 2 characters + *** + domain
+     * Example: sa***@gmail.com
+     *
+     * @param string $email Email address to mask.
+     * @return string Masked email.
+     */
+    private static function maskEmail(string $email): string
+    {
+        if ($email === '') {
+            return '';
+        }
+
+        $parts = explode('@', $email, 2);
+        if (count($parts) !== 2) {
+            // Invalid email format, mask entirely
+            return str_repeat('*', mb_strlen($email));
+        }
+
+        $local = $parts[0];
+        $domain = $parts[1];
+
+        // Keep first 2 characters of local part, mask the rest
+        $visibleChars = 2;
+        $localLen = mb_strlen($local);
+        if ($localLen <= $visibleChars) {
+            // Short local part, mask all but first char
+            $masked = mb_substr($local, 0, 1) . str_repeat('*', max(1, $localLen - 1));
+        } else {
+            $masked = mb_substr($local, 0, $visibleChars) . str_repeat('*', $localLen - $visibleChars);
+        }
+
+        return $masked . '@' . $domain;
     }
 }

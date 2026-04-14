@@ -2295,6 +2295,8 @@ BASH;
         if ($target === '') {
             throw new RuntimeException('ssh_target_missing');
         }
+        // FOUND-002 FIX: Validate SSH target against SSRF
+        $this->validateSshTarget($target);
         if (!$this->shellAvailable()) {
             throw new RuntimeException('exec_unavailable');
         }
@@ -2403,6 +2405,8 @@ BASH;
             if ($target === '') {
                 return null;
             }
+            // FOUND-002 FIX: Validate SSH target against SSRF
+            $this->validateSshTarget($target);
 
             $remote = 'bash -lc ' . escapeshellarg($command);
             return implode(' ', [
@@ -2416,6 +2420,42 @@ BASH;
         }
 
         return null;
+    }
+
+    /**
+     * FOUND-002 FIX: Validate SSH target to prevent SSRF attacks
+     */
+    private function validateSshTarget(string $target): void
+    {
+        // Extract host from user@host or user@host:port format
+        $hostPart = preg_replace('/^[^@]*@/', '', $target);
+        if (!is_string($hostPart) || $hostPart === '') {
+            throw new RuntimeException('invalid_ssh_target_format');
+        }
+
+        // Remove port if present
+        $host = preg_replace('/:.*$/', '', $hostPart);
+        if (!is_string($host) || $host === '') {
+            throw new RuntimeException('invalid_ssh_target_host');
+        }
+
+        // Validate host format
+        if (!preg_match('/^[a-zA-Z0-9\.\-]{1,253}$/', $host)) {
+            throw new RuntimeException('invalid_ssh_host_format');
+        }
+
+        // Resolve IP and block private/loopback addresses
+        $resolvedIp = gethostbyname($host);
+        $privateRanges = ['10.', '192.168.', '127.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.', '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'];
+        foreach ($privateRanges as $range) {
+            if (str_starts_with($resolvedIp, $range)) {
+                // Only allow if it matches configured VPS hosts from env
+                $allowedHosts = explode(',', getenv('VPS_ALLOWED_HOSTS') ?: '');
+                if (!in_array(trim($host), $allowedHosts, true)) {
+                    throw new RuntimeException('ssh_host_resolves_to_private_address');
+                }
+            }
+        }
     }
 
     private function resolveExecutionMode(array $host): string

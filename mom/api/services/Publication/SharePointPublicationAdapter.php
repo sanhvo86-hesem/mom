@@ -24,6 +24,10 @@ final class SharePointPublicationAdapter
         if ($this->boolConfig('direct_user_upload_allowed')) {
             throw new RuntimeException('SharePoint direct user upload is not allowed for controlled evidence.');
         }
+        $targetUrl = trim((string)($this->targetConfig['sharepoint_url'] ?? $this->targetConfig['site_url'] ?? ''));
+        if ($targetUrl !== '') {
+            $this->validateSharePointUrl($targetUrl);
+        }
     }
 
     /**
@@ -45,7 +49,6 @@ final class SharePointPublicationAdapter
         if ($snapshotUri === '') {
             throw new RuntimeException('Publication requires a readable snapshot artifact.');
         }
-
         $manifestHash = trim((string)($evidencePackage['manifest_hash_sha256'] ?? ''));
         $packageHash = trim((string)($evidencePackage['package_hash_sha256'] ?? ''));
         if (!$this->sha256($manifestHash) || !$this->sha256($packageHash)) {
@@ -90,5 +93,27 @@ final class SharePointPublicationAdapter
     private function sha256(string $value): bool
     {
         return preg_match('/^[a-f0-9]{64}$/', $value) === 1;
+    }
+
+    /**
+     * FOUND-005 FIX: Validate SharePoint URL to prevent SSRF attacks
+     */
+    private function validateSharePointUrl(string $url): void
+    {
+        $parsed = parse_url($url);
+        if ($parsed === false || empty($parsed['scheme']) || empty($parsed['host'])) {
+            throw new RuntimeException('invalid_sharepoint_url_format');
+        }
+
+        // SharePoint URLs must use HTTPS
+        if ($parsed['scheme'] !== 'https') {
+            throw new RuntimeException('sharepoint_url_must_use_https');
+        }
+
+        // Block private IP ranges
+        $ip = gethostbyname($parsed['host']);
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            throw new RuntimeException('sharepoint_url_resolves_to_private_address');
+        }
     }
 }

@@ -58,6 +58,10 @@ final class PeriodicEvaluationService
             }
         }
 
+        // FOUND-003 FIX: Validate due_at does not exceed 1 year in future
+        $dueAtStr = trim((string)$request['due_at']);
+        $this->validateDueAt($dueAtStr);
+
         $row = $this->db->queryOne(
             "INSERT INTO periodic_evaluations
                 (evaluation_scope, scope_ref, due_at, assigned_role, result_payload)
@@ -69,7 +73,7 @@ final class PeriodicEvaluationService
             [
                 ':evaluation_scope' => trim((string)$request['evaluation_scope']),
                 ':scope_ref' => trim((string)$request['scope_ref']),
-                ':due_at' => trim((string)$request['due_at']),
+                ':due_at' => $dueAtStr,
                 ':assigned_role' => $this->nullableText($request['assigned_role'] ?? null),
                 ':result_payload' => json_encode((array)($request['result_payload'] ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ],
@@ -201,5 +205,29 @@ final class PeriodicEvaluationService
     private function state(mixed $value): string
     {
         return strtolower(trim(is_scalar($value) ? (string)$value : ''));
+    }
+
+    /**
+     * FOUND-003 FIX: Validate due_at date is not more than 1 year in future
+     */
+    private function validateDueAt(string $dueAtStr): void
+    {
+        try {
+            $dueAt = new \DateTimeImmutable($dueAtStr);
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            $maxFuture = $now->add(new \DateInterval('P1Y'));
+
+            if ($dueAt > $maxFuture) {
+                throw new RuntimeException('due_at_exceeds_one_year_future');
+            }
+            if ($dueAt < $now) {
+                throw new RuntimeException('due_at_cannot_be_retroactive');
+            }
+        } catch (\Throwable $e) {
+            if (strpos($e->getMessage(), 'due_at') !== false) {
+                throw $e;
+            }
+            throw new RuntimeException('invalid_due_at_format');
+        }
     }
 }

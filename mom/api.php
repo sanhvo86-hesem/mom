@@ -13693,7 +13693,11 @@ function destroy_auth_session(): void {
   }
   $_SESSION = [];
   if (session_status() === PHP_SESSION_ACTIVE) {
-    @session_destroy();
+    session_destroy();
+  }
+  // Ensure session state is written and file handle is closed
+  if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
   }
 }
 

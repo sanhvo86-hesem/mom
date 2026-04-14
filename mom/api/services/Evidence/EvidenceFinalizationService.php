@@ -168,6 +168,8 @@ final class EvidenceFinalizationService
             );
         }
 
+        $signatureEvents = $this->persistSignatureEvents($db, $input, $package, $record, $version);
+
         $publicationState = is_array($package['manifest']['publication_state'] ?? null) ? $package['manifest']['publication_state'] : [];
         $publication = $db->queryOne(
             "INSERT INTO evidence_publications
@@ -212,8 +214,88 @@ final class EvidenceFinalizationService
             'evidence_record' => $record,
             'evidence_version' => $version,
             'evidence_artifacts' => $artifacts,
+            'signature_events' => $signatureEvents,
             'evidence_publication' => $publication,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $package
+     * @param array<string, mixed> $record
+     * @param array<string, mixed> $version
+     * @return list<array<string, mixed>>
+     */
+    private function persistSignatureEvents(object $db, array $input, array $package, array $record, array $version): array
+    {
+        $manifest = is_array($package['manifest'] ?? null) ? $package['manifest'] : [];
+        $events = is_array($manifest['signature_events'] ?? null)
+            ? $manifest['signature_events']
+            : (is_array($input['signature_events'] ?? null) ? $input['signature_events'] : []);
+        if ($events === []) {
+            return [];
+        }
+
+        $persisted = [];
+        foreach ($events as $index => $event) {
+            if (!is_array($event)) {
+                continue;
+            }
+
+            $signerUserId = $this->nullableUuid($event['signer_user_id'] ?? $event['user_id'] ?? null);
+            $signerRef = $this->nullableText($event['signer_ref'] ?? $event['actor_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null);
+            if ($signerUserId === null && $signerRef === null) {
+                throw new RuntimeException('signature_event_signer_required');
+            }
+
+            $meaning = $this->text($event['signature_meaning'] ?? $event['meaning'] ?? '');
+            if ($meaning === '') {
+                throw new RuntimeException('signature_event_meaning_required');
+            }
+
+            $payloadHash = $this->nullableHash($event['signed_payload_hash_sha256'] ?? null)
+                ?? (string)$package['manifest_hash_sha256'];
+            $signatureHash = $this->nullableHash($event['signature_hash_sha256'] ?? null)
+                ?? hash('sha256', $payloadHash . '|' . ($signerUserId ?? $signerRef) . '|' . $meaning);
+            $idempotencyKey = $this->nullableText($event['idempotency_key'] ?? null)
+                ?? hash('sha256', (string)$version['evidence_version_id'] . '|signature|' . $index . '|' . $signatureHash);
+
+            $row = $db->queryOne(
+                "INSERT INTO signature_events
+                    (signed_object_type, signed_object_id, signed_object_version, signer_user_id, signer_ref,
+                     signer_role, signature_meaning, signature_state, signed_payload_hash_sha256,
+                     signature_hash_sha256, signed_at, idempotency_key, metadata)
+                 VALUES
+                    ('evidence_version', :signed_object_id, :signed_object_version, CAST(:signer_user_id AS uuid), :signer_ref,
+                     :signer_role, :signature_meaning, :signature_state, :signed_payload_hash_sha256,
+                     :signature_hash_sha256, CAST(:signed_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
+                 ON CONFLICT (idempotency_key) DO UPDATE SET metadata = signature_events.metadata || EXCLUDED.metadata
+                 RETURNING *",
+                [
+                    ':signed_object_id' => (string)$version['evidence_version_id'],
+                    ':signed_object_version' => $this->nullableText($version['version_no'] ?? null) ?? '1',
+                    ':signer_user_id' => $signerUserId,
+                    ':signer_ref' => $signerRef,
+                    ':signer_role' => $this->nullableText($event['signer_role'] ?? $event['role'] ?? null),
+                    ':signature_meaning' => $meaning,
+                    ':signature_state' => $this->signatureState($event['signature_state'] ?? 'applied'),
+                    ':signed_payload_hash_sha256' => $payloadHash,
+                    ':signature_hash_sha256' => $signatureHash,
+                    ':signed_at' => $this->nullableText($event['signed_at'] ?? null) ?? gmdate('c'),
+                    ':idempotency_key' => $idempotencyKey,
+                    ':metadata' => $this->json([
+                        'authority' => 'EvidenceFinalizationService',
+                        'evidence_record_id' => (string)($record['evidence_record_id'] ?? ''),
+                        'package_hash_sha256' => (string)$package['package_hash_sha256'],
+                    ]),
+                ],
+            );
+            if (is_array($row)) {
+                $persisted[] = $row;
+            }
+        }
+
+        return $persisted;
     }
 
     private function normalizeDb(?object $db): ?object
@@ -250,6 +332,21 @@ final class EvidenceFinalizationService
     {
         $text = $this->text($value);
         return preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    private function nullableHash(mixed $value): ?string
+    {
+        $text = strtolower($this->text($value));
+        return preg_match('/^[a-f0-9]{64}$/', $text) === 1 ? $text : null;
+    }
+
+    private function signatureState(mixed $value): string
+    {
+        $state = strtolower($this->text($value));
+        if (!in_array($state, ['applied', 'rejected', 'voided'], true)) {
+            throw new RuntimeException('invalid_signature_state');
+        }
+        return $state;
     }
 
     private function json(mixed $value): string

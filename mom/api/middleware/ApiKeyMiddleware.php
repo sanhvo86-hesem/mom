@@ -121,7 +121,9 @@ class ApiKeyMiddleware
         $_SESSION['mfa_ok'] = true; // API keys bypass MFA
         $_SESSION['auth_method'] = 'api_key';
         $_SESSION['api_key_id'] = $key['key_id'] ?? null;
-        $_SESSION['api_key_scopes'] = $key['scopes'] ?? ['*'];
+        // SEC-002 FIX: Set admin flag based on key metadata
+        $_SESSION['api_key_is_admin'] = (bool)($key['is_admin'] ?? false);
+        $_SESSION['api_key_scopes'] = $key['scopes'] ?? [];
         $_SESSION['last_active'] = time();
     }
 
@@ -226,13 +228,29 @@ class ApiKeyMiddleware
 
     /**
      * Check if the current request has a specific scope.
+     * SEC-002 FIX: Wildcard '*' scope only allowed for admin API keys.
+     * Regular API keys must have explicit scope list.
      */
     public static function hasScope(string $scope): bool
     {
-        $scopes = $_SESSION['api_key_scopes'] ?? $_SESSION['jwt_scopes'] ?? ['*'];
-        if (in_array('*', $scopes, true) || in_array('admin:*', $scopes, true)) {
+        $scopes = $_SESSION['api_key_scopes'] ?? $_SESSION['jwt_scopes'] ?? [];
+
+        // SEC-002: Wildcard '*' only allowed if auth method is NOT api_key OR is explicitly admin key
+        $authMethod = $_SESSION['auth_method'] ?? 'session';
+        $isAdminKey = ($authMethod === 'api_key') && (bool)($_SESSION['api_key_is_admin'] ?? false);
+
+        if (in_array('*', $scopes, true)) {
+            // Wildcard only for admin API keys; reject for regular API keys
+            if ($authMethod === 'api_key' && !$isAdminKey) {
+                return false;
+            }
             return true;
         }
+
+        if (in_array('admin:*', $scopes, true)) {
+            return $isAdminKey;
+        }
+
         return in_array($scope, $scopes, true);
     }
 

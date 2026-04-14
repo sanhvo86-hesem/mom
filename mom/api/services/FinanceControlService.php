@@ -234,9 +234,20 @@ final class FinanceControlService
                 && ($row['subject_ref'] ?? '') === $subjectRef
                 && ($row['requested_posting_date'] ?? '') === $requestedPostingDate
                 && ($row['exception_status'] ?? '') === 'approved'
-                && strtotime((string)($row['expires_at'] ?? '')) > time()
             ) {
-                throw new RuntimeException('An active backdate exception already exists for this subject and posting date.');
+                // BLF-006: Use DateTimeImmutable instead of strtotime for reliable timezone handling
+                try {
+                    $expiresAt = new DateTimeImmutable((string)($row['expires_at'] ?? ''));
+                    $now = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
+                    if ($expiresAt > $now) {
+                        throw new RuntimeException('An active backdate exception already exists for this subject and posting date.');
+                    }
+                } catch (\Exception $e) {
+                    if (strpos($e->getMessage(), 'already exists') !== false) {
+                        throw $e;
+                    }
+                    // Invalid date format in stored exception, skip it
+                }
             }
         }
 
@@ -428,8 +439,12 @@ final class FinanceControlService
         if (!in_array($invoiceScope, ['AP', 'AR'], true)) {
             throw new RuntimeException('Invalid invoice_scope.');
         }
-        if ($originalInvoiceRef === '' || $reasonText === '' || $amount <= 0) {
-            throw new RuntimeException('Memo requires original invoice reference, reason, and positive amount.');
+        // BLF-002: Validate that amount is positive (not zero or negative)
+        if ($originalInvoiceRef === '' || $reasonText === '') {
+            throw new RuntimeException('Memo requires original invoice reference and reason.');
+        }
+        if ($amount <= 0) {
+            throw new RuntimeException('Amount must be positive');
         }
 
         return $this->withFinanceControlLock(function () use (

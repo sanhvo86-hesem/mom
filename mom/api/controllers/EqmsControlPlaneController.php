@@ -13,6 +13,7 @@ use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Publication\PublicationMonitorService;
@@ -440,6 +441,23 @@ final class EqmsControlPlaneController extends BaseController
             ], 201);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function canonicalEvidencePackage(): never
+    {
+        $this->requireAuth();
+        $evidenceRef = trim((string)($this->query('evidence_ref', '') ?: $this->query('evidence_id', '')));
+        if ($evidenceRef === '') {
+            $this->error('evidence_ref_required', 400);
+        }
+
+        try {
+            $this->success([
+                'evidence_package' => (new CanonicalEvidenceReadService($this->data))->package($evidenceRef),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 404);
         }
     }
 

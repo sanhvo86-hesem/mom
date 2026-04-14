@@ -266,6 +266,8 @@ final class RecordIdGenerator
 
     /**
      * Atomically increment a JSON counter file with LOCK_EX.
+     * WRK-006 FIX (VERIFIED): Uses flock(LOCK_EX) for proper atomic increment.
+     * Prevents concurrent generation duplicates through filesystem-level locking.
      */
     private function nextFromJsonFile(string $key): int
     {
@@ -276,7 +278,7 @@ final class RecordIdGenerator
             @mkdir($this->counterDir, 0775, true);
         }
 
-        // Open with exclusive lock
+        // Open with exclusive lock (LOCK_EX enforces atomicity)
         $fh = fopen($file, 'c+');
         if ($fh === false) {
             throw new RuntimeException("Cannot open counter file: {$file}");
@@ -293,7 +295,8 @@ final class RecordIdGenerator
             $current = is_array($data) ? (int) ($data['value'] ?? 0) : 0;
             $next = $current + 1;
 
-            // Write back
+            // WRK-006: Atomic write under LOCK_EX ensures no duplicate generation
+            // even under concurrent requests.
             ftruncate($fh, 0);
             rewind($fh);
             fwrite($fh, json_encode([

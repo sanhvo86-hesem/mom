@@ -55,7 +55,7 @@ return [
     ],
     'auth' => [
         'enforce_middleware' => $envBool('QMS_API_ENFORCE_AUTH_MIDDLEWARE', true),
-        'idle_timeout_seconds' => max(60, (int)(getenv('QMS_API_IDLE_TIMEOUT_SECONDS') ?: 14400)),
+        'idle_timeout_seconds' => max(60, (int)(getenv('QMS_API_IDLE_TIMEOUT_SECONDS') ?: 1800)), // SEC-001 FIX: Changed from 14400 (4h) to 1800 (30m)
         'public_actions' => $envList('QMS_API_PUBLIC_ACTIONS', [
             'status',
             'auth_login',

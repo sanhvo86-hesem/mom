@@ -475,9 +475,41 @@ final class OrderService
             throw new RuntimeException('Sales Order number is required.');
         }
 
+        // MISSING-001 FIX: Validate order amount is not zero
+        $orderAmount = (float)($so['total_value'] ?? 0);
+        if ($orderAmount <= 0) {
+            throw new \InvalidArgumentException('Order amount must be greater than zero');
+        }
+
         $store = $this->readStore();
         if ($this->findOrderRecord($store, 'so', $soNumber) !== null) {
             throw new RuntimeException("Sales Order {$soNumber} already exists.");
+        }
+
+        // BLF-011: Validate credit limit if customer has one
+        $customerId = (string)($so['customer_id'] ?? $so['customer'] ?? '');
+        if ($customerId !== '') {
+            $creditLimit = (float)($so['customer_credit_limit'] ?? 0);
+            if ($creditLimit > 0) {
+                // Calculate outstanding balance - sum of unpaid/partial orders
+                $outstandingBalance = 0.0;
+                foreach ((array)($store['sales_orders'] ?? []) as $existingSo) {
+                    if (!is_array($existingSo)) {
+                        continue;
+                    }
+                    if ((string)($existingSo['customer_id'] ?? '') !== $customerId) {
+                        continue;
+                    }
+                    $status = strtolower((string)($existingSo['status'] ?? ''));
+                    // Don't count cancelled, closed, or shipped orders in outstanding
+                    if (!in_array($status, ['closed', 'cancelled', 'shipped'], true)) {
+                        $outstandingBalance += (float)($existingSo['total_value'] ?? 0);
+                    }
+                }
+                if ($outstandingBalance + $orderAmount > $creditLimit) {
+                    throw new RuntimeException("Order amount exceeds customer credit limit. Outstanding: {$outstandingBalance}, Order: {$orderAmount}, Limit: {$creditLimit}");
+                }
+            }
         }
 
         $this->syncCounterWithNumber($store, 'so', $soNumber);
@@ -489,9 +521,11 @@ final class OrderService
     /**
      * Attach a canonical customer purchase order reference to an existing SO.
      *
+     * BLF-005: Uses optimistic locking to prevent TOCTOU race conditions.
+     *
      * @return array<string, mixed>
      */
-    public function linkCustomerPurchaseOrderToSalesOrder(string $soNumber, string $customerPoId, string $customerPoNumber): array
+    public function linkCustomerPurchaseOrderToSalesOrder(string $soNumber, string $customerPoId, string $customerPoNumber, ?string $expectedUpdatedAt = null): array
     {
         $soNumber = trim($soNumber);
         $customerPoId = trim($customerPoId);
@@ -504,6 +538,11 @@ final class OrderService
         foreach ((array)($store['sales_orders'] ?? []) as $index => $row) {
             if (!is_array($row) || (string)($row['so_number'] ?? '') !== $soNumber) {
                 continue;
+            }
+
+            // BLF-005: Optimistic lock check - verify SO hasn't been modified since we read it
+            if ($expectedUpdatedAt !== null && ($row['updated_at'] ?? '') !== $expectedUpdatedAt) {
+                throw new RuntimeException('Sales Order was modified by another user. Please refresh and try again.');
             }
 
             $row['customer_po_id'] = $customerPoId;

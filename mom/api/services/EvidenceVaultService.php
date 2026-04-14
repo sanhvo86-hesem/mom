@@ -295,6 +295,7 @@ final class EvidenceVaultService
      *   - date_to     (string): YYYY-MM-DD inclusive upper bound on stored_at.
      *   - entity_type (string): Filter to evidence linked to this entity type.
      *   - entity_id   (string): Filter to evidence linked to this entity id.
+     *   - org_id      (string): Cross-org isolation - filter to this organization only.
      *
      * @param array<string, string> $filters
      * @return array<int, array<string, mixed>>
@@ -310,6 +311,12 @@ final class EvidenceVaultService
 
         $vault  = $this->loadVault();
         $result = [];
+
+        // FILE-003 (HIGH): Cross-org evidence isolation - filter by org_id from session/filter
+        $requiredOrgId = isset($filters['org_id']) && $filters['org_id'] !== '' ? $filters['org_id'] : null;
+        if ($requiredOrgId === null && isset($_SESSION['org_id'])) {
+            $requiredOrgId = $_SESSION['org_id'];
+        }
 
         // If filtering by entity, get linked evidence IDs first
         $linkedIds = null;
@@ -341,6 +348,14 @@ final class EvidenceVaultService
         foreach ($vault as $rec) {
             if (!is_array($rec)) {
                 continue;
+            }
+
+            // FILE-003: Verify org_id matches session org_id
+            if ($requiredOrgId !== null) {
+                $recOrgId = (string)($rec['org_id'] ?? '');
+                if ($recOrgId !== $requiredOrgId) {
+                    continue; // Skip records from other organizations
+                }
             }
 
             if (isset($filters['type']) && $filters['type'] !== '') {
@@ -383,11 +398,24 @@ final class EvidenceVaultService
      */
     public function getDetail(string $evidenceId): ?array
     {
+        // FILE-003 (HIGH): Cross-org evidence isolation - verify org_id matches
+        $requiredOrgId = $_SESSION['org_id'] ?? null;
+
         $vault = $this->loadVault();
         foreach ($vault as $rec) {
-            if (is_array($rec) && ($rec['evidence_id'] ?? '') === $evidenceId) {
-                return $rec;
+            if (!is_array($rec) || ($rec['evidence_id'] ?? '') !== $evidenceId) {
+                continue;
             }
+
+            // Verify org_id matches session org_id
+            if ($requiredOrgId !== null) {
+                $recOrgId = (string)($rec['org_id'] ?? '');
+                if ($recOrgId !== $requiredOrgId) {
+                    return null; // Record belongs to different organization
+                }
+            }
+
+            return $rec;
         }
         return null;
     }

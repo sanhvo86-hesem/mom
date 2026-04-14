@@ -396,6 +396,14 @@ final class ManufacturingEventBackboneService
         if ($ts === false) {
             throw new InvalidArgumentException('invalid_event_timestamp');
         }
+
+        // QUAL-010 FIX: Reject timestamps in the future (allow 5-minute clock skew)
+        $now = time();
+        $maxFutureWindow = $now + (5 * 60); // 5 minutes
+        if ($ts > $maxFutureWindow) {
+            throw new InvalidArgumentException('event_timestamp_in_future');
+        }
+
         return gmdate(DATE_ATOM, $ts);
     }
 

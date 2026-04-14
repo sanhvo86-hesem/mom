@@ -30,6 +30,9 @@ final class CircuitBreaker
     private string $stateKey;
     private ?CacheService $cacheService;
 
+    // WRK-004 FIX: Track if a half-open test request is currently in progress
+    private bool $halfOpenTestInProgress = false;
+
     public function __construct(
         string $stateDir,
         string $serviceName = 'default',
@@ -56,7 +59,18 @@ final class CircuitBreaker
         $this->evaluateState();
 
         if ($this->state === self::STATE_CLOSED) return true;
-        if ($this->state === self::STATE_HALF_OPEN) return true; // allow test request
+
+        // WRK-004 FIX: In HALF_OPEN state, only allow ONE test request at a time.
+        // Other concurrent requests must wait or be rejected.
+        if ($this->state === self::STATE_HALF_OPEN) {
+            // Only allow if no other request is already testing
+            if ($this->halfOpenTestInProgress) {
+                return false; // Another request is already testing, reject this one
+            }
+            $this->halfOpenTestInProgress = true; // Mark that a test is in progress
+            return true; // Allow this test request
+        }
+
         // STATE_OPEN: check if recovery timeout has elapsed
         return false;
     }
@@ -72,6 +86,8 @@ final class CircuitBreaker
                 $this->successCount = 0;
                 $this->openedAt = null;
             }
+            // WRK-004 FIX: Clear the half-open test flag after success
+            $this->halfOpenTestInProgress = false;
         } else {
             $this->failureCount = 0;
         }
@@ -88,6 +104,8 @@ final class CircuitBreaker
             $this->state = self::STATE_OPEN;
             $this->openedAt = microtime(true);
             $this->successCount = 0;
+            // WRK-004 FIX: Clear the half-open test flag after failure
+            $this->halfOpenTestInProgress = false;
         } elseif ($this->failureCount >= $this->failureThreshold) {
             $this->state = self::STATE_OPEN;
             $this->openedAt = microtime(true);

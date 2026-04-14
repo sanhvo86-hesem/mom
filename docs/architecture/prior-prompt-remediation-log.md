@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `main`
+Audited branch: `codex/worldclass-reaudit-20260414-080436`
 
 Date: 2026-04-14
 
@@ -24,6 +24,9 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | AI NLQ and RCA write-like surface control | Fixed now | `aiNlQuery()` is role-scoped, CSRF-protected, audited, and read-only; `aiRcaAnalyze()` now requires CSRF. |
 | AI NLQ PostgreSQL runtime safety | Fixed now | `NaturalLanguageQueryService::executeSafeQuery()` begins a read-only transaction before `SET LOCAL statement_timeout`. |
 | AI prediction schema grounding | Fixed now | NLQ prompt uses the same prediction types as `AiPredictionPipeline`; migration `110_ai_advisory_boundary_comments.sql` replaces legacy autonomous-action comments with advisory-boundary comments. |
+| Planning schedule compatibility aliases | Fixed now | Legacy `order_schedule_*`, `order_capacity_heatmap`, and `order_promise_suggest` action aliases now route to the existing `AiSchedulingController` schedule handlers instead of non-existent `OrderController` methods. |
+| Planner schedule slot validation | Fixed now | Schedule slot create/update now validate `YYYY-MM-DD` dates, `HH:MM` times, same-day time order, and controlled priority values before writing DB or JSON fallback stores. |
+| Order hold release governance | Fixed now | `OrderController::releaseHold()` now derives the held order type and requires the corresponding `so_write`, `jo_write`, or `wo_write` permission before mutating the hold. |
 | Evidence upload validation | Fixed now | `EvidenceVaultService` validates server-side size and byte-detected MIME; extension fallback cannot override concrete dangerous MIME content. |
 | Operational override role governance | Fixed now | `OperationalOverrideController` keeps permission gating and now uses canonical elevated roles through `userHasAnyRole()`. |
 | FMEA role governance | Fixed now | `FmeaController` uses migrated roles and quality/engineering/production buckets instead of a single unmigrated role string. |
@@ -37,7 +40,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | deliverable | current status | blocker / reason |
 |---|---|---|
 | Full DB-primary dispatch and production reporting | Staged | JSON compatibility remains live authority because the application still depends on legacy fallback and file-backed flows. DB bridge is the safe migration path. |
-| Full ERP release/hold governance tied to dispatch edit rules | Staged | Order/planning truth is still split across JSON and DB-backed concepts; broad release governance requires a dedicated planning migration. |
+| Full ERP release/hold governance tied to dispatch edit rules | Staged after safe fixes | Hold release now checks source-order write permission and schedule aliases are corrected. Broad release governance still requires a dedicated planning migration because order/planning truth remains split across JSON and DB-backed concepts. |
 | Full skill/certification matching on dispatch report submission | Staged | Mobile task start uses qualification gate, but dispatch report matching needs governed machine-operation-skill policy data. |
 | Full NCR/CAPA/SPC workflow enforcement | Staged | First-piece and inspection capture are now linked, but nonconformance disposition/CAPA/SPC enforcement needs EQMS workflow integration. |
 | Full genealogy edge emission from every report | Staged | Trace-ready fields exist, but serial/lot/traveler edge policy needs product/lot/operation governance before automatic edge creation. |
@@ -54,6 +57,9 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | AI feedback endpoint | Advisory feedback write lacked CSRF/idempotency consistency. | Added CSRF and idempotency wrapper. |
 | AI NLQ/RCA endpoints | NLQ POST wrote conversation history without CSRF or scoped roles; RCA POST lacked CSRF. | Added scoped role gate, CSRF, audit hash, and CSRF on RCA. |
 | AI NLQ transaction order | `SET LOCAL statement_timeout` ran before `BEGIN TRANSACTION READ ONLY`, which is invalid for PostgreSQL transaction-local settings. | Transaction now begins first, then sets the local timeout. |
+| Order schedule route drift | Compatibility aliases pointed to methods that do not exist on `OrderController`, creating hidden runtime failure risk. | Aliases now point at the existing scheduling controller handlers. |
+| Schedule slot validation | Planner-entered schedule dates/times could reach the schedule store without strict format/range validation. | Added controller-level date, time-range, and priority validation before DB/JSON writes. |
+| Hold release authorization | Hold release mutated a hold without deriving the held order permission first. | Release now requires matching source-order write permission before mutation and audits order context. |
 | AI recommendation schema comments | Migration 099 described recommendation rows as automated actions. | Migration 110 clarifies advisory-only, human-review semantics without changing enum compatibility. |
 | Evidence MIME validation | Extension fallback could allow an allowed filename extension to override disallowed byte-detected content. | Fallback now only applies to generic/ambiguous MIME detection. |
 | Operational override elevated roles | Generic `manager/director/admin` gate could block real repository roles. | Replaced with canonical elevated role list plus `admin_roles()` and role migration. |

@@ -766,17 +766,18 @@ final class FormEngine
         $actualValue = $data[$targetField] ?? null;
 
         return match ($operator) {
-            'equals', '=='     => $actualValue == $targetValue,
-            'not_equals', '!=' => $actualValue != $targetValue,
-            'in'               => is_array($targetValue) && in_array($actualValue, $targetValue, false),
-            'not_in'           => is_array($targetValue) && !in_array($actualValue, $targetValue, false),
+            // RA-003 FIX: Use strict comparison (===) instead of loose (==) to prevent type juggling
+            'equals', '=='     => $actualValue === $targetValue || (is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
+            'not_equals', '!=' => $actualValue !== $targetValue && !(is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
+            'in'               => is_array($targetValue) && in_array($actualValue, $targetValue, true),
+            'not_in'           => is_array($targetValue) && !in_array($actualValue, $targetValue, true),
             'gt', '>'          => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue > (float) $targetValue,
             'gte', '>='        => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue >= (float) $targetValue,
             'lt', '<'          => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue < (float) $targetValue,
             'lte', '<='        => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue <= (float) $targetValue,
             'not_empty'        => $actualValue !== null && $actualValue !== '' && $actualValue !== [],
             'empty'            => $actualValue === null || $actualValue === '' || $actualValue === [],
-            default            => $actualValue == $targetValue,
+            default            => $actualValue === $targetValue || (is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
         };
     }
 

@@ -33,11 +33,11 @@ return static function (Router $router, string $dataDir): void {
         'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
         'order_shipment_gate_override' => [OrderController::class, 'overrideShipmentGate'],
         'order_shipment_gate_overrides' => [OrderController::class, 'listShipmentGateOverrides'],
-        'order_schedule_get'      => [OrderController::class, 'getSchedule'],
-        'order_schedule_slot'     => [OrderController::class, 'createScheduleSlot'],
-        'order_schedule_update'   => [OrderController::class, 'updateScheduleSlot'],
-        'order_capacity_heatmap'  => [OrderController::class, 'getCapacityHeatmap'],
-        'order_promise_suggest'   => [OrderController::class, 'suggestPromiseDate'],
+        'order_schedule_get'      => [AiSchedulingController::class, 'getSchedule'],
+        'order_schedule_slot'     => [AiSchedulingController::class, 'createSlot'],
+        'order_schedule_update'   => [AiSchedulingController::class, 'updateSlot'],
+        'order_capacity_heatmap'  => [AiSchedulingController::class, 'getCapacityHeatmap'],
+        'order_promise_suggest'   => [AiSchedulingController::class, 'suggestPromiseDate'],
     ]);
     
     // Exception Management

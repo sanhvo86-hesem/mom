@@ -53,6 +53,8 @@ final class GenealogyGraphService
         $fromId = $this->requiredText($fact, 'from_object_id');
         $toType = $this->requiredToken($fact, 'to_object_type');
         $toId = $this->requiredText($fact, 'to_object_id');
+        $this->nodeType($fromType);
+        $this->nodeType($toType);
         $sourceEventId = $this->text($fact['source_event_id'] ?? '');
         if ($sourceEventId === '') {
             $sourceEventId = 'portal-' . hash('sha256', implode('|', [$edgeFactType, $fromType, $fromId, $toType, $toId, $actorRef]));
@@ -488,13 +490,56 @@ final class GenealogyGraphService
 
     private function nodeType(string $type): string
     {
-        return match ($type) {
+        $normalized = match ($type) {
             'user', 'operator', 'person' => 'personnel',
-            'machine' => 'equipment',
-            default => in_array($type, ['job', 'work_order', 'operation', 'lot', 'serial', 'material', 'equipment', 'tool', 'personnel', 'document_revision', 'evidence_record', 'evidence_version', 'change_order', 'nonconformance', 'shipment'], true)
-                ? $type
-                : 'evidence_record',
+            'machine', 'asset' => 'equipment',
+            'route' => 'routing',
+            'fixture', 'gauge' => 'tool',
+            default => $type,
         };
+
+        $allowed = [
+            'job',
+            'work_order',
+            'job_order',
+            'operation',
+            'work_center',
+            'lot',
+            'batch',
+            'serial',
+            'material',
+            'equipment',
+            'tool',
+            'personnel',
+            'method',
+            'measurement',
+            'process',
+            'routing',
+            'setup_sheet',
+            'inspection_plan',
+            'inspection_result',
+            'nc_program',
+            'cnc_program',
+            'document_revision',
+            'form_template',
+            'form_schema',
+            'evidence_record',
+            'evidence_version',
+            'change_request',
+            'change_order',
+            'nonconformance',
+            'deviation',
+            'capa',
+            'shipment',
+            'supplier_lot',
+            'customer_order',
+        ];
+
+        if (!in_array($normalized, $allowed, true)) {
+            throw new RuntimeException('unsupported_genealogy_node_type');
+        }
+
+        return $normalized;
     }
 
     private function snapshotSubjectType(string $type): string

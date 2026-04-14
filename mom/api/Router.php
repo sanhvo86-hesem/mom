@@ -253,6 +253,26 @@ class Router
             }
         }
 
+        // SEC-006 FIX: Check if route path matches but different HTTP method used
+        // If so, return 405 Method Not Allowed instead of 404
+        $pathMatchedMethods = [];
+        foreach ($this->restRoutes as $method => $patterns) {
+            foreach ($patterns as $pattern => $handler) {
+                if ($this->matchPattern($pattern, $pathInfo) !== null) {
+                    $pathMatchedMethods[] = $method;
+                }
+            }
+        }
+        if (!empty($pathMatchedMethods)) {
+            return [
+                'action'  => 'method_not_allowed',
+                'handler' => null,
+                'params'  => [],
+                'allowed_methods' => $pathMatchedMethods,
+                'method_not_allowed' => true,
+            ];
+        }
+
         // 3. If action was given but not mapped, return it for fallback
         if ($action !== '') {
             return [
@@ -282,6 +302,23 @@ class Router
         $handler  = $resolved['handler'];
         $params   = $resolved['params'];
         $action   = $resolved['action'];
+
+        // SEC-006 FIX: Handle 405 Method Not Allowed
+        if ($resolved['method_not_allowed'] ?? false) {
+            $allowedMethods = $resolved['allowed_methods'] ?? [];
+            try {
+                throw ExitException::json([
+                    'ok'    => false,
+                    'error' => 'method_not_allowed',
+                    'server_time' => gmdate('c'),
+                ], 405, [
+                    'Allow' => implode(', ', $allowedMethods),
+                ]);
+            } catch (ExitException $e) {
+                $this->emitResponse($e, $action);
+                return true;
+            }
+        }
 
         if ($handler === null) {
             return false; // Not mapped -> fallback to legacy
@@ -401,7 +438,9 @@ class Router
         $this->emitStandardHeaders($action);
 
         foreach ($response->getHeaders() as $name => $value) {
-            header($name . ': ' . $value);
+            // RA-001 FIX: Sanitize header value to prevent CRLF injection
+            $safeValue = str_replace(["\r", "\n", "\r\n"], '', $value);
+            header($name . ': ' . $safeValue);
         }
 
         $body = $response->getBody();
@@ -417,7 +456,9 @@ class Router
         }
 
         header('X-QMS-API-Pipeline: mvc');
-        header('X-QMS-API-Route: ' . $action);
+        // RA-001 FIX: Sanitize action header to prevent CRLF injection
+        $safeAction = str_replace(["\r", "\n", "\r\n"], '', $action);
+        header('X-QMS-API-Route: ' . $safeAction);
         header('X-QMS-Data-Mode: ' . $this->data->getMode());
     }
 

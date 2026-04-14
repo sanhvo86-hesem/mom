@@ -87,6 +87,13 @@ final class QuoteService
         $id  = $this->generateQuoteNumber();
         $now = $this->nowIso();
 
+        // BLF-013: Validate currency code against ISO 4217 whitelist
+        $currency = strtoupper(trim((string)($data['currency'] ?? 'VND')));
+        $validCurrencies = ['USD', 'EUR', 'VND', 'JPY', 'GBP', 'SGD', 'CNY', 'KRW', 'THB', 'AUD'];
+        if (!in_array($currency, $validCurrencies, true)) {
+            throw new \InvalidArgumentException('Invalid currency code');
+        }
+
         $record = array_merge($data, [
             'quote_id'       => $id,
             'status'         => 'draft',
@@ -95,6 +102,7 @@ final class QuoteService
             'updated_at'     => $now,
             'updated_by'     => $userId,
             'revision'       => (int)($data['revision'] ?? 1),
+            'currency'       => $currency,
             'status_history' => [[
                 'from'      => null,
                 'to'        => 'draft',
@@ -146,6 +154,16 @@ final class QuoteService
         foreach ($whitelist as $field) {
             if (isset($updates[$field])) {
                 $filtered[$field] = $updates[$field];
+            }
+        }
+
+        // BLF-007: Validate discount percentage range
+        foreach (['discount_pct', 'discount_percent', 'discount'] as $discountField) {
+            if (isset($filtered[$discountField])) {
+                $discount = (float)$filtered[$discountField];
+                if ($discount < 0 || $discount > 100) {
+                    throw new RuntimeException('Discount must be between 0 and 100%');
+                }
             }
         }
 
@@ -311,6 +329,11 @@ final class QuoteService
         $toolingCost   = (float)($line['tooling_cost'] ?? 0);
         $overheadPct   = (float)($line['overhead_pct'] ?? 15.0);
         $marginPct     = (float)($line['margin_pct'] ?? 25.0);
+
+        // BLF-001: Validate margin to prevent division by zero
+        if ($marginPct >= 100 || $marginPct < 0) {
+            throw new \InvalidArgumentException('Margin must be between 0 and 99.99%');
+        }
 
         // Auto-estimate if not provided
         if ($materialCost <= 0 && isset($line['material_params'])) {

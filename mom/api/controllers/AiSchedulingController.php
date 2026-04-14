@@ -219,6 +219,37 @@ class AiSchedulingController extends BaseController
         return 0;
     }
 
+    /**
+     * Guard planner-entered schedule dates before they become capacity context.
+     */
+    private function requireScheduleDate(string $date, string $field = 'date'): void
+    {
+        $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        if ($parsed === false || $parsed->format('Y-m-d') !== $date) {
+            $this->error("invalid_{$field}", 400, "{$field} must use YYYY-MM-DD.");
+        }
+    }
+
+    /**
+     * Guard shopfloor schedule times in 24-hour HH:MM format.
+     */
+    private function requireScheduleTime(string $time, string $field): void
+    {
+        if (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $time)) {
+            $this->error("invalid_{$field}", 400, "{$field} must use HH:MM 24-hour time.");
+        }
+    }
+
+    private function requireScheduleTimeRange(string $startTime, string $endTime): void
+    {
+        $this->requireScheduleTime($startTime, 'start_time');
+        $this->requireScheduleTime($endTime, 'end_time');
+
+        if ($this->timeToMinutes($endTime) <= $this->timeToMinutes($startTime)) {
+            $this->error('invalid_time_range', 400, 'end_time must be after start_time for same-day schedule slots.');
+        }
+    }
+
     // -- Prediction Endpoints -------------------------------------------------
 
     /**
@@ -970,9 +1001,15 @@ class AiSchedulingController extends BaseController
             $operation = trim((string)($body['operation'] ?? ''));
             $priority  = strtolower(trim((string)($body['priority'] ?? 'normal')));
 
+            $this->requireScheduleDate($date);
+            $this->requireScheduleTimeRange($startTime, $endTime);
+            if (!in_array($priority, ['low', 'normal', 'high', 'urgent'], true)) {
+                $this->error('invalid_priority', 400, 'priority must be one of: low, normal, high, urgent.');
+            }
+
             // Map priority string to integer (DB uses INT priority)
             $priorityMap = ['low' => 25, 'normal' => 50, 'high' => 75, 'urgent' => 100];
-            $priorityInt = $priorityMap[$priority] ?? 50;
+            $priorityInt = $priorityMap[$priority];
 
             // Try DB first / Thu DB truoc
             $db = $this->getDb();
@@ -1141,6 +1178,23 @@ class AiSchedulingController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            if (isset($body['date'])) {
+                $this->requireScheduleDate(trim((string)$body['date']));
+            }
+            if (isset($body['start_time']) && isset($body['end_time'])) {
+                $this->requireScheduleTimeRange(trim((string)$body['start_time']), trim((string)$body['end_time']));
+            } elseif (isset($body['start_time'])) {
+                $this->requireScheduleTime(trim((string)$body['start_time']), 'start_time');
+            } elseif (isset($body['end_time'])) {
+                $this->requireScheduleTime(trim((string)$body['end_time']), 'end_time');
+            }
+            if (isset($body['priority'])) {
+                $priority = strtolower(trim((string)$body['priority']));
+                if (!in_array($priority, ['low', 'normal', 'high', 'urgent'], true)) {
+                    $this->error('invalid_priority', 400, 'priority must be one of: low, normal, high, urgent.');
+                }
+            }
+
             // Try DB first / Thu DB truoc
             $db = $this->getDb();
             if ($db !== null) {
