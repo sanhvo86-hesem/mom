@@ -1927,7 +1927,7 @@ BASH;
             }
 
             $loop = implode(' ', array_map('escapeshellarg', $units));
-            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\n'; fi";
+            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\\n'; fi";
         }
 
         if ($parts === []) {
@@ -2037,7 +2037,7 @@ BASH;
                 'response_ms' => null,
                 'detail' => 'Site probe failed',
             ];
-            $parts[] = "if command -v curl >/dev/null 2>&1; then out=\"\$(curl -k -L --max-time 8 -o /dev/null -s -w " . escapeshellarg('%{http_code}|%{url_effective}|%{content_type}|%{remote_ip}|%{time_total}') . ' ' . escapeshellarg($url) . " 2>/dev/null || true)\"; [ -n \"\$out\" ] || out='000||||'; printf '__SITE__|{$index}|%s\n' \"\$out\"; else printf '__SITE__|{$index}|000||||\n'; fi";
+            $parts[] = "if command -v curl >/dev/null 2>&1; then out=\"\$(curl -k -L --max-time 8 -o /dev/null -s -w " . escapeshellarg('%{http_code}|%{url_effective}|%{content_type}|%{remote_ip}|%{time_total}') . ' ' . escapeshellarg($url) . " 2>/dev/null || true)\"; [ -n \"\$out\" ] || out='000||||'; printf '__SITE__|{$index}|%s\\n' \"\$out\"; else printf '__SITE__|{$index}|000||||\\n'; fi";
         }
 
         if ($parts === []) {
@@ -2187,9 +2187,9 @@ BASH;
                 'reachable' => false,
             ];
             if ($captureBody) {
-                $parts[] = "if command -v curl >/dev/null 2>&1; then tmp_file=\"\$(mktemp)\"; meta=\"\$(curl -sS --max-time 6 -o \"\$tmp_file\" -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; body=\"\$(head -c 180 \"\$tmp_file\" 2>/dev/null | tr '\n' ' ' | tr '\r' ' ' | tr '|' ' ')\"; rm -f \"\$tmp_file\"; printf '__CTRL__|{$index}|%s|%s\n' \"\$meta\" \"\$body\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+                $parts[] = "if command -v curl >/dev/null 2>&1; then tmp_file=\"\$(mktemp)\"; meta=\"\$(curl -sS --max-time 6 -o \"\$tmp_file\" -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; body=\"\$(head -c 180 \"\$tmp_file\" 2>/dev/null | tr '\\n' ' ' | tr '\\r' ' ' | tr '|' ' ')\"; rm -f \"\$tmp_file\"; printf '__CTRL__|{$index}|%s|%s\\n' \"\$meta\" \"\$body\"; else printf '__CTRL__|{$index}|000||curl_missing\\n'; fi";
             } else {
-                $parts[] = "if command -v curl >/dev/null 2>&1; then meta=\"\$(curl -sSI --max-time 5 -o /dev/null -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; printf '__CTRL__|{$index}|%s|\n' \"\$meta\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+                $parts[] = "if command -v curl >/dev/null 2>&1; then meta=\"\$(curl -sSI --max-time 5 -o /dev/null -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; printf '__CTRL__|{$index}|%s|\\n' \"\$meta\"; else printf '__CTRL__|{$index}|000||curl_missing\\n'; fi";
             }
         }
 
