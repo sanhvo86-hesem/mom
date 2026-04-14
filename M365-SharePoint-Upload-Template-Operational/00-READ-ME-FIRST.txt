@@ -1,26 +1,40 @@
-﻿HESEM QMS - SharePoint 4-Site Folder Template
-Generated: 2026-03-27 16:01:45
-Year: 2026
+HESEM QMS - SharePoint Publication Template
+Governance revision: 2026-04-14
 
-Architecture: core-standards/14-m365-sharepoint-architecture.md
-Naming:       core-standards/15-evidence-and-records-naming.md
-ANNEX:        ANNEX-137 (Evidence and Records Naming Convention)
+Purpose
+SharePoint is a read-only publication and discovery surface for controlled
+records that were accepted through the MOM/eQMS portal. SharePoint is not the
+authoritative source of truth for final evidence, document revisions, form
+submissions, or signatures.
 
-SITES:
-  HESEM-Records        Site 1: Operational records (Quality, QMS, Training, Department)
-  HESEM-Job-Evidence   Site 2: Job dossiers + Part baseline + Customer IP (TACH RIENG)
-  HESEM-People         Site 3: HR restricted (Employee records, HR operations)
-  HESEM-Digital        Site 4: IT governance + Source control backup
+Portal-first rules
+- Users download form blanks, fill online forms, upload offline Excel carriers,
+  request amendments, search evidence, review, approve, and sign through the
+  portal only.
+- End users must not upload controlled evidence directly to SharePoint.
+- Offline Excel files are controlled capture carriers. The authoritative record
+  is created only after portal issuance, upload validation, finalization, and
+  canonical persistence.
+- SharePoint publication is asynchronous after portal acceptance. A failed
+  publication does not make the portal evidence invalid; it creates a
+  publication state and retry/exception record.
 
-RULES:
-  - Max 3 folder levels. Use SharePoint metadata columns for filtering.
-  - Placeholders: {CustomerID}, {PartNum}, {JobNum}, {EmpID} - replace when creating actual.
-  - External sharing OFF on HESEM-Job-Evidence and HESEM-People.
-  - Employee personal files go to OneDrive, NOT SharePoint.
-  - Form blanks served from web portal. SharePoint stores FILLED forms + evidence only.
+Evidence package requirement
+Every final evidence package must include:
+1. Original artifact.
+2. Canonical structured payload.
+3. Readable snapshot.
+4. Hash/signature manifest.
+5. Publication receipt or publication state record.
 
-PERMISSIONS (Entra ID Groups):
-  HESEM-Records:       AllStaff (read), Dept Groups (edit own dept)
-  HESEM-Job-Evidence:  Job-Core = ENG+QA+PRO+SCM (read+edit), Ext Sharing OFF
-  HESEM-People:        HR only
-  HESEM-Digital:       IT + QMS-Team
+Permissions model
+- SharePoint site owners maintain read-only distribution libraries.
+- Department users receive read access as needed for discovery.
+- Edit/upload permissions are restricted to the controlled publication worker
+  or approved system publishing identity.
+- Direct department edit folders for final evidence are prohibited.
+
+Operational note
+If a user has a filled form or evidence file, route it to the portal upload or
+online form flow. Do not place it directly into SharePoint and do not treat a
+SharePoint file as the authoritative record.

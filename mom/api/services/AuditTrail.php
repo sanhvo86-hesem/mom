@@ -180,42 +180,51 @@ final class AuditTrail
     {
         $record = $event->toArray();
         $requiresAuthoritativeStore = $this->requiresAuthoritativeStore($event);
+        $lockAcquired = false;
 
-        // Build hash chain: hash of this event includes the previous event's hash
-        $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId, $requiresAuthoritativeStore);
-        $record['prev_hash'] = $prevHash;
-        $record['event_hash'] = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($record), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        try {
+            $lockAcquired = $this->acquireAggregateAuditLock($event, $requiresAuthoritativeStore);
 
-        // Electronic signature block
-        if ($event->esigReason !== null) {
-            $record['esig'] = [
-                'signer'    => $event->actorId,
-                'reason'    => $event->esigReason,
-                'timestamp' => $event->recordedAt,
-                'hash'      => hash(self::HASH_ALGO, $event->actorId . '|' . $event->esigReason . '|' . $event->recordedAt),
-            ];
-        }
+            // Build hash chain: hash of this event includes the previous event's hash
+            $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId, $requiresAuthoritativeStore);
+            $record['prev_hash'] = $prevHash;
+            $record['event_hash'] = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($record), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
-        // Persist to PostgreSQL if available
-        if ($this->db !== null) {
-            try {
-                $this->persistToPostgres($record);
-            } catch (\Throwable $e) {
-                if ($requiresAuthoritativeStore) {
-                    throw new RuntimeException(
-                        'Authoritative audit write failed for controlled event: ' . $e->getMessage(),
-                        0,
-                        $e,
-                    );
+            // Electronic signature block
+            if ($event->esigReason !== null) {
+                $record['esig'] = [
+                    'signer'    => $event->actorId,
+                    'reason'    => $event->esigReason,
+                    'timestamp' => $event->recordedAt,
+                    'hash'      => hash(self::HASH_ALGO, $event->actorId . '|' . $event->esigReason . '|' . $event->recordedAt),
+                ];
+            }
+
+            // Persist to PostgreSQL if available
+            if ($this->db !== null) {
+                try {
+                    $this->persistToPostgres($record);
+                } catch (\Throwable $e) {
+                    if ($requiresAuthoritativeStore) {
+                        throw new RuntimeException(
+                            'Authoritative audit write failed for controlled event: ' . $e->getMessage(),
+                            0,
+                            $e,
+                        );
+                    }
+                    error_log('[AuditTrail] PG write failed, falling back to JSON: ' . $e->getMessage());
+                    $this->persistToJson($record);
                 }
-                error_log('[AuditTrail] PG write failed, falling back to JSON: ' . $e->getMessage());
+            } else {
+                if ($requiresAuthoritativeStore) {
+                    throw new RuntimeException('Authoritative audit store is required for controlled event.');
+                }
                 $this->persistToJson($record);
             }
-        } else {
-            if ($requiresAuthoritativeStore) {
-                throw new RuntimeException('Authoritative audit store is required for controlled event.');
+        } finally {
+            if ($lockAcquired) {
+                $this->releaseAggregateAuditLock($event);
             }
-            $this->persistToJson($record);
         }
     }
 
@@ -530,6 +539,51 @@ final class AuditTrail
             )
         SQL;
         $this->db->execute($fallbackSql, $params);
+    }
+
+    private function acquireAggregateAuditLock(AuditEvent $event, bool $requiresAuthoritativeStore): bool
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            return false;
+        }
+
+        try {
+            $this->db->queryOne(
+                'SELECT pg_advisory_lock(hashtext(:audit_chain_key)) AS locked',
+                [':audit_chain_key' => $this->auditLockKey($event)],
+            );
+            return true;
+        } catch (\Throwable $e) {
+            if ($requiresAuthoritativeStore) {
+                throw new RuntimeException(
+                    'Authoritative audit chain is unavailable for controlled event: ' . $e->getMessage(),
+                    0,
+                    $e,
+                );
+            }
+            return false;
+        }
+    }
+
+    private function releaseAggregateAuditLock(AuditEvent $event): void
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            return;
+        }
+
+        try {
+            $this->db->queryOne(
+                'SELECT pg_advisory_unlock(hashtext(:audit_chain_key)) AS unlocked',
+                [':audit_chain_key' => $this->auditLockKey($event)],
+            );
+        } catch (\Throwable $e) {
+            error_log('[AuditTrail] PG advisory unlock failed: ' . $e->getMessage());
+        }
+    }
+
+    private function auditLockKey(AuditEvent $event): string
+    {
+        return strtolower($event->aggregateType) . ':' . $event->aggregateId;
     }
 
     /**

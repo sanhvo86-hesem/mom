@@ -35,12 +35,18 @@ final class DocumentRevisionCommandService
         }
 
         $family = $db->queryOne(
-            "INSERT INTO doc_families
-                (doc_code, doc_type, title, process_area, source_system, source_record_id, metadata)
-             VALUES
-                (:doc_code, :doc_type, :title, :process_area, 'mom', :source_record_id, CAST(:metadata AS jsonb))
-             ON CONFLICT (doc_code) DO UPDATE SET title = EXCLUDED.title, updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO doc_families
+                    (doc_code, doc_type, title, process_area, source_system, source_record_id, metadata)
+                VALUES
+                    (:doc_code, :doc_type, :title, :process_area, 'mom', :source_record_id, CAST(:metadata AS jsonb))
+                ON CONFLICT (doc_code) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM doc_families WHERE doc_code = :doc_code
+             LIMIT 1",
             [
                 ':doc_code' => $this->requiredText($input, 'doc_code'),
                 ':doc_type' => $this->docType($input['doc_type'] ?? 'OTHER'),
@@ -57,18 +63,36 @@ final class DocumentRevisionCommandService
             throw new RuntimeException('doc_family_persistence_failed');
         }
 
+        if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true)) {
+            $this->assertReleasedDocumentChangeAuthority(
+                $db,
+                $sourceChangeOrderId,
+                ['document_family', 'doc_family', 'document'],
+                [(string)$family['doc_family_id'], $this->requiredText($input, 'doc_code')],
+                'lifecycle_state',
+                $this->documentChangeEffect($lifecycleState),
+                $input,
+            );
+        }
+
         $revision = $db->queryOne(
-            "INSERT INTO doc_revisions
-                (doc_family_id, revision_label, revision_sequence, lifecycle_state, source_change_order_id,
-                 canonical_payload, readable_snapshot_uri, manifest_hash_sha256, released_at, idempotency_key, metadata)
-             VALUES
-                (CAST(:doc_family_id AS uuid), :revision_label, :revision_sequence, :lifecycle_state,
-                 CAST(:source_change_order_id AS uuid), CAST(:canonical_payload AS jsonb), :readable_snapshot_uri,
-                 :manifest_hash_sha256, CAST(:released_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (doc_family_id, revision_label) DO UPDATE SET
-                 metadata = doc_revisions.metadata || EXCLUDED.metadata,
-                 updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO doc_revisions
+                    (doc_family_id, revision_label, revision_sequence, lifecycle_state, source_change_order_id,
+                     canonical_payload, readable_snapshot_uri, manifest_hash_sha256, released_at, idempotency_key, metadata)
+                VALUES
+                    (CAST(:doc_family_id AS uuid), :revision_label, :revision_sequence, :lifecycle_state,
+                     CAST(:source_change_order_id AS uuid), CAST(:canonical_payload AS jsonb), :readable_snapshot_uri,
+                     :manifest_hash_sha256, CAST(:released_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
+                ON CONFLICT (doc_family_id, revision_label) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM doc_revisions
+              WHERE doc_family_id = CAST(:doc_family_id AS uuid)
+                AND revision_label = :revision_label
+             LIMIT 1",
             [
                 ':doc_family_id' => (string)$family['doc_family_id'],
                 ':revision_label' => $this->requiredText($input, 'revision_label'),
@@ -180,6 +204,15 @@ final class DocumentRevisionCommandService
         $revisionId = $this->requiredUuid($input, 'doc_revision_id');
         $sourceChangeOrderId = $this->requiredUuid($input, 'source_change_order_id');
         $supersededBy = $this->nullableUuid($input['superseded_by_doc_revision_id'] ?? null);
+        $this->assertReleasedDocumentChangeAuthority(
+            $db,
+            $sourceChangeOrderId,
+            ['document_revision', 'doc_revision'],
+            [$revisionId],
+            'lifecycle_state',
+            'supersede',
+            $input,
+        );
 
         $revision = $db->queryOne(
             "UPDATE doc_revisions
@@ -305,6 +338,173 @@ final class DocumentRevisionCommandService
             }
         }
         return $rows;
+    }
+
+    /**
+     * @param list<string> $objectTypes
+     * @param list<string> $objectIds
+     * @param array<string, mixed> $context
+     */
+    private function assertReleasedDocumentChangeAuthority(
+        object $db,
+        ?string $changeOrderId,
+        array $objectTypes,
+        array $objectIds,
+        string $fieldPath,
+        string $requestedEffect,
+        array $context,
+    ): void {
+        if ($changeOrderId === null) {
+            throw new RuntimeException('released_document_change_order_required');
+        }
+        if (!method_exists($db, 'query')) {
+            throw new RuntimeException('released_document_change_authority_store_required');
+        }
+
+        $rows = $db->query(
+            "SELECT
+                co.plm_change_order_id::text AS plm_change_order_id,
+                co.change_order_number,
+                co.status,
+                lower(cao.object_type) AS object_type,
+                cao.object_id,
+                cao.affected_fields,
+                cao.requested_effect,
+                cao.effectivity_rule,
+                cao.disposition
+             FROM plm_change_orders co
+             INNER JOIN plm_change_affected_objects cao
+               ON cao.plm_change_order_id = co.plm_change_order_id
+             WHERE co.plm_change_order_id = CAST(:change_order_id AS uuid)
+               AND co.status = 'released'
+               AND cao.disposition = 'accepted'
+             ORDER BY cao.created_at DESC",
+            [':change_order_id' => $changeOrderId],
+        );
+        if (!is_array($rows)) {
+            throw new RuntimeException('released_document_change_authority_required');
+        }
+
+        $normalizedObjectTypes = array_values(array_filter(array_map(
+            fn(string $type): string => strtolower(trim($type)),
+            $objectTypes,
+        )));
+        $normalizedObjectIds = array_values(array_filter(array_map(
+            fn(string $id): string => trim($id),
+            $objectIds,
+        )));
+
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            if (!in_array(strtolower($this->text($row['object_type'] ?? '')), $normalizedObjectTypes, true)) {
+                continue;
+            }
+            if (!in_array($this->text($row['object_id'] ?? ''), $normalizedObjectIds, true)) {
+                continue;
+            }
+            if (!$this->fieldListContains($row['affected_fields'] ?? null, $fieldPath)) {
+                continue;
+            }
+            if (!$this->effectListContains($row['requested_effect'] ?? null, $requestedEffect)) {
+                continue;
+            }
+            if (!$this->effectivityRuleMatches($row['effectivity_rule'] ?? null, $context)) {
+                continue;
+            }
+            return;
+        }
+
+        throw new RuntimeException('released_document_change_authority_required');
+    }
+
+    private function documentChangeEffect(string $lifecycleState): string
+    {
+        return match ($lifecycleState) {
+            'released' => 'release',
+            'superseded' => 'supersede',
+            'obsolete' => 'obsolete',
+            'withdrawn' => 'withdraw',
+            default => 'revise',
+        };
+    }
+
+    private function fieldListContains(mixed $raw, string $fieldPath): bool
+    {
+        return in_array($fieldPath, $this->textList($raw), true);
+    }
+
+    private function effectListContains(mixed $raw, string $requestedEffect): bool
+    {
+        $effects = $this->textList($raw);
+        if ($effects === []) {
+            return false;
+        }
+        return in_array($requestedEffect, $effects, true)
+            || ($requestedEffect === 'release' && in_array('revise', $effects, true))
+            || ($requestedEffect === 'supersede' && in_array('revise', $effects, true));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function textList(mixed $raw): array
+    {
+        if (is_array($raw)) {
+            return array_values(array_unique(array_filter(array_map(
+                fn(mixed $value): string => is_scalar($value) ? strtolower(trim((string)$value)) : '',
+                $raw,
+            ))));
+        }
+        if (!is_string($raw) || trim($raw) === '') {
+            return [];
+        }
+        $text = trim($raw);
+        $decoded = json_decode($text, true);
+        if (is_array($decoded)) {
+            return $this->textList($decoded);
+        }
+        if (str_starts_with($text, '{') && str_ends_with($text, '}')) {
+            $text = substr($text, 1, -1);
+        }
+        return array_values(array_unique(array_filter(array_map(
+            fn(string $value): string => strtolower(trim($value, " \t\n\r\0\x0B\"'")),
+            str_getcsv($text, ',', '"', '\\'),
+        ))));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function effectivityRuleMatches(mixed $ruleRaw, array $context): bool
+    {
+        $rule = $ruleRaw;
+        if (is_string($ruleRaw)) {
+            $decoded = json_decode($ruleRaw, true);
+            $rule = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($rule) || $rule === []) {
+            return true;
+        }
+
+        $effectivity = is_array($context['effectivity'] ?? null) ? $context['effectivity'] : $context;
+        foreach (['site', 'plant', 'lot', 'serial', 'order_id'] as $key) {
+            if (!array_key_exists($key, $rule)) {
+                continue;
+            }
+            $actual = $effectivity[$key] ?? $effectivity['effectivity_' . $key] ?? null;
+            $expected = $rule[$key];
+            if (is_array($expected)) {
+                if (!in_array($actual, $expected, true)) {
+                    return false;
+                }
+            } elseif ((string)$expected !== (string)$actual) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function normalizeDb(?object $db): ?object

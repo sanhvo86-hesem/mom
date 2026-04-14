@@ -107,6 +107,19 @@ final class ChangeLifecycleCommandService
     public function createChangeOrder(array $input, string $actorRef): array
     {
         $this->requireDb();
+        if (method_exists($this->db, 'transactional')) {
+            return $this->db->transactional(fn(): array => $this->createChangeOrderInsideTransaction($input, $actorRef));
+        }
+
+        return $this->createChangeOrderInsideTransaction($input, $actorRef);
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private function createChangeOrderInsideTransaction(array $input, string $actorRef): array
+    {
         $status = $this->enum($input['status'] ?? 'draft', ['draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled']);
         if (in_array($status, ['released', 'implemented', 'closed'], true)) {
             throw new RuntimeException('change_order_release_requires_transition');

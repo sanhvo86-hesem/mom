@@ -83,17 +83,42 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertMatchesRegularExpression('/public function getDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertMatchesRegularExpression('/public function aiDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertStringContainsString('SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}', $controller);
+        $this->assertStringContainsString('return $rowPlant === $plantId;', $controller);
+        $this->assertStringNotContainsString("return \$rowPlant === '' || \$rowPlant === \$plantId;", $controller);
+        $this->assertStringContainsString('$all = $this->filterAiRowsByPlant($all, $plantId);', $controller);
         $this->assertStringContainsString('$canViewModelInternals = $this->userHasAnyRole($user, admin_roles())', $controller);
         $this->assertStringContainsString('unset($row[\'training_data_source\'], $row[\'config\'], $row[\'metadata\']);', $controller);
         $this->assertStringContainsString('p.plant_id = :mtta_plant_id', $pipeline);
     }
 
+    public function testAiConversationFallbackIsRoleGuardedValidatedAndOwnerScoped(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+
+        $this->assertStringContainsString('private function normalizeConversationId(mixed $value): string', $source);
+        $this->assertStringContainsString('private function conversationFallbackPath(string $conversationId): string', $source);
+        $this->assertStringContainsString('private function assertConversationFallbackOwner(array $conversation, array $user): void', $source);
+        $this->assertMatchesRegularExpression('/public function aiConversationHistory\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $source);
+        $this->assertMatchesRegularExpression('/public function aiConversationDetail\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$conversationId = \$this->normalizeConversationId\(\$this->query\(\'conversation_id\'\)\);/s', $source);
+        $this->assertStringContainsString('$file = $this->conversationFallbackPath($conversationId);', $source);
+        $this->assertStringContainsString('$this->assertConversationFallbackOwner($conv, $user);', $source);
+        $this->assertStringNotContainsString('$historyDir . \'/\' . $conversationId . \'.json\'', $source);
+    }
+
     public function testCanonicalEvidenceFinalizationRequiresControlledRole(): void
     {
         $controller = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/EqmsControlPlaneController.php');
+        $service = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/Evidence/EvidenceFinalizationService.php');
+        $readService = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/Evidence/CanonicalEvidenceReadService.php');
 
         $this->assertStringContainsString('private function evidenceFinalizationRoles(): array', $controller);
+        $this->assertStringContainsString('private function evidenceReadRoles(): array', $controller);
+        $this->assertStringContainsString('private function requireOrgContext(array $user): string', $controller);
         $this->assertMatchesRegularExpression('/public function finalizeEvidencePackage\(\): never\s*\{.*?\$this->requireAnyRole\(\$user, \$this->evidenceFinalizationRoles\(\)\);.*?\$this->requireCsrf\(\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function canonicalEvidencePackage\(\): never\s*\{.*?\$this->requireAnyRole\(\$user, \$this->evidenceReadRoles\(\)\);.*?\$orgId = \$this->requireOrgContext\(\$user\);/s', $controller);
+        $this->assertStringContainsString('->package($evidenceRef, $orgId)', $controller);
+        $this->assertStringContainsString('evidence_signature_event_required', $service);
+        $this->assertStringContainsString("metadata->>'org_id' = :org_id", $readService);
     }
 
     public function testEvidenceIdempotencyUsesPlatformKeyContract(): void
@@ -138,8 +163,25 @@ final class SecurityHardeningRegressionTest extends TestCase
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/OrderController.php');
 
+        $this->assertStringContainsString('private function appendOrderHoldEvent(array $event): void', $source);
+        $this->assertStringContainsString('/orders/hold_events.json', $source);
+        $this->assertStringContainsString("'event_type' => 'order.hold_set'", $source);
+        $this->assertStringContainsString("'event_type' => 'order.hold_released'", $source);
         $this->assertMatchesRegularExpression('/public function releaseHold\(\): never\s*\{.*?\$permission = match \(\$orderType\).*?\'so\' => \'so_write\'.*?\'jo\' => \'jo_write\'.*?\'wo\' => \'wo_write\'.*?\$this->requireOrderPermission\(\$user, \$permission\);.*?\$h\[\'released\'\]\s+= true;/s', $source);
         $this->assertStringContainsString('hold_order_type_invalid', $source);
+    }
+
+    public function testCncProgramsCarryPlantAndDigitalThreadScopeLikeSetupSheets(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/CncProgramController.php');
+
+        $this->assertStringContainsString('private function programScopeFields(array $body, array $fallback = []): array', $source);
+        $this->assertStringContainsString('private function inPlantScope(array $record, string $plantId): bool', $source);
+        $this->assertStringContainsString('$program = array_merge($program, $this->programScopeFields($body, $program));', $source);
+        $this->assertStringContainsString('$version = array_merge($version, $this->programScopeFields($body, $program));', $source);
+        $this->assertStringContainsString("'inspection_plan_id' => trim", $source);
+        $this->assertStringContainsString("'part_revision' => trim", $source);
+        $this->assertStringContainsString('$this->inPlantScope($program, $plantId)', $source);
     }
 
     public function testScheduleSlotWritesValidateDatesTimesAndPriority(): void

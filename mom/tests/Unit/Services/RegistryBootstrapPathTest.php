@@ -9,27 +9,25 @@ use PHPUnit\Framework\TestCase;
 
 final class RegistryBootstrapPathTest extends TestCase
 {
-    public function testBootstrapRegistryLivesInRuntimeConsumedPathOnly(): void
+    public function testBootstrapRegistryDoesNotLiveInControlledRuntimeDataPath(): void
     {
         $portalRoot = dirname(__DIR__, 3);
         $repoRoot = dirname($portalRoot);
         $runtimeRegistryDir = $portalRoot . '/data/registry';
+        $controlledRegistryDir = $portalRoot . '/contracts';
 
-        $this->assertDirectoryExists($runtimeRegistryDir);
-        $this->assertFileExists($runtimeRegistryDir . '/table-registry.json');
-        $this->assertFileExists($runtimeRegistryDir . '/endpoint-catalog-index.json');
-        $this->assertFileExists($runtimeRegistryDir . '/relation-map.json');
-        $this->assertFileExists($runtimeRegistryDir . '/schema-authority-summary.json');
+        $this->assertFileDoesNotExist($runtimeRegistryDir . '/table-registry.json');
+        $this->assertFileExists($controlledRegistryDir . '/table-registry.json');
         $this->assertFileDoesNotExist($repoRoot . '/data/registry/table-registry.json');
     }
 
-    public function testBootstrapRegistryContainsRuntimeUsableTablesAndEndpoints(): void
+    public function testControlledRegistryFallbackContainsUsableTablesAndGeneratedEndpoints(): void
     {
         $portalRoot = dirname(__DIR__, 3);
-        $runtimeRegistryDir = $portalRoot . '/data/registry';
+        $controlledRegistryDir = $portalRoot . '/contracts';
 
-        $tableRegistry = $this->readJson($runtimeRegistryDir . '/table-registry.json');
-        $endpointCatalog = $this->readJson($runtimeRegistryDir . '/endpoint-catalog-index.json');
+        $tableRegistry = $this->readJson($controlledRegistryDir . '/table-registry.json');
+        $endpointCatalog = (new RegistryService($portalRoot . '/data'))->raw('endpoint-catalog');
 
         $this->assertIsArray($tableRegistry['tables'] ?? null);
         $this->assertGreaterThan(0, count($tableRegistry['tables']));
@@ -40,10 +38,10 @@ final class RegistryBootstrapPathTest extends TestCase
         $primaryKeys = $firstTable['primaryKeys'] ?? (array)$firstTable['primaryKey'];
         $this->assertNotEmpty(array_filter($primaryKeys));
 
-        $this->assertIsArray($endpointCatalog['rows'] ?? null);
-        $this->assertGreaterThan(0, count($endpointCatalog['rows']));
+        $this->assertIsArray($endpointCatalog['endpoints'] ?? null);
+        $this->assertGreaterThan(0, count($endpointCatalog['endpoints']));
 
-        $firstEndpoint = reset($endpointCatalog['rows']);
+        $firstEndpoint = reset($endpointCatalog['endpoints']);
         $this->assertIsArray($firstEndpoint);
         $this->assertArrayHasKey('handler', $firstEndpoint);
     }

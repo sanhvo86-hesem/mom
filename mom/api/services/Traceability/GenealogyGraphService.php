@@ -182,9 +182,10 @@ final class GenealogyGraphService
         $objectType = $this->requiredToken($request, 'object_type');
         $objectId = $this->requiredText($request, 'object_id');
         $context = is_array($request['context'] ?? null) ? $request['context'] : $request;
+        $required5M = $this->required5M($request);
 
         $missing = [];
-        foreach ($this->required5M($request) as $dimension => $required) {
+        foreach ($required5M as $dimension => $required) {
             if (!$required) {
                 continue;
             }
@@ -202,7 +203,7 @@ final class GenealogyGraphService
              VALUES
                 (:operation_class, :object_type, :object_id, :material_required, :machine_required,
                  :method_required, :measurement_required, :manpower_required, :gate_state,
-                 CAST(:missing_context AS jsonb), now())
+                CAST(:missing_context AS jsonb), now())
              ON CONFLICT (operation_class, object_type, object_id)
              DO UPDATE SET
                  material_required = EXCLUDED.material_required,
@@ -218,11 +219,11 @@ final class GenealogyGraphService
                 ':operation_class' => $operationClass,
                 ':object_type' => $objectType,
                 ':object_id' => $objectId,
-                ':material_required' => $this->boolSql($request['material_required'] ?? true),
-                ':machine_required' => $this->boolSql($request['machine_required'] ?? true),
-                ':method_required' => $this->boolSql($request['method_required'] ?? true),
-                ':measurement_required' => $this->boolSql($request['measurement_required'] ?? true),
-                ':manpower_required' => $this->boolSql($request['manpower_required'] ?? true),
+                ':material_required' => $this->boolSql($required5M['material']),
+                ':machine_required' => $this->boolSql($required5M['machine']),
+                ':method_required' => $this->boolSql($required5M['method']),
+                ':measurement_required' => $this->boolSql($required5M['measurement']),
+                ':manpower_required' => $this->boolSql($required5M['manpower']),
                 ':gate_state' => $gateState,
                 ':missing_context' => $this->json($missing),
             ],
@@ -629,12 +630,26 @@ final class GenealogyGraphService
      */
     private function required5M(array $request): array
     {
+        $policy = is_array($request['required_5m_policy'] ?? null) ? $request['required_5m_policy'] : [];
+        $source = $this->normalizeToken((string)($request['required_5m_policy_source'] ?? $policy['source'] ?? ''));
+        if (in_array($source, ['traceability_5m_policy_rules', 'control_plan', 'operation_policy'], true)) {
+            return [
+                'material' => $this->truthy($policy['material_required'] ?? true),
+                'machine' => $this->truthy($policy['machine_required'] ?? true),
+                'method' => $this->truthy($policy['method_required'] ?? true),
+                'measurement' => $this->truthy($policy['measurement_required'] ?? true),
+                'manpower' => $this->truthy($policy['manpower_required'] ?? true),
+            ];
+        }
+
+        // Caller-supplied *_required booleans are capture metadata only. They
+        // cannot weaken the 5M obligation unless a governed policy row says so.
         return [
-            'material' => $this->truthy($request['material_required'] ?? true),
-            'machine' => $this->truthy($request['machine_required'] ?? true),
-            'method' => $this->truthy($request['method_required'] ?? true),
-            'measurement' => $this->truthy($request['measurement_required'] ?? true),
-            'manpower' => $this->truthy($request['manpower_required'] ?? true),
+            'material' => true,
+            'machine' => true,
+            'method' => true,
+            'measurement' => true,
+            'manpower' => true,
         ];
     }
 

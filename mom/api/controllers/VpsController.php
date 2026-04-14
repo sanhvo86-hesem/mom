@@ -378,7 +378,8 @@ final class VpsController extends BaseController
             $result = $this->service->runAction(
                 $hostId,
                 $action,
-                $requiresWrite
+                $requiresWrite,
+                is_array($body['deployment_governance'] ?? null) ? $body['deployment_governance'] : $body
             );
             $this->auditLog('vps_control_action', [
                 'host_id' => $hostId,
@@ -397,6 +398,10 @@ final class VpsController extends BaseController
                 str_starts_with($message, 'action_not_allowed') => 403,
                 str_starts_with($message, 'action_not_found') => 404,
                 str_starts_with($message, 'write_access_required') => 403,
+                str_starts_with($message, 'deployment_actions_disabled') => 403,
+                str_starts_with($message, 'deployment_change_authority_required') => 409,
+                str_starts_with($message, 'deployment_promotion_intent_required') => 409,
+                str_starts_with($message, 'deployment_confirmation_required') => 409,
                 default => 400,
             };
             $this->error('vps_control_action_failed', $status, $message);

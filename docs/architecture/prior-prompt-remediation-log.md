@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-reaudit-20260414-122702`
+Audited branch: `codex/worldclass-closure-20260414-1512`
 
 Date: 2026-04-14
 
@@ -35,7 +35,8 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Local storage first-write reliability | Fixed now | `LocalStorageDriver` creates directories before realpath validation and rejects absolute/traversal paths. |
 | Required docs under requested names | Fixed now | Added `canonical-execution-source-of-truth.md`, `prior-prompt-remediation-log.md`, and `shopfloor-execution-contracts.md`; updated benchmark doc. |
 | Six-agent global reaudit artifacts | Fixed now | Added `docs/audits/agent1-benchmark.md` through `agent6-ai-security.md` with current finding dispositions. |
-| AI model/dashboard read governance | Fixed now | `aiModelList()` and `aiDashboard()` require AI read access; non-admin model list output redacts config, metadata, and training source. |
+| AI model/dashboard read governance | Fixed now | `aiModelList()` and `aiDashboard()` require AI read access; non-admin model list output redacts config, metadata, and training source; scoped JSON fallback reads no longer include blank-plant advisory rows. |
+| AI conversation fallback safety | Fixed now | `aiConversationHistory()` and `aiConversationDetail()` require AI read roles; JSON fallback detail reads validate conversation IDs, avoid path concatenation, and require owner metadata. |
 | EQMS generic update lifecycle bypass | Fixed now | Exception update routes now use field allowlists and reject lifecycle/status fields through generic update. |
 | JO/WO generic update field drift | Fixed now | `OrderController` now rejects unknown JO/WO update fields before workflow validation and validates WO schedule window order. |
 | Evidence replay-key contract drift | Fixed now | `EvidenceController` idempotency keys now follow the 16-128 character platform token contract without colon separators. |
@@ -44,6 +45,9 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Mobile clock-out scrap contradiction | Fixed now | Clock-out rejects `qty_scrap > qty_completed` even when completed quantity is zero. |
 | Mobile inspection replay identity through controller | Fixed now | `MobileController::captureInspection()` forwards capture/client/idempotency/captured timestamp fields into the service. |
 | Canonical evidence finalization role gate | Fixed now | `EqmsControlPlaneController::finalizeEvidencePackage()` now requires controlled evidence finalization roles. |
+| Canonical evidence read and signature governance | Fixed now | Canonical evidence reads require EQMS read roles and org context; finalization writes org metadata and rejects packages without signature events. |
+| Order hold event history | Fixed now | Hold set/release still update the compatibility snapshot but also append `orders/hold_events.json` lifecycle facts. |
+| CNC program digital-thread scope | Fixed now | CNC program creation/update/version rows now preserve plant/site/work-center/operation/part-revision/routing/inspection context and scoped reads honor `plant_id`/`org_plant_id`. |
 | CNC setup-sheet release default | Fixed now | Setup sheet creation defaults to `draft`, and strict dispatch no longer treats missing setup status as released. |
 | MTConnect XML entity expansion | Fixed now | `EdgeConnectorService` rejects `DOCTYPE`/`ENTITY` payloads and parses MTConnect XML without `LIBXML_NOENT`. |
 | Legacy AI read surface gating | Fixed now | Prediction list, SPC anomalies, tool-wear, and legacy AI dashboard now require AI read roles. |
@@ -81,6 +85,10 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Operational override elevated roles | Generic `manager/director/admin` gate could block real repository roles. | Replaced with canonical elevated role list plus `admin_roles()` and role migration. |
 | FMEA authorization | Role gates used a single unmigrated `role` string. | Added migrated multi-role checks and role buckets. |
 | COPQ configuration | A TODO documented hardcoded cost rates without remediation. | Added config-driven rates with defaults and tests. |
+| AI conversation JSON fallback | Conversation detail built a file path from the query string and did not enforce fallback-file ownership. | Conversation IDs are now constrained to safe tokens, fallback paths are resolved under the conversations directory, and fallback records must belong to the caller. |
+| Canonical evidence package reads | Canonical evidence read endpoints were auth-only and not org-scoped. | Reads now require evidence read roles and session org context, and DB package lookup filters by metadata org scope. |
+| Evidence finalization completeness | Signature manifest artifacts existed, but finalization could persist with no signature events. | Finalization now rejects packages without at least one structured signature event. |
+| CNC program execution context | CNC setup sheets carried plant/work-center/revision fields, but programs and versions did not. | Program and version records now carry the same scope/digital-thread fields used by setup and dispatch. |
 | Required documentation names | Previous docs existed under related names but not all requested names. | Added exact required documents and updated the benchmark doc. |
 
 ## Still blocked by evidence

@@ -198,8 +198,59 @@ class AiSchedulingController extends BaseController
                 return false;
             }
             $rowPlant = trim((string)($row['plant_id'] ?? $row['org_plant_id'] ?? ''));
-            return $rowPlant === '' || $rowPlant === $plantId;
+            return $rowPlant === $plantId;
         }));
+    }
+
+    private function normalizeConversationId(mixed $value): string
+    {
+        if (!is_scalar($value)) {
+            $this->error('invalid_conversation_id', 400);
+        }
+
+        $text = trim((string)$value);
+        if ($text === '') {
+            $this->error('missing_conversation_id', 400);
+        }
+        if (strlen($text) < 8 || strlen($text) > 128 || preg_match('/^[A-Za-z0-9._\-]+$/', $text) !== 1) {
+            $this->error('invalid_conversation_id', 400);
+        }
+
+        return $text;
+    }
+
+    private function conversationFallbackPath(string $conversationId): string
+    {
+        $historyDir = $this->aiDir() . '/conversations';
+        if (!is_dir($historyDir)) {
+            @mkdir($historyDir, 0755, true);
+        }
+
+        $base = realpath($historyDir);
+        if ($base === false) {
+            $this->error('conversation_store_unavailable', 500);
+        }
+
+        return rtrim(str_replace('\\', '/', $base), '/') . '/' . $conversationId . '.json';
+    }
+
+    /**
+     * @param array<string, mixed> $conversation
+     * @param array<string, mixed> $user
+     */
+    private function assertConversationFallbackOwner(array $conversation, array $user): void
+    {
+        $owner = trim((string)($conversation['user_id'] ?? $conversation['created_by_user_id'] ?? $conversation['actor_id'] ?? ''));
+        $allowedOwners = array_values(array_unique(array_filter([
+            $this->userUuid($user),
+            $this->userId($user),
+            (string)($user['username'] ?? ''),
+            (string)($user['user'] ?? ''),
+        ], static fn(string $value): bool => trim($value) !== '')));
+
+        if ($owner === '' || !in_array($owner, $allowedOwners, true)) {
+            $this->error('conversation_not_found', 404);
+        }
     }
 
     /**
@@ -380,6 +431,7 @@ class AiSchedulingController extends BaseController
             // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/predictions.json';
             $all  = $this->readJsonFile($file) ?? [];
+            $all = $this->filterAiRowsByPlant($all, $plantId);
 
             $status = $this->query('status');
             if ($status !== null && $status !== '') {
@@ -1941,6 +1993,7 @@ class AiSchedulingController extends BaseController
     public function aiConversationHistory(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
         $userId = $this->userUuid($user);
 
         try {
@@ -2048,8 +2101,8 @@ class AiSchedulingController extends BaseController
     public function aiConversationDetail(): never
     {
         $user           = $this->requireAuth();
-        $conversationId = trim((string)($this->query('conversation_id') ?? ''));
-        if ($conversationId === '') $this->error('missing_conversation_id', 400);
+        $this->requireAiReadAccess($user);
+        $conversationId = $this->normalizeConversationId($this->query('conversation_id'));
 
         try {
             $db = $this->getDb();
@@ -2071,10 +2124,10 @@ class AiSchedulingController extends BaseController
             }
 
             // JSON fallback: scan conversation history files
-            $historyDir = $this->aiDir() . '/conversations';
-            $file = $historyDir . '/' . $conversationId . '.json';
+            $file = $this->conversationFallbackPath($conversationId);
             $conv = is_file($file) ? ($this->readJsonFile($file) ?? []) : [];
             if (empty($conv)) $this->error('conversation_not_found', 404);
+            $this->assertConversationFallbackOwner($conv, $user);
             $this->success([
                 'conversation_id' => $conversationId,
                 'messages'        => $conv['messages'] ?? [],

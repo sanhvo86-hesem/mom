@@ -22,6 +22,8 @@ final class VpsService
         'git_pull', 'db_migrate', 'reload_php',
     ];
 
+    private const DEPLOYMENT_VPS_ACTIONS = ['git_pull', 'db_migrate', 'reload_php'];
+
     /** @var list<string> */
     private array $configCandidates;
 
@@ -293,7 +295,10 @@ final class VpsService
         }
     }
 
-    public function runAction(string $hostId, string $actionId, bool $allowWrite = false): array
+    /**
+     * @param array<string, mixed> $governanceContext
+     */
+    public function runAction(string $hostId, string $actionId, bool $allowWrite = false, array $governanceContext = []): array
     {
         // INT-013 FIX: Validate action is in the whitelist before execution
         if (!in_array($actionId, self::ALLOWED_VPS_ACTIONS, true)) {
@@ -307,6 +312,10 @@ final class VpsService
             throw new RuntimeException('write_access_required:' . $actionId);
         }
 
+        if (in_array($actionId, self::DEPLOYMENT_VPS_ACTIONS, true)) {
+            $this->assertDeploymentActionGovernance($actionId, $governanceContext);
+        }
+
         $run = $this->executeOnHost($host, (string)($action['command'] ?? ''));
 
         $result = [
@@ -317,6 +326,9 @@ final class VpsService
             'exit_code' => (int)($run['exit_code'] ?? 1),
             'output' => (string)($run['output'] ?? ''),
             'executed_at' => gmdate('c'),
+            'deployment_governance' => in_array($actionId, self::DEPLOYMENT_VPS_ACTIONS, true)
+                ? $this->summarizeDeploymentGovernance($governanceContext)
+                : null,
             'host_after' => $this->buildHostSnapshot($host),
         ];
 
@@ -325,6 +337,45 @@ final class VpsService
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function assertDeploymentActionGovernance(string $actionId, array $context): void
+    {
+        if (strtolower(trim((string)getenv('VPS_DEPLOY_ACTIONS_ENABLED'))) !== '1') {
+            throw new RuntimeException('deployment_actions_disabled');
+        }
+
+        $manifestRef = trim((string)($context['release_manifest_ref'] ?? ''));
+        $changeAuthorityRef = trim((string)($context['change_authority_ref'] ?? $context['source_change_order_id'] ?? ''));
+        $intent = strtolower(trim((string)($context['promotion_intent'] ?? '')));
+        $confirmation = trim((string)($context['confirmation_phrase'] ?? ''));
+        $expectedConfirmation = 'DEPLOY ' . strtoupper($actionId);
+
+        if ($manifestRef === '' || $changeAuthorityRef === '') {
+            throw new RuntimeException('deployment_change_authority_required');
+        }
+        if (!in_array($intent, ['deploy_controlled_source', 'run_controlled_migration', 'reload_controlled_runtime'], true)) {
+            throw new RuntimeException('deployment_promotion_intent_required');
+        }
+        if ($confirmation !== $expectedConfirmation) {
+            throw new RuntimeException('deployment_confirmation_required');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, string>
+     */
+    private function summarizeDeploymentGovernance(array $context): array
+    {
+        return [
+            'release_manifest_ref' => trim((string)($context['release_manifest_ref'] ?? '')),
+            'change_authority_ref' => trim((string)($context['change_authority_ref'] ?? $context['source_change_order_id'] ?? '')),
+            'promotion_intent' => trim((string)($context['promotion_intent'] ?? '')),
+        ];
     }
 
     /**

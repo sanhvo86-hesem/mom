@@ -109,6 +109,34 @@ Behavior:
 - Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
 - Mobile offline conflict resolution is owner-scoped. Supervisor/admin-style override requires explicit override reason and is audited.
 
+## CNC program/version context
+
+Handlers: existing CNC program routes in `CncProgramController`.
+
+Additive fields accepted on create/update/version upload:
+
+```json
+{
+  "plant_id": "P01",
+  "org_plant_id": "P01",
+  "org_site_id": "HCM-CNC",
+  "machine_id": "MC-5AX-01",
+  "equipment_id": "MC-5AX-01",
+  "work_center_id": "WC-5AX",
+  "operation_id": "OP20",
+  "operation_seq": 20,
+  "part_revision": "REV-C",
+  "routing_id": "RT-714",
+  "inspection_plan_id": "IP-714-OP20"
+}
+```
+
+Rules:
+
+- Program and version rows carry the same plant/site/work-center/operation/revision context as setup sheets.
+- Scoped users read only programs/setup sheets whose `plant_id` or `org_plant_id` matches session plant context.
+- These fields are digital-thread references. CNC program release/version authority remains in CNC program management; dispatch/reporting only freezes references.
+
 ## Production report
 
 Handler: existing production-report route in `DispatchController` backed by `ShopfloorExecutionService`.
@@ -299,6 +327,7 @@ Rules:
 - The service validates generated SQL as SELECT/CTE only, rejects DDL/DML and dangerous functions, caps rows, runs in a PostgreSQL read-only transaction, and sets `statement_timeout` inside that transaction.
 - The NLQ prompt uses canonical AI prediction types: `defect_probability`, `tool_wear`, `spc_anomaly`, `process_drift`, and `equipment_failure`.
 - NLQ is read-only advisory access. It cannot dispatch work, approve quality, alter schedules, create NCRs, or command machines.
+- Conversation history/detail reads require AI read roles. JSON fallback detail reads validate safe conversation IDs, resolve files under the conversation directory, and require owner metadata before returning content.
 
 ## AI root-cause analysis
 
@@ -328,9 +357,16 @@ Evidence upload and governance attachment paths validate:
 - extension fallback is allowed only for generic/ambiguous byte detection, not for concrete disallowed content
 - explicit idempotency keys must be 16 to 128 characters and use only letters, numbers, `.`, `_`, or `-`
 
+Canonical evidence package reads and finalization:
+
+- Finalization requires controlled quality/document/compliance roles, CSRF, org context, and at least one structured signature event.
+- Finalized canonical records carry org metadata when submitted through the controller.
+- Canonical package reads require EQMS read roles and session org context; DB lookups filter by evidence metadata org scope.
+
 ## Planning and EQMS controlled update surfaces
 
 - JO and WO generic update routes use explicit field allowlists before workflow validation. Unknown top-level fields are rejected instead of being silently added to the JSON authority store.
+- Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` facts for set/release lifecycle history.
 - WO schedule edits reject `scheduled_end <= scheduled_start` when both timestamps are supplied.
 - WO creation and update contracts preserve optional CNC/digital-thread fields: `routing_operation_id`, `job_operation_id`, `cnc_program_version_id`, `setup_sheet_id`, `setup_sheet_revision`, `org_plant_id`, and `org_site_id`.
 - EQMS complaint/MRB/deviation/concession generic updates cannot mutate lifecycle fields such as `status`, `status_history`, closure, approval, or rejection metadata. Those changes must use transition or change-control paths.

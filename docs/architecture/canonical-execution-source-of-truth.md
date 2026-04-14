@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-reaudit-20260414-122702`
+Audited branch: `codex/worldclass-closure-20260414-1512`
 
 Date: 2026-04-14
 
@@ -27,14 +27,14 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Machine alarm/downtime | Manual downtime/blocking facts in production reports for Phase 1 | Connectivity alarm tables, machine state projections | Manual downtime is execution truth only for operator-reported losses. Telemetry remains separate until connectivity cutover. |
 | Reason codes | Master-data catalogs: downtime, defect, rework, blocking | Free text notes | Governed codes are required for structured loss/defect/blocker semantics. Notes are supporting context only. |
 | Schedule/capacity slot | Planning/scheduling modules | Dispatch shift target date/shift fields | Dispatch captures execution intent, not APS authority. |
-| CNC program version | CNC program management module | Dispatch target copied program revision | Execution freezes references; CNC program store owns release/version truth. |
+| CNC program version | CNC program management module | Dispatch target copied program revision | Execution freezes references; CNC program store owns release/version truth. Program and version rows now persist plant/site/work-center/operation/part-revision/inspection context for CNC traceability. |
 | Setup sheet revision | CNC setup sheet store | Dispatch target copied setup revision | Execution freezes references; setup sheet store owns release/version truth. New setup sheets start as `draft`; missing setup status is not treated as released. |
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
 | Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. |
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
 | AI model/dashboard/read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard reads require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
-| Evidence artifact | `EvidenceVaultService` custody/hash chain with DB bridge where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. |
+| Evidence artifact | `EvidenceVaultService` custody/hash chain and canonical evidence DB tables where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. Canonical package reads require EQMS read roles and org scope; finalization requires at least one signature event. |
 | Genealogy ontology | `GenealogyGraphService` runtime ontology plus migration 121 DB constraints | Older migration 108 constraints | Runtime and DB now agree on expanded MOM/MES/EQMS/PLM node and snapshot subject types. |
 
 ## Event vs snapshot rules
@@ -43,6 +43,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - Target and production-log snapshots are compatibility/read-model state.
 - Mobile inspection capture is append-only by behavior for offline replay: matching replay returns existing fact; divergent replay is rejected.
 - Mobile task assignment/start/completion writes append task events and then exposes the queue row as the current snapshot.
+- Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` lifecycle facts for set/release audit history.
 - DB bridge writes are migration/readiness mirrors. They are not allowed to override JSON compatibility truth in this Phase 1 patch.
 - If event history and snapshot disagree, event history wins for audit and reconciliation.
 
