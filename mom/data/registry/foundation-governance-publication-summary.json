@@ -2,8 +2,8 @@
   "slice_publication": {
     "scope": "foundation_governance_contract_slice",
     "truth_model": "slice_within_global_canonical",
-    "publication_run_family": "6b44c138-a80f-4197-9680-48de7c9392ca",
-    "generated_at": "2026-04-14T14:57:01.682Z",
+    "publication_run_family": "3b73ad15-ff7a-46ed-a691-bdc9f0a63fb2",
+    "generated_at": "2026-04-14T16:12:18.091Z",
     "slice_verdict": "PASS",
     "blockers": "none",
     "entity_count": 6,

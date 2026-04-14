@@ -182,8 +182,8 @@ run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_canonica
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_data_fields_from_table_registry.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_blind_spot_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_stress_report.py'], $projectRoot);
-run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_publication_truth_summaries.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_system_contract_authority.py'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_publication_truth_summaries.py'], $projectRoot);
 if (!is_dir($myProjectRoot)) {
     refresh_portal_only_migration_gap_report($portalRoot, $dataDir, $projectRoot);
 }

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace MOM\Tests\Unit\Services;
 
 use MOM\Api\Services\QueueService;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class QueueServiceFallbackTest extends TestCase
 {
@@ -53,6 +56,51 @@ final class QueueServiceFallbackTest extends TestCase
         $this->assertSame('handler_returned_false', $deadLetter['dead_letter_reason'] ?? null);
     }
 
+    public function testAmqpPublishWaitsForBrokerConfirmBeforeSuccess(): void
+    {
+        $queue = new QueueService($this->tmpDir, ['host' => '127.0.0.1', 'port' => 1], 2);
+        $channel = $this->newFakeChannel();
+
+        $this->setPrivate($queue, 'channel', $channel);
+        $this->invokePrivate($queue, 'enablePublisherConfirms');
+        $this->setPrivate($queue, 'amqpAvailable', true);
+
+        $this->assertTrue($queue->publish('workflow.transitioned', ['record_id' => 'REC-1']));
+        $this->assertTrue($channel->confirmSelected);
+        $this->assertTrue($channel->published);
+        $this->assertTrue($channel->mandatory);
+        $this->assertTrue($channel->waitedForConfirm);
+        $this->assertSame(5.0, $channel->confirmTimeout);
+    }
+
+    private function newFakeChannel(): ConfirmingQueueTestChannel
+    {
+        $reflection = new ReflectionClass(ConfirmingQueueTestChannel::class);
+        /** @var ConfirmingQueueTestChannel $channel */
+        $channel = $reflection->newInstanceWithoutConstructor();
+        return $channel;
+    }
+
+    private function setPrivate(object $target, string $property, mixed $value): void
+    {
+        $reflection = new ReflectionClass($target);
+        $prop = $reflection->getProperty($property);
+        if (PHP_VERSION_ID < 80100) {
+            $prop->setAccessible(true);
+        }
+        $prop->setValue($target, $value);
+    }
+
+    private function invokePrivate(object $target, string $method): void
+    {
+        $reflection = new ReflectionClass($target);
+        $refMethod = $reflection->getMethod($method);
+        if (PHP_VERSION_ID < 80100) {
+            $refMethod->setAccessible(true);
+        }
+        $refMethod->invoke($target);
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {
@@ -66,5 +114,46 @@ final class QueueServiceFallbackTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         rmdir($dir);
+    }
+}
+
+final class ConfirmingQueueTestChannel extends AMQPChannel
+{
+    public bool $confirmSelected = false;
+    public bool $published = false;
+    public bool $mandatory = false;
+    public bool $waitedForConfirm = false;
+    public float|int $confirmTimeout = -1;
+
+    public function confirm_select($nowait = false)
+    {
+        $this->confirmSelected = true;
+    }
+
+    public function set_nack_handler($callback)
+    {
+    }
+
+    public function set_return_listener($callback)
+    {
+    }
+
+    public function basic_publish(
+        $msg,
+        $exchange = '',
+        $routing_key = '',
+        $mandatory = false,
+        $immediate = false,
+        $ticket = null
+    ) {
+        TestCase::assertInstanceOf(AMQPMessage::class, $msg);
+        $this->published = true;
+        $this->mandatory = (bool)$mandatory;
+    }
+
+    public function wait_for_pending_acks_returns($timeout = 0)
+    {
+        $this->waitedForConfirm = true;
+        $this->confirmTimeout = $timeout;
     }
 }

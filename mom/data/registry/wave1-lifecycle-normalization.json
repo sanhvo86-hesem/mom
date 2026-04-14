@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T14:56:53.957Z",
+    "generatedAt": "2026-04-14T16:12:09.711Z",
     "description": "Wave 1 lifecycle normalization overlay for core operational entities, recovery objects, and execution-critical masters."
   },
   "mode_default_for_normalized_core": "guarded_transition_runtime",

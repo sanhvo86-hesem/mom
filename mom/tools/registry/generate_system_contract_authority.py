@@ -556,11 +556,14 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
     schema_authority_payload = schema_authority.get("schema_authority", {})
     if not isinstance(schema_authority_payload, dict):
         schema_authority_payload = {}
-    schema_authority_count = int(
-        schema_authority_payload.get("registry_table_count")
-        or schema_authority_payload.get("table_count")
+    schema_authority_count = int(schema_authority_payload.get("table_count") or 0)
+    schema_physical_table_count = int(
+        schema_authority_payload.get("schema_snapshot_physical_table_count")
+        or schema_authority_payload.get("schema_snapshot_create_table_count")
         or 0
     )
+    schema_partition_table_count = int(schema_authority_payload.get("schema_snapshot_partition_table_count") or 0)
+    schema_registry_table_count = int(schema_authority_payload.get("registry_table_count") or 0)
     global_summary = global_audit.get("summary", {}) if isinstance(global_audit.get("summary"), dict) else {}
     capability_blocking_gap_count = int(global_summary.get("blocking_gap_count") or 0)
     graphics_summary = graphics_release_summary(graphics_governance)
@@ -583,6 +586,10 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
                 "severity": "critical",
                 "actual": len(tables),
                 "expected": schema_authority_count,
+                "physicalTableCount": schema_physical_table_count,
+                "partitionTableCount": schema_partition_table_count,
+                "registryTableCount": schema_registry_table_count,
+                "interpretation": "System-contract publication must match logical runtime-contract tables from schema authority. Physical partition children are tracked separately and are not frontend contract entities.",
             }
         )
     if table_missing_in_relation:
@@ -661,6 +668,10 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
 
     summary = {
         "tableCount": len(tables),
+        "authoritativeLogicalTableCount": schema_authority_count,
+        "authoritativePhysicalTableCount": schema_physical_table_count,
+        "authoritativePartitionTableCount": schema_partition_table_count,
+        "schemaAuthorityRegistryTableCount": schema_registry_table_count,
         "relationCount": len(relation_edges),
         "relationEntityCount": len(relation_entities),
         "endpointCount": len(endpoints),

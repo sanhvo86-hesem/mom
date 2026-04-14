@@ -28129,6 +28129,31 @@ CREATE TABLE IF NOT EXISTS signature_events (
     UNIQUE (idempotency_key)
 );
 
+CREATE TABLE IF NOT EXISTS e_signature_auth_challenges (
+    auth_challenge_id TEXT PRIMARY KEY,
+    signer_user_id UUID REFERENCES users(user_id),
+    signer_ref TEXT,
+    session_id TEXT,
+    org_id TEXT,
+    signature_action TEXT NOT NULL DEFAULT 'evidence_finalize',
+    signed_payload_hash_sha256 CHAR(64) NOT NULL,
+    displayed_record_hash_sha256 CHAR(64) NOT NULL,
+    challenge_state TEXT NOT NULL DEFAULT 'issued'
+        CHECK (challenge_state IN ('issued', 'consumed', 'expired', 'revoked')),
+    expires_at TIMESTAMPTZ NOT NULL,
+    consumed_at TIMESTAMPTZ,
+    consumed_by_user_id UUID REFERENCES users(user_id),
+    consumed_by_ref TEXT,
+    idempotency_key TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version BIGINT NOT NULL DEFAULT 1,
+    CHECK (signer_user_id IS NOT NULL OR NULLIF(trim(signer_ref), '') IS NOT NULL),
+    CHECK (challenge_state <> 'consumed' OR consumed_at IS NOT NULL),
+    UNIQUE (idempotency_key)
+);
+
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_doc_read_ack_signature_event') THEN
@@ -28153,7 +28178,7 @@ CREATE TABLE IF NOT EXISTS plm_change_affected_objects (
     object_revision       TEXT,
     affected_fields       TEXT[] NOT NULL DEFAULT '{}',
     requested_effect      TEXT NOT NULL
-        CHECK (requested_effect IN ('create', 'revise', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update')),
+        CHECK (requested_effect IN ('create', 'revise', 'release', 'supersede', 'withdraw', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update', 'deploy_controlled_source', 'run_controlled_migration', 'reload_controlled_runtime')),
     disposition           TEXT NOT NULL DEFAULT 'pending'
         CHECK (disposition IN ('pending', 'accepted', 'rejected', 'deferred', 'cancelled')),
     effectivity_rule      JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -29629,3 +29654,1598 @@ COMMENT ON COLUMN ai_recommendation_actions.status IS
 COMMENT ON COLUMN ai_recommendation_actions.action_payload IS
     'Advisory payload. Expected governance fields include advisory_only=true, execution_authority=false, requires_human_approval=true, and side_effect_policy=pending_human_review_only / Du lieu khuyen nghi tu van voi ranh gioi khong co tham quyen thuc thi';
 -- <<< END MIGRATION: 110_ai_advisory_boundary_comments.sql
+
+-- >>> BEGIN MIGRATION: 111_security_hardening_indexes.sql
+-- ============================================================================
+-- Migration 111: Security Hardening - Missing Foreign Key Indexes
+-- ============================================================================
+-- Purpose:
+--   Add missing indexes on foreign key columns to improve query performance
+--   and prevent full table scans on common join operations.
+--   Critical for performance on large tables with high cardinality foreign keys.
+-- ============================================================================
+
+BEGIN;
+
+-- User relationship indexes
+CREATE INDEX IF NOT EXISTS idx_users_primary_role_id ON users(primary_role_id);
+CREATE INDEX IF NOT EXISTS idx_users_supervisor_id ON users(supervisor_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_events_actor_id ON audit_events(actor_id);
+
+-- Document and form indexes
+CREATE INDEX IF NOT EXISTS idx_document_versions_doc_id ON document_versions(doc_id);
+CREATE INDEX IF NOT EXISTS idx_document_embeddings_version_id ON document_embeddings(version_id);
+CREATE INDEX IF NOT EXISTS idx_document_distribution_version_id ON document_distribution(version_id);
+CREATE INDEX IF NOT EXISTS idx_document_distribution_user_id ON document_distribution(user_id);
+CREATE INDEX IF NOT EXISTS idx_form_entries_form_code_version ON form_entries(form_code, form_version);
+CREATE INDEX IF NOT EXISTS idx_form_attachments_entry_id ON form_attachments(entry_id);
+
+-- Record management indexes
+CREATE INDEX IF NOT EXISTS idx_record_links_parent_record_id ON record_links(parent_record_id);
+CREATE INDEX IF NOT EXISTS idx_record_links_child_record_id ON record_links(child_record_id);
+
+-- Item and BOM indexes
+CREATE INDEX IF NOT EXISTS idx_items_substitute_item_id ON items(substitute_item_id);
+CREATE INDEX IF NOT EXISTS idx_items_preferred_vendor_id ON items(preferred_vendor_id);
+CREATE INDEX IF NOT EXISTS idx_item_revisions_item_id ON item_revisions(item_id);
+CREATE INDEX IF NOT EXISTS idx_bom_components_bom_id_revision ON bom_components(bom_id, bom_revision);
+CREATE INDEX IF NOT EXISTS idx_bom_components_component_item_id ON bom_components(component_item_id);
+CREATE INDEX IF NOT EXISTS idx_bom_components_substitute_item_id ON bom_components(substitute_component_id);
+
+-- Routing indexes
+CREATE INDEX IF NOT EXISTS idx_routing_operations_routing_id_revision ON routing_operations(routing_id, routing_revision);
+CREATE INDEX IF NOT EXISTS idx_routing_operations_work_center_id ON routing_operations(work_center_id);
+CREATE INDEX IF NOT EXISTS idx_routing_operations_subcontract_vendor_id ON routing_operations(subcontract_vendor_id);
+
+-- Customer and sales indexes
+CREATE INDEX IF NOT EXISTS idx_sales_orders_customer_id ON sales_orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_sales_order_lines_sales_order_id ON sales_order_lines(sales_order_id);
+CREATE INDEX IF NOT EXISTS idx_sales_order_lines_item_id ON sales_order_lines(item_id);
+
+-- Vendor and procurement indexes
+CREATE INDEX IF NOT EXISTS idx_vendor_ratings_vendor_id ON vendor_ratings(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_vendor_id ON purchase_orders(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_po_id ON purchase_order_lines(po_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_item_id ON purchase_order_lines(item_id);
+
+-- Inventory indexes
+CREATE INDEX IF NOT EXISTS idx_inventory_locations_warehouse_id ON inventory_locations(warehouse_id);
+-- item_id and vendor_id only if present (inventory_locations schema varies by deployment)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='item_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_item_id ON inventory_locations(item_id)';
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='vendor_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_vendor_id ON inventory_locations(vendor_id)';
+    END IF;
+END $$;
+CREATE INDEX IF NOT EXISTS idx_inventory_transactions_warehouse_id ON inventory_transactions(warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_transactions_location_id ON inventory_transactions(location_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_transactions_item_id ON inventory_transactions(item_id);
+
+-- Job and labor indexes
+CREATE INDEX IF NOT EXISTS idx_job_orders_item_id ON job_orders(item_id);
+CREATE INDEX IF NOT EXISTS idx_job_orders_customer_id ON job_orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_job_operations_job_order_id ON job_operations(job_order_id);
+CREATE INDEX IF NOT EXISTS idx_job_operations_work_center_id ON job_operations(work_center_id);
+
+-- Production and inspection indexes
+CREATE INDEX IF NOT EXISTS idx_production_schedule_work_center_id ON production_schedule(work_center_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_plans_item_id ON inspection_plans(item_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_plan_id ON inspection_results(plan_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_record_id ON inspection_results(record_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_item_id ON inspection_results(item_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_inspector_id ON inspection_results(inspector_id);
+
+-- Quality management indexes
+CREATE INDEX IF NOT EXISTS idx_spc_data_item_id ON spc_data(item_id);
+CREATE INDEX IF NOT EXISTS idx_ncr_records_record_id ON ncr_records(record_id);
+CREATE INDEX IF NOT EXISTS idx_capa_records_record_id ON capa_records(record_id);
+CREATE INDEX IF NOT EXISTS idx_capa_records_source_ncr_id ON capa_records(source_ncr_id);
+CREATE INDEX IF NOT EXISTS idx_fai_records_record_id ON fai_records(record_id);
+CREATE INDEX IF NOT EXISTS idx_fai_characteristics_fai_id ON fai_characteristics(fai_id);
+
+-- Certificate indexes
+CREATE INDEX IF NOT EXISTS idx_certificates_item_id ON certificates(item_id);
+CREATE INDEX IF NOT EXISTS idx_certificates_customer_id ON certificates(customer_id);
+
+-- NPI and EHS indexes
+CREATE INDEX IF NOT EXISTS idx_npi_projects_item_id ON npi_projects(item_id);
+CREATE INDEX IF NOT EXISTS idx_npi_projects_customer_id ON npi_projects(customer_id);
+CREATE INDEX IF NOT EXISTS idx_ehs_incidents_record_id ON ehs_incidents(record_id);
+CREATE INDEX IF NOT EXISTS idx_contamination_checks_item_id ON contamination_checks(item_id);
+CREATE INDEX IF NOT EXISTS idx_contamination_checks_inspector_id ON contamination_checks(inspector_id);
+
+-- Engineering change indexes
+CREATE INDEX IF NOT EXISTS idx_engineering_change_requests_item_id ON engineering_change_requests(item_id);
+CREATE INDEX IF NOT EXISTS idx_engineering_change_requests_linked_record_id ON engineering_change_requests(linked_record_id);
+
+-- Equipment and calibration indexes
+CREATE INDEX IF NOT EXISTS idx_calibration_records_equipment_id ON calibration_records(equipment_id);
+CREATE INDEX IF NOT EXISTS idx_maintenance_work_orders_equipment_id ON maintenance_work_orders(equipment_id);
+
+-- Tool indexes
+CREATE INDEX IF NOT EXISTS idx_tools_tool_vendor_id ON tools(tool_vendor_id);
+CREATE INDEX IF NOT EXISTS idx_tools_regrind_vendor_id ON tools(regrind_vendor_id);
+CREATE INDEX IF NOT EXISTS idx_tool_transactions_tool_id ON tool_transactions(tool_id);
+
+-- Employee and training indexes
+CREATE INDEX IF NOT EXISTS idx_employees_user_id ON employees(user_id);
+CREATE INDEX IF NOT EXISTS idx_training_records_record_id ON training_records(record_id);
+CREATE INDEX IF NOT EXISTS idx_training_records_trainee_id ON training_records(trainee_id);
+CREATE INDEX IF NOT EXISTS idx_skills_matrix_employee_id ON skills_matrix(employee_id);
+CREATE INDEX IF NOT EXISTS idx_employee_certifications_employee_id ON employee_certifications(employee_id);
+
+-- Audit and compliance indexes
+CREATE INDEX IF NOT EXISTS idx_audit_findings_audit_id ON audit_findings(audit_id);
+CREATE INDEX IF NOT EXISTS idx_audit_actions_finding_id ON audit_actions(finding_id);
+CREATE INDEX IF NOT EXISTS idx_audit_actions_capa_record_id ON audit_actions(capa_record_id);
+CREATE INDEX IF NOT EXISTS idx_risk_register_record_id ON risk_register(record_id);
+CREATE INDEX IF NOT EXISTS idx_improvement_projects_record_id ON improvement_projects(record_id);
+CREATE INDEX IF NOT EXISTS idx_management_reviews_record_id ON management_reviews(record_id);
+
+-- Cost management indexes
+CREATE INDEX IF NOT EXISTS idx_cost_elements_item_id ON cost_elements(item_id);
+
+-- Shipment and logistics indexes
+CREATE INDEX IF NOT EXISTS idx_shipments_sales_order_id ON shipments(sales_order_id);
+CREATE INDEX IF NOT EXISTS idx_shipments_customer_id ON shipments(customer_id);
+-- packages table may not exist in all deployments
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_packages_shipment_id ON packages(shipment_id)';
+    END IF;
+END $$;
+
+-- Compliance indexes (compliance table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_item_id ON compliance(item_id)';
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_customer_id ON compliance(customer_id)';
+    END IF;
+END $$;
+
+-- Control plane indexes
+CREATE INDEX IF NOT EXISTS idx_governed_route_registry_org_company ON governed_route_registry(org_company_code);
+CREATE INDEX IF NOT EXISTS idx_governed_route_registry_org_plant ON governed_route_registry(org_plant_id);
+CREATE INDEX IF NOT EXISTS idx_governed_route_registry_org_site ON governed_route_registry(org_site_id);
+
+CREATE INDEX IF NOT EXISTS idx_control_plane_command_handlers_org_company ON control_plane_command_handlers(org_company_code);
+CREATE INDEX IF NOT EXISTS idx_control_plane_command_handlers_org_plant ON control_plane_command_handlers(org_plant_id);
+CREATE INDEX IF NOT EXISTS idx_control_plane_command_handlers_org_site ON control_plane_command_handlers(org_site_id);
+
+CREATE INDEX IF NOT EXISTS idx_periodic_evaluations_assigned_user_id ON periodic_evaluations(assigned_user_id);
+CREATE INDEX IF NOT EXISTS idx_periodic_evaluations_integrity_digest_id ON periodic_evaluations(integrity_digest_id);
+CREATE INDEX IF NOT EXISTS idx_periodic_evaluations_audit_pack_export_id ON periodic_evaluations(audit_pack_export_id);
+
+CREATE INDEX IF NOT EXISTS idx_emergency_change_controls_plm_change_order_id ON emergency_change_controls(plm_change_order_id);
+CREATE INDEX IF NOT EXISTS idx_emergency_change_controls_declared_by ON emergency_change_controls(declared_by);
+CREATE INDEX IF NOT EXISTS idx_emergency_change_controls_normalized_by ON emergency_change_controls(normalized_by);
+
+CREATE INDEX IF NOT EXISTS idx_rollback_requirements_plm_change_order_id ON rollback_requirements(plm_change_order_id);
+CREATE INDEX IF NOT EXISTS idx_rollback_requirements_execution_evidence_record_id ON rollback_requirements(execution_evidence_record_id);
+CREATE INDEX IF NOT EXISTS idx_rollback_requirements_approved_by ON rollback_requirements(approved_by);
+
+CREATE INDEX IF NOT EXISTS idx_genealogy_edge_facts_evidence_record_id ON genealogy_edge_facts(evidence_record_id);
+CREATE INDEX IF NOT EXISTS idx_genealogy_edge_facts_change_order_id ON genealogy_edge_facts(change_order_id);
+
+-- JSONB query indexes for common patterns
+CREATE INDEX IF NOT EXISTS idx_evidence_records_metadata_gin ON evidence_records USING GIN (metadata);
+CREATE INDEX IF NOT EXISTS idx_control_plane_command_handlers_required_role_set_gin ON control_plane_command_handlers USING GIN (required_role_set);
+CREATE INDEX IF NOT EXISTS idx_control_plane_command_handlers_emitted_event_types_gin ON control_plane_command_handlers USING GIN (emitted_event_types);
+CREATE INDEX IF NOT EXISTS idx_genealogy_edge_facts_metadata_gin ON genealogy_edge_facts USING GIN (metadata);
+
+-- Multi-column indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_audit_events_actor_type_recorded ON audit_events(actor_id, event_type, recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_inventory_transactions_warehouse_item ON inventory_transactions(warehouse_id, item_id, recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sales_order_lines_so_item ON sales_order_lines(sales_order_id, item_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_po_item ON purchase_order_lines(po_id, item_id);
+CREATE INDEX IF NOT EXISTS idx_inspection_results_item_created ON inspection_results(item_id, recorded_at DESC);
+
+COMMIT;
+-- <<< END MIGRATION: 111_security_hardening_indexes.sql
+
+-- >>> BEGIN MIGRATION: 112_security_hardening_constraints.sql
+-- ============================================================================
+-- Migration 112: Security Hardening - Missing NOT NULL and UNIQUE Constraints
+-- ============================================================================
+-- Purpose:
+--   Add missing NOT NULL and UNIQUE constraints on critical columns
+--   to enforce data integrity and prevent invalid states.
+-- ============================================================================
+
+BEGIN;
+
+-- User and authentication constraints
+ALTER TABLE users ALTER COLUMN email SET NOT NULL;
+ALTER TABLE users ALTER COLUMN employee_id SET NOT NULL;
+ALTER TABLE users ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE users ALTER COLUMN updated_at SET NOT NULL;
+
+-- roles table uses role_code/role_label (not role_name); created_at not present — skip
+
+-- Session management constraints
+ALTER TABLE sessions ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE sessions ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE sessions ALTER COLUMN expires_at SET NOT NULL;
+
+-- Document constraints
+ALTER TABLE documents ALTER COLUMN doc_id SET NOT NULL;
+ALTER TABLE documents ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE documents ALTER COLUMN updated_at SET NOT NULL;
+
+ALTER TABLE document_versions ALTER COLUMN doc_id SET NOT NULL;
+ALTER TABLE document_versions ALTER COLUMN version_number SET NOT NULL;
+ALTER TABLE document_versions ALTER COLUMN created_at SET NOT NULL;
+
+-- Form management constraints
+ALTER TABLE form_entries ALTER COLUMN form_code SET NOT NULL;
+ALTER TABLE form_entries ALTER COLUMN form_version SET NOT NULL;
+ALTER TABLE form_entries ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE form_attachments ALTER COLUMN entry_id SET NOT NULL;
+ALTER TABLE form_attachments ALTER COLUMN created_at SET NOT NULL;
+
+-- Record management constraints
+ALTER TABLE records ALTER COLUMN record_id SET NOT NULL;
+ALTER TABLE records ALTER COLUMN record_type SET NOT NULL;
+ALTER TABLE records ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE records ALTER COLUMN updated_at SET NOT NULL;
+
+-- Item master constraints
+ALTER TABLE items ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE items ALTER COLUMN item_description SET NOT NULL;
+ALTER TABLE items ALTER COLUMN item_status SET NOT NULL;
+ALTER TABLE items ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE items ALTER COLUMN updated_at SET NOT NULL;
+
+ALTER TABLE item_revisions ALTER COLUMN item_id SET NOT NULL;
+-- revision_level does not exist; actual column is "rev" — skip
+ALTER TABLE item_revisions ALTER COLUMN created_at SET NOT NULL;
+
+-- BOM constraints
+ALTER TABLE bill_of_materials ALTER COLUMN bom_id SET NOT NULL;
+ALTER TABLE bill_of_materials ALTER COLUMN parent_item_id SET NOT NULL;
+ALTER TABLE bill_of_materials ALTER COLUMN bom_status SET NOT NULL;
+ALTER TABLE bill_of_materials ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE bom_components ALTER COLUMN bom_id SET NOT NULL;
+ALTER TABLE bom_components ALTER COLUMN bom_revision SET NOT NULL;
+ALTER TABLE bom_components ALTER COLUMN component_item_id SET NOT NULL;
+ALTER TABLE bom_components ALTER COLUMN quantity SET NOT NULL;
+ALTER TABLE bom_components ALTER COLUMN created_at SET NOT NULL;
+
+-- Work center and routing constraints
+ALTER TABLE work_centers ALTER COLUMN work_center_id SET NOT NULL;
+ALTER TABLE work_centers ALTER COLUMN work_center_name SET NOT NULL;
+ALTER TABLE work_centers ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE routings ALTER COLUMN routing_id SET NOT NULL;
+ALTER TABLE routings ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE routings ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE routing_operations ALTER COLUMN routing_id SET NOT NULL;
+ALTER TABLE routing_operations ALTER COLUMN routing_revision SET NOT NULL;
+ALTER TABLE routing_operations ALTER COLUMN operation_sequence SET NOT NULL;
+ALTER TABLE routing_operations ALTER COLUMN created_at SET NOT NULL;
+
+-- Customer and sales constraints
+ALTER TABLE customers ALTER COLUMN customer_id SET NOT NULL;
+ALTER TABLE customers ALTER COLUMN customer_name SET NOT NULL;
+ALTER TABLE customers ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE customers ALTER COLUMN updated_at SET NOT NULL;
+
+ALTER TABLE sales_orders ALTER COLUMN customer_id SET NOT NULL;
+ALTER TABLE sales_orders ALTER COLUMN order_date SET NOT NULL;
+ALTER TABLE sales_orders ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE sales_order_lines ALTER COLUMN sales_order_id SET NOT NULL;
+ALTER TABLE sales_order_lines ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE sales_order_lines ALTER COLUMN order_quantity SET NOT NULL;
+ALTER TABLE sales_order_lines ALTER COLUMN created_at SET NOT NULL;
+
+-- Vendor and procurement constraints
+ALTER TABLE vendors ALTER COLUMN vendor_id SET NOT NULL;
+ALTER TABLE vendors ALTER COLUMN vendor_name SET NOT NULL;
+ALTER TABLE vendors ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE vendors ALTER COLUMN updated_at SET NOT NULL;
+
+ALTER TABLE vendor_ratings ALTER COLUMN vendor_id SET NOT NULL;
+ALTER TABLE vendor_ratings ALTER COLUMN rating_date SET NOT NULL;
+ALTER TABLE vendor_ratings ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE purchase_orders ALTER COLUMN vendor_id SET NOT NULL;
+ALTER TABLE purchase_orders ALTER COLUMN po_date SET NOT NULL;
+ALTER TABLE purchase_orders ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE purchase_order_lines ALTER COLUMN po_id SET NOT NULL;
+ALTER TABLE purchase_order_lines ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE purchase_order_lines ALTER COLUMN po_quantity SET NOT NULL;
+ALTER TABLE purchase_order_lines ALTER COLUMN created_at SET NOT NULL;
+
+-- Warehouse and inventory constraints
+ALTER TABLE warehouses ALTER COLUMN warehouse_id SET NOT NULL;
+ALTER TABLE warehouses ALTER COLUMN warehouse_name SET NOT NULL;
+ALTER TABLE warehouses ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE inventory_locations ALTER COLUMN location_id SET NOT NULL;
+ALTER TABLE inventory_locations ALTER COLUMN warehouse_id SET NOT NULL;
+-- item_id and created_at do not exist in inventory_locations schema — skip
+
+ALTER TABLE lot_master ALTER COLUMN lot_number SET NOT NULL;
+ALTER TABLE lot_master ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE lot_master ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE serial_master ALTER COLUMN serial_number SET NOT NULL;
+ALTER TABLE serial_master ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE serial_master ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE inventory_transactions ALTER COLUMN warehouse_id SET NOT NULL;
+ALTER TABLE inventory_transactions ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE inventory_transactions ALTER COLUMN txn_type SET NOT NULL;
+ALTER TABLE inventory_transactions ALTER COLUMN recorded_at SET NOT NULL;
+
+-- Job order constraints
+ALTER TABLE job_orders ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE job_orders ALTER COLUMN job_qty SET NOT NULL;
+ALTER TABLE job_orders ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE job_operations ALTER COLUMN job_order_id SET NOT NULL;
+ALTER TABLE job_operations ALTER COLUMN operation_seq SET NOT NULL;
+ALTER TABLE job_operations ALTER COLUMN created_at SET NOT NULL;
+
+-- Labor transaction constraints
+ALTER TABLE labor_transactions ALTER COLUMN employee_id SET NOT NULL;
+ALTER TABLE labor_transactions ALTER COLUMN recorded_at SET NOT NULL;
+
+-- Production schedule constraints
+ALTER TABLE production_schedule ALTER COLUMN created_at SET NOT NULL;
+
+-- Inspection plan constraints
+ALTER TABLE inspection_plans ALTER COLUMN inspection_plan_id SET NOT NULL;
+ALTER TABLE inspection_plans ALTER COLUMN created_at SET NOT NULL;
+
+-- inspection_results uses recorded_at (not created_at)
+ALTER TABLE inspection_results ALTER COLUMN recorded_at SET NOT NULL;
+
+-- SPC data constraints
+ALTER TABLE spc_data ALTER COLUMN item_id SET NOT NULL;
+ALTER TABLE spc_data ALTER COLUMN created_at SET NOT NULL;
+
+-- Quality control constraints (NCR, CAPA, FAI)
+ALTER TABLE ncr_records ALTER COLUMN record_id SET NOT NULL;
+ALTER TABLE ncr_records ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE capa_records ALTER COLUMN record_id SET NOT NULL;
+ALTER TABLE capa_records ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE fai_records ALTER COLUMN record_id SET NOT NULL;
+ALTER TABLE fai_records ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE fai_characteristics ALTER COLUMN fai_id SET NOT NULL;
+ALTER TABLE fai_characteristics ALTER COLUMN characteristic_name SET NOT NULL;
+ALTER TABLE fai_characteristics ALTER COLUMN created_at SET NOT NULL;
+
+-- Certificate constraints
+ALTER TABLE certificates ALTER COLUMN created_at SET NOT NULL;
+
+-- NPI project constraints
+ALTER TABLE npi_projects ALTER COLUMN created_at SET NOT NULL;
+
+-- EHS incident constraints
+ALTER TABLE ehs_incidents ALTER COLUMN created_at SET NOT NULL;
+
+-- Contamination check constraints
+ALTER TABLE contamination_checks ALTER COLUMN created_at SET NOT NULL;
+
+-- Engineering change constraints
+ALTER TABLE engineering_change_requests ALTER COLUMN ecr_number SET NOT NULL;
+ALTER TABLE engineering_change_requests ALTER COLUMN created_at SET NOT NULL;
+
+-- Equipment constraints
+ALTER TABLE equipment ALTER COLUMN equipment_id SET NOT NULL;
+ALTER TABLE equipment ALTER COLUMN equipment_name SET NOT NULL;
+ALTER TABLE equipment ALTER COLUMN created_at SET NOT NULL;
+
+-- Calibration constraints
+ALTER TABLE calibration_records ALTER COLUMN equipment_id SET NOT NULL;
+ALTER TABLE calibration_records ALTER COLUMN calibration_date SET NOT NULL;
+ALTER TABLE calibration_records ALTER COLUMN created_at SET NOT NULL;
+
+-- Maintenance work order constraints
+ALTER TABLE maintenance_work_orders ALTER COLUMN equipment_id SET NOT NULL;
+ALTER TABLE maintenance_work_orders ALTER COLUMN work_order_id SET NOT NULL;
+ALTER TABLE maintenance_work_orders ALTER COLUMN created_at SET NOT NULL;
+
+-- Tool management constraints
+ALTER TABLE tools ALTER COLUMN tool_id SET NOT NULL;
+ALTER TABLE tools ALTER COLUMN tool_name SET NOT NULL;
+ALTER TABLE tools ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE tool_transactions ALTER COLUMN tool_id SET NOT NULL;
+ALTER TABLE tool_transactions ALTER COLUMN txn_type SET NOT NULL;
+ALTER TABLE tool_transactions ALTER COLUMN created_at SET NOT NULL;
+
+-- Employee constraints
+ALTER TABLE employees ALTER COLUMN employee_id SET NOT NULL;
+ALTER TABLE employees ALTER COLUMN employee_name SET NOT NULL;
+ALTER TABLE employees ALTER COLUMN created_at SET NOT NULL;
+
+-- Training constraints
+ALTER TABLE training_records ALTER COLUMN created_at SET NOT NULL;
+
+-- Skills matrix constraints
+ALTER TABLE skills_matrix ALTER COLUMN employee_id SET NOT NULL;
+ALTER TABLE skills_matrix ALTER COLUMN skill_name SET NOT NULL;
+ALTER TABLE skills_matrix ALTER COLUMN created_at SET NOT NULL;
+
+-- Employee certification constraints
+ALTER TABLE employee_certifications ALTER COLUMN employee_id SET NOT NULL;
+ALTER TABLE employee_certifications ALTER COLUMN certification_name SET NOT NULL;
+ALTER TABLE employee_certifications ALTER COLUMN created_at SET NOT NULL;
+
+-- Audit management constraints
+ALTER TABLE audits ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE audit_findings ALTER COLUMN audit_id SET NOT NULL;
+ALTER TABLE audit_findings ALTER COLUMN finding_description SET NOT NULL;
+ALTER TABLE audit_findings ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE audit_actions ALTER COLUMN finding_id SET NOT NULL;
+ALTER TABLE audit_actions ALTER COLUMN action_description SET NOT NULL;
+ALTER TABLE audit_actions ALTER COLUMN created_at SET NOT NULL;
+
+-- Risk register constraints
+ALTER TABLE risk_register ALTER COLUMN risk_description SET NOT NULL;
+ALTER TABLE risk_register ALTER COLUMN created_at SET NOT NULL;
+
+-- Improvement project constraints
+ALTER TABLE improvement_projects ALTER COLUMN created_at SET NOT NULL;
+
+-- Management review constraints
+ALTER TABLE management_reviews ALTER COLUMN created_at SET NOT NULL;
+
+-- Cost element constraints
+ALTER TABLE cost_elements ALTER COLUMN cost_type SET NOT NULL;
+ALTER TABLE cost_elements ALTER COLUMN created_at SET NOT NULL;
+
+-- Shipment constraints
+ALTER TABLE shipments ALTER COLUMN created_at SET NOT NULL;
+
+-- Package constraints (packages table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
+        EXECUTE 'ALTER TABLE packages ALTER COLUMN shipment_id SET NOT NULL';
+        EXECUTE 'ALTER TABLE packages ALTER COLUMN created_at SET NOT NULL';
+    END IF;
+END $$;
+
+-- Compliance constraints (compliance table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
+        EXECUTE 'ALTER TABLE compliance ALTER COLUMN created_at SET NOT NULL';
+    END IF;
+END $$;
+
+-- ============================================================================
+-- Note on future ENUM columns:
+-- ============================================================================
+-- Future migrations should use CHECK constraints instead of PostgreSQL ENUM types.
+-- Example pattern:
+--   status VARCHAR(50) CHECK (status IN ('draft','active','closed'))
+-- This allows adding new enumeration values via migration without locking tables.
+-- ENUM types cannot be modified without ALTER TYPE which locks the table.
+
+COMMIT;
+-- <<< END MIGRATION: 112_security_hardening_constraints.sql
+
+-- >>> BEGIN MIGRATION: 113_audit_columns.sql
+-- ============================================================================
+-- Migration 113: Add Audit Columns (created_by, updated_by, deleted_at)
+-- ============================================================================
+-- Purpose:
+--   Add missing audit columns to tables that track record lifecycle.
+--   Enables comprehensive audit trail for compliance and forensics.
+--
+-- Audit column pattern:
+--   - created_by: UUID REFERENCES users(user_id) - who created the record
+--   - created_at: TIMESTAMPTZ - when created (should already exist)
+--   - updated_by: UUID REFERENCES users(user_id) - who last updated
+--   - updated_at: TIMESTAMPTZ - when last updated (should already exist)
+--   - deleted_by: UUID REFERENCES users(user_id) - who deleted (soft delete)
+--   - deleted_at: TIMESTAMPTZ - when deleted (soft delete)
+-- ============================================================================
+
+BEGIN;
+
+-- ============================================================================
+-- User & Authentication Tables
+-- ============================================================================
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Document Management Tables
+-- ============================================================================
+
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE document_versions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE document_versions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE document_versions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE document_embeddings ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE document_embeddings ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE document_embeddings ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE document_distribution ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE document_distribution ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE document_distribution ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Form Management Tables
+-- ============================================================================
+
+ALTER TABLE form_schemas ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE form_schemas ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE form_schemas ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE form_schemas ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE form_entries ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE form_entries ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE form_entries ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE form_entries ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE form_attachments ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE form_attachments ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE form_attachments ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Record Management Tables
+-- ============================================================================
+
+ALTER TABLE records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE records ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE record_links ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE record_links ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE record_links ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE record_counters ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE record_counters ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+
+-- ============================================================================
+-- Master Data Tables (Items, BOMs, Routings)
+-- ============================================================================
+
+ALTER TABLE items ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE items ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE items ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE items ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE item_revisions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE item_revisions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE item_revisions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE bill_of_materials ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE bill_of_materials ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE bill_of_materials ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE bill_of_materials ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE bom_components ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE bom_components ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE bom_components ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE bom_components ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE work_centers ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE work_centers ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE work_centers ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE work_centers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE routings ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE routings ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE routings ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE routings ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE routing_operations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE routing_operations ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE routing_operations ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE routing_operations ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Customer & Sales Tables
+-- ============================================================================
+
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE sales_orders ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_orders ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_orders ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_orders ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE sales_order_lines ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_order_lines ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_order_lines ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE sales_order_lines ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Vendor & Procurement Tables
+-- ============================================================================
+
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE vendors ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE vendor_ratings ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE vendor_ratings ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE vendor_ratings ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE purchase_order_lines ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_order_lines ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_order_lines ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE purchase_order_lines ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Inventory & Logistics Tables
+-- ============================================================================
+
+ALTER TABLE warehouses ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE warehouses ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE warehouses ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE warehouses ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE inventory_locations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE inventory_locations ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE inventory_locations ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE inventory_locations ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE lot_master ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE lot_master ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE lot_master ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE lot_master ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE serial_master ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE serial_master ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE serial_master ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE serial_master ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- Note: inventory_transactions has recorded_at not created_at, so we only add audit_actor_id if missing
+ALTER TABLE inventory_transactions ADD COLUMN IF NOT EXISTS recorded_by_user_id UUID REFERENCES users(user_id);
+
+-- ============================================================================
+-- Production & Job Tables
+-- ============================================================================
+
+ALTER TABLE job_orders ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE job_orders ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE job_orders ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE job_orders ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE job_operations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE job_operations ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE job_operations ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE job_operations ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE labor_transactions ADD COLUMN IF NOT EXISTS recorded_by_user_id UUID REFERENCES users(user_id);
+
+ALTER TABLE production_schedule ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE production_schedule ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE production_schedule ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE production_schedule ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Quality Management Tables
+-- ============================================================================
+
+ALTER TABLE inspection_plans ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_plans ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_plans ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_plans ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE inspection_results ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_results ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_results ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE inspection_results ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE spc_data ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE spc_data ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE spc_data ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE ncr_records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE ncr_records ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE ncr_records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE ncr_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE capa_records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE capa_records ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE capa_records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE capa_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE fai_records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_records ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE fai_characteristics ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_characteristics ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_characteristics ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE fai_characteristics ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE npi_projects ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE npi_projects ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE npi_projects ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE npi_projects ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- EHS & Environment Tables
+-- ============================================================================
+
+ALTER TABLE ehs_incidents ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE ehs_incidents ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE ehs_incidents ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE ehs_incidents ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE contamination_checks ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE contamination_checks ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE contamination_checks ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Engineering Change Tables
+-- ============================================================================
+
+ALTER TABLE engineering_change_requests ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE engineering_change_requests ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE engineering_change_requests ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE engineering_change_requests ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Equipment & Maintenance Tables
+-- ============================================================================
+
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE equipment ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE calibration_records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE calibration_records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE calibration_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE maintenance_work_orders ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE maintenance_work_orders ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE maintenance_work_orders ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE maintenance_work_orders ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE tools ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE tools ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE tools ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE tools ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE tool_transactions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE tool_transactions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE tool_transactions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Human Resources & Training Tables
+-- ============================================================================
+
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE training_records ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE skills_matrix ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE skills_matrix ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE skills_matrix ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE skills_matrix ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE employee_certifications ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE employee_certifications ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE employee_certifications ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE employee_certifications ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Audit & Compliance Tables
+-- ============================================================================
+
+ALTER TABLE audits ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE audits ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE audits ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE audits ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE audit_findings ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_findings ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_findings ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_findings ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE audit_actions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_actions ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_actions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE audit_actions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE risk_register ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE risk_register ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE risk_register ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE risk_register ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE improvement_projects ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE improvement_projects ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE improvement_projects ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE improvement_projects ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+ALTER TABLE management_reviews ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE management_reviews ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE management_reviews ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE management_reviews ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Financial & Cost Tables
+-- ============================================================================
+
+ALTER TABLE cost_elements ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE cost_elements ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE cost_elements ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE cost_elements ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- ============================================================================
+-- Logistics & Shipment Tables
+-- ============================================================================
+
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE shipments ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+
+-- packages table may not exist in all deployments
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
+        EXECUTE 'ALTER TABLE packages ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE packages ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE packages ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE packages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ';
+    END IF;
+END $$;
+
+-- ============================================================================
+-- Compliance & Traceability Tables
+-- ============================================================================
+
+-- compliance table may not exist in all deployments
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
+        EXECUTE 'ALTER TABLE compliance ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE compliance ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE compliance ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id)';
+        EXECUTE 'ALTER TABLE compliance ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ';
+    END IF;
+END $$;
+
+-- ============================================================================
+-- Indexes for audit columns (enable efficient audit queries)
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_users_created_by ON users(created_by);
+CREATE INDEX IF NOT EXISTS idx_users_updated_by ON users(updated_by);
+CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_documents_created_by ON documents(created_by);
+CREATE INDEX IF NOT EXISTS idx_documents_updated_by ON documents(updated_by);
+CREATE INDEX IF NOT EXISTS idx_documents_deleted_at ON documents(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_records_created_by ON records(created_by);
+CREATE INDEX IF NOT EXISTS idx_records_updated_by ON records(updated_by);
+CREATE INDEX IF NOT EXISTS idx_records_deleted_at ON records(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_items_created_by ON items(created_by);
+CREATE INDEX IF NOT EXISTS idx_items_updated_by ON items(updated_by);
+CREATE INDEX IF NOT EXISTS idx_items_deleted_at ON items(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_sales_orders_created_by ON sales_orders(created_by);
+CREATE INDEX IF NOT EXISTS idx_sales_orders_updated_by ON sales_orders(updated_by);
+CREATE INDEX IF NOT EXISTS idx_sales_orders_deleted_at ON sales_orders(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_created_by ON purchase_orders(created_by);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_updated_by ON purchase_orders(updated_by);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_deleted_at ON purchase_orders(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_customers_created_by ON customers(created_by);
+CREATE INDEX IF NOT EXISTS idx_customers_updated_by ON customers(updated_by);
+CREATE INDEX IF NOT EXISTS idx_customers_deleted_at ON customers(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_vendors_created_by ON vendors(created_by);
+CREATE INDEX IF NOT EXISTS idx_vendors_updated_by ON vendors(updated_by);
+CREATE INDEX IF NOT EXISTS idx_vendors_deleted_at ON vendors(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_ncr_records_created_by ON ncr_records(created_by);
+CREATE INDEX IF NOT EXISTS idx_ncr_records_deleted_at ON ncr_records(deleted_at);
+
+CREATE INDEX IF NOT EXISTS idx_capa_records_created_by ON capa_records(created_by);
+CREATE INDEX IF NOT EXISTS idx_capa_records_deleted_at ON capa_records(deleted_at);
+
+COMMIT;
+-- <<< END MIGRATION: 113_audit_columns.sql
+
+-- >>> BEGIN MIGRATION: 114_world_class_closure_lifecycle_constraints.sql
+-- World-class closure: align PLM change lifecycle constraints with the canonical
+-- eQMS/MOM state machine and prevent ambiguous lifecycle semantics.
+
+UPDATE plm_change_requests
+SET status = CASE status
+    WHEN 'in_review' THEN 'triage'
+    WHEN 'approved' THEN 'approved_for_order'
+    WHEN 'implemented' THEN 'approved_for_order'
+    ELSE status
+END
+WHERE status IN ('in_review', 'approved', 'implemented');
+
+ALTER TABLE plm_change_requests
+    DROP CONSTRAINT IF EXISTS plm_change_requests_status_check;
+
+ALTER TABLE plm_change_requests
+    ADD CONSTRAINT plm_change_requests_status_check
+    CHECK (status IN ('draft', 'submitted', 'triage', 'approved_for_order', 'rejected', 'cancelled'));
+
+UPDATE plm_change_orders
+SET status = CASE status
+    WHEN 'closed' THEN 'implemented'
+    ELSE status
+END
+WHERE status = 'closed'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM plm_change_effectiveness_reviews r
+      WHERE r.plm_change_order_id = plm_change_orders.plm_change_order_id
+        AND r.review_state = 'effective'
+  );
+
+ALTER TABLE plm_change_orders
+    DROP CONSTRAINT IF EXISTS plm_change_orders_status_check;
+
+ALTER TABLE plm_change_orders
+    ADD CONSTRAINT plm_change_orders_status_check
+    CHECK (status IN ('draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled'));
+
+COMMENT ON CONSTRAINT plm_change_requests_status_check ON plm_change_requests
+    IS 'Canonical change request lifecycle: draft -> submitted -> triage -> approved_for_order/rejected/cancelled.';
+
+COMMENT ON CONSTRAINT plm_change_orders_status_check ON plm_change_orders
+    IS 'Canonical change order lifecycle: draft -> impact_assessment -> in_review -> approved -> released -> implemented -> closed.';
+-- <<< END MIGRATION: 114_world_class_closure_lifecycle_constraints.sql
+
+-- >>> BEGIN MIGRATION: 115_missing_fk_indexes.sql
+-- ============================================================================
+-- Migration 115: Add missing foreign key indexes for query performance
+-- ============================================================================
+-- Purpose:
+--   These indexes were identified as missing in Round 6 security audit.
+--   They improve performance of queries on foreign key columns and ensure
+--   that cascading operations are efficient.
+-- ============================================================================
+
+BEGIN;
+
+-- Foreign key indexes for MES release record tracking
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_target_aggregate_id
+    ON mes_trusted_release_record (target_aggregate_id) WHERE target_aggregate_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_release_record_correlation_id
+    ON mes_trusted_release_record (correlation_id) WHERE correlation_id IS NOT NULL;
+
+-- Foreign key index for AI feedback loops
+CREATE INDEX IF NOT EXISTS idx_ai_feedback_loops_prediction_id
+    ON ai_feedback_loops (prediction_id);
+
+-- ============================================================================
+-- Fix audit column FK ON DELETE behavior (alter constraints to SET NULL)
+-- These are done via DROP CONSTRAINT / ADD CONSTRAINT since ALTER CONSTRAINT
+-- doesn't support changing ON DELETE in PostgreSQL
+-- ============================================================================
+
+DO $$
+DECLARE
+    t TEXT;
+    col TEXT;
+    constraint_name TEXT;
+    delete_rule TEXT;
+BEGIN
+    FOR t, col IN
+        SELECT table_name, column_name
+        FROM information_schema.columns
+        WHERE column_name IN ('created_by', 'updated_by', 'deleted_by')
+          AND table_schema = 'public'
+          AND udt_name = 'uuid'
+    LOOP
+        -- Find existing constraint and its delete rule
+        SELECT tc.constraint_name, rc.delete_rule INTO constraint_name, delete_rule
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu
+          ON tc.constraint_name = kcu.constraint_name
+        LEFT JOIN information_schema.referential_constraints rc
+          ON tc.constraint_name = rc.constraint_name
+        WHERE tc.table_name = t
+          AND kcu.column_name = col
+          AND tc.constraint_type = 'FOREIGN KEY'
+        LIMIT 1;
+
+        -- Only modify the constraint if it doesn't already have ON DELETE SET NULL
+        IF constraint_name IS NOT NULL AND delete_rule != 'SET NULL' THEN
+            -- Drop and re-add with ON DELETE SET NULL
+            EXECUTE format('ALTER TABLE %I DROP CONSTRAINT IF EXISTS %I', t, constraint_name);
+            EXECUTE format('ALTER TABLE %I ADD CONSTRAINT %I FOREIGN KEY (%I) REFERENCES users(user_id) ON DELETE SET NULL',
+                           t, constraint_name, col);
+        END IF;
+    END LOOP;
+END $$;
+
+COMMIT;
+-- <<< END MIGRATION: 115_missing_fk_indexes.sql
+
+-- >>> BEGIN MIGRATION: 115_order_workflow_status_authority.sql
+-- World-class closure: unify SO workflow/status authority across runtime,
+-- registry contracts, and database constraints.
+
+ALTER TYPE so_status_enum ADD VALUE IF NOT EXISTS 'engineering_ready' AFTER 'confirmed';
+
+UPDATE sales_order
+SET status_code = CASE status_code
+    WHEN 'open' THEN 'draft'
+    WHEN 'released' THEN 'engineering_ready'
+    WHEN 'in_progress' THEN 'in_production'
+    WHEN 'completed' THEN 'shipped'
+    ELSE status_code
+END
+WHERE status_code IN ('open', 'released', 'in_progress', 'completed');
+
+ALTER TABLE sales_order
+    ALTER COLUMN status_code SET DEFAULT 'draft';
+
+ALTER TABLE sales_order
+    DROP CONSTRAINT IF EXISTS sales_order_status_code_canonical_check;
+
+ALTER TABLE sales_order
+    ADD CONSTRAINT sales_order_status_code_canonical_check
+    CHECK (status_code IN ('draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production', 'shipped', 'closed', 'cancelled'));
+
+COMMENT ON CONSTRAINT sales_order_status_code_canonical_check ON sales_order
+    IS 'Canonical SO lifecycle aligned with so_jo_wo_config and wf_sales_order.';
+
+-- sales_orders uses the so_status_enum value added above. Its data migration and
+-- constraint are intentionally placed in the next migration so runners that wrap
+-- each migration in a transaction commit the new enum value before using it.
+-- <<< END MIGRATION: 115_order_workflow_status_authority.sql
+
+-- >>> BEGIN MIGRATION: 116_sales_orders_status_authority_constraints.sql
+-- World-class closure: constrain legacy sales_orders status after the
+-- engineering_ready enum value from migration 115 has committed.
+
+UPDATE sales_orders
+SET so_status = CASE so_status::text
+    WHEN 'open' THEN 'draft'::so_status_enum
+    WHEN 'released' THEN 'engineering_ready'::so_status_enum
+    WHEN 'in_progress' THEN 'in_production'::so_status_enum
+    ELSE so_status
+END
+WHERE so_status::text IN ('open', 'released', 'in_progress');
+
+ALTER TABLE sales_orders
+    ALTER COLUMN so_status SET DEFAULT 'draft';
+
+ALTER TABLE sales_orders
+    DROP CONSTRAINT IF EXISTS sales_orders_so_status_canonical_check;
+
+ALTER TABLE sales_orders
+    ADD CONSTRAINT sales_orders_so_status_canonical_check
+    CHECK (so_status::text IN ('draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production', 'shipped', 'closed', 'cancelled'));
+
+COMMENT ON CONSTRAINT sales_orders_so_status_canonical_check ON sales_orders
+    IS 'Legacy SO table constrained to canonical SO lifecycle; old aliases are migrated before this check is applied.';
+-- <<< END MIGRATION: 116_sales_orders_status_authority_constraints.sql
+
+-- >>> BEGIN MIGRATION: 117_job_order_status_authority_enum.sql
+-- World-class closure: add runtime terminal state for job order authority.
+
+ALTER TYPE job_status_enum ADD VALUE IF NOT EXISTS 'cancelled' AFTER 'closed';
+-- <<< END MIGRATION: 117_job_order_status_authority_enum.sql
+
+-- >>> BEGIN MIGRATION: 118_job_orders_status_authority_constraints.sql
+-- World-class closure: constrain job_orders to the runtime job-order lifecycle
+-- after the cancelled enum value from migration 117 has committed.
+
+UPDATE job_orders
+SET job_status = CASE job_status::text
+    WHEN 'engineered' THEN 'released'::job_status_enum
+    ELSE job_status
+END
+WHERE job_status::text IN ('engineered');
+
+ALTER TABLE job_orders
+    DROP CONSTRAINT IF EXISTS job_orders_job_status_runtime_check;
+
+ALTER TABLE job_orders
+    ADD CONSTRAINT job_orders_job_status_runtime_check
+    CHECK (job_status::text IN ('planned', 'released', 'active', 'on_hold', 'completed', 'closed', 'cancelled'));
+
+COMMENT ON CONSTRAINT job_orders_job_status_runtime_check ON job_orders
+    IS 'Canonical JO lifecycle aligned with so_jo_wo_config and wf_job_order.';
+-- <<< END MIGRATION: 118_job_orders_status_authority_constraints.sql
+
+-- >>> BEGIN MIGRATION: 119_work_orders_status_authority_constraints.sql
+-- World-class closure: constrain production work_orders to the runtime
+-- work-order execution lifecycle. Service/maintenance WO lifecycles remain
+-- separate and must not reuse wf_work_order_execution.
+
+UPDATE work_orders
+SET work_order_status = CASE work_order_status
+    WHEN 'draft' THEN 'scheduled'
+    WHEN 'planned' THEN 'scheduled'
+    WHEN 'released' THEN 'setup'
+    WHEN 'in_production' THEN 'running'
+    WHEN 'quality_hold' THEN 'on_hold'
+    WHEN 'closed' THEN 'completed'
+    ELSE work_order_status
+END
+WHERE work_order_status IN ('draft', 'planned', 'released', 'in_production', 'quality_hold', 'closed');
+
+ALTER TABLE work_orders
+    DROP CONSTRAINT IF EXISTS work_orders_work_order_status_check;
+
+ALTER TABLE work_orders
+    DROP CONSTRAINT IF EXISTS work_orders_status_runtime_check;
+
+ALTER TABLE work_orders
+    ADD CONSTRAINT work_orders_status_runtime_check
+    CHECK (work_order_status IN ('scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold', 'cancelled'));
+
+COMMENT ON CONSTRAINT work_orders_status_runtime_check ON work_orders
+    IS 'Canonical production WO lifecycle aligned with so_jo_wo_config and wf_work_order_execution.';
+-- <<< END MIGRATION: 119_work_orders_status_authority_constraints.sql
+
+-- >>> BEGIN MIGRATION: 120_work_order_spine_status_authority_constraints.sql
+-- World-class closure: align singular MES work_order spine status with the
+-- same runtime production WO lifecycle used by wf_work_order_execution.
+
+UPDATE work_order
+SET status_code = CASE status_code
+    WHEN 'open' THEN 'scheduled'
+    WHEN 'planned' THEN 'scheduled'
+    WHEN 'released' THEN 'setup'
+    WHEN 'in_progress' THEN 'running'
+    WHEN 'quality_hold' THEN 'on_hold'
+    WHEN 'closed' THEN 'completed'
+    ELSE status_code
+END
+WHERE status_code IN ('open', 'planned', 'released', 'in_progress', 'quality_hold', 'closed');
+
+ALTER TABLE work_order
+    ALTER COLUMN status_code SET DEFAULT 'scheduled';
+
+ALTER TABLE work_order
+    DROP CONSTRAINT IF EXISTS work_order_status_code_runtime_check;
+
+ALTER TABLE work_order
+    ADD CONSTRAINT work_order_status_code_runtime_check
+    CHECK (status_code IN ('scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold', 'cancelled'));
+
+COMMENT ON CONSTRAINT work_order_status_code_runtime_check ON work_order
+    IS 'Canonical MES work_order lifecycle aligned with work_order_status_runtime and wf_work_order_execution.';
+-- <<< END MIGRATION: 120_work_order_spine_status_authority_constraints.sql
+
+-- >>> BEGIN MIGRATION: 121_genealogy_runtime_ontology_constraints.sql
+-- ============================================================================
+-- Migration 121: Genealogy Runtime Ontology Constraint Alignment
+-- ============================================================================
+-- Purpose:
+--   Align DB CHECK constraints with GenealogyGraphService::nodeType(). Runtime
+--   already accepts the expanded MOM/MES/EQMS/PLM ontology; persistence must not
+--   reject valid canonical graph nodes.
+--
+-- Rollback:
+--   Re-apply the narrower constraints from migration 108 only after confirming
+--   no rows use expanded node or snapshot subject types.
+-- ============================================================================
+
+BEGIN;
+
+DO $$
+DECLARE
+    constraint_name TEXT;
+BEGIN
+    FOR constraint_name IN
+        SELECT c.conname
+        FROM pg_constraint c
+        WHERE c.conrelid = 'genealogy_nodes'::regclass
+          AND c.contype = 'c'
+          AND pg_get_constraintdef(c.oid) ILIKE '%node_type%'
+    LOOP
+        EXECUTE format('ALTER TABLE genealogy_nodes DROP CONSTRAINT IF EXISTS %I', constraint_name);
+    END LOOP;
+END $$;
+
+ALTER TABLE genealogy_nodes
+    ADD CONSTRAINT chk_genealogy_nodes_node_type_world_class
+    CHECK (node_type IN (
+        'job',
+        'work_order',
+        'job_order',
+        'operation',
+        'work_center',
+        'lot',
+        'batch',
+        'serial',
+        'material',
+        'equipment',
+        'tool',
+        'personnel',
+        'method',
+        'measurement',
+        'process',
+        'routing',
+        'setup_sheet',
+        'inspection_plan',
+        'inspection_result',
+        'nc_program',
+        'cnc_program',
+        'document_revision',
+        'form_template',
+        'form_schema',
+        'evidence_record',
+        'evidence_version',
+        'change_request',
+        'change_order',
+        'nonconformance',
+        'deviation',
+        'capa',
+        'shipment',
+        'supplier_lot',
+        'customer_order'
+    ));
+
+DO $$
+DECLARE
+    constraint_name TEXT;
+BEGIN
+    FOR constraint_name IN
+        SELECT c.conname
+        FROM pg_constraint c
+        WHERE c.conrelid = 'as_manufactured_snapshots'::regclass
+          AND c.contype = 'c'
+          AND pg_get_constraintdef(c.oid) ILIKE '%subject_type%'
+    LOOP
+        EXECUTE format('ALTER TABLE as_manufactured_snapshots DROP CONSTRAINT IF EXISTS %I', constraint_name);
+    END LOOP;
+END $$;
+
+ALTER TABLE as_manufactured_snapshots
+    ADD CONSTRAINT chk_as_manufactured_snapshots_subject_type_world_class
+    CHECK (subject_type IN (
+        'job',
+        'work_order',
+        'job_order',
+        'operation',
+        'work_center',
+        'lot',
+        'batch',
+        'serial',
+        'material',
+        'equipment',
+        'tool',
+        'personnel',
+        'method',
+        'measurement',
+        'process',
+        'routing',
+        'setup_sheet',
+        'inspection_plan',
+        'inspection_result',
+        'nc_program',
+        'cnc_program',
+        'document_revision',
+        'form_template',
+        'form_schema',
+        'evidence_record',
+        'evidence_version',
+        'change_request',
+        'change_order',
+        'nonconformance',
+        'deviation',
+        'capa',
+        'shipment',
+        'supplier_lot',
+        'customer_order'
+    ));
+
+COMMENT ON CONSTRAINT chk_genealogy_nodes_node_type_world_class ON genealogy_nodes
+    IS 'Must match GenealogyGraphService::nodeType() expanded MOM/MES/EQMS/PLM ontology.';
+
+COMMENT ON CONSTRAINT chk_as_manufactured_snapshots_subject_type_world_class ON as_manufactured_snapshots
+    IS 'Allows expanded digital-thread subjects; service-level snapshot breadth may remain narrower until productized.';
+
+COMMIT;
+-- <<< END MIGRATION: 121_genealogy_runtime_ontology_constraints.sql
+
+-- >>> BEGIN MIGRATION: 122_digital_thread_event_context_filters.sql
+-- Migration 122: Digital thread event context filters
+--
+-- Extends the canonical manufacturing event ledger so MES/MOM history queries
+-- can filter by 5M and as-manufactured context without scraping payload JSON.
+
+ALTER TABLE mes_operational_event_ledger
+    ADD COLUMN IF NOT EXISTS equipment_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS operator_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS tool_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS process_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS material_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS material_lot_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS material_batch_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS batch_number VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS routing_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS setup_sheet_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS inspection_plan_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS nc_program_id VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS cnc_program_id VARCHAR(120);
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_equipment
+    ON mes_operational_event_ledger (equipment_id, occurred_at, recorded_at)
+    WHERE equipment_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_operator
+    ON mes_operational_event_ledger (operator_id, occurred_at, recorded_at)
+    WHERE operator_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_tool
+    ON mes_operational_event_ledger (tool_id, occurred_at, recorded_at)
+    WHERE tool_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_process
+    ON mes_operational_event_ledger (process_id, routing_id, occurred_at, recorded_at)
+    WHERE process_id IS NOT NULL OR routing_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_material_context
+    ON mes_operational_event_ledger (material_id, material_lot_id, material_batch_id, occurred_at, recorded_at)
+    WHERE material_id IS NOT NULL OR material_lot_id IS NOT NULL OR material_batch_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_mes_operational_event_control_plan_context
+    ON mes_operational_event_ledger (setup_sheet_id, inspection_plan_id, nc_program_id, cnc_program_id, occurred_at)
+    WHERE setup_sheet_id IS NOT NULL
+       OR inspection_plan_id IS NOT NULL
+       OR nc_program_id IS NOT NULL
+       OR cnc_program_id IS NOT NULL;
+
+COMMENT ON COLUMN mes_operational_event_ledger.equipment_id IS
+    'Machine/equipment context used for as-manufactured 5M traceability.';
+COMMENT ON COLUMN mes_operational_event_ledger.operator_id IS
+    'Personnel/operator context used for as-manufactured 5M traceability.';
+COMMENT ON COLUMN mes_operational_event_ledger.tool_id IS
+    'Tooling context used for as-manufactured 5M traceability.';
+COMMENT ON COLUMN mes_operational_event_ledger.process_id IS
+    'Method/process context used for as-manufactured 5M traceability.';
+COMMENT ON COLUMN mes_operational_event_ledger.material_lot_id IS
+    'Material lot context used for genealogy and as-manufactured traceability.';
+-- <<< END MIGRATION: 122_digital_thread_event_context_filters.sql
+
+-- >>> BEGIN MIGRATION: 123_hcm_org_units_status_metadata.sql
+-- ============================================================================
+-- Migration 123: HCM org-units status and metadata alignment
+-- ============================================================================
+-- Purpose:
+--   Add `status` and `metadata` columns to hcm_org_units so the table matches
+--   the contracts/table-registry.json definition.  Without these columns the
+--   GenericCrudService builds a SELECT that references them and the query fails,
+--   causing the HCM org catalog to report generic_list_failed in the admin panel.
+--
+-- Data safety:
+--   Additive migration only.  IF NOT EXISTS / DEFAULT guards ensure this is
+--   safe to re-run against a schema that already has the columns.
+--
+-- Rollback:
+--   ALTER TABLE hcm_org_units DROP COLUMN IF EXISTS status;
+--   ALTER TABLE hcm_org_units DROP COLUMN IF EXISTS metadata;
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE hcm_org_units
+    ADD COLUMN IF NOT EXISTS status   VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'inactive')),
+    ADD COLUMN IF NOT EXISTS metadata JSONB       NOT NULL DEFAULT '{}'::jsonb;
+
+CREATE INDEX IF NOT EXISTS idx_hcm_org_units_status ON hcm_org_units (status);
+
+COMMIT;
+-- <<< END MIGRATION: 123_hcm_org_units_status_metadata.sql
+
+-- >>> BEGIN MIGRATION: 124_world_class_closure_authoritative_controls.sql
+-- World-class closure hardening: e-signature ceremony, deterministic audit
+-- sequencing, and server-authoritative 5M policy rules.
+
+BEGIN;
+
+ALTER TABLE signature_events
+    ADD COLUMN IF NOT EXISTS auth_challenge_id TEXT,
+    ADD COLUMN IF NOT EXISTS auth_method TEXT,
+    ADD COLUMN IF NOT EXISTS auth_result_hash_sha256 CHAR(64),
+    ADD COLUMN IF NOT EXISTS signer_identity_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ADD COLUMN IF NOT EXISTS displayed_record_hash_sha256 CHAR(64),
+    ADD COLUMN IF NOT EXISTS signature_manifestation TEXT;
+
+ALTER TABLE audit_events
+    ADD COLUMN IF NOT EXISTS aggregate_sequence BIGINT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_audit_events_aggregate_sequence
+    ON audit_events (aggregate_type, aggregate_id, aggregate_sequence)
+    WHERE aggregate_sequence IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS traceability_5m_policy_rules (
+    traceability_5m_policy_rule_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    operation_class       TEXT NOT NULL,
+    object_type           TEXT NOT NULL,
+    object_id             TEXT NOT NULL DEFAULT '*',
+    material_required     BOOLEAN NOT NULL DEFAULT TRUE,
+    machine_required      BOOLEAN NOT NULL DEFAULT TRUE,
+    method_required       BOOLEAN NOT NULL DEFAULT TRUE,
+    measurement_required  BOOLEAN NOT NULL DEFAULT TRUE,
+    manpower_required     BOOLEAN NOT NULL DEFAULT TRUE,
+    policy_source         TEXT NOT NULL CHECK (policy_source IN ('traceability_5m_policy_rules', 'control_plan', 'operation_policy', 'approved_waiver')),
+    policy_state          TEXT NOT NULL DEFAULT 'active' CHECK (policy_state IN ('draft', 'active', 'superseded', 'withdrawn')),
+    source_change_order_id UUID REFERENCES plm_change_orders(plm_change_order_id),
+    effective_from        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    effective_to          TIMESTAMPTZ,
+    idempotency_key       TEXT,
+    metadata              JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version           BIGINT NOT NULL DEFAULT 1,
+    CHECK (policy_state <> 'active' OR source_change_order_id IS NOT NULL),
+    UNIQUE (operation_class, object_type, object_id, effective_from),
+    UNIQUE (idempotency_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_traceability_5m_policy_lookup
+    ON traceability_5m_policy_rules (operation_class, object_type, object_id, policy_state, effective_from DESC);
+
+COMMIT;
+-- <<< END MIGRATION: 124_world_class_closure_authoritative_controls.sql
+
+-- >>> BEGIN MIGRATION: 125_change_effect_exact_release_semantics.sql
+-- Align PLM affected-object effect semantics with exact release authority
+-- checks used by document/evidence/deployment services.
+
+BEGIN;
+
+ALTER TABLE plm_change_affected_objects
+    DROP CONSTRAINT IF EXISTS plm_change_affected_objects_requested_effect_check;
+
+ALTER TABLE plm_change_affected_objects
+    ADD CONSTRAINT plm_change_affected_objects_requested_effect_check
+    CHECK (requested_effect IN (
+        'create',
+        'revise',
+        'release',
+        'supersede',
+        'withdraw',
+        'obsolete',
+        'replace',
+        'amend',
+        'deviation',
+        'metadata_update',
+        'training_update',
+        'publication_update',
+        'deploy_controlled_source',
+        'run_controlled_migration',
+        'reload_controlled_runtime'
+    ));
+
+COMMIT;
+-- <<< END MIGRATION: 125_change_effect_exact_release_semantics.sql
+
+-- >>> BEGIN MIGRATION: 126_e_signature_auth_challenges.sql
+-- Server-authoritative e-signature re-authentication challenges.
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS e_signature_auth_challenges (
+    auth_challenge_id TEXT PRIMARY KEY,
+    signer_user_id UUID REFERENCES users(user_id),
+    signer_ref TEXT,
+    session_id TEXT,
+    org_id TEXT,
+    signature_action TEXT NOT NULL DEFAULT 'evidence_finalize',
+    signed_payload_hash_sha256 CHAR(64) NOT NULL,
+    displayed_record_hash_sha256 CHAR(64) NOT NULL,
+    challenge_state TEXT NOT NULL DEFAULT 'issued'
+        CHECK (challenge_state IN ('issued', 'consumed', 'expired', 'revoked')),
+    expires_at TIMESTAMPTZ NOT NULL,
+    consumed_at TIMESTAMPTZ,
+    consumed_by_user_id UUID REFERENCES users(user_id),
+    consumed_by_ref TEXT,
+    idempotency_key TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version BIGINT NOT NULL DEFAULT 1,
+    CHECK (signer_user_id IS NOT NULL OR NULLIF(trim(signer_ref), '') IS NOT NULL),
+    CHECK (challenge_state <> 'consumed' OR consumed_at IS NOT NULL),
+    UNIQUE (idempotency_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_e_signature_auth_challenges_signer
+    ON e_signature_auth_challenges (signer_ref, challenge_state, expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_e_signature_auth_challenges_payload
+    ON e_signature_auth_challenges (signed_payload_hash_sha256, displayed_record_hash_sha256, challenge_state);
+
+COMMIT;
+-- <<< END MIGRATION: 126_e_signature_auth_challenges.sql
+
+-- >>> BEGIN MIGRATION: 127_reconcile_historical_migration_checksums.sql
+-- Reconcile historical migration ledger checksums after clone-verified VPS
+-- promotion showed the live schema aligned with the current migration source.
+--
+-- This migration does not change application tables. It preserves the
+-- governed migration runner's checksum guard while recording the current
+-- source-of-truth checksums for migrations that were edited before the VPS
+-- ledger was stabilized.
+
+UPDATE schema_migrations
+   SET checksum = '631bac5243b2031d57970ec6f33237a5deddd23f9efaadcc2c58a25fd07e8b54'
+ WHERE migration_id = '080_seed_master_data_from_json'
+   AND checksum <> '631bac5243b2031d57970ec6f33237a5deddd23f9efaadcc2c58a25fd07e8b54';
+
+UPDATE schema_migrations
+   SET checksum = '7d8f6569259558c775e89a646e3e42353c0bda4e03e784f70cc60de42a55baf2'
+ WHERE migration_id = '106_eqms_world_class_control_plane'
+   AND checksum <> '7d8f6569259558c775e89a646e3e42353c0bda4e03e784f70cc60de42a55baf2';
+
+UPDATE schema_migrations
+   SET checksum = '9d5982805a4e0247c6e8af641d3ebfe79eda36a2839adccd944aaab5f59dbef6'
+ WHERE migration_id = '112_security_hardening_constraints'
+   AND checksum <> '9d5982805a4e0247c6e8af641d3ebfe79eda36a2839adccd944aaab5f59dbef6';
+
+UPDATE schema_migrations
+   SET checksum = 'af7c0260a71f0d8c8223067e8e2fb7349901caf401d9380e8326ecddf2b49f11'
+ WHERE migration_id = '113_audit_columns'
+   AND checksum <> 'af7c0260a71f0d8c8223067e8e2fb7349901caf401d9380e8326ecddf2b49f11';
+-- <<< END MIGRATION: 127_reconcile_historical_migration_checksums.sql

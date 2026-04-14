@@ -24,6 +24,7 @@ final class QueueService
     private ?\PhpAmqpLib\Connection\AMQPStreamConnection $connection = null;
     private ?\PhpAmqpLib\Channel\AMQPChannel $channel = null;
     private bool $amqpAvailable = false;
+    private bool $publisherConfirmsEnabled = false;
     private string $fileDir;
     private int $fileMaxAttempts;
 
@@ -92,11 +93,13 @@ final class QueueService
             );
             $this->channel = $this->connection->channel();
             $this->declareTopology();
+            $this->enablePublisherConfirms();
             $this->amqpAvailable = true;
         } catch (\Throwable $e) {
             $this->connection = null;
             $this->channel = null;
             $this->amqpAvailable = false;
+            $this->publisherConfirmsEnabled = false;
             @error_log("[QueueService] AMQP unavailable ({$host}:{$port}): {$e->getMessage()}");
         }
     }
@@ -153,6 +156,35 @@ final class QueueService
     }
 
     /**
+     * Require broker confirms before AMQP can be treated as authoritative.
+     */
+    private function enablePublisherConfirms(): void
+    {
+        if (!$this->channel) {
+            throw new \RuntimeException('AMQP channel is not available for publisher confirms');
+        }
+
+        $this->channel->set_nack_handler(static function (): void {
+            throw new \RuntimeException('AMQP broker negatively acknowledged the published message');
+        });
+        $this->channel->set_return_listener(
+            static function (int $replyCode, string $replyText, string $exchange = '', string $routingKey = '', mixed ...$unused): void {
+                throw new \RuntimeException("AMQP broker returned unroutable message ({$replyCode}) on {$exchange}/{$routingKey}: {$replyText}");
+            }
+        );
+        $this->channel->confirm_select();
+        $this->publisherConfirmsEnabled = true;
+    }
+
+    private function waitForPublishConfirm(): void
+    {
+        if (!$this->channel || !$this->publisherConfirmsEnabled) {
+            throw new \RuntimeException('AMQP publisher confirms are not enabled');
+        }
+        $this->channel->wait_for_pending_acks_returns(5.0);
+    }
+
+    /**
      * Publish a domain event.
      *
      * @param string $routingKey  Dot-notation routing key (e.g. 'workflow.transitioned', 'record.created')
@@ -183,7 +215,8 @@ final class QueueService
                         'timestamp'     => time(),
                     ]
                 );
-                $this->channel->basic_publish($amqpMessage, $exchange, $routingKey);
+                $this->channel->basic_publish($amqpMessage, $exchange, $routingKey, true);
+                $this->waitForPublishConfirm();
                 return true;
             } catch (\Throwable $e) {
                 @error_log("[QueueService] AMQP publish error: {$e->getMessage()}");

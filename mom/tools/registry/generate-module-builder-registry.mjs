@@ -445,6 +445,32 @@ function mergeExistingQualityReport(generatedReport) {
   };
 }
 
+function loadSchemaAuthoritySummary() {
+  const filePath = path.join(registryDir, 'schema-authority-summary.json');
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    const authority = readJson(filePath).schema_authority;
+    return authority && typeof authority === 'object' ? authority : null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function schemaAuthorityPublishabilityCheck(tableCount) {
+  const authority = loadSchemaAuthoritySummary();
+  if (!authority) return null;
+  const expected = Number(authority.table_count || 0);
+  if (!expected) return null;
+  return {
+    id: 'schema_authority_table_count_mismatch',
+    passed: expected === tableCount,
+    actual: tableCount,
+    target: expected,
+    physical_table_count: Number(authority.schema_snapshot_physical_table_count || authority.schema_snapshot_create_table_count || 0),
+    partition_table_count: Number(authority.schema_snapshot_partition_table_count || 0),
+  };
+}
+
 function loadWave1LifecycleNormalization(registryDir) {
   const filePath = path.join(registryDir, 'wave1-lifecycle-normalization.json');
   if (!fs.existsSync(filePath)) return {};
@@ -3263,7 +3289,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'formula_reference_target', passed: formulaReferenceCount === formulaKeys.length, actual: formulaReferenceCount, target: formulaKeys.length },
   ];
 
+  const schemaAuthorityCheck = schemaAuthorityPublishabilityCheck(tableNames.length);
   const publishabilityChecks = [
+    ...(schemaAuthorityCheck ? [schemaAuthorityCheck] : []),
     {
       id: 'frontend_entities_publishable',
       passed: frontendUnpublishableEntities.length === 0,
@@ -3328,6 +3356,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
       frontend_archive_isolation_entities: frontendArchiveIsolatedEntities.length,
       frontend_publishable_entities: frontendPublishableEntities.length,
       frontend_unpublishable_entities: frontendUnpublishableEntities.length,
+      schema_authority_table_count: schemaAuthorityCheck ? schemaAuthorityCheck.target : tableNames.length,
+      schema_authority_partition_table_count: schemaAuthorityCheck ? schemaAuthorityCheck.partition_table_count : 0,
+      schema_authority_physical_table_count: schemaAuthorityCheck ? schemaAuthorityCheck.physical_table_count : tableNames.length,
       attachment_contract_entities: attachmentContractEntities.length,
       comment_contract_entities: commentContractEntities.length,
       activity_contract_entities: activityContractEntities.length,
@@ -3346,6 +3377,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
         workflow_engine_bridge_blocked: workflowEngineBridgeCounts.blocked,
         unsupported_record_endpoints: unsupportedRecordEndpoints.length,
         contract_issues: contractIssues.length,
+        schema_authority_table_count_mismatch: schemaAuthorityCheck && !schemaAuthorityCheck.passed ? 1 : 0,
       },
       recommended_next_actions: publishabilityReady
         ? (frontendPartialEntities.length > 0
@@ -3355,6 +3387,9 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
           ]
           : [])
         : [
+          ...(schemaAuthorityCheck && !schemaAuthorityCheck.passed
+            ? ['Regenerate schema authority and table registry from the migration-derived schema snapshot before publication.']
+            : []),
           'Close remaining unpublishable record surfaces before rollout.',
           'Bridge persisted workflows into the workflow engine before exposing transition UX.',
           'Resolve remaining record endpoint/runtime contract gaps before publishing modules.',

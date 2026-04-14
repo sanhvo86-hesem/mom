@@ -12,7 +12,7 @@ Scope: graphics control plane, frontend SSOT, regulated UI, accessibility, relea
 - `node mom/tools/design/validate-frontend-contracts.mjs` passes with `0` errors and `14` warnings.
 - The graphics authority registry exists in `mom/data/registry/graphics-governance-registry.json`.
 - Graphics release blockers are cleared: `graphics-governance-registry.json` reports `releaseBlocked: false`, `blockerCount: 0`, and `releaseReadinessState: ready`.
-- Platform-global publishability remains `review_required` in `registry-quality-report.json` because of non-graphics registry quality debt; this benchmark does not overclaim full platform publication readiness.
+- Platform-global publishability is `ready` in `registry-quality-report.json` after the schema authority refresh. The current count model separates 773 physical storage tables, including 13 partition children, from 760 logical runtime-contract tables published through the frontend/runtime registry.
 - Graphics debt remains material: `privateCssDebtScore = 14777`, `privateCssFileCount = 75`, `tokenCoveragePercent = 29`.
 
 ## Benchmark Matrix
@@ -41,7 +41,7 @@ Validation details:
 
 - Publication truth is converged and fresh.
 - Frontend contract validation passes, but with warnings that point to legacy API alias mappings.
-- Graphics release readiness is ready, while platform-global publishability remains review-required for non-graphics quality debt.
+- Graphics release readiness and platform-global publishability are both ready under the current logical-contract count model. Physical partition children remain storage details and are not frontend/runtime contract entities.
 
 ## Must-Adopt Rules
 

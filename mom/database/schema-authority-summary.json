@@ -1,15 +1,34 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-04-14T14:56:59+00:00",
+        "declared_at": "2026-04-14T16:12:14+00:00",
         "authoritative_schema_source": "database/migrations/*.sql (001–127)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",
-        "table_count": 772,
+        "table_count": 760,
         "registry_table_count": 760,
+        "registry_contract_table_count": 760,
+        "schema_snapshot_create_table_count": 775,
+        "schema_snapshot_physical_table_count": 773,
+        "schema_snapshot_logical_table_count": 760,
+        "schema_snapshot_partition_table_count": 13,
+        "partition_tables_excluded_from_contract_registry": [
+            "audit_events_2026_q1",
+            "audit_events_2026_q2",
+            "audit_events_2026_q3",
+            "audit_events_2026_q4",
+            "audit_events_2027_q1",
+            "audit_events_default",
+            "inv_txn_2026_h1",
+            "inv_txn_2026_h2",
+            "inv_txn_2027_h1",
+            "inv_txn_default",
+            "labor_txn_2026_h1",
+            "labor_txn_2026_h2",
+            "labor_txn_default"
+        ],
         "migration_range": "001–127",
         "migration_count": 129,
-        "schema_snapshot_create_table_count": 772,
         "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–127",
         "snapshot_role": "generated_aggregate — built by build_schema_snapshot.php from migrations, for quick reference only",
         "snapshot_generator": "database/build_schema_snapshot.php",
@@ -29,8 +48,8 @@
         ],
         "generation_drift_relationship": "schema.sql MUST be regenerated from migrations after any migration change. Drift = schema.sql out of date, not a truth conflict.",
         "anti_parallel_authority_statement": "There is exactly ONE schema authority chain: migrations → schema.sql (snapshot). Blueprint and spec SQL files are design inputs, NOT parallel authorities. No table definition outside migrations is authoritative.",
-        "registry_dependency": "Full table-registry publication is intended to derive table metadata from schema.sql via generate-table-architecture.mjs. A bootstrap or partial registry is not schema authority. Registry does not modify schema; schema does not depend on registry.",
-        "registry_publication_state": "registry_bootstrap_or_partial_publication_table_count_differs_from_schema_snapshot",
+        "registry_dependency": "Full table-registry publication is intended to derive logical runtime-contract table metadata from schema.sql via generate-table-architecture.mjs. Physical partition children are storage implementation details and must not be counted as frontend/runtime contract entities. Registry does not modify schema; schema does not depend on registry.",
+        "registry_publication_state": "registry_table_count_matches_schema_snapshot",
         "drift_verifier": "tools/verify_schema_authority.py"
     }
 }

@@ -4,7 +4,9 @@ Canonical Publication Orchestrator
 ===================================
 Single entry-point that runs the full publication pipeline in sequence:
 
+  0. build_schema_snapshot.php               (migration-derived schema snapshot)
   1. generate-table-architecture.mjs         (table architecture + registry regeneration)
+  1b. refresh_schema_authority_summary.php   (logical/physical schema authority counts)
   2. generate-data-fields-registry.mjs       (data-field regeneration)
   3. generate-workflow-governance.mjs        (status/workflow regeneration)
   4. generate-module-builder-registry.mjs    (canonical generator)
@@ -24,9 +26,9 @@ Single entry-point that runs the full publication pipeline in sequence:
   18. enterprise_registry_doctor.py           (authority/probe overlay outputs)
   19. enterprise_frontend_simulator.py        (frontend/runtime simulation proof)
   20. generate_global_erp_mom_capability_audit.py (global ERP+MOM capability audit)
-  21. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
-  22. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
-  23. generate_system_contract_authority.py   (DB-derived full system contract)
+  21. refresh_data_schema_authority.php --skip-publication (workspace/authority sync)
+  22. generate_system_contract_authority.py   (DB-derived full system contract)
+  23. generate_publication_truth_summaries.py (truth/accounting summary artifacts)
   24. Generate wave/gap ledger                (wave-gap-ledger.json)
   25. Generate publication proof artifact     (_reports/publication-proof-latest.json)
 
@@ -660,10 +662,18 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
 
     step_results: dict[str, bool] = {}
 
+    step_results["schema_snapshot"] = run_step(
+        "Schema Snapshot (build_schema_snapshot.php)",
+        ["php", str(PORTAL_ROOT / "database" / "build_schema_snapshot.php")],
+        cwd=PORTAL_ROOT.parent,
+        dry_run=dry_run,
+    )
+
     # Step 1-4: Registry generators (Node.js)
     if skip_generator:
         print("\n[SKIP] Canonical generator (--skip-generator flag)")
         step_results["table_architecture_generator"] = True
+        step_results["schema_authority_summary"] = True
         step_results["data_fields_generator"] = True
         step_results["workflow_governance_generator"] = True
         step_results["canonical_generator"] = True
@@ -672,6 +682,12 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
             "Table Architecture Generator (generate-table-architecture.mjs)",
             ["node", "generate-table-architecture.mjs"],
             cwd=TOOLS_REGISTRY_DIR,
+            dry_run=dry_run,
+        )
+        step_results["schema_authority_summary"] = run_step(
+            "Schema Authority Summary (refresh_schema_authority_summary.php)",
+            ["php", str(PORTAL_ROOT / "tools" / "schema" / "refresh_schema_authority_summary.php")],
+            cwd=PORTAL_ROOT.parent,
             dry_run=dry_run,
         )
         step_results["data_fields_generator"] = run_step(
@@ -821,15 +837,7 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 20: Compact truth/accounting summaries
-    step_results["publication_truth_summaries"] = run_step(
-        "Publication Truth Summaries (generate_publication_truth_summaries.py)",
-        [sys.executable, "generate_publication_truth_summaries.py"],
-        cwd=TOOLS_REGISTRY_DIR,
-        dry_run=dry_run,
-    )
-
-    # Step 21: Synchronize workspace-design / authority artifacts to the same publication cycle
+    # Step 20: Synchronize workspace-design / authority artifacts before truth summaries.
     step_results["schema_authority_sync"] = run_step(
         "Schema Authority Sync (refresh_data_schema_authority.php --skip-publication)",
         ["php", str(PORTAL_ROOT / "tools" / "schema" / "refresh_data_schema_authority.php"), "--skip-publication"],
@@ -837,10 +845,18 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
         dry_run=dry_run,
     )
 
-    # Step 22: DB-derived full system contract artifacts
+    # Step 21: DB-derived full system contract artifacts
     step_results["system_contract_authority"] = run_step(
         "System Contract Authority (generate_system_contract_authority.py)",
         [sys.executable, "generate_system_contract_authority.py"],
+        cwd=TOOLS_REGISTRY_DIR,
+        dry_run=dry_run,
+    )
+
+    # Step 22: Compact truth/accounting summaries after diagnostics exist.
+    step_results["publication_truth_summaries"] = run_step(
+        "Publication Truth Summaries (generate_publication_truth_summaries.py)",
+        [sys.executable, "generate_publication_truth_summaries.py"],
         cwd=TOOLS_REGISTRY_DIR,
         dry_run=dry_run,
     )

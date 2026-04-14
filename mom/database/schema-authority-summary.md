@@ -1,7 +1,7 @@
 # Schema Authority Summary
 
 **Declared**: 2026-04-14
-**Scope**: Platform-global (772 tables)
+**Scope**: Platform-global (760 tables)
 **Migration range**: 001–127 (129 migrations)
 
 ## Authority Chain
@@ -24,9 +24,13 @@ No table definition outside migrations is authoritative.
 
 - `schema.sql` is a generated artifact; if it differs from migrations, regenerate it.
 - Full `table-registry.json` publication is intended to derive table metadata from `schema.sql` via `generate-table-architecture.mjs`; a bootstrap or partial registry is not schema authority.
+- Physical partition children are storage implementation details; they are counted separately and excluded from frontend/runtime contract table targets.
 - Registry does not modify schema; schema does not depend on registry.
-- Snapshot CREATE TABLE count: 772
-- Registry table count: 760
+- Snapshot CREATE TABLE statement count: 775
+- Snapshot unique physical table count: 773
+- Snapshot logical runtime-contract table count: 760
+- Snapshot partition table count: 13
+- Registry contract table count: 760
 - Drift verifier: `tools/verify_schema_authority.py`
 
 ## Verification

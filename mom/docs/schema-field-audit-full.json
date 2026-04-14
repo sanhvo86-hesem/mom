@@ -1,4 +1,10 @@
 {
+  "snapshot_status": {
+    "classification": "legacy_orphan_field_audit_input",
+    "current_release_authority": "mom/data/registry/registry-quality-report.json and mom/data/registry/publication-truth-summary.json",
+    "current_publishability": "ready",
+    "note": "This retained snapshot feeds orphan_fields.genuine classification in generate-table-architecture.mjs. Its historical publishability fields are not release authority."
+  },
   "tables": 628,
   "columns": 11115,
   "field_keys": 4014,

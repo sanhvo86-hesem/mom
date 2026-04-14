@@ -492,9 +492,10 @@ class Connection
         }
 
         $durationMs = round((microtime(true) - $startTime) * 1000, 2);
+        $safeParams = $this->redactQueryParams($params);
         $entry = [
             'sql'         => $sql,
-            'params'      => $params,
+            'params'      => $safeParams,
             'duration_ms' => $durationMs,
             'error'       => $error,
             'timestamp'   => gmdate('Y-m-d\TH:i:s\Z'),
@@ -515,6 +516,62 @@ class Connection
                 @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
             }
         }
+    }
+
+    /**
+     * @param array<int|string, mixed> $params
+     * @return array<int|string, mixed>
+     */
+    private function redactQueryParams(array $params): array
+    {
+        $safe = [];
+        foreach ($params as $key => $value) {
+            $name = strtolower(trim((string)$key, ':'));
+            if ($this->isSensitiveBindName($name)) {
+                $safe[$key] = '[redacted]';
+                continue;
+            }
+            $safe[$key] = $this->summarizeBindValue($value);
+        }
+        return $safe;
+    }
+
+    private function isSensitiveBindName(string $name): bool
+    {
+        if ($name === '') {
+            return false;
+        }
+        return (bool)preg_match('/(pass|pwd|secret|token|api[_-]?key|session|cookie|csrf|signature|otp|challenge|credential|auth|email|phone|address|ssn|tax|personal|payload_hash)/i', $name);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function summarizeBindValue(mixed $value): array
+    {
+        if ($value === null) {
+            return ['type' => 'null'];
+        }
+        if (is_bool($value)) {
+            return ['type' => 'bool', 'value' => $value];
+        }
+        if (is_int($value) || is_float($value)) {
+            return ['type' => gettype($value), 'value' => $value];
+        }
+        if (is_string($value)) {
+            return [
+                'type' => 'string',
+                'length' => strlen($value),
+                'sha256_12' => substr(hash('sha256', $value), 0, 12),
+            ];
+        }
+        if (is_array($value)) {
+            return ['type' => 'array', 'count' => count($value)];
+        }
+        if (is_object($value)) {
+            return ['type' => 'object', 'class' => get_class($value)];
+        }
+        return ['type' => gettype($value)];
     }
 
     /**

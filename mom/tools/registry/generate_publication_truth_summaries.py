@@ -28,6 +28,8 @@ ENDPOINT_PATH = REGISTRY_DIR / "endpoint-catalog.json"
 MANIFEST_PATH = REGISTRY_DIR / "registry-manifest.json"
 GRAPHICS_GOVERNANCE_PATH = REGISTRY_DIR / "graphics-governance-registry.json"
 DATA_FIELDS_INDEX_PATH = REGISTRY_DIR / "data-fields.json"
+SCHEMA_AUTHORITY_PATH = REGISTRY_DIR / "schema-authority-summary.json"
+SYSTEM_CONTRACT_DIAGNOSTICS_PATH = REGISTRY_DIR / "system-contract-diagnostics.json"
 PUBLICATION_ACCOUNTING_PATH = REGISTRY_DIR / "publication-entity-accounting.json"
 PUBLICATION_TRUTH_PATH = REGISTRY_DIR / "publication-truth-summary.json"
 SLICE_SUMMARY_PATH = REGISTRY_DIR / "foundation-governance-publication-summary.json"
@@ -116,6 +118,8 @@ def main() -> int:
     quality_report = load_json(QUALITY_REPORT_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     graphics_governance = load_optional_json(GRAPHICS_GOVERNANCE_PATH)
+    schema_authority = load_optional_json(SCHEMA_AUTHORITY_PATH)
+    system_contract_diagnostics = load_optional_json(SYSTEM_CONTRACT_DIAGNOSTICS_PATH)
     manifest = load_json(MANIFEST_PATH)
 
     tables = table_registry.get("tables", {}) if isinstance(table_registry.get("tables"), dict) else {}
@@ -127,7 +131,18 @@ def main() -> int:
     run_id = str(frontend_catalog.get("_meta", {}).get("publication_run_id") or "")
     generated_at = utc_now()
 
+    schema_authority_payload = schema_authority.get("schema_authority", {})
+    if not isinstance(schema_authority_payload, dict):
+        schema_authority_payload = {}
     schema_table_count = len(tables)
+    authoritative_logical_table_count = int(schema_authority_payload.get("table_count") or schema_table_count)
+    authoritative_physical_table_count = int(
+        schema_authority_payload.get("schema_snapshot_physical_table_count")
+        or schema_authority_payload.get("schema_snapshot_create_table_count")
+        or authoritative_logical_table_count
+    )
+    authoritative_partition_table_count = int(schema_authority_payload.get("schema_snapshot_partition_table_count") or 0)
+    schema_authority_matches_registry = authoritative_logical_table_count == schema_table_count
     frontend_entity_count = len(entities)
     ready_count = int(frontend_summary.get("ready_entities") or 0)
     partial_count = int(frontend_summary.get("partial_entities") or 0)
@@ -156,7 +171,15 @@ def main() -> int:
             "schema_tables": {
                 "count": schema_table_count,
                 "source": "table-registry.json",
-                "description": "Physical tables currently governed by the canonical table registry.",
+                "description": "Logical runtime-contract tables currently governed by the canonical table registry.",
+            },
+            "schema_authority": {
+                "logical_contract_table_count": authoritative_logical_table_count,
+                "physical_table_count": authoritative_physical_table_count,
+                "partition_table_count": authoritative_partition_table_count,
+                "matches_registry": schema_authority_matches_registry,
+                "source": "schema-authority-summary.json",
+                "description": "Migrations/schema.sql own storage truth. The frontend/runtime registry targets logical contract tables; partition children are storage implementation details.",
             },
             "frontend_entities": {
                 "count": frontend_entity_count,
@@ -202,7 +225,7 @@ def main() -> int:
     }
     dump_json(PUBLICATION_ACCOUNTING_PATH, accounting)
 
-    publishability_ready = bool(quality_summary.get("publishability_ready"))
+    publishability_ready = bool(quality_summary.get("publishability_ready")) and schema_authority_matches_registry
     review_required = int(
         quality_summary.get("publishability_review_required_entities")
         or quality_summary.get("frontend_unpublishable_entities")
@@ -210,6 +233,18 @@ def main() -> int:
     )
     publishability_failed_checks = quality_report.get("publishability", {}).get("failed_checks") or []
     publishability_blocked_by = []
+    if not schema_authority_matches_registry:
+        publishability_blocked_by.append("schema_authority_table_count_mismatch")
+    diagnostics_blockers = (
+        system_contract_diagnostics.get("blockers", [])
+        if isinstance(system_contract_diagnostics.get("blockers"), list)
+        else []
+    )
+    for blocker in diagnostics_blockers:
+        if isinstance(blocker, dict) and blocker.get("severity") == "critical":
+            blocker_id = str(blocker.get("id") or "").strip()
+            if blocker_id and blocker_id not in publishability_blocked_by:
+                publishability_blocked_by.append(blocker_id)
     graphics_blocked = graphics_release_blocked(graphics_governance)
     graphics_blockers = (
         graphics_governance.get("releaseBlockers", {}).get("blockers", [])
@@ -227,7 +262,14 @@ def main() -> int:
             "truth_model": "global_canonical_plus_slice_summary",
             "publication_run_id": run_id,
             "generated_at": generated_at,
-            "schema_authority": "table-registry.json backed by database/migrations and publication generators",
+            "schema_authority": "database/migrations -> schema.sql own storage truth; table-registry publishes logical runtime-contract tables, excluding physical partition children.",
+            "schema_authority_counts": {
+                "logical_contract_table_count": authoritative_logical_table_count,
+                "registry_contract_table_count": schema_table_count,
+                "physical_table_count": authoritative_physical_table_count,
+                "partition_table_count": authoritative_partition_table_count,
+                "matches_registry": schema_authority_matches_registry,
+            },
             "table_count": schema_table_count,
             "entity_counts": {
                 "total": frontend_entity_count,
@@ -276,7 +318,12 @@ def main() -> int:
                 "blockers": (
                     []
                     if publishability_ready
-                    else [f"{len(publishability_failed_checks)} publishability checks still fail, so platform-global publication cannot be claimed yet."]
+                    else [
+                        *([
+                            "Schema authority and table registry counts diverge, so platform-global publication cannot be claimed."
+                        ] if not schema_authority_matches_registry else []),
+                        f"{len(publishability_failed_checks)} publishability checks still fail, so platform-global publication cannot be claimed yet.",
+                    ]
                 ),
                 "anti_false_green": (
                     "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."

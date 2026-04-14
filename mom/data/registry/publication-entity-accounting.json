@@ -1,12 +1,20 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-14T14:57:01.682Z",
-    "publication_run_id": "6b44c138-a80f-4197-9680-48de7c9392ca",
+    "generated_at": "2026-04-14T16:12:18.091Z",
+    "publication_run_id": "3b73ad15-ff7a-46ed-a691-bdc9f0a63fb2",
     "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {
       "count": 760,
       "source": "table-registry.json",
-      "description": "Physical tables currently governed by the canonical table registry."
+      "description": "Logical runtime-contract tables currently governed by the canonical table registry."
+    },
+    "schema_authority": {
+      "logical_contract_table_count": 760,
+      "physical_table_count": 773,
+      "partition_table_count": 13,
+      "matches_registry": true,
+      "source": "schema-authority-summary.json",
+      "description": "Migrations/schema.sql own storage truth. The frontend/runtime registry targets logical contract tables; partition children are storage implementation details."
     },
     "frontend_entities": {
       "count": 771,

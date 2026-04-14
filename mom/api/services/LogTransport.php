@@ -234,6 +234,7 @@ final class LogTransport
         $file = $this->fallbackDir . "/logs-{$date}.jsonl";
 
         $lines = '';
+        $encodedEntryCount = 0;
         foreach ($entries as $entry) {
             // WRK-026: Validate log source field format to prevent CRLF injection
             $source = (string)($entry['source'] ?? 'unknown');
@@ -249,12 +250,17 @@ final class LogTransport
             }
 
             $encoded = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (!is_string($encoded)) {
+                @error_log('[LogTransport] Skipping entry that cannot be JSON encoded');
+                continue;
+            }
             if (str_contains($encoded, "\r")) {
                 @error_log('[LogTransport] Skipping entry with \\r in encoded JSON');
                 continue;
             }
 
             $lines .= $encoded . "\n";
+            $encodedEntryCount++;
         }
 
         if ($lines === '') {
@@ -268,7 +274,7 @@ final class LogTransport
         }
 
         $this->fallbackWriteCount++;
-        $this->fallbackEntryCount += count($entries);
+        $this->fallbackEntryCount += $encodedEntryCount;
     }
 
     /**
