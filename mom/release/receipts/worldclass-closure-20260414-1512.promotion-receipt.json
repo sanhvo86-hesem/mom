@@ -11,12 +11,12 @@
   "merge_strategy": "fast_forward_preferred_else_stop",
   "validation_evidence": {
     "focused_lint": "passed: php -l touched PHP files",
-    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest 63 tests, 321 assertions; ChangeAuthorityServiceTest 8 tests, 28 assertions",
+    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest 66 tests, 327 assertions; ChangeAuthorityServiceTest 8 tests, 28 assertions",
     "repo_boundary": "passed: P0/P1 clean, 7 P2 prompt-file warnings",
     "workflow_status_authority": "passed",
     "composer_analyse": "passed",
-    "composer_test": "passed: 430 tests, 2429 assertions, 1 skipped",
-    "full_composer_check": "passed: PHPStan clean; PHPUnit 430 tests, 2429 assertions, 1 skipped"
+    "composer_test": "passed: 433 tests, 2435 assertions, 1 skipped",
+    "full_composer_check": "passed: PHPStan clean; PHPUnit 433 tests, 2435 assertions, 1 skipped"
   },
   "closure_counts": {
     "unresolved_p0": 0,

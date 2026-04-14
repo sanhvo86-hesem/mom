@@ -63,6 +63,7 @@
     "P1 replay conflict proof covers document revision, form issuance, submission attempt, validation result, evidence record, and evidence version",
     "P1 schema validation proof covers missing required and type mismatch through validator and command service",
     "P1 e-signature ceremony requires server-issued one-time challenge consumption",
+    "P1 e-signature challenge consumption is bound to authenticated principal, session, and organization context",
     "P1 audit-pack evidence and audit summaries preserve org scope after canonical DB assembly",
     "P1 deployment authority requires exact manifest object, hash, environment, action, intent, effectivity, and effect",
     "P1 shared post-release field authority rejects wildcard object, empty fields, broad effects, and missing canonical effectivity",
