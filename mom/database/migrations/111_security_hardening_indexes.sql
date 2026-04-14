@@ -55,8 +55,15 @@ CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_item_id ON purchase_order_li
 
 -- Inventory indexes
 CREATE INDEX IF NOT EXISTS idx_inventory_locations_warehouse_id ON inventory_locations(warehouse_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_locations_item_id ON inventory_locations(item_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_locations_vendor_id ON inventory_locations(vendor_id);
+-- item_id and vendor_id only if present (inventory_locations schema varies by deployment)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='item_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_item_id ON inventory_locations(item_id)';
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='vendor_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_vendor_id ON inventory_locations(vendor_id)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_warehouse_id ON inventory_transactions(warehouse_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_location_id ON inventory_transactions(location_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_item_id ON inventory_transactions(item_id);
@@ -128,11 +135,20 @@ CREATE INDEX IF NOT EXISTS idx_cost_elements_item_id ON cost_elements(item_id);
 -- Shipment and logistics indexes
 CREATE INDEX IF NOT EXISTS idx_shipments_sales_order_id ON shipments(sales_order_id);
 CREATE INDEX IF NOT EXISTS idx_shipments_customer_id ON shipments(customer_id);
-CREATE INDEX IF NOT EXISTS idx_packages_shipment_id ON packages(shipment_id);
+-- packages table may not exist in all deployments
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_packages_shipment_id ON packages(shipment_id)';
+    END IF;
+END $$;
 
--- Compliance indexes
-CREATE INDEX IF NOT EXISTS idx_compliance_item_id ON compliance(item_id);
-CREATE INDEX IF NOT EXISTS idx_compliance_customer_id ON compliance(customer_id);
+-- Compliance indexes (compliance table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_item_id ON compliance(item_id)';
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_compliance_customer_id ON compliance(customer_id)';
+    END IF;
+END $$;
 
 -- Control plane indexes
 CREATE INDEX IF NOT EXISTS idx_governed_route_registry_org_company ON governed_route_registry(org_company_code);
