@@ -136,6 +136,9 @@ foreach (['listGovernanceAttachments', 'getGovernanceAttachment', 'createGoverna
 
 $indexPath   = $baseDir . '/api/index.php';
 $routeSource = is_file($indexPath) ? (string) file_get_contents($indexPath) : '';
+foreach (glob($baseDir . '/api/routes/*.php') ?: [] as $routePath) {
+    $routeSource .= "\n" . (string) file_get_contents($routePath);
+}
 
 $frozenRoutes = [
     '/api/v1/foundation/organizations',

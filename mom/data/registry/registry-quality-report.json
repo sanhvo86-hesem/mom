@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-14T14:17:16.715Z",
+    "generatedAt": "2026-04-14T14:48:25.628Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
@@ -11,14 +11,14 @@
   },
   "summary": {
     "endpoint_count": 4192,
-    "pack_count": 4560,
+    "pack_count": 4607,
     "relation_edge_count": 3453,
     "workflow_count": 335,
     "status_set_count": 876,
     "validation_rule_count": 48616,
     "formula_count": 1351,
     "formula_reference_count": 1351,
-    "field_context_count": 56087,
+    "field_context_count": 75075,
     "row_version_tables": 615,
     "org_scoped_tables": 575,
     "composite_pk_tables": 21,
@@ -29,8 +29,8 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 349,
-    "workflow_engine_bridge_ready": 349,
+    "transition_runtime_warnings": 344,
+    "workflow_engine_bridge_ready": 344,
     "workflow_engine_bridge_blocked": 0,
     "archive_only_tables": 697,
     "soft_delete_tables": 63,
@@ -38,8 +38,8 @@
     "workflow_lifecycle_modes": {
       "stateless": 366,
       "generic_status_only": 45,
-      "guarded_transition_runtime": 0,
-      "persisted": 349,
+      "guarded_transition_runtime": 5,
+      "persisted": 344,
       "unknown": 0
     },
     "frontend_foundation_entities": 771,
@@ -47,7 +47,7 @@
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 6,
-    "frontend_publishable_entities": 754,
+    "frontend_publishable_entities": 765,
     "frontend_unpublishable_entities": 0,
     "attachment_contract_entities": 758,
     "comment_contract_entities": 758,
@@ -140,7 +140,7 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 760,
+      "actual": 771,
       "target": 760
     },
     {
@@ -1248,13 +1248,6 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
-        "table": "audit",
-        "workflowId": "wf_audit",
-        "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine",
-        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
-      },
-      {
         "table": "audit_actions",
         "workflowId": "wf_audit_action",
         "lifecycle_mode": "persisted",
@@ -1439,6 +1432,13 @@
       {
         "table": "control_plane_command_handlers",
         "workflowId": "wf_control_plane_command_handler",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "control_plane_object_registry",
+        "workflowId": "wf_control_plane_object_registry",
         "lifecycle_mode": "persisted",
         "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."

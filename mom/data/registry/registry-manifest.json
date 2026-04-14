@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-14T14:17:16.715Z",
+    "generatedAt": "2026-04-14T14:48:25.628Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
     "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
@@ -10,33 +10,33 @@
     "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T14:17:22.742360+00:00"
   },
   "coverage": {
-    "router_actions": 4160,
-    "field_registry_actions": 4185,
-    "field_definitions": 56087,
-    "unique_field_keys": 5192,
+    "router_actions": 4192,
+    "field_registry_actions": 4920,
+    "field_definitions": 75075,
+    "unique_field_keys": 4716,
     "status_sets": 876,
     "workflow_count": 335,
     "relation_edges": 3453,
     "validation_rules": 48616,
     "formula_count": 1351,
-    "domain_pack_count": 4560,
+    "domain_pack_count": 4607,
     "scalar_record_endpoints": 4048,
     "workflow_runtime_modes": {
       "stateless": 366,
       "generic_status_only": 45,
-      "guarded_transition_runtime": 0,
-      "persisted": 349,
-      "unknown": 0
+      "guarded_transition_runtime": 5,
+      "persisted": 344,
+      "unknown": 12
     },
     "deletion_modes": {
-      "hard_delete": 0,
+      "hard_delete": 12,
       "soft_delete": 63,
       "archive_only": 697
     },
     "workflow_engine_bridge": {
-      "ready": 349,
+      "ready": 344,
       "blocked": 0,
-      "unneeded": 411
+      "unneeded": 428
     },
     "frontend_foundation": {
       "entity_count": 771,
@@ -73,8 +73,8 @@
       "medium": 0,
       "watch": 15,
       "idempotency_mentions": 22064,
-      "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_ratio": 1.0,
+      "idempotency_contract_coverage_ratio": 1,
+      "default_retry_safe_ratio": 1,
       "create_endpoints_requiring_client_key": 0,
       "generic_status_only_core_entities": 0,
       "missing_transition_contracts_for_core_entities": 0,
@@ -85,7 +85,7 @@
       "normalized_target_entities": 39,
       "normalized_target_entities_passed": 39,
       "normalized_target_entities_failed": 0,
-      "guarded_transition_runtime_entities": 0,
+      "guarded_transition_runtime_entities": 5,
       "remaining_generic_status_only_core_entities": 0,
       "schema_blockers": 0,
       "unused_candidate_entities": 0
@@ -166,8 +166,8 @@
       "medium": 0,
       "watch": 12,
       "idempotency_mentions": 22085,
-      "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_ratio": 1.0,
+      "idempotency_contract_coverage_ratio": 1,
+      "default_retry_safe_ratio": 1,
       "create_endpoints_requiring_client_key": 0,
       "compensation_markers": 5,
       "correction_markers": 2259,
@@ -220,7 +220,7 @@
   "assets": {
     "data-fields-index.json": {
       "kind": "field-registry-index",
-      "records": 4185
+      "records": 4920
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
@@ -228,7 +228,7 @@
     },
     "endpoint-catalog-index.json": {
       "kind": "endpoint-catalog-index",
-      "records": 4160
+      "records": 4192
     },
     "runtime-access-policy.json": {
       "kind": "runtime-access-policy",
@@ -236,7 +236,7 @@
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 4560
+      "records": 4607
     },
     "relation-map.json": {
       "kind": "relation-map",
