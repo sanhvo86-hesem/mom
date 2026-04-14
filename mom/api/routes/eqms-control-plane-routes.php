@@ -12,7 +12,10 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/control-plane/commands', EqmsControlPlaneController::class, 'submitCommand');
     $router->get('/api/v1/eqms/control-plane/commands/{command_id}', EqmsControlPlaneController::class, 'getCommand');
     $router->post('/api/v1/eqms/control-plane/commands/validate', EqmsControlPlaneController::class, 'validateCommand');
+    $router->post('/api/v1/eqms/documents/revisions', EqmsControlPlaneController::class, 'createDocumentRevision');
+    $router->post('/api/v1/eqms/forms/issuances', EqmsControlPlaneController::class, 'issueForm');
     $router->post('/api/v1/eqms/forms/issuance-manifest/validate', EqmsControlPlaneController::class, 'validateIssuanceManifest');
+    $router->post('/api/v1/eqms/forms/submission-attempts', EqmsControlPlaneController::class, 'recordFormSubmissionAttempt');
     $router->post('/api/v1/eqms/forms/submission-attempts/validate', EqmsControlPlaneController::class, 'validateSubmissionAttempt');
     $router->post('/api/v1/eqms/change-requests', EqmsControlPlaneController::class, 'createChangeRequest');
     $router->post('/api/v1/eqms/change-requests/transition', EqmsControlPlaneController::class, 'transitionChangeRequest');

@@ -100,6 +100,14 @@ final class CanonicalEvidenceReadService
                  ORDER BY updated_at DESC",
                 [':version_id' => $versionId],
             ),
+            'retention_locks' => $this->queryRows(
+                "SELECT *
+                 FROM retention_locks
+                 WHERE (object_type = 'evidence_record' AND object_id = :record_id)
+                    OR (object_type = 'evidence_version' AND object_id = :version_id)
+                 ORDER BY created_at DESC",
+                [':record_id' => $recordId, ':version_id' => $versionId],
+            ),
         ];
     }
 

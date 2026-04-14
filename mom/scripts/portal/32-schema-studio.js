@@ -9879,7 +9879,9 @@ window._renderSchemaStudio = function(page){
 /* Round 13 Lite fix: registry-only workspace + detail options + performance hardening */
 (function(){
   var LITE_PREFS_KEY = LS_PREFIX + 'round13-lite';
-  var LITE_SYSTEM_ONLY_ID = 'workspace';
+  var LITE_WORKSPACE_ID = 'workspace';
+  var LITE_AUTHORITY_VIEW_ID = 'system_contract_registry';
+  var LITE_SYSTEM_ONLY_ID = LITE_WORKSPACE_ID;
   var LITE_STYLE_ID = 'ss-round13-lite-style';
   var LITE_DEFAULTS = {
     tableDetailMode: 'minimal',
@@ -9925,6 +9927,36 @@ window._renderSchemaStudio = function(page){
       tableCount: tableCount,
       isSystem: true
     };
+  }
+
+  function liteRegistryEntry(){
+    var tableCount = STORE.schema && STORE.currentDesignId === LITE_AUTHORITY_VIEW_ID && STORE.schema.tables ? STORE.schema.tables.length : 0;
+    var schemaMeta = STORE.schema && STORE.schema._meta ? STORE.schema._meta : {};
+    return {
+      id: LITE_AUTHORITY_VIEW_ID,
+      name: schemaMeta.name || 'HESEM System Contract Registry',
+      displayName: schemaMeta.displayName || 'System Contract Registry',
+      version: schemaMeta.version || '1.0.0',
+      updatedAt: schemaMeta.updatedAt || schemaMeta.generated_at || '',
+      author: schemaMeta.author || 'registry',
+      tableCount: tableCount,
+      readOnly: true,
+      editable: false,
+      authorityLayer: 'system_contract_registry',
+      isSystem: true
+    };
+  }
+
+  function liteHasDesign(id){
+    return (STORE.designs || []).some(function(item){
+      return item && String(item.id || '') === id;
+    });
+  }
+
+  function litePreferredLoadId(){
+    if(liteHasDesign(LITE_AUTHORITY_VIEW_ID)) return LITE_AUTHORITY_VIEW_ID;
+    if(liteHasDesign(LITE_WORKSPACE_ID)) return LITE_WORKSPACE_ID;
+    return LITE_AUTHORITY_VIEW_ID;
   }
 
   function liteEnsureStyles(){
@@ -10271,7 +10303,15 @@ window._renderSchemaStudio = function(page){
       seen[id] = true;
       return true;
     });
-    return filtered.length ? filtered : [liteSystemEntry()];
+    if(!seen[LITE_WORKSPACE_ID]){
+      filtered.unshift(liteSystemEntry());
+      seen[LITE_WORKSPACE_ID] = true;
+    }
+    if(!seen[LITE_AUTHORITY_VIEW_ID]){
+      filtered.push(liteRegistryEntry());
+      seen[LITE_AUTHORITY_VIEW_ID] = true;
+    }
+    return filtered.length ? filtered : [liteSystemEntry(), liteRegistryEntry()];
   };
 
   var originalRenderSelector = SchemaLib.renderSelector;
@@ -10301,22 +10341,22 @@ window._renderSchemaStudio = function(page){
       STORE.designs = SchemaLib.withSystemEntries(STORE.designs);
       SchemaLib.renderSelector();
       if(!STORE.currentDesignId || !STORE.schema || !((STORE.schema.tables || []).length)){
-        return SchemaLib.load(LITE_SYSTEM_ONLY_ID).then(function(){ return result; });
+        return SchemaLib.load(litePreferredLoadId()).then(function(){ return result; });
       }
       liteRefreshRelationLabels();
       return result;
     }).catch(function(err){
-      STORE.designs = [liteSystemEntry()];
+      STORE.designs = SchemaLib.withSystemEntries([]);
       SchemaLib.renderSelector();
       if(STORE.currentDesignId !== LITE_SYSTEM_ONLY_ID || !STORE.schema || !((STORE.schema.tables || []).length)){
-        return SchemaLib.load(LITE_SYSTEM_ONLY_ID);
+        return SchemaLib.load(litePreferredLoadId());
       }
       throw err;
     });
   };
 
   SchemaLib.onSelectChange = function(value){
-    return SchemaLib.load(value || LITE_SYSTEM_ONLY_ID);
+    return SchemaLib.load(value || litePreferredLoadId());
   };
 
   SchemaLib.createNew = function(){
@@ -10342,8 +10382,8 @@ window._renderSchemaStudio = function(page){
   };
 
   SchemaLib.load = function(){
-    var requestedId = arguments.length ? arguments[0] : LITE_SYSTEM_ONLY_ID;
-    return originalLoad.apply(this, [requestedId || LITE_SYSTEM_ONLY_ID]).then(function(result){
+    var requestedId = arguments.length ? arguments[0] : litePreferredLoadId();
+    return originalLoad.apply(this, [requestedId || litePreferredLoadId()]).then(function(result){
       liteRefreshRelationLabels();
       return result;
     });
@@ -10439,7 +10479,7 @@ window._renderSchemaStudio = function(page){
     liteEnsureStyles();
     result = originalInit(page);
     if(!STORE.currentDesignId || !STORE.schema || !((STORE.schema.tables || []).length)){
-      SchemaLib.load(LITE_SYSTEM_ONLY_ID);
+      SchemaLib.load(litePreferredLoadId());
     }
     if(window.SchemaStudio){
       window.SchemaStudio.openLiteOptions = liteOpenOptions;

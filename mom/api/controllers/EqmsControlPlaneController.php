@@ -12,9 +12,11 @@ use MOM\Services\ControlPlane\EqmsFormExecutionService;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
+use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
+use MOM\Services\FormControl\FormIssuanceCommandService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Traceability\GenealogyGraphService;
@@ -187,6 +189,63 @@ final class EqmsControlPlaneController extends BaseController
             $this->error('submission_validation_failed', 409, 'Submission attempt did not pass validation.', ['validation' => $result]);
         }
         $this->success(['validation' => $result]);
+    }
+
+    public function createDocumentRevision(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['doc_code', 'doc_type', 'title', 'revision_label']);
+
+        try {
+            $this->success([
+                'document_control' => (new DocumentRevisionCommandService($this->data))->createRevision(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function issueForm(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['allocation_id', 'issued_record_id', 'frm_template_revision_id', 'frm_schema_version_id', 'delivery_mode']);
+
+        try {
+            $this->success([
+                'form_control' => (new FormIssuanceCommandService($this->data))->issue(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function recordFormSubmissionAttempt(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['frm_issuance_id', 'attempt_no']);
+
+        try {
+            $this->success([
+                'form_control' => (new FormIssuanceCommandService($this->data))->recordSubmissionAttempt(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
     }
 
     public function evaluateChangeRelease(): never

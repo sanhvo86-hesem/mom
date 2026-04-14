@@ -49,6 +49,9 @@ final class MobileWorkQueueService
     /** Valid inspection results. */
     private const INSPECTION_RESULTS = ['pass', 'fail', 'conditional'];
 
+    /** Valid mobile task completion results. */
+    private const TASK_RESULTS = ['pass', 'fail', 'partial'];
+
     // ── Construction ────────────────────────────────────────────────────────
 
     public function __construct(
@@ -240,6 +243,15 @@ final class MobileWorkQueueService
                 // Read data inside lock to prevent TOCTOU
                 $queue = $this->loadFile('work_queue');
                 $now   = $this->nowIso();
+                $completionResult = $this->normalizeTaskResult($result['result'] ?? null);
+                $qtyCompleted = $this->nonNegativeInt($result['qty_completed'] ?? 0, 'qty_completed');
+                $qtyScrap = $this->nonNegativeInt($result['qty_scrap'] ?? 0, 'qty_scrap');
+                if ($qtyScrap > $qtyCompleted && $qtyCompleted > 0) {
+                    throw new RuntimeException('qty_scrap_exceeds_completed');
+                }
+                if ($completionResult === 'pass' && $qtyScrap > 0) {
+                    throw new RuntimeException('pass_result_cannot_have_scrap');
+                }
 
                 foreach ($queue as $idx => $task) {
                     if (!is_array($task)) {
@@ -265,6 +277,11 @@ final class MobileWorkQueueService
                         'task_status'    => self::TASK_STATUSES[2],
                         'completed_at'   => $now,
                         'actual_minutes'  => $actualMinutes,
+                        'result'          => $completionResult,
+                        'qty_completed'   => $qtyCompleted,
+                        'qty_scrap'       => $qtyScrap,
+                        'quantity_completed' => $qtyCompleted,
+                        'quantity_scrap'  => $qtyScrap,
                         'notes'          => $result['notes'] ?? $task['notes'],
                         'updated_at'     => $now,
                     ]);
@@ -322,9 +339,11 @@ final class MobileWorkQueueService
             'created_at'         => $now,
         ];
 
-        $entries   = $this->loadFile('time_entries');
-        $entries[] = $entry;
-        $this->saveFile('time_entries', $entries);
+        $this->withStoreLock('time_entries', function () use ($entry): void {
+            $entries   = $this->loadFile('time_entries');
+            $entries[] = $entry;
+            $this->saveFile('time_entries', $entries);
+        });
 
         return $entry;
     }
@@ -334,65 +353,75 @@ final class MobileWorkQueueService
      */
     public function clockOut(string $entryId, ?int $qtyCompleted = null, ?int $qtyScrap = null, ?string $operatorId = null): array
     {
-        $entries = $this->loadFile('time_entries');
-        $now     = $this->nowIso();
-
-        // Find the clock_in entry
-        $clockInIdx = null;
-        foreach ($entries as $idx => $entry) {
-            if (!is_array($entry)) {
-                continue;
+        return $this->withStoreLock('time_entries', function () use ($entryId, $qtyCompleted, $qtyScrap, $operatorId): array {
+            $entries = $this->loadFile('time_entries');
+            $now     = $this->nowIso();
+            $completed = $qtyCompleted === null ? null : $this->nonNegativeInt($qtyCompleted, 'qty_completed');
+            $scrap = $qtyScrap === null ? null : $this->nonNegativeInt($qtyScrap, 'qty_scrap');
+            if ($completed !== null && $scrap !== null && $scrap > $completed && $completed > 0) {
+                throw new RuntimeException('qty_scrap_exceeds_completed');
             }
-            if (($entry['entry_id'] ?? '') === $entryId && ($entry['entry_type'] ?? '') === 'clock_in') {
-                $clockInIdx = $idx;
-                break;
+
+            // Find the clock_in entry
+            $clockInIdx = null;
+            foreach ($entries as $idx => $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+                if (($entry['entry_id'] ?? '') === $entryId && ($entry['entry_type'] ?? '') === 'clock_in') {
+                    $clockInIdx = $idx;
+                    break;
+                }
             }
-        }
 
-        if ($clockInIdx === null) {
-            throw new RuntimeException("Clock-in entry {$entryId} not found.");
-        }
+            if ($clockInIdx === null) {
+                throw new RuntimeException("Clock-in entry {$entryId} not found.");
+            }
 
-        $clockIn = $entries[$clockInIdx];
-        if ($operatorId !== null && $operatorId !== '' && ($clockIn['operator_id'] ?? '') !== $operatorId) {
-            throw new RuntimeException('forbidden_clock_out_operator');
-        }
+            $clockIn = $entries[$clockInIdx];
+            if ($operatorId !== null && $operatorId !== '' && ($clockIn['operator_id'] ?? '') !== $operatorId) {
+                throw new RuntimeException('forbidden_clock_out_operator');
+            }
+            if (($clockIn['duration_minutes'] ?? null) !== null) {
+                throw new RuntimeException('clock_in_already_closed');
+            }
 
-        // Calculate duration
-        $inTime    = new \DateTimeImmutable($clockIn['entry_time']);
-        $outTime   = new \DateTimeImmutable($now);
-        $duration  = round(($outTime->getTimestamp() - $inTime->getTimestamp()) / 60, 2);
+            // Calculate duration
+            $inTime    = new \DateTimeImmutable($clockIn['entry_time']);
+            $outTime   = new \DateTimeImmutable($now);
+            $duration  = round(($outTime->getTimestamp() - $inTime->getTimestamp()) / 60, 2);
 
-        // Update clock_in with duration
-        $entries[$clockInIdx]['duration_minutes']   = $duration;
-        $entries[$clockInIdx]['quantity_completed']  = $qtyCompleted;
-        $entries[$clockInIdx]['quantity_scrap']      = $qtyScrap;
+            // Update clock_in with duration
+            $entries[$clockInIdx]['duration_minutes']   = $duration;
+            $entries[$clockInIdx]['quantity_completed']  = $completed;
+            $entries[$clockInIdx]['quantity_scrap']      = $scrap;
 
-        // Create clock_out entry
-        $outEntry = [
-            'entry_id'           => $this->generateUuidV4(),
-            'operator_id'        => $clockIn['operator_id'],
-            'wo_number'          => $clockIn['wo_number'],
-            'jo_number'          => $clockIn['jo_number'],
-            'operation_seq'      => $clockIn['operation_seq'],
-            'machine_id'         => $clockIn['machine_id'],
-            'entry_type'         => 'clock_out',
-            'entry_time'         => $now,
-            'duration_minutes'   => $duration,
-            'labor_type'         => $clockIn['labor_type'],
-            'quantity_completed' => $qtyCompleted,
-            'quantity_scrap'     => $qtyScrap,
-            'offline_created'    => false,
-            'sync_status'        => 'synced',
-            'device_id'          => $clockIn['device_id'],
-            'metadata'           => ['clock_in_entry_id' => $entryId],
-            'created_at'         => $now,
-        ];
+            // Create clock_out entry
+            $outEntry = [
+                'entry_id'           => $this->generateUuidV4(),
+                'operator_id'        => $clockIn['operator_id'],
+                'wo_number'          => $clockIn['wo_number'],
+                'jo_number'          => $clockIn['jo_number'],
+                'operation_seq'      => $clockIn['operation_seq'],
+                'machine_id'         => $clockIn['machine_id'],
+                'entry_type'         => 'clock_out',
+                'entry_time'         => $now,
+                'duration_minutes'   => $duration,
+                'labor_type'         => $clockIn['labor_type'],
+                'quantity_completed' => $completed,
+                'quantity_scrap'     => $scrap,
+                'offline_created'    => false,
+                'sync_status'        => 'synced',
+                'device_id'          => $clockIn['device_id'],
+                'metadata'           => ['clock_in_entry_id' => $entryId],
+                'created_at'         => $now,
+            ];
 
-        $entries[] = $outEntry;
-        $this->saveFile('time_entries', $entries);
+            $entries[] = $outEntry;
+            $this->saveFile('time_entries', $entries);
 
-        return $outEntry;
+            return $outEntry;
+        });
     }
 
     // ── Inspection Captures ───────────────────────────────────────────────
@@ -446,6 +475,13 @@ final class MobileWorkQueueService
             'machine_id'         => $this->nullableString($data['machine_id'] ?? $data['equipment_id'] ?? null),
             'equipment_id'       => $this->nullableString($data['equipment_id'] ?? $data['machine_id'] ?? null),
             'work_center_id'     => $this->nullableString($data['work_center_id'] ?? null),
+            'cnc_program_id'     => $this->nullableString($data['cnc_program_id'] ?? $data['nc_program_id'] ?? null),
+            'cnc_program_revision' => $this->nullableString($data['cnc_program_revision'] ?? $data['program_revision'] ?? null),
+            'setup_sheet_id'     => $this->nullableString($data['setup_sheet_id'] ?? null),
+            'setup_sheet_revision' => $this->nullableString($data['setup_sheet_revision'] ?? null),
+            'part_revision'      => $this->nullableString($data['part_revision'] ?? null),
+            'org_plant_id'       => $this->nullableString($data['org_plant_id'] ?? $data['plant_id'] ?? null),
+            'org_site_id'        => $this->nullableString($data['org_site_id'] ?? $data['site_id'] ?? null),
             'measurements'       => $measurements,
             'overall_result'     => $overallResult,
             'photos'             => $this->normalizeStringList($data['photos'] ?? [], 'photos'),
@@ -468,16 +504,21 @@ final class MobileWorkQueueService
             $record['idempotency_key'] = 'inspection:' . hash('sha256', $record['inspection_fingerprint']);
         }
 
-        $inspections   = $this->loadFile('inspections');
-        $existing = $this->findExistingOfflineRecord($inspections, $record, 'capture_id');
-        if ($existing !== null) {
-            return $existing;
+        [$savedRecord, $isNew] = $this->withStoreLock('inspections', function () use ($record): array {
+            $inspections = $this->loadFile('inspections');
+            $existing = $this->findExistingOfflineRecord($inspections, $record, 'capture_id');
+            if ($existing !== null) {
+                return [$existing, false];
+            }
+            $inspections[] = $record;
+            $this->saveFile('inspections', $inspections);
+            return [$record, true];
+        });
+        if ($isNew) {
+            $this->shadowInspectionCapture($record);
         }
-        $inspections[] = $record;
-        $this->saveFile('inspections', $inspections);
-        $this->shadowInspectionCapture($record);
 
-        return $record;
+        return $savedRecord;
     }
 
     // ── Offline Sync ──────────────────────────────────────────────────────
@@ -557,7 +598,7 @@ final class MobileWorkQueueService
     /**
      * Resolve a sync conflict.
      */
-    public function resolveConflict(string $entryId, string $resolution): array
+    public function resolveConflict(string $entryId, string $resolution, string $operatorId, bool $allowOverride = false): array
     {
         $resolution = match ($resolution) {
             'keep_server' => 'accept_server',
@@ -565,36 +606,47 @@ final class MobileWorkQueueService
             default => $resolution,
         };
 
-        // Search across all stores
         foreach (['work_queue', 'time_entries', 'inspections'] as $store) {
-            $records = $this->loadFile($store);
-            $idKey   = $store === 'work_queue' ? 'queue_id'
-                     : ($store === 'time_entries' ? 'entry_id' : 'capture_id');
+            $resolved = $this->withStoreLock($store, function () use ($store, $entryId, $resolution, $operatorId, $allowOverride): ?array {
+                $records = $this->loadFile($store);
+                $idKey   = $store === 'work_queue' ? 'queue_id'
+                         : ($store === 'time_entries' ? 'entry_id' : 'capture_id');
 
-            foreach ($records as $idx => $rec) {
-                if (!is_array($rec)) {
-                    continue;
+                foreach ($records as $idx => $rec) {
+                    if (!is_array($rec)) {
+                        continue;
+                    }
+                    if (($rec[$idKey] ?? '') !== $entryId) {
+                        continue;
+                    }
+                    if (!$allowOverride && $this->stringValue($rec['operator_id'] ?? '') !== $operatorId) {
+                        throw new RuntimeException('forbidden_conflict_operator');
+                    }
+
+                    $now = $this->nowIso();
+
+                    if ($resolution === 'accept_server' || $resolution === 'accept_client') {
+                        $records[$idx]['sync_status'] = 'synced';
+                        $records[$idx]['updated_at'] = $now;
+                        if ($allowOverride && $this->stringValue($rec['operator_id'] ?? '') !== $operatorId) {
+                            $records[$idx]['conflict_override'] = [
+                                'resolved_by' => $operatorId,
+                                'resolved_at' => $now,
+                            ];
+                        }
+                    } else {
+                        throw new RuntimeException("Invalid resolution: {$resolution}. Use 'accept_server', 'accept_client', 'keep_server', or 'keep_local'.");
+                    }
+
+                    $this->saveFile($store, $records);
+                    return $records[$idx];
                 }
-                if (($rec[$idKey] ?? '') !== $entryId) {
-                    continue;
-                }
 
-                $now = $this->nowIso();
+                return null;
+            });
 
-                if ($resolution === 'accept_server') {
-                    // Keep server version, mark synced
-                    $records[$idx]['sync_status']  = 'synced';
-                    $records[$idx]['updated_at']   = $now;
-                } elseif ($resolution === 'accept_client') {
-                    // Client version is already in the entry, just mark synced
-                    $records[$idx]['sync_status']  = 'synced';
-                    $records[$idx]['updated_at']   = $now;
-                } else {
-                    throw new RuntimeException("Invalid resolution: {$resolution}. Use 'accept_server', 'accept_client', 'keep_server', or 'keep_local'.");
-                }
-
-                $this->saveFile($store, $records);
-                return $records[$idx];
+            if ($resolved !== null) {
+                return $resolved;
             }
         }
 
@@ -961,7 +1013,15 @@ final class MobileWorkQueueService
             'capture_type',
             'inspection_plan_id',
             'machine_id',
+            'equipment_id',
             'work_center_id',
+            'cnc_program_id',
+            'cnc_program_revision',
+            'setup_sheet_id',
+            'setup_sheet_revision',
+            'part_revision',
+            'org_plant_id',
+            'org_site_id',
             'measurements',
             'overall_result',
             'device_id',
@@ -1086,6 +1146,13 @@ final class MobileWorkQueueService
         $metadata['machine_id'] = $this->stringValue($record['machine_id'] ?? '');
         $metadata['equipment_id'] = $this->stringValue($record['equipment_id'] ?? '');
         $metadata['work_center_id'] = $this->stringValue($record['work_center_id'] ?? '');
+        $metadata['cnc_program_id'] = $this->stringValue($record['cnc_program_id'] ?? '');
+        $metadata['cnc_program_revision'] = $this->stringValue($record['cnc_program_revision'] ?? '');
+        $metadata['setup_sheet_id'] = $this->stringValue($record['setup_sheet_id'] ?? '');
+        $metadata['setup_sheet_revision'] = $this->stringValue($record['setup_sheet_revision'] ?? '');
+        $metadata['part_revision'] = $this->stringValue($record['part_revision'] ?? '');
+        $metadata['org_plant_id'] = $this->stringValue($record['org_plant_id'] ?? '');
+        $metadata['org_site_id'] = $this->stringValue($record['org_site_id'] ?? '');
         $metadata['idempotency_key'] = $this->stringValue($record['idempotency_key'] ?? '');
         $metadata['client_capture_id'] = $this->stringValue($record['client_capture_id'] ?? '');
         $metadata['inspection_fingerprint'] = $this->stringValue($record['inspection_fingerprint'] ?? '');
@@ -1260,6 +1327,28 @@ final class MobileWorkQueueService
         return (int)$value;
     }
 
+    private function nonNegativeInt(mixed $value, string $field): int
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+        if (!is_numeric($value) || (int)$value < 0) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+
+        return (int)$value;
+    }
+
+    private function normalizeTaskResult(mixed $value): string
+    {
+        $result = strtolower($this->stringValue($value));
+        if (!in_array($result, self::TASK_RESULTS, true)) {
+            throw new RuntimeException('invalid_task_result');
+        }
+
+        return $result;
+    }
+
     private function nullableFloat(mixed $value, string $field): ?float
     {
         if ($value === null || $value === '') {
@@ -1332,6 +1421,38 @@ final class MobileWorkQueueService
     {
         $file = $this->mobileDir . '/' . $name . '.json';
         return $this->readJson($file) ?? [];
+    }
+
+    /**
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    private function withStoreLock(string $name, callable $callback): mixed
+    {
+        if (!in_array($name, ['work_queue', 'time_entries', 'inspections'], true)) {
+            throw new RuntimeException('invalid_mobile_store_lock');
+        }
+
+        $lockPath = $this->mobileDir . '/' . $name . '.lock';
+        $lockHandle = @fopen($lockPath, 'c');
+        if ($lockHandle === false) {
+            throw new RuntimeException("Cannot open lock file: {$lockPath}");
+        }
+
+        try {
+            if (!flock($lockHandle, LOCK_EX)) {
+                throw new RuntimeException("Cannot acquire exclusive lock on {$name}.");
+            }
+
+            try {
+                return $callback();
+            } finally {
+                flock($lockHandle, LOCK_UN);
+            }
+        } finally {
+            fclose($lockHandle);
+        }
     }
 
     private function saveFile(string $name, array $data): void

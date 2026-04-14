@@ -167,6 +167,19 @@ class DispatchController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    private function sessionPlantScope(): string
+    {
+        return trim((string)($_SESSION['org_plant_id'] ?? $_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? ''));
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    private function targetPlantScope(array $target): string
+    {
+        return trim((string)($target['org_plant_id'] ?? $target['plant_id'] ?? ''));
+    }
+
     /**
      * @param array<string, mixed> $before
      * @param array<string, mixed> $after
@@ -487,8 +500,7 @@ class DispatchController extends BaseController
             $this->error('forbidden', 403);
         }
 
-        // P1: Verify operator belongs to the current plant/organization
-        $plantId = $_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? null;
+        $plantId = $this->sessionPlantScope();
 
         $date = $this->query('date') ?? date('Y-m-d');
         $shiftCode = $this->query('shift_code');
@@ -525,7 +537,7 @@ class DispatchController extends BaseController
                 }
                 if (($t['operator_id'] ?? '') === $operatorId && ($t['shift_date'] ?? '') === $date) {
                     // P1: Verify target belongs to current plant if plant_id is available
-                    if ($plantId !== null && ($t['plant_id'] ?? '') !== $plantId) {
+                    if ($plantId !== '' && $this->targetPlantScope($t) !== $plantId) {
                         continue;
                     }
                     $operatorFound = true;
@@ -540,7 +552,7 @@ class DispatchController extends BaseController
             }
 
             // P1: Return 403 if trying to access an operator outside current plant
-            if ($operatorId !== $currentUserId && $plantId !== null && !$operatorFound) {
+            if ($operatorId !== $currentUserId && $plantId !== '' && !$operatorFound) {
                 $this->error('forbidden', 403);
             }
 
@@ -1048,7 +1060,7 @@ class DispatchController extends BaseController
         $lockHandle = null;
 
         // PROC-001: Add mandatory plant_id/org_id filter from session
-        $sessionPlantId = (string)($_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? '');
+        $sessionPlantId = $this->sessionPlantScope();
 
         try {
             $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
@@ -1059,7 +1071,7 @@ class DispatchController extends BaseController
 
             $filtered = array_filter($targets, function ($t) use ($startDate, $endDate, $machineId, $operatorId, $status, $sessionPlantId) {
                 // PROC-001: Filter results only for targets where plant_id matches session
-                if ($sessionPlantId !== '' && ($t['plant_id'] ?? '') !== $sessionPlantId) return false;
+                if ($sessionPlantId !== '' && $this->targetPlantScope($t) !== $sessionPlantId) return false;
                 if ($startDate && ($t['shift_date'] ?? '') < $startDate) return false;
                 if ($endDate && ($t['shift_date'] ?? '') > $endDate) return false;
                 if ($machineId && ($t['machine_id'] ?? '') !== $machineId) return false;
@@ -1109,7 +1121,7 @@ class DispatchController extends BaseController
         $lockHandle = null;
 
         // PROC-001: Add mandatory plant_id/org_id filter from session
-        $sessionPlantId = (string)($_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? '');
+        $sessionPlantId = $this->sessionPlantScope();
 
         try {
             $lockHandle = $this->acquireExecutionStateLock();
@@ -1126,7 +1138,7 @@ class DispatchController extends BaseController
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === $targetId) {
                     // PROC-001: Validate ownership check BEFORE modifying
-                    if (($t['plant_id'] ?? '') !== $sessionPlantId && $sessionPlantId !== '') {
+                    if ($sessionPlantId !== '' && $this->targetPlantScope($t) !== $sessionPlantId) {
                         $this->error('forbidden', 403, 'Cannot modify dispatch targets outside your plant');
                     }
                     $previousTarget = is_array($t) ? $t : null;

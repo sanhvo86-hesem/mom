@@ -169,6 +169,9 @@ final class EvidenceFinalizationService
         }
 
         $signatureEvents = $this->persistSignatureEvents($db, $input, $package, $record, $version);
+        $retentionLock = (new RetentionLockService($db))->ensureForFinalEvidence($record, $version, [
+            'package_hash_sha256' => (string)$package['package_hash_sha256'],
+        ] + $input);
 
         $publicationState = is_array($package['manifest']['publication_state'] ?? null) ? $package['manifest']['publication_state'] : [];
         $publication = $db->queryOne(
@@ -215,6 +218,7 @@ final class EvidenceFinalizationService
             'evidence_version' => $version,
             'evidence_artifacts' => $artifacts,
             'signature_events' => $signatureEvents,
+            'retention_lock' => $retentionLock,
             'evidence_publication' => $publication,
         ];
     }

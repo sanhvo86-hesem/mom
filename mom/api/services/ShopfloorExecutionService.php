@@ -2000,6 +2000,13 @@ final class ShopfloorExecutionService
         if ($cncProgramId !== '' && $this->cncProgramKnown($cncProgramId) && !$this->cncProgramReleased($cncProgramId)) {
             $warnings[] = 'cnc_program_not_released';
         }
+        $setupSheetId = $this->stringValue($target['setup_sheet_id'] ?? '');
+        if ($setupSheetId !== '' && !$this->setupSheetKnown($setupSheetId)) {
+            $warnings[] = 'unverified_setup_sheet_reference';
+        }
+        if ($setupSheetId !== '' && $this->setupSheetKnown($setupSheetId) && !$this->setupSheetReleased($setupSheetId)) {
+            $warnings[] = 'setup_sheet_not_released';
+        }
         if ($this->stringValue($target['inspection_plan_id'] ?? '') === '') {
             $warnings[] = 'missing_inspection_plan_reference';
         } elseif (!$this->inspectionPlanKnown($this->stringValue($target['inspection_plan_id'] ?? ''))) {
@@ -2023,6 +2030,15 @@ final class ShopfloorExecutionService
             $blockers[] = 'unverified_cnc_program_reference';
         } elseif (!$this->cncProgramReleased($cncProgramId)) {
             $blockers[] = 'cnc_program_not_released';
+        }
+
+        $setupSheetId = $this->stringValue($target['setup_sheet_id'] ?? '');
+        if ($setupSheetId === '') {
+            $blockers[] = 'missing_setup_sheet_reference';
+        } elseif (!$this->setupSheetKnown($setupSheetId)) {
+            $blockers[] = 'unverified_setup_sheet_reference';
+        } elseif (!$this->setupSheetReleased($setupSheetId)) {
+            $blockers[] = 'setup_sheet_not_released';
         }
 
         $inspectionPlanId = $this->stringValue($target['inspection_plan_id'] ?? '');
@@ -2058,17 +2074,17 @@ final class ShopfloorExecutionService
     {
         $file = $this->dataDir . '/cnc-programs/programs.json';
         if (!is_file($file)) {
-            return ['status' => 'released'];
+            return null;
         }
 
         $raw = @file_get_contents($file);
         if (!is_string($raw) || trim($raw) === '') {
-            return ['status' => 'released'];
+            return null;
         }
 
         $programs = json_decode($raw, true);
         if (!is_array($programs) || $programs === []) {
-            return ['status' => 'released'];
+            return null;
         }
 
         foreach ($programs as $program) {
@@ -2079,6 +2095,57 @@ final class ShopfloorExecutionService
                 if ($this->stringValue($program[$field] ?? '') === $programId) {
                     /** @var array<string, mixed> $program */
                     return $program;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function setupSheetKnown(string $setupSheetId): bool
+    {
+        return $this->setupSheetRecord($setupSheetId) !== null;
+    }
+
+    private function setupSheetReleased(string $setupSheetId): bool
+    {
+        $sheet = $this->setupSheetRecord($setupSheetId);
+        if ($sheet === null) {
+            return false;
+        }
+        $status = strtolower($this->stringValue($sheet['status'] ?? $sheet['approval_status'] ?? 'released'));
+
+        return in_array($status, ['released', 'approved', 'active'], true);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function setupSheetRecord(string $setupSheetId): ?array
+    {
+        $file = $this->dataDir . '/cnc-programs/setup-sheets.json';
+        if (!is_file($file)) {
+            return null;
+        }
+
+        $raw = @file_get_contents($file);
+        if (!is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+
+        $sheets = json_decode($raw, true);
+        if (!is_array($sheets) || $sheets === []) {
+            return null;
+        }
+
+        foreach ($sheets as $sheet) {
+            if (!is_array($sheet)) {
+                continue;
+            }
+            foreach (['id', 'setup_sheet_id', 'sheet_id', 'setup_number', 'title'] as $field) {
+                if ($this->stringValue($sheet[$field] ?? '') === $setupSheetId) {
+                    /** @var array<string, mixed> $sheet */
+                    return $sheet;
                 }
             }
         }
