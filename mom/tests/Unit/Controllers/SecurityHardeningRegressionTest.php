@@ -70,6 +70,42 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertStringContainsString('content_sha256', $source);
     }
 
+    public function testAiReadSurfacesRequireScopedRolesAndScopedMetrics(): void
+    {
+        $controller = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+        $pipeline = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/AiPredictionPipeline.php');
+
+        $this->assertMatchesRegularExpression('/public function aiModelList\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function aiDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertStringContainsString('$canViewModelInternals = $this->userHasAnyRole($user, admin_roles())', $controller);
+        $this->assertStringContainsString('unset($row[\'training_data_source\'], $row[\'config\'], $row[\'metadata\']);', $controller);
+        $this->assertStringContainsString('p.plant_id = :mtta_plant_id', $pipeline);
+    }
+
+    public function testEvidenceIdempotencyUsesPlatformKeyContract(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/EvidenceController.php');
+
+        $this->assertStringContainsString("strlen(\$text) < 16 || strlen(\$text) > 128", $source);
+        $this->assertStringContainsString("preg_match('/^[A-Za-z0-9._\\-]+$/', \$text)", $source);
+        $this->assertStringNotContainsString("preg_match('/^[A-Za-z0-9._:\\-]+$/', \$text)", $source);
+    }
+
+    public function testExceptionAndOrderGenericUpdatesRejectUngovernedFields(): void
+    {
+        $exceptions = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/ExceptionController.php');
+        $orders = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/OrderController.php');
+
+        $this->assertStringContainsString('private const GOVERNED_EXCEPTION_FIELDS', $exceptions);
+        $this->assertStringContainsString('private function guardedExceptionUpdate', $exceptions);
+        $this->assertStringContainsString('exception_transition_required', $exceptions);
+        $this->assertStringContainsString('unknown_exception_update_field', $exceptions);
+        $this->assertStringContainsString('private const JO_UPDATE_FIELDS', $orders);
+        $this->assertStringContainsString('private const WO_UPDATE_FIELDS', $orders);
+        $this->assertStringContainsString('private function guardedOrderChanges', $orders);
+        $this->assertStringContainsString('unknown_order_update_field', $orders);
+    }
+
     public function testOrderScheduleCompatibilityAliasesUseExistingSchedulingController(): void
     {
         $routes = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/routes/operations-routes.php');
