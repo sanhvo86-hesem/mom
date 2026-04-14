@@ -113,6 +113,25 @@ class MobileController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function mobileConflictOverrideRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'cnc_workshop_manager',
+                'quality_manager',
+                'qa_manager',
+                'supervisor',
+                'shift_leader',
+            ]
+        )));
+    }
+
+    /**
      * @return void
      */
     private function requireMobileAccess(array $user): void
@@ -562,13 +581,16 @@ class MobileController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $allowOverride = $this->userHasAnyRole($user, $this->mobileOverviewRoles());
-            $result = $this->mobileService()->resolveConflict($entryId, $resolution, $employeeId, $allowOverride);
+            $allowOverride = $this->userHasAnyRole($user, $this->mobileConflictOverrideRoles());
+            $overrideReason = trim((string)($body['override_reason'] ?? $body['reason_code'] ?? ''));
+            $result = $this->mobileService()->resolveConflict($entryId, $resolution, $employeeId, $allowOverride, $overrideReason);
 
             $this->auditLog('mobile_resolve_conflict', [
                 'entry_id'    => $entryId,
                 'employee_id' => $employeeId,
                 'resolution'  => $resolution,
+                'override'    => $allowOverride ? '1' : '0',
+                'override_reason' => $overrideReason,
             ], $userId);
 
             $this->success(['resolved' => $result]);
