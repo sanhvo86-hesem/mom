@@ -88,6 +88,9 @@ return static function (Router $router, string $dataDir): void {
         'admin_metadata_studio_summary'    => [AdminMetadataStudioController::class, 'getSummary'],
         'admin_metadata_studio_detail'     => [AdminMetadataStudioController::class, 'getDetail'],
         'admin_metadata_studio_save'       => [AdminMetadataStudioController::class, 'saveDetail'],
+        // Data layer config (was unreachable — previously only in legacy api.php switch)
+        'admin_data_layer_config_get'      => [AdminDataLayerController::class, 'getConfig'],
+        'admin_data_layer_config_save'     => [AdminDataLayerController::class, 'saveConfig'],
     ]);
     
     // Dictionary

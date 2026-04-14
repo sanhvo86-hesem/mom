@@ -400,4 +400,13 @@ return static function (Router $router, string $dataDir): void {
         'energy_per_part'       => [EnergyController::class, 'getPerPartEnergy'],
         'energy_cost_trend'     => [EnergyController::class, 'getCostTrend'],
     ]);
+
+    // MES Observability & Manual Runtime (was unreachable — previously only in legacy api.php switch)
+    $router->actions([
+        'mes_shadow_status'                => [AdminDataLayerController::class, 'shadowStatus'],
+        'epicor_transport_health'          => [AdminDataLayerController::class, 'epicorTransportHealth'],
+        'mes_connector_snapshot'           => [AdminDataLayerController::class, 'connectorSnapshot'],
+        'manual_runtime_summary'           => [ManualRuntimeController::class, 'summary'],
+        'manual_runtime_endpoint_contracts'=> [ManualRuntimeController::class, 'endpointContracts'],
+    ]);
 };
