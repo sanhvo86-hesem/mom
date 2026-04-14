@@ -42,7 +42,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "analyse": "phpstan analyse",
+        "analyse": "php -d memory_limit=1G vendor/bin/phpstan analyse",
         "check": [
             "@analyse",
             "@test"
