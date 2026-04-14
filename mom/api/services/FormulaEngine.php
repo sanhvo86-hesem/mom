@@ -575,7 +575,7 @@ final class FormulaEngine
         return $this->toNumber($left) / $r;
     }
 
-    private function safeMod(mixed $left, mixed $right): float|int
+    private function safeMod(mixed $left, mixed $right): int
     {
         $r = $this->toNumber($right);
         if ($r == 0) {
@@ -753,7 +753,6 @@ final class FormulaEngine
                     '<'         => is_numeric($actual) && $actual < (float) $expected,
                     '>='        => is_numeric($actual) && $actual >= (float) $expected,
                     '<='        => is_numeric($actual) && $actual <= (float) $expected,
-                    default     => false,
                 };
 
                 if (!$match) {

@@ -19,7 +19,6 @@ final class ApqpPpapService
 {
     private readonly string $dataDir;
     private readonly string $apqpDir;
-    private ?object $db = null;
 
     /** APQP phases in order. */
     private const PHASES = [
@@ -123,7 +122,7 @@ final class ApqpPpapService
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->apqpDir = $this->dataDir . '/apqp';
-        $this->db      = $db;
+        unset($db);
 
         foreach (['projects', 'gates', 'ppap'] as $sub) {
             $dir = $this->apqpDir . '/' . $sub;
@@ -138,21 +137,19 @@ final class ApqpPpapService
         }
     }
 
-    // ── Shadow Write ────────────────────────────────────────────────────────
+    // ── Validation ──────────────────────────────────────────────────────────
 
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    /**
+     * @param array<int, string> $allowed
+     */
+    private function enumValue(array $allowed, mixed $value, string $field, string $default): string
     {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[ApqpPpapService] Shadow write to {$table} failed: " . $e->getMessage());
+        $candidate = strtolower(trim((string)($value ?? $default)));
+        if (!in_array($candidate, $allowed, true)) {
+            throw new RuntimeException("Invalid {$field}: {$candidate}");
         }
+
+        return $candidate;
     }
 
     // ── Projects ──────────────────────────────────────────────────────────
@@ -179,12 +176,12 @@ final class ApqpPpapService
             'customer_id'           => $data['customer_id'] ?? null,
             'npi_id'                => $data['npi_id'] ?? null,
             'current_phase'         => 'phase1_planning',
-            'overall_status'        => 'not_started',
+            'overall_status'        => $this->enumValue(self::GATE_STATUSES, 'not_started', 'overall_status', 'not_started'),
             'project_lead'          => $data['project_lead'] ?? $userId,
             'team_members'          => $data['team_members'] ?? [],
             'target_ppap_date'      => $data['target_ppap_date'] ?? null,
             'actual_ppap_date'      => null,
-            'ppap_submission_level' => $data['ppap_submission_level'] ?? 'level3',
+            'ppap_submission_level' => $this->enumValue(self::PPAP_LEVELS, $data['ppap_submission_level'] ?? null, 'ppap_submission_level', 'level3'),
             'linked_fmea_id'        => $data['linked_fmea_id'] ?? null,
             'linked_control_plan_id' => $data['linked_control_plan_id'] ?? null,
             'linked_so_number'      => $data['linked_so_number'] ?? null,
@@ -309,7 +306,7 @@ final class ApqpPpapService
             'phase'               => $phase,
             'gate_number'         => $gateNumber,
             'review_date'         => $reviewData['review_date'] ?? date('Y-m-d'),
-            'status'              => 'pending_review',
+            'status'              => $this->enumValue(self::GATE_STATUSES, 'pending_review', 'status', 'pending_review'),
             'reviewers'           => $reviewData['reviewers'] ?? [],
             'deliverables_status' => $reviewData['deliverables_status'] ?? new \stdClass(),
             'conditions'          => $reviewData['conditions'] ?? null,
@@ -351,7 +348,7 @@ final class ApqpPpapService
                 continue;
             }
 
-            $status = $conditions !== null ? 'conditional' : 'approved';
+            $status = $this->enumValue(self::GATE_STATUSES, $conditions !== null ? 'conditional' : 'approved', 'status', 'approved');
 
             $gates[$idx] = array_merge($gate, [
                 'status'      => $status,
@@ -388,7 +385,7 @@ final class ApqpPpapService
             }
 
             $gates[$idx] = array_merge($gate, [
-                'status'          => 'rejected',
+                'status'          => $this->enumValue(self::GATE_STATUSES, 'rejected', 'status', 'rejected'),
                 'conditions'      => $reason,
                 'rejected_by'     => $userId,
                 'rejected_at'     => $now,
@@ -412,7 +409,7 @@ final class ApqpPpapService
 
         $now          = $this->nowIso();
         $submissionId = $this->generateUuidV4();
-        $level        = $data['submission_level'] ?? $project['ppap_submission_level'] ?? 'level3';
+        $level        = $this->enumValue(self::PPAP_LEVELS, $data['submission_level'] ?? $project['ppap_submission_level'] ?? null, 'submission_level', 'level3');
 
         // Initialize elements structure
         $requiredElements = self::PPAP_LEVEL_REQUIREMENTS[$level] ?? self::PPAP_LEVEL_REQUIREMENTS['level3'];

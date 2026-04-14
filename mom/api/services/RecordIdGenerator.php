@@ -31,9 +31,6 @@ final class RecordIdGenerator
     /** Directory where JSON counter files live. */
     private readonly string $counterDir;
 
-    /** Cached registry data (loaded once). */
-    private ?array $registry = null;
-
     /** Cached record_types sub-tree. */
     private ?array $recordTypes = null;
 
@@ -425,7 +422,6 @@ final class RecordIdGenerator
             throw new RuntimeException("Invalid document type registry format");
         }
 
-        $this->registry = $data;
         $this->recordTypes = $data['record_types'];
 
         return $this->recordTypes;

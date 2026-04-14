@@ -19,7 +19,6 @@ use RuntimeException;
  */
 final class MesEvidenceBridge
 {
-    private readonly string $dataDir;
     private readonly EvidenceVaultService $vault;
 
     private const SYSTEM_USER = 'system/mes-bridge';
@@ -32,7 +31,7 @@ final class MesEvidenceBridge
      */
     public function __construct(string $dataDir, EvidenceVaultService $vault)
     {
-        $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
+        unset($dataDir);
         $this->vault   = $vault;
     }
 

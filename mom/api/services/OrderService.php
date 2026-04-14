@@ -77,6 +77,10 @@ final class OrderService
     {
         $orders = array_values((array)($this->readStore()['sales_orders'] ?? []));
         $result = [];
+        $statusFilter = strtolower(trim((string)($filters['status'] ?? '')));
+        if ($statusFilter !== '' && !in_array($statusFilter, self::SO_STATUSES, true)) {
+            return [];
+        }
 
         foreach ($orders as $so) {
             if (!is_array($so)) {
@@ -90,7 +94,7 @@ final class OrderService
             $customerPoId = strtolower((string)($so['customer_po_id'] ?? ''));
             $orderDate = (string)($so['order_date'] ?? '');
 
-            if (isset($filters['status']) && $filters['status'] !== '' && $status !== strtolower($filters['status'])) {
+            if ($statusFilter !== '' && $status !== $statusFilter) {
                 continue;
             }
 
@@ -158,6 +162,10 @@ final class OrderService
     {
         $jobs = array_values((array)($this->readStore()['job_orders'] ?? []));
         $result = [];
+        $statusFilter = strtolower(trim((string)($filters['status'] ?? '')));
+        if ($statusFilter !== '' && !in_array($statusFilter, self::JO_STATUSES, true)) {
+            return [];
+        }
 
         foreach ($jobs as $jo) {
             if (!is_array($jo)) {
@@ -168,8 +176,8 @@ final class OrderService
                 continue;
             }
 
-            if (isset($filters['status']) && $filters['status'] !== '') {
-                if (strtolower((string)($jo['status'] ?? '')) !== strtolower($filters['status'])) {
+            if ($statusFilter !== '') {
+                if (strtolower((string)($jo['status'] ?? '')) !== $statusFilter) {
                     continue;
                 }
             }
@@ -424,7 +432,7 @@ final class OrderService
 
         usort(
             $recentCompleted,
-            static fn(array $a, array $b): int => strcmp((string)($b['completed_at'] ?? ''), (string)($a['completed_at'] ?? '')),
+            static fn(array $a, array $b): int => strcmp((string)$b['completed_at'], (string)$a['completed_at']),
         );
 
         return [
@@ -533,6 +541,11 @@ final class OrderService
         if ($this->findOrderRecord($store, 'jo', $joNumber) !== null) {
             throw new RuntimeException("Job Order {$joNumber} already exists.");
         }
+        $joStatus = strtolower(trim((string)($jo['status'] ?? 'planned')));
+        if (!in_array($joStatus, self::JO_STATUSES, true)) {
+            throw new RuntimeException("Invalid Job Order status: {$joStatus}.");
+        }
+        $jo['status'] = $joStatus;
         $parentSo = $this->findOrderRecord($store, 'so', $soNumber);
         if ($parentSo === null) {
             throw new RuntimeException("Parent Sales Order {$soNumber} not found.");
@@ -575,6 +588,11 @@ final class OrderService
         if ($this->findOrderRecord($store, 'jo', $joNumber) === null) {
             throw new RuntimeException("Parent Job Order {$joNumber} not found.");
         }
+        $woStatus = strtolower(trim((string)($wo['status'] ?? 'scheduled')));
+        if (!in_array($woStatus, self::WO_STATUSES, true)) {
+            throw new RuntimeException("Invalid Work Order status: {$woStatus}.");
+        }
+        $wo['status'] = $woStatus;
 
         $this->syncCounterWithNumber($store, 'wo', $woNumber);
         $store['work_orders'][] = $wo;

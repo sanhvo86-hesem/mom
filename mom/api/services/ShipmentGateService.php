@@ -20,7 +20,6 @@ final class ShipmentGateService
 {
     private readonly string $dataDir;
     private readonly string $confDir;
-    private ?object $db = null;
     private ?OperationalOverrideService $overrideService = null;
 
     /** Roles permitted to invoke shipment readiness checks. */
@@ -61,24 +60,7 @@ final class ShipmentGateService
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->confDir = rtrim(str_replace('\\', '/', $confDir), '/');
-        $this->db      = $db;
-    }
-
-    // ── Shadow Write ────────────────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[ShipmentGateService] Shadow write to {$table} failed: " . $e->getMessage());
-        }
+        unset($db);
     }
 
     private function overrideService(): OperationalOverrideService
@@ -790,30 +772,6 @@ final class ShipmentGateService
         return is_array($decoded) ? $decoded : null;
     }
 
-    private function writeJson(string $path, array $data): void
-    {
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
-        }
-        $tmp  = $path . '.tmp.' . getmypid();
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        if ($json === false) {
-            throw new RuntimeException('Failed to encode JSON for ' . basename($path));
-        }
-        if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
-            @unlink($tmp);
-            throw new RuntimeException('Cannot write ' . basename($path));
-        }
-        if (file_exists($path)) {
-            @unlink($path);
-        }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new RuntimeException('Failed to atomically replace ' . basename($path));
-        }
-    }
-
     private function nowIso(): string
     {
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
@@ -901,8 +859,4 @@ final class ShipmentGateService
         return $mapped;
     }
 
-    private function saveOverrides(string $soNumber, array $overrides): void
-    {
-        $this->writeJson($this->overridesPath($soNumber), $overrides);
-    }
 }

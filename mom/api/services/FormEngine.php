@@ -139,12 +139,13 @@ final class FormEngine
      */
     public function __construct(
         private readonly string $dataDir,
-        private readonly string $rootDir,
+        string $rootDir,
         private readonly ?Connection $db = null,
         private readonly ?RecordIdGenerator $idGen = null,
         private readonly ?WorkflowEngine $workflow = null,
         private readonly ?AuditTrail $auditTrail = null,
     ) {
+        unset($rootDir);
         $base = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->entriesDir = $base . '/online-forms/entries';
         $this->schemaDir = $base . '/online-forms/schemas';
@@ -594,7 +595,7 @@ final class FormEngine
 
         // Skip further validation if empty and not required
         if ($value === null || $value === '') {
-            return [];
+            return $errors;
         }
 
         // Type-specific validation
@@ -922,6 +923,14 @@ final class FormEngine
                         'File "%s" exceeds max size (%d MB)',
                         $fileName,
                         self::MAX_ATTACHMENT_BYTES / (1024 * 1024),
+                    );
+                    continue;
+                }
+                if ($mimeType !== '' && !in_array($mimeType, self::ALLOWED_MIME_TYPES, true)) {
+                    $data['_attachment_errors'][] = sprintf(
+                        'File "%s" has unsupported MIME type "%s"',
+                        $fileName,
+                        $mimeType,
                     );
                     continue;
                 }

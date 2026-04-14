@@ -154,9 +154,6 @@ final class QuoteService
                 continue;
             }
 
-            // Do not allow status change via update
-            unset($filtered['status']);
-
             $quotes[$idx] = array_merge($rec, $filtered, [
                 'updated_at' => $now,
                 'updated_by' => $userId,

@@ -94,9 +94,6 @@ final class ReportGenerator
     /** Workflow states directory. */
     private readonly string $stateDir;
 
-    /** Form entries directory. */
-    private readonly string $entriesDir;
-
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -106,15 +103,15 @@ final class ReportGenerator
      * @param AuditTrail|null      $auditTrail Optional audit trail.
      */
     public function __construct(
-        private readonly string $dataDir,
+        string $dataDir,
         private readonly ?Connection $db = null,
-        private readonly ?WorkflowEngine $workflow = null,
-        private readonly ?AuditTrail $auditTrail = null,
+        ?WorkflowEngine $workflow = null,
+        ?AuditTrail $auditTrail = null,
     ) {
+        unset($workflow, $auditTrail);
         $base = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->cacheDir = $base . '/report-cache';
         $this->stateDir = $base . '/workflow-states';
-        $this->entriesDir = $base . '/online-forms/entries';
 
         if (!is_dir($this->cacheDir)) {
             @mkdir($this->cacheDir, 0775, true);

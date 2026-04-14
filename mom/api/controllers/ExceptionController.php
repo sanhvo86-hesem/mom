@@ -715,9 +715,6 @@ class ExceptionController extends BaseController
                 $comment,
                 $expectedUpdatedAt
             );
-            if ($updated === null) {
-                $this->error('transition_failed', 400, "Cannot transition {$type}/{$id} to {$toStatus}.");
-            }
 
             $this->auditLog('exception_transition', [
                 'type'      => $type,

@@ -150,8 +150,9 @@ class Connection
         if ($this->pdo === null) {
             $this->connect();
         }
-        /** @var PDO $this->pdo */
-        return $this->pdo;
+        /** @var PDO $pdo */
+        $pdo = $this->pdo;
+        return $pdo;
     }
 
     /**

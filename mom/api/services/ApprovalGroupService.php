@@ -17,14 +17,6 @@ use MOM\Database\DataLayer;
  */
 final class ApprovalGroupService
 {
-    /**
-     * Workflow-engine bridge readiness flag.
-     *
-     * Set to true now that ApprovalWorkflowAdapter validates transitions
-     * before canonical persistence.
-     */
-    private const WORKFLOW_BRIDGE_READY = true;
-
     private DataLayer $data;
     private FoundationGovernanceService $fgService;
     private ?ApprovalWorkflowAdapter $workflowAdapter = null;
@@ -314,10 +306,6 @@ final class ApprovalGroupService
      */
     public function decide(string $approvalGroupId, string $ifMatchEtag, array $payload, string $actorPartyId): array
     {
-        if (!self::WORKFLOW_BRIDGE_READY) {
-            throw new \RuntimeException('bridge_not_ready', 409);
-        }
-
         $current = $this->getApprovalGroup($approvalGroupId);
         if ($current === null) {
             throw new \RuntimeException('resource_not_found', 404);

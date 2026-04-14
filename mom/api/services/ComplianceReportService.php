@@ -36,8 +36,6 @@ final class ComplianceReportService
     /** @var array<string, mixed> Cached templates. */
     private array $templates = [];
 
-    private ?object $db = null;
-
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -50,7 +48,7 @@ final class ComplianceReportService
         $this->confDir      = rtrim(str_replace('\\', '/', $confDir), '/');
         $this->reportsDir   = $this->dataDir . '/reports/generated';
         $this->templateFile = $this->confDir . '/compliance_report_templates.json';
-        $this->db           = $db;
+        unset($db);
 
         // Ensure directories exist
         foreach ([
@@ -676,7 +674,7 @@ final class ComplianceReportService
      * Aggregate all supplier metrics for a period (summary across vendors).
      *
      * @param string $period Period key.
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     private function _aggregateAllSupplierMetrics(string $period): array
     {

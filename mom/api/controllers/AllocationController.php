@@ -6,7 +6,6 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Controllers\BaseController;
 use MOM\Services\AllocationService;
-use MOM\Services\RecordIdGenerator;
 use Throwable;
 
 /**
@@ -24,9 +23,6 @@ class AllocationController extends BaseController
     /** @var AllocationService|null Lazy-loaded allocation service. */
     private ?AllocationService $allocationService = null;
 
-    /** @var RecordIdGenerator|null Lazy-loaded ID generator. */
-    private ?RecordIdGenerator $idGenerator = null;
-
     // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -40,19 +36,6 @@ class AllocationController extends BaseController
             $this->allocationService = new AllocationService($this->dataDir, $this->data);
         }
         return $this->allocationService;
-    }
-
-    /**
-     * Get or create the RecordIdGenerator instance.
-     *
-     * @return RecordIdGenerator
-     */
-    private function idGenerator(): RecordIdGenerator
-    {
-        if ($this->idGenerator === null) {
-            $this->idGenerator = new RecordIdGenerator($this->dataDir);
-        }
-        return $this->idGenerator;
     }
 
     /**

@@ -20,7 +20,6 @@ final class ExceptionService
 {
     private readonly string $dataDir;
     private readonly string $exceptionsDir;
-    private ?object $db = null;
 
     private const TYPES = ['complaints', 'mrb', 'deviations', 'concessions'];
 
@@ -79,7 +78,7 @@ final class ExceptionService
     {
         $this->dataDir       = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->exceptionsDir = $this->dataDir . '/exceptions';
-        $this->db            = $db;
+        unset($db);
 
         foreach (self::TYPES as $type) {
             $dir = $this->exceptionsDir . '/' . $type;
@@ -92,23 +91,6 @@ final class ExceptionService
         $countersDir = $this->dataDir . '/counters';
         if (!is_dir($countersDir)) {
             @mkdir($countersDir, 0775, true);
-        }
-    }
-
-    // ── Shadow Write ────────────────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[ExceptionService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 
@@ -466,7 +448,7 @@ final class ExceptionService
                     'window_days'  => $daysBack,
                     'records'      => array_map(fn($r) => [
                         'id'   => $r['id'] ?? '',
-                        'type' => $r['_exception_type'] ?? '',
+                        'type' => $r['_exception_type'],
                         'date' => $r['created_at'] ?? '',
                     ], $group),
                 ];
@@ -482,7 +464,7 @@ final class ExceptionService
                     'window_days'  => $daysBack,
                     'records'      => array_map(fn($r) => [
                         'id'   => $r['id'] ?? '',
-                        'type' => $r['_exception_type'] ?? '',
+                        'type' => $r['_exception_type'],
                         'date' => $r['created_at'] ?? '',
                     ], $group),
                 ];

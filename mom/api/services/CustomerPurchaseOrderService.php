@@ -138,6 +138,9 @@ final class CustomerPurchaseOrderService
             'updated_at' => $now,
             'updated_by' => $userId,
         ];
+        if (!in_array((string)$record['po_status'], self::STATUSES, true)) {
+            throw new RuntimeException('Invalid customer purchase order status.');
+        }
         $record = $this->withTotals($record);
 
         $store['customer_purchase_orders'][] = $record;
@@ -168,6 +171,9 @@ final class CustomerPurchaseOrderService
         $record = (array)$store['customer_purchase_orders'][$index];
         $record = $this->refreshSalesOrderStatuses($record);
         $currentStatus = (string)($record['po_status'] ?? 'received');
+        if (!in_array($currentStatus, self::STATUSES, true)) {
+            throw new RuntimeException("Invalid customer purchase order status: {$currentStatus}.");
+        }
         $reason = trim((string)($context['reason'] ?? ''));
 
         $targetStatus = match ($transition) {
@@ -180,6 +186,9 @@ final class CustomerPurchaseOrderService
         if ($targetStatus === '') {
             throw new RuntimeException('Unsupported customer purchase order transition.');
         }
+        if (!in_array($targetStatus, self::STATUSES, true)) {
+            throw new RuntimeException("Invalid target customer purchase order status: {$targetStatus}.");
+        }
 
         $allowed = [
             'received' => ['acknowledge', 'confirm', 'cancel'],
@@ -188,7 +197,7 @@ final class CustomerPurchaseOrderService
             'closed' => [],
             'cancelled' => [],
         ];
-        if (!in_array($transition, $allowed[$currentStatus] ?? [], true)) {
+        if (!in_array($transition, $allowed[$currentStatus], true)) {
             throw new RuntimeException("Transition {$transition} is not allowed from {$currentStatus}.");
         }
 
@@ -569,6 +578,9 @@ final class CustomerPurchaseOrderService
         }
 
         $status = strtolower(trim((string)($filters['status'] ?? '')));
+        if ($status !== '' && !in_array($status, self::STATUSES, true)) {
+            return false;
+        }
         if ($status !== '' && strtolower((string)($record['po_status'] ?? '')) !== $status) {
             return false;
         }

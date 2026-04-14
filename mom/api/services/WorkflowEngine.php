@@ -1059,7 +1059,7 @@ final class WorkflowEngine
         return 'clear_due_date';
     }
 
-    private function actionNotifyRole(array $record, string $role, string $targetState): ?string
+    private function actionNotifyRole(array $record, string $role, string $targetState): string
     {
         // Role notification is handled via the notification service's role-lookup
         // For now, log the intent

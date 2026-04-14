@@ -28,7 +28,6 @@ final class QualityIntegrationService
 {
     private readonly string $dataDir;
     private readonly string $qualityDir;
-    private ?object $db = null;
 
     /** Threshold: number of similar NCRs to auto-trigger CAPA. */
     private const AUTO_CAPA_NCR_COUNT     = 3;
@@ -72,30 +71,13 @@ final class QualityIntegrationService
     {
         $this->dataDir    = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->qualityDir = $this->dataDir . '/quality';
-        $this->db         = $db;
+        unset($db);
 
         foreach (['ncr', 'capa', 'fai', 'trend', 'jidoka', 'copq'] as $sub) {
             $dir = $this->qualityDir . '/' . $sub;
             if (!is_dir($dir)) {
                 @mkdir($dir, 0775, true);
             }
-        }
-    }
-
-    // ── Shadow Write ────────────────────────────────────────────────────────
-
-    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
-    {
-        if ($this->db === null) return;
-        try {
-            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $this->db->execute(
-                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
-                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
-                [':id' => $idValue, ':meta' => $meta]
-            );
-        } catch (\Throwable $e) {
-            error_log("[QualityIntegrationService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 
@@ -352,6 +334,11 @@ final class QualityIntegrationService
         if (!empty($context['corrective_action_change'])) {
             $triggers[] = ['type' => 'corrective_action_change', 'fai_type' => 'partial', 'reason' => 'Process changed due to corrective action implementation'];
         }
+
+        $triggers = array_values(array_filter(
+            $triggers,
+            static fn(array $trigger): bool => in_array((string)$trigger['type'], self::FAI_TRIGGERS, true),
+        ));
 
         $faiRequired = !empty($triggers);
         $faiType = 'none';

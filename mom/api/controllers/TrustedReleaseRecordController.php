@@ -207,7 +207,7 @@ final class TrustedReleaseRecordController extends BaseController
      * @param array<string, mixed> $packet
      * @param array<string, mixed> $user
      * @return void
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     private function verifyPacketScope(array $packet, array $user): void
     {
@@ -236,4 +236,3 @@ final class TrustedReleaseRecordController extends BaseController
         }
     }
 }
-

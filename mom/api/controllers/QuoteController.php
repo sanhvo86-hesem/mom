@@ -376,9 +376,6 @@ class QuoteController extends BaseController
 
         try {
             $updated = $this->quoteService()->update($id, $body, $userId);
-            if ($updated === null) {
-                $this->error('not_found', 404, "Quote {$id} not found.");
-            }
 
             $this->auditLog('quote_update', [
                 'quote_id' => $id,
@@ -432,9 +429,6 @@ class QuoteController extends BaseController
             }
 
             $updated = $this->quoteService()->transition($id, $toStatus, $userId, $comment);
-            if ($updated === null) {
-                $this->error('transition_failed', 400, "Cannot transition quote {$id} to {$toStatus}.");
-            }
 
             $this->auditLog('quote_transition', [
                 'quote_id'  => $id,

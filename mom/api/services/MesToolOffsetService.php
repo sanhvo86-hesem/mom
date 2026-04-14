@@ -27,7 +27,7 @@ final class MesToolOffsetService
 
         // MES-005 FIX: Use cryptographically secure random_bytes instead of weak md5(microtime())
         $presetId = (string)($payload['preset_id'] ?? null);
-        if ($presetId === '' || $presetId === null) {
+        if ($presetId === '') {
             $presetId = 'TOP-' . gmdate('YmdHis') . '-' . bin2hex(random_bytes(8));
         }
 

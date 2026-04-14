@@ -150,7 +150,8 @@ class QueryBuilder
      */
     public function where(string $column, mixed $operator = null, mixed $value = null): self
     {
-        return $this->addWhere('AND', $column, $operator, $value);
+        $this->addWhere('AND', $column, $operator, $value);
+        return $this;
     }
 
     /**
@@ -163,7 +164,8 @@ class QueryBuilder
      */
     public function orWhere(string $column, mixed $operator = null, mixed $value = null): self
     {
-        return $this->addWhere('OR', $column, $operator, $value);
+        $this->addWhere('OR', $column, $operator, $value);
+        return $this;
     }
 
     /**

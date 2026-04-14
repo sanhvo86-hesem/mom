@@ -39,12 +39,6 @@ final class PredictiveQualityEngine
     /** @var string Absolute path to predictions index file. */
     private readonly string $predictionsFile;
 
-    /** @var string Absolute path to models registry file. */
-    private readonly string $modelsFile;
-
-    /** @var string Absolute path to anomaly rules file. */
-    private readonly string $rulesFile;
-
     private ?object $db = null;
 
     // ── Construction ────────────────────────────────────────────────────────
@@ -57,8 +51,6 @@ final class PredictiveQualityEngine
         $this->dataDir        = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->predictionsDir = $this->dataDir . '/predictions';
         $this->predictionsFile = $this->predictionsDir . '/predictions.json';
-        $this->modelsFile     = $this->predictionsDir . '/models.json';
-        $this->rulesFile      = $this->predictionsDir . '/anomaly_rules.json';
         $this->db             = $db;
 
         // Ensure directories exist
@@ -68,6 +60,19 @@ final class PredictiveQualityEngine
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
+
+    /**
+     * @param array<int, string> $allowed
+     */
+    private function enumValue(array $allowed, mixed $value, string $field, string $default): string
+    {
+        $candidate = strtolower(trim((string)($value ?? $default)));
+        if (!in_array($candidate, $allowed, true)) {
+            throw new RuntimeException("Invalid {$field}: {$candidate}");
+        }
+
+        return $candidate;
+    }
 
     /**
      * Analyse SPC data for a given item/characteristic using Western Electric
@@ -503,9 +508,9 @@ final class PredictiveQualityEngine
 
         $prediction = [
             'prediction_id'    => $this->generateUuidV4(),
-            'prediction_type'  => $data['prediction_type'] ?? 'spc_anomaly',
-            'severity'         => $data['severity'] ?? 'info',
-            'status'           => 'active',
+            'prediction_type'  => $this->enumValue(self::TYPES, $data['prediction_type'] ?? null, 'prediction_type', 'spc_anomaly'),
+            'severity'         => $this->enumValue(self::SEVERITIES, $data['severity'] ?? null, 'severity', 'info'),
+            'status'           => $this->enumValue(self::STATUSES, 'active', 'status', 'active'),
             'confidence_score' => $data['confidence_score'] ?? null,
             'item_id'          => $data['item_id'] ?? null,
             'job_number'       => $data['job_number'] ?? null,

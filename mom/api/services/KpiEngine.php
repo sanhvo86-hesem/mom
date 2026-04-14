@@ -492,7 +492,7 @@ final class KpiEngine
 
             $seen = [];
             foreach ($rows as $row) {
-                $code = $row['metric_code'];
+                $code = (string)$row['metric_code'];
                 if (isset($seen[$code])) {
                     continue; // only latest per metric
                 }
@@ -504,10 +504,11 @@ final class KpiEngine
 
                 $alerts[] = [
                     'metric_code' => $code,
-                    'kpi_name'    => $row['kpi_name'],
+                    'kpi_name'    => (string)$row['kpi_name'],
                     'value'       => round($actual, 4),
                     'target'      => round($target, 4),
-                    'status'      => $row['kpi_status'],
+                    'status'      => (string)$row['kpi_status'],
+                    'gap'         => $gap,
                     'gap_pct'     => $gap,
                 ];
             }

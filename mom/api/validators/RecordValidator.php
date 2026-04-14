@@ -86,7 +86,7 @@ class RecordValidator
         $this->checkDepartmentPermission($type, $department);
 
         // Check required fields
-        $requiredFields = self::REQUIRED_FIELDS[$type] ?? [];
+        $requiredFields = self::REQUIRED_FIELDS[$type];
         foreach ($requiredFields as $field) {
             $value = $data[$field] ?? null;
             if ($value === null || (is_string($value) && trim($value) === '')) {

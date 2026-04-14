@@ -153,35 +153,13 @@ final class VpsController extends BaseController
         $listType = '';
         $listItems = [];
 
-        $flushParagraph = function () use (&$html, &$paragraph, $currentAssetPath): void {
-            if ($paragraph === []) {
-                return;
-            }
-            $text = trim(implode(' ', $paragraph));
-            if ($text !== '') {
-                $html .= '<p>' . $this->renderMarkdownInline($text, $currentAssetPath) . '</p>';
-            }
-            $paragraph = [];
-        };
-
-        $flushList = function () use (&$html, &$listType, &$listItems): void {
-            if ($listType === '' || $listItems === []) {
-                $listType = '';
-                $listItems = [];
-                return;
-            }
-            $html .= '<' . $listType . '>' . implode('', $listItems) . '</' . $listType . '>';
-            $listType = '';
-            $listItems = [];
-        };
-
         foreach (preg_split("/\r\n|\n|\r/", $source) ?: [] as $line) {
             $line = (string)$line;
             $trimmed = trim($line);
 
             if (preg_match('/^```([A-Za-z0-9_-]+)?\s*$/', $trimmed, $match) === 1) {
-                $flushParagraph();
-                $flushList();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
+                $this->flushMarkdownList($html, $listType, $listItems);
                 if ($inCode) {
                     $langClass = $codeLang !== '' ? ' data-lang="' . $this->esc($codeLang) . '"' : '';
                     $html .= '<pre class="vps-asset-code"' . $langClass . '><code>' . $this->esc(implode("\n", $codeLines)) . '</code></pre>';
@@ -202,30 +180,30 @@ final class VpsController extends BaseController
             }
 
             if ($trimmed === '') {
-                $flushParagraph();
-                $flushList();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
+                $this->flushMarkdownList($html, $listType, $listItems);
                 continue;
             }
 
             if (preg_match('/^(#{1,6})\s+(.*)$/', $trimmed, $match) === 1) {
-                $flushParagraph();
-                $flushList();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
+                $this->flushMarkdownList($html, $listType, $listItems);
                 $level = strlen($match[1]);
                 $html .= '<h' . $level . '>' . $this->renderMarkdownInline($match[2], $currentAssetPath) . '</h' . $level . '>';
                 continue;
             }
 
             if (preg_match('/^>\s?(.*)$/', $trimmed, $match) === 1) {
-                $flushParagraph();
-                $flushList();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
+                $this->flushMarkdownList($html, $listType, $listItems);
                 $html .= '<blockquote><p>' . $this->renderMarkdownInline($match[1], $currentAssetPath) . '</p></blockquote>';
                 continue;
             }
 
             if (preg_match('/^[-*]\s+(.*)$/', $trimmed, $match) === 1) {
-                $flushParagraph();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
                 if ($listType !== 'ul') {
-                    $flushList();
+                    $this->flushMarkdownList($html, $listType, $listItems);
                     $listType = 'ul';
                 }
                 $listItems[] = '<li>' . $this->renderMarkdownInline($match[1], $currentAssetPath) . '</li>';
@@ -233,9 +211,9 @@ final class VpsController extends BaseController
             }
 
             if (preg_match('/^\d+\.\s+(.*)$/', $trimmed, $match) === 1) {
-                $flushParagraph();
+                $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
                 if ($listType !== 'ol') {
-                    $flushList();
+                    $this->flushMarkdownList($html, $listType, $listItems);
                     $listType = 'ol';
                 }
                 $listItems[] = '<li>' . $this->renderMarkdownInline($match[1], $currentAssetPath) . '</li>';
@@ -245,8 +223,8 @@ final class VpsController extends BaseController
             $paragraph[] = $trimmed;
         }
 
-        $flushParagraph();
-        $flushList();
+        $this->flushMarkdownParagraph($html, $paragraph, $currentAssetPath);
+        $this->flushMarkdownList($html, $listType, $listItems);
 
         if ($inCode) {
             $langClass = $codeLang !== '' ? ' data-lang="' . $this->esc($codeLang) . '"' : '';
@@ -254,6 +232,34 @@ final class VpsController extends BaseController
         }
 
         return $html !== '' ? $html : '<p>No content.</p>';
+    }
+
+    /**
+     * @param array<int, string> $paragraph
+     */
+    private function flushMarkdownParagraph(string &$html, array &$paragraph, string $currentAssetPath): void
+    {
+        if ($paragraph === []) {
+            return;
+        }
+
+        $text = trim(implode(' ', $paragraph));
+        if ($text !== '') {
+            $html .= '<p>' . $this->renderMarkdownInline($text, $currentAssetPath) . '</p>';
+        }
+        $paragraph = [];
+    }
+
+    /**
+     * @param array<int, string> $listItems
+     */
+    private function flushMarkdownList(string &$html, string &$listType, array &$listItems): void
+    {
+        if ($listType !== '' && $listItems !== []) {
+            $html .= '<' . $listType . '>' . implode('', $listItems) . '</' . $listType . '>';
+        }
+        $listType = '';
+        $listItems = [];
     }
 
     private function renderAssetViewer(array $asset, string $content): string
