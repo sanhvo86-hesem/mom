@@ -5,6 +5,8 @@
 > **Phần 1 (Prompt 1-6)**: Tạo tài liệu v4.0 + mã nguồn. Prompt 1→2→3 song song. Prompt 4 sau. Prompt 5+6 song song.
 > **Phần 2 (Prompt 7-12)**: Nâng cấp v4.0→v4.1. Prompt 7+8+9 song song. Prompt 10 trước, Prompt 11 sau Prompt 10. Prompt 12 cuối.
 
+> **Historical artifact only**: File này lưu prompt triển khai cũ, không phải authority hiện hành. Authority hiện hành là Standard 36 + authority HTML + backend graphics-governance contracts. Mọi đoạn nói `template-centric`, `hesem_layout_templates` hoặc localStorage template registry chỉ còn là ví dụ legacy bị thay thế; production template/governance authority phải đi qua backend graphics authority.
+
 ---
 
 ## QUY TẮC CHUNG CHO TẤT CẢ PROMPTS
@@ -79,7 +81,7 @@ Links đến tất cả sections:
 #### PHẦN 4: Executive Summary (~100 dòng HTML)
 - 8 stat-cards trong grid hiển thị: 150+ Templates, 34 Modules, 90 Block Types, 12 Nhóm, 20 Visual Themes, 8 Zone Types, 181 CSS Tokens, 139 Components
 - Info box giải thích: Template là gì, tại sao là trung tâm, cách hoạt động
-- So sánh Before/After (comparison-grid): Trước (8 tab rời rạc, không có template) vs Sau (6 tab, template-centric)
+- So sánh Before/After (comparison-grid): Trước (8 tab rời rạc, không có template) vs Sau (6 tab graphics-control-plane; template là một authority artifact, không phải browser authority)
 
 #### PHẦN 5: Kiến trúc hệ thống (~150 dòng HTML)
 - **Token Cascade** — 5 lớp: System CSS → Admin Config → Template Override → Zone Override → User Preference
@@ -761,7 +763,7 @@ Giống v3 nhưng mở rộng:
 - 5 lớp cascade với diagram
 - Override priority rules
 - Merge strategy
-- localStorage keys
+- localStorage keys, chỉ cho user preference / preview cache / unsaved draft cache; không làm production authority
 
 ### PHẦN G: Governance & Roadmap (~100 dòng HTML)
 - Operating model
@@ -891,7 +893,7 @@ var _selectedTemplate = null;
 var _templateView = 'gallery'; // 'gallery' | 'detail' | 'editor'
 
 function getTemplates() { ... } // filter + sort
-function getModuleTemplateBinding() { ... } // load from localStorage
+function getModuleTemplateBinding() { ... } // legacy note only; production binding must load from backend graphics authority
 
 // ═══ PHẦN 7: TAB 1 — TEMPLATE STUDIO ═══
 function renderTemplates() {
@@ -1016,10 +1018,11 @@ Cập nhật các file hỗ trợ để tích hợp với Template System mới.
 
 **Thêm vào cuối** (trước `})()`):
 ```javascript
-// ═══ TEMPLATE STORAGE ═══
-var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates';
+// ═══ LEGACY TEMPLATE PREVIEW CACHE ONLY — NOT PRODUCTION AUTHORITY ═══
+var TEMPLATE_STORAGE_KEY = 'hesem_layout_templates'; // forbidden legacy authority key; bridge/migrate only
 
 HmTheme.getTemplates = function() {
+  // Historical snippet only. Current code must call backend graphics governance services.
   try { var raw = localStorage.getItem(TEMPLATE_STORAGE_KEY); return raw ? JSON.parse(raw) : {}; }
   catch(e) { return {}; }
 };

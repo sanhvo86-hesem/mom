@@ -37,6 +37,7 @@ var DEFAULTS = {
 var _adminConfig = null;
 var _adminConfigVersion = '';
 var _adminConfigEtag = '';
+var _adminConfigAuthorityState = 'unknown';
 var _userPrefs = null;
 var _previewPrefs = null;
 var _templateStore = null;
@@ -84,11 +85,13 @@ function _loadAdminConfig(callback){
         _adminConfig = (resp && resp.data) ? resp.data : (resp && resp.config) ? resp.config : (_adminConfig || {});
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = String((resp && resp.etag) || '');
+        _adminConfigAuthorityState = 'backend-attested';
         if(callback) callback(_adminConfig);
         return;
       } catch(e){}
     }
-    /* Fallback: direct JSON file */
+    /* Fallback: direct JSON file for runtime preview/bootstrap only. This state
+       is not publish/apply authority and must be surfaced by admin UI. */
     var xhr2 = new XMLHttpRequest();
     xhr2.open('GET', 'data/config/design-system-config.json', true);
     xhr2.onreadystatechange = function(){
@@ -97,7 +100,8 @@ function _loadAdminConfig(callback){
         _adminConfig = JSON.parse(xhr2.responseText) || (_adminConfig || {});
         _adminConfigVersion = String((_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = '';
-      } catch(e){ _adminConfig = _adminConfig || {}; }
+        _adminConfigAuthorityState = 'backend-unavailable-preview-only';
+      } catch(e){ _adminConfig = _adminConfig || {}; _adminConfigAuthorityState = 'backend-unavailable-preview-only'; }
       if(callback) callback(_adminConfig);
     };
     xhr2.send();
@@ -761,6 +765,8 @@ function getAdminConfigAuthority(){
     cacheKey: ADMIN_STORAGE_KEY,
     cacheRole: 'legacy-disabled',
     localStorageAuthority: false,
+    authorityState: _adminConfigAuthorityState,
+    releaseEligible: _adminConfigAuthorityState === 'backend-attested',
     version: _adminConfigVersion,
     etag: _adminConfigEtag
   };
@@ -782,6 +788,7 @@ function saveAdminConfig(config, callback){
         _adminConfig = nextConfig || config;
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
         _adminConfigEtag = String((resp && resp.etag) || _adminConfigEtag || '');
+        _adminConfigAuthorityState = 'backend-attested';
         _previewPrefs = {};
       } catch(e){}
     }

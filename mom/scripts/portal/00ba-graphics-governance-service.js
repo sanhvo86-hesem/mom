@@ -1394,16 +1394,22 @@ function normalizeBackendImpact(remote, change, localImpact){
 
 function analyzeImpact(change, seedTemplates){
   var localImpact = markChange(change, seedTemplates || []);
-  var endpointName = impactEndpointForChange(_state.lastChange);
+  var requestChange = clone(_state.lastChange);
+  var endpointName = impactEndpointForChange(requestChange);
   if(!endpointName) return Promise.resolve(localImpact);
-  return callEndpoint(endpointName, impactPayloadForChange(_state.lastChange)).then(function(remote){
-    _state.lastImpact = normalizeBackendImpact(remote, _state.lastChange, localImpact);
+  return callEndpoint(endpointName, impactPayloadForChange(requestChange)).then(function(remote){
+    var attestedImpact = normalizeBackendImpact(remote, requestChange, localImpact);
+    if(_state.lastChange && _state.lastChange.changeId && requestChange.changeId && _state.lastChange.changeId !== requestChange.changeId){
+      recordAudit('graphics-impact-analyzed', requestChange.target, 'backend-attested-stale-ignored', { impactId:attestedImpact.impactId || '' });
+      return clone(attestedImpact);
+    }
+    _state.lastImpact = attestedImpact;
     _state.changeSet = buildChangeSet(_state.lastImpact);
     _state.releaseDashboard = buildReleaseDashboard();
-    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'backend-attested', { impactId:_state.lastImpact.impactId || '' });
+    recordAudit('graphics-impact-analyzed', requestChange.target, 'backend-attested', { impactId:_state.lastImpact.impactId || '' });
     return clone(_state.lastImpact);
   }).catch(function(){
-    recordAudit('graphics-impact-analyzed', _state.lastChange.target, 'frontend-preview-fallback-blocked');
+    recordAudit('graphics-impact-analyzed', requestChange.target, 'frontend-preview-fallback-blocked');
     return clone(localImpact);
   });
 }

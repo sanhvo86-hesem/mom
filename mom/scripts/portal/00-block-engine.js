@@ -4064,14 +4064,18 @@ function invalidateCache(action){
 
 /* ── Module Schema CRUD ──────────────────────────────────────────────── */
 
+function _allowModuleSchemaPreviewCache(){
+  return !!(window.HmBlockEngineAllowPreviewCache || (document.body && document.body.getAttribute('data-hm-module-schema-preview-cache') === 'enabled'));
+}
+
 function loadModuleSchema(moduleId){
-  // Try API first
+  // Production schema authority is API-only. localStorage keys below are fenced
+  // to explicit builder preview cache so they cannot become release authority.
   return _api('module_schema_get', {id:moduleId}, 'GET').then(function(resp){
     if(resp && resp.schema) return resp.schema;
-    // Fallback to localStorage
-    return _loadSchemaLocal(moduleId);
+    return _allowModuleSchemaPreviewCache() ? _loadSchemaLocal(moduleId) : null;
   }).catch(function(){
-    return _loadSchemaLocal(moduleId);
+    return _allowModuleSchemaPreviewCache() ? _loadSchemaLocal(moduleId) : null;
   });
 }
 
@@ -4080,6 +4084,7 @@ function _schemaStorageKeys(moduleId){
 }
 
 function _loadSchemaLocal(moduleId){
+  if(!_allowModuleSchemaPreviewCache()) return null;
   try{
     var keys = _schemaStorageKeys(moduleId);
     var raw = null;
@@ -4093,6 +4098,7 @@ function _loadSchemaLocal(moduleId){
 }
 
 function _writeSchemaLocal(moduleId, schema){
+  if(!_allowModuleSchemaPreviewCache()) return;
   try{
     _schemaStorageKeys(moduleId).forEach(function(key){
       localStorage.setItem(key, JSON.stringify(schema));
@@ -4109,15 +4115,13 @@ function _clearSchemaLocal(moduleId){
 }
 
 function _legacySaveModuleSchemaRaw(moduleId, schema){
-  // Save to localStorage first (backup)
-  try{ localStorage.setItem('hm_schema_'+moduleId, JSON.stringify(schema)); }catch(e){}
-  // Then persist via API
   return _api('module_schema_save', { moduleId:moduleId, schema:schema }, 'POST').then(function(resp){
     toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return resp;
   }).catch(function(err){
-    toast(_t('Lưu thất bại, đã lưu cục bộ','Save failed, saved locally'), 'warning');
-    return { ok:false, local:true };
+    _writeSchemaLocal(moduleId, schema);
+    toast(_t('Lưu thất bại, chỉ lưu nháp xem trước nếu chế độ preview được bật','Save failed; preview draft only when preview cache is enabled'), 'warning');
+    return { ok:false, localPreviewOnly:_allowModuleSchemaPreviewCache(), releaseEligible:false };
   });
 }
 
@@ -4134,7 +4138,6 @@ function saveModuleSchema(moduleId, schema){
   var nowIso = new Date().toISOString();
   savedSchema.moduleId = savedSchema.moduleId || moduleId;
   if(!savedSchema.updatedAt) savedSchema.updatedAt = nowIso;
-  _writeSchemaLocal(moduleId, savedSchema);
   if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
     window.HmModuleRouter.clearCache(moduleId);
   }
@@ -4152,8 +4155,9 @@ function saveModuleSchema(moduleId, schema){
     toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return { ok:true, saved:true, version:savedSchema.version, updatedAt:savedSchema.updatedAt, updatedBy:savedSchema.updatedBy || '', schema:savedSchema };
   }).catch(function(err){
-    toast(_t('Lưu thất bại, đã lưu cục bộ','Save failed, saved locally'), 'warning');
-    return { ok:false, local:true, error: err && err.message ? err.message : '', schema:savedSchema };
+    _writeSchemaLocal(moduleId, savedSchema);
+    toast(_t('Lưu thất bại, chỉ lưu nháp xem trước nếu chế độ preview được bật','Save failed; preview draft only when preview cache is enabled'), 'warning');
+    return { ok:false, localPreviewOnly:_allowModuleSchemaPreviewCache(), releaseEligible:false, error: err && err.message ? err.message : '', schema:savedSchema };
   });
 }
 
@@ -4199,6 +4203,8 @@ function createNewModule(config){
 /* ── User Override Persistence ────────────────────────────────────────── */
 
 function _loadUserOverrides(moduleId){
+  // User layout overrides are personal view preferences only; they are not
+  // module schema, template, or graphics authority.
   try{
     var raw = localStorage.getItem('hesem_layout_'+moduleId);
     return raw ? JSON.parse(raw) : null;

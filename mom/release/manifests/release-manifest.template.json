@@ -9,8 +9,30 @@
     "repo_boundary_scan_clean",
     "migration_lint_passed",
     "targeted_tests_passed",
-    "authority_map_reviewed"
+    "authority_map_reviewed",
+    "graphics_compliance_matrix_attested",
+    "graphics_release_blockers_clear"
   ],
+  "graphics_governance": {
+    "change_set_ref": "",
+    "template_registry_version": "",
+    "template_registry_checksum": "",
+    "compliance_matrix_ref": "",
+    "impact_report_ref": "",
+    "drift_report_ref": "",
+    "waiver_refs": [],
+    "rollout_decision_ref": "",
+    "rollback_plan_ref": "",
+    "runtime_beacon_ref": "",
+    "release_blockers_ref": ""
+  },
+  "evidence_bundle": {
+    "affected_modules_snapshot_ref": "",
+    "graphics_compliance_snapshot_ref": "",
+    "debt_drift_snapshot_ref": "",
+    "rollout_verification_ref": "",
+    "post_apply_verification_ref": ""
+  },
   "signature_event_id": null,
   "approver": null,
   "notes": ""
