@@ -332,7 +332,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $db->queryOneRows[] = [
             'evidence_publication_id' => '00000000-0000-0000-0000-000000000012',
             'publication_state' => 'published',
-            'metadata' => '{"change_order_state":"released"}',
+            'metadata' => '{"change_order_state":"released","source_change_order_id":"00000000-0000-0000-0000-000000000013"}',
         ];
 
         $result = (new PublicationMonitorService($db))->queueAction(
@@ -347,6 +347,30 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('publication.supersede', $db->executeCalls[0]['params'][':handler_key']);
         $payload = json_decode((string)$db->executeCalls[0]['params'][':payload'], true);
         $this->assertSame('superseded', $payload['target_publication_state']);
+    }
+
+    public function testPublicationQueuedActionPersistsAttemptReceiptAndStateTransition(): void
+    {
+        $db = new PublicationActionFakeDb();
+
+        $result = (new PublicationMonitorService($db))->processQueuedAction([
+            'outbox_event_id' => '00000000-0000-0000-0000-000000000099',
+            'aggregate_id' => '00000000-0000-0000-0000-000000000012',
+            'payload' => json_encode([
+                'action' => 'withdraw',
+                'reason' => 'Released change order withdrew publication.',
+                'actor_ref' => 'qa.user',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->assertSame('withdrawn', $result['target_state']);
+        $this->assertSame('succeeded', $result['attempt']['attempt_state']);
+        $this->assertSame('external_index', $result['receipt']['target_type']);
+        $this->assertSame(1, $db->transactionCount);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('INSERT INTO publication_attempts', $sql);
+        $this->assertStringContainsString('INSERT INTO publication_receipts', $sql);
+        $this->assertStringContainsString('UPDATE evidence_publications', $sql);
     }
 
 
@@ -552,16 +576,16 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'frm_schema_version_id' => $schemaVersionId,
             'delivery_mode' => 'offline_excel',
             'issued_to_ref' => 'operator-1',
-            'carrier_manifest_hash_sha256' => str_repeat('b', 64),
             'idempotency_key' => 'form-issuance-100',
         ], 'qa-1');
 
         $attempt = (new FormIssuanceCommandService($db))->recordSubmissionAttempt([
             'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
             'attempt_no' => 1,
+            'carrier_manifest' => $issuance['issuance_manifest'],
             'attempt_state' => 'valid',
             'submitted_by_ref' => 'operator-1',
-            'original_hash_sha256' => str_repeat('c', 64),
+            'original_artifact_hash_sha256' => str_repeat('c', 64),
             'canonical_payload_hash_sha256' => str_repeat('d', 64),
             'parsed_payload' => ['result' => 'pass'],
             'validation_errors' => [[
@@ -577,16 +601,40 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('FRMISS-1', $issuance['issuance']['frm_issuance_id']);
         $this->assertSame('FRMATT-1', $attempt['submission_attempt']['frm_submission_attempt_id']);
         $this->assertSame('passed', $attempt['validation_result']['validation_state']);
-        $this->assertNotEmpty($attempt['validation_errors']);
+        $this->assertSame('passed', $attempt['server_validation']['validation_state']);
+        $this->assertEmpty($attempt['validation_errors']);
         $this->assertNotEmpty($attempt['duplicate_detection_fingerprints']);
         $sql = $db->combinedSql();
+        $this->assertStringContainsString('FROM frm_template_revisions', $sql);
+        $this->assertStringContainsString('FROM frm_schema_versions', $sql);
+        $this->assertStringContainsString('FROM frm_issuances fi', $sql);
         $this->assertStringContainsString('frm_issuances', $sql);
         $this->assertStringContainsString('frm_submission_attempts', $sql);
         $this->assertStringContainsString('submission_validation_results', $sql);
-        $this->assertStringContainsString('submission_validation_errors', $sql);
         $this->assertStringContainsString('duplicate_detection_fingerprints', $sql);
         $this->assertStringNotContainsString('form_schemas', $sql);
         $this->assertStringNotContainsString('record_counters.json', $sql);
+    }
+
+    public function testFormSubmissionAttemptCannotBeCallerForcedToPassedValidation(): void
+    {
+        $db = new DocumentFormControlFakeDb();
+
+        $attempt = (new FormIssuanceCommandService($db))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 2,
+            'attempt_state' => 'valid',
+            'validation_state' => 'passed',
+            'submitted_by_ref' => 'operator-1',
+            'original_hash_sha256' => 'not-a-sha',
+            'canonical_payload_hash_sha256' => 'also-not-a-sha',
+            'parsed_payload' => ['result' => 'pass'],
+        ], 'operator-1');
+
+        $this->assertSame('invalid', $attempt['submission_attempt']['attempt_state']);
+        $this->assertSame('failed', $attempt['validation_result']['validation_state']);
+        $this->assertSame('original_artifact_hash_required', $attempt['server_validation']['errors'][0]['error_code']);
+        $this->assertNotSame('passed', $db->lastValidationState);
     }
 
     public function testEffectivityGateBlocksReleaseForOpenConflictAndIncompleteTraining(): void
@@ -678,6 +726,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertArrayHasKey('hash_signature_manifest', $result['package']['artifacts']);
             $this->assertCount(1, $result['canonical']['signature_events']);
             $this->assertSame('RET-1', $result['canonical']['retention_lock']['retention_lock_id']);
+            $this->assertSame(1, $db->transactionCount);
             $this->assertTrue($db->sawSignatureEventInsert);
             $this->assertTrue($db->sawRetentionLockInsert);
             $this->assertGreaterThanOrEqual(9, count($db->queryOneCalls));
@@ -690,6 +739,36 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertStringNotContainsString('metadata = evidence_versions.metadata || EXCLUDED.metadata', $sql);
             $this->assertStringNotContainsString('metadata = evidence_artifacts.metadata || EXCLUDED.metadata', $sql);
             $this->assertStringNotContainsString('metadata = signature_events.metadata || EXCLUDED.metadata', $sql);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationDetectsSignatureIdempotencyCollision(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-collision-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_finalization_idempotency_conflict');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(signatureConflict: true)))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'retention_class' => 'quality_record',
+                'signature_events' => [[
+                    'signer_ref' => 'qa-1',
+                    'signer_role' => 'qa_qms',
+                    'signature_meaning' => 'final evidence package approval',
+                    'idempotency_key' => 'sig-key-1',
+                ]],
+            ]);
         } finally {
             $this->removeTree($dir);
         }
@@ -1184,12 +1263,96 @@ final class CanonicalOutboxFakeDb
     }
 }
 
+final class PublicationActionFakeDb
+{
+    /** @var list<array{sql: string, params: array<string, mixed>}> */
+    public array $queryOneCalls = [];
+
+    public int $transactionCount = 0;
+
+    public function transactional(callable $callback): mixed
+    {
+        $this->transactionCount++;
+        return $callback();
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM evidence_publications ep')) {
+            return [
+                'evidence_publication_id' => (string)$params[':id'],
+                'evidence_version_id' => '00000000-0000-0000-0000-000000000014',
+                'publication_state' => 'published',
+                'source_package_hash_sha256' => str_repeat('a', 64),
+                'source_manifest_hash_sha256' => str_repeat('b', 64),
+                'source_change_order_id' => '00000000-0000-0000-0000-000000000013',
+                'change_order_state' => 'released',
+                'metadata' => '{}',
+            ];
+        }
+        if (str_contains($sql, 'INSERT INTO publication_attempts')) {
+            return [
+                'publication_attempt_id' => '00000000-0000-0000-0000-000000000090',
+                'evidence_publication_id' => (string)$params[':evidence_publication_id'],
+                'attempt_no' => 1,
+                'attempt_state' => 'started',
+            ];
+        }
+        if (str_contains($sql, 'INSERT INTO publication_receipts')) {
+            return [
+                'publication_receipt_id' => '00000000-0000-0000-0000-000000000091',
+                'evidence_publication_id' => (string)$params[':evidence_publication_id'],
+                'target_type' => 'external_index',
+                'target_uri' => (string)$params[':target_uri'],
+                'target_hash_sha256' => (string)$params[':target_hash_sha256'],
+            ];
+        }
+        if (str_starts_with(ltrim($sql), 'UPDATE evidence_publications')) {
+            return [
+                'evidence_publication_id' => (string)$params[':evidence_publication_id'],
+                'publication_state' => (string)$params[':publication_state'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_starts_with(ltrim($sql), 'UPDATE publication_attempts')) {
+            return [
+                'publication_attempt_id' => (string)$params[':publication_attempt_id'],
+                'attempt_state' => 'succeeded',
+                'response_payload' => (string)$params[':response_payload'],
+            ];
+        }
+        return [];
+    }
+
+    public function query(string $sql, array $params = []): array
+    {
+        return [];
+    }
+
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
+    }
+}
+
 final class DocumentFormControlFakeDb
 {
     /**
      * @var list<array{sql: string, params: array<string, mixed>}>
      */
     public array $queryOneCalls = [];
+
+    public string $lastValidationState = '';
+
+    public string $lastIssuanceManifestHash = '';
 
     /**
      * @param array<string, mixed> $params
@@ -1199,6 +1362,40 @@ final class DocumentFormControlFakeDb
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
         $trimmed = ltrim($sql);
+        if (str_contains($trimmed, 'FROM frm_template_revisions')) {
+            return [
+                'frm_template_revision_id' => (string)$params[':frm_template_revision_id'],
+                'frm_family_id' => 'FRMFAM-1',
+                'template_revision' => 'R1',
+                'lifecycle_state' => 'released',
+                'template_checksum_sha256' => str_repeat('b', 64),
+            ];
+        }
+        if (str_contains($trimmed, 'FROM frm_schema_versions')) {
+            return [
+                'frm_schema_version_id' => (string)$params[':frm_schema_version_id'],
+                'frm_template_revision_id' => (string)$params[':frm_template_revision_id'],
+                'schema_version' => '1.0.0',
+                'lifecycle_state' => 'released',
+            ];
+        }
+        if (str_contains($trimmed, 'FROM frm_issuances fi')) {
+            return [
+                'frm_issuance_id' => (string)$params[':frm_issuance_id'],
+                'allocation_id' => 'ALLOC-100',
+                'issued_record_id' => 'FRM-100-0001',
+                'template_revision_id' => '00000000-0000-0000-0000-000000000801',
+                'schema_version_id' => '00000000-0000-0000-0000-000000000802',
+                'issuance_state' => 'issued',
+                'delivery_mode' => 'offline_excel',
+                'carrier_manifest_hash_sha256' => $this->lastIssuanceManifestHash,
+                'metadata' => '{}',
+                'frm_family_id' => 'FRMFAM-1',
+                'template_revision' => 'R1',
+                'template_checksum_sha256' => str_repeat('b', 64),
+                'schema_version' => '1.0.0',
+            ];
+        }
         if (str_starts_with($trimmed, 'INSERT INTO doc_families')) {
             return ['doc_family_id' => 'DOCFAM-1', 'doc_code' => (string)$params[':doc_code']];
         }
@@ -1238,6 +1435,7 @@ final class DocumentFormControlFakeDb
             ];
         }
         if (str_starts_with($trimmed, 'INSERT INTO frm_issuances')) {
+            $this->lastIssuanceManifestHash = (string)$params[':issuance_manifest_hash_sha256'];
             return [
                 'frm_issuance_id' => 'FRMISS-1',
                 'allocation_id' => (string)$params[':allocation_id'],
@@ -1253,6 +1451,7 @@ final class DocumentFormControlFakeDb
             ];
         }
         if (str_starts_with($trimmed, 'INSERT INTO submission_validation_results')) {
+            $this->lastValidationState = (string)$params[':validation_state'];
             return [
                 'submission_validation_result_id' => 'VAL-1',
                 'frm_submission_attempt_id' => (string)$params[':frm_submission_attempt_id'],
@@ -1423,6 +1622,18 @@ final class EvidenceFinalizationFakeDb
 
     public bool $sawRetentionLockInsert = false;
 
+    public int $transactionCount = 0;
+
+    public function __construct(private readonly bool $signatureConflict = false)
+    {
+    }
+
+    public function transactional(callable $callback): mixed
+    {
+        $this->transactionCount++;
+        return $callback();
+    }
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>
@@ -1448,8 +1659,10 @@ final class EvidenceFinalizationFakeDb
                 'signature_event_id' => 'SIG-1',
                 'signed_object_type' => 'evidence_version',
                 'signed_object_id' => (string)$params[':signed_object_id'],
+                'signer_ref' => (string)$params[':signer_ref'],
                 'signature_meaning' => (string)$params[':signature_meaning'],
-                'signature_hash_sha256' => (string)$params[':signature_hash_sha256'],
+                'signed_payload_hash_sha256' => (string)$params[':signed_payload_hash_sha256'],
+                'signature_hash_sha256' => $this->signatureConflict ? str_repeat('0', 64) : (string)$params[':signature_hash_sha256'],
             ];
         }
         if (str_contains($sql, 'INSERT INTO retention_locks')) {

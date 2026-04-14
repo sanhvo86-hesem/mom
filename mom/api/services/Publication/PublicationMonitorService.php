@@ -83,15 +83,11 @@ final class PublicationMonitorService
             throw new RuntimeException('idempotency_key_required');
         }
 
-        $publication = $this->db->queryOne(
-            'SELECT * FROM evidence_publications WHERE evidence_publication_id = CAST(:id AS uuid)',
-            [':id' => $publicationId],
-        );
-        if (!is_array($publication)) {
-            throw new RuntimeException('publication_not_found');
-        }
-        $publication = $this->decodeJsonColumns($publication);
+        $publication = $this->fetchPublicationWithAuthority($publicationId);
         $targetState = $this->actionTargetState($action);
+        if (in_array($action, ['withdraw', 'supersede'], true) && trim($reason) === '') {
+            throw new RuntimeException('publication_action_reason_required');
+        }
         $transition = (new PublicationStateService())->transition(
             $publication,
             $targetState,
@@ -111,6 +107,8 @@ final class PublicationMonitorService
                 'actor_ref' => $actorRef,
                 'publication_state' => (string)($publication['publication_state'] ?? ''),
                 'target_publication_state' => $targetState,
+                'source_change_order_id' => (string)($this->transitionContext($publication)['change_order_id'] ?? ''),
+                'change_order_state' => (string)($this->transitionContext($publication)['change_order_state'] ?? ''),
                 'transition' => $transition,
             ],
             [
@@ -128,11 +126,196 @@ final class PublicationMonitorService
         ];
     }
 
+    /**
+     * Apply a queued publication action. This is the canonical handler body for
+     * `publication.retry`, `publication.withdraw`, and `publication.supersede`.
+     * It persists the attempt and receipt trail before mutating publication
+     * state, so asynchronous publication changes remain auditable.
+     *
+     * @param array<string, mixed> $outboxRow
+     * @return array<string, mixed>
+     */
+    public function processQueuedAction(array $outboxRow, string $workerRef = 'publication-worker'): array
+    {
+        $this->requireDb();
+        if (!method_exists($this->db, 'queryOne')) {
+            throw new RuntimeException('authoritative_publication_store_required');
+        }
+
+        $payload = $this->decodePayload($outboxRow['payload'] ?? []);
+        $publicationId = $this->text($payload['publication_id'] ?? $outboxRow['aggregate_id'] ?? '');
+        $action = strtolower($this->text($payload['action'] ?? ''));
+        if ($publicationId === '' || !in_array($action, ['retry', 'withdraw', 'supersede'], true)) {
+            throw new RuntimeException('publication_action_payload_invalid');
+        }
+
+        $work = function () use ($publicationId, $action, $payload, $outboxRow, $workerRef): array {
+            $publication = $this->fetchPublicationWithAuthority($publicationId);
+            $targetState = $this->actionTargetState($action);
+            $context = $this->transitionContext($publication);
+            $transition = (new PublicationStateService())->transition($publication, $targetState, $context);
+            if (empty($transition['allowed'])) {
+                throw new RuntimeException((string)($transition['error_code'] ?? 'publication_action_not_allowed'));
+            }
+
+            $requestPayload = [
+                'action' => $action,
+                'reason' => $this->text($payload['reason'] ?? ''),
+                'actor_ref' => $this->text($payload['actor_ref'] ?? $workerRef),
+                'worker_ref' => $workerRef,
+                'transition' => $transition,
+                'source_change_order_id' => (string)($context['change_order_id'] ?? ''),
+            ];
+            $attempt = $this->db->queryOne(
+                "INSERT INTO publication_attempts
+                    (evidence_publication_id, attempt_no, attempt_state, request_payload)
+                 VALUES
+                    (CAST(:evidence_publication_id AS uuid),
+                     (SELECT COALESCE(MAX(attempt_no), 0) + 1
+                        FROM publication_attempts
+                       WHERE evidence_publication_id = CAST(:evidence_publication_id AS uuid)),
+                     'started', CAST(:request_payload AS jsonb))
+                 RETURNING *",
+                [
+                    ':evidence_publication_id' => $publicationId,
+                    ':request_payload' => $this->json($requestPayload),
+                ],
+            );
+            if (!is_array($attempt) || $this->text($attempt['publication_attempt_id'] ?? '') === '') {
+                throw new RuntimeException('publication_attempt_persistence_failed');
+            }
+
+            $receiptPayload = [
+                'action' => $action,
+                'publication_id' => $publicationId,
+                'previous_state' => (string)($publication['publication_state'] ?? ''),
+                'new_state' => $targetState,
+                'reason' => $requestPayload['reason'],
+                'actor_ref' => $requestPayload['actor_ref'],
+                'source_change_order_id' => $requestPayload['source_change_order_id'],
+                'processed_at' => gmdate(DATE_ATOM),
+            ];
+            $receiptHash = hash('sha256', $this->json($receiptPayload));
+            $targetUri = $this->text($payload['target_uri'] ?? $payload['notice_uri'] ?? '');
+            if ($targetUri === '') {
+                $targetUri = 'urn:mom:publication-action:' . $publicationId . ':' . $action . ':' . $receiptHash;
+            }
+
+            $receipt = null;
+            if (in_array($action, ['withdraw', 'supersede'], true)) {
+                $receipt = $this->db->queryOne(
+                    "INSERT INTO publication_receipts
+                        (evidence_publication_id, target_type, target_uri, target_hash_sha256,
+                         source_package_hash_sha256, receipt_payload, verified_at)
+                     VALUES
+                        (CAST(:evidence_publication_id AS uuid), 'external_index', :target_uri, :target_hash_sha256,
+                         :source_package_hash_sha256, CAST(:receipt_payload AS jsonb), now())
+                     ON CONFLICT (evidence_publication_id, target_uri) DO UPDATE SET
+                         receipt_payload = EXCLUDED.receipt_payload,
+                         verified_at = now()
+                     RETURNING *",
+                    [
+                        ':evidence_publication_id' => $publicationId,
+                        ':target_uri' => $targetUri,
+                        ':target_hash_sha256' => $receiptHash,
+                        ':source_package_hash_sha256' => (string)($publication['source_package_hash_sha256'] ?? ''),
+                        ':receipt_payload' => $this->json($receiptPayload),
+                    ],
+                );
+            }
+
+            $updated = $this->db->queryOne(
+                "UPDATE evidence_publications
+                 SET publication_state = :publication_state,
+                     attempt_count = attempt_count + 1,
+                     publication_receipt = CASE
+                         WHEN CAST(:publication_receipt AS jsonb) <> '{}'::jsonb THEN CAST(:publication_receipt AS jsonb)
+                         ELSE publication_receipt
+                     END,
+                     last_error_code = CASE
+                         WHEN :publication_state = 'retry_scheduled' THEN COALESCE(NULLIF(last_error_code, ''), 'retry_requested')
+                         ELSE NULL
+                     END,
+                     last_error_message = CASE
+                         WHEN :publication_state = 'retry_scheduled' THEN COALESCE(NULLIF(last_error_message, ''), :reason)
+                         ELSE NULL
+                     END,
+                     metadata = metadata || CAST(:metadata AS jsonb),
+                     updated_at = now(),
+                     row_version = row_version + 1
+                 WHERE evidence_publication_id = CAST(:evidence_publication_id AS uuid)
+                 RETURNING *",
+                [
+                    ':evidence_publication_id' => $publicationId,
+                    ':publication_state' => $targetState,
+                    ':publication_receipt' => $receipt === null ? '{}' : $this->json($receiptPayload),
+                    ':reason' => $requestPayload['reason'],
+                    ':metadata' => $this->json([
+                        'last_publication_action' => $receiptPayload,
+                    ]),
+                ],
+            );
+            if (!is_array($updated) || $this->text($updated['evidence_publication_id'] ?? '') === '') {
+                throw new RuntimeException('publication_state_update_failed');
+            }
+
+            $completed = $this->db->queryOne(
+                "UPDATE publication_attempts
+                 SET attempt_state = 'succeeded',
+                     response_payload = CAST(:response_payload AS jsonb),
+                     completed_at = now()
+                 WHERE publication_attempt_id = CAST(:publication_attempt_id AS uuid)
+                 RETURNING *",
+                [
+                    ':publication_attempt_id' => (string)$attempt['publication_attempt_id'],
+                    ':response_payload' => $this->json([
+                        'publication_state' => $targetState,
+                        'receipt_hash_sha256' => $receiptHash,
+                        'outbox_event_id' => (string)($outboxRow['outbox_event_id'] ?? ''),
+                    ]),
+                ],
+            );
+
+            return [
+                'publication' => $this->decodeJsonColumns($updated),
+                'attempt' => is_array($completed) ? $completed : $attempt,
+                'receipt' => $receipt,
+                'target_state' => $targetState,
+            ];
+        };
+
+        if (method_exists($this->db, 'transactional')) {
+            return $this->db->transactional($work);
+        }
+        return $work();
+    }
+
     private function requireDb(): void
     {
         if ($this->db === null || !method_exists($this->db, 'query')) {
             throw new RuntimeException('authoritative_publication_store_required');
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchPublicationWithAuthority(string $publicationId): array
+    {
+        $publication = $this->db->queryOne(
+            "SELECT ep.*,
+                    ev.source_change_order_id,
+                    co.status AS change_order_state
+             FROM evidence_publications ep
+             JOIN evidence_versions ev ON ev.evidence_version_id = ep.evidence_version_id
+             LEFT JOIN plm_change_orders co ON co.plm_change_order_id = ev.source_change_order_id
+             WHERE ep.evidence_publication_id = CAST(:id AS uuid)",
+            [':id' => $publicationId],
+        );
+        if (!is_array($publication)) {
+            throw new RuntimeException('publication_not_found');
+        }
+        return $this->decodeJsonColumns($publication);
     }
 
     private function normalizeDb(?object $db): ?object
@@ -169,6 +352,30 @@ final class PublicationMonitorService
             }
         }
         return $row;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodePayload(mixed $payload): array
+    {
+        if (is_array($payload)) {
+            return $payload;
+        }
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
+    }
+
+    private function json(mixed $value): string
+    {
+        $json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('json_encode_failed');
+        }
+        return $json;
     }
 
     private function actionTargetState(string $action): string

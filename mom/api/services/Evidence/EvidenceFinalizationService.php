@@ -75,6 +75,20 @@ final class EvidenceFinalizationService
             return [];
         }
 
+        if (method_exists($db, 'transactional')) {
+            return $db->transactional(fn(): array => $this->persistCanonicalRowsInsideTransaction($db, $input, $package));
+        }
+
+        return $this->persistCanonicalRowsInsideTransaction($db, $input, $package);
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $package
+     * @return array<string, mixed>
+     */
+    private function persistCanonicalRowsInsideTransaction(object $db, array $input, array $package): array
+    {
         $subjectType = $this->text($package['subject_type'] ?? $input['subject_type'] ?? '');
         $subjectId = $this->text($package['subject_id'] ?? $input['subject_id'] ?? '');
         if ($subjectType === '' || $subjectId === '') {
@@ -223,15 +237,18 @@ final class EvidenceFinalizationService
              LIMIT 1",
             [
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
-                ':publication_target' => $this->text($publicationState['target_type'] ?? 'sharepoint_graph') ?: 'sharepoint_graph',
-                ':publication_state' => $this->text($publicationState['publication_state'] ?? 'pending') ?: 'pending',
-                ':source_package_hash_sha256' => (string)$package['package_hash_sha256'],
-                ':source_manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
-                ':publication_receipt' => $this->json($publicationState['publication_receipt'] ?? []),
-                ':idempotency_key' => hash('sha256', (string)$version['evidence_version_id'] . '|publication|sharepoint_graph'),
-                ':metadata' => $this->json(['publication_boundary' => 'async_read_only_replica']),
-            ],
-        );
+            ':publication_target' => $this->text($publicationState['target_type'] ?? 'sharepoint_graph') ?: 'sharepoint_graph',
+            ':publication_state' => $this->text($publicationState['publication_state'] ?? 'pending') ?: 'pending',
+            ':source_package_hash_sha256' => (string)$package['package_hash_sha256'],
+            ':source_manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
+            ':publication_receipt' => $this->json($publicationState['publication_receipt'] ?? []),
+            ':idempotency_key' => hash('sha256', (string)$version['evidence_version_id'] . '|publication|sharepoint_graph'),
+            ':metadata' => $this->json([
+                'publication_boundary' => 'async_read_only_replica',
+                'source_change_order_id' => $sourceChangeOrderId,
+            ]),
+        ],
+    );
 
         $record = $db->queryOne(
             "UPDATE evidence_records
@@ -339,11 +356,46 @@ final class EvidenceFinalizationService
                 ],
             );
             if (is_array($row)) {
+                $this->assertSignatureConflictEquivalent($row, [
+                    'signed_object_type' => 'evidence_version',
+                    'signed_object_id' => (string)$version['evidence_version_id'],
+                    'signature_meaning' => $meaning,
+                    'signed_payload_hash_sha256' => $payloadHash,
+                    'signature_hash_sha256' => $signatureHash,
+                    'signer_user_id' => $signerUserId,
+                    'signer_ref' => $signerRef,
+                ]);
                 $persisted[] = $row;
             }
         }
 
         return $persisted;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertSignatureConflictEquivalent(array $row, array $expected): void
+    {
+        foreach (['signed_object_type', 'signed_object_id', 'signature_meaning', 'signed_payload_hash_sha256', 'signature_hash_sha256'] as $field) {
+            if (isset($row[$field]) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('evidence_finalization_idempotency_conflict');
+            }
+        }
+
+        $rowSignerUserId = $this->nullableUuid($row['signer_user_id'] ?? null);
+        $expectedSignerUserId = $this->nullableUuid($expected['signer_user_id'] ?? null);
+        if ($rowSignerUserId !== null || $expectedSignerUserId !== null) {
+            if ($rowSignerUserId !== $expectedSignerUserId) {
+                throw new RuntimeException('evidence_finalization_idempotency_conflict');
+            }
+            return;
+        }
+
+        if (isset($row['signer_ref']) && $this->text($row['signer_ref']) !== $this->text($expected['signer_ref'] ?? '')) {
+            throw new RuntimeException('evidence_finalization_idempotency_conflict');
+        }
     }
 
     private function normalizeDb(?object $db): ?object

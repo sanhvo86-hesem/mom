@@ -94,7 +94,8 @@ final class PublicationStateService
 
         if (in_array($to, ['withdrawn', 'superseded'], true)) {
             $changeState = strtolower($this->text($context['change_order_state'] ?? ''));
-            if ($changeState !== 'released') {
+            $changeOrderId = $this->text($context['change_order_id'] ?? '');
+            if ($changeState !== 'released' || $changeOrderId === '') {
                 return [
                     'allowed' => false,
                     'error_code' => 'change_authority_required',

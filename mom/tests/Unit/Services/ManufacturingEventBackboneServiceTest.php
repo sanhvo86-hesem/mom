@@ -265,7 +265,19 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
         $this->assertSame(1, $timeline['count']);
         $this->assertSame('authoritative_ready', $probe['readiness_state']);
         $this->assertSame('postgres', $probe['backend']);
+        $this->assertTrue($probe['schema_complete']);
         $this->assertSame(1, $probe['event_count']);
+    }
+
+    public function testPostgresRepositoryProbeDegradesWhenDigitalThreadColumnsAreMissing(): void
+    {
+        $db = new ManufacturingEventFakeConnection(schemaComplete: false);
+        $probe = (new PostgresManufacturingEventRepository($db))->probe();
+
+        $this->assertSame('degraded', $probe['readiness_state']);
+        $this->assertFalse($probe['authoritative']);
+        $this->assertFalse($probe['schema_complete']);
+        $this->assertContains('equipment_id', $probe['missing_columns']);
     }
 
     private function fileService(): ManufacturingEventBackboneService
@@ -298,7 +310,7 @@ final class ManufacturingEventFakeConnection extends Connection
     /** @var array<string, array<string, mixed>> */
     public array $rows = [];
 
-    public function __construct()
+    public function __construct(private readonly bool $schemaComplete = true)
     {
     }
 
@@ -370,6 +382,28 @@ final class ManufacturingEventFakeConnection extends Connection
 
     public function query(string $sql, array $params = []): array
     {
+        if (str_contains($sql, 'information_schema.columns')) {
+            $columns = [
+                'equipment_id',
+                'operator_id',
+                'tool_id',
+                'process_id',
+                'material_id',
+                'material_lot_id',
+                'material_batch_id',
+                'batch_number',
+                'routing_id',
+                'setup_sheet_id',
+                'inspection_plan_id',
+                'nc_program_id',
+                'cnc_program_id',
+            ];
+            if (!$this->schemaComplete) {
+                array_shift($columns);
+            }
+            return array_map(static fn(string $column): array => ['column_name' => $column], $columns);
+        }
+
         $rows = array_values($this->rows);
         foreach (ManufacturingEventBackboneService::timelineFilterFields() as $field) {
             $param = ':' . $field;
