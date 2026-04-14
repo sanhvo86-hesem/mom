@@ -21,7 +21,7 @@ final class LogTransport
     private string $lokiUrl;
     private string $environment;
     private string $fallbackDir;
-    private bool $lokiAvailable;
+    private ?bool $lokiAvailable;
     private bool $lokiConfigured = false;
     private bool $lokiVerified = false;
     private string $lokiVerifiedAt = '';
@@ -51,7 +51,7 @@ final class LogTransport
         } else {
             $this->lokiUrl = $lokiUrl;
             $this->lokiConfigured = true;
-            $this->lokiAvailable = false;
+            $this->lokiAvailable = null;
             $this->markFailure('Loki endpoint configured but not yet verified by a successful push');
         }
 
@@ -294,6 +294,7 @@ final class LogTransport
     public function getHealth(): array
     {
         $fallbackStats = $this->fallbackStats();
+        $fallbackActive = !$this->lokiConfigured || $this->fallbackWriteCount > 0 || $fallbackStats['file_count'] > 0;
         return [
             'loki_url'       => $this->lokiUrl,
             'loki_configured' => $this->lokiConfigured,
@@ -303,7 +304,7 @@ final class LogTransport
             'loki_verified_at' => $this->lokiVerifiedAt,
             'buffer_count'   => count($this->buffer),
             'fallback_dir'   => $this->fallbackDir,
-            'fallback_active' => !$this->lokiAvailable || $this->fallbackWriteCount > 0 || $fallbackStats['file_count'] > 0,
+            'fallback_active' => $fallbackActive,
             'fallback_write_count' => $this->fallbackWriteCount,
             'fallback_entry_count' => $this->fallbackEntryCount,
             'fallback_file_count' => $fallbackStats['file_count'],

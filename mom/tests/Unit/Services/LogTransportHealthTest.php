@@ -47,10 +47,10 @@ final class LogTransportHealthTest extends TestCase
         $health = $transport->getHealth();
 
         $this->assertTrue($health['loki_configured']);
-        $this->assertFalse($health['loki_available']);
+        $this->assertNull($health['loki_available']);
         $this->assertFalse($health['loki_verified']);
         $this->assertSame('unverified', $health['loki_probe_state']);
-        $this->assertTrue($health['fallback_active']);
+        $this->assertFalse($health['fallback_active']);
         $this->assertStringContainsString('not yet verified', $health['last_failure_message']);
     }
 
