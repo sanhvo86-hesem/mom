@@ -74,7 +74,7 @@ final class FinanceControlServicePeriodPolicyTest extends TestCase
             'backdate_exception_id' => $exception['backdate_exception_id'],
         ], 'finance-user');
 
-        $this->assertSame('approved', $memo['memo_status']);
+        $this->assertSame('draft', $memo['memo_status']);
         $this->assertSame('closed_period_backdate_exception_consumed', $memo['posting_control']['policy'] ?? null);
 
         $consumed = $service->getBackdateException((string)$exception['backdate_exception_id']);

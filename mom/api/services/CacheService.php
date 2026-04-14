@@ -24,6 +24,9 @@ final class CacheService
     /** @var array<string, mixed> In-memory L1 cache (per-request) */
     private array $l1 = [];
 
+    // WRK-034: Maximum size for L1 in-memory cache to prevent memory exhaustion
+    private const L1_MAX_SIZE = 1000;
+
     /**
      * @param string $dataDir   Base data directory (e.g. /mom/data)
      * @param string $prefix    Key prefix for namespace isolation (default: 'mom:')
@@ -99,6 +102,10 @@ final class CacheService
                 $raw = $this->redis->get($fullKey);
                 if ($raw !== null) {
                     $value = json_decode($raw, true);
+                    // WRK-034: Apply LRU eviction when adding to L1
+                    if (count($this->l1) >= self::L1_MAX_SIZE) {
+                        $this->l1 = array_slice($this->l1, (int)(self::L1_MAX_SIZE * 0.25), null, true);
+                    }
                     $this->l1[$fullKey] = $value;
                     return $value;
                 }
@@ -164,17 +171,24 @@ final class CacheService
         $fullKey = $this->prefix . $key;
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+        // WRK-011: Enforce minimum TTL to prevent memory exhaustion
+        if ($ttl !== null && $ttl <= 0) {
+            $ttl = 3600; // minimum 1 hour to prevent memory exhaustion
+        }
+
+        // WRK-034: L1 cache LRU eviction when max size reached
+        if (count($this->l1) >= self::L1_MAX_SIZE) {
+            // Evict oldest 25%
+            $this->l1 = array_slice($this->l1, (int)(self::L1_MAX_SIZE * 0.25), null, true);
+        }
+
         // L1
         $this->l1[$fullKey] = $value;
 
         // L2: Redis
         if ($this->redisAvailable) {
             try {
-                if ($ttl > 0) {
-                    $this->redis->setex($fullKey, $ttl, $encoded);
-                } else {
-                    $this->redis->set($fullKey, $encoded);
-                }
+                $this->redis->setex($fullKey, $ttl, $encoded);
                 return; // Redis success, skip file
             } catch (\Throwable $e) {
                 @error_log("[CacheService] Redis SET error: {$e->getMessage()}");
@@ -438,6 +452,10 @@ final class CacheService
         }
 
         $fullKey = $this->prefix . $key;
+        // WRK-034: Apply LRU eviction when adding to L1
+        if (count($this->l1) >= self::L1_MAX_SIZE) {
+            $this->l1 = array_slice($this->l1, (int)(self::L1_MAX_SIZE * 0.25), null, true);
+        }
         $this->l1[$fullKey] = $data['value'];
         return $data['value'];
     }

@@ -385,8 +385,29 @@ class UploadHardeningService
         }
 
         $destFile = $destDir . '/' . $quarantineId . ($ext !== '' ? ".{$ext}" : '');
-        if (!@rename($srcFile, $destFile)) {
-            throw new \RuntimeException("Could not move file into accepted storage: {$quarantineId}");
+
+        // FILE-010 (HIGH): Prevent race condition (TOCTOU) during file move
+        // Use advisory lock to ensure atomic move operation
+        $lockFile = $this->quarantineDir . '/' . $quarantineId . '.accept.lock';
+        $lockHandle = @fopen($lockFile, 'w');
+        if ($lockHandle && @flock($lockHandle, LOCK_EX)) {
+            try {
+                // Re-check file exists after acquiring lock
+                clearstatcache(true, $srcFile);
+                // @phpstan-ignore-next-line TOCTOU re-check is intentionally defensive after lock acquisition.
+                if (!file_exists($srcFile)) {
+                    throw new \RuntimeException('quarantine_file_already_processed');
+                }
+                if (!@rename($srcFile, $destFile)) {
+                    throw new \RuntimeException("Could not move file into accepted storage: {$quarantineId}");
+                }
+            } finally {
+                @flock($lockHandle, LOCK_UN);
+                @fclose($lockHandle);
+                @unlink($lockFile);
+            }
+        } else {
+            throw new \RuntimeException("Could not acquire lock for file move: {$quarantineId}");
         }
 
         $meta['status'] = 'accepted';

@@ -279,9 +279,10 @@ final class AnthropicService
         // Nếu có context data, đính kèm vào user message
         $userContent = $userQuery;
         if (!empty($sanitizedContext)) {
-            // Clear delimiter to isolate user data from instructions
+            // INT-015: Use unpredictable delimiters to prevent prompt injection
+            $delimiter = 'USER_DATA_' . strtoupper(bin2hex(random_bytes(8)));
             $contextJson = json_encode($sanitizedContext, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-            $userContent .= "\n\n[USER_DATA_START]\n--- Context Data / Dữ liệu ngữ cảnh ---\n" . $contextJson . "\n[USER_DATA_END]";
+            $userContent .= "\n\n[{$delimiter}_START]\n--- Context Data / Dữ liệu ngữ cảnh ---\n" . $contextJson . "\n[{$delimiter}_END]";
         }
 
         $messages = [

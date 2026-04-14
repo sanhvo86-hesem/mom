@@ -29,6 +29,8 @@ final class GenealogyGraphService
         'measure',
     ];
 
+    private const MAX_GENEALOGY_DEPTH = 50;
+
     private ?object $db;
 
     public function __construct(?object $db = null)
@@ -80,6 +82,26 @@ final class GenealogyGraphService
         );
 
         if ($reverseEdgeExists !== null) {
+            throw new RuntimeException('genealogy_cycle_detected');
+        }
+
+        // MES-004 FIX: Transitive cycle detection using recursive CTE
+        $cyclePath = $this->db->queryOne(
+            "WITH RECURSIVE path AS (
+                SELECT from_object_id, to_object_id, 1 as depth
+                FROM genealogy_edge_facts
+                WHERE from_object_id = :to_id
+                UNION ALL
+                SELECT p.from_object_id, e.to_object_id, p.depth + 1
+                FROM path p
+                JOIN genealogy_edge_facts e ON e.from_object_id = p.to_object_id
+	                WHERE p.depth < " . self::MAX_GENEALOGY_DEPTH . "
+            )
+            SELECT 1 FROM path WHERE to_object_id = :from_id LIMIT 1",
+            [':to_id' => $toId, ':from_id' => $fromId]
+        );
+
+        if ($cyclePath !== null) {
             throw new RuntimeException('genealogy_cycle_detected');
         }
         $sourceEventId = $this->text($fact['source_event_id'] ?? '');

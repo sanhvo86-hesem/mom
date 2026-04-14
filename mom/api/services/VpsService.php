@@ -13,6 +13,14 @@ final class VpsService
     private const FILE_SEARCH_MAX_RESULTS = 160;
     private const FILE_UPLOAD_MAX_BYTES = 67108864;
 
+    /**
+     * INT-013 FIX: Whitelist allowed VPS actions to prevent arbitrary command execution
+     */
+    private const ALLOWED_VPS_ACTIONS = [
+        'health', 'docker_ps', 'nginx_test', 'ports', 'recent_logs',
+        'terminal_gateway_logs', 'observability_logs'
+    ];
+
     /** @var list<string> */
     private array $configCandidates;
 
@@ -286,6 +294,11 @@ final class VpsService
 
     public function runAction(string $hostId, string $actionId, bool $allowWrite = false): array
     {
+        // INT-013 FIX: Validate action is in the whitelist before execution
+        if (!in_array($actionId, self::ALLOWED_VPS_ACTIONS, true)) {
+            throw new RuntimeException('VPS action not allowed: ' . $actionId);
+        }
+
         $host = $this->findHost($hostId);
         $action = $this->resolveAction($host, $actionId);
 

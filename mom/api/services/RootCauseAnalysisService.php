@@ -461,6 +461,7 @@ PROMPT;
 
         if ($this->db !== null) {
             try {
+                $orgId = (string)($_SESSION['org_id'] ?? '');
                 return $this->dbQuery(
                     "SELECT prediction_id, prediction_type, severity, confidence_score,
                             characteristic, predicted_value, threshold_value,
@@ -468,9 +469,11 @@ PROMPT;
                      FROM quality_predictions
                      WHERE entity_type = 'spc'
                        AND machine_id = :machine_id
+                       AND org_id = :org_id
                        AND created_at >= (now() - make_interval(days => :days))
-                     ORDER BY created_at DESC",
-                    ['machine_id' => $machineId, 'days' => $days]
+                     ORDER BY created_at DESC
+                     LIMIT 1000",
+                    ['machine_id' => $machineId, 'org_id' => $orgId, 'days' => $days]
                 );
             } catch (\Throwable $e) {
                 // Bang co the chua ton tai / Table may not exist yet
@@ -602,6 +605,8 @@ PROMPT;
         }
 
         $whereOr = '(' . implode(' OR ', $conditions) . ')';
+        $orgId = (string)($_SESSION['org_id'] ?? '');
+        $params['org_id'] = $orgId;
 
         try {
             return $this->dbQuery(
@@ -611,14 +616,14 @@ PROMPT;
                         ncr_status, metadata, created_at
                  FROM ncr_records
                  WHERE {$whereOr}
+                   AND org_id = :org_id
                    AND ncr_id != :current_id
                    AND ncr_number != :current_num
-                 ORDER BY created_at DESC
-                 LIMIT :limit",
+	                 ORDER BY created_at DESC
+	                 LIMIT " . self::MAX_HISTORICAL_NCRS,
                 array_merge($params, [
                     'current_id'  => $currentNcrId,
                     'current_num' => $currentNcrId,
-                    'limit'       => self::MAX_HISTORICAL_NCRS,
                 ])
             );
         } catch (\Throwable $e) {
@@ -647,6 +652,7 @@ PROMPT;
 
         if ($this->db !== null) {
             try {
+                $orgId = (string)($_SESSION['org_id'] ?? '');
                 return $this->dbQuery(
                     "SELECT fm.failure_mode_id, fm.failure_mode, fm.failure_effect,
                             fm.failure_cause, fm.severity, fm.occurrence, fm.detection,
@@ -655,9 +661,10 @@ PROMPT;
                      FROM fmea_failure_modes fm
                      JOIN fmea_records fr ON fr.fmea_id = fm.fmea_id
                      WHERE fr.item_id = :part_number
-                     ORDER BY fm.rpn DESC NULLS LAST
-                     LIMIT 20",
-                    ['part_number' => $partNumber]
+                       AND fr.org_id = :org_id
+	                     ORDER BY fm.rpn DESC NULLS LAST
+	                     LIMIT 500",
+                    ['part_number' => $partNumber, 'org_id' => $orgId]
                 );
             } catch (\Throwable $e) {
                 @error_log('[RootCauseAnalysisService] FMEA query failed: ' . $e->getMessage());
@@ -770,6 +777,7 @@ PROMPT;
         $params = [
             'exclude_id'  => $ncrId,
             'exclude_num' => $ncrNumber,
+            'org_id'      => (string)($_SESSION['org_id'] ?? ''),
         ];
 
         if ($partNumber !== null) {
@@ -798,10 +806,11 @@ PROMPT;
                         part_number, severity, ncr_status, metadata, created_at
                  FROM ncr_records
                  WHERE {$whereOr}
+                   AND org_id = :org_id
                    AND ncr_id != :exclude_id
                    AND ncr_number != :exclude_num
                  ORDER BY created_at DESC
-                 LIMIT 50",
+                 LIMIT 500",
                 $params
             );
         } catch (\Throwable $e) {

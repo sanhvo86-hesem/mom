@@ -40,7 +40,9 @@ class CsrfMiddleware
                 return;
             }
 
-            $path = (string)($_SERVER['REQUEST_URI'] ?? '/');
+            // INFRA-020: Normalize path before CSRF exemption check
+            $path = parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?? '/';
+            $path = '/' . trim($path, '/');
 
             // Check if this endpoint is exempt from CSRF (API key auth, webhooks, etc.)
             if (CsrfService::isExempt($path)) {

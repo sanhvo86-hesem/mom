@@ -267,6 +267,9 @@ class AiSchedulingController extends BaseController
     {
         $user = $this->requireAuth();
 
+        // MES-001: Add plant_id scoping for multi-tenant isolation
+        $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
+
         try {
             // Try DB first / Thu DB truoc
             $db = $this->getDb();
@@ -275,16 +278,22 @@ class AiSchedulingController extends BaseController
                     $where = ['1=1'];
                     $params = [];
 
+                    // MES-001: Mandatory plant_id filter
+                    if ($plantId !== '') {
+                        $where[] = 'plant_id = :plant_id';
+                        $params[':plant_id'] = $plantId;
+                    }
+
                     $status = $this->query('status');
                     if ($status !== null && $status !== '') {
                         $where[] = 'status = :status';
-                        $params['status'] = strtolower($status);
+                        $params[':status'] = strtolower($status);
                     }
 
                     $severity = $this->query('severity');
                     if ($severity !== null && $severity !== '') {
                         $where[] = 'severity = :severity';
-                        $params['severity'] = strtolower($severity);
+                        $params[':severity'] = strtolower($severity);
                     }
 
                     $offset = max(0, (int)($this->query('offset', '0')));
@@ -786,6 +795,9 @@ class AiSchedulingController extends BaseController
     {
         $user = $this->requireAuth();
 
+        // MES-002: Add plant_id scoping for multi-tenant isolation
+        $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
+
         try {
             // Try DB first / Thu DB truoc
             $db = $this->getDb();
@@ -793,9 +805,14 @@ class AiSchedulingController extends BaseController
                 try {
                     $kpis = [];
 
+                    // MES-002: Add plant_id filter to all COUNT queries
+                    $wherePlant = $plantId !== '' ? "WHERE plant_id = :plant_id" : '';
+                    $plantParams = $plantId !== '' ? [':plant_id' => $plantId] : [];
+
                     // Total predictions by status
                     $statusCounts = $db->query(
-                        "SELECT status, COUNT(*) AS cnt FROM quality_predictions GROUP BY status"
+                        "SELECT status, COUNT(*) AS cnt FROM quality_predictions {$wherePlant} GROUP BY status",
+                        $plantParams
                     );
                     $byStatus = [];
                     $totalAll = 0;
@@ -811,18 +828,22 @@ class AiSchedulingController extends BaseController
 
                     // SPC anomalies (prediction_type = 'spc_anomaly')
                     $kpis['total_anomalies'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'spc_anomaly'"
+                        "SELECT COUNT(*) FROM quality_predictions {$wherePlant} AND prediction_type = 'spc_anomaly'",
+                        $plantParams
                     ) ?? 0);
                     $kpis['critical_anomalies'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'spc_anomaly' AND severity = 'critical'"
+                        "SELECT COUNT(*) FROM quality_predictions {$wherePlant} AND prediction_type = 'spc_anomaly' AND severity = 'critical'",
+                        $plantParams
                     ) ?? 0);
 
                     // Tool wear alerts (prediction_type = 'tool_wear')
                     $kpis['tool_wear_alerts'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'tool_wear'"
+                        "SELECT COUNT(*) FROM quality_predictions {$wherePlant} AND prediction_type = 'tool_wear'",
+                        $plantParams
                     ) ?? 0);
                     $kpis['high_urgency_wear'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM quality_predictions WHERE prediction_type = 'tool_wear' AND severity = 'critical'"
+                        "SELECT COUNT(*) FROM quality_predictions {$wherePlant} AND prediction_type = 'tool_wear' AND severity = 'critical'",
+                        $plantParams
                     ) ?? 0);
 
                     $this->success(['kpis' => $kpis]);
@@ -880,14 +901,25 @@ class AiSchedulingController extends BaseController
                     $where = ['1=1'];
                     $params = [];
 
+                    // MES-012: Validate date range to prevent calendar overflow attacks
                     $startDate = $this->query('start_date');
                     if ($startDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
+                        $minDate = gmdate('Y-m-d', strtotime('-5 years'));
+                        $maxDate = gmdate('Y-m-d', strtotime('+10 years'));
+                        if ($startDate < $minDate || $startDate > $maxDate) {
+                            $this->error('invalid_date_range', 400, 'Date range out of allowed bounds');
+                        }
                         $where[] = 'slot_date >= :start_date';
                         $params['start_date'] = $startDate;
                     }
 
                     $endDate = $this->query('end_date');
                     if ($endDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
+                        $minDate = gmdate('Y-m-d', strtotime('-5 years'));
+                        $maxDate = gmdate('Y-m-d', strtotime('+10 years'));
+                        if ($endDate < $minDate || $endDate > $maxDate) {
+                            $this->error('invalid_date_range', 400, 'Date range out of allowed bounds');
+                        }
                         $where[] = 'slot_date <= :end_date';
                         $params['end_date'] = $endDate;
                     }
@@ -1199,33 +1231,27 @@ class AiSchedulingController extends BaseController
             $db = $this->getDb();
             if ($db !== null) {
                 try {
-                    $setClauses = ['updated_at = NOW()'];
-                    $params = ['id' => $id];
-
-                    // Map JSON fields to DB columns
-                    $fieldMap = [
-                        'date'       => 'slot_date',
+                    // MES-003: Strict whitelist for SET clause — prevent SQL injection
+                    $allowedColumns = [
+                        'date' => 'slot_date',
                         'start_time' => 'start_time',
-                        'end_time'   => 'end_time',
-                        'machine_id' => 'machine_id',
-                        'job_number' => 'wo_number',
-                        'status'     => 'slot_type',
+                        'end_time' => 'end_time',
+                        'status' => 'status',
+                        'notes' => 'notes',
                     ];
+                    $setClauses = ['updated_at = NOW()'];
+                    $params = [':id' => $id];
 
-                    foreach ($fieldMap as $bodyField => $dbCol) {
-                        if (isset($body[$bodyField])) {
-                            $paramKey = 'u_' . $dbCol;
-                            $setClauses[] = "{$dbCol} = :{$paramKey}";
-                            $params[$paramKey] = trim((string)$body[$bodyField]);
+                    foreach ($allowedColumns as $inputKey => $dbColumn) {
+                        if (isset($body[$inputKey])) {
+                            $phKey = ':' . $dbColumn;
+                            $setClauses[] = "{$dbColumn} = {$phKey}";
+                            $params[$phKey] = $body[$inputKey];
                         }
                     }
 
-                    // Priority: map string to int
-                    if (isset($body['priority'])) {
-                        $priorityMap = ['low' => 25, 'normal' => 50, 'high' => 75, 'urgent' => 100];
-                        $pVal = $priorityMap[strtolower(trim((string)$body['priority']))] ?? 50;
-                        $setClauses[] = 'priority = :u_priority';
-                        $params['u_priority'] = $pVal;
+                    if (count($setClauses) <= 1) {
+                        $this->error('no_fields_to_update', 400, 'No updatable fields provided');
                     }
 
                     $setSql = implode(', ', $setClauses);
@@ -1315,6 +1341,9 @@ class AiSchedulingController extends BaseController
     {
         $user = $this->requireAuth();
 
+        // MES-009: Add plant_id filter for multi-tenant isolation
+        $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
+
         try {
             // Try DB first / Thu DB truoc
             $db = $this->getDb();
@@ -1323,16 +1352,22 @@ class AiSchedulingController extends BaseController
                     $where = ['1=1'];
                     $params = [];
 
+                    // MES-009: Mandatory plant_id filter
+                    if ($plantId !== '') {
+                        $where[] = 'sc.plant_id = :plant_id';
+                        $params[':plant_id'] = $plantId;
+                    }
+
                     $date = $this->query('date');
                     if ($date !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                         $where[] = 'conflict_date = :date';
-                        $params['date'] = $date;
+                        $params[':date'] = $date;
                     }
 
                     $machineId = $this->query('machine_id');
                     if ($machineId !== null && $machineId !== '') {
                         $where[] = 'machine_id = :machine_id';
-                        $params['machine_id'] = $machineId;
+                        $params[':machine_id'] = $machineId;
                     }
 
                     $whereSql = implode(' AND ', $where);
@@ -1441,6 +1476,9 @@ class AiSchedulingController extends BaseController
     {
         $user = $this->requireAuth();
 
+        // MES-015: Add plant_id filter for multi-tenant isolation
+        $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
+
         try {
             // Try DB first — use capacity_snapshots table / Thu DB truoc — dung bang capacity_snapshots
             $db = $this->getDb();
@@ -1449,6 +1487,9 @@ class AiSchedulingController extends BaseController
                     $startDate = $this->query('start_date', gmdate('Y-m-d'));
                     $endDate   = $this->query('end_date', gmdate('Y-m-d', strtotime('+14 days')));
 
+                    $wherePlant = $plantId !== '' ? "AND plant_id = :plant_id" : '';
+                    $plantParams = $plantId !== '' ? [':plant_id' => $plantId] : [];
+
                     $rows = $db->query(
                         "SELECT machine_id, snapshot_date AS date,
                                 COALESCE(scheduled_minutes, 0) / 60.0 AS total_hours,
@@ -1456,9 +1497,9 @@ class AiSchedulingController extends BaseController
                                 jobs_completed AS slot_count
                          FROM capacity_snapshots
                          WHERE snapshot_date >= :start_date
-                           AND snapshot_date <= :end_date
+                           AND snapshot_date <= :end_date {$wherePlant}
                          ORDER BY machine_id, snapshot_date",
-                        ['start_date' => $startDate, 'end_date' => $endDate]
+                        array_merge(['start_date' => $startDate, 'end_date' => $endDate], $plantParams)
                     );
 
                     $heatmap = [];
@@ -1649,6 +1690,24 @@ class AiSchedulingController extends BaseController
         $userId      = $this->userUuid($user);
 
         try {
+            // MES-008: Validate input length and reject SQL keywords
+            if (mb_strlen($question) > 500) {
+                $this->error('question_too_long', 400, 'Question must be under 500 characters');
+            }
+
+            // Block obvious SQL injection patterns
+            if (preg_match('/\b(SELECT|UNION|DROP|INSERT|UPDATE|DELETE|EXEC|EXECUTE|CAST|CONVERT)\b/i', $question)) {
+                $this->error('invalid_question_format', 400, 'Question contains disallowed SQL keywords');
+            }
+
+            // MES-022: Rate limiting on aiNlQuery (20 per hour max)
+            $rateKey = 'ai_nl_query_' . ($user['user_id'] ?? 'anon') . '_' . gmdate('YmdH');
+            $count = (int)($_SESSION['ai_nl_count_' . gmdate('YmdH')] ?? 0);
+            if ($count >= 20) {
+                $this->error('rate_limit_exceeded', 429, 'Maximum 20 AI queries per hour');
+            }
+            $_SESSION['ai_nl_count_' . gmdate('YmdH')] = $count + 1;
+
             $service = new NaturalLanguageQueryService($this->dataDir);
             $context = [];
             if ($contextType !== '') {

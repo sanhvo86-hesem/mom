@@ -37,6 +37,13 @@ final class ControlPlaneCommandService
     {
         $this->requireDb();
 
+        // CTRL-015: Validate command payload schema - strip unexpected keys using allowlist
+        $allowedPayloadKeys = ['entity_id', 'entity_type', 'action', 'data', 'metadata', 'reason'];
+        $envelope['payload'] = array_intersect_key(
+            is_array($envelope['payload'] ?? null) ? $envelope['payload'] : [],
+            array_flip($allowedPayloadKeys)
+        );
+
         $guardEnvelope = $this->withCanonicalAuthorityResolution($envelope);
         $decision = $this->guard->validateEnvelope($guardEnvelope);
         $commandName = $this->text($guardEnvelope['command_name'] ?? '');
@@ -70,7 +77,7 @@ final class ControlPlaneCommandService
                     'command_state' => 'accepted',
                     'scope_key' => $scopeKey,
                     'request_hash_sha256' => $requestHash,
-                    'payload' => is_array($envelope['payload'] ?? null) ? $envelope['payload'] : [],
+                    'payload' => is_array($envelope['payload']) ? $envelope['payload'] : [],
                 ],
                 [
                     'idempotency_key' => $idempotencyKey,

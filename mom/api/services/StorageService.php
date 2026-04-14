@@ -191,10 +191,19 @@ final class LocalStorageDriver implements StorageDriver
         $full = rtrim($this->basePath, '/') . '/' . implode('/', $segments);
         $this->ensureDirectory($full);
 
+        // FILE-011: Ensure parent directory exists before calling realpath()
+        // realpath() can silently fail if parent doesn't exist
+        if (!is_dir(dirname($full))) {
+            @mkdir(dirname($full), 0775, true);
+        }
+
         // Prevent path traversal attacks
         $resolved = realpath(dirname($full));
         $baseResolved = realpath($this->basePath);
-        if ($resolved === false || $baseResolved === false || strpos($resolved . '/', $baseResolved . '/') !== 0) {
+        if ($resolved === false || $baseResolved === false) {
+            throw new \RuntimeException('Path resolution failed');
+        }
+        if (strpos($resolved . '/', $baseResolved . '/') !== 0) {
             throw new \RuntimeException('Path traversal detected: ' . $path);
         }
 

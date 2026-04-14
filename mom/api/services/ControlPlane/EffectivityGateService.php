@@ -225,6 +225,10 @@ final class EffectivityGateService
                 if ($fromDate > $untilDate) {
                     return ['ok' => false, 'error' => 'effectivity_date_range_invalid', 'message' => 'Effective from date must be before or equal to effective until date.'];
                 }
+                // CTRL-004: Check that from_date != to_date (zero-width range)
+                if ($fromDate == $untilDate) {
+                    return ['ok' => false, 'error' => 'effectivity_date_range_zero_width', 'message' => 'Effectivity date range cannot be zero-width; from and until dates must differ.'];
+                }
             }
 
             return ['ok' => true];

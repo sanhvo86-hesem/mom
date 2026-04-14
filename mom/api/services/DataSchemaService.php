@@ -496,8 +496,19 @@ final class DataSchemaService
 
     private function relativePath(string $path): string
     {
+        // INT-011 FIX: Prevent path traversal attacks by validating the resolved path
         $normalizedPath = rtrim(str_replace('\\', '/', $path), '/');
         $root = rtrim(str_replace('\\', '/', $this->rootDir), '/');
+
+        // Use realpath to resolve all .. and . components
+        $resolved = realpath($normalizedPath);
+        $rootResolved = realpath($root);
+
+        // Ensure the resolved path is within the root directory (prevent traversal)
+        if ($resolved === false || $rootResolved === false || strpos($resolved, $rootResolved) !== 0) {
+            throw new \RuntimeException('Path traversal detected: ' . $path);
+        }
+
         if ($root !== '' && $root !== '.' && $normalizedPath === $root) {
             return '';
         }

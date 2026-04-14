@@ -213,7 +213,8 @@ class RateLimitMiddleware
             $state = ['start' => $now, 'hits' => 0, 'tokens' => $maxRequests];
             if ($raw !== '' && $raw !== false) {
                 $tmp = json_decode($raw, true);
-                if (is_array($tmp) && isset($tmp['start'], $tmp['hits'])) {
+                // INFRA-010: Validate parsed result is array with required integer keys
+                if (is_array($tmp) && isset($tmp['start'], $tmp['hits']) && is_int($tmp['start']) && is_int($tmp['hits'])) {
                     $state = $tmp;
                 }
             }

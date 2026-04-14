@@ -161,7 +161,7 @@ final class QuoteService
         foreach (['discount_pct', 'discount_percent', 'discount'] as $discountField) {
             if (isset($filtered[$discountField])) {
                 $discount = (float)$filtered[$discountField];
-                if ($discount < 0 || $discount > 100) {
+                if ($discount < 0 || $discount >= 100) {
                     throw new RuntimeException('Discount must be between 0 and 100%');
                 }
             }
@@ -217,6 +217,12 @@ final class QuoteService
      */
     public function listQuotes(array $filters = []): array
     {
+        // FIN-002: Mandatory org_id scoping from session
+        $orgId = (string)($_SESSION['org_id'] ?? '');
+        if ($orgId === '') {
+            throw new RuntimeException('org_id required');
+        }
+
         $quotes = $this->loadQuotes();
         $result = [];
 
@@ -225,11 +231,9 @@ final class QuoteService
                 continue;
             }
 
-            // COM-002: Filter by org_id if provided in filters
-            if (isset($filters['org_id']) && $filters['org_id'] !== null && $filters['org_id'] !== '') {
-                if (($rec['org_id'] ?? '') !== $filters['org_id']) {
-                    continue;
-                }
+            // FIN-002: Always filter by session org_id
+            if (($rec['org_id'] ?? '') !== $orgId) {
+                continue;
             }
 
             if (isset($filters['status']) && $filters['status'] !== '') {

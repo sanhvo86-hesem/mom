@@ -101,6 +101,10 @@ final class ReleaseGovernanceBuilder
         foreach ($files as $file) {
             $path = trim(str_replace('\\', '/', (string)$file), '/');
             if ($path !== '') {
+                // CTRL-011: Reject paths with traversal
+                if (preg_match('/\.\./', $path) || str_starts_with($path, '/')) {
+                    throw new RuntimeException("Invalid tracked file path: $path");
+                }
                 $normalized[] = $path;
             }
         }

@@ -103,8 +103,9 @@ final class AiDataEtlService
             );
         }
 
-        // MES-R6-010 FIX: Verify org_id matches session
-        if (isset($_SESSION['org_id']) && (string)$_SESSION['org_id'] !== (string)$orgId) {
+        // INT-003 FIX: Validate org_id against session to prevent privilege escalation
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($orgId !== $sessionOrgId && $sessionOrgId !== '') {
             throw new \RuntimeException('unauthorized_org_access');
         }
 

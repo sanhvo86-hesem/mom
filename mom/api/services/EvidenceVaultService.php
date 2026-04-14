@@ -312,10 +312,17 @@ final class EvidenceVaultService
         $vault  = $this->loadVault();
         $result = [];
 
-        // FILE-003 (HIGH): Cross-org evidence isolation - filter by org_id from session/filter
-        $requiredOrgId = isset($filters['org_id']) && $filters['org_id'] !== '' ? $filters['org_id'] : null;
-        if ($requiredOrgId === null && isset($_SESSION['org_id'])) {
-            $requiredOrgId = $_SESSION['org_id'];
+        // FILE-003 (HIGH): Cross-org evidence isolation - validate org_id from session
+        $orgId = (string)($_SESSION['org_id'] ?? '');
+        if ($orgId === '') {
+            throw new \RuntimeException('org_id required');
+        }
+
+        // FILE-003: Filter by org_id from session/request
+        $requiredOrgId = isset($filters['org_id']) && $filters['org_id'] !== '' ? $filters['org_id'] : $orgId;
+        // Prevent escaping to other organizations via filter override
+        if ($requiredOrgId !== $orgId && $orgId !== '') {
+            $requiredOrgId = $orgId;
         }
 
         // If filtering by entity, get linked evidence IDs first

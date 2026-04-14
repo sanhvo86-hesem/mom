@@ -90,8 +90,12 @@ abstract class BaseController
         // Validate Content-Type header if body is non-empty
         if (strlen($raw) > 0 && trim($raw) !== '') {
             $contentType = $this->requestHeader('Content-Type');
-            if ($contentType !== null && !str_contains($contentType, 'application/json')) {
-                $this->error('unsupported_media_type', 415, 'Content-Type must be application/json');
+            if ($contentType !== null) {
+                // INFRA-016: Parse only the media type (before semicolon) to handle charset properly
+                $mediaType = strtolower(trim(explode(';', $contentType)[0]));
+                if ($mediaType !== 'application/json') {
+                    $this->error('unsupported_media_type', 415, 'Content-Type must be application/json');
+                }
             }
         }
 

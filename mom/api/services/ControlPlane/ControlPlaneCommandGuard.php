@@ -210,8 +210,14 @@ final class ControlPlaneCommandGuard
 
         $authoritySource = strtolower($this->text($context['authority_source'] ?? ''));
         $authorityContext = is_array($context['authority_context'] ?? null) ? $context['authority_context'] : [];
-        $authorityVerified = $this->bool($context['authority_verified'] ?? false)
-            && $authoritySource === 'canonical_change_authority'
+
+        // CTRL-001: NEVER trust authority_verified from caller-supplied context
+        // Strip any caller-injected authority claims
+        unset($authorityContext['authority_verified']);
+        unset($authorityContext['authority_source']);
+
+        // authority_verified can ONLY be set server-side by ChangeAuthorityService
+        $authorityVerified = $authoritySource === 'canonical_change_authority'
             && $this->text($authorityContext['resolved_by'] ?? '') === 'ChangeAuthorityService'
             && $this->text($authorityContext['resolution_status'] ?? '') === 'verified'
             && $this->text($authorityContext['field_path'] ?? '') === $fieldPath;

@@ -225,10 +225,10 @@ final class EdgeConnectorService
         }
 
         try {
-            // MES-R6-001 FIX: XXE protection for MTConnect XML parsing
+            // MES-023 FIX: XXE protection with LIBXML_NOENT for MTConnect XML parsing
             libxml_disable_entity_loader(true);
             libxml_use_internal_errors(true);
-            $options = LIBXML_NONET;
+            $options = LIBXML_NONET | LIBXML_NOENT | LIBXML_COMPACT;
 
             $doc = @simplexml_load_string($xml, null, $options);
             if ($doc === false) {
@@ -281,7 +281,21 @@ final class EdgeConnectorService
             return date(DATE_ATOM);
         }
         try {
-            return (new \DateTimeImmutable($raw))->format(DATE_ATOM);
+            $ts = new \DateTimeImmutable($raw);
+
+            // MES-014 FIX: Tighten timestamp validation
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            $maxSkew = new \DateInterval('PT5M');
+            $maxAge = new \DateInterval('P7D');
+
+            if ($ts > $now->add($maxSkew)) {
+                throw new \RuntimeException('timestamp_in_future');
+            }
+            if ($ts < $now->sub($maxAge)) {
+                throw new \RuntimeException('timestamp_too_old');
+            }
+
+            return $ts->format(DATE_ATOM);
         } catch (\Throwable) {
             return date(DATE_ATOM);
         }

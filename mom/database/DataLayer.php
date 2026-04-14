@@ -517,7 +517,9 @@ class DataLayer
                     $qb->where('status', $filters['status']);
                 }
                 if (!empty($filters['search'])) {
-                    $qb->where('title', 'ILIKE', '%' . $filters['search'] . '%');
+                    // DB-008: Escape LIKE wildcard characters to prevent injection
+                    $search = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $filters['search']);
+                    $qb->where('title', 'ILIKE', '%' . $search . '%');
                 }
                 $qb->orderBy('doc_id');
                 if (isset($filters['limit'])) {
@@ -726,7 +728,8 @@ class DataLayer
     public function submitFormEntry(string $formCode, array $data): string
     {
         $code = strtoupper(trim($formCode));
-        $entryId = $data['entry_id'] ?? ($code . '-' . (string)round(microtime(true) * 1000));
+        // DB-013: Use cryptographically secure random bytes instead of microtime
+        $entryId = $data['entry_id'] ?? ($code . '-' . bin2hex(random_bytes(16)));
 
         $this->write(
             jsonWriter: function () use ($code, $data): bool {
@@ -1054,7 +1057,9 @@ class DataLayer
                     $qb->where('u.status', $status);
                 }
                 if (!empty($filters['search'])) {
-                    $qb->where('u.full_name', 'ILIKE', '%' . $filters['search'] . '%');
+                    // DB-009: Escape LIKE wildcard characters to prevent injection
+                    $search = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $filters['search']);
+                    $qb->where('u.full_name', 'ILIKE', '%' . $search . '%');
                 }
                 $qb->orderBy('u.full_name');
                 return $qb->get();
@@ -1585,7 +1590,9 @@ class DataLayer
                     $qb->where('recorded_at', '<=', $filters['to']);
                 }
                 if (!empty($filters['search'])) {
-                    $needle = '%' . (string)$filters['search'] . '%';
+                    // DB-008: Escape LIKE wildcard characters to prevent injection
+                    $search = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], (string)$filters['search']);
+                    $needle = '%' . $search . '%';
                     $qb->whereRaw('(coalesce(actor_name, \'\') ILIKE ? OR coalesce(event_type, \'\') ILIKE ? OR coalesce(aggregate_type, \'\') ILIKE ? OR coalesce(aggregate_id, \'\') ILIKE ? OR CAST(payload AS text) ILIKE ?)', [
                         $needle,
                         $needle,
@@ -1626,7 +1633,9 @@ class DataLayer
                     ->where('category', 'glossary')
                     ->orderBy('label');
                 if (!empty($filters['search'])) {
-                    $qb->where('label', 'ILIKE', '%' . $filters['search'] . '%');
+                    // DB-008: Escape LIKE wildcard characters to prevent injection
+                    $search = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $filters['search']);
+                    $qb->where('label', 'ILIKE', '%' . $search . '%');
                 }
                 if (isset($filters['limit'])) {
                     $qb->limit((int)$filters['limit']);

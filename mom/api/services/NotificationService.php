@@ -690,12 +690,26 @@ final class NotificationService
             return [];
         }
 
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
+        // PROC-014: Use shared file lock when reading to prevent race conditions
+        $fp = @fopen($file, 'r');
+        if (!$fp) {
+            return [];
+        }
+
+        if (!@flock($fp, LOCK_SH)) {
+            @fclose($fp);
             return [];
         }
 
         $pending = [];
+        $lines = [];
+        while (($line = fgets($fp)) !== false) {
+            $line = trim($line);
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
         foreach ($lines as $line) {
             $item = json_decode($line, true);
             if (is_array($item) && ($item['sent'] ?? false) === false) {
@@ -705,6 +719,9 @@ final class NotificationService
                 }
             }
         }
+
+        @flock($fp, LOCK_UN);
+        @fclose($fp);
 
         return $pending;
     }
@@ -721,9 +738,24 @@ final class NotificationService
             return;
         }
 
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
+        // PROC-015: Use exclusive lock for read-modify-write to prevent race conditions
+        $fp = @fopen($file, 'c+');
+        if (!$fp) {
             return;
+        }
+
+        if (!@flock($fp, LOCK_EX)) {
+            @fclose($fp);
+            return;
+        }
+
+        $lines = [];
+        rewind($fp);
+        while (($line = fgets($fp)) !== false) {
+            $line = trim($line);
+            if ($line !== '') {
+                $lines[] = $line;
+            }
         }
 
         $newLines = [];
@@ -736,7 +768,11 @@ final class NotificationService
             $newLines[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
-        file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
+        rewind($fp);
+        ftruncate($fp, 0);
+        fwrite($fp, implode("\n", $newLines) . "\n");
+        @flock($fp, LOCK_UN);
+        @fclose($fp);
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────

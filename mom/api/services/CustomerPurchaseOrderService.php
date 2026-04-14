@@ -39,10 +39,21 @@ final class CustomerPurchaseOrderService
      */
     public function listPurchaseOrders(array $filters = []): array
     {
+        // COM-001: Mandatory org_id scoping from session
+        $orgId = (string)($_SESSION['org_id'] ?? '');
+        if ($orgId === '') {
+            throw new RuntimeException('org_id_required');
+        }
+
         $this->synchronizeLegacySalesOrders();
 
         $rows = [];
         foreach ($this->records() as $record) {
+            // COM-001: Always filter by session org_id
+            if (($record['org_id'] ?? '') !== $orgId) {
+                continue;
+            }
+
             if (!$this->matchesFilters($record, $filters)) {
                 continue;
             }
@@ -543,7 +554,15 @@ final class CustomerPurchaseOrderService
                 continue;
             }
             $qty = (float)($rawLine['qty'] ?? $rawLine['quantity'] ?? 0);
+            // COM-002: Validate quantity is positive
+            if ($qty < 0) {
+                throw new RuntimeException('Line quantity cannot be negative');
+            }
             $unitPrice = (float)($rawLine['unit_price'] ?? $rawLine['price'] ?? 0);
+            // FIN-010: Validate line values don't exceed maximum limits before multiplication
+            if ($qty > 1000000 || $unitPrice > 1000000) {
+                throw new RuntimeException('Line values exceed maximum limits');
+            }
             $lineTotal = isset($rawLine['line_total']) ? (float)$rawLine['line_total'] : ($qty * $unitPrice);
             $lines[] = [
                 'customer_po_line_id' => sprintf('%s-L%03d', preg_replace('/[^A-Za-z0-9]+/', '-', strtoupper($customerPoNumber)) ?: 'CPO', $lineNumber),

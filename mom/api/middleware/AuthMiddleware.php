@@ -96,15 +96,20 @@ class AuthMiddleware
                 $self->deny('unauthorized', 401);
             }
 
+            // INFRA-008 FIX: Validate that session user is a string (type check)
+            $username = $_SESSION['user'] ?? null;
+            if (!is_string($username) || trim($username) === '') {
+                $self->deny('unauthorized', 401);
+            }
+
             // Validate idle session timeout for ALL authentication methods (not just session)
             // SECURITY FIX PIPE-AUTH-001: This check must apply to API keys and JWT tokens too
             $now = time();
-            if (isset($_SESSION['last_active'])) {
-                $last = (int)$_SESSION['last_active'];
-                if ($last > 0 && ($now - $last) > $self->idleTimeoutSeconds) {
-                    destroy_auth_session();
-                    $self->deny('session_expired', 401);
-                }
+            // INFRA-018 FIX: Check timeout BEFORE updating last_active to prevent timing issues
+            $lastActive = (int)($_SESSION['last_active'] ?? 0);
+            if ($lastActive > 0 && ($now - $lastActive) > $self->idleTimeoutSeconds) {
+                destroy_auth_session();
+                $self->deny('session_expired', 401);
             }
 
             $user = find_user_by_username($self->store, (string)$_SESSION['user']);
@@ -117,7 +122,7 @@ class AuthMiddleware
                 $self->deny('mfa_required', 401);
             }
 
-            // Update last active time
+            // Update last active time AFTER successful checks
             $_SESSION['last_active'] = $now;
 
             // Pass through to controller

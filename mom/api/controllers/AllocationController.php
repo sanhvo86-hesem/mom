@@ -176,6 +176,13 @@ class AllocationController extends BaseController
 
         $userFilter = $this->query('user');
         if ($userFilter !== null && $userFilter !== '') {
+            // PROC-008: Validate authorization check for viewing other users' allocations
+            $currentUserId = $user['username'] ?? $user['user'] ?? '';
+            if ($userFilter && $userFilter !== $currentUserId) {
+                if (!$this->userHasAnyRole($user, $this->allocationAdminRoles())) {
+                    $this->error('forbidden', 403, 'Can only view own allocation history');
+                }
+            }
             $filters['requested_by'] = $userFilter;
         }
 
@@ -229,6 +236,9 @@ class AllocationController extends BaseController
         $reason       = trim((string)($body['reason'] ?? ''));
         $userId       = (string)($user['username'] ?? $user['user'] ?? 'unknown');
 
+        // PROC-009: Add org_id ownership check BEFORE voiding
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+
         $this->validatePattern(
             $allocationId,
             '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
@@ -240,6 +250,15 @@ class AllocationController extends BaseController
         }
 
         try {
+            // PROC-009: Get allocation and validate it belongs to user's org
+            $allocation = $this->allocationService()->getByAllocationId($allocationId);
+            if (!is_array($allocation) || empty($allocation)) {
+                $this->error('void_failed', 404, 'Allocation not found or already voided.');
+            }
+            if (($allocation['org_id'] ?? '') !== $sessionOrgId && $sessionOrgId !== '') {
+                $this->error('forbidden', 403, 'Cannot void allocations outside your organization');
+            }
+
             $success = $this->allocationService()->voidAllocation($allocationId, $reason, $userId);
 
             if (!$success) {

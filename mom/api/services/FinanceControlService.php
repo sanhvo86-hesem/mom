@@ -107,6 +107,12 @@ final class FinanceControlService
      */
     public function transitionPeriodClose(string $periodCloseId, string $transition, string $userId, array $context = [], ?string $orgId = null): array
     {
+        // FIN-001: Mandatory org_id scoping from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            throw new RuntimeException('org_id required');
+        }
+
         $transition = strtolower(trim($transition));
         if ($transition === '') {
             throw new RuntimeException('Period close transition is required.');
@@ -120,8 +126,8 @@ final class FinanceControlService
 
         $row = (array)$rows[$index];
 
-        // SECURITY: Verify org_id matches session if provided
-        if ($orgId !== null && ($row['org_id'] ?? null) !== $orgId) {
+        // FIN-001: Always verify org_id matches session
+        if (($row['org_id'] ?? '') !== $sessionOrgId) {
             throw new RuntimeException('Period close access denied');
         }
 
@@ -235,11 +241,11 @@ final class FinanceControlService
                 && ($row['requested_posting_date'] ?? '') === $requestedPostingDate
                 && ($row['exception_status'] ?? '') === 'approved'
             ) {
-                // BLF-006: Use DateTimeImmutable instead of strtotime for reliable timezone handling
+                // FIN-013: Normalize dates to UTC before comparison
                 try {
-                    $expiresAt = new DateTimeImmutable((string)($row['expires_at'] ?? ''));
-                    $now = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
-                    if ($expiresAt > $now) {
+                    $expiresAtNorm = (new DateTimeImmutable((string)($row['expires_at'] ?? ''), new \DateTimeZone('UTC')))->format('Y-m-d');
+                    $nowNorm = (new DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d');
+                    if ($expiresAtNorm >= $nowNorm) {
                         throw new RuntimeException('An active backdate exception already exists for this subject and posting date.');
                     }
                 } catch (\Exception $e) {
@@ -479,7 +485,7 @@ final class FinanceControlService
             $row = [
                 $idField => $this->uuid(strtoupper(substr($kind, 0, 1)) . 'M'),
                 'memo_type' => $kind,
-                'memo_status' => 'approved',
+                'memo_status' => 'draft',
                 'invoice_scope' => $invoiceScope,
                 'original_invoice_ref' => $originalInvoiceRef,
                 'reason_code' => $reasonCode,

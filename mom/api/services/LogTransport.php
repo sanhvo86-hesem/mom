@@ -222,8 +222,14 @@ final class LogTransport
 
         $lines = '';
         foreach ($entries as $entry) {
+            // WRK-026: Validate log source field format to prevent CRLF injection
+            $source = (string)($entry['source'] ?? 'unknown');
+            if (!preg_match('/^[a-zA-Z0-9_\-\.]{1,64}$/', $source)) {
+                $source = 'invalid_source';
+            }
+            $entry['source'] = $source;
+
             // OPS-R6-004: Validate log entries for injection attacks
-            $source = (string)($entry['source'] ?? '');
             if (str_contains($source, "\n") || str_contains($source, "\r")) {
                 @error_log('[LogTransport] Skipping entry with newline in source field');
                 continue;
@@ -301,7 +307,8 @@ final class LogTransport
      */
     private function fallbackStats(): array
     {
-        $files = is_dir($this->fallbackDir) ? glob($this->fallbackDir . '/logs-*.jsonl') : [];
+        // WRK-032: Limit glob() file count to prevent memory exhaustion
+        $files = is_dir($this->fallbackDir) ? array_slice(glob($this->fallbackDir . '/logs-*.jsonl') ?: [], 0, 1000) : [];
         $fileCount = 0;
         $bytes = 0;
         foreach ($files ?: [] as $file) {
