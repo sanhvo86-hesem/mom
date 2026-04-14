@@ -1730,6 +1730,23 @@ blocked transitions:
 </table></div></div>
 </section>
 
+<section class="section" id="graphics-debt-closure-protocol">
+<h2 class="section-title"><span class="section-number">2O.1</span>Graphics Debt Closure Protocol <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Debt closure is a governed state machine. It converts observability into accountable remediation, evidence and release eligibility.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Closure state</th><th>Required fields</th><th>Entry condition</th><th>Exit evidence / blocker rule</th></tr></thead>
+<tbody>
+<tr><td><code>detected</code></td><td><code>debtId</code>, moduleId, route, debtType, sourceFile, detectedBy, detectedAt.</td><td>Compliance matrix, runtime beacon, drift detector or release scan finds private CSS, hardcoded style, bridge alias or token/component drift.</td><td>Cannot be hidden from dashboard; new/major-refactor module remains blocked until triaged.</td></tr>
+<tr><td><code>triaged</code></td><td>owner, team, domain, severity, regulated/shopfloor flags, remediationClass, dueAt.</td><td>Design System Governance assigns ownership and risk.</td><td>High/regulated/shopfloor-critical debt requires release blocker or approved waiver before release.</td></tr>
+<tr><td><code>waived-temporarily</code></td><td>waiverId, compensatingControl, approver, expiresAt, retrospectiveDueAt, migrationPlanRef.</td><td>Only allowed through Graphics Waiver flow and never for prohibited regulated/shopfloor conditions.</td><td>Expired waiver reopens blocker automatically; waiver is not closure evidence.</td></tr>
+<tr><td><code>remediation-in-progress</code></td><td>targetSharedTokenRefs, targetComponentContractRefs, templateMigrationRef, testPlanRef.</td><td>Owner submits migration plan from private/bridged graphics back to Admin/shared authority.</td><td>Publish blocked if plan does not name affected modules/routes/screens and rollback path.</td></tr>
+<tr><td><code>verified</code></td><td>impactReportRef, complianceSnapshotRef, driftReportRef, runtimeBeaconRef, screenshotDiffRef.</td><td>Code/runtime artifacts prove shared token/component/template linkage.</td><td>Debt may close only when beacon state is not blocked and drift status is clear for the affected scope.</td></tr>
+<tr><td><code>closed</code></td><td>closedBy, closedAt, releaseEvidenceRef, auditEventRef, trendBaselineAfter.</td><td>Release Engineering accepts evidence pack and updates release dashboard trend.</td><td>Closure is invalid if evidence is ad hoc, missing checksum, missing owner, or not linked from GraphicsReleaseLink.</td></tr>
+</tbody>
+</table></div></div>
+<div class="info-box info-box-red"><strong>Controlled debt rule.</strong> Debt with no owner, reason, due date, evidence path or waiver is uncontrolled debt and must appear as a release blocker for new modules and major refactors.</div>
+</section>
+
 <section class="section" id="multi-site-plant-branding-governance">
 <h2 class="section-title"><span class="section-number">2P</span>Multi-Site / Plant Branding Governance <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
 <p class="section-subtitle">Plant branding được phép thay đổi identity/environment tokens có kiểm soát; không được thay semantic safety, quality or audit meaning.</p>
@@ -1784,7 +1801,7 @@ blocked transitions:
 </section>
 
 <section class="section" id="world-benchmark-delta-matrix">
-<h2 class="section-title"><span class="section-number">2T</span>World Benchmark Delta Matrix <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<h2 class="section-title"><span class="section-number">2T</span>World Benchmark Matrix / Delta Matrix <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
 <p class="section-subtitle">Benchmark toàn cầu chỉ có giá trị khi được chuyển thành rule kiểm được, artifact máy đọc được và release blocker rõ ràng.</p>
 <div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
 <thead><tr><th>Benchmark source</th><th>Top-tier practice</th><th>HESEM control-plane adoption</th><th>Priority</th><th>Release evidence</th></tr></thead>

@@ -38,6 +38,8 @@ var _adminConfig = null;
 var _adminConfigVersion = '';
 var _adminConfigEtag = '';
 var _adminConfigAuthorityState = 'unknown';
+var _adminConfigPreviewDirty = false;
+var _adminConfigPreviewReason = '';
 var _userPrefs = null;
 var _previewPrefs = null;
 var _templateStore = null;
@@ -45,6 +47,7 @@ var _listeners = [];
 var _scheduleTimer = null;
 var _colorSchemeMedia = null;
 var _colorSchemeListenerBound = false;
+var _previewCssVarsApplied = {};
 
 /* ── Load/Save ──────────────────────────────────────────────────────────── */
 function _loadUserPrefs(){
@@ -86,6 +89,8 @@ function _loadAdminConfig(callback){
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = String((resp && resp.etag) || '');
         _adminConfigAuthorityState = 'backend-attested';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
         if(callback) callback(_adminConfig);
         return;
       } catch(e){}
@@ -101,7 +106,14 @@ function _loadAdminConfig(callback){
         _adminConfigVersion = String((_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = '';
         _adminConfigAuthorityState = 'backend-unavailable-preview-only';
-      } catch(e){ _adminConfig = _adminConfig || {}; _adminConfigAuthorityState = 'backend-unavailable-preview-only'; }
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
+      } catch(e){
+        _adminConfig = _adminConfig || {};
+        _adminConfigAuthorityState = 'backend-unavailable-preview-only';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
+      }
       if(callback) callback(_adminConfig);
     };
     xhr2.send();
@@ -112,6 +124,35 @@ function _loadAdminConfig(callback){
 function _loadPreviewPrefs(){
   if(!_previewPrefs) _previewPrefs = {};
   return _previewPrefs;
+}
+
+function _markPreviewDirty(reason){
+  _adminConfigPreviewDirty = true;
+  _adminConfigPreviewReason = reason || 'admin-preview-overrides';
+  if(_adminConfigAuthorityState === 'backend-attested'){
+    _adminConfigAuthorityState = 'preview-overridden';
+  }
+}
+
+function _hasPreviewOverrides(){
+  var prefs = _previewPrefs || {};
+  return Object.keys(prefs).some(function(key){
+    if(key === '_cssVarPreviewOverrides'){
+      return Object.keys(prefs[key] || {}).length > 0;
+    }
+    return prefs[key] !== undefined && prefs[key] !== null && prefs[key] !== '';
+  });
+}
+
+function _clearPreviewOverrideDirty(){
+  if(_hasPreviewOverrides()) return;
+  if(_adminConfigPreviewReason === 'admin-preview-overrides' || _adminConfigPreviewReason === 'inline-css-var-preview'){
+    _adminConfigPreviewDirty = false;
+    _adminConfigPreviewReason = '';
+    if(_adminConfigAuthorityState === 'preview-overridden'){
+      _adminConfigAuthorityState = (_adminConfigVersion || _adminConfigEtag) ? 'backend-attested' : 'unknown';
+    }
+  }
 }
 
 /* ── Resolve: preview → user → admin → default ──────────────────────────── */
@@ -497,6 +538,20 @@ function _applyCustomVars(){
      config and must be accompanied by waiver/governance evidence before rollout. */
   var customCSS = _resolveDeep('advanced.customCSS');
   _applyCustomCSS(customCSS || '');
+
+  var previewVars = (_loadPreviewPrefs() || {})._cssVarPreviewOverrides || {};
+  Object.keys(_previewCssVarsApplied).forEach(function(varName){
+    if(!Object.prototype.hasOwnProperty.call(previewVars, varName)){
+      ROOT.style.removeProperty(varName);
+      delete _previewCssVarsApplied[varName];
+    }
+  });
+  Object.keys(previewVars).forEach(function(varName){
+    if(/^--[A-Za-z0-9_-]+$/.test(varName)){
+      ROOT.style.setProperty(varName, String(previewVars[varName]));
+      _previewCssVarsApplied[varName] = true;
+    }
+  });
 }
 
 /** Merge admin + user into one config (user wins) */
@@ -692,23 +747,39 @@ function setPreviewDeep(path, value){
     obj = obj[parts[i]];
   }
   obj[parts[parts.length - 1]] = value;
+  _markPreviewDirty('admin-preview-overrides');
   _apply();
 }
 
 function setPreviewAll(prefs){
   _deepMerge(_loadPreviewPrefs(), prefs || {});
+  _markPreviewDirty('admin-preview-overrides');
   _apply();
 }
 
 function clearPreviewOverrides(){
   _previewPrefs = {};
+  Object.keys(_previewCssVarsApplied).forEach(function(varName){
+    ROOT.style.removeProperty(varName);
+    delete _previewCssVarsApplied[varName];
+  });
+  _clearPreviewOverrideDirty();
   _apply();
 }
 
-  /** Set a CSS variable directly for real-time preview only.
-      Exported as setPreviewVar to make the non-authority role explicit. */
+  /** Set a CSS variable for real-time preview only.
+      This records the override in the in-memory preview layer so authority
+      state, release eligibility and clearPreviewOverrides stay deterministic. */
   function setPreviewVar(varName, value){
-    ROOT.style.setProperty(varName, value);
+    if(!/^--[A-Za-z0-9_-]+$/.test(String(varName || ''))) return false;
+    var prefs = _loadPreviewPrefs();
+    prefs._cssVarPreviewOverrides = prefs._cssVarPreviewOverrides || {};
+    if(value === undefined || value === null || value === '') delete prefs._cssVarPreviewOverrides[varName];
+    else prefs._cssVarPreviewOverrides[varName] = value;
+    if(_hasPreviewOverrides()) _markPreviewDirty('inline-css-var-preview');
+    else _clearPreviewOverrideDirty();
+    _apply();
+    return true;
   }
 
 /** Persist personal appearance preferences only; Admin authority saves must use
@@ -723,6 +794,9 @@ function setAll(prefs){
 function reset(){
   _userPrefs = {};
   _saveUserPrefs();
+  _previewPrefs = {};
+  _previewCssVarsApplied = {};
+  _clearPreviewOverrideDirty();
   /* Remove all inline style overrides */
   ROOT.removeAttribute('style');
   _apply();
@@ -760,13 +834,16 @@ function isDark(){
 function getAdminConfig(){ return _adminConfig || {}; }
 
 function getAdminConfigAuthority(){
+  var releaseEligible = _adminConfigAuthorityState === 'backend-attested' && !_adminConfigPreviewDirty;
   return {
     authority: 'backend_admin_design_config',
     cacheKey: ADMIN_STORAGE_KEY,
     cacheRole: 'legacy-disabled',
     localStorageAuthority: false,
     authorityState: _adminConfigAuthorityState,
-    releaseEligible: _adminConfigAuthorityState === 'backend-attested',
+    releaseEligible: releaseEligible,
+    previewDirty: _adminConfigPreviewDirty,
+    previewReason: _adminConfigPreviewReason,
     version: _adminConfigVersion,
     etag: _adminConfigEtag
   };
@@ -774,6 +851,9 @@ function getAdminConfigAuthority(){
 
 function saveAdminConfig(config, callback){
   _adminConfig = config;
+  _adminConfigAuthorityState = 'pending-backend-save';
+  _adminConfigPreviewDirty = true;
+  _adminConfigPreviewReason = 'backend-save-pending';
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'api.php?action=admin_design_config_save', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
@@ -781,7 +861,8 @@ function saveAdminConfig(config, callback){
   if(typeof csrfToken !== 'undefined' && csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
   xhr.onreadystatechange = function(){
     if(xhr.readyState !== 4) return;
-    if(xhr.status >= 200 && xhr.status < 300){
+    var ok = xhr.status >= 200 && xhr.status < 300;
+    if(ok){
       try {
         var resp = JSON.parse(xhr.responseText);
         var nextConfig = resp && resp.config ? resp.config : (resp && resp.data ? resp.data : config);
@@ -789,11 +870,17 @@ function saveAdminConfig(config, callback){
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
         _adminConfigEtag = String((resp && resp.etag) || _adminConfigEtag || '');
         _adminConfigAuthorityState = 'backend-attested';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
         _previewPrefs = {};
       } catch(e){}
+    } else {
+      _adminConfigAuthorityState = 'preview-unsaved';
+      _adminConfigPreviewDirty = true;
+      _adminConfigPreviewReason = 'backend-save-failed';
     }
     _apply();
-    if(callback) callback(xhr.status >= 200 && xhr.status < 300);
+    if(callback) callback(ok);
   };
   xhr.send(JSON.stringify({ config: config, expectedVersion: _adminConfigEtag || _adminConfigVersion || '' }));
 }
@@ -826,6 +913,9 @@ function importTheme(jsonStr){
   try {
     var config = JSON.parse(jsonStr);
     _adminConfig = config;
+    _adminConfigAuthorityState = 'preview-imported';
+    _adminConfigPreviewDirty = true;
+    _adminConfigPreviewReason = 'imported-theme-not-backend-attested';
     _apply();
     return true;
   } catch(e){ return false; }

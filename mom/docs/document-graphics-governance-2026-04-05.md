@@ -366,6 +366,10 @@ Any non-compliant module must carry reason text, debt counts and remediation own
 
 Release manifest and evidence bundle must include graphics authority refs, template registry version/checksum, compliance matrix ref, impact analysis ref, waiver refs, drift report and rollback plan.
 
+### Debt closure protocol
+
+Visual debt is not closed by hiding a warning or granting a waiver. Each debt item must move through `detected -> triaged -> remediation-in-progress -> verified -> closed`, with `waived-temporarily` allowed only as an expiring exception state. Closure requires owner, due date, affected module/route/screen scope, remediation plan, runtime beacon proof, drift snapshot and release evidence ref. Any debt without owner, reason, expiry/evidence path or approved waiver is uncontrolled debt and blocks new modules and major refactors.
+
 ### Validation proof boundary
 
 Graphics governance smoke checks may pass in a clean source checkout, but full publication-truth gates require generated runtime registry artifacts under `mom/data/registry/*`. That directory is runtime/generated state and is not packaged as static source authority. A report must not claim `verify_publication_truth.py` or `validate-frontend-contracts.mjs` green unless the generated registry artifacts exist for that environment and the database-backed schema authority prerequisites are available. When those artifacts are absent, the correct state is `proof-unavailable-generated-registry-missing`, not `passed`.
