@@ -56,6 +56,7 @@ final class MobileWorkQueueServiceTest extends TestCase
             'result' => 'partial',
             'qty_completed' => 7,
             'qty_scrap' => 1,
+            'reason_code' => 'INSERT_ISSUE',
             'notes' => 'One insert issue.',
         ]);
 
@@ -63,6 +64,7 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertSame('partial', $completed['result']);
         $this->assertSame(7, $completed['qty_completed']);
         $this->assertSame(1, $completed['qty_scrap']);
+        $this->assertSame('INSERT_ISSUE', $completed['completion_reason_code']);
 
         $task2 = $service->assignTask('operator-1', 'WO-1002', 'operation_complete', []);
         $this->expectException(RuntimeException::class);
@@ -71,6 +73,33 @@ final class MobileWorkQueueServiceTest extends TestCase
             'result' => 'pass',
             'qty_completed' => 5,
             'qty_scrap' => 1,
+        ]);
+    }
+
+    public function testCompleteTaskRequiresReasonForNonPassAndRejectsScrapWithoutCompletedQuantity(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1003', 'operation_complete', []);
+
+        try {
+            $service->completeTask((string)$task['queue_id'], 'operator-1', [
+                'result' => 'fail',
+                'qty_completed' => 0,
+                'qty_scrap' => 0,
+            ]);
+            $this->fail('Fail completion should require a structured reason code.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('completion_reason_code_required', $e->getMessage());
+        }
+
+        $task2 = $service->assignTask('operator-1', 'WO-1004', 'operation_complete', []);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('qty_scrap_exceeds_completed');
+        $service->completeTask((string)$task2['queue_id'], 'operator-1', [
+            'result' => 'fail',
+            'qty_completed' => 0,
+            'qty_scrap' => 1,
+            'reason_code' => 'DEF-DIM',
         ]);
     }
 

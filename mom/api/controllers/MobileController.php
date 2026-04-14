@@ -256,6 +256,7 @@ class MobileController extends BaseController
                 'result'        => strtolower(trim((string)($body['result'] ?? ''))),
                 'qty_completed' => (int)($body['qty_completed'] ?? 0),
                 'qty_scrap'     => (int)($body['qty_scrap'] ?? 0),
+                'reason_code'   => trim((string)($body['reason_code'] ?? $body['completion_reason_code'] ?? $body['defect_code'] ?? '')),
                 'notes'         => trim((string)($body['notes'] ?? '')),
             ]);
 

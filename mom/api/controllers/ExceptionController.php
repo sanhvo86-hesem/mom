@@ -24,6 +24,102 @@ use Throwable;
  */
 class ExceptionController extends BaseController
 {
+    private const GOVERNED_EXCEPTION_FIELDS = [
+        'status',
+        'status_history',
+        'closed_at',
+        'closed_by',
+        'approved_at',
+        'approved_by',
+        'rejected_at',
+        'rejected_by',
+    ];
+
+    private const EXCEPTION_UPDATE_FIELDS = [
+        'complaints' => [
+            'customer_id',
+            'source',
+            'severity',
+            'subject',
+            'description',
+            'affected_so_number',
+            'affected_part_id',
+            'affected_qty',
+            'received_date',
+            'assigned_to',
+            'department',
+            'priority',
+            'due_date',
+            'containment_action',
+            'root_cause',
+            'corrective_action',
+            'preventive_action',
+            'verification_result',
+            'd1',
+            'd2',
+            'd3',
+            'd4',
+            'd5',
+            'd6',
+            'd7',
+            'd8',
+            'notes',
+            'attachments',
+            'metadata',
+        ],
+        'mrb' => [
+            'ncr_id',
+            'item_id',
+            'job_number',
+            'lot_number',
+            'qty_affected',
+            'disposition',
+            'disposition_reason',
+            'review_notes',
+            'assigned_to',
+            'department',
+            'priority',
+            'due_date',
+            'actions',
+            'notes',
+            'attachments',
+            'metadata',
+        ],
+        'deviations' => [
+            'title',
+            'description',
+            'severity',
+            'department',
+            'affected_process',
+            'justification',
+            'risk_assessment',
+            'temporary_control',
+            'assigned_to',
+            'priority',
+            'due_date',
+            'notes',
+            'attachments',
+            'metadata',
+        ],
+        'concessions' => [
+            'title',
+            'description',
+            'severity',
+            'customer_id',
+            'affected_part_id',
+            'affected_qty',
+            'justification',
+            'conditions',
+            'expiry_date',
+            'assigned_to',
+            'priority',
+            'due_date',
+            'notes',
+            'attachments',
+            'metadata',
+        ],
+    ];
+
     /** @var ExceptionService|null Lazy-loaded exception service. */
     private ?ExceptionService $exceptionSvc = null;
 
@@ -117,6 +213,59 @@ class ExceptionController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @return array<string, mixed>
+     */
+    private function guardedExceptionUpdate(string $type, string $fileName, string $id, array $body, string $userId): array
+    {
+        $filePath = $this->dataDir . '/exceptions/' . $fileName;
+        $items = $this->readJsonFile($filePath) ?? [];
+        $updates = $body;
+        unset($updates['id'], $updates['type']);
+
+        foreach (self::GOVERNED_EXCEPTION_FIELDS as $field) {
+            if (array_key_exists($field, $updates)) {
+                $this->error('exception_transition_required', 409, "Field '{$field}' must be changed through the transition endpoint.");
+            }
+        }
+
+        $allowed = array_fill_keys(self::EXCEPTION_UPDATE_FIELDS[$type] ?? [], true);
+        foreach (array_keys($updates) as $field) {
+            if (!isset($allowed[(string)$field])) {
+                $this->error('unknown_exception_update_field', 400, "Field '{$field}' is not writable through generic exception update.");
+            }
+        }
+
+        $updated = null;
+        foreach ($items as &$item) {
+            if (!is_array($item) || ($item['id'] ?? '') !== $id) {
+                continue;
+            }
+
+            if (in_array(strtolower((string)($item['status'] ?? '')), ['closed', 'rejected'], true)) {
+                $this->error('exception_record_locked', 409, 'Closed or rejected exception records require governed transition/change-control handling.');
+            }
+
+            foreach ($updates as $key => $value) {
+                $item[$key] = $value;
+            }
+            $item['updated_by'] = $userId;
+            $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+            $updated = $item;
+            break;
+        }
+        unset($item);
+
+        if ($updated === null) {
+            $this->error('not_found', 404, "Exception {$type}/{$id} not found.");
+        }
+
+        $this->writeJsonFile($filePath, $items);
+
+        return $updated;
     }
 
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -326,30 +475,7 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $filePath = $this->dataDir . '/exceptions/complaints.json';
-            $items    = $this->readJsonFile($filePath) ?? [];
-            $updated  = null;
-
-            foreach ($items as &$item) {
-                if (($item['id'] ?? '') === $id) {
-                    $updates = $body;
-                    unset($updates['id']);
-                    foreach ($updates as $key => $value) {
-                        $item[$key] = $value;
-                    }
-                    $item['updated_by'] = $userId;
-                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
-                    $updated = $item;
-                    break;
-                }
-            }
-            unset($item);
-
-            if ($updated === null) {
-                $this->error('not_found', 404, "Complaint {$id} not found.");
-            }
-
-            $this->writeJsonFile($filePath, $items);
+            $updated = $this->guardedExceptionUpdate('complaints', 'complaints.json', $id, $body, $userId);
 
             $this->auditLog('exception_update_complaint', [
                 'complaint_id' => $id,
@@ -430,30 +556,7 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $filePath = $this->dataDir . '/exceptions/mrb.json';
-            $items    = $this->readJsonFile($filePath) ?? [];
-            $updated  = null;
-
-            foreach ($items as &$item) {
-                if (($item['id'] ?? '') === $id) {
-                    $updates = $body;
-                    unset($updates['id']);
-                    foreach ($updates as $key => $value) {
-                        $item[$key] = $value;
-                    }
-                    $item['updated_by'] = $userId;
-                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
-                    $updated = $item;
-                    break;
-                }
-            }
-            unset($item);
-
-            if ($updated === null) {
-                $this->error('not_found', 404, "MRB {$id} not found.");
-            }
-
-            $this->writeJsonFile($filePath, $items);
+            $updated = $this->guardedExceptionUpdate('mrb', 'mrb.json', $id, $body, $userId);
 
             $this->auditLog('exception_update_mrb', [
                 'mrb_id' => $id,
@@ -534,30 +637,7 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $filePath = $this->dataDir . '/exceptions/deviations.json';
-            $items    = $this->readJsonFile($filePath) ?? [];
-            $updated  = null;
-
-            foreach ($items as &$item) {
-                if (($item['id'] ?? '') === $id) {
-                    $updates = $body;
-                    unset($updates['id']);
-                    foreach ($updates as $key => $value) {
-                        $item[$key] = $value;
-                    }
-                    $item['updated_by'] = $userId;
-                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
-                    $updated = $item;
-                    break;
-                }
-            }
-            unset($item);
-
-            if ($updated === null) {
-                $this->error('not_found', 404, "Deviation {$id} not found.");
-            }
-
-            $this->writeJsonFile($filePath, $items);
+            $updated = $this->guardedExceptionUpdate('deviations', 'deviations.json', $id, $body, $userId);
 
             $this->auditLog('exception_update_deviation', [
                 'deviation_id' => $id,
@@ -640,30 +720,7 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $filePath = $this->dataDir . '/exceptions/concessions.json';
-            $items    = $this->readJsonFile($filePath) ?? [];
-            $updated  = null;
-
-            foreach ($items as &$item) {
-                if (($item['id'] ?? '') === $id) {
-                    $updates = $body;
-                    unset($updates['id']);
-                    foreach ($updates as $key => $value) {
-                        $item[$key] = $value;
-                    }
-                    $item['updated_by'] = $userId;
-                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
-                    $updated = $item;
-                    break;
-                }
-            }
-            unset($item);
-
-            if ($updated === null) {
-                $this->error('not_found', 404, "Concession {$id} not found.");
-            }
-
-            $this->writeJsonFile($filePath, $items);
+            $updated = $this->guardedExceptionUpdate('concessions', 'concessions.json', $id, $body, $userId);
 
             $this->auditLog('exception_update_concession', [
                 'concession_id' => $id,

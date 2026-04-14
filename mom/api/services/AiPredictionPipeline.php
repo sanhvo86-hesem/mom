@@ -639,10 +639,18 @@ final class AiPredictionPipeline
             }
 
             // ── Mean time to action (seconds) / Thời gian TB đến hành động (giây) ──
+            $mttaWhere = [];
+            $mttaParams = [];
+            if ($plantId !== '') {
+                $mttaWhere[] = 'p.plant_id = :mtta_plant_id';
+                $mttaParams[':mtta_plant_id'] = $plantId;
+            }
             $mtta = $this->db->queryScalar(
                 "SELECT EXTRACT(EPOCH FROM AVG(a.created_at - p.created_at))
                  FROM ai_recommendation_actions a
                  JOIN quality_predictions p ON p.prediction_id = a.prediction_id"
+                . ($mttaWhere !== [] ? ' WHERE ' . implode(' AND ', $mttaWhere) : ''),
+                $mttaParams
             );
             $metrics['mean_time_to_action'] = $mtta !== null ? round((float)$mtta, 2) : 0.0;
 

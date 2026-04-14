@@ -25,6 +25,67 @@ use Throwable;
  */
 class OrderController extends BaseController
 {
+    private const JO_UPDATE_FIELDS = [
+        'customer_id',
+        'item_id',
+        'qty_ordered',
+        'unit_price',
+        'due_date',
+        'priority',
+        'part_number',
+        'part_revision',
+        'material_spec',
+        'routing_id',
+        'routing_revision',
+        'bom_id',
+        'control_plan_id',
+        'inspection_plan_id',
+        'traveler_template_id',
+        'engineering_release_status',
+        'material_ready_status',
+        'quality_plan_status',
+        'source_inspection_status',
+        'outside_processing_status',
+        'fai_required',
+        'customer_source_inspection',
+        'special_process',
+        'special_process_supplier_id',
+        'org_plant_id',
+        'org_site_id',
+        'notes',
+    ];
+
+    private const WO_UPDATE_FIELDS = [
+        'operation_number',
+        'operation_desc',
+        'routing_operation_id',
+        'job_operation_id',
+        'machine_id',
+        'work_center_id',
+        'operator_id',
+        'nc_program_id',
+        'cnc_program_version_id',
+        'setup_sheet_id',
+        'setup_sheet_revision',
+        'setup_time_est',
+        'run_time_est',
+        'scheduled_start',
+        'scheduled_end',
+        'fixture_id',
+        'dispatch_priority',
+        'quality_gate_status',
+        'first_piece_status',
+        'handover_status',
+        'material_lot_number',
+        'heat_number',
+        'traveler_number',
+        'traveler_status',
+        'material_cert_status',
+        'org_plant_id',
+        'org_site_id',
+        'notes',
+    ];
+
     /** @var OrderService|null Lazy-loaded order service. */
     private ?OrderService $orderService = null;
 
@@ -78,6 +139,61 @@ class OrderController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $changes
+     * @return array<string, mixed>
+     */
+    private function guardedOrderChanges(string $orderType, array $body, array $changes): array
+    {
+        foreach (['so_number', 'jo_number', 'wo_number', 'id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by', 'status_history', 'change_history', 'reason'] as $systemField) {
+            unset($changes[$systemField]);
+        }
+
+        foreach (array_keys($body) as $key) {
+            if (str_starts_with((string)$key, 'change_') || in_array((string)$key, ['authority_source', 'authority_verified', 'authority_context'], true)) {
+                unset($changes[$key]);
+            }
+        }
+
+        $allowed = match ($orderType) {
+            'jo' => array_fill_keys(self::JO_UPDATE_FIELDS, true),
+            'wo' => array_fill_keys(self::WO_UPDATE_FIELDS, true),
+            default => [],
+        };
+
+        foreach (array_keys($changes) as $field) {
+            if (!isset($allowed[(string)$field])) {
+                $this->error('unknown_order_update_field', 400, "Field '{$field}' is not writable through {$orderType} update.");
+            }
+        }
+
+        return $changes;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function assertWorkOrderScheduleWindow(array $data): void
+    {
+        $start = trim((string)($data['scheduled_start'] ?? ''));
+        $end = trim((string)($data['scheduled_end'] ?? ''));
+        if ($start === '' || $end === '') {
+            return;
+        }
+
+        try {
+            $startTime = new \DateTimeImmutable($start);
+            $endTime = new \DateTimeImmutable($end);
+        } catch (Throwable) {
+            $this->error('invalid_work_order_schedule_time', 400);
+        }
+
+        if ($endTime <= $startTime) {
+            $this->error('work_order_schedule_end_before_start', 400);
+        }
     }
 
     /**
@@ -745,7 +861,10 @@ class OrderController extends BaseController
         }
 
         $changes = $body['changes'] ?? $body;
-        unset($changes['jo_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+        if (!is_array($changes)) {
+            $this->error('invalid_changes', 400);
+        }
+        $changes = $this->guardedOrderChanges('jo', $body, $changes);
 
         $uid = $this->userId($user);
         $reason = trim((string)($body['reason'] ?? 'Field update'));
@@ -812,6 +931,13 @@ class OrderController extends BaseController
             'traveler_number' => (string)($body['traveler_number'] ?? ''),
             'traveler_status' => (string)($body['traveler_status'] ?? ''),
             'material_cert_status' => (string)($body['material_cert_status'] ?? ''),
+            'routing_operation_id' => (string)($body['routing_operation_id'] ?? ''),
+            'job_operation_id' => (string)($body['job_operation_id'] ?? ''),
+            'cnc_program_version_id' => (string)($body['cnc_program_version_id'] ?? ''),
+            'setup_sheet_id' => (string)($body['setup_sheet_id'] ?? ''),
+            'setup_sheet_revision' => (string)($body['setup_sheet_revision'] ?? ''),
+            'org_plant_id' => (string)($body['org_plant_id'] ?? $body['plant_id'] ?? ''),
+            'org_site_id' => (string)($body['org_site_id'] ?? $body['site_id'] ?? ''),
             'status'           => 'scheduled',
             'created_by'       => $uid,
             'created_at'       => $now,
@@ -821,6 +947,7 @@ class OrderController extends BaseController
         ];
 
         try {
+            $this->assertWorkOrderScheduleWindow($wo);
             $saved = $this->orderService()->createWorkOrder($wo);
             $this->auditLog('order_wo_create', ['wo_number' => $saved['wo_number'], 'jo_number' => $wo['jo_number']], $uid);
             $this->success(['work_order' => $saved], 201);
@@ -848,7 +975,11 @@ class OrderController extends BaseController
         }
 
         $changes = $body['changes'] ?? $body;
-        unset($changes['wo_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+        if (!is_array($changes)) {
+            $this->error('invalid_changes', 400);
+        }
+        $changes = $this->guardedOrderChanges('wo', $body, $changes);
+        $this->assertWorkOrderScheduleWindow($changes);
 
         $uid = $this->userId($user);
         $reason = trim((string)($body['reason'] ?? 'Field update'));

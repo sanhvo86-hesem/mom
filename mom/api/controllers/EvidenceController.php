@@ -94,7 +94,7 @@ class EvidenceController extends BaseController
         if ($text === '') {
             return null;
         }
-        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+        if (strlen($text) < 16 || strlen($text) > 128 || preg_match('/^[A-Za-z0-9._\-]+$/', $text) !== 1) {
             $this->sliceProblem('urn:qms:problem:validation-error', 'Invalid Idempotency-Key', 400);
         }
 
