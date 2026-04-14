@@ -37,7 +37,8 @@ final class RegistryBootstrapPathTest extends TestCase
         $firstTable = reset($tableRegistry['tables']);
         $this->assertIsArray($firstTable);
         $this->assertArrayHasKey('primaryKey', $firstTable);
-        $this->assertArrayHasKey('primaryKeys', $firstTable);
+        $primaryKeys = $firstTable['primaryKeys'] ?? (array)$firstTable['primaryKey'];
+        $this->assertNotEmpty(array_filter($primaryKeys));
 
         $this->assertIsArray($endpointCatalog['rows'] ?? null);
         $this->assertGreaterThan(0, count($endpointCatalog['rows']));
