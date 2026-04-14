@@ -1,6 +1,13 @@
 # Agent 1 - Global Benchmark And Standards Refresh
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+
+## 2026-04-15 Current-Pass Addendum
+
+- Confirmed P1 staged authority remains the dominant benchmark gap: dispatch/order/CNC execution still uses JSON compatibility truth with DB bridges.
+- Confirmed H15/H16 were absent from older scorecards; this pass adds explicit duplicate/storage drift and regression-test-gap dispositions.
+- Safe fixes applied now: dispatch redispatch blocking, orphan hold rejection, SO date validation, shared NLQ rate ledger, and manufacturing-event fallback append scanning.
+- Deferred with evidence: DB-primary execution/CNC/EQMS authority needs reconciliation and compatibility testing before cutover.
 
 ## 2026-04-14 Current-Pass Addendum
 

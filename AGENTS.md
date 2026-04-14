@@ -69,3 +69,4 @@ Run the maximum safe subset for every change:
 - Do not add direct machine-control behavior in this application layer.
 - Do not hide unfinished work in documentation; either implement the safe remediation or record the precise blocker and next step.
 - Keep diffs localized, auditable, tested, and compatible with existing public contracts.
+- When closing audit debt, explicitly classify duplicate/storage drift and regression-test gaps instead of treating them as generic follow-up work.

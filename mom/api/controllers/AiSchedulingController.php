@@ -236,6 +236,54 @@ class AiSchedulingController extends BaseController
         return rtrim(str_replace('\\', '/', $base), '/') . '/' . $conversationId . '.json';
     }
 
+    private function consumeAiNlRateLimit(string $userId): void
+    {
+        $bucket = gmdate('YmdH');
+        $dir = $this->aiDir() . '/rate-limits';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        $file = $dir . '/nlq-' . $bucket . '.json';
+        $handle = @fopen($file, 'c+');
+        if (!is_resource($handle)) {
+            $this->error('rate_limit_store_unavailable', 500);
+        }
+
+        try {
+            if (!flock($handle, LOCK_EX)) {
+                $this->error('rate_limit_store_locked', 503);
+            }
+            rewind($handle);
+            $raw = stream_get_contents($handle);
+            $counts = [];
+            if (is_string($raw) && trim($raw) !== '') {
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $counts = $decoded;
+                }
+            }
+
+            $key = hash('sha256', $userId . '|' . $bucket);
+            $count = max(0, (int)($counts[$key] ?? 0));
+            if ($count >= 20) {
+                $this->error('rate_limit_exceeded', 429, 'Maximum 20 AI queries per hour');
+            }
+            $counts[$key] = $count + 1;
+
+            $json = json_encode($counts, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            if (!is_string($json)) {
+                $this->error('rate_limit_store_encode_failed', 500);
+            }
+            ftruncate($handle, 0);
+            rewind($handle);
+            fwrite($handle, $json);
+            fflush($handle);
+        } finally {
+            @flock($handle, LOCK_UN);
+            @fclose($handle);
+        }
+    }
+
     /**
      * @param array<string, mixed> $conversation
      * @param array<string, mixed> $user
@@ -1920,13 +1968,7 @@ class AiSchedulingController extends BaseController
                 $this->error('invalid_question_format', 400, 'Question contains disallowed SQL keywords');
             }
 
-            // MES-022: Rate limiting on aiNlQuery (20 per hour max)
-            $rateKey = 'ai_nl_query_' . ($user['user_id'] ?? 'anon') . '_' . gmdate('YmdH');
-            $count = (int)($_SESSION['ai_nl_count_' . gmdate('YmdH')] ?? 0);
-            if ($count >= 20) {
-                $this->error('rate_limit_exceeded', 429, 'Maximum 20 AI queries per hour');
-            }
-            $_SESSION['ai_nl_count_' . gmdate('YmdH')] = $count + 1;
+            $this->consumeAiNlRateLimit($userId);
 
             $service = new NaturalLanguageQueryService($this->dataDir);
             $context = [];

@@ -1,8 +1,8 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-reaudit-20260414-203827`
+Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
 
-Date: 2026-04-14
+Date: 2026-04-15
 
 Scope: official-source benchmark deltas that directly affect this repository's ERP + MOM + MES + EQMS posture for CNC/discrete manufacturing.
 
@@ -32,3 +32,13 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - Security gaps in AI/NLQ are high-leverage because natural-language query surfaces can expose broad manufacturing data and write conversation history.
 - This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped, AI prediction JSON fallback no longer leaks blank-plant rows to scoped users, AI conversation fallback IDs are validated and owner-scoped, mobile task assignment/start/completion now has an event journal, canonical evidence finalization is role/org scoped and requires signature events, order holds append lifecycle events, CNC program/version records persist plant/site/work-center/operation/revision/inspection context, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.
 - Current re-audit fix: schedule slot create/update now uses the same overlap guard in DB and JSON fallback paths, and AI-named `ai_schedule_apply` / `ai_schedule_pm` routes now return advisory review/proposal responses instead of implying schedule or maintenance execution authority.
+- Current 2026-04-15 re-audit fix: dispatch can only promote `planned` targets to `dispatched`; order holds now reject invalid order types and missing source orders before writing hold state; sales-order dates are format/bounds checked on create/update; NLQ hourly throttling moved from session-local counters to a shared per-user/hour file ledger; the manufacturing-event file fallback scans append context instead of retaining the full ledger in memory.
+
+## 2026-04-15 six-workstream benchmark deltas
+
+- Agent 1 confirmed the staged JSON-live/DB-bridge model remains the main benchmark gap. Safe remediation is bridge hardening plus explicit DB-primary promotion criteria, not a second execution model.
+- Agent 2 confirmed planning still has JSON compatibility authority. This pass closed safe planning defects by validating sales-order date semantics and rejecting orphan order holds.
+- Agent 3 confirmed production snapshots remain compatibility read models while event journals provide audit/replay truth. This pass tightened dispatch lifecycle transitions, aligned mobile queue reads to the factory calendar, and improved fallback event-append scalability.
+- Agent 4 confirmed legacy quality/SPC/NCR sidecars remain the EQMS gap, while the newer evidence/signature control plane is materially stronger.
+- Agent 5 confirmed CNC program/setup-sheet authority remains file-backed, but digital-thread fields and genealogy scope constraints are present. OPC UA remains readiness-only, not a live adapter.
+- Agent 6 confirmed AI stays advisory. This pass replaced session-local NLQ throttling with a shared ledger so rate limits are user/hour scoped across sessions.

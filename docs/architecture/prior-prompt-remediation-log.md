@@ -1,8 +1,8 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-reaudit-20260414-203827`
+Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
 
-Date: 2026-04-14
+Date: 2026-04-15
 
 This log records prior deliverables from the Phase 1 CNC shopfloor execution prompts and the status after this pass.
 
@@ -50,6 +50,11 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Canonical evidence finalization role gate | Fixed now | `EqmsControlPlaneController::finalizeEvidencePackage()` now requires controlled evidence finalization roles. |
 | Canonical evidence read and signature governance | Fixed now | Canonical evidence reads require EQMS read roles and org context; finalization writes org metadata and rejects packages without signature events. |
 | Order hold event history | Fixed now | Hold set/release still update the compatibility snapshot but also append `orders/hold_events.json` lifecycle facts. |
+| Order hold target validation | Fixed now | `OrderController::setHold()` rejects invalid order types and missing SO/JO/WO targets before appending the compatibility hold snapshot or event fact. |
+| Sales-order date validation | Fixed now | SO create/update normalizes `YYYY-MM-DD` fields and rejects requested/promise/commit/due dates before `order_date`. |
+| Dispatch redispatch lifecycle gap | Fixed now | `ShopfloorExecutionService::assertTargetDispatchable()` allows only `planned` targets to be dispatched, preventing redispatch of started or terminal targets. |
+| Manufacturing-event fallback append scalability | Fixed now | `FileManufacturingEventRepository::append()` scans duplicate/hash-chain context under lock instead of retaining the full fallback ledger in memory. |
+| AI NLQ session-local throttle | Fixed now | `AiSchedulingController::aiNlQuery()` consumes a shared per-user/hour file ledger instead of a session-only counter. |
 | CNC program digital-thread scope | Fixed now | CNC program creation/update/version rows now preserve plant/site/work-center/operation/part-revision/routing/inspection context and scoped reads honor `plant_id`/`org_plant_id`. |
 | CNC setup-sheet release default | Fixed now | Setup sheet creation defaults to `draft`, and strict dispatch no longer treats missing setup status as released. |
 | MTConnect XML entity expansion | Fixed now | `EdgeConnectorService` rejects `DOCTYPE`/`ENTITY` payloads and parses MTConnect XML without `LIBXML_NOENT`. |
@@ -97,6 +102,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Evidence finalization completeness | Signature manifest artifacts existed, but finalization could persist with no signature events. | Finalization now rejects packages without at least one structured signature event. |
 | CNC program execution context | CNC setup sheets carried plant/work-center/revision fields, but programs and versions did not. | Program and version records now carry the same scope/digital-thread fields used by setup and dispatch. |
 | Required documentation names | Previous docs existed under related names but not all requested names. | Added exact required documents and updated the benchmark doc. |
+| Mobile work-queue factory date | Queue assignments used factory `+07:00` timestamps while default queue/dashboard reads used the PHP process date, hiding today's tasks near UTC day boundaries. | Mobile queue and dashboard default dates now use the same factory calendar as assignment timestamps, with a regression test. |
 
 ## Still blocked by evidence
 

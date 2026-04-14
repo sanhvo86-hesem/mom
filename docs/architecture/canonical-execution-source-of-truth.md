@@ -1,8 +1,8 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-reaudit-20260414-203827`
+Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
 
-Date: 2026-04-14
+Date: 2026-04-15
 
 This document defines the current Phase 1 execution truth model for CNC/discrete manufacturing. It preserves the existing custom MVC architecture, router/middleware behavior, and legacy JSON fallback while making the operational boundary explicit.
 
@@ -41,11 +41,13 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 ## Event vs snapshot rules
 
 - Append-only production report events and dispatch lifecycle events are the audit/replay truth.
+- File-backed manufacturing event fallback is compatibility-only and scans append context under lock for idempotency/hash-chain continuity; it is not DB-primary authority.
 - Target and production-log snapshots are compatibility/read-model state.
 - Mobile inspection capture is append-only by behavior for offline replay: matching replay returns existing fact; divergent replay is rejected.
 - Mobile task assignment/start/completion writes append task events and then exposes the queue row as the current snapshot.
 - `mobile/work_queue.index.json` is a derived operator/date read model. If stale or absent, the service rebuilds it from `work_queue.json`.
 - Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` lifecycle facts for set/release audit history.
+- Order hold set rejects invalid order types and missing source orders before writing the compatibility snapshot or lifecycle fact.
 - DB bridge writes are migration/readiness mirrors. They are not allowed to override JSON compatibility truth in this Phase 1 patch.
 - If event history and snapshot disagree, event history wins for audit and reconciliation.
 
@@ -61,7 +63,8 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 
 ## State model rules
 
-- `planned`: planner can edit target context and sequencing fields.
+- `planned`: planner can edit target context and sequencing fields; `planned -> dispatched` is the only normal dispatch promotion.
+- Redispatch of `dispatched`, `in_progress`, `completed`, or `cancelled` targets is rejected.
 - `dispatched`: engineering, identity, quality, and shift edits require explicit supervisor override reason.
 - `in_progress`: reporting has started; identity and engineering edits require override and audit.
 - `completed`: normal edits are locked; corrections must use correction/override semantics.
@@ -73,6 +76,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 
 - Overrides must be explicit, role-guarded, CSRF-protected when invoked via web/API write route, and audited.
 - Order hold release must derive the held order type and require the matching source-order write permission before mutating the hold.
+- Order hold set must validate the source SO/JO/WO exists before writing the hold snapshot or event.
 - First-piece gate override requires a structured `quality_override_reason`.
 - Completed/cancelled target edits are not silently reopened by a free-text note.
 - Offline/mobile replay is not an override path. Conflicting replay keys are rejected as data-integrity defects.
@@ -84,7 +88,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - AI may read canonical execution facts and derived projections.
 - AI may record feedback only through CSRF-protected, idempotent write paths.
 - AI feedback that can affect advisory confidence requires feedback/write roles, not read-only AI access.
-- AI natural-language query and RCA POST surfaces require CSRF because they write conversation/advisory history or trigger advisory processing.
+- AI natural-language query and RCA POST surfaces require CSRF because they write conversation/advisory history or trigger advisory processing. NLQ throttling is a shared user/hour ledger, not session-only state.
 - AI may suggest risk, priority, or quality insights, but may not dispatch work, complete targets, approve inspections, create quality disposition, or command machines.
 - AI schedule apply and preventive-maintenance proposal routes are advisory review capture only. A human planner or governed maintenance/EQMS path must perform any real schedule or maintenance mutation.
 - Execution truth remains in MOM/MES service paths, not in AI JSON files.

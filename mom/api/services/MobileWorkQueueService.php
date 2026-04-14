@@ -93,7 +93,7 @@ final class MobileWorkQueueService
      */
     public function getOperatorQueue(string $operatorId, ?string $date = null): array
     {
-        $targetDate = $date ?? date('Y-m-d');
+        $targetDate = $date ?? $this->factoryToday();
         $indexed = $this->operatorQueueFromIndex($operatorId, $targetDate);
         if ($indexed !== null) {
             return $indexed;
@@ -820,7 +820,7 @@ final class MobileWorkQueueService
      */
     public function getOperatorDashboard(string $operatorId): array
     {
-        $today = date('Y-m-d');
+        $today = $this->factoryToday();
         $queue = $this->getOperatorQueue($operatorId, $today);
 
         $totalTasks     = count($queue);
@@ -1931,6 +1931,11 @@ final class MobileWorkQueueService
     private function nowIso(): string
     {
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+    }
+
+    private function factoryToday(): string
+    {
+        return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('Y-m-d');
     }
 
     private function generateUuidV4(): string

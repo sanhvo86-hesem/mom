@@ -30,16 +30,16 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
                 throw new RuntimeException('Unable to lock manufacturing event fallback store.');
             }
 
-            $events = $this->readEventsFromHandle($handle);
-            $duplicate = $this->findDuplicate($events, $event);
-            if ($duplicate !== null) {
+            $scan = $this->scanEventFileForAppend($handle, $event);
+            if (is_array($scan['duplicate'] ?? null)) {
+                $duplicate = $scan['duplicate'];
                 if (($duplicate['fingerprint_hash'] ?? '') !== ($event['fingerprint_hash'] ?? '')) {
                     throw new RecordConflictException('manufacturing_event_idempotency_conflict');
                 }
                 return ['event' => ManufacturingEventCodec::normalizeRow($duplicate), 'replayed' => true];
             }
 
-            $event['previous_event_hash'] = $this->previousHash($events, $event);
+            $event['previous_event_hash'] = $scan['previous_event_hash'] ?? null;
             $event['recorded_at'] = $event['recorded_at'] ?? gmdate(DATE_ATOM);
             $event['event_hash'] = ManufacturingEventCodec::eventHash($event);
 
@@ -118,6 +118,56 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
 
     /**
      * @param resource $handle
+     * @param array<string, mixed> $event
+     * @return array{duplicate?: array<string, mixed>|null, previous_event_hash?: string|null}
+     */
+    private function scanEventFileForAppend($handle, array $event): array
+    {
+        rewind($handle);
+        $duplicate = null;
+        $previousHash = null;
+        while (($line = fgets($handle)) !== false) {
+            $decoded = json_decode(trim($line), true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            if ($duplicate === null && $this->isDuplicateCandidate($decoded, $event)) {
+                $duplicate = $decoded;
+            }
+            if (
+                ($decoded['source_system'] ?? '') === ($event['source_system'] ?? '') &&
+                ($decoded['source_aggregate_type'] ?? '') === ($event['source_aggregate_type'] ?? '') &&
+                ($decoded['source_aggregate_id'] ?? '') === ($event['source_aggregate_id'] ?? '')
+            ) {
+                $hash = trim((string)($decoded['event_hash'] ?? ''));
+                if ($hash !== '') {
+                    $previousHash = $hash;
+                }
+            }
+        }
+        fseek($handle, 0, SEEK_END);
+
+        return [
+            'duplicate' => $duplicate,
+            'previous_event_hash' => $previousHash,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $existing
+     * @param array<string, mixed> $event
+     */
+    private function isDuplicateCandidate(array $existing, array $event): bool
+    {
+        if (($existing['event_id'] ?? '') === ($event['event_id'] ?? '')) {
+            return true;
+        }
+
+        return $this->sameIdempotencyIdentity($existing, $event);
+    }
+
+    /**
+     * @param resource $handle
      * @return list<array<string, mixed>>
      */
     private function readEventsFromHandle($handle): array
@@ -155,43 +205,6 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
             @flock($handle, LOCK_UN);
             @fclose($handle);
         }
-    }
-
-    /**
-     * @param list<array<string, mixed>> $events
-     * @param array<string, mixed> $event
-     * @return array<string, mixed>|null
-     */
-    private function findDuplicate(array $events, array $event): ?array
-    {
-        foreach ($events as $existing) {
-            if (($existing['event_id'] ?? '') === ($event['event_id'] ?? '')) {
-                return $existing;
-            }
-            if ($this->sameIdempotencyIdentity($existing, $event)) {
-                return $existing;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param list<array<string, mixed>> $events
-     * @param array<string, mixed> $event
-     */
-    private function previousHash(array $events, array $event): ?string
-    {
-        for ($i = count($events) - 1; $i >= 0; $i--) {
-            $existing = $events[$i];
-            if (
-                ($existing['source_system'] ?? '') === ($event['source_system'] ?? '') &&
-                ($existing['source_aggregate_type'] ?? '') === ($event['source_aggregate_type'] ?? '') &&
-                ($existing['source_aggregate_id'] ?? '') === ($event['source_aggregate_id'] ?? '')
-            ) {
-                return (string)($existing['event_hash'] ?? '');
-            }
-        }
-        return null;
     }
 
     /**

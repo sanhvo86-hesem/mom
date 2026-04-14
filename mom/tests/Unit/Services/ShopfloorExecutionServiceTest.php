@@ -1062,6 +1062,22 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertContains('setup_sheet_not_released', $target['reference_validation']['blockers']);
     }
 
+    public function testDispatchTransitionCannotRedispatchStartedOrTerminalTargets(): void
+    {
+        $service = $this->service();
+        foreach (['dispatched', 'in_progress', 'completed', 'cancelled'] as $status) {
+            $target = $this->target();
+            $target['status'] = $status;
+
+            try {
+                $service->assertTargetDispatchable($target);
+                $this->fail('Non-planned target should not be dispatchable: ' . $status);
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame('invalid_dispatch_transition:' . $status, $e->getMessage());
+            }
+        }
+    }
+
     public function testExecutionStateTracksPauseResumeAndCompletionWithoutNewStatusModel(): void
     {
         $service = $this->service();

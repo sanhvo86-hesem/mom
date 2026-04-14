@@ -1,6 +1,6 @@
 # Shopfloor Execution API Contracts
 
-Date: 2026-04-14
+Date: 2026-04-15
 
 Scope: Phase 1 CNC shopfloor manual-input foundation using the existing custom MVC routes, middleware, CSRF, role, audit, dispatch, mobile, and AI advisory patterns.
 
@@ -74,6 +74,7 @@ Dispatch payload:
 Lifecycle rules:
 
 - `planned` targets can be edited by planners.
+- Only `planned` targets can be dispatched. `dispatched`, `in_progress`, `completed`, and `cancelled` targets cannot be redispatched through the normal dispatch endpoint.
 - `dispatched` and `in_progress` targets require supervisor override reason for identity, shift, engineering, target quantity, and quality-gate field changes.
 - `completed` and `cancelled` targets are locked for normal edits.
 - Pause, resume, blocked, downtime, and completion are execution events, not a second work-order abstraction.
@@ -147,7 +148,7 @@ Behavior:
 - Response may include legacy task fields and compact task cards. The compact shape should preserve `target_id`, `wo_number`, `operation_seq`, `machine_id`, `equipment_id`, `work_center_id`, `shift_date`, `shift_code`, `target_quantity`, `reported_quantity`, `remaining_quantity`, and quality-gate status when available.
 - Mobile task completion persists `result`, `qty_completed`, `qty_scrap`, `quantity_completed`, `quantity_scrap`, and `completion_reason_code` on the existing mobile work queue snapshot. Non-`pass` outcomes and any scrap require a structured reason code; `qty_scrap` may not exceed `qty_completed`.
 - Mobile task assignment, start, and completion append `mobile.task_assigned`, `mobile.task_started`, and `mobile.task_completed` records to `mobile/task_events.json`; the queue row is the current snapshot.
-- Mobile operator queue reads may use `mobile/work_queue.index.json` as a derived read model keyed by operator/date. The index is rebuilt from `work_queue.json` when stale and is never execution authority.
+- Mobile operator queue reads may use `mobile/work_queue.index.json` as a derived read model keyed by operator/date. The index is rebuilt from `work_queue.json` when stale and is never execution authority. Default queue and dashboard dates use the same factory calendar as mobile assignment timestamps.
 - Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
 - Mobile task completion accepts optional `idempotency_key`. A repeated completion with the same key and same completion payload returns the completed task as an idempotent replay and does not append another completion event; same-key/different-payload replay is rejected as `completion_idempotency_conflict`.
 - Mobile clock-in accepts optional `idempotency_key`. A repeated clock-in with the same key and same work context returns the original clock-in; a same-key/different-context replay is rejected as `clock_in_idempotency_conflict`.
@@ -370,6 +371,7 @@ Rules:
 - Actor must be authenticated and hold an AI read role such as quality, production planning/management, CNC workshop management, engineering management/lead, supervisor, shift lead, or admin.
 - CSRF is required because the route writes conversation history and may trigger external advisory processing.
 - The service validates generated SQL as SELECT/CTE only, rejects DDL/DML and dangerous functions, caps rows, runs in a PostgreSQL read-only transaction, and sets `statement_timeout` inside that transaction.
+- Hourly throttling is enforced through a shared per-user/hour ledger under the AI scheduling data directory rather than browser session state.
 - The NLQ prompt uses canonical AI prediction types: `defect_probability`, `tool_wear`, `spc_anomaly`, `process_drift`, and `equipment_failure`.
 - NLQ is read-only advisory access. It cannot dispatch work, approve quality, alter schedules, create NCRs, or command machines.
 - Conversation history/detail reads require AI read roles. JSON fallback detail reads validate safe conversation IDs, resolve files under the conversation directory, and require owner metadata before returning content.
@@ -412,6 +414,7 @@ Canonical evidence package reads and finalization:
 
 - JO and WO generic update routes use explicit field allowlists before workflow validation. Unknown top-level fields are rejected instead of being silently added to the JSON authority store.
 - Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` facts for set/release lifecycle history.
+- Hold set rejects invalid order types and missing SO/JO/WO targets before writing either the compatibility snapshot or lifecycle event.
 - WO schedule edits reject `scheduled_end <= scheduled_start` when both timestamps are supplied.
 - WO creation and update contracts preserve optional CNC/digital-thread fields: `routing_operation_id`, `job_operation_id`, `cnc_program_version_id`, `setup_sheet_id`, `setup_sheet_revision`, `org_plant_id`, and `org_site_id`.
 - EQMS complaint/MRB/deviation/concession generic updates cannot mutate lifecycle fields such as `status`, `status_history`, closure, approval, or rejection metadata. Those changes must use transition or change-control paths.

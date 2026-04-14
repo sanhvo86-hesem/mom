@@ -242,6 +242,57 @@ class OrderController extends BaseController
         return $date;
     }
 
+    private function assertDateNotBefore(string $candidate, string $anchor, string $error): void
+    {
+        if ($candidate === '' || $anchor === '') {
+            return;
+        }
+        if ($candidate < $anchor) {
+            $this->error($error, 400);
+        }
+    }
+
+    private function assertSalesOrderDateEnvelope(array $so): void
+    {
+        $orderDate = (string)($so['order_date'] ?? '');
+        foreach (['requested_date', 'promise_date', 'commit_date', 'due_date'] as $field) {
+            $this->assertDateNotBefore((string)($so[$field] ?? ''), $orderDate, $field . '_before_order_date');
+        }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function findOrderForHold(string $orderType, string $orderId): ?array
+    {
+        return match ($orderType) {
+            'so' => $this->orderService()->getSalesOrder($orderId),
+            'jo' => $this->orderService()->getJobOrder($orderId),
+            'wo' => $this->findWorkOrderForHold($orderId),
+            default => null,
+        };
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function findWorkOrderForHold(string $workOrderNo): ?array
+    {
+        $store = $this->readJsonFile($this->dataDir . '/orders/orders.json') ?? [];
+        $workOrders = is_array($store['work_orders'] ?? null) ? (array)$store['work_orders'] : [];
+        foreach ($workOrders as $workOrder) {
+            if (!is_array($workOrder)) {
+                continue;
+            }
+            if ((string)($workOrder['wo_number'] ?? $workOrder['work_order_no'] ?? '') === $workOrderNo) {
+                /** @var array<string, mixed> $workOrder */
+                return $workOrder;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Get primary user role string.
      */
@@ -734,11 +785,11 @@ class OrderController extends BaseController
             'customer_po_id' => trim((string)($body['customer_po_id'] ?? '')),
             'customer_po'    => trim((string)($body['customer_po'] ?? $body['customer_po_number'] ?? '')),
             'customer_po_number' => trim((string)($body['customer_po_number'] ?? $body['customer_po'] ?? '')),
-            'order_date'     => (string)($body['order_date'] ?? ''),
-            'requested_date' => (string)($body['requested_date'] ?? ''),
-            'promise_date'   => (string)($body['promise_date'] ?? ''),
-            'commit_date'    => (string)($body['commit_date'] ?? ''),
-            'due_date'       => (string)($body['due_date'] ?? ''),
+            'order_date'     => $this->requiredDateField($body['order_date'] ?? '', 'order_date'),
+            'requested_date' => $this->optionalDateField($body['requested_date'] ?? '', 'requested_date'),
+            'promise_date'   => $this->optionalDateField($body['promise_date'] ?? '', 'promise_date'),
+            'commit_date'    => $this->optionalDateField($body['commit_date'] ?? '', 'commit_date'),
+            'due_date'       => $this->requiredDateField($body['due_date'] ?? '', 'due_date'),
             'total_qty'      => (int)($body['total_qty'] ?? 0),
             'total_value'    => (float)($body['total_value'] ?? 0),
             'priority'       => (string)($body['priority'] ?? 'normal'),
@@ -755,6 +806,7 @@ class OrderController extends BaseController
             'status_history' => [['status' => 'draft', 'from' => '', 'to' => 'draft', 'timestamp' => $now, 'user' => $uid]],
             'change_history' => [],
         ];
+        $this->assertSalesOrderDateEnvelope($so);
 
         try {
             $saved = $this->orderService()->createSalesOrder($so);
@@ -800,6 +852,10 @@ class OrderController extends BaseController
         // Mass assignment protection: whitelist allowed fields
         $allowedFields = ['customer_id', 'customer_name', 'due_date', 'priority', 'special_requirements', 'notes', 'shipping_address', 'payment_terms', 'currency', 'revision', 'po_number'];
         $changes = array_intersect_key(($body['changes'] ?? $body), array_flip($allowedFields));
+        if (array_key_exists('due_date', $changes)) {
+            $changes['due_date'] = $this->requiredDateField($changes['due_date'], 'due_date');
+            $this->assertDateNotBefore((string)$changes['due_date'], (string)($so['order_date'] ?? ''), 'due_date_before_order_date');
+        }
 
         $uid = $this->userId($user);
         $reason = trim((string)($body['reason'] ?? 'Field update'));
@@ -1247,6 +1303,13 @@ class OrderController extends BaseController
         $reason    = trim((string)($body['reason'] ?? ''));
         $uid       = $this->userId($user);
         $now       = $this->nowIso();
+
+        if (!in_array($orderType, ['so', 'jo', 'wo'], true)) {
+            $this->error('invalid_order_type', 400);
+        }
+        if ($this->findOrderForHold($orderType, $orderId) === null) {
+            $this->error('hold_order_not_found', 404, 'Hold target order was not found.');
+        }
 
         $permKey = $orderType . '_write';
         $this->requireOrderPermission($user, $permKey);

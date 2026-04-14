@@ -1,6 +1,12 @@
 # Agent 4 - EQMS / Quality / SPC / Compliance
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+
+## 2026-04-15 Current-Pass Addendum
+
+- Confirmed remaining P1 EQMS risk is legacy quality sidecars: supplier incoming inspections, SPC analytics, NCR/CAPA compatibility rows, and quality integration JSONL sidecars are not yet one governed EQMS authority.
+- Refuted new control-plane weakness: evidence finalization, signature challenge consumption, canonical package reads, and form/document release gates are role/signature/org scoped.
+- No safe broad EQMS rewrite was attempted in this pass; the blocker is a DB-backed command service and reconciliation plan for legacy quality surfaces.
 
 ## 2026-04-14 Current-Pass Addendum
 

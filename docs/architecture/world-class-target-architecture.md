@@ -1,8 +1,8 @@
 # World-Class Target Architecture
 
-Audited branch: `codex/worldclass-reaudit-20260414-203827`
+Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
 
-Date: 2026-04-14
+Date: 2026-04-15
 
 This target keeps the custom PHP MVC framework, router, middleware, DataLayer, EventBus, and legacy fallback behavior. It does not propose a rewrite.
 
@@ -21,8 +21,9 @@ This target keeps the custom PHP MVC framework, router, middleware, DataLayer, E
 - Keep mobile task events as audit/replay truth for mobile assignment/start/completion while `work_queue.json` remains the snapshot.
 - Treat target and production-log JSON snapshots as compatibility/read models until a DB-primary cutover is proven.
 - Keep `ShopfloorExecutionPersistenceService` as the DB bridge for `shift_targets`, `shift_production_log`, `shift_production_report_events`, and `shift_dispatch_execution_events`.
+- Dispatch promotion must be a lifecycle transition from `planned` only. Started, terminal, paused, blocked, and correction states must flow through report/correction paths, not through redispatch.
 - Keep scheduling/capacity endpoints owned by the existing scheduling controller. Order-prefixed aliases are compatibility routes only and must not drift into missing `OrderController` methods.
-- Hold release is a controlled planning/governance mutation and must require source-order write authority before the hold row/file is changed.
+- Hold set/release are controlled planning/governance mutations. Hold set must validate the source order exists; hold release must require source-order write authority before the hold row/file is changed.
 - Hold set/release keeps the legacy hold snapshot but also appends hold lifecycle events so planning governance has a replayable audit trail.
 
 ## Quality and evidence backbone
@@ -50,7 +51,7 @@ Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database geneal
 - AI prediction rows and recommendation actions are advisory projections.
 - `ai_recommendation_actions` may track pending human review but does not create NCRs, maintenance work, schedule moves, tool orders, dispatch changes, completion events, or machine commands.
 - AI schedule apply and preventive-maintenance proposal routes may record review intent or propose a planner action, but they must return no execution authority and must not create schedule moves or maintenance work.
-- Natural-language query writes conversation history and may expose broad manufacturing data, so it requires authentication, scoped roles, CSRF, read-only SQL validation, row limits, audit logging, and PostgreSQL read-only transactions.
+- Natural-language query writes conversation history and may expose broad manufacturing data, so it requires authentication, scoped roles, CSRF, shared user/hour rate limiting, read-only SQL validation, row limits, audit logging, and PostgreSQL read-only transactions.
 - Conversation history/detail reads also require AI read roles; JSON fallback detail reads validate safe IDs and require owner metadata before returning content.
 - AI prediction, SPC anomaly, tool-wear, legacy dashboard, model, and combined dashboard surfaces are advisory read APIs and require the same AI read role boundary; model internals are admin-only.
 - AI feedback that can alter advisory confidence requires feedback/write roles and remains idempotent.

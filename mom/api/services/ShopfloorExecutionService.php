@@ -369,6 +369,11 @@ final class ShopfloorExecutionService
      */
     public function assertTargetDispatchable(array $target): void
     {
+        $status = strtolower($this->stringValue($target['status'] ?? 'planned'));
+        if ($status !== 'planned') {
+            throw new InvalidArgumentException('invalid_dispatch_transition:' . $status);
+        }
+
         $policy = $this->normalizeReferencePolicy($target['reference_policy'] ?? null);
         if ($policy !== 'enforce_dispatch') {
             return;

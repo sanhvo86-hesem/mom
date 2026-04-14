@@ -163,7 +163,7 @@ final class MobileWorkQueueServiceTest extends TestCase
         $service->assignTask('operator-2', 'WO-OTHER', 'operation_complete', ['priority' => 1]);
         $service->assignTask('operator-1', 'WO-HIGH', 'operation_complete', ['priority' => 5]);
 
-        $queue = $service->getOperatorQueue('operator-1', date('Y-m-d'));
+        $queue = $service->getOperatorQueue('operator-1');
 
         $this->assertSame(['WO-HIGH', 'WO-LOW'], array_column($queue, 'wo_number'));
 
