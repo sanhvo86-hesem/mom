@@ -64,7 +64,30 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'link_type' => 'production_consumption',
             'parent_lot_number' => 'SUP-LOT-BROKEN',
             'wo_number' => 'WO-BROKEN',
+            'org_site_id' => 'SITE-A',
         ]);
+    }
+
+    public function testGenealogyWriteAndReadRequireGovernedScope(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_genealogy_scope_required');
+
+        $this->traceability->recordGenealogyLink([
+            'link_type' => 'supplier_receipt',
+            'parent_lot_number' => 'SUP-NO-SCOPE',
+            'child_lot_number' => 'REC-NO-SCOPE',
+        ]);
+    }
+
+    public function testGenealogyReadRequiresGovernedScope(): void
+    {
+        $this->seedSupplierToShipmentChain('SUP-SCOPE-REQ', 'REC-SCOPE-REQ', 'PROD-SCOPE-REQ', 'SHIP-SCOPE-REQ', 'SITE-A');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_genealogy_scope_required');
+
+        $this->traceability->downstreamTrace(['lot_number' => 'SUP-SCOPE-REQ']);
     }
 
     public function testTraceReadModelHonorsSiteScope(): void
@@ -83,6 +106,56 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             static fn(array $node): string => (string)($node['shipment_id'] ?? ''),
             $siteB['nodes'],
         ))));
+    }
+
+    public function testImpactedOutputsAndShipmentEligibilityFailClosedWhenTraceIsTruncated(): void
+    {
+        $this->seedSupplierToShipmentChain('SUP-TRUNC', 'REC-TRUNC', 'PROD-TRUNC', 'SHIP-TRUNC', 'SITE-A');
+
+        $impact = $this->traceability->impactedOutputs([
+            'lot_number' => 'SUP-TRUNC',
+            'org_site_id' => 'SITE-A',
+            'max_depth' => 1,
+        ]);
+        $shipment = $this->traceability->shipmentEligibility([
+            'shipment_id' => 'SHIP-TRUNC',
+            'org_site_id' => 'SITE-A',
+            'max_depth' => 1,
+        ]);
+
+        $this->assertFalse($impact['complete']);
+        $this->assertTrue($impact['trace_truncated']);
+        $this->assertSame('incomplete_trace', $impact['decision_state']);
+        $this->assertSame('downstream_trace_truncated', $impact['blockers'][0]['reason_code']);
+        $this->assertFalse($shipment['eligible']);
+        $this->assertSame('upstream_trace_truncated', $shipment['blockers'][0]['reason_code']);
+    }
+
+    public function testContainmentPacketCannotResolveAgainstTruncatedImpactTrace(): void
+    {
+        $this->seedSupplierToShipmentChain('SUP-LOT-T', 'REC-LOT-T', 'PROD-LOT-T', 'SHIP-T', 'SITE-A');
+        $this->traceability->recordSupplierQualityIssue([
+            'supplier_issue_id' => 'SQI-T',
+            'scar_id' => 'SCAR-T',
+            'affected_lot_number' => 'SUP-LOT-T',
+            'vendor_id' => 'VEND-T',
+            'issue_status' => 'issued',
+            'org_site_id' => 'SITE-A',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('containment_packet_blocked');
+
+        $this->traceability->resolveContainmentPacket([
+            'supplier_issue_id' => 'SQI-T',
+            'scar_id' => 'SCAR-T',
+            'affected_lot_number' => 'SUP-LOT-T',
+            'impact_assessment_completed' => true,
+            'evidence_ids' => ['EVID-T'],
+            'approval_ids' => ['APR-T'],
+            'org_site_id' => 'SITE-A',
+            'max_depth' => 1,
+        ]);
     }
 
     public function testSupplierQualityIssueBlocksConsumptionAndShipmentUntilClosed(): void

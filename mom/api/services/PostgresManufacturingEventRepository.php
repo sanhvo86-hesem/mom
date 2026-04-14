@@ -166,19 +166,27 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
         return $this->db->queryOne(
             'SELECT * FROM ' . self::TABLE . '
              WHERE source_system = :source_system
-               AND source_aggregate_type = :source_aggregate_type
-               AND source_aggregate_id = :source_aggregate_id
-               AND event_type = :event_type
-               AND idempotency_key = :idempotency_key
-             LIMIT 1
-             FOR UPDATE',
-            [
+	               AND source_aggregate_type = :source_aggregate_type
+	               AND source_aggregate_id = :source_aggregate_id
+	               AND event_type = :event_type
+	               AND idempotency_key = :idempotency_key
+	               AND enterprise_id IS NOT DISTINCT FROM :enterprise_id
+	               AND company_id IS NOT DISTINCT FROM :company_id
+	               AND site_id IS NOT DISTINCT FROM :site_id
+	               AND plant_id IS NOT DISTINCT FROM :plant_id
+	               AND org_company_code IS NOT DISTINCT FROM :org_company_code
+	               AND org_legal_entity_code IS NOT DISTINCT FROM :org_legal_entity_code
+	               AND org_plant_id IS NOT DISTINCT FROM :org_plant_id
+	               AND org_site_id IS NOT DISTINCT FROM :org_site_id
+	             LIMIT 1
+	             FOR UPDATE',
+            array_merge([
                 ':source_system' => (string)$event['source_system'],
                 ':source_aggregate_type' => (string)$event['source_aggregate_type'],
                 ':source_aggregate_id' => (string)$event['source_aggregate_id'],
                 ':event_type' => (string)$event['event_type'],
                 ':idempotency_key' => (string)$event['idempotency_key'],
-            ],
+            ], $this->scopeParams($event)),
         );
     }
 
@@ -213,21 +221,53 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
     {
         $row = $this->db->queryOne(
             'SELECT event_hash FROM ' . self::TABLE . '
-             WHERE source_system = :source_system
-               AND source_aggregate_type = :source_aggregate_type
-               AND source_aggregate_id = :source_aggregate_id
-             ORDER BY occurred_at DESC, recorded_at DESC, event_id DESC
-             LIMIT 1
-             FOR UPDATE',
-            [
+	             WHERE source_system = :source_system
+	               AND source_aggregate_type = :source_aggregate_type
+	               AND source_aggregate_id = :source_aggregate_id
+	               AND enterprise_id IS NOT DISTINCT FROM :enterprise_id
+	               AND company_id IS NOT DISTINCT FROM :company_id
+	               AND site_id IS NOT DISTINCT FROM :site_id
+	               AND plant_id IS NOT DISTINCT FROM :plant_id
+	               AND org_company_code IS NOT DISTINCT FROM :org_company_code
+	               AND org_legal_entity_code IS NOT DISTINCT FROM :org_legal_entity_code
+	               AND org_plant_id IS NOT DISTINCT FROM :org_plant_id
+	               AND org_site_id IS NOT DISTINCT FROM :org_site_id
+	             ORDER BY occurred_at DESC, recorded_at DESC, event_id DESC
+	             LIMIT 1
+	             FOR UPDATE',
+            array_merge([
                 ':source_system' => (string)$event['source_system'],
                 ':source_aggregate_type' => (string)$event['source_aggregate_type'],
                 ':source_aggregate_id' => (string)$event['source_aggregate_id'],
-            ],
+            ], $this->scopeParams($event)),
         );
 
         $hash = trim((string)($row['event_hash'] ?? ''));
         return $hash !== '' ? $hash : null;
+    }
+
+    /**
+     * @param array<string, mixed> $event
+     * @return array<string, string|null>
+     */
+    private function scopeParams(array $event): array
+    {
+        return [
+            ':enterprise_id' => $this->nullableScope($event['enterprise_id'] ?? null),
+            ':company_id' => $this->nullableScope($event['company_id'] ?? null),
+            ':site_id' => $this->nullableScope($event['site_id'] ?? null),
+            ':plant_id' => $this->nullableScope($event['plant_id'] ?? null),
+            ':org_company_code' => $this->nullableScope($event['org_company_code'] ?? null),
+            ':org_legal_entity_code' => $this->nullableScope($event['org_legal_entity_code'] ?? null),
+            ':org_plant_id' => $this->nullableScope($event['org_plant_id'] ?? null),
+            ':org_site_id' => $this->nullableScope($event['org_site_id'] ?? null),
+        ];
+    }
+
+    private function nullableScope(mixed $value): ?string
+    {
+        $text = trim((string)($value ?? ''));
+        return $text !== '' ? $text : null;
     }
 
     /**

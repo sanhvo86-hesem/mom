@@ -238,6 +238,22 @@ final class ChangeAuthorityService
             );
         }
 
+        if ((string)($match['authority_source'] ?? '') === 'field_authorization' && !$this->consumeExplicitFieldAuthorization($match, $context)) {
+            return new ChangeAuthorityDecision(
+                false,
+                "Field authorization token for {$objectType}:{$objectId}.{$fieldPath} was already consumed or could not be consumed atomically.",
+                'field_authorization_replay_denied',
+                [
+                    'object_type' => $objectType,
+                    'object_id' => $objectId,
+                    'field_path' => $fieldPath,
+                    'change_order_ref' => $changeOrderRef,
+                    'required_authority' => 'one_shot_field_authorization',
+                    'governance_rule' => $governance,
+                ],
+            );
+        }
+
         return new ChangeAuthorityDecision(true, 'Change authority verified.', data: [
             'object_type' => $objectType,
             'object_id' => $objectId,
@@ -502,6 +518,8 @@ final class ChangeAuthorityService
             $rows = $this->queryRows(
                 $db,
                 "SELECT
+                    fca.field_change_authorization_id::text AS field_change_authorization_id,
+                    fca.field_change_authorization_id::text AS field_change_authorization_id,
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
                     co.status,
@@ -583,6 +601,7 @@ final class ChangeAuthorityService
             $rows = $this->queryRows(
                 $db,
                 "SELECT
+                    fca.field_change_authorization_id::text AS field_change_authorization_id,
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
                     co.status,
@@ -627,6 +646,50 @@ final class ChangeAuthorityService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $match
+     * @param array<string, mixed> $context
+     */
+    private function consumeExplicitFieldAuthorization(array $match, array $context): bool
+    {
+        $authorizationId = $this->text($match['field_change_authorization_id'] ?? '');
+        if ($authorizationId === '' || $this->db === null || !method_exists($this->db, 'query')) {
+            return false;
+        }
+
+        $actorId = $this->text(
+            $context['actor_user_id']
+            ?? $context['user_id']
+            ?? $context['actor_id']
+            ?? $context['consumed_by']
+            ?? ''
+        );
+
+        try {
+            $rows = $this->queryRows(
+                $this->db,
+                "UPDATE eqms_field_change_authorization
+                    SET consumed_at = now(),
+                        consumed_by = COALESCE(CAST(:consumed_by AS uuid), consumed_by),
+                        metadata = metadata || jsonb_build_object(
+                            'consumed_via', 'ChangeAuthorityService',
+                            'consumed_reason', 'field_edit_authorized'
+                        )
+                  WHERE field_change_authorization_id = CAST(:field_change_authorization_id AS uuid)
+                    AND consumed_at IS NULL
+                  RETURNING field_change_authorization_id",
+                [
+                    ':field_change_authorization_id' => $authorizationId,
+                    ':consumed_by' => $actorId !== '' ? $actorId : null,
+                ],
+            );
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $rows !== [];
     }
 
     /**

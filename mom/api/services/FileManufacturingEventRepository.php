@@ -137,7 +137,8 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
             if (
                 ($decoded['source_system'] ?? '') === ($event['source_system'] ?? '') &&
                 ($decoded['source_aggregate_type'] ?? '') === ($event['source_aggregate_type'] ?? '') &&
-                ($decoded['source_aggregate_id'] ?? '') === ($event['source_aggregate_id'] ?? '')
+                ($decoded['source_aggregate_id'] ?? '') === ($event['source_aggregate_id'] ?? '') &&
+                $this->sameScopeIdentity($decoded, $event)
             ) {
                 $hash = trim((string)($decoded['event_hash'] ?? ''));
                 if ($hash !== '') {
@@ -222,7 +223,35 @@ final class FileManufacturingEventRepository implements ManufacturingEventReposi
                 return false;
             }
         }
+        return $this->sameScopeIdentity($left, $right);
+    }
+
+    /**
+     * @param array<string, mixed> $left
+     * @param array<string, mixed> $right
+     */
+    private function sameScopeIdentity(array $left, array $right): bool
+    {
+        foreach ([
+            'enterprise_id',
+            'company_id',
+            'site_id',
+            'plant_id',
+            'org_company_code',
+            'org_legal_entity_code',
+            'org_plant_id',
+            'org_site_id',
+        ] as $field) {
+            if ($this->scopeValue($left[$field] ?? null) !== $this->scopeValue($right[$field] ?? null)) {
+                return false;
+            }
+        }
         return true;
+    }
+
+    private function scopeValue(mixed $value): string
+    {
+        return trim((string)($value ?? ''));
     }
 
     /**

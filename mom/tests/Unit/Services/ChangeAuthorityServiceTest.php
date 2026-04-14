@@ -285,6 +285,46 @@ final class ChangeAuthorityServiceTest extends TestCase
         $this->assertSame('field_never_editable', $decision->errorCode);
         $this->assertSame([], $db->lastAffectedParams);
     }
+
+    public function testExplicitFieldAuthorizationIsConsumedOnce(): void
+    {
+        $db = new FakeChangeAuthorityDb([
+            'governance' => [[
+                'object_type' => 'form_record',
+                'field_path' => '*',
+                'lifecycle_state' => 'draft',
+                'governance_class' => 'controlled',
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+            ]],
+            'explicit' => [[
+                'field_change_authorization_id' => 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+                'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
+                'change_order_number' => 'ECO-2026-EXPLICIT',
+                'status' => 'released',
+                'allowed_effect' => 'amend',
+                'affected_fields' => ['temperature'],
+                'authority_source' => 'field_authorization',
+            ]],
+        ]);
+        $service = new ChangeAuthorityService($db);
+
+        $first = $service->assertFieldEditAllowed('form_record', 'FRM-EXPLICIT', 'temperature', '10', '11', 'draft', [
+            'change_authority_id' => 'ECO-2026-EXPLICIT',
+            'requested_effect' => 'amend',
+        ]);
+        $second = $service->assertFieldEditAllowed('form_record', 'FRM-EXPLICIT', 'temperature', '11', '12', 'draft', [
+            'change_authority_id' => 'ECO-2026-EXPLICIT',
+            'requested_effect' => 'amend',
+        ]);
+
+        $this->assertTrue($first->allowed, $first->message);
+        $this->assertSame('field_authorization', $first->data['authority_source'] ?? null);
+        $this->assertSame(['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'], $db->consumedAuthorizationIds);
+        $this->assertFalse($second->allowed);
+        $this->assertSame('change_authority_required', $second->errorCode);
+    }
 }
 
 final class FakeChangeAuthorityDb
@@ -301,6 +341,9 @@ final class FakeChangeAuthorityDb
     /** @var array<string, mixed> */
     public array $lastAffectedParams = [];
 
+    /** @var list<string> */
+    public array $consumedAuthorizationIds = [];
+
     /**
      * @param array{governance?:list<array<string,mixed>>,explicit?:list<array<string,mixed>>,affected?:list<array<string,mixed>>} $rows
      */
@@ -316,6 +359,21 @@ final class FakeChangeAuthorityDb
      */
     public function query(string $sql, array $params = []): array
     {
+        if (str_starts_with(ltrim($sql), 'UPDATE eqms_field_change_authorization')) {
+            $authorizationId = (string)($params[':field_change_authorization_id'] ?? '');
+            foreach ($this->explicit as $idx => $row) {
+                if ((string)($row['field_change_authorization_id'] ?? '') !== $authorizationId) {
+                    continue;
+                }
+                if (!empty($row['consumed_at'])) {
+                    return [];
+                }
+                $this->explicit[$idx]['consumed_at'] = '2026-04-14T00:00:00Z';
+                $this->consumedAuthorizationIds[] = $authorizationId;
+                return [['field_change_authorization_id' => $authorizationId]];
+            }
+            return [];
+        }
         if (str_contains($sql, 'field_governance_rules')) {
             return $this->governance;
         }
@@ -342,6 +400,6 @@ final class FakeChangeAuthorityDb
      */
     private function filterByChangeOrder(array $rows, string $changeOrderNumber): array
     {
-        return array_values(array_filter($rows, static fn(array $row): bool => (string)($row['change_order_number'] ?? '') === $changeOrderNumber));
+        return array_values(array_filter($rows, static fn(array $row): bool => (string)($row['change_order_number'] ?? '') === $changeOrderNumber && empty($row['consumed_at'])));
     }
 }

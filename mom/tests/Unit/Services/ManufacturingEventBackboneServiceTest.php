@@ -183,6 +183,31 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
         $service->recordWorkExecutionEvent($conflicting);
     }
 
+    public function testIdempotencyAndHashChainIdentityAreScopedBySite(): void
+    {
+        $service = $this->fileService();
+        $base = [
+            'correlation_id' => 'corr-scope-replay',
+            'wo_number' => 'WO-SCOPE-REPLAY',
+            'source_aggregate_id' => 'WO-SCOPE-REPLAY',
+            'idempotency_key' => 'idem-scope-replay',
+            'occurred_at' => '2026-04-13T02:00:00Z',
+            'payload' => ['state' => 'started'],
+        ];
+
+        $siteA = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-A']);
+        $siteB = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-B', 'occurred_at' => '2026-04-13T02:01:00Z']);
+        $siteAReplay = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-A']);
+
+        $this->assertFalse($siteA['replayed']);
+        $this->assertFalse($siteB['replayed']);
+        $this->assertTrue($siteAReplay['replayed']);
+        $this->assertNotSame($siteA['event']['event_id'], $siteB['event']['event_id']);
+        $this->assertNull($siteB['event']['previous_event_hash']);
+        $this->assertSame(1, $service->productionTimeline(['wo_number' => 'WO-SCOPE-REPLAY', 'org_site_id' => 'SITE-A'])['count']);
+        $this->assertSame(1, $service->productionTimeline(['wo_number' => 'WO-SCOPE-REPLAY', 'org_site_id' => 'SITE-B'])['count']);
+    }
+
     public function testTaxonomyCoversRequiredDigitalThreadFamilies(): void
     {
         $service = $this->fileService();
@@ -336,7 +361,8 @@ final class ManufacturingEventFakeConnection extends Connection
                     ($row['source_aggregate_type'] ?? '') === ($params[':source_aggregate_type'] ?? '') &&
                     ($row['source_aggregate_id'] ?? '') === ($params[':source_aggregate_id'] ?? '') &&
                     ($row['event_type'] ?? '') === ($params[':event_type'] ?? '') &&
-                    ($row['idempotency_key'] ?? '') === ($params[':idempotency_key'] ?? '')
+                    ($row['idempotency_key'] ?? '') === ($params[':idempotency_key'] ?? '') &&
+                    $this->scopeMatches($row, $params)
                 ) {
                     return $row;
                 }
@@ -348,7 +374,8 @@ final class ManufacturingEventFakeConnection extends Connection
             $matches = array_values(array_filter($this->rows, static function (array $row) use ($params): bool {
                 return ($row['source_system'] ?? '') === ($params[':source_system'] ?? '')
                     && ($row['source_aggregate_type'] ?? '') === ($params[':source_aggregate_type'] ?? '')
-                    && ($row['source_aggregate_id'] ?? '') === ($params[':source_aggregate_id'] ?? '');
+                    && ($row['source_aggregate_id'] ?? '') === ($params[':source_aggregate_id'] ?? '')
+                    && self::staticScopeMatches($row, $params);
             }));
             usort($matches, static fn(array $a, array $b): int => strcmp((string)($b['occurred_at'] ?? ''), (string)($a['occurred_at'] ?? '')));
             return isset($matches[0]) ? ['event_hash' => $matches[0]['event_hash']] : null;
@@ -366,7 +393,8 @@ final class ManufacturingEventFakeConnection extends Connection
                 ($row['source_aggregate_id'] ?? '') === ($params[':source_aggregate_id'] ?? '') &&
                 ($row['event_type'] ?? '') === ($params[':event_type'] ?? '') &&
                 trim((string)($params[':idempotency_key'] ?? '')) !== '' &&
-                ($row['idempotency_key'] ?? '') === ($params[':idempotency_key'] ?? '')
+                ($row['idempotency_key'] ?? '') === ($params[':idempotency_key'] ?? '') &&
+                $this->scopeMatches($row, $params)
             ) {
                 return null;
             }
@@ -419,5 +447,34 @@ final class ManufacturingEventFakeConnection extends Connection
     public function queryScalar(string $sql, array $params = []): mixed
     {
         return count($this->rows);
+    }
+
+    private function scopeMatches(array $row, array $params): bool
+    {
+        return self::staticScopeMatches($row, $params);
+    }
+
+    private static function staticScopeMatches(array $row, array $params): bool
+    {
+        foreach ([
+            'enterprise_id',
+            'company_id',
+            'site_id',
+            'plant_id',
+            'org_company_code',
+            'org_legal_entity_code',
+            'org_plant_id',
+            'org_site_id',
+        ] as $field) {
+            $param = ':' . $field;
+            if (!array_key_exists($param, $params)) {
+                continue;
+            }
+            if (trim((string)($row[$field] ?? '')) !== trim((string)($params[$param] ?? ''))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

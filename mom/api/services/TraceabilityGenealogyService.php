@@ -60,6 +60,7 @@ final class TraceabilityGenealogyService
      */
     public function recordGenealogyLink(array $input): array
     {
+        $this->requireScope($input);
         $link = $this->normalizeGenealogyLink($input);
         $event = $this->events->recordGenealogyRelationEvent($this->eventPayloadForLink($link, $input));
         $this->metrics['genealogy_link_append']++;
@@ -81,10 +82,11 @@ final class TraceabilityGenealogyService
      */
     public function recordProductionConsumption(array $input): array
     {
+        $scope = $this->requireScope($input);
         $eligibility = $this->consumptionEligibility([
             'lot_number' => $this->firstString($input, ['parent_lot_number', 'input_lot_number', 'material_lot_number', 'supplier_lot_number', 'receipt_lot_number']),
             'serial_number' => $this->firstString($input, ['parent_serial_number', 'input_serial_number', 'material_serial_number']),
-        ] + $this->scopeFields($input));
+        ] + $scope);
 
         if (!$eligibility['eligible']) {
             $this->metrics['supplier_quality_block']++;
@@ -100,8 +102,9 @@ final class TraceabilityGenealogyService
      */
     public function recordSupplierQualityIssue(array $input): array
     {
+        $scope = $this->requireScope($input);
         $issue = $this->normalizeSupplierQualityIssue($input);
-        $event = $this->events->recordNcrCapaLinkageEvent(array_merge($this->scopeFields($input), [
+        $event = $this->events->recordNcrCapaLinkageEvent(array_merge($scope, [
             'event_id' => $this->nullableString($input['event_id'] ?? null),
             'correlation_id' => $this->correlationId($input),
             'request_id' => $this->nullableString($input['request_id'] ?? null),
@@ -145,6 +148,7 @@ final class TraceabilityGenealogyService
      */
     public function upstreamTrace(array $filters): array
     {
+        $this->requireScope($filters);
         $this->metrics['upstream_trace_query']++;
         return $this->trace($filters, 'upstream');
     }
@@ -155,6 +159,7 @@ final class TraceabilityGenealogyService
      */
     public function downstreamTrace(array $filters): array
     {
+        $this->requireScope($filters);
         $this->metrics['downstream_trace_query']++;
         return $this->trace($filters, 'downstream');
     }
@@ -165,7 +170,9 @@ final class TraceabilityGenealogyService
      */
     public function impactedOutputs(array $filters): array
     {
+        $this->requireScope($filters);
         $trace = $this->downstreamTrace($filters);
+        $traceBlockers = $this->traceCompletenessBlockers($trace, 'downstream_trace_truncated');
         $startKey = (string)($trace['start_node']['node_key'] ?? '');
         $outputNodes = [];
         $shipments = [];
@@ -196,6 +203,11 @@ final class TraceabilityGenealogyService
             'generated_at' => gmdate(DATE_ATOM),
             'filters' => $this->publicFilters($filters),
             'start_node' => $trace['start_node'],
+            'complete' => $traceBlockers === [],
+            'decision_state' => $traceBlockers === [] ? 'complete' : 'incomplete_trace',
+            'trace_truncated' => (bool)($trace['truncated'] ?? false),
+            'blocker_count' => count($traceBlockers),
+            'blockers' => $traceBlockers,
             'impacted_output_count' => count($outputNodes),
             'impacted_outputs' => array_values($outputNodes),
             'shipment_count' => count($shipments),
@@ -210,6 +222,7 @@ final class TraceabilityGenealogyService
      */
     public function supplierIssueImpactSummary(array $filters): array
     {
+        $this->requireScope($filters);
         $events = $this->allEvents($filters);
         $issues = $this->matchingSupplierIssueEvents($events, $filters);
         $summaries = [];
@@ -258,6 +271,7 @@ final class TraceabilityGenealogyService
      */
     public function consumptionEligibility(array $filters): array
     {
+        $this->requireScope($filters);
         $node = $this->targetNode($filters);
         $events = $this->allEvents($filters);
         $issues = $this->unresolvedSupplierIssuesForNodes([$node], $events);
@@ -279,6 +293,7 @@ final class TraceabilityGenealogyService
      */
     public function shipmentEligibility(array $filters): array
     {
+        $this->requireScope($filters);
         $upstream = $this->upstreamTrace($filters);
         $events = $this->allEvents($filters);
         $nodes = [];
@@ -289,7 +304,10 @@ final class TraceabilityGenealogyService
         }
 
         $issues = $this->unresolvedSupplierIssuesForNodes(array_values($nodes), $events);
-        $blockers = $this->issueBlockers($issues, 'supplier_quality_shipment_block');
+        $blockers = array_merge(
+            $this->traceCompletenessBlockers($upstream, 'upstream_trace_truncated'),
+            $this->issueBlockers($issues, 'supplier_quality_shipment_block'),
+        );
         if ($blockers !== []) {
             $this->metrics['shipment_eligibility_block']++;
         }
@@ -310,6 +328,7 @@ final class TraceabilityGenealogyService
      */
     public function assembleContainmentPacket(array $input): array
     {
+        $this->requireScope($input);
         $packet = $this->buildContainmentPacket($input, 'assembled');
         $this->appendContainmentPacketEvent($packet, $input);
         $this->metrics['containment_packet']++;
@@ -325,6 +344,7 @@ final class TraceabilityGenealogyService
      */
     public function resolveContainmentPacket(array $input): array
     {
+        $this->requireScope($input);
         $packet = $this->buildContainmentPacket($input, 'resolved');
         if ((int)$packet['blocker_count'] > 0) {
             $this->metrics['containment_blocked']++;
@@ -888,6 +908,9 @@ final class TraceabilityGenealogyService
         }
 
         $impactFilters = $this->scopeFields($input);
+        if (array_key_exists('max_depth', $input)) {
+            $impactFilters['max_depth'] = $input['max_depth'];
+        }
         if ($affectedLot !== '') {
             $impactFilters['lot_number'] = $affectedLot;
         }
@@ -903,6 +926,11 @@ final class TraceabilityGenealogyService
 
         if (!$this->truthy($input['impact_assessment_completed'] ?? false)) {
             $blockers[] = $this->packetBlocker('impact_assessment_incomplete', 'Impact assessment must be completed before containment closure.');
+        }
+        foreach ((array)($impact['blockers'] ?? []) as $impactBlocker) {
+            if (is_array($impactBlocker)) {
+                $blockers[] = $impactBlocker;
+            }
         }
         if ($this->truthy($input['require_impacted_outputs'] ?? false) && (int)$impact['impacted_output_count'] === 0) {
             $blockers[] = $this->packetBlocker('no_impacted_outputs_identified', 'Containment packet requires at least one impacted downstream object or an explicit no-impact assessment.');
@@ -938,6 +966,8 @@ final class TraceabilityGenealogyService
                 'shipment_count' => $impact['shipment_count'],
                 'impacted_outputs' => $impact['impacted_outputs'],
                 'shipments' => $impact['shipments'],
+                'trace_complete' => (bool)($impact['complete'] ?? true),
+                'trace_truncated' => (bool)($impact['trace_truncated'] ?? false),
             ],
             'evidence_ids' => $evidenceIds,
             'approval_ids' => $approvalIds,
@@ -1005,6 +1035,31 @@ final class TraceabilityGenealogyService
             'message' => $message,
             'details' => $details,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $trace
+     * @return list<array<string, mixed>>
+     */
+    private function traceCompletenessBlockers(array $trace, string $reasonCode): array
+    {
+        if (!((bool)($trace['truncated'] ?? false))) {
+            return [];
+        }
+
+        return [[
+            'blocker_id' => 'trace-block-' . substr(hash('sha256', $reasonCode . '|' . (string)($trace['start_node']['node_key'] ?? '')), 0, 20),
+            'category' => 'traceability_completeness',
+            'reason_code' => $reasonCode,
+            'severity' => 'release_blocking',
+            'message' => 'Trace traversal reached the configured depth limit; downstream release decisions must fail closed until the full graph is evaluated.',
+            'details' => [
+                'direction' => (string)($trace['direction'] ?? ''),
+                'max_depth' => (int)($trace['max_depth'] ?? 0),
+                'node_count' => (int)($trace['node_count'] ?? 0),
+                'edge_count' => (int)($trace['edge_count'] ?? 0),
+            ],
+        ]];
     }
 
     /**
@@ -1080,6 +1135,20 @@ final class TraceabilityGenealogyService
                 $scope[$field] = $value;
             }
         }
+        return $scope;
+    }
+
+    /**
+     * @param array<string, mixed> $source
+     * @return array<string, string>
+     */
+    private function requireScope(array $source): array
+    {
+        $scope = $this->scopeFields($source);
+        if ($scope === []) {
+            throw new RuntimeException('traceability_genealogy_scope_required');
+        }
+
         return $scope;
     }
 
