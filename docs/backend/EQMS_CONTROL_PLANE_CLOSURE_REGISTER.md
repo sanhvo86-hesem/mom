@@ -56,8 +56,8 @@ Verification evidence:
 - `php mom/tools/release/build_release_governance.php --artifact=manifest --change-authority=CO-WORLDCLASS-CLOSURE`: emitted a valid release manifest hash.
 - `php mom/tools/release/check_workflow_status_authority.php`: workflow status authority clean.
 - `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors.
-- `./composer test`: 428 tests, 2426 assertions, 1 skipped, passed on the current `codex/worldclass-closure-20260414-1512` closure branch after Agent 2/3/5 P1 remediation.
-- `./composer check`: PHPStan plus PHPUnit completed with no errors; 428 tests, 2426 assertions, 1 skipped on the current closure branch.
+- `./composer test`: 430 tests, 2429 assertions, 1 skipped, passed on the current `codex/worldclass-closure-20260414-1512` closure branch after Agent 2/3/5 P1 remediation.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 430 tests, 2429 assertions, 1 skipped on the current closure branch.
 
 ## 2026-04-14 15:12 Agent 2 P1 Closure Addendum
 
@@ -77,14 +77,15 @@ Verification evidence:
 | Audit pack org-scope assertion could false-fail because summarization dropped `org_id` | `AuditPackExporter` preserves `org_id` in evidence package and audit timeline summaries; `AuditPackExportService` test proves org-scoped package/event rows remain visible after manifest assembly. |
 | VPS deployment authority accepted wildcard objects, empty fields, missing effectivity, and broad effects | `VpsService` requires release manifest hash, exact manifest object, exact target environment, exact release manifest ref/hash in effectivity scope, exact action plus promotion intent fields, and exact deployment requested effect; focused regression tests cover wildcard/empty/wrong/missing cases. |
 | Shared post-release change authority allowed wildcard object/field/effectivity and substitute effects | `ChangeAuthorityService` strict controlled-lifecycle mode uses canonical `plm_change_affected_objects` plus `plm_change_effectivities`, skips legacy broad authorization, requires exact object/effect/field, and rejects empty effectivity; focused tests cover wildcard object, empty fields, broad effect, missing effectivity row, and empty effectivity scope. |
+| MOM/MES execution states were post-release in order workflow but not strict in shared change authority | `ChangeAuthorityService::isControlledLifecycle()` now includes `running`, `inspection`, `setup`, `on_hold`, and `in_production`; `OrderWorkflowRepositoryBoundaryTest` proves a `running` job order rejects broad legacy authority and passes only with exact canonical object/field/effect/effectivity authority. |
 
 Verification evidence for this addendum:
 
 - `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php --testdox`: 63 tests, 321 assertions, passed.
 - `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/ChangeAuthorityServiceTest.php --testdox`: 8 tests, 28 assertions, passed.
 - `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors over 223 files.
-- `./composer test`: 428 tests, 2426 assertions, 1 skipped, passed.
-- `./composer check`: PHPStan plus PHPUnit completed with no errors; 428 tests, 2426 assertions, 1 skipped.
+- `./composer test`: 430 tests, 2429 assertions, 1 skipped, passed.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 430 tests, 2429 assertions, 1 skipped.
 
 ## 2026-04-14 10:02 Closure Re-Audit Cycle
 

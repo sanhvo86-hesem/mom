@@ -22,6 +22,7 @@ Validated remediation state: Agent 2 P1 closure pass on `codex/worldclass-closur
 | Audit-pack org-scope assertion could false-fail after summarization | P1 | Closed | `AuditPackExporter` preserves `org_id` in evidence and audit summaries; `AuditPackExportService` test proves org-scoped package/event rows survive manifest assembly. |
 | Deployment change authority was DB-backed but not exact | P1 | Closed | `VpsService` now requires release manifest hash, exact manifest object, exact target environment, exact manifest ref/hash effectivity, exact action plus intent fields, and exact deployment requested effect. |
 | Shared post-release field authority allowed wildcard/empty/broad effectivity | P1 | Closed | `ChangeAuthorityService` strict post-release mode skips legacy broad authorization, rejects wildcard/empty fields, requires exact object/effect, and requires canonical non-empty `plm_change_effectivities` scope. |
+| MOM/MES execution states were not all strict change-authority states | P1 | Closed | `ChangeAuthorityService` strict lifecycle list now includes `running`, `inspection`, `setup`, `on_hold`, and `in_production`; order workflow tests prove `running` rejects broad legacy authority and passes only with exact canonical authority. |
 | Finalized evidence record can receive a new package without amendment authority | P1 | Closed | Existing finalized evidence records now require source version and released change authority before a new version can be finalized. |
 | Released document lifecycle changes only require a UUID-shaped change order | P0 | Closed | `DocumentRevisionCommandService` now requires a released `plm_change_order` with exact affected object, field, effect, and canonical `plm_change_effectivities` scope. |
 | Periodic evaluation schedule endpoint lacks write governance | P1 | Closed | `schedulePeriodicEvaluation()` now requires controlled QMS/admin role and CSRF. |
@@ -121,8 +122,8 @@ Primary benchmark URLs used during audit refresh:
 - `php tools/release/check_repo_boundary.php`: P0/P1 clean, 7 P2 prompt-file warnings remain.
 - `php tools/release/check_workflow_status_authority.php`: clean.
 - `./composer analyse -- --memory-limit=1G`: passed.
-- `./composer test`: passed, `428 tests`, `2426 assertions`, `1 skipped`.
-- `./composer check`: passed, `428 tests`, `2426 assertions`, `1 skipped`.
+- `./composer test`: passed, `430 tests`, `2429 assertions`, `1 skipped`.
+- `./composer check`: passed, `430 tests`, `2429 assertions`, `1 skipped`.
 
 ## Dependency-Blocked Register
 

@@ -832,6 +832,11 @@ final class ChangeAuthorityService
             'received',
             'in_review',
             'active',
+            'running',
+            'inspection',
+            'setup',
+            'on_hold',
+            'in_production',
         ], true);
     }
 

@@ -89,6 +89,65 @@ final class OrderWorkflowRepositoryBoundaryTest extends TestCase
         $this->assertTrue($result->ok, $result->message);
     }
 
+    public function testRunningOrderRejectsBroadLegacyChangeAuthority(): void
+    {
+        $repository = new InMemoryOrderWorkflowRepository([
+            'sales_orders' => [],
+            'job_orders' => [[
+                'jo_number' => 'JO-AUTH-003',
+                'status' => 'running',
+                'part_revision' => 'A',
+            ]],
+            'work_orders' => [],
+        ]);
+        $service = new OrderWorkflowService(
+            sys_get_temp_dir(),
+            db: new BroadLegacyReleasedChangeAuthorityFakeDb(),
+            repository: $repository,
+        );
+
+        $result = $service->validateFieldEdit(
+            'jo',
+            'JO-AUTH-003',
+            'part_revision',
+            'B',
+            'qa_manager',
+            ['change_order_number' => 'ECO-001', 'requested_effect' => 'amend'],
+        );
+
+        $this->assertFalse($result->ok);
+        $this->assertSame('change_authority_required', $result->errorCode);
+    }
+
+    public function testRunningOrderCanBeUnlockedOnlyByExactCanonicalChangeAuthority(): void
+    {
+        $repository = new InMemoryOrderWorkflowRepository([
+            'sales_orders' => [],
+            'job_orders' => [[
+                'jo_number' => 'JO-AUTH-003',
+                'status' => 'running',
+                'part_revision' => 'A',
+            ]],
+            'work_orders' => [],
+        ]);
+        $service = new OrderWorkflowService(
+            sys_get_temp_dir(),
+            db: new ReleasedChangeAuthorityFakeDb('JO-AUTH-003'),
+            repository: $repository,
+        );
+
+        $result = $service->validateFieldEdit(
+            'jo',
+            'JO-AUTH-003',
+            'part_revision',
+            'B',
+            'qa_manager',
+            ['change_order_number' => 'ECO-001', 'requested_effect' => 'amend'],
+        );
+
+        $this->assertTrue($result->ok, $result->message);
+    }
+
     public function testEveryPostReleaseFieldRequiresReleasedChangeAuthority(): void
     {
         $repository = new InMemoryOrderWorkflowRepository([
@@ -202,6 +261,10 @@ final class InMemoryOrderWorkflowRepository implements OrderWorkflowRepository
 
 final class ReleasedChangeAuthorityFakeDb
 {
+    public function __construct(private readonly string $objectId = 'JO-AUTH-001')
+    {
+    }
+
     /**
      * @param array<string, mixed> $params
      * @return array<int, array<string, mixed>>
@@ -226,13 +289,51 @@ final class ReleasedChangeAuthorityFakeDb
                 'plm_change_order_id' => '00000000-0000-4000-8000-000000000001',
                 'change_order_number' => 'ECO-001',
                 'status' => 'released',
-                'object_id' => 'JO-AUTH-001',
+                'object_id' => $this->objectId,
                 'allowed_effect' => 'amend',
                 'affected_fields' => '{part_revision}',
                 'plm_change_effectivity_id' => '00000000-0000-4000-8000-000000000002',
-                'effectivity_scope' => ['order_id' => 'JO-AUTH-001'],
+                'effectivity_scope' => ['order_id' => $this->objectId],
                 'effective_from' => '2026-04-14T00:00:00Z',
                 'effective_to' => null,
+                'authority_source' => 'affected_object',
+            ]];
+        }
+
+        return [];
+    }
+}
+
+final class BroadLegacyReleasedChangeAuthorityFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return array<int, array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (str_contains($sql, 'eqms_field_governance_rule')) {
+            return [[
+                'object_type' => 'jo',
+                'field_path' => 'part_revision',
+                'lifecycle_state' => 'released',
+                'governance_class' => 'post_release_locked',
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+                'metadata' => '{}',
+            ]];
+        }
+
+        if (str_contains($sql, 'eqms_change_affected_object')) {
+            return [[
+                'plm_change_order_id' => '00000000-0000-4000-8000-000000000001',
+                'change_order_number' => 'ECO-001',
+                'status' => 'released',
+                'object_id' => '*',
+                'allowed_effect' => 'revise',
+                'effectivity_rule' => '{}',
+                'affected_fields' => '{}',
                 'authority_source' => 'affected_object',
             ]];
         }

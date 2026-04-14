@@ -65,7 +65,8 @@
     "P1 e-signature ceremony requires server-issued one-time challenge consumption",
     "P1 audit-pack evidence and audit summaries preserve org scope after canonical DB assembly",
     "P1 deployment authority requires exact manifest object, hash, environment, action, intent, effectivity, and effect",
-    "P1 shared post-release field authority rejects wildcard object, empty fields, broad effects, and missing canonical effectivity"
+    "P1 shared post-release field authority rejects wildcard object, empty fields, broad effects, and missing canonical effectivity",
+    "P1 MOM/MES execution states enter strict post-release change authority"
   ],
   "required_validation": [
     "php -l touched PHP files",
