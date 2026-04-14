@@ -47,7 +47,7 @@
     "P1 group document distributions are not completed by one actor acknowledgement",
     "P1 CR/CO API paths are role-gated and pass actor role context to lifecycle service",
     "P1 CO release requires governance, release signature, conflict evaluation, and DB-visible side effects",
-    "P1 resulting objects cannot remain orphaned from affected objects after migration 127",
+    "P1 resulting objects cannot remain orphaned from affected objects after migration 128",
     "P1 manufacturing timeline and production history reject caller-supplied scope",
     "P1 as-manufactured query requires traceability role and authenticated session scope",
     "P1 genealogy facts use content-bound source ids and replay-equivalence checks",

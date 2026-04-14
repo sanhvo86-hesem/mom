@@ -27,7 +27,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Change lifecycle lacked transition governance, reason, SoD, and released signature checks | P1 | Closed for service/API path | `ChangeLifecycleCommandService` enforces reason, role, segregation-of-duties when roles are supplied, and signature evidence on released transitions. |
 | Effectivity conflict detection was passive | P1 | Closed | New `EffectivityConflictService` evaluates overlaps and persists open conflicts with idempotency hash before CO release. |
 | Change release side effects were declared but not DB-visible | P1 | Closed to minimum executable standard | New `ChangeReleaseSideEffectService` freezes affected objects, marks resulting objects released, marks effectivities active, and enqueues training gate events. |
-| Resulting objects could orphan from affected objects | P1 | Closed | Migration `127_change_resulting_object_scope_and_snapshot_current.sql` backfills and enforces `plm_change_resulting_objects.affected_object_id NOT NULL`. |
+| Resulting objects could orphan from affected objects | P1 | Closed | Migration `128_change_resulting_object_scope_and_snapshot_current.sql` backfills and enforces `plm_change_resulting_objects.affected_object_id NOT NULL`. |
 | Manufacturing timeline/history accepted caller-supplied org scope | P1 | Closed | `ManufacturingEventController` now rejects caller scope fields and injects authenticated session scope. |
 | As-manufactured thread endpoint accepted caller-supplied scope and was auth-only | P1 | Closed | `EqmsControlPlaneController::asManufacturedThread()` now requires traceability read role and injects session org/site/plant/department scope. |
 | Genealogy facts used default source ids not bound to fact content | P1 | Closed | `GenealogyGraphService` derives default `source_event_id` from a canonical fact fingerprint and treats conflicting replay as `genealogy_edge_fact_replay_conflict`. |
@@ -54,7 +54,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 |---|---|---|---|---|
 | 1. Platform governance and repo hygiene | Branch was stale versus `origin/main`; previous release evidence did not bind this branch; source boundary gates existed and passed after sync. | P0 stale branch; P1 branch-specific manifest/receipt/reverse-sync missing; P2 prompt hygiene. | NIST SP 800-128-style controlled baselines require known promotion state, not undocumented branch drift. | Fast-forward sync to `origin/main`; add branch manifest/receipt/reverse-sync; rerun boundary and workflow authority checks. |
 | 2. Document/form/evidence control | Evidence, document, and distribution models existed but several finality gates were still permissive. | P1 accepted-vs-valid source attempt, missing finalization audit event, retention lock not fail-closed, direct released doc signature gap, group acknowledgement over-completion. | Connected QMS requires document-change-training-evidence linkage with final records controlled by ceremony and durable event evidence. | Hardened finalization, retention, audit event, direct release signature, and read ack semantics; added focused tests. |
-| 3. Change authority/configuration control | CR/CO tables existed but release execution was closer to workflow than configuration control. | P1 auth-only endpoints, weak SoD/reason/signature, passive conflict detection, missing side effects, orphan resulting objects. | Windchill-class PLM patterns require affected objects, resulting objects, effectivity, verification, and executed implementation effects. | Added role gates, lifecycle governance, `EffectivityConflictService`, `ChangeReleaseSideEffectService`, and migration 127. |
+| 3. Change authority/configuration control | CR/CO tables existed but release execution was closer to workflow than configuration control. | P1 auth-only endpoints, weak SoD/reason/signature, passive conflict detection, missing side effects, orphan resulting objects. | Windchill-class PLM patterns require affected objects, resulting objects, effectivity, verification, and executed implementation effects. | Added role gates, lifecycle governance, `EffectivityConflictService`, `ChangeReleaseSideEffectService`, and migration 128. |
 | 4. MES/MOM/genealogy/digital thread | Event ledger and genealogy primitives existed; endpoint scope and replay semantics were weak. | P1 caller-supplied scope, fact source not content-bound, semantic mutation on replay, multiple current snapshots. | SAP/Siemens-class MOM traceability needs scoped genealogy, dates/times, 5M context, and deterministic as-manufactured records. | Injected session scope, content-bound fact fingerprinting, replay conflict detection, and current snapshot uniqueness. |
 | 5. Regulated electronic records/data integrity | Audit and package services existed; fail-closed proof and package/event linkage were incomplete. | P1 no finalization audit event, audit pack timeline false-ready, broad event query, weak stable content hash. | Part 11/ALCOA+/Annex 11 patterns require attributable events, durable auditability, preserved content and meaning, and retrievable packages. | Added finalization audit event, exact audit pack scope, timeline guard, stable record content hash, and tests. |
 | 6. Product capability benchmark | Foundations existed but several differentiators were partial or undocumented in API contracts. | P1 OpenAPI coverage gap; P1 publication/WORM/training/full closure remain dependency or roadmap; P2 product UI depth. | SAP DM, Siemens Opcenter, and PLM-class systems expose operational monitors, impact explorers, and audit-ready export surfaces. | Added OpenAPI contracts and waiver/roadmap discipline; retained operational workers as explicit dependency-waived items. |
@@ -67,9 +67,9 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Evidence source attempt not acceptance-strict | P1 | Validation state and business acceptance state were conflated. | Form execution, evidence finalization. | Connected QMS evidence acceptance. | Require `frm_submission_attempts.submission_state = accepted`. | Unit test proving `valid` fails. |
 | Finalization no audit-event proof | P1 | Evidence persistence and audit trail were not transactionally evidenced. | Evidence, audit, audit pack. | Part 11 and ALCOA+ event attribution. | Persist/replay `evidence.finalized` event or fail closed. | Audit insert/replay test and audit-pack finalization-event guard. |
 | Retention not fail-closed | P1 | Local retention row could be absent while finalization succeeded. | Evidence, retention. | Annex 11 record retention and availability. | Require persisted lock id for final evidence. | Unit test proving failure when lock is not persisted. |
-| Change authority too close to workflow | P1 | Lifecycle states did not execute release implementation controls. | Change, document, training, effectivity. | PLM affected/resulting/effectivity patterns. | Add transition governance, effectivity conflict persistence, side-effect service. | Focused lifecycle tests and migration 127. |
+| Change authority too close to workflow | P1 | Lifecycle states did not execute release implementation controls. | Change, document, training, effectivity. | PLM affected/resulting/effectivity patterns. | Add transition governance, effectivity conflict persistence, side-effect service. | Focused lifecycle tests and migration 128. |
 | Group document ack over-completion | P1 | Distribution audience semantics were not separated from user acknowledgement rows. | Document control, training/read-understand. | Connected QMS training linkage. | Only individual/user audience rows complete on one actor ack. | SQL assertion in document control test. |
-| Genealogy replay not deterministic | P1 | Default source id was not fact-content-bound and conflict update mutated facts. | MES, genealogy, audit. | Siemens/SAP genealogy and as-manufactured trail. | Canonical fact fingerprint, conflict as replay conflict, current snapshot uniqueness. | Focused genealogy tests and migration 127. |
+| Genealogy replay not deterministic | P1 | Default source id was not fact-content-bound and conflict update mutated facts. | MES, genealogy, audit. | Siemens/SAP genealogy and as-manufactured trail. | Canonical fact fingerprint, conflict as replay conflict, current snapshot uniqueness. | Focused genealogy tests and migration 128. |
 | API contracts incomplete | P1 | EQMS control-plane operations were implemented but not externally contract-governed. | API, integrations, test strategy. | Best-in-class platform API clarity. | Add OpenAPI paths, responses, and error codes. | `api/openapi.yaml` updated. |
 
 ## E. Benchmark Matrix Vs World-Class Systems
@@ -110,11 +110,11 @@ External sources refreshed without sending repository content:
 | Wave | Objective | DB migrations | Services/classes | APIs | Workers/jobs | Tests | Acceptance criteria | Metrics | Rollback risks | Closure evidence |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 0 | Repo hygiene and release discipline | None in this branch | Release scanners only | None | None | Boundary and workflow gates | Branch current with `origin/main`, manifest/receipt/reverse-sync present | Gate pass/fail, stale branch age | Merge blocked if main moved | Manifest, receipt, reverse-sync, gate output |
-| 1 | Control-plane foundation | `127_change_resulting_object_scope_and_snapshot_current.sql` | Change/evidence/document/genealogy services hardened | OpenAPI EQMS additions | Training outbox enqueue on CO release | WorldClassControlPlaneExecutionTest | No permissive P1 closure without DB evidence | Finalization failures, CO release conflicts | Schema backfill may fail if orphan data cannot map affected object | Migration, tests, PHPStan |
+| 1 | Control-plane foundation | `128_change_resulting_object_scope_and_snapshot_current.sql` | Change/evidence/document/genealogy services hardened | OpenAPI EQMS additions | Training outbox enqueue on CO release | WorldClassControlPlaneExecutionTest | No permissive P1 closure without DB evidence | Finalization failures, CO release conflicts | Schema backfill may fail if orphan data cannot map affected object | Migration, tests, PHPStan |
 | 2 | Offline issuance and online finalization | Existing evidence/form migrations retained | `EvidenceFinalizationService`, `EvidencePackageBuilder` | Evidence finalization API | Future package builder worker | Accepted vs valid, retention fail-closed, audit event tests | Final evidence includes original, canonical, readable, manifest, publication state, audit event, retention lock | Finalization fail rate, replay conflicts, retention lock creation | Legacy valid-only attempts must be accepted before finalization | Tests and OpenAPI errors |
-| 3 | Change authority, effectivity, training gate | Migration 127 conflict idempotency fields | `ChangeLifecycleCommandService`, `EffectivityConflictService`, `ChangeReleaseSideEffectService` | Change order create/transition API | Training gate outbox | Change lifecycle focused tests | Released CO has role, reason, SoD, signature, no blocking conflict, side effects persisted | CO conflict count, training event lag | Existing orphan resulting objects need cleanup | Migration and tests |
+| 3 | Change authority, effectivity, training gate | Migration 128 conflict idempotency fields | `ChangeLifecycleCommandService`, `EffectivityConflictService`, `ChangeReleaseSideEffectService` | Change order create/transition API | Training gate outbox | Change lifecycle focused tests | Released CO has role, reason, SoD, signature, no blocking conflict, side effects persisted | CO conflict count, training event lag | Existing orphan resulting objects need cleanup | Migration and tests |
 | 4 | Publication, immutable evidence package, audit pack | Existing publication/audit pack schema retained | `AuditPackExportService`, `AuditPackExporter` | Audit pack API | Future Graph, WORM, daily digest jobs | Audit pack finalization event guard | Audit pack is scope-only DB assembled and fails without finalization event | Export duration, missing timeline count | External storage dependency | Tests and waiver register |
-| 5 | Genealogy, digital thread, impact explorer | Migration 127 snapshot uniqueness | `GenealogyGraphService` | As-manufactured query API | Future graph closure worker | Genealogy replay/current snapshot tests | Facts are immutable/replay-safe and queries scoped | Replay conflict count, graph closure duration | Legacy duplicate current snapshots must be superseded | Migration and tests |
+| 5 | Genealogy, digital thread, impact explorer | Migration 128 snapshot uniqueness | `GenealogyGraphService` | As-manufactured query API | Future graph closure worker | Genealogy replay/current snapshot tests | Facts are immutable/replay-safe and queries scoped | Replay conflict count, graph closure duration | Legacy duplicate current snapshots must be superseded | Migration and tests |
 
 ## H. Path-By-Path Patch Map
 
@@ -135,7 +135,7 @@ External sources refreshed without sending repository content:
 | `mom/api/controllers/EqmsControlPlaneController.php` | Refactor | Role gates for CR/CO and traceability read; session scope injection; OpenAPI alignment. | Controller-level integration tests are next P2. |
 | `mom/api/controllers/ManufacturingEventController.php` | Refactor | Rejects caller-supplied scope and injects session scope filters. | Existing controller smoke tests plus future scoped API tests. |
 | `mom/api/openapi.yaml` | Refactor | Adds EQMS control-plane contracts and state-aware error codes. | `composer check` and future OpenAPI contract lint. |
-| `mom/database/migrations/*` | Create/update | Adds migration 127 and README range update. | Migration review and DB dry-run in deployment. |
+| `mom/database/migrations/*` | Create/update | Adds migration 128 and README range update. | Migration review and DB dry-run in deployment. |
 | `mom/docs/backend/*` | Create | Adds this closure register. | Boundary scanner. |
 | `mom/release/*` | Create | Adds manifest, promotion receipt, reverse-sync intake. | Boundary scanner and branch review. |
 
@@ -143,9 +143,9 @@ External sources refreshed without sending repository content:
 
 | Migration | Operation | Safety check | Rollback note |
 |---|---|---|---|
-| `127_change_resulting_object_scope_and_snapshot_current.sql` | Backfill `affected_object_id` on resulting objects from matching CO affected objects. | Abort if unmapped resulting rows remain before `NOT NULL`. | Do not roll back after enforcing traceability unless downstream data is restored from backup. |
-| `127_change_resulting_object_scope_and_snapshot_current.sql` | Add `effectivity_conflicts.idempotency_key`, `metadata`, and unique index. | Existing rows receive stable hash over conflict object/scope. | Dropping idempotency loses duplicate detection evidence. |
-| `127_change_resulting_object_scope_and_snapshot_current.sql` | Supersede duplicate current snapshots and add unique partial index. | Keeps newest current row by timestamp/id. | Rollback can reintroduce multiple current snapshots and is not recommended after production writes. |
+| `128_change_resulting_object_scope_and_snapshot_current.sql` | Backfill `affected_object_id` on resulting objects from matching CO affected objects. | Abort if unmapped resulting rows remain before `NOT NULL`. | Do not roll back after enforcing traceability unless downstream data is restored from backup. |
+| `128_change_resulting_object_scope_and_snapshot_current.sql` | Add `effectivity_conflicts.idempotency_key`, `metadata`, and unique index. | Existing rows receive stable hash over conflict object/scope. | Dropping idempotency loses duplicate detection evidence. |
+| `128_change_resulting_object_scope_and_snapshot_current.sql` | Supersede duplicate current snapshots and add unique partial index. | Keeps newest current row by timestamp/id. | Rollback can reintroduce multiple current snapshots and is not recommended after production writes. |
 
 ## J. API Contract List
 
@@ -279,11 +279,11 @@ Validation:
 - `composer check`
 
 Risk:
-- Migration 127 enforces resulting-object affected-object integrity and current snapshot uniqueness; production dry-run is required before deployment.
+- Migration 128 enforces resulting-object affected-object integrity and current snapshot uniqueness; production dry-run is required before deployment.
 - Graph/WORM/daily digest/full training lifecycle/full as-built closure remain explicit P1 dependency waivers, not closure claims.
 
 Rollback:
-- Do not roll back migration 127 after production writes unless restoring from backup, because it protects traceability integrity.
+- Do not roll back migration 128 after production writes unless restoring from backup, because it protects traceability integrity.
 - Service changes are backward-compatible at API path level but intentionally reject previously permissive invalid finalization/release/replay states.
 
 ## U. Final Merge Checklist
@@ -292,7 +292,7 @@ Rollback:
 |---|---|
 | Unresolved P0 = 0 | Pending second audit verification. |
 | Unresolved non-waived P1 = 0 | Pending second audit verification. |
-| Required migrations present | Present: migration 127. |
+| Required migrations present | Present: migration 128. |
 | Required backend changes present | Present. |
 | Required tests green | Passed before register; rerun after register and second audit. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |

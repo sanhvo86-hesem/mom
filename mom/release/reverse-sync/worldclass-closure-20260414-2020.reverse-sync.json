@@ -14,7 +14,7 @@
     "Blocked one-actor completion of group document distributions",
     "Role-gated EQMS change and as-manufactured API paths",
     "Added change release governance, effectivity conflict persistence, and release side-effect execution",
-    "Enforced resulting-object affected-object linkage and current snapshot uniqueness in migration 127",
+    "Enforced resulting-object affected-object linkage and current snapshot uniqueness in migration 128",
     "Rejected caller-supplied scope for manufacturing timeline/history and as-manufactured query",
     "Made genealogy facts content-fingerprint-bound and replay-conflict aware",
     "Added EQMS control-plane OpenAPI contracts",
@@ -28,7 +28,7 @@
     "local runtime logs"
   ],
   "post_merge_actions": [
-    "Run governed migration 127 in target environments after dry-run",
+    "Run governed migration 128 in target environments after dry-run",
     "Capture environment deploy receipt with release manifest ref and change authority ref",
     "Configure Graph publication worker credentials and target library IDs",
     "Select WORM/Object Lock adapter and update retention policy waiver",
