@@ -14,8 +14,8 @@ Date: 2026-04-14
 | PHASE 4 | Complete: six pass-2 reports are present under `mom/docs/system/agent-reports/tranche14/pass2-agent*.md`. |
 | PHASE 5 | Complete: pass-2 code-fixable defects were fixed and retested. |
 | PHASE 6 | Complete on integration branch: targeted verification and aggregate Composer gate are green. |
-| PHASE 7 | Pending final git phase: merge integration branch into `main`. |
-| PHASE 8 | Pending final git phase: remove helper/integration worktrees and branches and leave `main` clean. |
+| PHASE 7 | Complete: integration branch was merged into `main` with merge commit `46807f6f`, then pushed to `origin/main`. |
+| PHASE 8 | Complete for tranche14: helper/integration worktrees and branches were removed; local `main` is clean and tracking `origin/main`. |
 
 ## First-Pass Findings
 
@@ -64,7 +64,7 @@ Durable audit-pack export was selected after inherited backlog closure because i
 
 ## Verification Evidence
 
-- `python3 tools/registry/canonical_publication_orchestrator.py` -> Overall PASS.
+- `python3 tools/registry/canonical_publication_orchestrator.py` on the integration branch -> Overall PASS.
 - `python3 tools/registry/verify_publication_truth.py` -> 241/241 PASS.
 - `php tools/release/check_repo_boundary.php` -> repo boundary clean.
 - `APP_ENV=test DB_PASSWORD=test_password php -d display_errors=1 tests/backend_smoke.php` -> passed.
@@ -72,7 +72,8 @@ Durable audit-pack export was selected after inherited backlog closure because i
 - Focused PHPUnit for mobile queue, shopfloor execution, control plane, registry fallback, Schema Studio fallback, security hardening -> 123 tests / 623 assertions PASS.
 - Focused order/finance tests -> 9 tests / 20 assertions PASS.
 - `composer analyse -- --memory-limit=1G` -> PHPStan no errors.
-- `composer test` / `composer check` -> 414 tests / 2404 assertions / 1 skipped PASS.
+- Integration branch `composer test` / `composer check` -> 414 tests / 2404 assertions / 1 skipped PASS.
+- Final `main` `composer check` -> 444 tests / 2496 assertions / 1 skipped PASS.
 
 ## Remaining Blocked-External Items
 
@@ -90,7 +91,15 @@ Durable audit-pack export was selected after inherited backlog closure because i
 - Full authority consolidation and complete digital-thread taxonomy.
 - Vendor-suite parity roadmap.
 
-## Final Verdict Before Git-Final
+## Final Git Result
+
+- `main` merge commit: `46807f6f`.
+- `origin/main` push: complete.
+- Local tranche14 branches deleted: `codex/tranche14-a1-*` through `codex/tranche14-a6-*`, plus `codex/tranche14-zero-trust-closure-20260414`.
+- Tranche14 worktrees removed: `/Users/a10/Documents/mom-tranche14-*`.
+- Additional clean pre-existing v7 helper worktrees removed; one pre-existing dirty `/Users/a10/Documents/mom-v7-integration` worktree was left intact because it contains uncommitted changes not created by this run.
+
+## Final Verdict
 
 Actually stronger now: generated truth is reproducible, source inputs are tracked, finance/AI scopes fail closed, object contract guidance is restored, sales/order/period/customer-PO paths are better tested, mobile and dispatch failure paths dead-letter instead of disappearing, and audit packs are durable and hash-verifiable.
 

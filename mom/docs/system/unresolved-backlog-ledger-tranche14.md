@@ -20,7 +20,7 @@ This ledger is synthesized from pass-1/pass-2 agent reports, current code, tests
 | Pass-2 Agent 4 / finance org authority | Governed org-scoped finance actions use authenticated org scope. | `CLOSED_BY_IMPLEMENTATION` | Finance tests cover rejection of caller-supplied org without session plus org propagation into backdate exception and memo. | Not open. | No | None. |
 | Pass-2 Agent 4 / object-index action guidance | Authored command guidance survives publication. | `CLOSED_BY_IMPLEMENTATION` | `generate_business_contract_bundle.py` derives `recommendedActions` from workflow commands; object index has non-empty actions for authored command resources. | Not open. | No | None. |
 | Pass-2 smoke / Data Schema freshness | Derived artifact drift does not flag downstream manifest patches as upstream drift. | `CLOSED_BY_IMPLEMENTATION` | `data_schema_admin_smoke.php` passes after removing circular manifest dependencies for reports that patch the manifest. | Not open. | No | None. |
-| Final git cleanup | Helper and integration worktrees/branches are removed after merge. | `FINAL_PHASE_PENDING` | `git worktree list` still contains tranche14 helper worktrees before final phase. | Cleanup must happen after merge gate and integration commit. | Yes | Remove helper worktrees/branches and integration branch after merge to `main`. |
+| Final git cleanup | Helper and integration worktrees/branches are removed after merge. | `CLOSED_BY_FINAL_PHASE` | Tranche14 helper/integration worktrees and branches were removed after merge commit `46807f6f`; `git branch --list 'codex/tranche14-*'` is empty. | Not open. | No | None. |
 | Strict runtime authority across all slices | Uniform production authority. | `PRODUCT_DECISION_REQUIRED` / `MIGRATION_ROLLOUT_REQUIRED` | Runtime authority still reports mixed-authority modes where compatibility paths remain. | Requires rollout/migration decisions. | No | Keep claims partial. |
 | Full publication equals schema authority | Registry publication covers every schema table. | `PRODUCT_DECISION_REQUIRED` / `MIGRATION_ROLLOUT_REQUIRED` | Schema authority reports 772 schema tables and 758 registry tables. | Requires migration/publication scope decision. | No | Keep explicit delta. |
 | Graphics publication blocker | Generated publishability can be true. | `PRODUCT_DECISION_REQUIRED` | Publication truth remains `ready=false` because graphics release blockers are active. | Owner disposition needed. | No | Do not claim publishable. |
@@ -38,6 +38,7 @@ Closed in this tranche: generated-count drift, source-label drift, missing gener
 - Production WORM/immutable storage evidence.
 - Formal validation package and Part 11 scope.
 - Graphics publication release blocker evidence.
+- One pre-existing dirty `/Users/a10/Documents/mom-v7-integration` worktree remains because it contains uncommitted non-tranche14 changes and was not safe to remove without discarding prior work.
 
 ## Remaining Product Decisions
 

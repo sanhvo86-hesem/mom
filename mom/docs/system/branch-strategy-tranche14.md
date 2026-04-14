@@ -56,6 +56,12 @@ Required final checks:
 - `git branch --list 'codex/tranche14-*'` is empty.
 - `main` contains the final tranche14 commits.
 
-## Current Final-Phase Risk
+## Actual Final Result
 
-The original root worktree at `/Users/a10/Documents/mom` has unrelated dirty changes on a non-main branch. Those changes must not be reverted or overwritten. If they still prevent checking out or updating local `main`, final merge/cleanup must stop with evidence rather than clobbering user work.
+- `main` contains merge commit `46807f6f`.
+- `origin/main` was updated from `4e94d566` to `46807f6f`.
+- Tranche14 helper/integration worktrees were removed.
+- Tranche14 helper/integration branches were deleted locally.
+- No remote `codex/tranche14*` heads were present after cleanup.
+- Local root worktree `/Users/a10/Documents/mom` is on `main` and clean.
+- One pre-existing dirty `/Users/a10/Documents/mom-v7-integration` worktree remains intentionally because it contains uncommitted changes outside Tranche 14 and was not safe to remove.
