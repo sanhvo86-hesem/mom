@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-closure-20260414-1022`
+Audited branch: `codex/worldclass-reaudit-20260414-102059`
 
 Date: 2026-04-14
 

@@ -123,7 +123,7 @@ $LOG_FILE = $DATA_DIR . '/php_error.log';
 
 // Load legacy helpers early so direct api/index.php requests get the same
 // structured JSON exception handling as requests forwarded through api.php.
-if (!function_exists('api_json')) {
+if (!function_exists('api_json') && !defined('API_HELPERS_ONLY')) {
     define('API_HELPERS_ONLY', true);
     require_once $BASE_DIR . '/api.php';
 }
@@ -185,7 +185,7 @@ if (!class_exists('MOM\\Api\\Router')) {
 // We include it in a way that loads the functions but does NOT execute the
 // action dispatch (the switch statement). We achieve this by requiring the
 // legacy file only if the functions are not yet defined.
-if (!function_exists('api_json')) {
+if (!function_exists('api_json') && !defined('API_HELPERS_ONLY')) {
     // Load the legacy api.php for its helper functions only.
     // The API_HELPERS_ONLY guard prevents the boot section and switch statement
     // from executing, so we can bootstrap the MVC router ourselves.
