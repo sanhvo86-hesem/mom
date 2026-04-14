@@ -144,9 +144,18 @@ try {
 // Composer autoloader (includes PSR-4 mappings defined in composer.json)
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (is_file($composerAutoload)) {
+    $autoloadBufferLevel = ob_get_level();
+    ob_start();
     try {
         require_once $composerAutoload;
+        $autoloadOutput = (string)ob_get_clean();
+        if ($autoloadOutput !== '') {
+            @error_log('[API index bootstrap] Composer autoload emitted output and it was suppressed.');
+        }
     } catch (Throwable $e) {
+        while (ob_get_level() > $autoloadBufferLevel) {
+            ob_end_clean();
+        }
         @error_log('[API index bootstrap] Composer autoload failed; using fallback autoloader: ' . $e->getMessage());
     }
 }
