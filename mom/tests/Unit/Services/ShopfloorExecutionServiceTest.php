@@ -850,6 +850,9 @@ final class ShopfloorExecutionServiceTest extends TestCase
             ['id' => 'NC-DRAFT', 'program_number' => 'NC-DRAFT', 'status' => 'draft'],
             ['id' => 'NC-REL', 'program_number' => 'NC-REL', 'status' => 'released'],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        file_put_contents($this->dataDir . '/cnc-programs/setup-sheets.json', json_encode([
+            ['id' => 'SETUP-REL', 'setup_number' => 'SETUP-REL', 'status' => 'released'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         $blocked = $this->service()->normalizeTargetForCreate([
             'wo_number' => 'WO-STRICT-1',
@@ -888,6 +891,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
             'cycle_time_minutes' => 5,
             'target_quantity' => 20,
             'cnc_program_id' => 'NC-REL',
+            'setup_sheet_id' => 'SETUP-REL',
             'inspection_plan_id' => 'IP-714-OP20',
             'reference_policy' => 'enforce_dispatch',
         ], 'planner-1', '2026-04-13T00:00:00Z');

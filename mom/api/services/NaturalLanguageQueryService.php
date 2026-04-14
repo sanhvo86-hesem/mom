@@ -42,6 +42,17 @@ final class NaturalLanguageQueryService
         'SET\s+ROLE', 'SET\s+SESSION',
     ];
 
+    private const ALLOWED_QUERY_RELATIONS = [
+        'items',
+        'work_orders',
+        'job_orders',
+        'ncr_records',
+        'mes_oee_snapshots',
+        'quality_predictions',
+        'production_schedule_slots',
+        'machines',
+    ];
+
     // ── Maximum result rows / So dong ket qua toi da ──────────────────────
 
     private const MAX_RESULT_ROWS = 100;
@@ -166,10 +177,10 @@ final class NaturalLanguageQueryService
 
             // ── Log every NLQ query for audit trail
             @error_log(sprintf(
-                '[NaturalLanguageQueryService] AUDIT - user_id: %s, question: %s, sql: %s, rows: %d',
+                '[NaturalLanguageQueryService] AUDIT - user_id: %s, question_hash: %s, sql_hash: %s, rows: %d',
                 $userId,
-                mb_substr($userQuestion, 0, 100),
-                mb_substr($sanitizedSql, 0, 200),
+                hash('sha256', $userQuestion),
+                hash('sha256', $sanitizedSql),
                 count($queryResults)
             ));
 
@@ -445,7 +456,7 @@ Ban la bo tao truy van PostgreSQL cho he thong HESEM MOM (Quan ly Van hanh San x
 ### quality_predictions — AI quality predictions
 - prediction_id   UUID PRIMARY KEY
 - prediction_type VARCHAR(50) — 'defect_probability', 'tool_wear', 'spc_anomaly', 'process_drift', 'equipment_failure'
-- severity        VARCHAR(20) — 'critical', 'major', 'minor'
+- severity        VARCHAR(20) — 'info', 'watch', 'warning', 'critical'
 - status          VARCHAR(30) — 'active', 'acknowledged', 'resolved', 'false_positive'
 - machine_id      VARCHAR(50)
 - confidence      NUMERIC(5,2) — 0.00 to 1.00
@@ -689,7 +700,44 @@ PROMPT;
             return 'System catalog access is not allowed for security reasons.';
         }
 
+        $relationError = $this->validateAllowedRelations($trimmed);
+        if ($relationError !== null) {
+            return $relationError;
+        }
+
         return null; // SQL is safe / SQL an toan
+    }
+
+    private function validateAllowedRelations(string $sql): ?string
+    {
+        $withoutStrings = preg_replace("/'([^']|'')*'/", "''", $sql) ?? $sql;
+        $withoutComments = preg_replace('/--.*?$|\/\*.*?\*\//ms', ' ', $withoutStrings) ?? $withoutStrings;
+        $allowed = array_fill_keys(self::ALLOWED_QUERY_RELATIONS, true);
+
+        if (preg_match_all('/(?:WITH|,)\s+([a-z_][a-z0-9_]*)\s+AS\s*\(/i', $withoutComments, $cteMatches)) {
+            foreach ($cteMatches[1] as $cteName) {
+                $allowed[strtolower((string)$cteName)] = true;
+            }
+        }
+
+        if (!preg_match_all('/\b(?:FROM|JOIN)\s+((?:"[^"]+"|[a-z_][a-z0-9_]*)(?:\s*\.\s*(?:"[^"]+"|[a-z_][a-z0-9_]*))?)/i', $withoutComments, $matches)) {
+            return null;
+        }
+
+        foreach ($matches[1] as $rawRelation) {
+            $relation = strtolower(str_replace('"', '', preg_replace('/\s+/', '', (string)$rawRelation) ?? ''));
+            if (str_contains($relation, '.')) {
+                $parts = explode('.', $relation);
+                $relation = (string)end($parts);
+            }
+            if ($relation === '' || isset($allowed[$relation])) {
+                continue;
+            }
+
+            return 'Relation is not allowed for natural-language queries: ' . $relation;
+        }
+
+        return null;
     }
 
     /**

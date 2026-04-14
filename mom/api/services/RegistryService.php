@@ -120,7 +120,7 @@ class RegistryService
                     'security' => [
                         'auth_required' => true,
                         'csrf_required' => true,
-                        'permission_keys' => ['registry.read'],
+                        'permission_keys' => $this->generatedEndpointPermissionKeys($domain, $safeTable, (string)$spec['kind']),
                     ],
                     'workflow' => [
                         'execution_mode' => 'registry_backed_generic_crud',
@@ -145,6 +145,16 @@ class RegistryService
             ],
             'endpoints' => $endpoints,
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function generatedEndpointPermissionKeys(string $domain, string $table, string $kind): array
+    {
+        $action = in_array($kind, ['list', 'detail', 'read'], true) ? 'read' : $kind;
+
+        return [strtolower($domain . '.' . $table . '.' . $action)];
     }
 
     /**

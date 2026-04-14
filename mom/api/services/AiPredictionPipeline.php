@@ -581,7 +581,7 @@ final class AiPredictionPipeline
      *
      * @return array Dashboard metrics / Chỉ số bảng điều khiển
      */
-    public function getDashboardMetrics(): array
+    public function getDashboardMetrics(array $scope = []): array
     {
         $metrics = [
             'total_active'         => 0,
@@ -593,23 +593,42 @@ final class AiPredictionPipeline
         ];
 
         try {
+            $plantId = trim((string)($scope['plant_id'] ?? $scope['org_plant_id'] ?? ''));
+            $predictionWhere = ["status = 'active'"];
+            $predictionParams = [];
+            if ($plantId !== '') {
+                $predictionWhere[] = 'plant_id = :plant_id';
+                $predictionParams[':plant_id'] = $plantId;
+            }
+            $activeWhereSql = implode(' AND ', $predictionWhere);
+
             // ── Total active predictions / Tổng số dự đoán đang hoạt động ──
             $metrics['total_active'] = (int)($this->db->queryScalar(
-                "SELECT COUNT(*) FROM quality_predictions WHERE status = 'active'"
+                "SELECT COUNT(*) FROM quality_predictions WHERE {$activeWhereSql}",
+                $predictionParams
             ) ?? 0);
 
             // ── Total critical + active / Tổng số nghiêm trọng + đang hoạt động ──
             $metrics['total_critical'] = (int)($this->db->queryScalar(
                 "SELECT COUNT(*) FROM quality_predictions
-                 WHERE status = 'active' AND severity = 'critical'"
+                 WHERE {$activeWhereSql} AND severity = 'critical'",
+                $predictionParams
             ) ?? 0);
 
             // ── Accuracy from feedback / Độ chính xác từ phản hồi ──
+            $feedbackWhere = [];
+            $feedbackParams = [];
+            if ($plantId !== '') {
+                $feedbackWhere[] = 'org_plant_id = :feedback_plant_id';
+                $feedbackParams[':feedback_plant_id'] = $plantId;
+            }
             $feedbackStats = $this->db->queryOne(
                 "SELECT
                     COUNT(*) AS total_feedback,
                     COUNT(*) FILTER (WHERE feedback_type = 'correct') AS correct_count
                  FROM ai_feedback_loops"
+                . ($feedbackWhere !== [] ? ' WHERE ' . implode(' AND ', $feedbackWhere) : ''),
+                $feedbackParams
             );
 
             if ($feedbackStats !== null && (int)$feedbackStats['total_feedback'] > 0) {
@@ -631,9 +650,10 @@ final class AiPredictionPipeline
             $byType = $this->db->query(
                 "SELECT prediction_type, COUNT(*) AS cnt
                  FROM quality_predictions
-                 WHERE status = 'active'
+                 WHERE {$activeWhereSql}
                  GROUP BY prediction_type
-                 ORDER BY cnt DESC"
+                 ORDER BY cnt DESC",
+                $predictionParams
             );
             foreach ($byType as $row) {
                 $metrics['by_type'][$row['prediction_type']] = (int)$row['cnt'];
@@ -643,9 +663,10 @@ final class AiPredictionPipeline
             $bySeverity = $this->db->query(
                 "SELECT severity, COUNT(*) AS cnt
                  FROM quality_predictions
-                 WHERE status = 'active'
+                 WHERE {$activeWhereSql}
                  GROUP BY severity
-                 ORDER BY cnt DESC"
+                 ORDER BY cnt DESC",
+                $predictionParams
             );
             foreach ($bySeverity as $row) {
                 $metrics['by_severity'][$row['severity']] = (int)$row['cnt'];

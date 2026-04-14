@@ -150,11 +150,43 @@ class AiSchedulingController extends BaseController
         if ($text === '') {
             return null;
         }
-        if (strlen($text) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $text) !== 1) {
+        if (strlen($text) < 16 || strlen($text) > 128 || preg_match('/^[A-Za-z0-9._\-]+$/', $text) !== 1) {
             $this->error('invalid_idempotency_key', 400);
         }
 
         return $text;
+    }
+
+    /**
+     * @return array{where:string, params:array<string, string>}
+     */
+    private function plantWhereClause(string $plantId, string $alias = ''): array
+    {
+        $field = ($alias !== '' ? $alias . '.' : '') . 'plant_id';
+        if ($plantId === '') {
+            return ['where' => 'WHERE 1=1', 'params' => []];
+        }
+
+        return ['where' => 'WHERE ' . $field . ' = :plant_id', 'params' => [':plant_id' => $plantId]];
+    }
+
+    /**
+     * @param array<int, mixed> $rows
+     * @return array<int, mixed>
+     */
+    private function filterAiRowsByPlant(array $rows, string $plantId): array
+    {
+        if ($plantId === '') {
+            return $rows;
+        }
+
+        return array_values(array_filter($rows, static function (mixed $row) use ($plantId): bool {
+            if (!is_array($row)) {
+                return false;
+            }
+            $rowPlant = trim((string)($row['plant_id'] ?? $row['org_plant_id'] ?? ''));
+            return $rowPlant === '' || $rowPlant === $plantId;
+        }));
     }
 
     /**
@@ -806,8 +838,9 @@ class AiSchedulingController extends BaseController
                     $kpis = [];
 
                     // MES-002: Add plant_id filter to all COUNT queries
-                    $wherePlant = $plantId !== '' ? "WHERE plant_id = :plant_id" : '';
-                    $plantParams = $plantId !== '' ? [':plant_id' => $plantId] : [];
+                    $plantScope = $this->plantWhereClause($plantId);
+                    $wherePlant = $plantScope['where'];
+                    $plantParams = $plantScope['params'];
 
                     // Total predictions by status
                     $statusCounts = $db->query(
@@ -853,9 +886,9 @@ class AiSchedulingController extends BaseController
             }
 
             // Fallback to JSON / Du phong doc JSON
-            $predictions = $this->readJsonFile($this->aiDir() . '/predictions.json') ?? [];
-            $anomalies   = $this->readJsonFile($this->aiDir() . '/spc-anomalies.json') ?? [];
-            $toolWear    = $this->readJsonFile($this->aiDir() . '/tool-wear.json') ?? [];
+            $predictions = $this->filterAiRowsByPlant($this->readJsonFile($this->aiDir() . '/predictions.json') ?? [], $plantId);
+            $anomalies   = $this->filterAiRowsByPlant($this->readJsonFile($this->aiDir() . '/spc-anomalies.json') ?? [], $plantId);
+            $toolWear    = $this->filterAiRowsByPlant($this->readJsonFile($this->aiDir() . '/tool-wear.json') ?? [], $plantId);
 
             $kpis = [
                 'total_predictions'        => count($predictions),
@@ -1777,6 +1810,7 @@ class AiSchedulingController extends BaseController
     public function aiFeedbackSubmit(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -1905,8 +1939,10 @@ class AiSchedulingController extends BaseController
     public function aiDocumentSummarize(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
+        $this->requireCsrf();
 
-        $body = $this->jsonBody();
+        $body = $this->jsonBody(256 * 1024);
         $this->requireFields($body, ['content']);
 
         $documentId = trim((string)($body['document_id'] ?? ''));
@@ -1914,6 +1950,12 @@ class AiSchedulingController extends BaseController
 
         if ($content === '') {
             $this->error('validation_error', 400, 'Content must not be empty.');
+        }
+        if (strlen($content) > 200000) {
+            $this->error('content_too_large', 413, 'Content exceeds the 200KB AI summarization limit.');
+        }
+        if ($documentId !== '' && preg_match('/^[A-Za-z0-9._:\-]{1,128}$/', $documentId) !== 1) {
+            $this->error('invalid_document_id', 400);
         }
 
         try {
@@ -1950,6 +1992,8 @@ class AiSchedulingController extends BaseController
 
             $this->auditLog('ai_document_summarize', [
                 'document_id' => $documentId,
+                'content_sha256' => hash('sha256', $content),
+                'content_bytes' => strlen($content),
             ], $this->userId($user));
 
             $this->success(['result' => $summary]);
@@ -1971,7 +2015,9 @@ class AiSchedulingController extends BaseController
         try {
             // Get prediction pipeline metrics
             $pipeline = new AiPredictionPipeline($this->dataDir);
-            $predictionMetrics = $pipeline->getDashboardMetrics();
+            $predictionMetrics = $pipeline->getDashboardMetrics([
+                'plant_id' => (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? ''),
+            ]);
 
             // Get schedule metrics from DB or JSON
             $scheduleMetrics = [

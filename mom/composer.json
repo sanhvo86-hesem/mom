@@ -41,7 +41,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
+        "test": "php -d memory_limit=1G vendor/bin/phpunit",
         "analyse": "php -d memory_limit=1G vendor/bin/phpstan analyse",
         "check": [
             "@analyse",
