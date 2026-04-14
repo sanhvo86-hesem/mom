@@ -1,291 +1,222 @@
 -- ============================================================================
--- Migration 112: Security Hardening - Missing NOT NULL and UNIQUE Constraints
+-- Migration 112: Security Hardening - Missing NOT NULL Constraints (defensive)
 -- ============================================================================
 -- Purpose:
---   Add missing NOT NULL and UNIQUE constraints on critical columns
---   to enforce data integrity and prevent invalid states.
+--   Add NOT NULL constraints on critical columns to enforce data integrity.
+--   Uses a defensive helper that skips any column that does not exist in the
+--   live schema or that still contains NULL values (safe for partial schemas).
 -- ============================================================================
 
 BEGIN;
 
--- User and authentication constraints
-ALTER TABLE users ALTER COLUMN email SET NOT NULL;
-ALTER TABLE users ALTER COLUMN employee_id SET NOT NULL;
-ALTER TABLE users ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE users ALTER COLUMN updated_at SET NOT NULL;
-
--- roles table uses role_code/role_label (not role_name); created_at not present — skip
-
--- Session management constraints
-ALTER TABLE sessions ALTER COLUMN user_id SET NOT NULL;
-ALTER TABLE sessions ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE sessions ALTER COLUMN expires_at SET NOT NULL;
-
--- Document constraints
-ALTER TABLE documents ALTER COLUMN doc_id SET NOT NULL;
-ALTER TABLE documents ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE documents ALTER COLUMN updated_at SET NOT NULL;
-
-ALTER TABLE document_versions ALTER COLUMN doc_id SET NOT NULL;
-ALTER TABLE document_versions ALTER COLUMN version_number SET NOT NULL;
-ALTER TABLE document_versions ALTER COLUMN created_at SET NOT NULL;
-
--- Form management constraints
-ALTER TABLE form_entries ALTER COLUMN form_code SET NOT NULL;
-ALTER TABLE form_entries ALTER COLUMN form_version SET NOT NULL;
-ALTER TABLE form_entries ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE form_attachments ALTER COLUMN entry_id SET NOT NULL;
-ALTER TABLE form_attachments ALTER COLUMN created_at SET NOT NULL;
-
--- Record management constraints
-ALTER TABLE records ALTER COLUMN record_id SET NOT NULL;
-ALTER TABLE records ALTER COLUMN record_type SET NOT NULL;
-ALTER TABLE records ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE records ALTER COLUMN updated_at SET NOT NULL;
-
--- Item master constraints
-ALTER TABLE items ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE items ALTER COLUMN item_description SET NOT NULL;
-ALTER TABLE items ALTER COLUMN item_status SET NOT NULL;
-ALTER TABLE items ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE items ALTER COLUMN updated_at SET NOT NULL;
-
-ALTER TABLE item_revisions ALTER COLUMN item_id SET NOT NULL;
--- revision_level does not exist; actual column is "rev" — skip
-ALTER TABLE item_revisions ALTER COLUMN created_at SET NOT NULL;
-
--- BOM constraints
-ALTER TABLE bill_of_materials ALTER COLUMN bom_id SET NOT NULL;
-ALTER TABLE bill_of_materials ALTER COLUMN parent_item_id SET NOT NULL;
-ALTER TABLE bill_of_materials ALTER COLUMN bom_status SET NOT NULL;
-ALTER TABLE bill_of_materials ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE bom_components ALTER COLUMN bom_id SET NOT NULL;
-ALTER TABLE bom_components ALTER COLUMN bom_revision SET NOT NULL;
-ALTER TABLE bom_components ALTER COLUMN component_item_id SET NOT NULL;
-ALTER TABLE bom_components ALTER COLUMN quantity SET NOT NULL;
-ALTER TABLE bom_components ALTER COLUMN created_at SET NOT NULL;
-
--- Work center and routing constraints
-ALTER TABLE work_centers ALTER COLUMN work_center_id SET NOT NULL;
-ALTER TABLE work_centers ALTER COLUMN work_center_name SET NOT NULL;
-ALTER TABLE work_centers ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE routings ALTER COLUMN routing_id SET NOT NULL;
-ALTER TABLE routings ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE routings ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE routing_operations ALTER COLUMN routing_id SET NOT NULL;
-ALTER TABLE routing_operations ALTER COLUMN routing_revision SET NOT NULL;
-ALTER TABLE routing_operations ALTER COLUMN operation_sequence SET NOT NULL;
-ALTER TABLE routing_operations ALTER COLUMN created_at SET NOT NULL;
-
--- Customer and sales constraints
-ALTER TABLE customers ALTER COLUMN customer_id SET NOT NULL;
-ALTER TABLE customers ALTER COLUMN customer_name SET NOT NULL;
-ALTER TABLE customers ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE customers ALTER COLUMN updated_at SET NOT NULL;
-
-ALTER TABLE sales_orders ALTER COLUMN customer_id SET NOT NULL;
-ALTER TABLE sales_orders ALTER COLUMN order_date SET NOT NULL;
-ALTER TABLE sales_orders ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE sales_order_lines ALTER COLUMN sales_order_id SET NOT NULL;
-ALTER TABLE sales_order_lines ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE sales_order_lines ALTER COLUMN order_quantity SET NOT NULL;
-ALTER TABLE sales_order_lines ALTER COLUMN created_at SET NOT NULL;
-
--- Vendor and procurement constraints
-ALTER TABLE vendors ALTER COLUMN vendor_id SET NOT NULL;
-ALTER TABLE vendors ALTER COLUMN vendor_name SET NOT NULL;
-ALTER TABLE vendors ALTER COLUMN created_at SET NOT NULL;
-ALTER TABLE vendors ALTER COLUMN updated_at SET NOT NULL;
-
-ALTER TABLE vendor_ratings ALTER COLUMN vendor_id SET NOT NULL;
-ALTER TABLE vendor_ratings ALTER COLUMN rating_date SET NOT NULL;
-ALTER TABLE vendor_ratings ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE purchase_orders ALTER COLUMN vendor_id SET NOT NULL;
-ALTER TABLE purchase_orders ALTER COLUMN po_date SET NOT NULL;
-ALTER TABLE purchase_orders ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE purchase_order_lines ALTER COLUMN po_id SET NOT NULL;
-ALTER TABLE purchase_order_lines ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE purchase_order_lines ALTER COLUMN po_quantity SET NOT NULL;
-ALTER TABLE purchase_order_lines ALTER COLUMN created_at SET NOT NULL;
-
--- Warehouse and inventory constraints
-ALTER TABLE warehouses ALTER COLUMN warehouse_id SET NOT NULL;
-ALTER TABLE warehouses ALTER COLUMN warehouse_name SET NOT NULL;
-ALTER TABLE warehouses ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE inventory_locations ALTER COLUMN location_id SET NOT NULL;
-ALTER TABLE inventory_locations ALTER COLUMN warehouse_id SET NOT NULL;
--- item_id and created_at do not exist in inventory_locations schema — skip
-
-ALTER TABLE lot_master ALTER COLUMN lot_number SET NOT NULL;
-ALTER TABLE lot_master ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE lot_master ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE serial_master ALTER COLUMN serial_number SET NOT NULL;
-ALTER TABLE serial_master ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE serial_master ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE inventory_transactions ALTER COLUMN warehouse_id SET NOT NULL;
-ALTER TABLE inventory_transactions ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE inventory_transactions ALTER COLUMN txn_type SET NOT NULL;
-ALTER TABLE inventory_transactions ALTER COLUMN recorded_at SET NOT NULL;
-
--- Job order constraints
-ALTER TABLE job_orders ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE job_orders ALTER COLUMN job_qty SET NOT NULL;
-ALTER TABLE job_orders ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE job_operations ALTER COLUMN job_order_id SET NOT NULL;
-ALTER TABLE job_operations ALTER COLUMN operation_seq SET NOT NULL;
-ALTER TABLE job_operations ALTER COLUMN created_at SET NOT NULL;
-
--- Labor transaction constraints
-ALTER TABLE labor_transactions ALTER COLUMN employee_id SET NOT NULL;
-ALTER TABLE labor_transactions ALTER COLUMN recorded_at SET NOT NULL;
-
--- Production schedule constraints
-ALTER TABLE production_schedule ALTER COLUMN created_at SET NOT NULL;
-
--- Inspection plan constraints
-ALTER TABLE inspection_plans ALTER COLUMN inspection_plan_id SET NOT NULL;
-ALTER TABLE inspection_plans ALTER COLUMN created_at SET NOT NULL;
-
--- inspection_results uses recorded_at (not created_at)
-ALTER TABLE inspection_results ALTER COLUMN recorded_at SET NOT NULL;
-
--- SPC data constraints
-ALTER TABLE spc_data ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE spc_data ALTER COLUMN created_at SET NOT NULL;
-
--- Quality control constraints (NCR, CAPA, FAI)
-ALTER TABLE ncr_records ALTER COLUMN record_id SET NOT NULL;
-ALTER TABLE ncr_records ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE capa_records ALTER COLUMN record_id SET NOT NULL;
-ALTER TABLE capa_records ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE fai_records ALTER COLUMN record_id SET NOT NULL;
-ALTER TABLE fai_records ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE fai_characteristics ALTER COLUMN fai_id SET NOT NULL;
-ALTER TABLE fai_characteristics ALTER COLUMN characteristic_name SET NOT NULL;
-ALTER TABLE fai_characteristics ALTER COLUMN created_at SET NOT NULL;
-
--- Certificate constraints
-ALTER TABLE certificates ALTER COLUMN created_at SET NOT NULL;
-
--- NPI project constraints
-ALTER TABLE npi_projects ALTER COLUMN created_at SET NOT NULL;
-
--- EHS incident constraints
-ALTER TABLE ehs_incidents ALTER COLUMN created_at SET NOT NULL;
-
--- Contamination check constraints
-ALTER TABLE contamination_checks ALTER COLUMN created_at SET NOT NULL;
-
--- Engineering change constraints
-ALTER TABLE engineering_change_requests ALTER COLUMN ecr_number SET NOT NULL;
-ALTER TABLE engineering_change_requests ALTER COLUMN created_at SET NOT NULL;
-
--- Equipment constraints
-ALTER TABLE equipment ALTER COLUMN equipment_id SET NOT NULL;
-ALTER TABLE equipment ALTER COLUMN equipment_name SET NOT NULL;
-ALTER TABLE equipment ALTER COLUMN created_at SET NOT NULL;
-
--- Calibration constraints
-ALTER TABLE calibration_records ALTER COLUMN equipment_id SET NOT NULL;
-ALTER TABLE calibration_records ALTER COLUMN calibration_date SET NOT NULL;
-ALTER TABLE calibration_records ALTER COLUMN created_at SET NOT NULL;
-
--- Maintenance work order constraints
-ALTER TABLE maintenance_work_orders ALTER COLUMN equipment_id SET NOT NULL;
-ALTER TABLE maintenance_work_orders ALTER COLUMN work_order_id SET NOT NULL;
-ALTER TABLE maintenance_work_orders ALTER COLUMN created_at SET NOT NULL;
-
--- Tool management constraints
-ALTER TABLE tools ALTER COLUMN tool_id SET NOT NULL;
-ALTER TABLE tools ALTER COLUMN tool_name SET NOT NULL;
-ALTER TABLE tools ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE tool_transactions ALTER COLUMN tool_id SET NOT NULL;
-ALTER TABLE tool_transactions ALTER COLUMN txn_type SET NOT NULL;
-ALTER TABLE tool_transactions ALTER COLUMN created_at SET NOT NULL;
-
--- Employee constraints
-ALTER TABLE employees ALTER COLUMN employee_id SET NOT NULL;
-ALTER TABLE employees ALTER COLUMN employee_name SET NOT NULL;
-ALTER TABLE employees ALTER COLUMN created_at SET NOT NULL;
-
--- Training constraints
-ALTER TABLE training_records ALTER COLUMN created_at SET NOT NULL;
-
--- Skills matrix constraints
-ALTER TABLE skills_matrix ALTER COLUMN employee_id SET NOT NULL;
-ALTER TABLE skills_matrix ALTER COLUMN skill_name SET NOT NULL;
-ALTER TABLE skills_matrix ALTER COLUMN created_at SET NOT NULL;
-
--- Employee certification constraints
-ALTER TABLE employee_certifications ALTER COLUMN employee_id SET NOT NULL;
-ALTER TABLE employee_certifications ALTER COLUMN certification_name SET NOT NULL;
-ALTER TABLE employee_certifications ALTER COLUMN created_at SET NOT NULL;
-
--- Audit management constraints
-ALTER TABLE audits ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE audit_findings ALTER COLUMN audit_id SET NOT NULL;
-ALTER TABLE audit_findings ALTER COLUMN finding_description SET NOT NULL;
-ALTER TABLE audit_findings ALTER COLUMN created_at SET NOT NULL;
-
-ALTER TABLE audit_actions ALTER COLUMN finding_id SET NOT NULL;
-ALTER TABLE audit_actions ALTER COLUMN action_description SET NOT NULL;
-ALTER TABLE audit_actions ALTER COLUMN created_at SET NOT NULL;
-
--- Risk register constraints
-ALTER TABLE risk_register ALTER COLUMN risk_description SET NOT NULL;
-ALTER TABLE risk_register ALTER COLUMN created_at SET NOT NULL;
-
--- Improvement project constraints
-ALTER TABLE improvement_projects ALTER COLUMN created_at SET NOT NULL;
-
--- Management review constraints
-ALTER TABLE management_reviews ALTER COLUMN created_at SET NOT NULL;
-
--- Cost element constraints
-ALTER TABLE cost_elements ALTER COLUMN cost_type SET NOT NULL;
-ALTER TABLE cost_elements ALTER COLUMN created_at SET NOT NULL;
-
--- Shipment constraints
-ALTER TABLE shipments ALTER COLUMN created_at SET NOT NULL;
-
--- Package constraints (packages table may not exist in all deployments)
-DO $$ BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
-        EXECUTE 'ALTER TABLE packages ALTER COLUMN shipment_id SET NOT NULL';
-        EXECUTE 'ALTER TABLE packages ALTER COLUMN created_at SET NOT NULL';
+-- Defensive helper: set NOT NULL only when (a) column exists and (b) has no NULLs
+CREATE OR REPLACE FUNCTION _m112_safe_set_not_null(p_table text, p_col text)
+RETURNS void LANGUAGE plpgsql AS $$
+DECLARE
+    v_count bigint;
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = p_table AND column_name = p_col
+    ) THEN RETURN; END IF;
+    EXECUTE format('SELECT COUNT(*) FROM %I WHERE %I IS NULL', p_table, p_col) INTO v_count;
+    IF v_count > 0 THEN
+        RAISE NOTICE 'Skipping %.%: % NULL rows', p_table, p_col, v_count;
+        RETURN;
     END IF;
-END $$;
+    EXECUTE format('ALTER TABLE %I ALTER COLUMN %I SET NOT NULL', p_table, p_col);
+END;
+$$;
 
--- Compliance constraints (compliance table may not exist in all deployments)
-DO $$ BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
-        EXECUTE 'ALTER TABLE compliance ALTER COLUMN created_at SET NOT NULL';
-    END IF;
-END $$;
+-- User and authentication
+SELECT _m112_safe_set_not_null('users', 'email');
+SELECT _m112_safe_set_not_null('users', 'employee_id');
+SELECT _m112_safe_set_not_null('users', 'created_at');
+SELECT _m112_safe_set_not_null('users', 'updated_at');
+SELECT _m112_safe_set_not_null('sessions', 'user_id');
+SELECT _m112_safe_set_not_null('sessions', 'created_at');
+SELECT _m112_safe_set_not_null('sessions', 'expires_at');
 
--- ============================================================================
--- Note on future ENUM columns:
--- ============================================================================
--- Future migrations should use CHECK constraints instead of PostgreSQL ENUM types.
--- Example pattern:
---   status VARCHAR(50) CHECK (status IN ('draft','active','closed'))
--- This allows adding new enumeration values via migration without locking tables.
--- ENUM types cannot be modified without ALTER TYPE which locks the table.
+-- Document management
+SELECT _m112_safe_set_not_null('documents', 'doc_id');
+SELECT _m112_safe_set_not_null('documents', 'created_at');
+SELECT _m112_safe_set_not_null('documents', 'updated_at');
+SELECT _m112_safe_set_not_null('document_versions', 'doc_id');
+SELECT _m112_safe_set_not_null('document_versions', 'version_number');
+SELECT _m112_safe_set_not_null('document_versions', 'created_at');
+
+-- Form management
+SELECT _m112_safe_set_not_null('form_entries', 'form_code');
+SELECT _m112_safe_set_not_null('form_entries', 'form_version');
+SELECT _m112_safe_set_not_null('form_entries', 'created_at');
+SELECT _m112_safe_set_not_null('form_attachments', 'entry_id');
+SELECT _m112_safe_set_not_null('form_attachments', 'created_at');
+
+-- Record management
+SELECT _m112_safe_set_not_null('records', 'record_id');
+SELECT _m112_safe_set_not_null('records', 'record_type');
+SELECT _m112_safe_set_not_null('records', 'created_at');
+SELECT _m112_safe_set_not_null('records', 'updated_at');
+
+-- Item master
+SELECT _m112_safe_set_not_null('items', 'item_id');
+SELECT _m112_safe_set_not_null('items', 'item_description');
+SELECT _m112_safe_set_not_null('items', 'item_status');
+SELECT _m112_safe_set_not_null('items', 'created_at');
+SELECT _m112_safe_set_not_null('items', 'updated_at');
+SELECT _m112_safe_set_not_null('item_revisions', 'item_id');
+SELECT _m112_safe_set_not_null('item_revisions', 'created_at');
+
+-- BOM
+SELECT _m112_safe_set_not_null('bill_of_materials', 'bom_id');
+SELECT _m112_safe_set_not_null('bill_of_materials', 'parent_item_id');
+SELECT _m112_safe_set_not_null('bill_of_materials', 'bom_status');
+SELECT _m112_safe_set_not_null('bill_of_materials', 'created_at');
+SELECT _m112_safe_set_not_null('bom_components', 'bom_id');
+SELECT _m112_safe_set_not_null('bom_components', 'bom_revision');
+SELECT _m112_safe_set_not_null('bom_components', 'component_item_id');
+SELECT _m112_safe_set_not_null('bom_components', 'quantity');
+SELECT _m112_safe_set_not_null('bom_components', 'created_at');
+
+-- Work center and routing
+SELECT _m112_safe_set_not_null('work_centers', 'work_center_id');
+SELECT _m112_safe_set_not_null('work_centers', 'work_center_name');
+SELECT _m112_safe_set_not_null('work_centers', 'created_at');
+SELECT _m112_safe_set_not_null('routings', 'routing_id');
+SELECT _m112_safe_set_not_null('routings', 'item_id');
+SELECT _m112_safe_set_not_null('routings', 'created_at');
+SELECT _m112_safe_set_not_null('routing_operations', 'routing_id');
+SELECT _m112_safe_set_not_null('routing_operations', 'routing_revision');
+SELECT _m112_safe_set_not_null('routing_operations', 'operation_sequence');
+SELECT _m112_safe_set_not_null('routing_operations', 'created_at');
+
+-- Customer and sales
+SELECT _m112_safe_set_not_null('customers', 'customer_id');
+SELECT _m112_safe_set_not_null('customers', 'customer_name');
+SELECT _m112_safe_set_not_null('customers', 'created_at');
+SELECT _m112_safe_set_not_null('customers', 'updated_at');
+SELECT _m112_safe_set_not_null('sales_orders', 'customer_id');
+SELECT _m112_safe_set_not_null('sales_orders', 'order_date');
+SELECT _m112_safe_set_not_null('sales_orders', 'created_at');
+SELECT _m112_safe_set_not_null('sales_order_lines', 'sales_order_id');
+SELECT _m112_safe_set_not_null('sales_order_lines', 'item_id');
+SELECT _m112_safe_set_not_null('sales_order_lines', 'order_quantity');
+SELECT _m112_safe_set_not_null('sales_order_lines', 'created_at');
+
+-- Vendor and procurement
+SELECT _m112_safe_set_not_null('vendors', 'vendor_id');
+SELECT _m112_safe_set_not_null('vendors', 'vendor_name');
+SELECT _m112_safe_set_not_null('vendors', 'created_at');
+SELECT _m112_safe_set_not_null('vendors', 'updated_at');
+SELECT _m112_safe_set_not_null('vendor_ratings', 'vendor_id');
+SELECT _m112_safe_set_not_null('vendor_ratings', 'rating_date');
+SELECT _m112_safe_set_not_null('vendor_ratings', 'created_at');
+SELECT _m112_safe_set_not_null('purchase_orders', 'vendor_id');
+SELECT _m112_safe_set_not_null('purchase_orders', 'po_date');
+SELECT _m112_safe_set_not_null('purchase_orders', 'created_at');
+SELECT _m112_safe_set_not_null('purchase_order_lines', 'po_id');
+SELECT _m112_safe_set_not_null('purchase_order_lines', 'item_id');
+SELECT _m112_safe_set_not_null('purchase_order_lines', 'po_quantity');
+SELECT _m112_safe_set_not_null('purchase_order_lines', 'created_at');
+
+-- Warehouse and inventory
+SELECT _m112_safe_set_not_null('warehouses', 'warehouse_id');
+SELECT _m112_safe_set_not_null('warehouses', 'warehouse_name');
+SELECT _m112_safe_set_not_null('warehouses', 'created_at');
+SELECT _m112_safe_set_not_null('inventory_locations', 'location_id');
+SELECT _m112_safe_set_not_null('inventory_locations', 'warehouse_id');
+SELECT _m112_safe_set_not_null('lot_master', 'lot_number');
+SELECT _m112_safe_set_not_null('lot_master', 'item_id');
+SELECT _m112_safe_set_not_null('lot_master', 'created_at');
+SELECT _m112_safe_set_not_null('serial_master', 'serial_number');
+SELECT _m112_safe_set_not_null('serial_master', 'item_id');
+SELECT _m112_safe_set_not_null('serial_master', 'created_at');
+SELECT _m112_safe_set_not_null('inventory_transactions', 'warehouse_id');
+SELECT _m112_safe_set_not_null('inventory_transactions', 'item_id');
+SELECT _m112_safe_set_not_null('inventory_transactions', 'txn_type');
+SELECT _m112_safe_set_not_null('inventory_transactions', 'recorded_at');
+
+-- Job orders
+SELECT _m112_safe_set_not_null('job_orders', 'item_id');
+SELECT _m112_safe_set_not_null('job_orders', 'job_qty');
+SELECT _m112_safe_set_not_null('job_orders', 'created_at');
+SELECT _m112_safe_set_not_null('job_operations', 'job_order_id');
+SELECT _m112_safe_set_not_null('job_operations', 'operation_seq');
+SELECT _m112_safe_set_not_null('job_operations', 'created_at');
+SELECT _m112_safe_set_not_null('labor_transactions', 'employee_id');
+SELECT _m112_safe_set_not_null('labor_transactions', 'recorded_at');
+SELECT _m112_safe_set_not_null('production_schedule', 'created_at');
+
+-- Quality
+SELECT _m112_safe_set_not_null('inspection_plans', 'inspection_plan_id');
+SELECT _m112_safe_set_not_null('inspection_plans', 'created_at');
+SELECT _m112_safe_set_not_null('inspection_results', 'recorded_at');
+SELECT _m112_safe_set_not_null('spc_data', 'item_id');
+SELECT _m112_safe_set_not_null('spc_data', 'created_at');
+SELECT _m112_safe_set_not_null('ncr_records', 'record_id');
+SELECT _m112_safe_set_not_null('ncr_records', 'created_at');
+SELECT _m112_safe_set_not_null('capa_records', 'record_id');
+SELECT _m112_safe_set_not_null('capa_records', 'created_at');
+SELECT _m112_safe_set_not_null('fai_records', 'record_id');
+SELECT _m112_safe_set_not_null('fai_records', 'created_at');
+SELECT _m112_safe_set_not_null('fai_characteristics', 'fai_id');
+SELECT _m112_safe_set_not_null('fai_characteristics', 'characteristic_name');
+SELECT _m112_safe_set_not_null('fai_characteristics', 'created_at');
+SELECT _m112_safe_set_not_null('certificates', 'created_at');
+SELECT _m112_safe_set_not_null('npi_projects', 'created_at');
+SELECT _m112_safe_set_not_null('ehs_incidents', 'created_at');
+SELECT _m112_safe_set_not_null('contamination_checks', 'created_at');
+SELECT _m112_safe_set_not_null('engineering_change_requests', 'ecr_number');
+SELECT _m112_safe_set_not_null('engineering_change_requests', 'created_at');
+
+-- Equipment and maintenance
+SELECT _m112_safe_set_not_null('equipment', 'equipment_id');
+SELECT _m112_safe_set_not_null('equipment', 'equipment_name');
+SELECT _m112_safe_set_not_null('equipment', 'created_at');
+SELECT _m112_safe_set_not_null('calibration_records', 'equipment_id');
+SELECT _m112_safe_set_not_null('calibration_records', 'calibration_date');
+SELECT _m112_safe_set_not_null('calibration_records', 'created_at');
+SELECT _m112_safe_set_not_null('maintenance_work_orders', 'equipment_id');
+SELECT _m112_safe_set_not_null('maintenance_work_orders', 'work_order_id');
+SELECT _m112_safe_set_not_null('maintenance_work_orders', 'created_at');
+SELECT _m112_safe_set_not_null('tools', 'tool_id');
+SELECT _m112_safe_set_not_null('tools', 'tool_name');
+SELECT _m112_safe_set_not_null('tools', 'created_at');
+SELECT _m112_safe_set_not_null('tool_transactions', 'tool_id');
+SELECT _m112_safe_set_not_null('tool_transactions', 'txn_type');
+SELECT _m112_safe_set_not_null('tool_transactions', 'created_at');
+
+-- HR
+SELECT _m112_safe_set_not_null('employees', 'employee_id');
+SELECT _m112_safe_set_not_null('employees', 'employee_name');
+SELECT _m112_safe_set_not_null('employees', 'created_at');
+SELECT _m112_safe_set_not_null('training_records', 'created_at');
+SELECT _m112_safe_set_not_null('skills_matrix', 'employee_id');
+SELECT _m112_safe_set_not_null('skills_matrix', 'skill_name');
+SELECT _m112_safe_set_not_null('skills_matrix', 'created_at');
+SELECT _m112_safe_set_not_null('employee_certifications', 'employee_id');
+SELECT _m112_safe_set_not_null('employee_certifications', 'certification_name');
+SELECT _m112_safe_set_not_null('employee_certifications', 'created_at');
+
+-- Audit and compliance
+SELECT _m112_safe_set_not_null('audits', 'created_at');
+SELECT _m112_safe_set_not_null('audit_findings', 'audit_id');
+SELECT _m112_safe_set_not_null('audit_findings', 'finding_description');
+SELECT _m112_safe_set_not_null('audit_findings', 'created_at');
+SELECT _m112_safe_set_not_null('audit_actions', 'finding_id');
+SELECT _m112_safe_set_not_null('audit_actions', 'action_description');
+SELECT _m112_safe_set_not_null('audit_actions', 'created_at');
+SELECT _m112_safe_set_not_null('risk_register', 'risk_description');
+SELECT _m112_safe_set_not_null('risk_register', 'created_at');
+SELECT _m112_safe_set_not_null('improvement_projects', 'created_at');
+SELECT _m112_safe_set_not_null('management_reviews', 'created_at');
+SELECT _m112_safe_set_not_null('cost_elements', 'cost_type');
+SELECT _m112_safe_set_not_null('cost_elements', 'created_at');
+SELECT _m112_safe_set_not_null('shipments', 'created_at');
+SELECT _m112_safe_set_not_null('packages', 'shipment_id');
+SELECT _m112_safe_set_not_null('packages', 'created_at');
+SELECT _m112_safe_set_not_null('compliance', 'created_at');
+
+DROP FUNCTION IF EXISTS _m112_safe_set_not_null(text, text);
 
 COMMIT;
