@@ -452,6 +452,31 @@ try {
     smoke_assert($resp['status'] === 404, 'Unknown host detail should return 404.');
     smoke_assert(($resp['payload']['error'] ?? null) === 'vps_control_host_failed', 'Unknown host should map to the controller host error.');
 
+    $portalHtml = (string)file_get_contents(QMS_TEST_BASE_DIR . '/portal.html');
+    $vpsScript = (string)file_get_contents(QMS_TEST_BASE_DIR . '/scripts/portal/33-vps-control-tower.js');
+    $vpsStyles = (string)file_get_contents(QMS_TEST_BASE_DIR . '/styles/vps-control-tower.css');
+
+    smoke_assert(
+        str_contains($portalHtml, '20260414-admin-file-tabs'),
+        'Portal should bust the VPS Control Tower JS/CSS cache after the admin file tab navigation fix.'
+    );
+    smoke_assert(
+        str_contains($vpsScript, 'vps-control-tab-strip'),
+        'VPS Control Tower should render File Explorer through the same tab strip as the other VPS tabs.'
+    );
+    smoke_assert(
+        !str_contains($vpsScript, "state.tab === 'files' ? ' vps-ct-file-mode'"),
+        'File Explorer should not switch the VPS Control Tower into a special file-only render mode.'
+    );
+    smoke_assert(
+        str_contains($vpsStyles, '.vps-control-tab-strip'),
+        'VPS Control Tower tab strip should have a persistent navigation surface.'
+    );
+    smoke_assert(
+        !str_contains($vpsStyles, '.vps-ct.vps-ct-file-mode'),
+        'VPS Control Tower CSS should not keep a special File Explorer-only layout mode.'
+    );
+
     echo "vps control tower smoke passed\n";
 } finally {
     if (is_dir($tmpDataDir)) {
