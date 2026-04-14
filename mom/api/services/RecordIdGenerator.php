@@ -249,6 +249,11 @@ final class RecordIdGenerator
     {
         $seqName = 'seq_' . strtolower($key);
 
+        // MES-010 FIX: Validate sequence name against injection
+        if (!preg_match('/^[a-z0-9_]+$/', $seqName)) {
+            throw new RuntimeException('Invalid sequence name: ' . $seqName);
+        }
+
         // Ensure sequence exists (CREATE IF NOT EXISTS is not available for sequences)
         try {
             $this->db->execute("CREATE SEQUENCE IF NOT EXISTS {$seqName} START 1 INCREMENT 1 MINVALUE 1 NO CYCLE");

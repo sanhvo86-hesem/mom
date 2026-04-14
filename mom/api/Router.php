@@ -394,7 +394,13 @@ class Router
     {
         // Convert pattern to regex
         $regex = preg_replace_callback('/\{([a-zA-Z_]+)\}/', static function (array $m): string {
-            return '(?P<' . $m[1] . '>[^/]+)';
+            $name = $m[1];
+            // INFRA-006: Reject parameter names that would shadow PHP superglobals
+            $reserved = ['_GET','_POST','_COOKIE','_SESSION','_SERVER','_ENV','_FILES','_REQUEST'];
+            if (in_array($name, $reserved, true)) {
+                throw new \RuntimeException("Parameter name '$name' is reserved");
+            }
+            return '(?P<' . $name . '>[^/]+)';
         }, $pattern);
         $regex = '#^' . $regex . '$#';
 
@@ -438,6 +444,10 @@ class Router
         $this->emitStandardHeaders($action);
 
         foreach ($response->getHeaders() as $name => $value) {
+            // INFRA-007 FIX: Validate header name format (RFC 7230 token) to prevent header injection
+            if (!preg_match('/^[a-zA-Z0-9!#$%&\'*+\-.^_`|~]+$/', (string)$name)) {
+                continue; // Skip invalid header names
+            }
             // RA-001 FIX: Sanitize header value to prevent CRLF injection
             $safeValue = str_replace(["\r", "\n", "\r\n"], '', $value);
             header($name . ': ' . $safeValue);

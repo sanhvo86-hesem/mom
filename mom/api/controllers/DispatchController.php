@@ -26,7 +26,11 @@ class DispatchController extends BaseController
     private function dispatchDir(): string
     {
         $dir = $this->dataDir . '/dispatch';
-        if (!is_dir($dir)) @mkdir($dir, 0775, true);
+        // PROC-034: Ensure explicit permissions after mkdir
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+            throw new RuntimeException('Failed to create dispatch directory');
+        }
+        @chmod($dir, 0775);
         return $dir;
     }
 
@@ -474,6 +478,10 @@ class DispatchController extends BaseController
         $operatorId    = trim((string)($this->query('operator_id') ?? $currentUserId));
         if ($operatorId === '') {
             $operatorId = $currentUserId;
+        }
+        // PROC-017: Validate operator_id format to prevent injection attacks
+        if (!preg_match('/^[a-zA-Z0-9_\-\.@]{1,128}$/', $operatorId)) {
+            $operatorId = $currentUserId; // fallback to self
         }
         if ($operatorId !== $currentUserId && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
             $this->error('forbidden', 403);
@@ -1039,6 +1047,9 @@ class DispatchController extends BaseController
         $status     = $this->query('status');
         $lockHandle = null;
 
+        // PROC-001: Add mandatory plant_id/org_id filter from session
+        $sessionPlantId = (string)($_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? '');
+
         try {
             $lockHandle = $this->acquireExecutionStateLock(LOCK_SH);
             $file    = $this->dispatchDir() . '/targets.json';
@@ -1046,7 +1057,9 @@ class DispatchController extends BaseController
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
 
-            $filtered = array_filter($targets, function ($t) use ($startDate, $endDate, $machineId, $operatorId, $status) {
+            $filtered = array_filter($targets, function ($t) use ($startDate, $endDate, $machineId, $operatorId, $status, $sessionPlantId) {
+                // PROC-001: Filter results only for targets where plant_id matches session
+                if ($sessionPlantId !== '' && ($t['plant_id'] ?? '') !== $sessionPlantId) return false;
                 if ($startDate && ($t['shift_date'] ?? '') < $startDate) return false;
                 if ($endDate && ($t['shift_date'] ?? '') > $endDate) return false;
                 if ($machineId && ($t['machine_id'] ?? '') !== $machineId) return false;
@@ -1095,6 +1108,9 @@ class DispatchController extends BaseController
         $now = $this->nowIso();
         $lockHandle = null;
 
+        // PROC-001: Add mandatory plant_id/org_id filter from session
+        $sessionPlantId = (string)($_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? '');
+
         try {
             $lockHandle = $this->acquireExecutionStateLock();
 
@@ -1109,6 +1125,10 @@ class DispatchController extends BaseController
 
             foreach ($targets as &$t) {
                 if (($t['target_id'] ?? '') === $targetId) {
+                    // PROC-001: Validate ownership check BEFORE modifying
+                    if (($t['plant_id'] ?? '') !== $sessionPlantId && $sessionPlantId !== '') {
+                        $this->error('forbidden', 403, 'Cannot modify dispatch targets outside your plant');
+                    }
                     $previousTarget = is_array($t) ? $t : null;
                     $t = $this->shopfloor()->applyTargetUpdates($t, $body, $now);
                     $updated = $t;

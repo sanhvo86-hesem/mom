@@ -154,7 +154,15 @@ class SupplierController extends BaseController
         $user = $this->requireAuth();
         $this->requireSupplierPermission($user, 'sq_read');
 
+        // PROC-005: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         $filters = [];
+        // PROC-005: Apply mandatory org_id filter to all queries
+        $filters['org_id'] = $sessionOrgId;
 
         $vendorId = $this->query('vendor_id');
         if ($vendorId !== null && $vendorId !== '') {
@@ -434,11 +442,16 @@ class SupplierController extends BaseController
         $id     = trim((string)($body['id'] ?? ''));
         $userId = $this->userId($user);
 
+        // PROC-011: Whitelist allowed fields from request body to prevent mass assignment
+        $allowed = ['qty_accepted', 'qty_rejected', 'disposition', 'notes', 'disposition_at'];
+        $updateData = array_intersect_key($body, array_flip($allowed));
+        $updateData['id'] = $id; // Preserve the ID for identification
+
         try {
-            $updated = $this->supplierService()->updateIncoming($id, $body, $userId);
+            $updated = $this->supplierService()->updateIncoming($id, $updateData, $userId);
             $this->auditLog('supplier_update_incoming', [
                 'inspection_id' => $id,
-                'fields'        => array_keys($body),
+                'fields'        => array_keys($updateData),
             ], $userId);
 
             $this->success(['inspection' => $updated]);
@@ -545,7 +558,15 @@ class SupplierController extends BaseController
         $user = $this->requireAuth();
         $this->requireSupplierPermission($user, 'sq_read');
 
+        // PROC-019: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         $filters = [];
+        // PROC-019: Apply mandatory org_id filter to all queries
+        $filters['org_id'] = $sessionOrgId;
 
         $vendorId = $this->query('vendor_id');
         if ($vendorId !== null && $vendorId !== '') {
@@ -643,7 +664,15 @@ class SupplierController extends BaseController
         $user = $this->requireAuth();
         $this->requireSupplierPermission($user, 'sq_read');
 
+        // PROC-025: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         $filters = [];
+        // PROC-025: Apply mandatory org_id filter to all queries
+        $filters['org_id'] = $sessionOrgId;
 
         $vendorId = $this->query('vendor_id');
         if ($vendorId !== null && $vendorId !== '') {
@@ -667,22 +696,23 @@ class SupplierController extends BaseController
             $sqDir    = $this->dataDir . '/supplier-quality';
             $allItems = $this->readJsonFile($sqDir . '/scar.json') ?? [];
 
-            // Apply filters
-            if (!empty($filters)) {
-                $allItems = array_filter($allItems, function (array $scar) use ($filters) {
-                    if (isset($filters['vendor_id']) && ($scar['vendor_id'] ?? '') !== $filters['vendor_id']) {
-                        return false;
-                    }
-                    if (isset($filters['status']) && ($scar['status'] ?? '') !== $filters['status']) {
-                        return false;
-                    }
-                    if (isset($filters['severity']) && ($scar['severity'] ?? '') !== $filters['severity']) {
-                        return false;
-                    }
-                    return true;
-                });
-                $allItems = array_values($allItems);
-            }
+            // Apply filters. org_id is mandatory and must always bound results.
+            $allItems = array_filter($allItems, function (array $scar) use ($filters) {
+                if (($scar['org_id'] ?? '') !== $filters['org_id']) {
+                    return false;
+                }
+                if (isset($filters['vendor_id']) && ($scar['vendor_id'] ?? '') !== $filters['vendor_id']) {
+                    return false;
+                }
+                if (isset($filters['status']) && ($scar['status'] ?? '') !== $filters['status']) {
+                    return false;
+                }
+                if (isset($filters['severity']) && ($scar['severity'] ?? '') !== $filters['severity']) {
+                    return false;
+                }
+                return true;
+            });
+            $allItems = array_values($allItems);
 
             $total = count($allItems);
             $items = array_slice($allItems, $offset, $limit);

@@ -175,7 +175,8 @@ final class QueueService
                     [
                         'content_type'  => 'application/json',
                         'delivery_mode' => \PhpAmqpLib\Message\AMQPMessage::DELIVERY_MODE_PERSISTENT,
-                        'message_id'    => $message['event_id'],
+                        'message_id'    => bin2hex(random_bytes(16)), // WRK-024: Separate AMQP message ID
+                        'correlation_id' => $message['event_id'], // WRK-024: Domain event linkage
                         'timestamp'     => time(),
                     ]
                 );
@@ -233,6 +234,15 @@ final class QueueService
                 function (\PhpAmqpLib\Message\AMQPMessage $amqpMsg) use ($handler, $timeoutPerJobSeconds) {
                     $jobStart = time();
                     $data = json_decode($amqpMsg->getBody(), true);
+
+                    // WRK-008: Validate message schema before processing
+                    if (!is_array($data) || !isset($data['event_id'], $data['routing_key'])) {
+                        // Dead-letter without retry
+                        $amqpMsg->nack(false, false);
+                        @error_log('[QueueService] Rejected malformed message');
+                        return;
+                    }
+
                     try {
                         // WRK-002: Check timeout before and during handler execution
                         if (time() - $jobStart > $timeoutPerJobSeconds) {
@@ -442,11 +452,14 @@ final class QueueService
                 }
             }
 
+            // WRK-010: Use atomic temp file swap for file queue atomicity
             // Only truncate and rewrite AFTER all processing is complete
-            ftruncate($fp, 0);
-            rewind($fp);
             if (!empty($remaining)) {
-                fwrite($fp, implode("\n", $remaining) . "\n");
+                $tmpFile = $file . '.tmp.' . bin2hex(random_bytes(6));
+                file_put_contents($tmpFile, implode("\n", $remaining) . "\n", LOCK_EX);
+                rename($tmpFile, $file); // atomic
+            } else {
+                ftruncate($fp, 0);
             }
         } finally {
             flock($fp, LOCK_UN);

@@ -91,17 +91,22 @@ class ApiKeyMiddleware
         $keys = $this->loadApiKeys();
         $hashedToken = hash('sha256', $token);
 
-        $key = null;
+        // INFRA-014 FIX: Prevent timing attacks - compare all keys before accepting any match
+        $foundKey = null;
+        $foundMatch = false;
         foreach ($keys as $k) {
-            if (hash_equals($k['hash'] ?? '', $hashedToken)) {
-                $key = $k;
-                break;
+            // Always compare all keys, even after finding a match
+            $matches = hash_equals((string)($k['hash'] ?? ''), $hashedToken);
+            if ($matches && !$foundMatch) {
+                $foundKey = $k;
+                $foundMatch = true;
             }
         }
-
-        if ($key === null) {
+        if (!$foundMatch) {
             $this->deny('invalid_api_key', 401);
         }
+
+        $key = $foundKey;
 
         // Check expiry
         if (!empty($key['expires_at'])) {
@@ -112,7 +117,8 @@ class ApiKeyMiddleware
         }
 
         // Check active status
-        if (!($key['active'] ?? true)) {
+        // INFRA-009: Default to false (revoked) when 'active' field is missing
+        if (!($key['active'] ?? false)) {
             $this->deny('api_key_revoked', 401);
         }
 
@@ -125,6 +131,8 @@ class ApiKeyMiddleware
         $_SESSION['api_key_is_admin'] = (bool)($key['is_admin'] ?? false);
         $_SESSION['api_key_scopes'] = $key['scopes'] ?? [];
         $_SESSION['last_active'] = time();
+        // INFRA-003 FIX: Clear any pre-existing JWT session state to prevent session pollution
+        unset($_SESSION['jwt_scopes']);
     }
 
     /**
@@ -186,6 +194,8 @@ class ApiKeyMiddleware
             $_SESSION['user'] = $userId;
             $_SESSION['mfa_ok'] = true;
             $_SESSION['auth_method'] = 'jwt';
+            // INFRA-003 FIX: Clear any pre-existing API key session state to prevent session pollution
+            unset($_SESSION['api_key_scopes'], $_SESSION['api_key_id'], $_SESSION['api_key_is_admin']);
             $_SESSION['jwt_scopes'] = is_array($scopes) ? $scopes : [$scopes];
             $_SESSION['last_active'] = time();
         } catch (\Throwable $e) {

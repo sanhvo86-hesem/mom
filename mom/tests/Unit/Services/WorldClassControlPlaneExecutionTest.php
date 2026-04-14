@@ -929,6 +929,9 @@ final class GenealogyGraphFakeDb
         if (str_contains($sql, 'SELECT 1 FROM genealogy_edge_facts')) {
             return null;
         }
+        if (str_contains($sql, 'WITH RECURSIVE path')) {
+            return null;
+        }
         if (str_contains($sql, 'INSERT INTO genealogy_edge_facts')) {
             return [
                 'edge_fact_type' => (string)$params[':edge_fact_type'],
@@ -968,6 +971,9 @@ final class GenealogyGraphFakeDb
                 'subject_ref' => (string)$params[':subject_ref'],
                 'snapshot_hash_sha256' => (string)$params[':snapshot_hash_sha256'],
             ];
+        }
+        if (str_contains($sql, 'WITH RECURSIVE path')) {
+            return null;
         }
 
         return [

@@ -336,11 +336,19 @@ class LogisticsController extends BaseController
         $dateFrom = $this->query('date_from');
         $dateTo   = $this->query('date_to');
 
+        // PROC-002: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         try {
             $file  = $this->logisticsDir() . '/subcontracts.json';
             $items = $this->readJsonFile($file) ?? [];
 
-            $filtered = array_filter($items, function ($r) use ($status, $vendorId, $dateFrom, $dateTo) {
+            $filtered = array_filter($items, function ($r) use ($status, $vendorId, $dateFrom, $dateTo, $sessionOrgId) {
+                // PROC-002: Filter all results only for records where org_id === session org_id
+                if (($r['org_id'] ?? '') !== $sessionOrgId) return false;
                 if ($status && ($r['status'] ?? '') !== $status) return false;
                 if ($vendorId && ($r['vendor_id'] ?? '') !== $vendorId) return false;
                 if ($dateFrom && ($r['ship_out_date'] ?? '') < $dateFrom) return false;
@@ -512,6 +520,11 @@ class LogisticsController extends BaseController
             if ($qtyReceived === 0) {
                 $this->error('qty_received_must_be_positive', 400, 'qty_received must be > 0 for incoming records');
             }
+            // PROC-007: Add maximum quantity validation to prevent overflow
+            $maxQty = 9999999;
+            if ($qtyReceived > $maxQty || $qtyAccepted > $maxQty || $qtyRejected > $maxQty) {
+                $this->error('qty_too_large', 400, 'Quantity exceeds maximum allowed value');
+            }
             if ($qtyAccepted + $qtyRejected > $qtyReceived) {
                 $this->error('accepted_rejected_exceed_received', 400, 'qty_accepted + qty_rejected must not exceed qty_received');
             }
@@ -577,11 +590,19 @@ class LogisticsController extends BaseController
         $dateFrom = $this->query('date_from');
         $dateTo   = $this->query('date_to');
 
+        // PROC-003: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         try {
             $file  = $this->logisticsDir() . '/oqc.json';
             $items = $this->readJsonFile($file) ?? [];
 
-            $filtered = array_filter($items, function ($r) use ($status, $soNumber, $dateFrom, $dateTo) {
+            $filtered = array_filter($items, function ($r) use ($status, $soNumber, $dateFrom, $dateTo, $sessionOrgId) {
+                // PROC-003: Filter all results only for records where org_id === session org_id
+                if (($r['org_id'] ?? '') !== $sessionOrgId) return false;
                 if ($status && ($r['result'] ?? '') !== $status) return false;
                 if ($soNumber && ($r['so_number'] ?? '') !== $soNumber) return false;
                 if ($dateFrom && ($r['created_at'] ?? '') < $dateFrom) return false;
@@ -622,6 +643,20 @@ class LogisticsController extends BaseController
         $now = $this->nowIso();
 
         try {
+            // PROC-022: Validate array size limits on request arrays
+            $serialNumbers = (array)($body['serial_numbers'] ?? []);
+            if (count($serialNumbers) > 10000) {
+                $this->error('array_too_large', 400, 'serial_numbers exceeds maximum of 10,000 entries');
+            }
+            $measurements = (array)($body['measurements'] ?? []);
+            if (count($measurements) > 10000) {
+                $this->error('array_too_large', 400, 'measurements exceeds maximum of 10,000 entries');
+            }
+            $photos = (array)($body['photos'] ?? []);
+            if (count($photos) > 10000) {
+                $this->error('array_too_large', 400, 'photos exceeds maximum of 10,000 entries');
+            }
+
             $file  = $this->logisticsDir() . '/oqc.json';
             $items = $this->readJsonFile($file) ?? [];
 
@@ -635,14 +670,14 @@ class LogisticsController extends BaseController
                 'wo_number'                => trim((string)($body['wo_number'] ?? '')),
                 'item_id'                  => trim((string)($body['item_id'] ?? '')),
                 'lot_number'               => trim((string)($body['lot_number'] ?? '')),
-                'serial_numbers'           => is_array($body['serial_numbers'] ?? null) ? $body['serial_numbers'] : [],
+                'serial_numbers'           => $serialNumbers,
                 'qty_inspected'            => (int)($body['qty_inspected'] ?? 0),
                 'qty_accepted'             => 0,
                 'qty_rejected'             => 0,
                 'oqc_type'                 => $oqcType,
                 'inspection_plan_ref'      => trim((string)($body['inspection_plan_ref'] ?? '')),
-                'measurements'             => is_array($body['measurements'] ?? null) ? $body['measurements'] : [],
-                'photos'                   => is_array($body['photos'] ?? null) ? $body['photos'] : [],
+                'measurements'             => $measurements,
+                'photos'                   => $photos,
                 'customer_witness_required'=> (bool)($body['customer_witness_required'] ?? false),
                 'customer_witness_name'    => trim((string)($body['customer_witness_name'] ?? '')),
                 'notes'                    => trim((string)($body['notes'] ?? '')),
@@ -887,11 +922,19 @@ class LogisticsController extends BaseController
         $dateFrom = $this->query('date_from');
         $dateTo   = $this->query('date_to');
 
+        // PROC-004: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         try {
             $file  = $this->logisticsDir() . '/packing.json';
             $items = $this->readJsonFile($file) ?? [];
 
-            $filtered = array_filter($items, function ($r) use ($status, $soNumber, $dateFrom, $dateTo) {
+            $filtered = array_filter($items, function ($r) use ($status, $soNumber, $dateFrom, $dateTo, $sessionOrgId) {
+                // PROC-004: Filter all results only for records where org_id === session org_id
+                if (($r['org_id'] ?? '') !== $sessionOrgId) return false;
                 if ($status && ($r['status'] ?? '') !== $status) return false;
                 if ($soNumber && ($r['so_number'] ?? '') !== $soNumber) return false;
                 if ($dateFrom && ($r['packing_date'] ?? '') < $dateFrom) return false;

@@ -116,6 +116,19 @@ final class RepoBoundaryScanner
                 continue;
             }
             $path = $dir . '/' . $entry;
+
+            // CTRL-003: Skip symlinks to prevent traversal
+            if (is_link($path)) {
+                continue;
+            }
+
+            // CTRL-003: Validate path stays within root
+            $realPath = realpath($path);
+            $realRoot = realpath($root);
+            if ($realPath === false || $realRoot === false || strpos($realPath, $realRoot) !== 0) {
+                continue;
+            }
+
             $relative = ltrim(substr($path, strlen($root)), '/');
             $paths[] = $relative;
             if (is_dir($path)) {

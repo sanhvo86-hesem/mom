@@ -352,12 +352,13 @@ class QueryBuilder
         // Fall back to schema introspection for new tables with deleted_at column
         try {
             $conn = Connection::getInstance();
+            // DB-001: Use named parameter to avoid binding mismatch
             $result = $conn->query(
                 "SELECT EXISTS (
                     SELECT 1 FROM information_schema.columns
-                    WHERE table_schema = 'public' AND table_name = ? AND column_name = 'deleted_at'
+                    WHERE table_schema = 'public' AND table_name = :table AND column_name = 'deleted_at'
                 )",
-                ['?' => $this->table]
+                [':table' => $this->table]
             );
             $hasDeletedAt = !empty($result) && ($result[0][0] ?? false);
             self::$softDeleteTableCache[$this->table] = $hasDeletedAt;
@@ -382,12 +383,13 @@ class QueryBuilder
     public function whereJsonText(string $column, string $key, mixed $value): self
     {
         $phVal = $this->nextPlaceholder();
+        $phKey = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
-        // Key must be a quoted string literal, not a parameter placeholder
-        $escapedKey = "'" . str_replace("'", "''", $key) . "'";
+        // DB-004: Use parameterized key value to prevent injection
+        // The >> operator requires text literal but we use parameter for the key value itself
         $this->wheres[] = [
-            'sql'       => "{$safeCol}>>{$escapedKey} = {$phVal}",
-            'params'    => [$phVal => (string)$value],
+            'sql'       => "{$safeCol}>>{$phKey} = {$phVal}",
+            'params'    => [$phKey => (string)$key, $phVal => (string)$value],
             'connector' => 'AND',
         ];
         return $this;
@@ -421,12 +423,12 @@ class QueryBuilder
      */
     public function whereJsonHasKey(string $column, string $key): self
     {
+        $phKey = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
-        // Key must be a quoted string literal, not a parameter placeholder
-        $escapedKey = "'" . str_replace("'", "''", $key) . "'";
+        // DB-005: Use parameterized key to prevent injection
         $this->wheres[] = [
-            'sql'       => "{$safeCol} ? {$escapedKey}",
-            'params'    => [],
+            'sql'       => "{$safeCol} ? {$phKey}",
+            'params'    => [$phKey => (string)$key],
             'connector' => 'AND',
         ];
         return $this;
@@ -612,6 +614,10 @@ class QueryBuilder
     public function get(): array
     {
         [$sql, $params] = $this->build();
+        // DB-018: Warn if no LIMIT is set on SELECT queries to identify unbounded queries
+        if ($this->operation === 'SELECT' && $this->limit === null) {
+            @error_log('[QueryBuilder] Warning: SELECT query executed without LIMIT: ' . $sql);
+        }
         return Connection::getInstance()->query($sql, $params);
     }
 

@@ -63,10 +63,26 @@ final class CanonicalOutboxWorker
 
             try {
                 $this->claim($id, $leaseOwner);
-                $handler($row);
-                $this->markDone($id);
-                $result['processed']++;
+                // CTRL-007: Wrap handler execution in try-catch that marks failed properly
+                try {
+                    $handler($row);
+                    $this->markDone($id);
+                    $result['processed']++;
+                } catch (\Throwable $e) {
+                    @error_log('[OutboxWorker] Handler failed: ' . $e->getMessage());
+                    // mark failed, do NOT re-throw partial state
+                    $attempt = max(0, (int)($row['attempt_count'] ?? 0)) + 1;
+                    if ($attempt >= self::DEFAULT_MAX_ATTEMPTS) {
+                        $this->markDeadLetter($id, $e);
+                        $result['dead_letter']++;
+                    } else {
+                        $this->markRetry($id, $attempt, $e);
+                        $result['failed']++;
+                    }
+                }
             } catch (\Throwable $e) {
+                @error_log('[OutboxWorker] Claim or finalization failed: ' . $e->getMessage());
+                // If claiming failed, mark as failed and don't re-throw
                 $attempt = max(0, (int)($row['attempt_count'] ?? 0)) + 1;
                 if ($attempt >= self::DEFAULT_MAX_ATTEMPTS) {
                     $this->markDeadLetter($id, $e);

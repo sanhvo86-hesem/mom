@@ -452,6 +452,43 @@ final class AllocationService
     }
 
     /**
+     * Get a single allocation by allocation UUID.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getByAllocationId(string $allocationId): ?array
+    {
+        if ($this->pgReadEnabled()) {
+            try {
+                $db = $this->dataLayer->getConnection();
+                $row = $db->queryOne(
+                    'SELECT * FROM allocations WHERE allocation_id = :aid::uuid',
+                    [':aid' => $allocationId]
+                );
+                if ($row !== null) {
+                    return $this->pgRowToAllocation($row);
+                }
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    return null;
+                }
+            } catch (\Throwable $e) {
+                error_log('[AllocationService] PG getByAllocationId failed: ' . $e->getMessage());
+                if ($this->dataLayer->getMode() === DataLayer::MODE_POSTGRES_ONLY) {
+                    throw $e;
+                }
+            }
+        }
+
+        foreach ($this->readLog() as $entry) {
+            if (($entry['allocation_id'] ?? '') === $allocationId) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Generate an empty .txt placeholder file named after the Record-ID.
      *
      * The file is created in a temp directory and its path is returned

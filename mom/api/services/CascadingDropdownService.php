@@ -424,6 +424,11 @@ final class CascadingDropdownService
             return $this->typeRegistry = [];
         }
 
+        // INT-018: Add file size limit check
+        if (filesize($file) > 5 * 1024 * 1024) {
+            throw new RuntimeException('Registry file too large: ' . basename($file));
+        }
+
         $raw  = @file_get_contents($file);
         $data = ($raw !== false) ? json_decode($raw, true) : null;
 
@@ -444,6 +449,11 @@ final class CascadingDropdownService
         $file = $this->confDir . '/form_control_registry.json';
         if (!file_exists($file)) {
             return $this->formRegistry = [];
+        }
+
+        // INT-018: Add file size limit check
+        if (filesize($file) > 5 * 1024 * 1024) {
+            throw new RuntimeException('Registry file too large: ' . basename($file));
         }
 
         $raw  = @file_get_contents($file);

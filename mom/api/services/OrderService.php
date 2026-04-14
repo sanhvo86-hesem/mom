@@ -501,8 +501,8 @@ final class OrderService
                         continue;
                     }
                     $status = strtolower((string)($existingSo['status'] ?? ''));
-                    // Don't count cancelled, closed, or shipped orders in outstanding
-                    if (!in_array($status, ['closed', 'cancelled', 'shipped'], true)) {
+                    // ORD-003: Shipped orders count toward credit limit (only exclude truly settled)
+                    if (!in_array($status, ['closed', 'cancelled'], true)) {
                         $outstandingBalance += (float)($existingSo['total_value'] ?? 0);
                     }
                 }

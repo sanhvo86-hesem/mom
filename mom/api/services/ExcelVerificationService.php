@@ -243,13 +243,17 @@ final class ExcelVerificationService
             return new VerificationResult(valid: false, reason: 'file_not_found');
         }
 
-        // Check file size
-        $maxBytes = self::DEFAULT_MAX_FILE_SIZE_MB * 1024 * 1024;
-        if (filesize($filePath) > $maxBytes) {
-            return new VerificationResult(valid: false, reason: 'file_too_large');
+        // FILE-018: Apply server-side file size limit FIRST before reading hidden sheet
+        $serverMaxBytes = 25 * 1024 * 1024; // 25MB hard server limit
+        $fileSize = filesize($filePath);
+        if ($fileSize === false) {
+            return new VerificationResult(valid: false, reason: 'file_not_readable');
+        }
+        if ($fileSize > $serverMaxBytes) {
+            return new VerificationResult(valid: false, reason: 'file_too_large', details: ['server_max_mb' => 25]);
         }
 
-        // Read hidden sheet data
+        // Read hidden sheet data (only after size check passes)
         $data = $this->readHiddenSheet($filePath);
         if ($data === null) {
             return new VerificationResult(
@@ -320,7 +324,10 @@ final class ExcelVerificationService
         if ($expectedFilename !== null) {
             $pattern = $data['expected_filename_pattern'] ?? null;
             if ($pattern !== null && $pattern !== '') {
-                if (!@preg_match('/' . $pattern . '/', $expectedFilename)) {
+                // FILE-009: Never use user-supplied regex directly; build server-side pattern
+                $safePattern = '/^' . preg_quote($formCode, '/') . '_/i';
+                $matches = (bool)@preg_match($safePattern, $expectedFilename);
+                if (!$matches) {
                     return new VerificationResult(
                         valid:        false,
                         reason:       'filename_mismatch',
@@ -329,7 +336,7 @@ final class ExcelVerificationService
                         allocationId: $allocationId,
                         downloadUser: $user,
                         downloadTime: $timestamp,
-                        details:      ['pattern' => $pattern, 'filename' => $expectedFilename],
+                        details:      ['pattern' => $safePattern, 'filename' => $expectedFilename],
                     );
                 }
             }

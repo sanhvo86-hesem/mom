@@ -61,14 +61,10 @@ final class CircuitBreaker
         if ($this->state === self::STATE_CLOSED) return true;
 
         // REAUDIT-R6-021: In HALF_OPEN state, only allow ONE test request at a time.
-        // Other concurrent requests must wait or be rejected.
+        // WRK-016: Use atomic lock acquisition to prevent race conditions
         if ($this->state === self::STATE_HALF_OPEN) {
-            // Only allow if no other request is already testing
-            if ($this->isHalfOpenTestInProgress()) {
-                return false; // Another request is already testing, reject this one
-            }
-            $this->setHalfOpenTestInProgress(true); // Mark that a test is in progress
-            return true; // Allow this test request
+            // Attempt atomic lock acquisition
+            return $this->acquireHalfOpenTestLock();
         }
 
         // STATE_OPEN: check if recovery timeout has elapsed
@@ -87,7 +83,7 @@ final class CircuitBreaker
                 $this->openedAt = null;
             }
             // REAUDIT-R6-021: Clear the half-open test flag after success
-            $this->setHalfOpenTestInProgress(false);
+            $this->releaseHalfOpenTestLock();
         } else {
             $this->failureCount = 0;
         }
@@ -105,7 +101,7 @@ final class CircuitBreaker
             $this->openedAt = microtime(true);
             $this->successCount = 0;
             // REAUDIT-R6-021: Clear the half-open test flag after failure
-            $this->setHalfOpenTestInProgress(false);
+            $this->releaseHalfOpenTestLock();
         } elseif ($this->failureCount >= $this->failureThreshold) {
             $this->state = self::STATE_OPEN;
             $this->openedAt = microtime(true);
@@ -157,9 +153,10 @@ final class CircuitBreaker
         }
 
         if (!is_file($this->stateFile)) return;
+        // WRK-022: Use LOCK_EX consistently for all file access
         $lockHandle = @fopen($this->stateFile, 'r');
         if ($lockHandle) {
-            if (@flock($lockHandle, LOCK_SH)) {
+            if (@flock($lockHandle, LOCK_EX)) {
                 try {
                     $data = json_decode(@file_get_contents($this->stateFile) ?: '', true);
                     if (!is_array($data)) return;
@@ -211,52 +208,53 @@ final class CircuitBreaker
             }
         }
 
-        @file_put_contents($this->stateFile, json_encode($state, JSON_PRETTY_PRINT), LOCK_EX);
+        // WRK-029: Use atomic temp file write pattern
+        $tmpFile = $this->stateFile . '.tmp.' . getmypid();
+        file_put_contents($tmpFile, json_encode($state, JSON_PRETTY_PRINT), LOCK_EX);
+        rename($tmpFile, $this->stateFile);
     }
 
     /**
-     * REAUDIT-R6-021: Check if a half-open test is currently in progress.
-     * Uses Redis for distribution across PHP-FPM workers if cache is available.
+     * REAUDIT-R6-021: Attempt atomic acquisition of half-open test lock.
+     * WRK-016: Use atomic SETNX with 5-second TTL to prevent race conditions.
+     * Returns true only if lock was successfully acquired.
      */
-    private function isHalfOpenTestInProgress(): bool
+    private function acquireHalfOpenTestLock(): bool
     {
         if ($this->cacheService !== null) {
             try {
-                $testKey = $this->stateKey . ':test_in_progress';
-                $value = $this->cacheService->get($testKey);
-                return $value === true;
+                $testKey = $this->stateKey . ':half_open_test';
+                // WRK-016: Use atomic set-if-not-exists with 5-second TTL
+                return $this->cacheService->setNx($testKey, true, 5);
             } catch (\Throwable $e) {
-                @error_log('[CircuitBreaker] Cache check failed: ' . $e->getMessage());
-                // Fall back to instance variable
+                @error_log('[CircuitBreaker] Cache SETNX failed: ' . $e->getMessage());
+                // Fall back to instance variable (not distributed, but safe)
             }
         }
 
-        return $this->halfOpenTestInProgress;
+        // File-based fallback - not atomic across processes but safe for single process
+        if ($this->halfOpenTestInProgress) {
+            return false;
+        }
+        $this->halfOpenTestInProgress = true;
+        return true;
     }
 
     /**
-     * REAUDIT-R6-021: Set or clear the half-open test in progress flag.
-     * Uses Redis for distribution across PHP-FPM workers if cache is available.
+     * REAUDIT-R6-021: Release the half-open test lock.
      */
-    private function setHalfOpenTestInProgress(bool $value): void
+    private function releaseHalfOpenTestLock(): void
     {
         if ($this->cacheService !== null) {
             try {
-                $testKey = $this->stateKey . ':test_in_progress';
-                if ($value) {
-                    // Set with 5-second TTL to auto-expire if process dies
-                    $this->cacheService->set($testKey, true, 5);
-                } else {
-                    // Clear the flag immediately
-                    $this->cacheService->delete($testKey);
-                }
+                $testKey = $this->stateKey . ':half_open_test';
+                $this->cacheService->delete($testKey);
                 return;
             } catch (\Throwable $e) {
-                @error_log('[CircuitBreaker] Cache set failed: ' . $e->getMessage());
-                // Fall back to instance variable
+                @error_log('[CircuitBreaker] Cache delete failed: ' . $e->getMessage());
             }
         }
 
-        $this->halfOpenTestInProgress = $value;
+        $this->halfOpenTestInProgress = false;
     }
 }

@@ -96,7 +96,7 @@ final class SharePointPublicationAdapter
     }
 
     /**
-     * FOUND-005 FIX: Validate SharePoint URL to prevent SSRF attacks
+     * INT-005: Validate SharePoint URL to prevent DNS rebinding SSRF attacks
      */
     private function validateSharePointUrl(string $url): void
     {
@@ -110,10 +110,18 @@ final class SharePointPublicationAdapter
             throw new RuntimeException('sharepoint_url_must_use_https');
         }
 
-        // Block private IP ranges
-        $ip = gethostbyname($parsed['host']);
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-            throw new RuntimeException('sharepoint_url_resolves_to_private_address');
+        // INT-005: Use dns_get_record instead of gethostbyname to prevent DNS rebinding
+        $host = $parsed['host'];
+        $records = @dns_get_record($host, DNS_A | DNS_AAAA);
+        if (empty($records)) {
+            throw new RuntimeException('sharepoint_url_dns_resolution_failed');
+        }
+
+        foreach ($records as $record) {
+            $ip = $record['ip'] ?? $record['ipv6'] ?? '';
+            if ($ip && !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                throw new RuntimeException('sharepoint_url_resolves_to_private_ip');
+            }
         }
     }
 }

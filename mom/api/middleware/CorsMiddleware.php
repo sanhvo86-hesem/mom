@@ -98,22 +98,23 @@ class CorsMiddleware
             // Handle preflight OPTIONS requests
             $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
             if ($method === 'OPTIONS') {
-                $headers = [];
+                // INFRA-015 FIX: Return 403 for unauthorized CORS preflight requests
                 if ($origin !== '' && $self->isOriginAllowed($origin)) {
                     $headers = [
                         'Access-Control-Allow-Methods' => implode(', ', $self->allowedMethods),
                         'Access-Control-Allow-Headers' => implode(', ', $self->allowedHeaders),
                         'Access-Control-Max-Age' => (string)$self->maxAge,
+                        'Access-Control-Allow-Origin' => $origin,
+                        'Vary' => 'Origin',
                     ];
-                    if ($origin !== '') {
-                        $headers['Access-Control-Allow-Origin'] = $origin;
-                        $headers['Vary'] = 'Origin';
-                        if ($self->credentials) {
-                            $headers['Access-Control-Allow-Credentials'] = 'true';
-                        }
+                    if ($self->credentials) {
+                        $headers['Access-Control-Allow-Credentials'] = 'true';
                     }
+                    throw ExitException::empty(204, $headers);
+                } else {
+                    // Unauthorized preflight - return 403
+                    throw ExitException::empty(403, []);
                 }
-                throw ExitException::empty(204, $headers);
             }
 
             $next();
@@ -146,8 +147,8 @@ class CorsMiddleware
             if (str_contains($allowed, '*')) {
                 // Only allow * at the beginning of the subdomain (e.g. https://*.example.com)
                 if (str_starts_with($allowed, 'https://*.') || str_starts_with($allowed, 'http://*.')) {
-                    // Extract the domain part after ://*. and anchor the regex to domain boundaries
-                    $pattern = preg_replace('/^\w+:\/\/\\\*\./', '', preg_quote($allowed, '/'));
+                    // Extract the domain part after ://*. and properly escape it
+                    $pattern = preg_quote(preg_replace('/^\w+:\/\/\*\./', '', $allowed), '/');
                     // Subdomain can be one or more segments of alphanumeric + hyphen, separated by dots
                     // The regex ensures the wildcard part ends exactly at the quoted domain boundary
                     $regex = '/^https?:\/\/[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?)*\.' . $pattern . '$/i';

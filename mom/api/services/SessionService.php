@@ -35,9 +35,19 @@ final class SessionService
         if (session_status() === PHP_SESSION_ACTIVE) return;
 
         $isCliLike = in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
-            || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
+        // INFRA-013 FIX: Only trust X-Forwarded-Proto from known trusted proxies
+        $isTrustedHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        if (!$isTrustedHttps) {
+            $xProto = strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+            if ($xProto === 'https') {
+                $remoteAddr = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+                $trustedProxies = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: ''))));
+                if (in_array($remoteAddr, $trustedProxies, true)) {
+                    $isTrustedHttps = true;
+                }
+            }
+        }
+        $https = $isTrustedHttps || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
         $headersMutable = !headers_sent();
         $headerlessSessionMode = $isCliLike || !$headersMutable;
 
@@ -92,7 +102,7 @@ final class SessionService
             }
 
             if ($headerlessSessionMode && session_id() === '') {
-                session_id(bin2hex(random_bytes(16)));
+                session_id(bin2hex(random_bytes(32)));
             }
 
             try {
@@ -367,7 +377,7 @@ final class SessionService
             ini_set('session.use_only_cookies', '0');
         }
         ini_set('session.cache_limiter', '');
-        session_id(bin2hex(random_bytes(16)));
+        session_id(bin2hex(random_bytes(32)));
 
         try {
             self::sessionStartOrThrow();

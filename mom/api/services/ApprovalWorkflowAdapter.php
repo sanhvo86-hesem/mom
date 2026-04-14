@@ -100,10 +100,16 @@ final class ApprovalWorkflowAdapter
         }
 
         // 3. Self-approval prohibition
-        // If requesterPartyId is null, treat it as the current session user to prevent bypass
-        $effectiveRequesterId = $requesterPartyId ?? $_SESSION['user_id'] ?? null;
+        // INT-009: Make requesterPartyId non-optional - validate it is not empty
+        if (empty($requesterPartyId)) {
+            return [
+                'valid' => false,
+                'error' => 'requester_id_required for approval operations',
+                'errorCode' => 400,
+            ];
+        }
 
-        if ($effectiveRequesterId !== null && $effectiveRequesterId === $actorPartyId) {
+        if ($requesterPartyId === $actorPartyId) {
             return [
                 'valid' => false,
                 'error' => 'self_approval_forbidden: requester may not decide their own request',

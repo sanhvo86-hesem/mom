@@ -231,6 +231,12 @@ class EnergyController extends BaseController
         $user = $this->requireAuth();
         $this->requireEnergyReadAccess($user);
 
+        // PROC-012: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         $machineId = $this->input('machine_id');
         if ($machineId === null || trim($machineId) === '') {
             $this->error('missing_machine_id', 400);
@@ -246,10 +252,17 @@ class EnergyController extends BaseController
                 'last_90d' => 90,
                 default    => 30,
             };
-            $cutoff = gmdate('Y-m-d', strtotime("-{$days} days"));
+            // PROC-031: Replace strtotime with explicit UTC DateTime to avoid timezone sensitivity
+            $cutoff = (new \DateTime('now', new \DateTimeZone('UTC')))
+                ->modify("-{$days} days")
+                ->format('Y-m-d');
 
             // Filter for this machine and date range
-            $filtered = array_filter($snapshots, function (array $s) use ($machineId, $cutoff) {
+            $filtered = array_filter($snapshots, function (array $s) use ($machineId, $cutoff, $sessionOrgId) {
+                // PROC-012: Filter energy data by org_id from session
+                if (($s['org_id'] ?? '') !== $sessionOrgId) {
+                    return false;
+                }
                 if (($s['machine_id'] ?? '') !== $machineId) {
                     return false;
                 }
@@ -330,6 +343,12 @@ class EnergyController extends BaseController
         $user = $this->requireAuth();
         $this->requireEnergyReadAccess($user);
 
+        // PROC-013: Add mandatory org_id filter from session
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        if ($sessionOrgId === '') {
+            $this->error('org_id_required', 403, 'Organization context is required');
+        }
+
         try {
             $snapshots = $this->loadEnergyData();
 
@@ -339,9 +358,16 @@ class EnergyController extends BaseController
                 'last_90d' => 90,
                 default    => 30,
             };
-            $cutoff = gmdate('Y-m-d', strtotime("-{$days} days"));
+            // PROC-031: Replace strtotime with explicit UTC DateTime to avoid timezone sensitivity
+            $cutoff = (new \DateTime('now', new \DateTimeZone('UTC')))
+                ->modify("-{$days} days")
+                ->format('Y-m-d');
 
-            $filtered = array_filter($snapshots, function (array $s) use ($cutoff) {
+            $filtered = array_filter($snapshots, function (array $s) use ($cutoff, $sessionOrgId) {
+                // PROC-013: Filter energy data by org_id from session
+                if (($s['org_id'] ?? '') !== $sessionOrgId) {
+                    return false;
+                }
                 $date = $s['date'] ?? $s['timestamp'] ?? '';
                 return substr($date, 0, 10) >= $cutoff;
             });

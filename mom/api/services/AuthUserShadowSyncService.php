@@ -18,6 +18,18 @@ class AuthUserShadowSyncService
 {
     private Connection $db;
 
+    /**
+     * INT-006 FIX: Define hardcoded role hierarchy to prevent privilege escalation
+     */
+    private const ROLE_HIERARCHY = [
+        'viewer' => 0,
+        'operator' => 1,
+        'supervisor' => 2,
+        'manager' => 3,
+        'admin' => 4,
+        'system_admin' => 5,
+    ];
+
     public function __construct(string $portalRoot)
     {
         $base = rtrim($portalRoot, '/\\');
@@ -810,6 +822,8 @@ class AuthUserShadowSyncService
      * 3. Requested role is lower privilege
      * Never allow promotion via JSON sync.
      *
+     * INT-006 FIX: Use hardcoded role hierarchy to implement privilege escalation prevention.
+     *
      * @param ?string $currentRole  The current DB role (authoritative), or null if new user
      * @param string  $requestedRoleCode The role from JSON (untrusted)
      * @param string  $username     For logging
@@ -825,10 +839,9 @@ class AuthUserShadowSyncService
         }
 
         // Existing user: only allow same role or lower privilege
-        // Define privilege hierarchy: admin > manager > operator > viewer
-        $hierarchy = ['admin' => 4, 'manager' => 3, 'operator' => 2, 'viewer' => 1];
-        $currentLevel = $hierarchy[strtolower($currentRole)] ?? 0;
-        $requestedLevel = $hierarchy[strtolower($requestedRoleCode)] ?? 0;
+        // A user cannot grant a role higher than their own
+        $currentLevel = self::ROLE_HIERARCHY[strtolower($currentRole)] ?? 0;
+        $requestedLevel = self::ROLE_HIERARCHY[strtolower($requestedRoleCode)] ?? 0;
 
         if ($requestedLevel > $currentLevel) {
             // Privilege escalation attempt detected

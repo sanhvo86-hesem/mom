@@ -266,7 +266,8 @@ final class IdempotencyService
         if (strlen($key) > 128) {
             throw new RuntimeException('idempotency_key_invalid_length');
         }
-        if (preg_match('/^[a-zA-Z0-9_\-\.]+$/', $key) !== 1) {
+        // WRK-013: Validate key format to prevent path traversal
+        if (!preg_match('/^[a-zA-Z0-9._\-]{8,128}$/', $key)) {
             throw new RuntimeException('idempotency_key_invalid_format');
         }
 

@@ -351,6 +351,14 @@ final class SpcEngine
         if ($n < 2) {
             throw new RuntimeException('At least 2 measurements required for capability analysis.');
         }
+        if ($n > 1000000) {
+            throw new RuntimeException('Measurement array exceeds maximum size of 1,000,000');
+        }
+        foreach ($measurements as $m) {
+            if (!is_finite((float)$m)) {
+                throw new RuntimeException('All measurements must be finite numbers');
+            }
+        }
         if ($usl <= $lsl) {
             throw new RuntimeException('USL must be greater than LSL.');
         }
@@ -515,22 +523,28 @@ final class SpcEngine
         }
 
         // ── Rule 4: Fourteen points alternating up and down ─────────────────
-        for ($i = 0; $i <= $n - 14; $i++) {
-            $alternating = true;
-            for ($j = $i; $j < $i + 12; $j++) {
-                $d1 = $measurements[$j + 1] - $measurements[$j];
-                $d2 = $measurements[$j + 2] - $measurements[$j + 1];
-                if ($d1 * $d2 >= 0) {
-                    $alternating = false;
-                    break;
+        if ($n >= 14) {
+            for ($i = 0; $i <= $n - 14; $i++) {
+                $alternating = true;
+                for ($j = $i; $j < $i + 12; $j++) {
+                    if (!isset($measurements[$j + 1]) || !isset($measurements[$j + 2])) {
+                        $alternating = false;
+                        break;
+                    }
+                    $d1 = $measurements[$j + 1] - $measurements[$j];
+                    $d2 = $measurements[$j + 2] - $measurements[$j + 1];
+                    if ($d1 * $d2 >= 0) {
+                        $alternating = false;
+                        break;
+                    }
                 }
-            }
-            if ($alternating) {
-                $violations[] = [
-                    'index'       => $i + 13,
-                    'rule'        => 4,
-                    'description' => 'Fourteen consecutive points alternating up and down',
-                ];
+                if ($alternating) {
+                    $violations[] = [
+                        'index'       => $i + 13,
+                        'rule'        => 4,
+                        'description' => 'Fourteen consecutive points alternating up and down',
+                    ];
+                }
             }
         }
 
@@ -806,14 +820,16 @@ final class SpcEngine
      */
     public function getSpcSummary(string $partNumber, string $characteristic, DateRange $period): SpcSummary
     {
+        $orgId = (string)($_SESSION['org_id'] ?? '');
         $rows = $this->db->query(
             "SELECT sample_value, subgroup_number, usl, lsl, recorded_at
              FROM spc_data sd
              WHERE sd.item_id = :part
                AND sd.characteristic = :char
                AND sd.recorded_at BETWEEN :s AND (:e || ' 23:59:59')::timestamptz
+               AND sd.org_id = :org_id
              ORDER BY sd.recorded_at",
-            [':part' => $partNumber, ':char' => $characteristic, ':s' => $period->start, ':e' => $period->end],
+            [':part' => $partNumber, ':char' => $characteristic, ':s' => $period->start, ':e' => $period->end, ':org_id' => $orgId],
         );
 
         if (empty($rows)) {
@@ -862,6 +878,7 @@ final class SpcEngine
         $alerts = [];
 
         try {
+            $orgId = (string)($_SESSION['org_id'] ?? '');
             $rows = $this->db->query(
                 "SELECT item_id, characteristic,
                         MIN(cpk) AS min_cpk,
@@ -869,9 +886,11 @@ final class SpcEngine
                         MAX(recorded_at) AS last_recorded
                  FROM spc_data
                  WHERE recorded_at >= (now() - INTERVAL '30 days')
+                   AND org_id = :org_id
                  GROUP BY item_id, characteristic
                  HAVING MIN(cpk) < 1.33 OR COUNT(*) FILTER (WHERE out_of_control = TRUE) > 0
                  ORDER BY MIN(cpk) ASC NULLS FIRST",
+                [':org_id' => $orgId],
             );
 
             foreach ($rows as $row) {
