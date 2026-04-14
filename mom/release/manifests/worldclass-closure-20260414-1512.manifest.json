@@ -4,7 +4,7 @@
   "branch": "codex/worldclass-closure-20260414-1512",
   "base_branch": "main",
   "base_head": "6e82963a",
-  "validated_head": "55a09426",
+  "validated_head": "recorded_in_branch_merge_summary_after_register_commit",
   "record_state": "pre_merge_controlled_source_manifest",
   "created_at": "2026-04-14T08:11:19Z",
   "change_authority": {
@@ -13,7 +13,7 @@
     "scope": "repo_boundary_evidence_finalization_document_change_authority_genealogy_vps_deploy_governance"
   },
   "branch_activity_note": {
-    "note": "A prior closure branch was created from an older main head, then the worktree was moved back to main by concurrent activity. The branch was rebased onto main 6e82963a before final validation; this manifest governs validated remediation head 55a09426.",
+    "note": "A prior closure branch was created from an older main head, then the worktree was moved back to main by concurrent activity. The branch was rebased onto main 6e82963a before final validation; this manifest governs the Agent 2 P1 closure remediation state on codex/worldclass-closure-20260414-1512. The exact final branch head is recorded in the merge summary because this manifest is itself part of the validated source tree.",
     "supersedes_working_branches": [
       "codex/worldclass-closure-20260414-1453",
       "codex/worldclass-closure-20260414-1501"
@@ -56,7 +56,12 @@
     "P1 change package idempotency scope expanded and rollback proof added",
     "P1 CI/deploy checks are blocking",
     "P1 generated registry/tranche13 artifacts removed from controlled source",
-    "P1 SharePoint template corrected to publication/read-only/discovery only"
+    "P1 SharePoint template corrected to publication/read-only/discovery only",
+    "P1 document release/supersede/withdraw authority uses exact DB-supported effects",
+    "P1 final document revisions require manifest hash anchors",
+    "P1 evidence signature ceremony no longer auto-fills signer-visible displayed hash",
+    "P1 replay conflict proof covers document revision, form issuance, submission attempt, validation result, evidence record, and evidence version",
+    "P1 schema validation proof covers missing required and type mismatch through validator and command service"
   ],
   "required_validation": [
     "php -l touched PHP files",

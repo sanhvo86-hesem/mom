@@ -30,8 +30,12 @@ final class DocumentRevisionCommandService
         $db = $this->requireDb();
         $lifecycleState = $this->documentState($input['lifecycle_state'] ?? 'draft');
         $sourceChangeOrderId = $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null);
+        $manifestHash = $this->nullableSha256($input['manifest_hash_sha256'] ?? null);
         if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true) && $sourceChangeOrderId === null) {
             throw new RuntimeException('released_document_change_order_required');
+        }
+        if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true) && $manifestHash === null) {
+            throw new RuntimeException('document_revision_manifest_hash_required');
         }
 
         $family = $db->queryOne(
@@ -106,7 +110,7 @@ final class DocumentRevisionCommandService
                 ':source_change_order_id' => $sourceChangeOrderId,
                 ':canonical_payload' => $this->json($input['canonical_payload'] ?? []),
                 ':readable_snapshot_uri' => $this->nullableText($input['readable_snapshot_uri'] ?? null),
-                ':manifest_hash_sha256' => $this->nullableSha256($input['manifest_hash_sha256'] ?? null),
+                ':manifest_hash_sha256' => $manifestHash,
                 ':released_at' => $lifecycleState === 'released' ? ($this->nullableText($input['released_at'] ?? null) ?? gmdate('c')) : null,
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
                 ':metadata' => $this->json([
@@ -125,7 +129,7 @@ final class DocumentRevisionCommandService
             'revision_sequence' => (string)max(1, (int)($input['revision_sequence'] ?? 1)),
             'lifecycle_state' => $lifecycleState,
             'source_change_order_id' => $sourceChangeOrderId,
-            'manifest_hash_sha256' => $this->nullableSha256($input['manifest_hash_sha256'] ?? null),
+            'manifest_hash_sha256' => $manifestHash,
         ]);
 
         return [
@@ -464,8 +468,7 @@ final class DocumentRevisionCommandService
             return false;
         }
         return in_array($requestedEffect, $effects, true)
-            || ($requestedEffect === 'release' && in_array('revise', $effects, true))
-            || ($requestedEffect === 'supersede' && in_array('revise', $effects, true));
+            || ($requestedEffect === 'withdraw' && in_array('withdrawn', $effects, true));
     }
 
     /**

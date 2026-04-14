@@ -16,7 +16,7 @@ This register is the backend closure ledger for the current world-class audit wa
 
 | Finding | Closure evidence |
 |---|---|
-| Controlled-source contamination by browser/test/report/runtime artifacts | P0/P1 spill files are removed from the Git index and filesystem. `php mom/tools/release/check_repo_boundary.php` now exits 0 only when P0/P1 are clean and prints P2 warnings separately. Current gate result: 33 P2 warnings, P0/P1 clean. |
+| Controlled-source contamination by browser/test/report/runtime artifacts | P0/P1 spill files are removed from the Git index and filesystem. `php mom/tools/release/check_repo_boundary.php` now exits 0 only when P0/P1 are clean and prints P2 warnings separately. Current gate result: 7 P2 prompt-file warnings, P0/P1 clean. |
 | Runtime services depended on generated `mom/data/registry` as source authority | `table-registry.json` was moved to controlled contract authority at `mom/contracts/table-registry.json`; `RegistryService` and `CanonicalManufacturingSpineService` fallback to the controlled contract without reintroducing `mom/data/registry` P1 artifacts. |
 | Boundary scanner was not a promotion gate | `.github/workflows/ci.yml` and `.github/workflows/deploy.yml` run `php mom/tools/release/check_repo_boundary.php` before lint/test/deploy. |
 | Legacy document HTML/archive mutation was authoritative | `DocumentController` write actions now return 410 through `LegacyWriteSurfacePolicy`; document write authority must use control-plane commands. |
@@ -52,12 +52,22 @@ Verification evidence:
 
 - `php -l` passed for changed control-plane, evidence, change-control, genealogy, route, controller, tool, and test files.
 - `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit --filter 'WorldClassControlPlaneExecution|OrderWorkflowEngineeringReadiness|OrderServiceEngineeringGate|SecurityHardeningRegression' --testdox`: 44 tests, 224 assertions, passed.
-- `php mom/tools/release/check_repo_boundary.php`: P0/P1 clean, 33 P2 warnings.
+- `php mom/tools/release/check_repo_boundary.php`: P0/P1 clean, 7 P2 prompt-file warnings.
 - `php mom/tools/release/build_release_governance.php --artifact=manifest --change-authority=CO-WORLDCLASS-CLOSURE`: emitted a valid release manifest hash.
 - `php mom/tools/release/check_workflow_status_authority.php`: workflow status authority clean.
 - `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors.
-- `./composer test`: 349 tests, 2002 assertions, 1 skipped, passed.
-- `./composer check`: PHPStan plus PHPUnit completed with no errors; 349 tests, 2002 assertions, 1 skipped.
+- `./composer test`: 424 tests, 2404 assertions, 1 skipped, passed on the current `codex/worldclass-closure-20260414-1512` closure branch after Agent 2 P1 remediation.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 424 tests, 2404 assertions, 1 skipped on the current closure branch.
+
+## 2026-04-14 15:12 Agent 2 P1 Closure Addendum
+
+| Finding closed | Closure evidence |
+|---|---|
+| Document release/supersede authority was service-level exact but DB CHECK did not allow exact `release`/`supersede`/`withdraw` effects | `mom/database/migrations/125_change_effect_exact_release_semantics.sql` updates `plm_change_affected_objects.requested_effect`; the base control-plane migration uses the same enum; `DocumentRevisionCommandService` no longer lets generic `revise` authorize release or supersede. |
+| Final document revision replay proof lacked a mandatory immutable anchor | `DocumentRevisionCommandService` now requires `manifest_hash_sha256` for released/superseded/obsolete/withdrawn revisions and includes it in idempotency equivalence checks; focused tests cover missing manifest and replay conflict. |
+| Evidence signature ceremony auto-filled the signer-visible hash | `EvidenceFinalizationService` no longer fills `displayed_record_hash_sha256`; `ElectronicSignatureService` requires it from the ceremony payload and finalization rejects signed payload hashes that are not part of the evidence package. |
+| Idempotency proof was incomplete | `WorldClassControlPlaneExecutionTest` now covers replay conflicts for document revision, form issuance, form submission attempt, validation result, evidence record, and evidence version. |
+| Schema validation proof did not go through the form command path | Tests now cover missing required fields and type mismatch through `EqmsFormExecutionService` and `FormIssuanceCommandService::recordSubmissionAttempt()`. |
 
 ## 2026-04-14 10:02 Closure Re-Audit Cycle
 

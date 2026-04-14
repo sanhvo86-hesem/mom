@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS plm_change_affected_objects (
     object_revision       TEXT,
     affected_fields       TEXT[] NOT NULL DEFAULT '{}',
     requested_effect      TEXT NOT NULL
-        CHECK (requested_effect IN ('create', 'revise', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update')),
+        CHECK (requested_effect IN ('create', 'revise', 'release', 'supersede', 'withdraw', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update')),
     disposition           TEXT NOT NULL DEFAULT 'pending'
         CHECK (disposition IN ('pending', 'accepted', 'rejected', 'deferred', 'cancelled')),
     effectivity_rule      JSONB NOT NULL DEFAULT '{}'::jsonb,

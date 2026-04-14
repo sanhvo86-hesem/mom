@@ -358,9 +358,7 @@ final class EvidenceFinalizationService
 
             $payloadHash = $this->nullableHash($event['signed_payload_hash_sha256'] ?? null)
                 ?? (string)$package['manifest_hash_sha256'];
-            if (!isset($event['displayed_record_hash_sha256']) && !isset($event['displayed_payload_hash_sha256'])) {
-                $event['displayed_record_hash_sha256'] = $payloadHash;
-            }
+            $this->assertSignedPayloadBelongsToPackage($payloadHash, $package);
             $ceremony = (new ElectronicSignatureService())->validateEvidenceSignature($event, [
                 'signed_payload_hash_sha256' => $payloadHash,
             ]);
@@ -487,6 +485,26 @@ final class EvidenceFinalizationService
         if ($schemaVersionId !== null && $this->nullableUuid($row['schema_version_id'] ?? null) !== $schemaVersionId) {
             throw new RuntimeException('source_submission_attempt_schema_mismatch');
         }
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function assertSignedPayloadBelongsToPackage(string $payloadHash, array $package): void
+    {
+        $allowed = array_filter([
+            $this->nullableHash($package['manifest_hash_sha256'] ?? null),
+            $this->nullableHash($package['package_hash_sha256'] ?? null),
+            $this->nullableHash($package['canonical_payload_hash_sha256'] ?? null),
+            $this->nullableHash($package['readable_snapshot_hash_sha256'] ?? null),
+        ]);
+        foreach ($allowed as $allowedHash) {
+            if (hash_equals((string)$allowedHash, $payloadHash)) {
+                return;
+            }
+        }
+
+        throw new RuntimeException('signature_payload_hash_not_in_evidence_package');
     }
 
     /**

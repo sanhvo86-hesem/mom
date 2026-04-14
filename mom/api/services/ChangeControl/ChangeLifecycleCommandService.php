@@ -353,7 +353,7 @@ final class ChangeLifecycleCommandService
                     ':object_id' => $this->requiredText($object, 'object_id'),
                     ':object_revision' => $this->nullableText($object['object_revision'] ?? null),
                     ':affected_fields' => $this->postgresTextArray($object['affected_fields'] ?? []),
-                    ':requested_effect' => $this->enum($object['requested_effect'] ?? 'metadata_update', ['create', 'revise', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update']),
+                    ':requested_effect' => $this->enum($object['requested_effect'] ?? 'metadata_update', ['create', 'revise', 'release', 'supersede', 'withdraw', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update']),
                     ':disposition' => $this->enum($object['disposition'] ?? 'pending', ['pending', 'accepted', 'rejected', 'deferred', 'cancelled']),
                     ':effectivity_rule' => $this->json(is_array($object['effectivity_rule'] ?? null) ? $object['effectivity_rule'] : []),
                     ':wip_disposition' => $this->json(is_array($object['wip_disposition'] ?? null) ? $object['wip_disposition'] : []),

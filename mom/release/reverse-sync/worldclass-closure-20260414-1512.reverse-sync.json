@@ -22,6 +22,10 @@
     ,"Added electronic signature ceremony fields and deterministic audit aggregate sequence"
     ,"Changed audit-pack endpoint to scope-only canonical DB assembly"
     ,"Wrapped genealogy fact/projection writes in transactions and loaded 5M policy from persisted rules"
+    ,"Aligned change affected-object requested effects with exact release/supersede/withdraw authority"
+    ,"Required manifest hashes for final document revisions"
+    ,"Removed evidence signature displayed-hash auto-fill and required signer-visible hash proof"
+    ,"Expanded replay conflict and form schema validation proof tests"
   ],
   "runtime_or_generated_artifacts_not_reimported": [
     "mom/data/registry/*.json",

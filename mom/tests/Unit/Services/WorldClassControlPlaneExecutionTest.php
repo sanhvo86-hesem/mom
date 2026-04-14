@@ -554,6 +554,23 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ], 'qa-1');
     }
 
+    public function testReleasedDocumentRevisionRequiresManifestHash(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('document_revision_manifest_hash_required');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb()))->createRevision([
+            'doc_code' => 'SOP-100',
+            'doc_type' => 'SOP',
+            'title' => 'Machine setup control',
+            'revision_label' => 'A',
+            'revision_sequence' => 1,
+            'lifecycle_state' => 'released',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000701',
+            'canonical_payload' => ['purpose' => 'controlled setup'],
+        ], 'qa-1');
+    }
+
     public function testDocumentReadAcknowledgementAndSupersessionUseCanonicalLedgers(): void
     {
         $db = new DocumentFormControlFakeDb();
@@ -708,6 +725,163 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'effective_from' => '2026-04-14T00:00:00Z',
             ]],
         ], 'qa-1');
+    }
+
+    public function testDocumentRevisionReplayConflictFailsClosed(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('doc_revision_idempotency_conflict');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb(docRevisionConflict: true)))->createRevision([
+            'doc_code' => 'SOP-100',
+            'doc_type' => 'SOP',
+            'title' => 'Machine setup control',
+            'revision_label' => 'A',
+            'revision_sequence' => 1,
+            'lifecycle_state' => 'released',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000701',
+            'canonical_payload' => ['purpose' => 'controlled setup'],
+            'manifest_hash_sha256' => str_repeat('a', 64),
+            'effectivities' => [[
+                'effectivity_type' => 'site',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+                'effective_from' => '2026-04-14T00:00:00Z',
+            ]],
+        ], 'qa-1');
+    }
+
+    public function testFormReplayConflictsFailClosed(): void
+    {
+        $templateRevisionId = '00000000-0000-0000-0000-000000000801';
+        $schemaVersionId = '00000000-0000-0000-0000-000000000802';
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('form_issuance_idempotency_conflict');
+
+        (new FormIssuanceCommandService(new DocumentFormControlFakeDb(formIssuanceConflict: true)))->issue([
+            'allocation_id' => 'ALLOC-100',
+            'issued_record_id' => 'FRM-100-0001',
+            'frm_template_revision_id' => $templateRevisionId,
+            'frm_schema_version_id' => $schemaVersionId,
+            'delivery_mode' => 'offline_excel',
+            'issued_to_ref' => 'operator-1',
+        ], 'qa-1');
+    }
+
+    public function testSubmissionAndValidationReplayConflictsFailClosed(): void
+    {
+        $payloadHash = hash('sha256', json_encode(['result' => 'pass'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('form_submission_attempt_idempotency_conflict');
+        (new FormIssuanceCommandService(new DocumentFormControlFakeDb(submissionAttemptConflict: true)))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 1,
+            'submitted_by_ref' => 'operator-1',
+            'original_artifact_hash_sha256' => str_repeat('c', 64),
+            'canonical_payload_hash_sha256' => $payloadHash,
+            'parsed_payload' => ['result' => 'pass'],
+        ], 'operator-1');
+    }
+
+    public function testSubmissionValidationReplayConflictFailsClosed(): void
+    {
+        $payloadHash = hash('sha256', json_encode(['result' => 'pass'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('submission_validation_idempotency_conflict');
+        (new FormIssuanceCommandService(new DocumentFormControlFakeDb(validationConflict: true)))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 1,
+            'submitted_by_ref' => 'operator-1',
+            'original_artifact_hash_sha256' => str_repeat('c', 64),
+            'canonical_payload_hash_sha256' => $payloadHash,
+            'parsed_payload' => ['result' => 'pass'],
+        ], 'operator-1');
+    }
+
+    public function testFormSchemaValidationRejectsMissingRequiredAndTypeMismatch(): void
+    {
+        $missing = (new EqmsFormExecutionService())->validateSubmissionAttempt(
+            [
+                'issuance_state' => 'issued',
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+                'json_schema' => ['required' => ['result'], 'properties' => ['result' => ['type' => 'string']]],
+            ],
+            [
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+            ],
+            [
+                'original_artifact_hash_sha256' => str_repeat('a', 64),
+                'canonical_payload_hash_sha256' => hash('sha256', '{}'),
+                'parsed_payload' => [],
+            ],
+        );
+
+        $this->assertContains('required_field_missing', array_column($missing['errors'], 'error_code'));
+
+        $typeMismatchHash = hash('sha256', json_encode(['result' => 123], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+        $typeMismatch = (new EqmsFormExecutionService())->validateSubmissionAttempt(
+            [
+                'issuance_state' => 'issued',
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+                'json_schema' => ['required' => ['result'], 'properties' => ['result' => ['type' => 'string']]],
+            ],
+            [
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+            ],
+            [
+                'original_artifact_hash_sha256' => str_repeat('a', 64),
+                'canonical_payload_hash_sha256' => $typeMismatchHash,
+                'parsed_payload' => ['result' => 123],
+            ],
+        );
+
+        $this->assertContains('field_type_mismatch', array_column($typeMismatch['errors'], 'error_code'));
+    }
+
+    public function testFormIssuanceSubmissionValidationPersistsMissingRequiredAndTypeMismatch(): void
+    {
+        $missing = (new FormIssuanceCommandService(new DocumentFormControlFakeDb()))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 3,
+            'submitted_by_ref' => 'operator-1',
+            'original_artifact_hash_sha256' => str_repeat('c', 64),
+            'canonical_payload_hash_sha256' => hash('sha256', '{}'),
+            'parsed_payload' => [],
+        ], 'operator-1');
+
+        $this->assertSame('failed', $missing['server_validation']['validation_state']);
+        $this->assertSame('invalid', $missing['submission_attempt']['attempt_state']);
+        $this->assertContains('required_field_missing', array_column($missing['server_validation']['errors'], 'error_code'));
+        $this->assertNotEmpty($missing['validation_errors']);
+
+        $typeMismatchPayload = ['result' => 123];
+        $typeMismatch = (new FormIssuanceCommandService(new DocumentFormControlFakeDb()))->recordSubmissionAttempt([
+            'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+            'attempt_no' => 4,
+            'submitted_by_ref' => 'operator-1',
+            'original_artifact_hash_sha256' => str_repeat('d', 64),
+            'canonical_payload_hash_sha256' => hash('sha256', json_encode($typeMismatchPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)),
+            'parsed_payload' => $typeMismatchPayload,
+        ], 'operator-1');
+
+        $this->assertSame('failed', $typeMismatch['server_validation']['validation_state']);
+        $this->assertSame('invalid', $typeMismatch['submission_attempt']['attempt_state']);
+        $this->assertContains('field_type_mismatch', array_column($typeMismatch['server_validation']['errors'], 'error_code'));
+        $this->assertNotEmpty($typeMismatch['validation_errors']);
     }
 
     public function testEffectivityGateBlocksReleaseForOpenConflictAndIncompleteTraining(): void
@@ -939,6 +1113,79 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'original_bytes' => 'raw original amended',
                 'canonical_payload' => ['result' => 'amended'],
                 'readable_snapshot_html' => '<html><body>amended</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRequiresExplicitDisplayedRecordHashForSignature(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-no-displayed-hash-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $event = $this->evidenceSignatureEvent();
+            unset($event['displayed_record_hash_sha256']);
+
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('displayed_record_hash_sha256_required');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$event],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceRecordAndVersionReplayConflictsFailClosed(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-conflict-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_record_idempotency_conflict');
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(recordConflict: true)))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceVersionReplayConflictFailsClosed(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-version-conflict-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_version_idempotency_conflict');
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(versionConflict: true)))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
                 'signature_events' => [$this->evidenceSignatureEvent()],
             ]);
@@ -1497,10 +1744,13 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
      */
     private function evidenceSignatureEvent(array $overrides = []): array
     {
+        $displayedHash = hash('sha256', json_encode(['result' => 'pass'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
         return $overrides + [
             'signer_ref' => 'qa-1',
             'signer_role' => 'qa_qms',
             'signature_meaning' => 'final evidence package approval',
+            'signed_payload_hash_sha256' => $displayedHash,
+            'displayed_record_hash_sha256' => $displayedHash,
             'auth_challenge_id' => 'reauth-challenge-1',
             'auth_method' => 'password_mfa',
             'auth_result_hash_sha256' => str_repeat('8', 64),
@@ -1696,6 +1946,10 @@ final class DocumentFormControlFakeDb
     public function __construct(
         private readonly bool $changeAuthorityVerified = true,
         private readonly array $documentEffectivityScope = ['site' => 'VN-HCMC'],
+        private readonly bool $docRevisionConflict = false,
+        private readonly bool $formIssuanceConflict = false,
+        private readonly bool $submissionAttemptConflict = false,
+        private readonly bool $validationConflict = false,
     )
     {
     }
@@ -1797,7 +2051,10 @@ final class DocumentFormControlFakeDb
                 'doc_revision_id' => 'DOCREV-1',
                 'doc_family_id' => (string)$params[':doc_family_id'],
                 'revision_label' => (string)$params[':revision_label'],
-                'lifecycle_state' => (string)$params[':lifecycle_state'],
+                'revision_sequence' => (string)$params[':revision_sequence'],
+                'lifecycle_state' => $this->docRevisionConflict ? 'draft' : (string)$params[':lifecycle_state'],
+                'source_change_order_id' => (string)($params[':source_change_order_id'] ?? ''),
+                'manifest_hash_sha256' => (string)($params[':manifest_hash_sha256'] ?? ''),
             ];
         }
         if (str_starts_with($trimmed, 'INSERT INTO doc_effectivities')) {
@@ -1832,8 +2089,11 @@ final class DocumentFormControlFakeDb
             return [
                 'frm_issuance_id' => 'FRMISS-1',
                 'allocation_id' => (string)$params[':allocation_id'],
+                'issued_record_id' => $this->formIssuanceConflict ? 'FRM-OTHER' : (string)$params[':issued_record_id'],
                 'frm_template_revision_id' => (string)$params[':frm_template_revision_id'],
                 'frm_schema_version_id' => (string)$params[':frm_schema_version_id'],
+                'delivery_mode' => (string)$params[':delivery_mode'],
+                'issuance_manifest_hash_sha256' => (string)$params[':issuance_manifest_hash_sha256'],
             ];
         }
         if (str_contains($trimmed, 'INSERT INTO frm_submission_attempts')) {
@@ -1841,6 +2101,7 @@ final class DocumentFormControlFakeDb
                 'frm_submission_attempt_id' => 'FRMATT-1',
                 'frm_issuance_id' => (string)$params[':frm_issuance_id'],
                 'attempt_state' => (string)$params[':attempt_state'],
+                'original_hash_sha256' => $this->submissionAttemptConflict ? str_repeat('f', 64) : (string)$params[':original_hash_sha256'],
             ];
         }
         if (str_contains($trimmed, 'INSERT INTO submission_validation_results')) {
@@ -1848,7 +2109,10 @@ final class DocumentFormControlFakeDb
             return [
                 'submission_validation_result_id' => 'VAL-1',
                 'frm_submission_attempt_id' => (string)$params[':frm_submission_attempt_id'],
-                'validation_state' => (string)$params[':validation_state'],
+                'validation_state' => $this->validationConflict ? 'failed' : (string)$params[':validation_state'],
+                'schema_version_id' => (string)($params[':schema_version_id'] ?? ''),
+                'canonical_payload_hash_sha256' => (string)($params[':canonical_payload_hash_sha256'] ?? ''),
+                'original_artifact_hash_sha256' => (string)($params[':original_artifact_hash_sha256'] ?? ''),
             ];
         }
         if (str_starts_with($trimmed, 'INSERT INTO submission_validation_errors')) {
@@ -2033,6 +2297,8 @@ final class EvidenceFinalizationFakeDb
         private readonly bool $existingFinalizedRecord = false,
         private readonly bool $sourceAttemptAccepted = true,
         private readonly bool $changeAuthorityVerified = true,
+        private readonly bool $recordConflict = false,
+        private readonly bool $versionConflict = false,
     )
     {
     }
@@ -2066,7 +2332,7 @@ final class EvidenceFinalizationFakeDb
             return [
                 'evidence_record_id' => 'EVREC-1',
                 'evidence_key' => (string)$params[':evidence_key'],
-                'subject_type' => (string)$params[':subject_type'],
+                'subject_type' => $this->recordConflict ? 'other_subject' : (string)$params[':subject_type'],
                 'subject_id' => (string)$params[':subject_id'],
                 'source_issuance_id' => (string)($params[':source_issuance_id'] ?? ''),
                 'source_attempt_id' => (string)($params[':source_attempt_id'] ?? ''),
@@ -2079,7 +2345,7 @@ final class EvidenceFinalizationFakeDb
                 'evidence_version_id' => 'EVVER-1',
                 'evidence_record_id' => (string)$params[':evidence_record_id'],
                 'version_state' => 'locked',
-                'package_hash_sha256' => (string)$params[':package_hash_sha256'],
+                'package_hash_sha256' => $this->versionConflict ? str_repeat('e', 64) : (string)$params[':package_hash_sha256'],
                 'manifest_hash_sha256' => (string)$params[':manifest_hash_sha256'],
                 'canonical_payload_hash_sha256' => (string)$params[':canonical_payload_hash_sha256'],
                 'readable_snapshot_hash_sha256' => (string)$params[':readable_snapshot_hash_sha256'],
