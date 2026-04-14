@@ -3,8 +3,8 @@
 Branch: `codex/worldclass-closure-20260414-2020`
 Base branch: `main`
 Original base head: `c7c3cdaa0c83`
-Synced base heads: `7d3500918270`, then `13ef99b2f1bb`, then `a5171d020e3e`
-Current validated code head before this evidence-only register update: `0b0de6b6`
+Synced base heads: `7d3500918270`, `13ef99b2f1bb`, `a5171d020e3e`, `7d562788b05f`
+Current validated code head before this evidence-only register update: `431e43193155`
 Sync strategy: initial `git fetch origin main` + `git merge --ff-only origin/main`; later `git merge --no-ff origin/main` when `main` moved during remediation.
 Record state: post-remediation controlled closure register for the branch-level remediation pass.
 
@@ -220,13 +220,13 @@ Final validation evidence after latest `origin/main` sync and deploy-binding rem
 - `php tools/release/check_workflow_status_authority.php`: passed, `workflow status authority clean`.
 - Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed; release manifest binding focused test passed.
 - `composer analyse -- --memory-limit=1G`: passed.
-- `composer test`: passed, 451 tests, 2543 assertions, 1 skipped.
-- `composer check`: passed, PHPStan clean plus 451 tests, 2543 assertions, 1 skipped.
+- `composer test`: passed, 456 tests, 2574 assertions, 1 skipped.
+- `composer check`: passed, PHPStan clean plus 456 tests, 2574 assertions, 1 skipped.
 
 ## N. Second Six-Agent Re-Audit
 
 Second and closure-loop audits found additional P0/P1 issues that were remediated in this branch:
-- stale branch after `origin/main` moved again: closed by `git merge --no-ff origin/main`;
+- stale branch after `origin/main` moved again: closed by repeated `git merge --no-ff origin/main`, latest synced head `7d562788b05f`;
 - release e-signature UUID-only validation: closed by `ChangeReleaseSignatureValidator` and migration 129;
 - role/idempotency/effectivity-conflict gaps: closed by mandatory actor roles, request hash replay checks, baseline conflict detection, and idempotent conflict replay;
 - publication/artifact persistence gaps: closed by fail-closed artifact/publication row checks;
@@ -315,7 +315,7 @@ Rollback:
 | Unresolved non-waived P1 = 0 | Closed by code/migration/API/test evidence; dependency waivers are explicit below. |
 | Required migrations present | Present: migrations 128 and 129. |
 | Required backend changes present | Present. |
-| Required tests green | Passed after latest `origin/main` sync and deploy-binding remediation: 451 tests, 2543 assertions, 1 skipped; PHPStan clean. |
+| Required tests green | Passed after latest `origin/main` sync and deploy-binding remediation: 456 tests, 2574 assertions, 1 skipped; PHPStan clean. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |
 | Waivers documented | Present. |
 | PR summary updated | Draft body prepared above. |
