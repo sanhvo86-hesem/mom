@@ -69,6 +69,7 @@ final class GenealogyGraphService
         $toId = $this->requiredText($fact, 'to_object_id');
         $this->nodeType($fromType);
         $this->nodeType($toType);
+        $scope = $this->trustedScope($fact);
 
         // MES-R6-004 FIX: Cycle detection
         if ($fromId === $toId) {
@@ -77,12 +78,13 @@ final class GenealogyGraphService
 
         // Check if reverse edge already exists
         $reverseEdgeExists = $this->db->queryOne(
-            "SELECT 1 FROM genealogy_edge_facts
-             WHERE edge_fact_type = :edge_fact_type
-               AND from_object_type = :to_object_type
-               AND from_object_id = :to_object_id
-               AND to_object_type = :from_object_type
-               AND to_object_id = :from_object_id
+            "SELECT 1 FROM genealogy_edge_facts gef
+             WHERE gef.edge_fact_type = :edge_fact_type
+               AND gef.from_object_type = :to_object_type
+               AND gef.from_object_id = :to_object_id
+               AND gef.to_object_type = :from_object_type
+               AND gef.to_object_id = :from_object_id
+               " . $this->scopeEqualitySql('gef') . "
              LIMIT 1",
             [
                 ':edge_fact_type' => $edgeFactType,
@@ -90,7 +92,7 @@ final class GenealogyGraphService
                 ':to_object_id' => $toId,
                 ':from_object_type' => $fromType,
                 ':from_object_id' => $fromId,
-            ]
+            ] + $this->scopeEqualityParams($scope)
         );
 
         if ($reverseEdgeExists !== null) {
@@ -100,17 +102,27 @@ final class GenealogyGraphService
         // MES-004 FIX: Transitive cycle detection using recursive CTE
         $cyclePath = $this->db->queryOne(
             "WITH RECURSIVE path AS (
-                SELECT from_object_id, to_object_id, 1 as depth
-                FROM genealogy_edge_facts
-                WHERE from_object_id = :to_id
+                SELECT from_object_id, to_object_id,
+                       org_company_code, org_legal_entity_code, org_plant_id, org_site_id,
+                       1 as depth
+                FROM genealogy_edge_facts e
+                WHERE e.from_object_id = :to_id
+                  " . $this->scopeEqualitySql('e') . "
                 UNION ALL
-                SELECT p.from_object_id, e.to_object_id, p.depth + 1
+                SELECT p.from_object_id, e.to_object_id,
+                       e.org_company_code, e.org_legal_entity_code, e.org_plant_id, e.org_site_id,
+                       p.depth + 1
                 FROM path p
-                JOIN genealogy_edge_facts e ON e.from_object_id = p.to_object_id
+                JOIN genealogy_edge_facts e
+                  ON e.from_object_id = p.to_object_id
+                 AND COALESCE(e.org_company_code, '') = COALESCE(p.org_company_code, '')
+                 AND COALESCE(e.org_legal_entity_code, '') = COALESCE(p.org_legal_entity_code, '')
+                 AND COALESCE(e.org_plant_id, '') = COALESCE(p.org_plant_id, '')
+                 AND COALESCE(e.org_site_id, '') = COALESCE(p.org_site_id, '')
 	                WHERE p.depth < " . self::MAX_GENEALOGY_DEPTH . "
             )
             SELECT 1 FROM path WHERE to_object_id = :from_id LIMIT 1",
-            [':to_id' => $toId, ':from_id' => $fromId]
+            [':to_id' => $toId, ':from_id' => $fromId] + $this->scopeEqualityParams($scope)
         );
 
         if ($cyclePath !== null) {
@@ -128,6 +140,7 @@ final class GenealogyGraphService
             'effective_at' => $this->nullableText($fact['effective_at'] ?? null),
             'evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
             'fact_state' => $this->text($fact['fact_state'] ?? 'active') ?: 'active',
+            'scope' => $scope,
         ]));
         if ($sourceEventId === '') {
             $sourceEventId = 'portal-' . hash('sha256', $factFingerprint . '|' . $actorRef);
@@ -140,7 +153,6 @@ final class GenealogyGraphService
         $metadata['authority'] = 'canonical_genealogy_edge_fact';
         $metadata['change_authority'] = $authority;
         $metadata['fact_fingerprint_sha256'] = $factFingerprint;
-        $scope = $this->trustedScope($fact);
         $metadata['scope'] = $scope;
 
         $row = $this->db->queryOne(
@@ -153,7 +165,11 @@ final class GenealogyGraphService
                  :quantity, :uom, :effective_at, CAST(:evidence_record_id AS uuid), CAST(:change_order_id AS uuid),
                  :source_event_id, :fact_state, CAST(:metadata AS jsonb),
                  :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
-             ON CONFLICT (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id)
+             ON CONFLICT (
+                edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             )
              DO NOTHING
              RETURNING *",
             [
@@ -187,6 +203,7 @@ final class GenealogyGraphService
                    AND to_object_type = :to_object_type
                    AND to_object_id = :to_object_id
                    AND source_event_id = :source_event_id
+                   " . $this->scopeEqualitySql('genealogy_edge_facts') . "
                  LIMIT 1",
                 [
                     ':edge_fact_type' => $edgeFactType,
@@ -195,7 +212,7 @@ final class GenealogyGraphService
                     ':to_object_type' => $toType,
                     ':to_object_id' => $toId,
                     ':source_event_id' => $sourceEventId,
-                ],
+                ] + $this->scopeEqualityParams($scope),
             );
             $this->assertEdgeFactReplayEquivalent(is_array($row) ? $row : [], $factFingerprint);
         }
@@ -514,7 +531,11 @@ final class GenealogyGraphService
              VALUES
                 (:node_type, :node_ref, :canonical_label, :lifecycle_state, CAST(:metadata AS jsonb),
                  :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
-             ON CONFLICT (node_type, node_ref) DO UPDATE
+             ON CONFLICT (
+                node_type, node_ref,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             ) DO UPDATE
                 SET metadata = genealogy_nodes.metadata || EXCLUDED.metadata
              RETURNING *",
             [
@@ -612,7 +633,11 @@ final class GenealogyGraphService
                 (:subject_type, :subject_ref, 'current', CAST(:snapshot_payload AS jsonb), :snapshot_hash_sha256,
                  CAST(:evidence_record_id AS uuid),
                  :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
-             ON CONFLICT (subject_type, subject_ref, snapshot_hash_sha256) DO UPDATE
+             ON CONFLICT (
+                subject_type, subject_ref, snapshot_hash_sha256,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             ) DO UPDATE
                 SET built_at = now()
              RETURNING *",
             [
@@ -694,6 +719,29 @@ final class GenealogyGraphService
             }
         }
         return $clauses === [] ? '' : ' AND ' . implode(' AND ', $clauses);
+    }
+
+    private function scopeEqualitySql(string $alias): string
+    {
+        $prefix = trim($alias) !== '' ? trim($alias) . '.' : '';
+        return " AND COALESCE({$prefix}org_company_code, '') = COALESCE(:org_company_code, '')
+                 AND COALESCE({$prefix}org_legal_entity_code, '') = COALESCE(:org_legal_entity_code, '')
+                 AND COALESCE({$prefix}org_plant_id, '') = COALESCE(:org_plant_id, '')
+                 AND COALESCE({$prefix}org_site_id, '') = COALESCE(:org_site_id, '')";
+    }
+
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, string|null>
+     */
+    private function scopeEqualityParams(array $scope): array
+    {
+        return [
+            ':org_company_code' => $scope['org_company_code'] ?? null,
+            ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+            ':org_plant_id' => $scope['org_plant_id'] ?? null,
+            ':org_site_id' => $scope['org_site_id'] ?? null,
+        ];
     }
 
     /**

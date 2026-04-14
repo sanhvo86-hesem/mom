@@ -2122,6 +2122,10 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         }
         $this->assertTrue($sawEdgeInsert, 'expected an authoritative genealogy edge fact insert after cycle check');
         $this->assertTrue($db->sawProjectionWrite);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString("COALESCE(gef.org_plant_id, '') = COALESCE(:org_plant_id, '')", $sql);
+        $this->assertStringContainsString("COALESCE(e.org_plant_id, '') = COALESCE(:org_plant_id, '')", $sql);
+        $this->assertStringContainsString("(COALESCE(org_plant_id, ''))", $sql);
 
         $gate = $service->evaluateAndPersist5M([
             'operation_class' => 'cnc_milling',
@@ -2244,15 +2248,48 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('routing', $snapshotCall['params'][':subject_type']);
     }
 
+    public function testGenealogyGraphIdentityUsesGovernanceScope(): void
+    {
+        $db = new GenealogyGraphFakeDb();
+        (new GenealogyGraphService($db))->recordEdgeFact([
+            'edge_fact_type' => 'consume',
+            'from_object_type' => 'material',
+            'from_object_id' => 'MAT-LOT-1',
+            'to_object_type' => 'work_order',
+            'to_object_id' => 'WO-1',
+            'change_order_id' => '00000000-0000-0000-0000-000000000201',
+            'field_path' => 'genealogy.consume',
+            'scope' => [
+                'org_plant_id' => 'PLANT-A',
+                'org_site_id' => 'SITE-1',
+            ],
+        ], 'operator-1');
+
+        $insert = array_values(array_filter(
+            $db->queryOneCalls,
+            static fn(array $call): bool => str_contains($call['sql'], 'INSERT INTO genealogy_edge_facts'),
+        ))[0];
+
+        $this->assertSame('PLANT-A', $insert['params'][':org_plant_id']);
+        $this->assertSame('SITE-1', $insert['params'][':org_site_id']);
+        $this->assertStringContainsString("(COALESCE(org_plant_id, ''))", $insert['sql']);
+        $this->assertStringContainsString("(COALESCE(org_site_id, ''))", $insert['sql']);
+    }
+
     public function testGenealogyOntologyMigrationMatchesRuntimeNodeTypes(): void
     {
         $migration = (string)file_get_contents(QMS_TEST_BASE_DIR . '/database/migrations/121_genealogy_runtime_ontology_constraints.sql');
+        $scopeMigration = (string)file_get_contents(QMS_TEST_BASE_DIR . '/database/migrations/130_genealogy_scope_identity_and_5m_gate.sql');
 
         foreach (['job_order', 'work_center', 'batch', 'process', 'routing', 'setup_sheet', 'inspection_plan', 'inspection_result', 'nc_program', 'cnc_program', 'form_template', 'form_schema', 'change_request', 'deviation', 'capa', 'supplier_lot', 'customer_order'] as $nodeType) {
             $this->assertStringContainsString("'" . $nodeType . "'", $migration);
         }
         $this->assertStringContainsString('chk_genealogy_nodes_node_type_world_class', $migration);
         $this->assertStringContainsString('chk_as_manufactured_snapshots_subject_type_world_class', $migration);
+        $this->assertStringContainsString('ux_genealogy_edge_facts_scope_source', $scopeMigration);
+        $this->assertStringContainsString('ux_genealogy_nodes_scope_identity', $scopeMigration);
+        $this->assertStringContainsString('ux_as_manufactured_snapshots_scope_hash', $scopeMigration);
+        $this->assertStringContainsString('chk_shift_production_log_traceability_5m_gate', $scopeMigration);
     }
 
     public function testAsManufacturedThreadReadsProjectedGraphAndSnapshot(): void
@@ -2571,6 +2608,14 @@ final class PublicationActionFakeDb
         return $callback();
     }
 
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
+    }
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>
@@ -2629,13 +2674,6 @@ final class PublicationActionFakeDb
         return [];
     }
 
-    public function combinedSql(): string
-    {
-        return implode("\n", array_map(
-            static fn(array $call): string => $call['sql'],
-            $this->queryOneCalls,
-        ));
-    }
 }
 
 final class DocumentFormControlFakeDb
@@ -2870,6 +2908,14 @@ final class GenealogyGraphFakeDb
     {
         $this->transactionCount++;
         return $callback();
+    }
+
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
     }
 
     /**

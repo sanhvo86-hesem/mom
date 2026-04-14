@@ -9,6 +9,7 @@ use MOM\Api\Services\ConnectedGovernanceService;
 use MOM\Api\Services\ManufacturingEventBackboneService;
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
+use MOM\Services\Traceability\GenealogyGraphService;
 use RuntimeException;
 use Throwable;
 
@@ -65,16 +66,19 @@ final class ShopfloorExecutionService
     private readonly string $dataDir;
     private ?ManufacturingEventBackboneService $eventBackbone;
     private ?ConnectedGovernanceService $connectedGovernance;
+    private ?GenealogyGraphService $genealogyGraph;
 
     public function __construct(
         string $dataDir,
         private readonly ?DataLayer $dataLayer = null,
         ?ManufacturingEventBackboneService $eventBackbone = null,
         ?ConnectedGovernanceService $connectedGovernance = null,
+        ?GenealogyGraphService $genealogyGraph = null,
     ) {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->eventBackbone = $eventBackbone;
         $this->connectedGovernance = $connectedGovernance;
+        $this->genealogyGraph = $genealogyGraph;
     }
 
     /**
@@ -562,6 +566,15 @@ final class ShopfloorExecutionService
             $actualCycleTimeAvg = round($actualRun / $quantityTotal, 2);
         }
         $qualityGate = $this->evaluateQualityGate($body, $target, $executionEventType, $quantityTotal, $actualRun, $hasPlannerOverride, $now);
+        $traceability5MGate = $this->evaluateProductionTraceability5MGate(
+            $body,
+            $target,
+            $operatorId,
+            $quantityTotal,
+            $totalActualMinutes,
+            $executionEventType,
+            $actualEnd !== '' ? $actualEnd : $now,
+        );
 
         $log = [
             'log_id' => is_array($existingLog) ? (string)($existingLog['log_id'] ?? '') : '',
@@ -595,6 +608,7 @@ final class ShopfloorExecutionService
             'quality_gate_policy' => $this->normalizeQualityGatePolicy($target['quality_gate_policy'] ?? null, $this->truthy($target['first_piece_required'] ?? false)),
             'quality_gate' => $qualityGate,
             'quality_override_reason' => $this->stringValue($body['quality_override_reason'] ?? ''),
+            'traceability_5m_gate' => $traceability5MGate,
             'material_lot_number' => (string)($target['material_lot_number'] ?? ''),
             'heat_number' => (string)($target['heat_number'] ?? ''),
             'traveler_number' => (string)($target['traveler_number'] ?? ''),
@@ -723,6 +737,161 @@ final class ShopfloorExecutionService
         }
 
         throw new InvalidArgumentException('first_piece_inspection_required');
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function evaluateProductionTraceability5MGate(
+        array $body,
+        array $target,
+        string $operatorId,
+        int $quantityTotal,
+        float $totalActualMinutes,
+        string $executionEventType,
+        string $effectiveAt,
+    ): array {
+        if (($quantityTotal <= 0 && $totalActualMinutes <= 0.0) || in_array($executionEventType, ['pause', 'resume', 'blocked'], true)) {
+            return [
+                'allowed' => true,
+                'gate_state' => 'not_applicable',
+                'source' => 'shopfloor_5m_gate',
+            ];
+        }
+
+        $request = [
+            'operation_class' => $this->operationClassFor5M($target),
+            'object_type' => 'work_order',
+            'object_id' => $this->stringValue($target['wo_number'] ?? $target['target_id'] ?? ''),
+            'effective_at' => $effectiveAt,
+            'context' => $this->traceability5MContext($body, $target, $operatorId),
+        ];
+
+        $service = $this->genealogyGraph;
+        if ($service === null && $this->dataLayer !== null) {
+            $service = new GenealogyGraphService($this->dataLayer);
+        }
+
+        if ($service !== null) {
+            $gate = $service->evaluateAndPersist5M($request);
+            if (($gate['allowed'] ?? false) === true) {
+                $gate['source'] = 'authoritative_traceability_5m_obligation';
+                return $gate;
+            }
+            if ($this->traceability5MWaiver($body, $target) !== []) {
+                return [
+                    'allowed' => true,
+                    'gate_state' => 'waived',
+                    'source' => 'signed_traceability_5m_waiver',
+                    'waiver' => $this->traceability5MWaiver($body, $target),
+                    'blocked_gate' => $gate,
+                ];
+            }
+
+            throw new RuntimeException('traceability_5m_gate_not_met');
+        }
+
+        $waiver = $this->traceability5MWaiver($body, $target);
+        if ($waiver !== []) {
+            return [
+                'allowed' => true,
+                'gate_state' => 'waived',
+                'source' => 'signed_traceability_5m_waiver',
+                'waiver' => $waiver,
+            ];
+        }
+
+        throw new RuntimeException('traceability_5m_authoritative_store_required');
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function traceability5MContext(array $body, array $target, string $operatorId): array
+    {
+        return [
+            'material_id' => $this->stringValue($body['material_id'] ?? $target['material_id'] ?? $target['item_id'] ?? ''),
+            'material_lot_id' => $this->stringValue($body['material_lot_id'] ?? $body['material_lot_number'] ?? $target['material_lot_id'] ?? $target['material_lot_number'] ?? ''),
+            'equipment_id' => $this->stringValue($body['equipment_id'] ?? $body['machine_id'] ?? $target['equipment_id'] ?? $target['machine_id'] ?? ''),
+            'work_center_id' => $this->stringValue($body['work_center_id'] ?? $target['work_center_id'] ?? ''),
+            'routing_id' => $this->stringValue($body['routing_id'] ?? $body['route_id'] ?? $target['routing_id'] ?? $target['route_id'] ?? ''),
+            'process_id' => $this->stringValue($body['process_id'] ?? $body['method_id'] ?? $target['process_id'] ?? $target['operation_id'] ?? ''),
+            'doc_revision_id' => $this->stringValue($body['doc_revision_id'] ?? $target['doc_revision_id'] ?? $target['setup_sheet_id'] ?? ''),
+            'inspection_id' => $this->stringValue($body['inspection_id'] ?? $body['inspection_result_id'] ?? $target['inspection_result_id'] ?? ''),
+            'inspection_result_id' => $this->stringValue($body['inspection_result_id'] ?? $target['inspection_result_id'] ?? ''),
+            'inspection_plan_id' => $this->stringValue($body['inspection_plan_id'] ?? $target['inspection_plan_id'] ?? ''),
+            'operator_id' => $this->stringValue($body['operator_id'] ?? $target['operator_id'] ?? $operatorId),
+            'org_company_code' => $this->stringValue($target['org_company_code'] ?? ''),
+            'org_legal_entity_code' => $this->stringValue($target['org_legal_entity_code'] ?? ''),
+            'org_plant_id' => $this->stringValue($target['org_plant_id'] ?? ''),
+            'org_site_id' => $this->stringValue($target['org_site_id'] ?? ''),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function traceability5MWaiver(array $body, array $target): array
+    {
+        $signatureId = $this->stringValue($body['traceability_5m_waiver_signature_event_id'] ?? $target['traceability_5m_waiver_signature_event_id'] ?? '');
+        $reason = $this->stringValue($body['traceability_5m_waiver_reason'] ?? $target['traceability_5m_waiver_reason'] ?? '');
+        if ($signatureId === '' || $reason === '') {
+            return [];
+        }
+
+        return [
+            'waiver_signature_event_id' => $signatureId,
+            'waiver_reason' => $reason,
+            'waiver_scope' => 'shopfloor_production_5m_gate',
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    private function operationClassFor5M(array $target): string
+    {
+        $operationClass = $this->normalizeToken($target['operation_class'] ?? $target['operation_type'] ?? '');
+        if ($operationClass !== '') {
+            return $operationClass;
+        }
+        $operationName = strtolower($this->stringValue($target['operation_name'] ?? ''));
+        if (str_contains($operationName, 'mill')) {
+            return 'cnc_milling';
+        }
+        if (str_contains($operationName, 'turn') || str_contains($operationName, 'lathe')) {
+            return 'cnc_turning';
+        }
+
+        return 'shopfloor_production';
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     */
+    private function assertProductionLogTraceability5MGate(array $log): void
+    {
+        $quantityTotal = (int)($log['quantity_total'] ?? 0);
+        $actualMinutes = (float)($log['actual_setup_minutes'] ?? 0.0)
+            + (float)($log['actual_run_minutes'] ?? 0.0)
+            + (float)($log['actual_idle_minutes'] ?? 0.0);
+        if ($quantityTotal <= 0 && $actualMinutes <= 0.0) {
+            return;
+        }
+
+        $gate = is_array($log['traceability_5m_gate'] ?? null) ? $log['traceability_5m_gate'] : [];
+        $state = $this->stringValue($gate['gate_state'] ?? '');
+        if (($gate['allowed'] ?? false) === true && in_array($state, ['complete', 'waived', 'not_applicable'], true)) {
+            return;
+        }
+
+        throw new RuntimeException('traceability_5m_gate_not_met');
     }
 
     /**
@@ -1049,6 +1218,8 @@ final class ShopfloorExecutionService
      */
     public function appendProductionReportEvent(array $log, array $target, string $actorId): array
     {
+        $this->assertProductionLogTraceability5MGate($log);
+
         try {
             $idempotencyKey = (string)($log['idempotency_key'] ?? '');
             if ($idempotencyKey === '') {
@@ -2475,6 +2646,13 @@ final class ShopfloorExecutionService
             return trim((string)$value);
         }
         return '';
+    }
+
+    private function normalizeToken(mixed $value): string
+    {
+        $token = strtolower($this->stringValue($value));
+        $token = preg_replace('/[^a-z0-9_]+/', '_', $token);
+        return is_string($token) ? trim($token, '_') : '';
     }
 
     private function normalizeCode(mixed $value): string
