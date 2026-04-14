@@ -1345,7 +1345,7 @@ final class MobileWorkQueueService
 
         try {
             return (new \DateTimeImmutable($raw))
-                ->setTimezone(new \DateTimeZone(date_default_timezone_get()))
+                ->setTimezone(new \DateTimeZone('+07:00'))
                 ->format('Y-m-d');
         } catch (Throwable) {
             return substr($raw, 0, 10);
