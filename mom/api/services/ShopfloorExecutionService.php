@@ -1046,7 +1046,10 @@ final class ShopfloorExecutionService
      * @param array<string, mixed> $log
      * @param array<string, mixed> $target
      */
-    public function appendProductionReportEvent(array $log, array $target, string $actorId): void
+    /**
+     * @return array<string, mixed>
+     */
+    public function appendProductionReportEvent(array $log, array $target, string $actorId): array
     {
         try {
             $idempotencyKey = (string)($log['idempotency_key'] ?? '');
@@ -1058,7 +1061,7 @@ final class ShopfloorExecutionService
                 $occurredAt = (string)($log['updated_at'] ?? gmdate(DATE_ATOM));
             }
 
-            $this->events()->recordWorkExecutionEvent([
+            $result = $this->events()->recordWorkExecutionEvent([
                 'correlation_id' => (string)($log['target_id'] ?? $log['wo_number'] ?? ''),
                 'request_id' => (string)($log['client_report_id'] ?? ''),
                 'source_record_id' => (string)($log['log_id'] ?? ''),
@@ -1090,9 +1093,57 @@ final class ShopfloorExecutionService
                     'ot_boundary' => 'manual_capture_no_machine_control',
                 ],
             ]);
+            return [
+                'projection_status' => !empty($result['replayed']) ? 'replayed' : 'recorded',
+                'manufacturing_event' => is_array($result['event'] ?? null) ? $result['event'] : [],
+                'replayed' => (bool)($result['replayed'] ?? false),
+            ];
         } catch (Throwable $e) {
+            $deadLetter = $this->appendManufacturingEventProjectionDeadLetter($log, $target, $actorId, $e);
             @error_log('[ShopfloorExecutionService] manufacturing event projection failed: ' . $e->getMessage());
+            return [
+                'projection_status' => 'dead_letter',
+                'error_code' => 'manufacturing_event_projection_failed',
+                'error_message' => $e->getMessage(),
+                'dead_letter' => $deadLetter,
+            ];
         }
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     * @param array<string, mixed> $target
+     * @return array<string, mixed>
+     */
+    private function appendManufacturingEventProjectionDeadLetter(array $log, array $target, string $actorId, Throwable $error): array
+    {
+        $dir = $this->dataDir . '/manufacturing-events';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $recordedAt = gmdate(DATE_ATOM);
+        $deadLetter = [
+            'dead_letter_id' => 'MEP-DL-' . substr(hash('sha256', ($log['log_id'] ?? '') . '|' . $recordedAt . '|' . $error->getMessage()), 0, 16),
+            'dead_letter_type' => 'manufacturing_event_projection',
+            'dead_letter_state' => 'pending_reconciliation',
+            'error_code' => 'manufacturing_event_projection_failed',
+            'error_message' => $error->getMessage(),
+            'recorded_at' => $recordedAt,
+            'actor_id' => $actorId,
+            'source_record_id' => (string)($log['log_id'] ?? ''),
+            'source_target_id' => (string)($target['target_id'] ?? $log['target_id'] ?? ''),
+            'idempotency_key' => (string)($log['idempotency_key'] ?? ''),
+            'retry_hint' => 'replay_through_manufacturing_event_projection_worker',
+            'payload' => [
+                'production_log' => $log,
+                'target' => $target,
+            ],
+        ];
+        $line = json_encode($deadLetter, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (is_string($line)) {
+            @file_put_contents($dir . '/projection-dead-letter.jsonl', $line . "\n", FILE_APPEND | LOCK_EX);
+        }
+        return $deadLetter;
     }
 
     /**

@@ -166,11 +166,11 @@ final class MobileWorkQueueService
         ];
 
         $this->withStoreLock('work_queue', function () use ($record): void {
-            $queue   = $this->loadFile('work_queue');
+            $queue = $this->loadFile('work_queue');
+            $previousQueue = $queue;
             $queue[] = $record;
-            $this->saveFile('work_queue', $queue);
+            $this->persistWorkQueueMutationWithTaskEvent($queue, $previousQueue, $record, 'mobile.task_assigned');
         });
-        $this->appendTaskEvent($record, 'mobile.task_assigned');
 
         return $record;
     }
@@ -196,7 +196,8 @@ final class MobileWorkQueueService
             try {
                 // Read data inside lock to prevent TOCTOU
                 $queue = $this->loadFile('work_queue');
-                $now   = $this->nowIso();
+                $previousQueue = $queue;
+                $now = $this->nowIso();
 
                 foreach ($queue as $idx => $task) {
                     if (!is_array($task)) {
@@ -224,9 +225,7 @@ final class MobileWorkQueueService
                         'qualification_gate' => $qualification,
                     ]);
 
-                    // Write data while still holding lock
-                    $this->saveFile('work_queue', $queue);
-                    $this->appendTaskEvent($queue[$idx], 'mobile.task_started', [
+                    $this->persistWorkQueueMutationWithTaskEvent($queue, $previousQueue, $queue[$idx], 'mobile.task_started', [
                         'previous_status' => $currentStatus,
                         'qualification_gate' => $qualification,
                     ]);
@@ -263,7 +262,8 @@ final class MobileWorkQueueService
             try {
                 // Read data inside lock to prevent TOCTOU
                 $queue = $this->loadFile('work_queue');
-                $now   = $this->nowIso();
+                $previousQueue = $queue;
+                $now = $this->nowIso();
                 $completionResult = $this->normalizeTaskResult($result['result'] ?? null);
                 $qtyCompleted = $this->nonNegativeInt($result['qty_completed'] ?? 0, 'qty_completed');
                 $qtyScrap = $this->nonNegativeInt($result['qty_scrap'] ?? 0, 'qty_scrap');
@@ -319,9 +319,7 @@ final class MobileWorkQueueService
                         'updated_at'     => $now,
                     ]);
 
-                    // Write data while still holding lock
-                    $this->saveFile('work_queue', $queue);
-                    $this->appendTaskEvent($queue[$idx], 'mobile.task_completed', [
+                    $this->persistWorkQueueMutationWithTaskEvent($queue, $previousQueue, $queue[$idx], 'mobile.task_completed', [
                         'previous_status' => $currentStatus,
                         'result' => $completionResult,
                         'qty_completed' => $qtyCompleted,
@@ -1131,10 +1129,34 @@ final class MobileWorkQueueService
     }
 
     /**
+     * @param array<int, mixed> $queue
+     * @param array<int, mixed> $previousQueue
      * @param array<string, mixed> $task
      * @param array<string, mixed> $context
+     * @return array<string, mixed>
      */
-    private function appendTaskEvent(array $task, string $eventType, array $context = []): void
+    private function persistWorkQueueMutationWithTaskEvent(array $queue, array $previousQueue, array $task, string $eventType, array $context = []): array
+    {
+        try {
+            $this->saveFile('work_queue', $queue);
+            return $this->appendTaskEvent($task, $eventType, $context);
+        } catch (Throwable $e) {
+            try {
+                $this->saveFile('work_queue', $previousQueue);
+            } catch (Throwable $rollbackError) {
+                $this->appendTaskEventDeadLetter($task, $eventType, $context, $rollbackError, 'rollback_failed');
+            }
+            $this->appendTaskEventDeadLetter($task, $eventType, $context, $e, 'event_journal_failed');
+            throw new RuntimeException('mobile_task_event_journal_failed', 0, $e);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    private function appendTaskEvent(array $task, string $eventType, array $context = []): array
     {
         if (!in_array($eventType, self::TASK_EVENT_TYPES, true)) {
             throw new RuntimeException('invalid_mobile_task_event_type');
@@ -1173,6 +1195,33 @@ final class MobileWorkQueueService
             $events[] = $event;
             $this->saveFile('task_events', $events);
         });
+        return $event;
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     * @param array<string, mixed> $context
+     */
+    private function appendTaskEventDeadLetter(array $task, string $eventType, array $context, Throwable $error, string $state): void
+    {
+        $deadLetter = [
+            'dead_letter_id' => 'MTE-DL-' . substr(hash('sha256', $eventType . '|' . (string)($task['queue_id'] ?? '') . '|' . microtime(true)), 0, 16),
+            'dead_letter_type' => 'mobile_task_event',
+            'dead_letter_state' => $state,
+            'event_type' => $eventType,
+            'queue_id' => $this->stringValue($task['queue_id'] ?? ''),
+            'operator_id' => $this->stringValue($task['operator_id'] ?? ''),
+            'task_status' => $this->stringValue($task['task_status'] ?? ''),
+            'context' => $context,
+            'error_code' => 'mobile_task_event_journal_failed',
+            'error_message' => $error->getMessage(),
+            'recorded_at' => $this->nowIso(),
+            'retry_hint' => 'replay_from_work_queue_and_context_after_store_repair',
+        ];
+        $line = json_encode($deadLetter, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (is_string($line)) {
+            @file_put_contents($this->mobileDir . '/task_events.dead-letter.jsonl', $line . "\n", FILE_APPEND | LOCK_EX);
+        }
     }
 
     /**

@@ -7,6 +7,7 @@ namespace MOM\Tests\Unit\Services;
 use InvalidArgumentException;
 use MOM\Api\Services\FileManufacturingEventRepository;
 use MOM\Api\Services\ManufacturingEventBackboneService;
+use MOM\Api\Services\ManufacturingEventRepository;
 use MOM\Services\ShopfloorExecutionService;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -644,7 +645,8 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertTrue($log['advisory_projection']['projection_only']);
         $this->assertSame('elevated', $log['advisory_projection']['delay_risk_hint']);
 
-        $service->appendProductionReportEvent($log, $target, 'operator-1');
+        $projection = $service->appendProductionReportEvent($log, $target, 'operator-1');
+        $this->assertSame('recorded', $projection['projection_status']);
 
         $eventFile = $this->dataDir . '/manufacturing-events/events.jsonl';
         $this->assertFileExists($eventFile);
@@ -655,6 +657,35 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('order.work_execution', $event['event_type']);
         $this->assertSame('manual_shift_report', $event['payload']['phase']);
         $this->assertSame('manual_capture_no_machine_control', $event['metadata']['ot_boundary']);
+    }
+
+    public function testProductionReportProjectionDeadLettersWhenManufacturingEventStoreFails(): void
+    {
+        $eventBackbone = new ManufacturingEventBackboneService(
+            $this->dataDir,
+            repository: new ThrowingManufacturingEventRepository(),
+            databaseConfig: ['use_postgres' => false],
+        );
+        $service = new ShopfloorExecutionService($this->dataDir, eventBackbone: $eventBackbone);
+        $target = $this->target();
+        $log = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'idempotency_key' => 'tablet-7:TGT-1001:dead-letter',
+            'client_report_id' => 'tablet-7-dead-letter',
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $projection = $service->appendProductionReportEvent($log, $target, 'operator-1');
+
+        $this->assertSame('dead_letter', $projection['projection_status']);
+        $this->assertSame('manufacturing_event_projection_failed', $projection['error_code']);
+        $this->assertFileExists($this->dataDir . '/manufacturing-events/projection-dead-letter.jsonl');
+        $deadLetters = file($this->dataDir . '/manufacturing-events/projection-dead-letter.jsonl', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->assertIsArray($deadLetters);
+        $deadLetter = json_decode((string)$deadLetters[0], true);
+        $this->assertSame('manufacturing_event_projection', $deadLetter['dead_letter_type']);
+        $this->assertSame('pending_reconciliation', $deadLetter['dead_letter_state']);
+        $this->assertSame($log['log_id'], $deadLetter['source_record_id']);
     }
 
     public function testProductionReportIdempotencyReplaysSameFingerprint(): void
@@ -1166,5 +1197,26 @@ final class ShopfloorExecutionServiceTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         rmdir($dir);
+    }
+}
+
+final class ThrowingManufacturingEventRepository implements ManufacturingEventRepository
+{
+    public function append(array $event): array
+    {
+        throw new RuntimeException('synthetic_manufacturing_event_store_failure');
+    }
+
+    public function timeline(array $filters = []): array
+    {
+        return [];
+    }
+
+    public function probe(): array
+    {
+        return [
+            'backend' => 'synthetic_throwing_repository',
+            'available' => false,
+        ];
     }
 }

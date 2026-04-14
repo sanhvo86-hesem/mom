@@ -92,6 +92,40 @@ final class MobileWorkQueueServiceTest extends TestCase
         ]);
     }
 
+    public function testCompleteTaskRollsBackSnapshotAndDeadLettersWhenEventJournalFails(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1001', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
+
+        $eventFile = $this->tmpDir . '/mobile/task_events.json';
+        $this->assertFileExists($eventFile);
+        unlink($eventFile);
+        mkdir($eventFile, 0775, true);
+
+        try {
+            $service->completeTask((string)$task['queue_id'], 'operator-1', [
+                'result' => 'pass',
+                'qty_completed' => 5,
+                'qty_scrap' => 0,
+            ]);
+            $this->fail('Task completion should fail when the event journal cannot be written.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('mobile_task_event_journal_failed', $e->getMessage());
+        }
+
+        $queue = json_decode((string)file_get_contents($this->tmpDir . '/mobile/work_queue.json'), true);
+        $this->assertIsArray($queue);
+        $this->assertSame('in_progress', $queue[0]['task_status']);
+        $this->assertFileExists($this->tmpDir . '/mobile/task_events.dead-letter.jsonl');
+        $deadLetters = file($this->tmpDir . '/mobile/task_events.dead-letter.jsonl', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->assertIsArray($deadLetters);
+        $deadLetter = json_decode((string)$deadLetters[0], true);
+        $this->assertSame('mobile_task_event', $deadLetter['dead_letter_type']);
+        $this->assertSame('event_journal_failed', $deadLetter['dead_letter_state']);
+        $this->assertSame('mobile.task_completed', $deadLetter['event_type']);
+    }
+
     public function testCompleteTaskRequiresReasonForNonPassAndRejectsScrapWithoutCompletedQuantity(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);

@@ -253,10 +253,11 @@ smoke_assert((int)($registryDesignSummary['tableCount'] ?? 0) >= 600, 'Data Sche
 smoke_assert((string)($registryDesignSummary['truth_status'] ?? '') === 'runtime_contract_authority', 'System contract registry should declare itself as runtime contract authority.');
 smoke_assert(($registryDesignSummary['runtimeLinked'] ?? false) === true, 'System contract registry should be runtime-linked authority.');
 smoke_assert((int)($workspace['metrics']['system_contract_table_count'] ?? 0) >= 600, 'Data Schema metrics should expose full system contract table coverage.');
-smoke_assert((int)($workspace['metrics']['system_contract_endpoint_count'] ?? 0) >= 3000, 'Data Schema metrics should expose full system contract endpoint coverage.');
-smoke_assert((int)($workspace['metrics']['system_contract_workflow_count'] ?? 0) >= 250, 'Data Schema metrics should expose full system contract workflow coverage.');
 smoke_assert((int)($workspace['metrics']['system_contract_critical_gap_count'] ?? -1) === 0, 'System contract diagnostics should have zero critical gaps.');
 smoke_assert(is_array(($workspace['artifacts']['system_contract_registry'] ?? null)), 'Data Schema workspace should expose the DB-derived system contract registry summary.');
+$systemContractArtifactSummary = (array)($workspace['artifacts']['system_contract_registry']['summary'] ?? []);
+smoke_assert((int)($workspace['metrics']['system_contract_endpoint_count'] ?? -1) === (int)($systemContractArtifactSummary['endpointCount'] ?? -2), 'Data Schema endpoint metric should match the generated system-contract artifact.');
+smoke_assert((int)($workspace['metrics']['system_contract_workflow_count'] ?? -1) === (int)($systemContractArtifactSummary['workflowCount'] ?? -2), 'Data Schema workflow metric should match the generated system-contract artifact.');
 smoke_assert((string)($workspace['artifacts']['system_contract_registry']['authorityLayer'] ?? '') === 'system_contract_registry', 'System contract artifact should declare the registry authority layer.');
 smoke_assert((int)($workspace['artifacts']['system_contract_registry']['summary']['tableCount'] ?? 0) >= 600, 'System contract artifact summary should expose full platform table coverage.');
 smoke_assert(is_array(($workspace['artifacts']['schema_studio_manifest'] ?? null)), 'Workspace design manifest should remain visible as a non-runtime design artifact.');

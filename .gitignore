@@ -30,6 +30,9 @@ mom/release/*-smoke-*.txt
 mom/release/*-sample-*.json
 mom/ops/local-runtime/.php-server.*
 tools/php82/
+prompts/
+standards/prompts/
+tools/prompts/
 
 # Root-level operational/audit documents must be promoted through release lanes,
 # not silently kept beside controlled source. Sanctioned templates under
@@ -73,6 +76,18 @@ mom/data/registry/*
 !mom/data/registry/relation-map.json
 !mom/data/registry/schema-authority-summary.json
 !mom/data/registry/table-registry.json
+!mom/data/schema-studio/
+mom/data/schema-studio/*
+!mom/data/schema-studio/designs/
+mom/data/schema-studio/designs/*
+!mom/data/schema-studio/designs/.gitkeep
+!mom/data/schema-studio/designs/workspace.json
+!mom/data/schema-studio/snapshots/
+mom/data/schema-studio/snapshots/*
+!mom/data/schema-studio/snapshots/workspace.baseline.json
+!mom/data/schema-studio/policies/
+mom/data/schema-studio/policies/*
+!mom/data/schema-studio/policies/control-plane-defaults.json
 storage/
 queue/
 rate-limit/

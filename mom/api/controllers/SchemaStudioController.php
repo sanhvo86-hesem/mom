@@ -1684,7 +1684,7 @@ class SchemaStudioController extends BaseController
                 'authorityViewKind' => 'design_draft',
                 'authorityRole' => 'non_authoritative_editing_surface',
                 'runtimeAuthority' => self::SYSTEM_REGISTRY_DESIGN_ID,
-                'authoritySource' => 'data/schema-studio/designs/workspace.json',
+                'authoritySource' => 'mom/data/schema-studio/designs/workspace.json',
                 'schemaName' => 'public',
                 'databaseName' => 'mom',
                 'physicalDbSchema' => 'public',
@@ -1714,7 +1714,7 @@ class SchemaStudioController extends BaseController
             return $this->buildRegistryDesignDocument(self::SYSTEM_REGISTRY_DESIGN_ID, [
                 'name' => 'HESEM System Contract Registry',
                 'description' => 'Read-only full backend contract registry generated from migrations, workflow contracts, and registry publication artifacts.',
-                'source' => 'data/registry/table-registry.json',
+                'source' => 'mom/data/registry/table-registry.json',
                 'designType' => 'system_contract_registry',
                 'authorityLayer' => 'system_contract_registry',
                 'readOnly' => true,
@@ -5113,7 +5113,7 @@ class SchemaStudioController extends BaseController
         $tableRegistry = $this->readRegistryDocumentWithFallback('table-registry', $registryPath);
         $relationMap = $this->readRegistryDocumentWithFallback('relation-map', $relationPath);
         $domainArch = $this->readRegistryDocumentWithFallback('domain-architecture', $domainPath);
-        $registrySource = $this->registrySourceLabel($registryPath, 'data/registry/table-registry.json');
+        $registrySource = $this->registrySourceLabel($registryPath, 'mom/data/registry/table-registry.json');
         $registryUpdatedAt = $registryPath !== null && is_file($registryPath)
             ? gmdate('c', (int)(filemtime($registryPath) ?: time()))
             : $this->nowIso();
@@ -5134,7 +5134,7 @@ class SchemaStudioController extends BaseController
                 'version' => '1.0.0',
                 'description' => 'Read-only full backend contract registry.',
                 'purpose' => 'Full backend contract visibility for AI, frontend, API governance, workflow mapping, and audit without editing the database.',
-                'source' => 'data/registry/table-registry.json',
+                'source' => 'mom/data/registry/table-registry.json',
                 'designType' => 'system_contract_registry',
                 'authorityLayer' => 'system_contract_registry',
                 'authorityViewKind' => 'db_derived_contract',
@@ -5546,7 +5546,7 @@ class SchemaStudioController extends BaseController
         $tableRegistry = $this->readRegistryDocumentWithFallback('table-registry', $registryPath);
         $relationMap = $this->readRegistryDocumentWithFallback('relation-map', $relationPath);
         $domainArch = $this->readRegistryDocumentWithFallback('domain-architecture', $domainPath);
-        $registrySource = $this->registrySourceLabel($registryPath, 'data/registry/table-registry.json');
+        $registrySource = $this->registrySourceLabel($registryPath, 'mom/data/registry/table-registry.json');
 
         $domainMap = [];
         foreach (($domainArch['domains'] ?? []) as $domainKey => $domainDef) {

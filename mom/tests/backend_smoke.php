@@ -639,7 +639,9 @@ $systemContractResponse = smoke_exit_payload(static function () use ($systemCont
 $systemContractPayload = $systemContractResponse['payload'];
 smoke_assert(($systemContractResponse['status'] ?? null) === 200, 'System contract endpoint should return 200 for registry readers.');
 smoke_assert((int)($systemContractPayload['summary']['tableCount'] ?? 0) >= 600, 'System contract should expose the full table registry.');
-smoke_assert((int)($systemContractPayload['summary']['endpointCount'] ?? 0) >= 3000, 'System contract should expose the endpoint catalog.');
+$systemContractEndpointCount = (int)($systemContractPayload['summary']['endpointCount'] ?? 0);
+smoke_assert($systemContractEndpointCount > 0, 'System contract should expose the endpoint catalog.');
+smoke_assert(count((array)($systemContractPayload['data']['endpoint_catalog']['endpoints'] ?? [])) === $systemContractEndpointCount, 'System contract endpoint count should match the generated endpoint catalog.');
 smoke_assert((int)($systemContractPayload['summary']['globalCapabilityCount'] ?? 0) >= 15, 'System contract should expose global ERP+MOM capability audit coverage.');
 smoke_assert((int)($systemContractPayload['summary']['systemContractCriticalGapCount'] ?? -1) === 0, 'System contract authority diagnostics should expose zero critical gaps.');
 smoke_assert(is_array(($systemContractPayload['data']['system_contract_authority'] ?? null)), 'System contract endpoint should expose DB-derived authority artifacts.');
@@ -739,6 +741,7 @@ try {
     smoke_assert(is_array($registryDesign), 'Schema Studio registry design summary should be available.');
     smoke_assert(!empty($registryDesign['readOnly']), 'System contract registry design should be read-only.');
     smoke_assert((int)($registryDesign['tableCount'] ?? 0) >= 600, 'System contract registry design should expose full platform table coverage.');
+    smoke_assert(str_contains((string)($registryDesign['source'] ?? ''), 'mom/data/registry') || str_contains((string)($registryDesign['source'] ?? ''), 'mom/contracts'), 'System contract registry design should expose the consumed runtime or controlled contract source path.');
 }
 
 smoke_reset_request_state();

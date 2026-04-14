@@ -39,13 +39,13 @@ function blankWorkspace(kind) {
       authorityViewKind: isBaseline ? 'blank_design_draft_baseline' : 'blank_design_draft',
       authorityRole: 'non_authoritative_editing_surface',
       source: isBaseline
-        ? 'data/schema-studio/snapshots/workspace.baseline.json'
-        : 'data/schema-studio/designs/workspace.json',
+        ? 'mom/data/schema-studio/snapshots/workspace.baseline.json'
+        : 'mom/data/schema-studio/designs/workspace.json',
       schemaName: 'public',
       databaseName: 'mom',
       physicalDbSchema: 'public',
       runtimeAuthority: 'system_contract_registry',
-      authoritySource: 'data/registry/system-contract-runtime-projections.json',
+      authoritySource: 'mom/data/registry/system-contract-runtime-projections.json',
       purpose: isBaseline
         ? 'Blank baseline for the editable workspace only. Use System Contract Registry and DB migrations for real backend authority.'
         : 'Empty editable workspace reserved for future controlled design experiments. Use System Contract Registry for real backend contract visibility and migrations for DB schema authority.',

@@ -31,6 +31,7 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/evidence/amendments', EqmsControlPlaneController::class, 'createEvidenceAmendment');
     $router->get('/api/v1/eqms/evidence/package', EqmsControlPlaneController::class, 'canonicalEvidencePackage');
     $router->post('/api/v1/eqms/audit-packs/manifest', EqmsControlPlaneController::class, 'buildAuditPackManifest');
+    $router->get('/api/v1/eqms/audit-packs/export', EqmsControlPlaneController::class, 'getAuditPackExport');
     $router->post('/api/v1/eqms/evidence-graph/preview', EqmsControlPlaneController::class, 'evidenceGraphPreview');
     $router->post('/api/v1/eqms/genealogy/facts', EqmsControlPlaneController::class, 'recordGenealogyFact');
     $router->post('/api/v1/eqms/genealogy/5m/evaluate', EqmsControlPlaneController::class, 'evaluate5MGate');
