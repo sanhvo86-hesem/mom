@@ -40,6 +40,20 @@ final class LogTransportHealthTest extends TestCase
         $this->assertStringContainsString('Invalid LOKI_URL', $health['last_failure_message']);
     }
 
+    public function testConfiguredLokiIsUnverifiedUntilSuccessfulPush(): void
+    {
+        $transport = new LogTransport($this->tmpDir, 'http://127.0.0.1:3100', 'test', 10);
+
+        $health = $transport->getHealth();
+
+        $this->assertTrue($health['loki_configured']);
+        $this->assertFalse($health['loki_available']);
+        $this->assertFalse($health['loki_verified']);
+        $this->assertSame('unverified', $health['loki_probe_state']);
+        $this->assertTrue($health['fallback_active']);
+        $this->assertStringContainsString('not yet verified', $health['last_failure_message']);
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {

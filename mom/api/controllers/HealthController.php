@@ -169,6 +169,8 @@ class HealthController extends BaseController
             $infra['logging'] = ['available' => false, 'error' => $e->getMessage()];
         }
 
+        $infra['legacy_audit_file_sink'] = $this->legacyAuditFileSinkHealth();
+
         try {
             $infra['evidence_vault'] = (new EvidenceVaultService($dataDir, $this->data))->pgWriteProbe();
         } catch (\Throwable $e) {
@@ -227,6 +229,8 @@ class HealthController extends BaseController
             $infra['logging'] = ['available' => false];
         }
 
+        $infra['legacy_audit_file_sink'] = $this->legacyAuditFileSinkHealth();
+
         try {
             $health = (new EvidenceVaultService($dataDir, $this->data))->pgWriteProbe();
             // Remove error message
@@ -260,6 +264,7 @@ class HealthController extends BaseController
             'redis' => $this->componentHealthy($infra['redis'] ?? []),
             'rabbitmq' => $this->componentHealthy($infra['rabbitmq'] ?? []),
             'logging' => $this->componentHealthy($infra['logging'] ?? []),
+            'legacy_audit_file_sink' => $this->componentHealthy($infra['legacy_audit_file_sink'] ?? []),
             'evidence_vault' => $this->componentHealthy($infra['evidence_vault'] ?? []),
             'upload_hardening' => $this->componentHealthy($infra['upload_hardening'] ?? []),
             'runtime_authority' => (bool)($authority['ok'] ?? false)
@@ -296,5 +301,19 @@ class HealthController extends BaseController
         }
 
         return true;
+    }
+
+    /**
+     * @return array{enabled:bool,degraded:bool,authority_mode:string}
+     */
+    private function legacyAuditFileSinkHealth(): array
+    {
+        $enabled = in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true);
+
+        return [
+            'enabled' => $enabled,
+            'degraded' => $enabled,
+            'authority_mode' => $enabled ? 'diagnostic_legacy_file_sink' : 'canonical_audit_store',
+        ];
     }
 }

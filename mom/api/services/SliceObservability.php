@@ -34,6 +34,9 @@ final class SliceObservability
     /** @var string HTTP request identifier. */
     private string $requestId;
 
+    /** @var string Request context creation timestamp. */
+    private string $requestStartedAt;
+
     /** @var array Actor context populated from auth middleware. */
     private array $actorContext = [];
 
@@ -53,6 +56,7 @@ final class SliceObservability
         $this->traceId       = self::generateUuid();
         $this->correlationId = self::generateUuid();
         $this->requestId     = self::generateUuid();
+        $this->requestStartedAt = gmdate('c');
         $this->logDir        = rtrim(str_replace('\\', '/', $dataDir), '/') . '/observability';
         if (!is_dir($this->logDir)) {
             @mkdir($this->logDir, 0775, true);
@@ -64,6 +68,12 @@ final class SliceObservability
         if (self::$instance === null) {
             self::$instance = new self($dataDir);
         }
+        return self::$instance;
+    }
+
+    public static function beginRequest(string $dataDir = ''): self
+    {
+        self::$instance = new self($dataDir);
         return self::$instance;
     }
 
@@ -108,6 +118,7 @@ final class SliceObservability
                 'trace_id'       => $this->traceId,
                 'correlation_id' => $this->correlationId,
                 'request_id'     => $this->requestId,
+                'request_started_at' => $this->requestStartedAt,
             ],
             $this->actorContext,
             $this->orgContext,
@@ -131,6 +142,7 @@ final class SliceObservability
             'trace_id'   => $this->traceId,
             'correlation_id' => $this->correlationId,
             'request_id' => $this->requestId,
+            'request_started_at' => $this->requestStartedAt,
             'service'    => self::SERVICE_NAME,
             'component'  => $component,
             'attributes' => array_merge($this->actorContext, $this->orgContext, $attributes),

@@ -9,6 +9,14 @@ Reaudit backend coverage for the full MOM process map after closing publication,
 3. Can the backend enforce the lifecycle and audit trail without frontend-specific logic?
 4. If the element is unused or duplicate, is it isolated or archived instead of published live?
 
+## Tranche 12 Correction
+
+This document is retained as a historical audit record, not as current closure proof.
+
+The Tranche 12 zero-trust audit on 2026-04-14 found that the current worktree does not contain the `mom/data/registry` publication artifact set required by `mom/tools/registry/verify_publication_truth.py` and `mom/tools/registry/canonical_publication_orchestrator.py`. The publication pipeline fails before convergence because required registry inputs such as `table-registry.json`, `data-fields.json`, and wave governance policy artifacts are absent, and the schema authority sync path also requires `DB_PASSWORD` in this environment.
+
+Therefore the historical `publishability_ready=true`, "no blocking gaps remain", and "backend coverage is complete" statements below are not valid for the current repository state. Current truth is recorded in `mom/docs/system/unresolved-backlog-ledger-tranche12.md` and `mom/docs/system/world-class-swarm-closure-tranche12.md`.
+
 ## World-Class References Used
 
 - ISA-95 for manufacturing operations management activity and integration boundaries: [ISA-95 Standard](https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard)
@@ -28,7 +36,7 @@ Reaudit backend coverage for the full MOM process map after closing publication,
 - Wave 3 process governance: `remaining_wave3_gaps=0`
 - Operational blind spots: `critical=0`, `high=0`, `medium=0`
 - Operational stress: `critical=0`, `high=0`, `medium=0`
-- Registry quality: `endpoint_count=3631`, `contract_issues=0`, `workflow_alignment_issues=0`, `publishability_ready=true`
+- Registry quality: historical generated claim only; current Tranche 12 verification is `UNPROVEN/BLOCKED` because the checked-in `mom/data/registry` publication artifacts are absent.
 
 ## Findings Closed In This Round
 
@@ -69,7 +77,7 @@ Reaudit backend coverage for the full MOM process map after closing publication,
 
 ## Remaining Backend Gaps
 
-At the current backend gate scope, no blocking gaps remain:
+At the historical backend gate scope, this file claimed no blocking gaps remained. Tranche 12 invalidates that as a current-state claim:
 
 - No planned canonical resources remain unimplemented.
 - No core entity remains `generic_status_only`.
@@ -78,8 +86,8 @@ At the current backend gate scope, no blocking gaps remain:
 - No `unused_candidate` entity remains published live.
 - No blind-spot or stress finding remains at `critical`, `high`, or `medium`.
 
-The remaining `watch` scenarios are continuous-monitoring items, not current defects. They exist to detect future drift, not because the present backend state is incomplete.
+The remaining `watch` scenarios may still be useful, but this file must not be used as proof that the present backend state is complete.
 
 ## Conclusion
 
-Backend coverage is now complete for the process map audited above, within the current repository’s governance and runtime contract model. The backend is in a state where frontend expansion can proceed without carrying known hidden gaps from schema, workflow, endpoint, idempotency, publication, or governed-case taxonomy drift.
+Historical conclusion superseded by Tranche 12: backend coverage has real implemented slices, but publication/backend completeness is not currently proven without the missing registry artifact set and environment credentials needed for regeneration.

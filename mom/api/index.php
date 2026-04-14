@@ -218,11 +218,13 @@ use MOM\Api\Services\EventBroadcaster;
 use MOM\Api\Services\LogTransport;
 use MOM\Api\Services\EventBus;
 use MOM\Api\Services\DomainEvent;
+use MOM\Services\SliceObservability;
 use MOM\Database\DataLayer;
 
 // â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $dataLayer = new DataLayer($DATA_DIR, $ROOT_DIR);
+SliceObservability::beginRequest($DATA_DIR);
 
 // â”€â”€ Build Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 

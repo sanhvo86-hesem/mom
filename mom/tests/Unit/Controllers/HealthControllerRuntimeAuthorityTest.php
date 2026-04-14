@@ -17,11 +17,13 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
     {
         $this->tmpDir = sys_get_temp_dir() . '/mom_health_authority_test_' . bin2hex(random_bytes(4));
         mkdir($this->tmpDir, 0775, true);
+        putenv('MOM_ENABLE_LEGACY_AUDIT_LOG');
     }
 
     protected function tearDown(): void
     {
         $_SESSION = [];
+        putenv('MOM_ENABLE_LEGACY_AUDIT_LOG');
         $this->removeDir($this->tmpDir);
     }
 
@@ -40,6 +42,9 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertArrayHasKey('infrastructure', $payload);
         $this->assertArrayHasKey('evidence_vault', $payload['infrastructure']);
         $this->assertArrayHasKey('upload_hardening', $payload['infrastructure']);
+        $this->assertArrayHasKey('legacy_audit_file_sink', $payload['infrastructure']);
+        $this->assertFalse($payload['infrastructure']['legacy_audit_file_sink']['enabled'] ?? true);
+        $this->assertFalse($payload['infrastructure']['legacy_audit_file_sink']['degraded'] ?? true);
         $this->assertSame('postgres', $payload['infrastructure']['evidence_vault']['backend'] ?? null);
         $this->assertSame('file_quarantine', $payload['infrastructure']['upload_hardening']['backend'] ?? null);
         $this->assertArrayHasKey('authority', $payload);
@@ -119,6 +124,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertArrayHasKey('redis', $payload['checks']);
         $this->assertArrayHasKey('rabbitmq', $payload['checks']);
         $this->assertArrayHasKey('logging', $payload['checks']);
+        $this->assertArrayHasKey('legacy_audit_file_sink', $payload['checks']);
         $this->assertArrayHasKey('evidence_vault', $payload['checks']);
         $this->assertArrayHasKey('upload_hardening', $payload['checks']);
         $this->assertArrayHasKey('runtime_authority', $payload['checks']);

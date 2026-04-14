@@ -583,7 +583,8 @@ abstract class BaseController
             'timestamp' => $this->nowIso(),
             'context'   => $sanitizedContext,
         ];
-        if (in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true)) {
+        $legacyAuditLogEnabled = in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true);
+        if ($legacyAuditLogEnabled) {
             $logFile = $this->dataDir . '/audit.log';
             $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
@@ -609,6 +610,7 @@ abstract class BaseController
             $metadata = [
                 'source' => 'api_controller',
                 'controller' => static::class,
+                'legacy_audit_file_sink_enabled' => $legacyAuditLogEnabled,
             ];
             if ($sanitizedContext !== []) {
                 $metadata['context_keys'] = array_values(array_map('strval', array_keys($sanitizedContext)));

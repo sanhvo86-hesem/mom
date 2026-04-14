@@ -25,6 +25,7 @@ final class QueueService
     private ?\PhpAmqpLib\Channel\AMQPChannel $channel = null;
     private bool $amqpAvailable = false;
     private string $fileDir;
+    private int $fileMaxAttempts;
 
     // Exchange names
     public const EXCHANGE_EVENTS        = 'mom.events';
@@ -52,9 +53,11 @@ final class QueueService
      */
     public function __construct(
         string $dataDir,
-        array $amqpConfig = []
+        array $amqpConfig = [],
+        int $fileMaxAttempts = 3
     ) {
         $this->fileDir = rtrim($dataDir, '/') . '/queue';
+        $this->fileMaxAttempts = max(1, $fileMaxAttempts);
         if (!is_dir($this->fileDir)) {
             @mkdir($this->fileDir, 0775, true);
         }
@@ -329,10 +332,15 @@ final class QueueService
      */
     public function getHealth(): array
     {
+        $fileStats = $this->fileQueueStats();
         return [
             'amqp_available'   => $this->amqpAvailable,
             'fallback_mode'    => !$this->amqpAvailable ? 'file' : 'none',
             'file_queue_dir'   => $this->fileDir,
+            'file_backlog_count' => $fileStats['backlog_count'],
+            'file_dead_letter_count' => $fileStats['dead_letter_count'],
+            'file_reconciliation_required' => $fileStats['dead_letter_count'] > 0,
+            'file_max_attempts' => $this->fileMaxAttempts,
         ];
     }
 
@@ -373,6 +381,8 @@ final class QueueService
         // Map routing key to file queue
         $queueName = $this->routingKeyToQueue($routingKey, $message['exchange'] ?? '');
         $file = $this->fileDir . '/' . $this->sanitizeQueueName($queueName) . '.jsonl';
+        $message['file_attempts'] = 0;
+        $message['file_status'] = 'pending';
 
         $line = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
         $result = @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
@@ -425,7 +435,15 @@ final class QueueService
                 if ($line === '') continue;
 
                 $data = json_decode($line, true);
-                if (!is_array($data)) continue;
+                if (!is_array($data)) {
+                    $this->writeDeadLetter($queue, [
+                        'file_status' => 'dead_letter',
+                        'dead_letter_reason' => 'invalid_json',
+                        'raw_line' => $line,
+                        'dead_lettered_at' => gmdate('c'),
+                    ]);
+                    continue;
+                }
 
                 $messages[] = ['line' => $line, 'data' => $data];
             }
@@ -444,10 +462,10 @@ final class QueueService
                 try {
                     $result = $handler($msg['data']);
                     if (!$result) {
-                        $remaining[] = $msg['line']; // Keep for retry
+                        $this->retainOrDeadLetter($queue, $msg['data'], $remaining, 'handler_returned_false');
                     }
                 } catch (\Throwable $e) {
-                    $remaining[] = $msg['line']; // Keep on error
+                    $this->retainOrDeadLetter($queue, $msg['data'], $remaining, 'handler_exception:' . $e->getMessage());
                     @error_log("[QueueService] File consumer error: {$e->getMessage()}");
                 }
             }
@@ -474,5 +492,79 @@ final class QueueService
             gmdate('YmdHis'),
             bin2hex(random_bytes(4))
         );
+    }
+
+    /**
+     * @param array<string, mixed> $message
+     * @param list<string> $remaining
+     */
+    private function retainOrDeadLetter(string $queue, array $message, array &$remaining, string $reason): void
+    {
+        $attempts = (int)($message['file_attempts'] ?? 0) + 1;
+        $message['file_attempts'] = $attempts;
+        $message['last_attempt_at'] = gmdate('c');
+        $message['last_error'] = substr($reason, 0, 500);
+
+        if ($attempts >= $this->fileMaxAttempts) {
+            $message['file_status'] = 'dead_letter';
+            $message['dead_letter_reason'] = substr($reason, 0, 500);
+            $message['dead_lettered_at'] = gmdate('c');
+            $this->writeDeadLetter($queue, $message);
+            return;
+        }
+
+        $message['file_status'] = 'retry_pending';
+        $encoded = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (is_string($encoded) && $encoded !== '') {
+            $remaining[] = $encoded;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $message
+     */
+    private function writeDeadLetter(string $queue, array $message): void
+    {
+        $file = $this->fileDir . '/' . $this->sanitizeQueueName($queue) . '.dead-letter.jsonl';
+        $encoded = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($encoded === false) {
+            $encoded = '{"file_status":"dead_letter","dead_letter_reason":"encode_failed"}';
+        }
+        @file_put_contents($file, $encoded . "\n", FILE_APPEND | LOCK_EX);
+    }
+
+    /**
+     * @return array{backlog_count:int, dead_letter_count:int}
+     */
+    private function fileQueueStats(): array
+    {
+        $backlog = 0;
+        $deadLetter = 0;
+        $files = is_dir($this->fileDir) ? (glob($this->fileDir . '/*.jsonl') ?: []) : [];
+
+        foreach ($files as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+            $count = 0;
+            $fp = @fopen($file, 'r');
+            if ($fp) {
+                try {
+                    while (fgets($fp) !== false) {
+                        $count++;
+                    }
+                } finally {
+                    fclose($fp);
+                }
+            }
+
+            if (str_ends_with($file, '.dead-letter.jsonl')) {
+                $deadLetter += $count;
+            } else {
+                $backlog += $count;
+            }
+        }
+
+        return ['backlog_count' => $backlog, 'dead_letter_count' => $deadLetter];
     }
 }

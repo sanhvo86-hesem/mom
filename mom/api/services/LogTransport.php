@@ -22,6 +22,9 @@ final class LogTransport
     private string $environment;
     private string $fallbackDir;
     private bool $lokiAvailable;
+    private bool $lokiConfigured = false;
+    private bool $lokiVerified = false;
+    private string $lokiVerifiedAt = '';
     private int $fallbackWriteCount = 0;
     private int $fallbackEntryCount = 0;
     private string $lastFailureAt = '';
@@ -47,7 +50,9 @@ final class LogTransport
             $this->lokiUrl = '';
         } else {
             $this->lokiUrl = $lokiUrl;
-            $this->lokiAvailable = true;
+            $this->lokiConfigured = true;
+            $this->lokiAvailable = false;
+            $this->markFailure('Loki endpoint configured but not yet verified by a successful push');
         }
 
         $this->environment = $environment;
@@ -148,7 +153,7 @@ final class LogTransport
             ];
         }
 
-        if ($this->lokiAvailable) {
+        if ($this->lokiConfigured) {
             $this->pushToLoki($streams);
         } else {
             $this->pushToFile($entries);
@@ -194,6 +199,7 @@ final class LogTransport
 
         if ($httpCode < 200 || $httpCode >= 300) {
             $this->lokiAvailable = false;
+            $this->lokiVerified = false;
             $message = "Loki push failed (HTTP {$httpCode})";
             if ($error !== '') {
                 $message .= ': ' . $error;
@@ -209,7 +215,14 @@ final class LogTransport
                 }
             }
             $this->pushToFile($allEntries);
+            return;
         }
+
+        $this->lokiAvailable = true;
+        $this->lokiVerified = true;
+        $this->lokiVerifiedAt = gmdate('c');
+        $this->lastFailureAt = '';
+        $this->lastFailureMessage = '';
     }
 
     /**
@@ -283,7 +296,11 @@ final class LogTransport
         $fallbackStats = $this->fallbackStats();
         return [
             'loki_url'       => $this->lokiUrl,
+            'loki_configured' => $this->lokiConfigured,
             'loki_available' => $this->lokiAvailable,
+            'loki_verified'  => $this->lokiVerified,
+            'loki_probe_state' => $this->lokiVerified ? 'verified' : ($this->lokiConfigured ? 'unverified' : 'disabled'),
+            'loki_verified_at' => $this->lokiVerifiedAt,
             'buffer_count'   => count($this->buffer),
             'fallback_dir'   => $this->fallbackDir,
             'fallback_active' => !$this->lokiAvailable || $this->fallbackWriteCount > 0 || $fallbackStats['file_count'] > 0,
