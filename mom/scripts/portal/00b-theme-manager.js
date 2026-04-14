@@ -47,6 +47,7 @@ var _listeners = [];
 var _scheduleTimer = null;
 var _colorSchemeMedia = null;
 var _colorSchemeListenerBound = false;
+var _previewCssVarsApplied = {};
 
 /* ── Load/Save ──────────────────────────────────────────────────────────── */
 function _loadUserPrefs(){
@@ -539,9 +540,16 @@ function _applyCustomVars(){
   _applyCustomCSS(customCSS || '');
 
   var previewVars = (_loadPreviewPrefs() || {})._cssVarPreviewOverrides || {};
+  Object.keys(_previewCssVarsApplied).forEach(function(varName){
+    if(!Object.prototype.hasOwnProperty.call(previewVars, varName)){
+      ROOT.style.removeProperty(varName);
+      delete _previewCssVarsApplied[varName];
+    }
+  });
   Object.keys(previewVars).forEach(function(varName){
     if(/^--[A-Za-z0-9_-]+$/.test(varName)){
       ROOT.style.setProperty(varName, String(previewVars[varName]));
+      _previewCssVarsApplied[varName] = true;
     }
   });
 }
@@ -751,6 +759,10 @@ function setPreviewAll(prefs){
 
 function clearPreviewOverrides(){
   _previewPrefs = {};
+  Object.keys(_previewCssVarsApplied).forEach(function(varName){
+    ROOT.style.removeProperty(varName);
+    delete _previewCssVarsApplied[varName];
+  });
   _clearPreviewOverrideDirty();
   _apply();
 }
@@ -783,6 +795,7 @@ function reset(){
   _userPrefs = {};
   _saveUserPrefs();
   _previewPrefs = {};
+  _previewCssVarsApplied = {};
   _clearPreviewOverrideDirty();
   /* Remove all inline style overrides */
   ROOT.removeAttribute('style');
