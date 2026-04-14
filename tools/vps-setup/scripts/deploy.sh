@@ -12,13 +12,31 @@ PRIVATE_DATA="/var/www/data-private"
 BRANCH="main"
 LOG="/var/log/qms-deploy.log"
 DEPLOY_USER="deploy"
-WEB_GROUP="www-data"
+WEB_USER="${WEB_USER:-}"
+WEB_GROUP="${WEB_GROUP:-}"
 RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
 RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
 die() { log "ERROR" "$1"; exit 1; }
+
+detect_php_fpm_identity() {
+    local conf user group
+    for conf in /etc/php/*/fpm/pool.d/mom.conf /etc/php/*/fpm/pool.d/*.conf; do
+        [ -f "$conf" ] || continue
+        user="$(sed -n 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*//p' "$conf" | head -n 1 || true)"
+        group="$(sed -n 's/^[[:space:]]*group[[:space:]]*=[[:space:]]*//p' "$conf" | head -n 1 || true)"
+        if [ -n "$user" ] && [ -n "$group" ]; then
+            WEB_USER="${WEB_USER:-$user}"
+            WEB_GROUP="${WEB_GROUP:-$group}"
+            return
+        fi
+    done
+
+    WEB_USER="${WEB_USER:-www-data}"
+    WEB_GROUP="${WEB_GROUP:-www-data}"
+}
 
 restore_git_executable_bits() {
     if [ ! -d "$SITE_DIR/.git" ]; then
@@ -37,6 +55,7 @@ log "INFO" "═══ Deploy started ═══"
 # ── Pre-flight checks ────────────────────────────────────────────────────
 [ -d "$SITE_DIR/.git" ] || die "$SITE_DIR is not a git repository"
 command -v php8.2 >/dev/null 2>&1 || die "php8.2 not found"
+detect_php_fpm_identity
 
 # ── Pull latest code ─────────────────────────────────────────────────────
 cd "$SITE_DIR"
@@ -66,8 +85,8 @@ find "$SITE_DIR" -type d -exec chmod 755 {} +
 find "$SITE_DIR" -type f -exec chmod 644 {} +
 restore_git_executable_bits
 
-# Writable directories (PHP-FPM writes here as www-data)
-for dir in sessions uploads online-forms allocations form-workflow/state; do
+# Writable directories (PHP-FPM writes here through the configured pool user/group)
+for dir in uploads online-forms allocations form-workflow/state; do
     target="$SITE_DIR/mom/data/$dir"
     if [ -d "$target" ]; then
         find "$target" -type d -exec chmod 775 {} +
@@ -76,15 +95,19 @@ for dir in sessions uploads online-forms allocations form-workflow/state; do
     fi
 done
 
-# Ensure session dir exists
-mkdir -p "$SITE_DIR/mom/data/sessions"
-chown "$WEB_GROUP:$WEB_GROUP" "$SITE_DIR/mom/data/sessions"
+# PHP refuses to open session files created by a different UID. Keep the
+# whole session tree owned by the PHP-FPM pool user, not the deploy user.
+session_dir="$SITE_DIR/mom/data/sessions"
+mkdir -p "$session_dir"
+chown -R "$WEB_USER:$WEB_GROUP" "$session_dir"
+find "$session_dir" -type d -exec chmod 2770 {} +
+find "$session_dir" -type f -exec chmod 660 {} +
 
 # Ensure log files are writable
 for logfile in php_error.log audit.log db_queries.log; do
     target="$SITE_DIR/mom/data/$logfile"
     touch "$target"
-    chown "$WEB_GROUP:$WEB_GROUP" "$target"
+    chown "$WEB_USER:$WEB_GROUP" "$target"
     chmod 664 "$target"
 done
 restore_git_executable_bits

@@ -350,6 +350,7 @@ final class SessionService
 
         return str_contains($message, 'session_start(): open(')
             || str_contains($message, 'failed to read session data')
+            || str_contains($message, 'session data file is not created by your uid')
             || str_contains($message, 'permission denied')
             || str_contains($message, 'no such file or directory');
     }

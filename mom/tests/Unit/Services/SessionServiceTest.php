@@ -108,4 +108,16 @@ class SessionServiceTest extends TestCase
         $this->assertFalse($ok);
         $this->assertStringContainsString('symbol', $msg);
     }
+
+    public function testSessionOwnershipWarningAllowsFreshStart(): void
+    {
+        $method = new \ReflectionMethod(SessionService::class, 'exceptionAllowsFreshStart');
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
+
+        $this->assertTrue($method->invoke(null, new \RuntimeException(
+            'session_start(): Session data file is not created by your uid'
+        )));
+    }
 }

@@ -80,7 +80,7 @@ chown -R "$DEPLOY_USER:$WEB_GROUP" "$SITE_DIR"
 find "$SITE_DIR" -type d -exec chmod 755 {} +
 find "$SITE_DIR" -type f -exec chmod 644 {} +
 
-for dir in sessions uploads online-forms allocations form-workflow/state; do
+for dir in uploads online-forms allocations form-workflow/state; do
     target="$SITE_DIR/mom/data/$dir"
     if [ -d "$target" ]; then
         chmod -R 775 "$target"
@@ -88,7 +88,9 @@ for dir in sessions uploads online-forms allocations form-workflow/state; do
 done
 
 mkdir -p "$SITE_DIR/mom/data/sessions"
-chown www-data:www-data "$SITE_DIR/mom/data/sessions"
+chown -R www-data:www-data "$SITE_DIR/mom/data/sessions"
+find "$SITE_DIR/mom/data/sessions" -type d -exec chmod 2770 {} +
+find "$SITE_DIR/mom/data/sessions" -type f -exec chmod 660 {} +
 
 for logfile in php_error.log audit.log db_queries.log; do
     touch "$SITE_DIR/mom/data/$logfile"

@@ -217,15 +217,18 @@ find "$SITE_DIR" -type d -exec chmod 755 {} +
 find "$SITE_DIR" -type f -exec chmod 644 {} +
 
 # Writable directories
-for dir in sessions uploads online-forms allocations form-workflow/state; do
+for dir in uploads online-forms allocations form-workflow/state; do
     target="$SITE_DIR/mom/data/$dir"
     mkdir -p "$target"
     chmod -R 775 "$target"
     chown -R "$DEPLOY_USER:www-data" "$target"
 done
 
-# Ensure session dir owned by www-data
-chown www-data:www-data "$SITE_DIR/mom/data/sessions"
+# PHP refuses to open session files created by a different UID.
+mkdir -p "$SITE_DIR/mom/data/sessions"
+chown -R www-data:www-data "$SITE_DIR/mom/data/sessions"
+find "$SITE_DIR/mom/data/sessions" -type d -exec chmod 2770 {} +
+find "$SITE_DIR/mom/data/sessions" -type f -exec chmod 660 {} +
 
 # Log files
 for logfile in php_error.log audit.log db_queries.log; do
