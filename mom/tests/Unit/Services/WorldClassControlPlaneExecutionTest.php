@@ -14,6 +14,7 @@ use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ControlPlane\ReleaseGovernanceBuilder;
+use MOM\Services\ControlPlane\ReleaseManifestBindingVerifier;
 use MOM\Services\ControlPlane\WorkflowStatusAuthorityService;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
@@ -139,6 +140,25 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ]);
         $this->assertSame($manifest['manifest_hash_sha256'], $receipt['manifest_hash_sha256']);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $receipt['receipt_hash_sha256']);
+    }
+
+    public function testReleaseManifestBindingVerifierRequiresCommitAuthorityAndHashMatch(): void
+    {
+        $builder = new ReleaseGovernanceBuilder();
+        $commit = str_repeat('a', 40);
+        $manifest = $builder->buildManifest(['mom/api/index.php'], [
+            'branch' => 'main',
+            'commit_sha' => $commit,
+            'change_authority_ref' => 'CO-DEPLOY-1',
+            'generated_at' => '2026-04-14T00:00:00+00:00',
+        ]);
+
+        $verified = (new ReleaseManifestBindingVerifier())->verify($manifest, $commit, 'CO-DEPLOY-1');
+        $this->assertSame('verified', $verified['release_manifest_binding']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('release_manifest_commit_mismatch');
+        (new ReleaseManifestBindingVerifier())->verify($manifest, str_repeat('b', 40), 'CO-DEPLOY-1');
     }
 
     public function testWorkflowStatusAuthorityRejectsStaleOrderStatusSetReferences(): void
