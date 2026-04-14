@@ -1,5 +1,7 @@
 # World-Class Closure Register - 2026-04-14 15:12
 
+**Historical superseded register.** This file is retained only as audit lineage for the superseded `codex/worldclass-closure-20260414-1512` branch. It is not current release evidence for `codex/integration-graphics-control-plane-v8`, and current graphics-control-plane evidence must resolve through `mom/data/registry/graphics-governance-registry.json`, tracked graphics release evidence files, and the current release manifest templates.
+
 Branch: `codex/worldclass-closure-20260414-1512`
 Base branch: `main`
 Base head after rebase: `6e82963a`

@@ -1229,10 +1229,10 @@ function _renderPreview(){
     var previewEl = document.getElementById('mb-preview-container');
     if(previewEl && state.schema){
       // Use Module Router to render with real API
-      if(MR.renderModuleById){
-        // Save schema to localStorage so router can find it
-        try{ localStorage.setItem('hm_module_schema_'+state.schema.moduleId, JSON.stringify(state.schema)); }catch(e){}
-        MR.renderModuleById(previewEl, state.schema.moduleId);
+      if(BE.renderModuleFromSchema){
+        BE.renderModuleFromSchema(previewEl, state.schema);
+      } else if(MR.renderModuleById){
+        previewEl.innerHTML = '<div class="hm-empty"><div class="hm-empty-icon">🔒</div>'+_t('Preview cần backend hoặc Block Engine render trực tiếp; không ghi schema vào localStorage để giả lập authority.','Preview requires backend or direct Block Engine rendering; schema is not written to localStorage as authority.')+'</div>';
       }
     }
   }, 100);
@@ -1546,10 +1546,7 @@ function _saveModule(){
   state.schema.version = (state.schema.version||0) + 1;
   state.schema.updatedAt = new Date().toISOString();
 
-  // Save to localStorage
-  try{
-    localStorage.setItem('hm_module_schema_'+state.schema.moduleId, JSON.stringify(state.schema));
-  }catch(e){}
+  _saveBuilderSnapshotLocal();
 
   // Save to saved modules list
   _addToSavedModules(state.schema);
@@ -1559,7 +1556,7 @@ function _saveModule(){
     apiCall('module_schema_save', { schema: state.schema }, 'POST', 10000).catch(function(){});
   }
 
-  BE.toast(_t('Đã lưu module: ','Module saved: ')+_t(state.schema.title.vi, state.schema.title.en), 'success');
+  BE.toast(_t('Đã gửi lưu backend; bản local chỉ là nháp khôi phục: ','Backend save requested; local copy is recovery draft only: ')+_t(state.schema.title.vi, state.schema.title.en), 'success');
 }
 
 function _loadSavedModules(){
@@ -1587,9 +1584,11 @@ function _addToSavedModules(schema){
 
 function _openSavedModule(moduleId){
   try{
-    var raw = localStorage.getItem('hm_module_schema_'+moduleId);
+    var raw = localStorage.getItem(_builderStorageKey(moduleId));
     if(raw){
-      state.schema = JSON.parse(raw);
+      var parsed = JSON.parse(raw);
+      state.schema = parsed && parsed.authority === 'draft-cache-only' && parsed.releaseEligible === false ? parsed.schema : null;
+      if(!state.schema) return;
       _normalizeSchemaBlocks();
       state.selectedBlock = null;
       state.propsDraft = null;
@@ -1602,7 +1601,7 @@ function _openSavedModule(moduleId){
 }
 
 function _deleteSavedModule(moduleId){
-  try{ localStorage.removeItem('hm_module_schema_'+moduleId); }catch(e){}
+  _clearBuilderSnapshotLocal(moduleId);
   state.savedModules = state.savedModules.filter(function(m){ return m.moduleId !== moduleId; });
   try{ localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); }catch(e){}
 }
@@ -4224,7 +4223,7 @@ function _ensureBuilderStyles(){
 }
 
 function _builderStorageKey(moduleId){
-  return 'hm_module_builder_' + moduleId;
+  return 'hm_module_builder_draft_' + moduleId;
 }
 
 function _snapshotSchema(){
@@ -4618,7 +4617,14 @@ function _compileRuntimeSchema(schema){
 
 function _saveBuilderSnapshotLocal(){
   if(!state.schema) return;
-  try { localStorage.setItem(_builderStorageKey(state.schema.moduleId), JSON.stringify(state.schema)); } catch(err){}
+  try {
+    localStorage.setItem(_builderStorageKey(state.schema.moduleId), JSON.stringify({
+      authority: 'draft-cache-only',
+      releaseEligible: false,
+      savedAt: new Date().toISOString(),
+      schema: state.schema
+    }));
+  } catch(err){}
 }
 
 function _clearBuilderSnapshotLocal(moduleId){
@@ -4626,7 +4632,7 @@ function _clearBuilderSnapshotLocal(moduleId){
 }
 
 function _runtimeSchemaStorageKeys(moduleId){
-  return ['hm_module_schema_' + moduleId, 'hm_schema_' + moduleId];
+  return ['hm_module_schema_preview_' + moduleId, 'hm_schema_preview_' + moduleId];
 }
 
 function _readRuntimeSchemaLocal(moduleId){
@@ -4636,16 +4642,27 @@ function _readRuntimeSchemaLocal(moduleId){
   try {
     for(i = 0; i < keys.length; i++){
       raw = localStorage.getItem(keys[i]);
-      if(raw) return JSON.parse(raw);
+      if(raw) {
+        var parsed = JSON.parse(raw);
+        if(parsed && parsed.authority === 'preview-cache-only' && parsed.releaseEligible === false){
+          return parsed.schema || null;
+        }
+      }
     }
   } catch(err){}
   return null;
 }
 
 function _writeRuntimeSchemaLocal(moduleId, schema){
+  if(!window.HmBlockEngineAllowPreviewCache) return;
   try {
     _runtimeSchemaStorageKeys(moduleId).forEach(function(key){
-      localStorage.setItem(key, JSON.stringify(schema));
+      localStorage.setItem(key, JSON.stringify({
+        authority: 'preview-cache-only',
+        releaseEligible: false,
+        savedAt: new Date().toISOString(),
+        schema: schema
+      }));
     });
   } catch(err){}
 }
@@ -5887,13 +5904,12 @@ _renderPreview = function(){
   setTimeout(function(){
     var previewEl = document.getElementById('mb-preview-container');
     if(previewEl && runtimeSchema){
-      _writeRuntimeSchemaLocal(runtimeSchema.moduleId, runtimeSchema);
       _saveBuilderSnapshotLocal();
       _clearRuntimeModuleCache(runtimeSchema.moduleId);
       if(BE.renderModuleFromSchema){
         BE.renderModuleFromSchema(previewEl, runtimeSchema);
       } else if(MR.renderModuleById){
-        MR.renderModuleById(previewEl, runtimeSchema.moduleId);
+        previewEl.innerHTML = '<div class="hm-empty"><div class="hm-empty-icon">🔒</div>'+_t('Preview cần backend hoặc Block Engine render trực tiếp; không dùng localStorage làm runtime authority.','Preview requires backend or direct Block Engine rendering; localStorage is not used as runtime authority.')+'</div>';
       }
     }
   }, 100);
@@ -6073,7 +6089,6 @@ var _legacySaveModule = function(){
   state.schema.version = (state.schema.version || 0) + 1;
   state.schema.updatedAt = new Date().toISOString();
   runtimeSchema = _compileRuntimeSchema(state.schema);
-  try { localStorage.setItem('hm_module_schema_'+state.schema.moduleId, JSON.stringify(runtimeSchema)); } catch(err){}
   _saveBuilderSnapshotLocal();
   _addToSavedModules(state.schema);
   if(typeof apiCall === 'function'){
@@ -6084,10 +6099,12 @@ var _legacySaveModule = function(){
 
 var _legacyOpenSavedModule = function(moduleId){
   var raw = null;
-  try { raw = localStorage.getItem(_builderStorageKey(moduleId)) || localStorage.getItem('hm_module_schema_'+moduleId); } catch(err){}
+  try { raw = localStorage.getItem(_builderStorageKey(moduleId)); } catch(err){}
   if(!raw) return;
   try {
-    state.schema = JSON.parse(raw);
+    var parsed = JSON.parse(raw);
+    state.schema = parsed && parsed.authority === 'draft-cache-only' && parsed.releaseEligible === false ? parsed.schema : null;
+    if(!state.schema) return;
     _normalizeSchemaBlocks();
     state.selectedBlock = null;
     state.propsDraft = null;
@@ -6100,7 +6117,6 @@ var _legacyOpenSavedModule = function(moduleId){
 };
 
 var _legacyDeleteSavedModule = function(moduleId){
-  try { localStorage.removeItem('hm_module_schema_'+moduleId); } catch(err){}
   _clearBuilderSnapshotLocal(moduleId);
   state.savedModules = state.savedModules.filter(function(item){
     return item.moduleId !== moduleId;
@@ -6121,7 +6137,6 @@ _saveModule = function(){
   runtimeSchema = _compileRuntimeSchema(state.schema);
   runtimeSchema.updatedAt = state.schema.updatedAt;
   runtimeSchema.updatedBy = state.schema.updatedBy;
-  _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
   _saveBuilderSnapshotLocal();
   _clearRuntimeModuleCache(state.schema.moduleId);
   if(typeof apiCall !== 'function'){
@@ -6129,11 +6144,10 @@ _saveModule = function(){
     runtimeSchema.version = state.schema.version;
     runtimeSchema.updatedAt = state.schema.updatedAt;
     runtimeSchema.updatedBy = state.schema.updatedBy;
-    _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
     _saveBuilderSnapshotLocal();
     _addToSavedModules(state.schema);
-    if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
-    return Promise.resolve({ ok:true, local:true, schema:runtimeSchema });
+    if(BE.toast) BE.toast(_t('Backend không sẵn sàng; chỉ giữ nháp local, không đủ điều kiện publish. ', 'Backend unavailable; kept local draft only, not publish-eligible. ') + _t(state.schema.title.vi, state.schema.title.en), 'warning');
+    return Promise.resolve({ ok:false, localDraftOnly:true, releaseEligible:false, schema:runtimeSchema });
   }
   saveRequest = apiCall('module_schema_save', { schema: runtimeSchema }, 'POST', 10000).then(function(resp){
     if(!resp || resp.ok === false || resp.saved === false){
@@ -6145,7 +6159,6 @@ _saveModule = function(){
     runtimeSchema.version = state.schema.version;
     runtimeSchema.updatedAt = state.schema.updatedAt;
     runtimeSchema.updatedBy = state.schema.updatedBy;
-    _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
     _saveBuilderSnapshotLocal();
     _addToSavedModules(state.schema);
     _clearRuntimeModuleCache(state.schema.moduleId);
@@ -6153,8 +6166,8 @@ _saveModule = function(){
     return resp;
   }).catch(function(err){
     _addToSavedModules(state.schema);
-    if(BE.toast) BE.toast(_t('Lưu thất bại, đã giữ bản local', 'Save failed, kept local copy'), 'warning');
-    return { ok:false, local:true, error: err && err.message ? err.message : 'save_failed' };
+    if(BE.toast) BE.toast(_t('Lưu backend thất bại; chỉ giữ nháp local, không đủ điều kiện publish.', 'Backend save failed; kept local draft only, not publish-eligible.'), 'warning');
+    return { ok:false, localDraftOnly:true, releaseEligible:false, error: err && err.message ? err.message : 'save_failed' };
   });
   return saveRequest;
 };
@@ -6178,19 +6191,23 @@ _openSavedModule = function(moduleId){
   function tryLocalAll(){
     var raw = null;
     try { raw = localStorage.getItem(_builderStorageKey(moduleId)); } catch(_e){}
-    if(raw){ try { if(applySchema(JSON.parse(raw))) return true; } catch(_e){} }
-    var rt = _readRuntimeSchemaLocal(moduleId);
-    if(rt){ try { if(applySchema(rt)) return true; } catch(_e){} }
+    if(raw){
+      try {
+        var parsed = JSON.parse(raw);
+        if(parsed && parsed.authority === 'draft-cache-only' && parsed.releaseEligible === false && applySchema(parsed.schema)){
+          if(BE.toast) BE.toast(_t('Đã mở bản nháp local; phải lưu backend trước khi publish.', 'Opened local draft; backend save is required before publish.'), 'warning');
+          return true;
+        }
+      } catch(_e){}
+    }
     return false;
   }
-  if(tryLocalAll()) return Promise.resolve(true);
-  if(typeof apiCall !== 'function') return Promise.resolve(false);
+  if(typeof apiCall !== 'function') return Promise.resolve(tryLocalAll());
   function doApiLoad(){
     return apiCall('module_schema_get', { id: moduleId }, 'GET', 10000).then(function(resp){
       if(!resp || resp.ok === false || !resp.schema){
         throw new Error((resp && (resp.detail || resp.error)) || 'not_found');
       }
-      _writeRuntimeSchemaLocal(moduleId, resp.schema);
       return applySchema(resp.schema);
     });
   }
@@ -6199,7 +6216,8 @@ _openSavedModule = function(moduleId){
   var initialDelay = state.savedModulesLoading ? 800 : 0;
   function startLoad(resolve){
     doApiLoad().then(resolve).catch(function(){
-      // First attempt failed — re-check localStorage (may have been written while request was in flight)
+      // First attempt failed — draft cache may be used only as edit recovery,
+      // never as runtime or release authority.
       if(tryLocalAll()){ resolve(true); return; }
       // Retry API once after a short delay (handles session/concurrency issues on first load)
       setTimeout(function(){
@@ -7287,6 +7305,8 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
       && releaseLink.complianceMatrixRef
       && releaseLink.runtimeBeaconRef
       && releaseLink.rollbackPlanRef
+      && releaseLink.releaseEvidencePackRef
+      && releaseLink.releaseReadinessState
       && releaseLink.multiSitePlantBrandingGovernanceRef
       && releaseLink.controlledEmergencyOverridePathRef
       && releaseLink.driftReportGeneratedAt);
@@ -7417,10 +7437,13 @@ if(!window.__HM_MODULE_BUILDER_NEXTGEN_PATCH__){
       debtObservatoryRef: graphicsReleaseLink.debtObservatoryRef || '',
       environmentPolicyPacksRef: graphicsReleaseLink.environmentPolicyPacksRef || '',
       releaseDashboardRef: graphicsReleaseLink.releaseDashboardRef || '',
+      releaseEvidencePackRef: graphicsReleaseLink.releaseEvidencePackRef || '',
       multiSitePlantBrandingGovernanceRef: graphicsReleaseLink.multiSitePlantBrandingGovernanceRef || '',
       controlledEmergencyOverridePathRef: graphicsReleaseLink.controlledEmergencyOverridePathRef || '',
       rolloutDecisionRef: graphicsReleaseLink.rolloutDecisionRef || '',
-      rollbackPlanRef: graphicsReleaseLink.rollbackPlanRef || ''
+      rollbackPlanRef: graphicsReleaseLink.rollbackPlanRef || '',
+      releaseBlocked: !!graphicsReleaseLink.releaseBlocked,
+      releaseReadinessState: graphicsReleaseLink.releaseReadinessState || ''
     };
     schema.builderManifest.updatedAt = _ngNowIso();
     schema.builderManifest.updatedBy = _ngCurrentUser();

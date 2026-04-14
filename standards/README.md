@@ -88,6 +88,8 @@ These files are mandatory for frontend/runtime module work. For conflicts, `36-f
 | 35 | `35-language-convention.md` | Language convention for runtime/frontend text |
 | 36 | `36-frontend-module-layout-template-standard.md` | **Mandatory frontend module layout/template SSOT: authority map, template contract, block contract, visual rules, accessibility, audit and QA gates** |
 
+Graphics control-plane authority is documented in `mom/docs/module-layout-template-design-system-v4.html`; the registry-side projection and release linkage are mirrored in `mom/docs/schema-authority-model.md`.
+
 ### Reference files
 
 | File | Content |

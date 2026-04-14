@@ -580,6 +580,21 @@ function _mergedConfig(){
   return merged;
 }
 
+function _stripInternalConfig(value){
+  if(Array.isArray(value)){
+    return value.map(_stripInternalConfig);
+  }
+  if(value && typeof value === 'object'){
+    var out = {};
+    Object.keys(value).forEach(function(key){
+      if(key === '_meta' || key.charAt(0) === '_') return;
+      out[key] = _stripInternalConfig(value[key]);
+    });
+    return out;
+  }
+  return value;
+}
+
 function _deepMerge(target, source){
   Object.keys(source || {}).forEach(function(key){
     if(key === '_meta') return;
@@ -592,6 +607,17 @@ function _deepMerge(target, source){
     }
   });
   return target;
+}
+
+function _adminDraftConfig(){
+  // Explicit save/export draft: backend admin config plus unsaved preview edits.
+  // This is not production authority until the backend graphics authority accepts
+  // it through saveAdminConfig(); user preferences and template preview caches
+  // remain separate from template registry authority.
+  var draft = {};
+  _deepMerge(draft, _stripInternalConfig(_adminConfig || {}));
+  _deepMerge(draft, _stripInternalConfig(_loadPreviewPrefs() || {}));
+  return draft;
 }
 
 function _getPathValue(cfg, path){
@@ -835,6 +861,11 @@ function getFullConfig(){
   return _mergedConfig();
 }
 
+/** Get authoritative admin draft config (admin config + preview edits, no user prefs). */
+function getAdminConfigDraft(){
+  return _adminDraftConfig();
+}
+
 function on(event, callback){ _listeners.push({ event: event, callback: callback }); }
 function off(event, callback){ _listeners = _listeners.filter(function(l){ return !(l.event === event && l.callback === callback); }); }
 
@@ -923,7 +954,7 @@ function contrastRatio(hex1, hex2){
 
 /** Export current theme as JSON */
 function exportTheme(){
-  return JSON.stringify(_mergedConfig(), null, 2);
+  return JSON.stringify(_adminDraftConfig(), null, 2);
 }
 
 /** Import theme from JSON string */
@@ -1195,6 +1226,33 @@ var VISUAL_THEME_PRESETS = {
   }
 };
 
+var VISUAL_THEME_PRESET_ALIASES = {
+  'hesem-enterprise': 'professional-light',
+  'hesem-executive': 'executive-glass',
+  'shopfloor-dark': 'shopfloor-signal',
+  'quality-lab': 'compliance-paper',
+  'maintenance-hub': 'industrial-steel',
+  'warehouse-ops': 'slate-ice',
+  'clean-room': 'compliance-paper'
+};
+
+function _resolveVisualThemePresetId(themeId){
+  var requested = String(themeId || '');
+  if(VISUAL_THEME_PRESETS[requested]) return requested;
+  return VISUAL_THEME_PRESET_ALIASES[requested] || '';
+}
+
+function _cloneVisualThemePreset(themeId, resolvedId){
+  var preset = VISUAL_THEME_PRESETS[resolvedId];
+  if(!preset) return null;
+  var clone = JSON.parse(JSON.stringify(preset));
+  clone.id = themeId;
+  clone.sourcePresetId = resolvedId;
+  clone.aliasOf = resolvedId !== themeId ? resolvedId : '';
+  clone.isAlias = resolvedId !== themeId;
+  return clone;
+}
+
 function getTemplatePreviewCache(){
   return _loadTemplatePreviewCache();
 }
@@ -1259,21 +1317,44 @@ function graphicsAuthorityClient(){
 function getVisualThemePresets(){
   var out = {};
   Object.keys(VISUAL_THEME_PRESETS).forEach(function(key){
-    out[key] = JSON.parse(JSON.stringify(VISUAL_THEME_PRESETS[key]));
+    out[key] = _cloneVisualThemePreset(key, key);
+  });
+  Object.keys(VISUAL_THEME_PRESET_ALIASES).forEach(function(key){
+    var resolvedId = _resolveVisualThemePresetId(key);
+    if(resolvedId) out[key] = _cloneVisualThemePreset(key, resolvedId);
   });
   return out;
 }
 
 function getVisualThemePresetIds(){
-  return Object.keys(VISUAL_THEME_PRESETS);
+  return Object.keys(VISUAL_THEME_PRESETS).concat(Object.keys(VISUAL_THEME_PRESET_ALIASES));
+}
+
+function getVisualThemeCatalogParity(){
+  return {
+    canonicalIds: Object.keys(VISUAL_THEME_PRESETS),
+    aliasIds: Object.keys(VISUAL_THEME_PRESET_ALIASES),
+    pairs: Object.keys(VISUAL_THEME_PRESET_ALIASES).map(function(aliasId){
+      return { aliasId: aliasId, presetId: VISUAL_THEME_PRESET_ALIASES[aliasId] };
+    })
+  };
 }
 
 function applyVisualTheme(themeId){
-  var theme = VISUAL_THEME_PRESETS[String(themeId || '')];
+  var requestedId = String(themeId || '');
+  var resolvedId = _resolveVisualThemePresetId(requestedId);
+  var theme = VISUAL_THEME_PRESETS[resolvedId];
   if(!theme) return false;
   var patch = {
-    visualTheme: String(themeId || ''),
+    visualTheme: requestedId,
+    visualThemeCanonical: resolvedId,
+    visualThemeCatalogState: resolvedId !== requestedId ? 'alias' : 'canonical',
     colorMode: theme.colorMode || 'light',
+    appearance: {
+      visualThemePreset: requestedId,
+      visualThemePresetCanonical: resolvedId,
+      visualThemeCatalogState: resolvedId !== requestedId ? 'alias' : 'canonical'
+    },
     brand: {
       primary: theme.brandPrimary,
       light: theme.brandLight || theme.brandPrimary,
@@ -1300,7 +1381,7 @@ function applyVisualTheme(themeId){
     }
   };
   setPreviewAll(patch);
-  _emit('theme-preset', { themeId: String(themeId || ''), patch: patch });
+  _emit('theme-preset', { themeId: requestedId, resolvedThemeId: resolvedId, patch: patch });
   return true;
 }
 
@@ -1319,6 +1400,7 @@ window.HmTheme = {
 	  setAllUserPreferences: setAll,
   getAll: getAll,
   getFullConfig: getFullConfig,
+  getAdminConfigDraft: getAdminConfigDraft,
   reset: reset,
   on: on,
   off: off,
@@ -1335,11 +1417,12 @@ window.HmTheme = {
   getTemplates: getTemplates,
   saveTemplate: saveTemplate,
   deleteTemplate: deleteTemplate,
-	  getTemplateAuthorityStatus: getTemplateAuthorityStatus,
+  getTemplateAuthorityStatus: getTemplateAuthorityStatus,
 	  graphicsAuthorityClient: graphicsAuthorityClient,
 	  resolveWithTemplate: resolveWithTemplate,
 	  getVisualThemePresets: getVisualThemePresets,
 	  getVisualThemePresetIds: getVisualThemePresetIds,
+  getVisualThemeCatalogParity: getVisualThemeCatalogParity,
 	  applyVisualTheme: applyVisualTheme,
   DEFAULTS: DEFAULTS
 };
