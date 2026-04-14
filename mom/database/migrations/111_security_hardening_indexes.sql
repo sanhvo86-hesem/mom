@@ -55,8 +55,15 @@ CREATE INDEX IF NOT EXISTS idx_purchase_order_lines_item_id ON purchase_order_li
 
 -- Inventory indexes
 CREATE INDEX IF NOT EXISTS idx_inventory_locations_warehouse_id ON inventory_locations(warehouse_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_locations_item_id ON inventory_locations(item_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_locations_vendor_id ON inventory_locations(vendor_id);
+-- item_id and vendor_id only if present (inventory_locations schema varies by deployment)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='item_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_item_id ON inventory_locations(item_id)';
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='inventory_locations' AND column_name='vendor_id') THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inventory_locations_vendor_id ON inventory_locations(vendor_id)';
+    END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_warehouse_id ON inventory_transactions(warehouse_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_location_id ON inventory_transactions(location_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_transactions_item_id ON inventory_transactions(item_id);
