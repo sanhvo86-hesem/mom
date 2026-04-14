@@ -1,0 +1,29 @@
+{
+  "artifact_type": "reverse_sync_intake",
+  "intake_id": "worldclass-closure-20260414-1257",
+  "branch": "codex/worldclass-closure-20260414-1257",
+  "created_at": "2026-04-14T05:57:00Z",
+  "source_of_change": "codex_worldclass_closure_program",
+  "controlled_source_updates": [
+    "authoritative offline form issuance manifest generation",
+    "server-authored submission attempt validation and duplicate classification",
+    "transactional evidence finalization and signature idempotency conflict detection",
+    "persisted publication withdraw/supersede/retry worker trail",
+    "released change-order gate for publication withdrawal and supersession",
+    "schema-complete MES digital-thread context probe",
+    "generated registry projection removal from controlled source"
+  ],
+  "runtime_or_generated_artifacts_not_reimported": [
+    "mom/data/registry/*.json generated projections",
+    "browser-test artifacts",
+    "temporary prompt dumps",
+    "local runtime logs and pid files"
+  ],
+  "post_merge_actions": [
+    "run governed migration process in target environments",
+    "capture environment deploy receipt",
+    "confirm immutable storage adapter selection or waiver review",
+    "schedule P2 documentation hygiene wave for prompt/tmp warnings",
+    "connect publication worker to production Graph credentials through secret-managed configuration"
+  ]
+}
