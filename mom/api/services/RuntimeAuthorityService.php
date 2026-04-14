@@ -74,11 +74,15 @@ final class RuntimeAuthorityService
 
         $states = [];
         $degraded = [];
+        $nonAuthoritative = [];
         foreach ($slices as $slice => $payload) {
             $state = (string)($payload['readiness_state'] ?? 'degraded');
             $states[$state] = (int)($states[$state] ?? 0) + 1;
             if ($state === 'degraded') {
                 $degraded[] = $slice;
+            }
+            if ($state !== 'authoritative_ready') {
+                $nonAuthoritative[] = $slice;
             }
         }
 
@@ -98,6 +102,9 @@ final class RuntimeAuthorityService
             'summary' => [
                 'readiness_counts' => $states,
                 'degraded_slices' => $degraded,
+                'non_authoritative_slices' => $nonAuthoritative,
+                'mixed_authority' => $nonAuthoritative !== [],
+                'strict_authority_ready' => $nonAuthoritative === [],
                 'idempotency_expected_authority_met' => (bool)($slices['idempotency']['expected_authority_met'] ?? true),
             ],
         ];

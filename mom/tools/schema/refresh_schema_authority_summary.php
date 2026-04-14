@@ -40,7 +40,7 @@ function refresh_schema_authority_write_file(string $path, string $contents): vo
 $existing = refresh_schema_authority_read_json($databaseDir . '/schema-authority-summary.json');
 $existingAuthority = is_array($existing['schema_authority'] ?? null) ? $existing['schema_authority'] : [];
 $tableRegistry = refresh_schema_authority_read_json($registryDir . '/table-registry.json');
-$tableCount = count((array)($tableRegistry['tables'] ?? []));
+$registryTableCount = count((array)($tableRegistry['tables'] ?? []));
 
 $migrationNumbers = [];
 foreach (glob($migrationsDir . '/*.sql') ?: [] as $file) {
@@ -59,6 +59,7 @@ $migrationRange = sprintf('%03d–%03d', $minMigration, $maxMigration);
 $declaredAt = gmdate('c');
 $schemaSql = is_file($schemaSqlPath) ? (string)file_get_contents($schemaSqlPath) : '';
 $schemaCreateTableCount = $schemaSql === '' ? 0 : preg_match_all('/CREATE\s+TABLE/i', $schemaSql);
+$tableCount = $schemaCreateTableCount > 0 ? $schemaCreateTableCount : $registryTableCount;
 $referenceArtifacts = array_values(array_filter((array)($existingAuthority['reference_sql_artifacts'] ?? []), 'is_array'));
 if ($referenceArtifacts === []) {
     $referenceArtifacts = [
@@ -84,6 +85,7 @@ $authority = [
     'authoritative_schema_file' => 'database/schema.sql',
     'authority_scope' => 'platform_global',
     'table_count' => $tableCount,
+    'registry_table_count' => $registryTableCount,
     'migration_range' => $migrationRange,
     'migration_count' => count($migrationNumbers),
     'schema_snapshot_create_table_count' => $schemaCreateTableCount,
@@ -93,7 +95,10 @@ $authority = [
     'reference_sql_artifacts' => $referenceArtifacts,
     'generation_drift_relationship' => (string)($existingAuthority['generation_drift_relationship'] ?? 'schema.sql MUST be regenerated from migrations after any migration change. Drift = schema.sql out of date, not a truth conflict.'),
     'anti_parallel_authority_statement' => (string)($existingAuthority['anti_parallel_authority_statement'] ?? 'There is exactly ONE schema authority chain: migrations → schema.sql (snapshot). Blueprint and spec SQL files are design inputs, NOT parallel authorities. No table definition outside migrations is authoritative.'),
-    'registry_dependency' => 'table-registry.json derives table metadata from schema.sql via generate-table-architecture.mjs. Registry does not modify schema; schema does not depend on registry.',
+    'registry_dependency' => 'Full table-registry publication is intended to derive table metadata from schema.sql via generate-table-architecture.mjs. A bootstrap or partial registry is not schema authority. Registry does not modify schema; schema does not depend on registry.',
+    'registry_publication_state' => $registryTableCount === $tableCount
+        ? 'registry_table_count_matches_schema_snapshot'
+        : 'registry_bootstrap_or_partial_publication_table_count_differs_from_schema_snapshot',
     'drift_verifier' => 'tools/verify_schema_authority.py',
 ];
 
@@ -133,9 +138,10 @@ $markdown = implode("\n", [
     '## Drift Control',
     '',
     '- `schema.sql` is a generated artifact; if it differs from migrations, regenerate it.',
-    '- `table-registry.json` derives table metadata from `schema.sql` via `generate-table-architecture.mjs`.',
+    '- Full `table-registry.json` publication is intended to derive table metadata from `schema.sql` via `generate-table-architecture.mjs`; a bootstrap or partial registry is not schema authority.',
     '- Registry does not modify schema; schema does not depend on registry.',
     '- Snapshot CREATE TABLE count: ' . $schemaCreateTableCount,
+    '- Registry table count: ' . $registryTableCount,
     '- Drift verifier: `tools/verify_schema_authority.py`',
     '',
     '## Verification',
@@ -153,5 +159,6 @@ fwrite(STDOUT, json_encode([
     'migrationRange' => $migrationRange,
     'migrationCount' => count($migrationNumbers),
     'tableCount' => $tableCount,
+    'registryTableCount' => $registryTableCount,
     'schemaCreateTableCount' => $schemaCreateTableCount,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);

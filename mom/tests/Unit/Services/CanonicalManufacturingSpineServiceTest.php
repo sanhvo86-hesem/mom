@@ -22,6 +22,38 @@ final class CanonicalManufacturingSpineServiceTest extends TestCase
         $this->assertSame('registry_primary', $probe['authority_mode']);
     }
 
+    public function testRuntimeBootstrapSkeletonUsesContractColumnsForValidation(): void
+    {
+        $tmpBase = sys_get_temp_dir() . '/mom_spine_registry_overlay_' . bin2hex(random_bytes(4));
+        mkdir($tmpBase . '/data/registry', 0775, true);
+        mkdir($tmpBase . '/contracts', 0775, true);
+
+        try {
+            copy(QMS_TEST_BASE_DIR . '/data/registry/table-registry.json', $tmpBase . '/data/registry/table-registry.json');
+            copy(QMS_TEST_BASE_DIR . '/contracts/table-registry.json', $tmpBase . '/contracts/table-registry.json');
+
+            $runtimeRegistry = json_decode(
+                (string)file_get_contents($tmpBase . '/data/registry/table-registry.json'),
+                true,
+            );
+            $this->assertIsArray($runtimeRegistry);
+            foreach (array_keys((array)($runtimeRegistry['tables'] ?? [])) as $tableName) {
+                $runtimeRegistry['tables'][$tableName]['columns'] = [];
+            }
+            file_put_contents(
+                $tmpBase . '/data/registry/table-registry.json',
+                json_encode($runtimeRegistry, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            );
+
+            $validation = (new CanonicalManufacturingSpineService($tmpBase))->validate();
+
+            $this->assertTrue($validation['ok'], implode("\n", $validation['errors']));
+            $this->assertSame(0, $validation['error_count']);
+        } finally {
+            $this->removeDir($tmpBase);
+        }
+    }
+
     public function testDefinitionsDeclareRequiredIdentityScopeAndAuthority(): void
     {
         $definitions = CanonicalManufacturingSpineService::definitions();
@@ -80,5 +112,21 @@ final class CanonicalManufacturingSpineServiceTest extends TestCase
         $this->assertContains('job_order>item_revision', $relationKeys);
         $this->assertContains('inspection_execution>lot', $relationKeys);
         $this->assertContains('certification_evidence>employees', $relationKeys);
+    }
+
+    private function removeDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+        foreach ($items as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($dir);
     }
 }

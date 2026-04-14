@@ -413,16 +413,82 @@ final class CanonicalManufacturingSpineService
         }
 
         $baseDir = rtrim($this->baseDir, '/');
-        $path = $baseDir . '/data/registry/table-registry.json';
-        if (!is_file($path)) {
-            $path = $baseDir . '/contracts/table-registry.json';
+        $runtimeRegistry = $this->readRegistryDocument($baseDir . '/data/registry/table-registry.json');
+        $contractRegistry = $this->readRegistryDocument($baseDir . '/contracts/table-registry.json');
+        $runtimeTables = (array)($runtimeRegistry['tables'] ?? []);
+        $contractTables = (array)($contractRegistry['tables'] ?? []);
+
+        if ($runtimeTables === [] && $contractTables === []) {
+            return [];
         }
+
+        if ($runtimeTables === []) {
+            $this->tableRegistry = $contractRegistry;
+            return $contractTables;
+        }
+
+        foreach ($contractTables as $tableName => $contractTable) {
+            if (!is_array($contractTable)) {
+                continue;
+            }
+
+            $runtimeTable = $runtimeTables[$tableName] ?? null;
+            if (!is_array($runtimeTable)) {
+                $runtimeTables[$tableName] = $contractTable;
+                continue;
+            }
+
+            $runtimeTables[$tableName] = $this->mergeRegistryTable($contractTable, $runtimeTable);
+        }
+
+        $this->tableRegistry = $runtimeRegistry;
+        $this->tableRegistry['tables'] = $runtimeTables;
+
+        return $runtimeTables;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function readRegistryDocument(string $path): array
+    {
         if (!is_file($path)) {
             return [];
         }
+
         $decoded = json_decode((string)file_get_contents($path), true);
-        $this->tableRegistry = is_array($decoded) ? $decoded : [];
-        return (array)($this->tableRegistry['tables'] ?? []);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @param array<string, mixed> $contractTable
+     * @param array<string, mixed> $runtimeTable
+     *
+     * @return array<string, mixed>
+     */
+    private function mergeRegistryTable(array $contractTable, array $runtimeTable): array
+    {
+        $merged = $contractTable;
+        foreach ($runtimeTable as $key => $value) {
+            if ($key === 'columns') {
+                continue;
+            }
+            if ($value === '' && is_string($merged[$key] ?? null) && $merged[$key] !== '') {
+                continue;
+            }
+            if ($value === [] && is_array($merged[$key] ?? null) && $merged[$key] !== []) {
+                continue;
+            }
+            $merged[$key] = $value;
+        }
+
+        $contractColumns = (array)($contractTable['columns'] ?? []);
+        $runtimeColumns = (array)($runtimeTable['columns'] ?? []);
+        if ($contractColumns !== [] || $runtimeColumns !== []) {
+            $merged['columns'] = array_replace_recursive($contractColumns, $runtimeColumns);
+        }
+
+        return $merged;
     }
 }
 

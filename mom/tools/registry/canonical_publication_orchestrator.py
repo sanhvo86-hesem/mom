@@ -906,8 +906,13 @@ def run_pipeline(*, dry_run: bool = False, skip_generator: bool = False) -> int:
     print(f"  Run ID: {run_id}")
     all_ok = all(step_results.values())
     for step_name, ok in step_results.items():
-        indicator = "OK" if ok else "FAIL"
+        indicator = "SKIPPED" if dry_run else ("OK" if ok else "FAIL")
         print(f"  [{indicator}] {step_name}")
+
+    if dry_run:
+        print("\n  Overall: DRY-RUN (NOT VERIFIED)")
+        return 0
+
     print(f"\n  Overall: {'PASS' if all_ok else 'FAIL'}")
 
     return 0 if all_ok else 1

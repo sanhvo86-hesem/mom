@@ -1,5 +1,6 @@
 # Workspace hygiene
 .DS_Store
+.claude/settings.local.json
 __pycache__/
 *.py[cod]
 
@@ -13,6 +14,7 @@ _Deleted/
 .tmp-*.jpg
 .tmp-*.jpeg
 .tmp-*.webm
+.tmp-*.sql
 .codex-playwright/
 mom/.phpunit.cache/
 mom/_reports/
@@ -52,10 +54,19 @@ mom/data/log-archive/**
 
 # Runtime data and sensitive files
 mom/data/
+!mom/data/
+mom/data/*
+!mom/data/registry/
+mom/data/registry/*
+!mom/data/registry/endpoint-catalog-index.json
+!mom/data/registry/relation-map.json
+!mom/data/registry/schema-authority-summary.json
+!mom/data/registry/table-registry.json
 storage/
 queue/
 rate-limit/
 *.log
+*.pid
 *.jsonl
 
 # Runtime-generated portal data (keep README markers tracked)

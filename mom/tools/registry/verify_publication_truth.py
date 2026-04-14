@@ -103,6 +103,17 @@ def check(name: str, condition: bool, detail: str = ""):
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
+def finish() -> int:
+    total = checks_passed + checks_failed
+    print(f"\n{'='*60}")
+    print(f"Total: {total}  |  Passed: {checks_passed}  |  Failed: {checks_failed}")
+    if failures:
+        print("\nFailures:")
+        for f in failures:
+            print(f"  - {f}")
+    print(f"{'='*60}")
+    return 0 if checks_failed == 0 else 1
+
 def main() -> int:
     print("=== Publication Truth Verification ===\n")
 
@@ -136,6 +147,16 @@ def main() -> int:
             gen_ats[p.name] = d.get("_meta", {}).get("generatedAt")
     unique_rids = set(v for v in run_ids.values() if v)
     check("shared_run_id", len(unique_rids) == 1, f"Found {len(unique_rids)} distinct: {unique_rids}")
+
+    missing_required = [p.name for p in REQUIRED_ARTIFACTS if not p.is_file()]
+    if missing_required:
+        print("\nPublication-dependent gates skipped because required publication artifacts are missing.")
+        check(
+            "publication_required_artifact_set_complete",
+            False,
+            f"missing_count={len(missing_required)} missing={missing_required[:20]}",
+        )
+        return finish()
 
     # Gate D: Accounting parity (533 entity universe)
     print("\nGate D: Accounting parity")
@@ -798,16 +819,7 @@ def main() -> int:
               "global-erp-mom-capability-audit.json" in (rm.get("assets") or {}),
               "global-erp-mom-capability-audit.json missing from registry-manifest assets")
 
-    # Summary
-    total = checks_passed + checks_failed
-    print(f"\n{'='*60}")
-    print(f"Total: {total}  |  Passed: {checks_passed}  |  Failed: {checks_failed}")
-    if failures:
-        print("\nFailures:")
-        for f in failures:
-            print(f"  - {f}")
-    print(f"{'='*60}")
-    return 0 if checks_failed == 0 else 1
+    return finish()
 
 if __name__ == "__main__":
     raise SystemExit(main())

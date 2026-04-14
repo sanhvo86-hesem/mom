@@ -107,7 +107,8 @@ function run_refresh_command(array $parts, string $cwd, bool $required = true): 
         fwrite(STDERR, $stderr);
     }
     if ($code !== 0 && $required) {
-        throw new RuntimeException('Refresh command failed: ' . $command);
+        fwrite(STDERR, "[refresh_data_schema_authority] required command failed: {$command}" . PHP_EOL);
+        exit($code > 0 ? $code : 1);
     }
     if ($code !== 0 && !$required) {
         fwrite(STDERR, "[refresh_data_schema_authority] skipped optional command after failure: {$command}" . PHP_EOL);

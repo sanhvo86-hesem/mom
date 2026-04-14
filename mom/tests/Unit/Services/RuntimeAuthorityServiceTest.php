@@ -38,6 +38,9 @@ final class RuntimeAuthorityServiceTest extends TestCase
         $report = (new RuntimeAuthorityService($data, $this->tmpDir, $idempotency))->report();
 
         $this->assertTrue($report['ok']);
+        $this->assertTrue($report['summary']['mixed_authority']);
+        $this->assertFalse($report['summary']['strict_authority_ready']);
+        $this->assertContains('order_workflow', $report['summary']['non_authoritative_slices']);
         $this->assertSame('JSON_ONLY', $report['profile']['data_layer_mode']);
         $this->assertSame('compatibility_only', $report['slices']['idempotency']['readiness_state']);
         $this->assertSame('compatibility_only', $report['slices']['order_workflow']['readiness_state']);

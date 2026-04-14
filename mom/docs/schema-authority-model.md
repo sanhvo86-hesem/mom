@@ -2,7 +2,7 @@
 
 This project separates database authority, generated system contracts, and editable design workspaces.
 
-Tranche 12 correction, 2026-04-14: the registry paths below describe the expected generated runtime contract layer. The current checked-in tree does not contain `mom/data/registry/table-registry.json` or the required publication artifacts, so the System Contract Registry layer is currently `UNPROVEN/BLOCKED` in-tree until the artifact set is restored or regenerated with the required environment credentials.
+Tranche 13 correction, 2026-04-14: the bootstrap registry path drift found in Tranche 12/13 was repaired so `mom/data/registry/table-registry.json`, `endpoint-catalog-index.json`, `relation-map.json`, and `schema-authority-summary.json` now exist in the runtime-consumed path. This is bootstrap proof only. The generated bootstrap table registry can be skeletal for domains/columns, so registry-backed consumers and canonical-spine validation still overlay the authored `mom/contracts/table-registry.json` metadata until full publication produces a complete runtime registry. Full publication truth remains `PARTIAL/BLOCKED` until the missing controlled inputs and outputs such as `data-fields.json`, `domain-architecture.json`, wave policy files, `endpoint-catalog.json`, `frontend-foundation-catalog.json`, and system-contract artifacts are generated successfully.
 
 ## Layers
 
@@ -10,14 +10,14 @@ Tranche 12 correction, 2026-04-14: the registry paths below describe the expecte
 | --- | --- | --- | --- | --- |
 | Physical DB schema | Runtime data storage in PostgreSQL | PostgreSQL schema `public` | Database writes only through application/runtime or governed migrations | Never delete from Schema Studio |
 | DB authority | Versioned structural source of truth | `database/migrations/*.sql` -> `database/schema.sql` | Governed migration review, deployment gate, rollback planning | Immutable history; supersede with a later migration |
-| System Contract Registry | Full backend contract for AI, frontend, API, workflow, and audit visibility | Expected: `data/registry/table-registry.json` and generated registry artifacts; current Tranche 12 state: missing from checked-in tree | Read-only generated artifact | Regenerate from authority; do not hand-edit or hard-delete |
+| System Contract Registry | Full backend contract for AI, frontend, API, workflow, and audit visibility | Bootstrap present: `mom/data/registry/table-registry.json`, `endpoint-catalog-index.json`, `relation-map.json`, `schema-authority-summary.json`; full publication artifacts still incomplete | Read-only generated artifact | Regenerate from authority; do not hand-edit or hard-delete |
 | Workspace Design Draft | Blank editable design surface for future controlled experiments only | `data/schema-studio/designs/workspace.json` | Editable with revision guard and audit trail | Archive or replace through a controlled change; do not hard-delete while Schema Studio needs an editable surface |
 
 ## Active Workspace State
 
 As of 2026-04-11, `data/schema-studio/designs/workspace.json` and `data/schema-studio/snapshots/workspace.baseline.json` are intentionally blank. They contain zero tables and zero relations by design.
 
-This prevents AI, frontend, and backend tools from mistaking an old curated 101-table draft for the real ERP+MOM schema. The target backend contract is the System Contract Registry, and the physical DB authority remains migrations plus the generated schema snapshot. In the current Tranche 12 worktree, the registry artifact layer itself is not checked in and must not be treated as verified runtime truth.
+This prevents AI, frontend, and backend tools from mistaking an old curated 101-table draft for the real ERP+MOM schema. The target backend contract is the System Contract Registry, and the physical DB authority remains migrations plus the generated schema snapshot. In the current Tranche 13 worktree, the bootstrap registry artifact layer is checked in under `mom/data/registry`, but it must not be treated as full publication truth until the full artifact set and publication verifier pass.
 
 ## Runtime Contract Artifacts
 

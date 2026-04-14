@@ -9,13 +9,13 @@ Reaudit backend coverage for the full MOM process map after closing publication,
 3. Can the backend enforce the lifecycle and audit trail without frontend-specific logic?
 4. If the element is unused or duplicate, is it isolated or archived instead of published live?
 
-## Tranche 12 Correction
+## Tranche 13 Correction
 
 This document is retained as a historical audit record, not as current closure proof.
 
-The Tranche 12 zero-trust audit on 2026-04-14 found that the current worktree does not contain the `mom/data/registry` publication artifact set required by `mom/tools/registry/verify_publication_truth.py` and `mom/tools/registry/canonical_publication_orchestrator.py`. The publication pipeline fails before convergence because required registry inputs such as `table-registry.json`, `data-fields.json`, and wave governance policy artifacts are absent, and the schema authority sync path also requires `DB_PASSWORD` in this environment.
+The Tranche 13 zero-trust audit on 2026-04-14 found and repaired a registry path drift: bootstrap artifacts had been committed under root `data/registry`, while runtime and publication tools consume `mom/data/registry`. The bootstrap artifacts now live in `mom/data/registry`; registry-backed runtime consumers overlay authored contract domain/column metadata when that bootstrap is skeletal. Full publication truth is still not proven. The real publication pipeline still fails before convergence because required controlled inputs such as `data-fields.json`, `domain-architecture.json`, `orphan-resolution.json`, wave governance policy artifacts, and frontend/system-contract outputs are absent.
 
-Therefore the historical `publishability_ready=true`, "no blocking gaps remain", and "backend coverage is complete" statements below are not valid for the current repository state. Current truth is recorded in `mom/docs/system/unresolved-backlog-ledger-tranche12.md` and `mom/docs/system/world-class-swarm-closure-tranche12.md`.
+Therefore the historical `publishability_ready=true`, "no blocking gaps remain", and "backend coverage is complete" statements below are not valid for the current repository state. Current truth is recorded in `mom/docs/system/unresolved-backlog-ledger-tranche13.md` and `mom/docs/system/world-class-swarm-closure-tranche13.md`.
 
 ## World-Class References Used
 
@@ -36,7 +36,7 @@ Therefore the historical `publishability_ready=true`, "no blocking gaps remain",
 - Wave 3 process governance: `remaining_wave3_gaps=0`
 - Operational blind spots: `critical=0`, `high=0`, `medium=0`
 - Operational stress: `critical=0`, `high=0`, `medium=0`
-- Registry quality: historical generated claim only; current Tranche 12 verification is `UNPROVEN/BLOCKED` because the checked-in `mom/data/registry` publication artifacts are absent.
+- Registry quality: historical generated claim only; current Tranche 13 verification is `PARTIAL/BLOCKED`. Bootstrap artifacts exist in `mom/data/registry`, but full publication artifacts and verifier convergence remain missing.
 
 ## Findings Closed In This Round
 

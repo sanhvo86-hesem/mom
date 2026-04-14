@@ -43,6 +43,10 @@ class RegistryService
             return $this->cache[$name];
         }
 
+        if ($name === 'table-registry') {
+            return $this->cache[$name] = $this->loadTableRegistry();
+        }
+
         if ($name === 'data-fields') {
             return $this->cache[$name] = $this->loadDataFieldsRegistry();
         }
@@ -173,6 +177,72 @@ class RegistryService
 
         $data = json_decode($raw, true);
         return is_array($data) ? $data : [];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadTableRegistry(): array
+    {
+        $runtimeRegistry = $this->readJsonFile($this->registryDir . '/table-registry.json');
+        $controlledRegistry = $this->readJsonFile($this->controlledRegistryDir . '/table-registry.json');
+
+        if ($runtimeRegistry === []) {
+            return $controlledRegistry;
+        }
+        if ($controlledRegistry === []) {
+            return $runtimeRegistry;
+        }
+
+        $runtimeTables = (array)($runtimeRegistry['tables'] ?? []);
+        $controlledTables = (array)($controlledRegistry['tables'] ?? []);
+        foreach ($controlledTables as $tableName => $controlledTable) {
+            if (!is_array($controlledTable)) {
+                continue;
+            }
+
+            $runtimeTable = $runtimeTables[$tableName] ?? null;
+            if (!is_array($runtimeTable)) {
+                $runtimeTables[$tableName] = $controlledTable;
+                continue;
+            }
+
+            $runtimeTables[$tableName] = $this->mergeTableRegistryMetadata($controlledTable, $runtimeTable);
+        }
+
+        $runtimeRegistry['tables'] = $runtimeTables;
+        return $runtimeRegistry;
+    }
+
+    /**
+     * @param array<string, mixed> $controlledTable
+     * @param array<string, mixed> $runtimeTable
+     *
+     * @return array<string, mixed>
+     */
+    private function mergeTableRegistryMetadata(array $controlledTable, array $runtimeTable): array
+    {
+        $merged = $controlledTable;
+        foreach ($runtimeTable as $key => $value) {
+            if ($key === 'columns') {
+                continue;
+            }
+            if ($value === '' && is_string($merged[$key] ?? null) && $merged[$key] !== '') {
+                continue;
+            }
+            if ($value === [] && is_array($merged[$key] ?? null) && $merged[$key] !== []) {
+                continue;
+            }
+            $merged[$key] = $value;
+        }
+
+        $controlledColumns = (array)($controlledTable['columns'] ?? []);
+        $runtimeColumns = (array)($runtimeTable['columns'] ?? []);
+        if ($controlledColumns !== [] || $runtimeColumns !== []) {
+            $merged['columns'] = array_replace_recursive($controlledColumns, $runtimeColumns);
+        }
+
+        return $merged;
     }
 
     /**

@@ -57,6 +57,9 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
             (bool)($payload['authority']['ok'] ?? false),
             $payload['health_evaluation']['components_ok']['runtime_authority'] ?? null,
         );
+        $this->assertFalse($payload['authority']['summary']['strict_authority_ready'] ?? true);
+        $this->assertTrue($payload['authority']['summary']['mixed_authority'] ?? false);
+        $this->assertFalse($payload['health_evaluation']['components_ok']['runtime_authority_strict'] ?? true);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['idempotency']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['order_workflow']['readiness_state'] ?? null);
         $this->assertSame('compatibility_only', $payload['authority']['slices']['master_data']['readiness_state'] ?? null);
@@ -128,6 +131,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertArrayHasKey('evidence_vault', $payload['checks']);
         $this->assertArrayHasKey('upload_hardening', $payload['checks']);
         $this->assertArrayHasKey('runtime_authority', $payload['checks']);
+        $this->assertArrayHasKey('runtime_authority_strict', $payload['checks']);
         $this->assertSame(
             !in_array(false, $payload['checks'], true),
             $payload['ok'],

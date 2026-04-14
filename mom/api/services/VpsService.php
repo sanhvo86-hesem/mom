@@ -2573,8 +2573,11 @@ BASH;
             }
         }
 
-        // Dynamic service probe commands are validated separately.
-        // Dynamic site / control-endpoint probe commands are validated separately.
+        // Dynamic probe commands are generated from controlled host inventory
+        // and validated structurally before execution.
+        if ($this->isAllowedServiceProbeCommand($command)) {
+            return true;
+        }
         if ($this->isAllowedSiteProbeCommand($command)) {
             return true;
         }

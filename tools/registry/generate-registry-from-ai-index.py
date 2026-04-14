@@ -21,7 +21,7 @@ ai_dir    = repo_root / '.ai'
 out_dir   = repo_root / 'mom' / 'data' / 'registry'
 
 out_dir.mkdir(parents=True, exist_ok=True)
-now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+now = datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # ── 1. Endpoint catalog from route-map.json ────────────────────────────────
 route_map     = json.loads((ai_dir / 'route-map.json').read_text())

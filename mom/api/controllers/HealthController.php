@@ -269,6 +269,7 @@ class HealthController extends BaseController
             'upload_hardening' => $this->componentHealthy($infra['upload_hardening'] ?? []),
             'runtime_authority' => (bool)($authority['ok'] ?? false)
                 && (bool)($authority['summary']['idempotency_expected_authority_met'] ?? true),
+            'runtime_authority_strict' => (bool)($authority['summary']['strict_authority_ready'] ?? false),
         ];
     }
 

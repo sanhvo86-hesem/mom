@@ -37,6 +37,8 @@ REPORT_PATH = REGISTRY_DIR / "operational-blind-spot-report.json"
 
 
 def load_json(path: Path) -> dict:
+    if not path.is_file():
+        raise SystemExit(f"Missing required registry input: {path}")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
