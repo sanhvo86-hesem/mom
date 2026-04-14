@@ -58,12 +58,55 @@ final class DatabaseConfigPasswordGuardTest extends TestCase
             'DB_ALLOW_EMPTY_PASSWORD' => 'false',
             'DB_REQUIRE_PASSWORD' => null,
             'DB_PASSWORD' => null,
+            'DB_PASS' => null,
         ]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('DB_PASSWORD environment variable is required');
+        $this->expectExceptionMessage('DB_PASSWORD (or legacy DB_PASS) environment variable is required');
 
         $this->loadConfig();
+    }
+
+    public function testLegacyDbPassFallbackIsAcceptedWhenDbPasswordNotSet(): void
+    {
+        // VPS setup scripts historically export DB_PASS (not DB_PASSWORD).
+        // database/config.php must accept DB_PASS as a backward-compatible fallback
+        // so that existing deployments work without silent password loss.
+        $this->setEnv([
+            'APP_ENV' => 'production',
+            'USE_POSTGRES' => 'true',
+            'SHADOW_WRITE' => 'false',
+            'JSON_FALLBACK' => 'true',
+            'DB_ALLOW_EMPTY_PASSWORD' => 'false',
+            'DB_REQUIRE_PASSWORD' => null,
+            'DB_PASSWORD' => null,        // primary not set
+            'DB_PASS' => 'legacy-secret', // legacy alias IS set
+        ]);
+
+        $config = $this->loadConfig();
+
+        $this->assertSame('legacy-secret', $config['password'],
+            'DB_PASS should be accepted as fallback when DB_PASSWORD is absent');
+    }
+
+    public function testDbPasswordTakesPrecedenceOverDbPass(): void
+    {
+        // When both are set, DB_PASSWORD (primary) wins over DB_PASS (legacy).
+        $this->setEnv([
+            'APP_ENV' => 'testing',
+            'USE_POSTGRES' => 'false',
+            'SHADOW_WRITE' => 'false',
+            'JSON_FALLBACK' => 'false',
+            'DB_ALLOW_EMPTY_PASSWORD' => 'false',
+            'DB_REQUIRE_PASSWORD' => null,
+            'DB_PASSWORD' => 'primary-secret',
+            'DB_PASS' => 'legacy-secret',
+        ]);
+
+        $config = $this->loadConfig();
+
+        $this->assertSame('primary-secret', $config['password'],
+            'DB_PASSWORD should take precedence over DB_PASS when both are set');
     }
 
     /**
@@ -104,6 +147,7 @@ final class DatabaseConfigPasswordGuardTest extends TestCase
             'DB_ALLOW_EMPTY_PASSWORD',
             'DB_REQUIRE_PASSWORD',
             'DB_PASSWORD',
+            'DB_PASS',
         ];
     }
 }

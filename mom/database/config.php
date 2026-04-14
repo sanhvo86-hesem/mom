@@ -29,7 +29,21 @@ $envBool = static function (string $name, bool $default): bool {
 // SECURITY FIX: Validate DB_PASSWORD when the PostgreSQL path is explicitly
 // enabled. JSON_ONLY deployments must still bootstrap without DB credentials
 // so read-only registry and compatibility surfaces can stay available.
+//
+// DB_PASSWORD (primary, set by PHP-FPM env[DB_PASSWORD]) takes precedence.
+// DB_PASS (legacy alias used by VPS setup scripts and CLI migration tools) is
+// accepted as a backward-compatible fallback so that deployments which have not
+// yet renamed their environment variable still work without silent password loss.
 $dbPassword = getenv('DB_PASSWORD');
+if ($dbPassword === false || $dbPassword === '') {
+    // Fallback: legacy VPS setup scripts export DB_PASS (not DB_PASSWORD).
+    // Accept it so password is not silently lost when the PHP-FPM pool has
+    // env[DB_PASS] instead of env[DB_PASSWORD].
+    $dbPasswordLegacy = getenv('DB_PASS');
+    if ($dbPasswordLegacy !== false && $dbPasswordLegacy !== '') {
+        $dbPassword = $dbPasswordLegacy;
+    }
+}
 $appEnv = strtolower(trim((string)(getenv('APP_ENV') ?: 'production')));
 $usePostgres = $envBool('USE_POSTGRES', false);
 $shadowWrite = $envBool('SHADOW_WRITE', false);
@@ -41,7 +55,7 @@ if (($dbPassword === false || $dbPassword === '' || $dbPassword === null)
     && $requirePassword
     && in_array($appEnv, ['production', 'staging'], true)) {
     throw new \RuntimeException(
-        'DB_PASSWORD environment variable is required and must not be empty in ' . $appEnv . ' environment'
+        'DB_PASSWORD (or legacy DB_PASS) environment variable is required and must not be empty in ' . $appEnv . ' environment'
     );
 }
 
