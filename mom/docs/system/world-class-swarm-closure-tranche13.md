@@ -11,8 +11,8 @@ Date: 2026-04-14
 | PHASE 1 | Complete: six first-pass reports committed and merged into integration |
 | PHASE 2 | Complete: coordinator synthesis created from six reports and local verifier output |
 | PHASE 3 | Complete for code-fixable registry path, dry-run, strict-authority, and hygiene fixes |
-| PHASE 4 | Pending pass-2 reaudit |
-| PHASE 5 | Pending pass-2 fixes |
+| PHASE 4 | Complete: six pass-2 reports merged into integration |
+| PHASE 5 | In progress: pass-2 Loki readiness defect fixed, final verification pending |
 | PHASE 6 | Pending merge gate |
 | PHASE 7 | Pending merge to `main` |
 | PHASE 8 | Pending cleanup |
@@ -49,6 +49,18 @@ Priority order for this tranche:
 - Tightened the operational blind-spot generator so missing registry source inputs are reported as explicit missing-input errors instead of Python tracebacks.
 - Tightened the schema-authority refresh wrapper so a required generator failure exits with an explicit command-failed line instead of a PHP fatal stack trace.
 - Tightened schema authority summary generation so authoritative `table_count` follows the schema snapshot while partial/bootstrap registry table count is reported separately.
+- Tightened controller-level logging readiness so configured Loki is unhealthy until a successful push verifies `loki_available` and `loki_verified`.
+
+## Pass-2 synthesis
+
+| Agent | Finding | Coordinator disposition |
+|---|---|---|
+| Agent 1 repo reality | Registry path, overlay, strict-authority surface, and verifier truthfulness are verified; final repo cleanup remains pending. | No code defect; keep cleanup in final git phase. |
+| Agent 2 standards | Benchmark claims are qualified, but configured/unverified Loki was a readiness false-confidence risk. | Fixed in `HealthController::componentHealthy()` with regression coverage. |
+| Agent 3 vendor benchmark | No new vendor parity overclaim; proof-layer work improves auditability, not vendor parity. | No code defect; keep vendor gaps explicit. |
+| Agent 4 architecture authority | Table overlay and schema count split are real; endpoint publication remains synthetic/missing until full artifacts exist. | Full endpoint publication remains blocked by missing source artifacts; no fabricated endpoint catalog. |
+| Agent 5 reliability/security/compliance | VPS command allowlist, dry-run truth, and strict authority visibility are stronger; strict authority remains false by design. | No additional code defect after Loki readiness fix. |
+| Agent 6 defects/backlog | Bootstrap path and tracked hygiene are fixed; full publication truth remains blocked; ignored runtime residue must be cleaned. | Clean ignored residue before merge; keep full publication blocker explicit. |
 - Added strict mixed-authority summary fields to `RuntimeAuthorityService` and exposed `runtime_authority_strict` in health checks.
 - Added regression tests for registry bootstrap path alignment, registry metadata overlay, canonical-spine bootstrap overlay, and dry-run truthfulness.
 

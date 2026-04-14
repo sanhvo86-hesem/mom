@@ -127,6 +127,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->assertArrayHasKey('redis', $payload['checks']);
         $this->assertArrayHasKey('rabbitmq', $payload['checks']);
         $this->assertArrayHasKey('logging', $payload['checks']);
+        $this->assertFalse($payload['checks']['logging']);
         $this->assertArrayHasKey('legacy_audit_file_sink', $payload['checks']);
         $this->assertArrayHasKey('evidence_vault', $payload['checks']);
         $this->assertArrayHasKey('upload_hardening', $payload['checks']);

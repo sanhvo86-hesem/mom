@@ -290,6 +290,11 @@ class HealthController extends BaseController
                 return false;
             }
         }
+        if (($payload['loki_configured'] ?? false) === true) {
+            if (($payload['loki_available'] ?? null) !== true || ($payload['loki_verified'] ?? false) !== true) {
+                return false;
+            }
+        }
 
         if (isset($payload['fallback_active']) && $payload['fallback_active'] === true) {
             return false;
