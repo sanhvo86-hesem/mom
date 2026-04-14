@@ -15,6 +15,7 @@ use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
+use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
 use MOM\Services\Publication\PublicationStateService;
@@ -24,6 +25,26 @@ use MOM\Services\Traceability\UnifiedEvidenceGraphService;
 
 final class EqmsControlPlaneController extends BaseController
 {
+    /**
+     * @return list<string>
+     */
+    private function evidenceFinalizationRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'document_control',
+                'document_controller',
+                'qms_manager',
+                'compliance_manager',
+                'production_director',
+            ],
+        )));
+    }
+
     public function contract(): never
     {
         $this->requireAuth();
@@ -205,6 +226,44 @@ final class EqmsControlPlaneController extends BaseController
                     (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
                 ),
             ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function acknowledgeDocumentRead(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['doc_revision_id']);
+
+        try {
+            $this->success([
+                'document_control' => (new DocumentRevisionCommandService($this->data))->acknowledgeRead(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function supersedeDocumentRevision(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['doc_revision_id', 'source_change_order_id']);
+
+        try {
+            $this->success([
+                'document_control' => (new DocumentRevisionCommandService($this->data))->supersedeRevision(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
         }
@@ -507,6 +566,7 @@ final class EqmsControlPlaneController extends BaseController
     public function finalizeEvidencePackage(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->evidenceFinalizationRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['subject_type', 'subject_id', 'canonical_payload']);
@@ -517,6 +577,26 @@ final class EqmsControlPlaneController extends BaseController
         try {
             $this->success([
                 'evidence_finalization' => (new EvidenceFinalizationService($this->dataDir, $this->data))->finalize($body),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function createEvidenceAmendment(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->evidenceFinalizationRoles());
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['source_evidence_version_id', 'source_change_order_id', 'field_paths']);
+
+        try {
+            $this->success([
+                'evidence_amendment' => (new EvidenceAmendmentService($this->data))->createAmendment(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
             ], 201);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);

@@ -223,12 +223,14 @@ final class EdgeConnectorService
         if ($xml === '') {
             return [];
         }
+        if (stripos($xml, '<!DOCTYPE') !== false || stripos($xml, '<!ENTITY') !== false) {
+            return [];
+        }
 
         try {
-            // MES-023 FIX: XXE protection with LIBXML_NOENT for MTConnect XML parsing
-            libxml_disable_entity_loader(true);
+            // MTConnect signal extraction does not need entity expansion.
             libxml_use_internal_errors(true);
-            $options = LIBXML_NONET | LIBXML_NOENT | LIBXML_COMPACT;
+            $options = LIBXML_NONET | LIBXML_COMPACT;
 
             $doc = @simplexml_load_string($xml, null, $options);
             if ($doc === false) {

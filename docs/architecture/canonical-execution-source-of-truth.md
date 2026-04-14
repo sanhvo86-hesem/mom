@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-reaudit-20260414-102059`
+Audited branch: `codex/worldclass-reaudit-20260414-122702`
 
 Date: 2026-04-14
 
@@ -17,7 +17,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Dispatch target | Existing dispatch target store through `DispatchController` | `shift_targets` PostgreSQL bridge, analytics projections | Existing dispatch target path is live Phase 1 operational truth; DB is bridge until cutover. |
 | Operator assignment | Dispatch target `operator_id` plus dispatch actor checks | Mobile queue assignee fields | Reports require assigned operator or supervisor/planner override. Blank assignment is not open execution. |
 | Operator time entry | Mobile work queue service time-entry store | MES labor/time tables, production report actual times | Mobile time entry remains capture truth; report times are production-event context. |
-| Mobile task completion | Mobile work queue service task snapshot plus audit log | Dispatch production report events | Completion now persists result, quantities, and completion reason code for fail/partial/scrap outcomes; dispatch report remains production quantity truth. |
+| Mobile task completion | Mobile work queue service task snapshot plus `mobile/task_events.json` event journal | Dispatch production report events | Queue row is a derived task snapshot. Assignment/start/completion events are mobile task history truth; dispatch report remains production quantity truth. |
 | Production report event | `ShopfloorExecutionService` report event journal | Production log snapshot, DB bridge | Event journal is audit/replay truth. Snapshot is derived latest state. |
 | Production report snapshot | `production_logs.json` through dispatch reporting | `shift_production_log` bridge | Snapshot is a read model for dashboards and compatibility. |
 | Inspection capture | `MobileWorkQueueService::captureInspection()` with JSON compatibility and DB bridge | Dispatch report quality gate fields | Mobile capture is quality evidence truth for Phase 1 first-piece/in-process checks. |
@@ -28,11 +28,11 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Reason codes | Master-data catalogs: downtime, defect, rework, blocking | Free text notes | Governed codes are required for structured loss/defect/blocker semantics. Notes are supporting context only. |
 | Schedule/capacity slot | Planning/scheduling modules | Dispatch shift target date/shift fields | Dispatch captures execution intent, not APS authority. |
 | CNC program version | CNC program management module | Dispatch target copied program revision | Execution freezes references; CNC program store owns release/version truth. |
-| Setup sheet revision | CNC setup sheet store | Dispatch target copied setup revision | Execution freezes references; setup sheet store owns release/version truth. |
+| Setup sheet revision | CNC setup sheet store | Dispatch target copied setup revision | Execution freezes references; setup sheet store owns release/version truth. New setup sheets start as `draft`; missing setup status is not treated as released. |
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
 | Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. |
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
-| AI model/dashboard read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list and dashboard require AI read roles; model config/training source metadata is admin-only. |
+| AI model/dashboard/read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard reads require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
 | Evidence artifact | `EvidenceVaultService` custody/hash chain with DB bridge where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. |
 | Genealogy ontology | `GenealogyGraphService` runtime ontology plus migration 121 DB constraints | Older migration 108 constraints | Runtime and DB now agree on expanded MOM/MES/EQMS/PLM node and snapshot subject types. |
@@ -42,6 +42,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - Append-only production report events and dispatch lifecycle events are the audit/replay truth.
 - Target and production-log snapshots are compatibility/read-model state.
 - Mobile inspection capture is append-only by behavior for offline replay: matching replay returns existing fact; divergent replay is rejected.
+- Mobile task assignment/start/completion writes append task events and then exposes the queue row as the current snapshot.
 - DB bridge writes are migration/readiness mirrors. They are not allowed to override JSON compatibility truth in this Phase 1 patch.
 - If event history and snapshot disagree, event history wins for audit and reconciliation.
 
@@ -79,6 +80,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 
 - AI may read canonical execution facts and derived projections.
 - AI may record feedback only through CSRF-protected, idempotent write paths.
+- AI feedback that can affect advisory confidence requires feedback/write roles, not read-only AI access.
 - AI natural-language query and RCA POST surfaces require CSRF because they write conversation/advisory history or trigger advisory processing.
 - AI may suggest risk, priority, or quality insights, but may not dispatch work, complete targets, approve inspections, create quality disposition, or command machines.
 - Execution truth remains in MOM/MES service paths, not in AI JSON files.

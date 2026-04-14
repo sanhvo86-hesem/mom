@@ -16,14 +16,20 @@ _Deleted/
 .tmp-*.webm
 .tmp-*.sql
 .codex-playwright/
+.ai/index.log
+.vscode/
 mom/.phpunit.cache/
 mom/_reports/
 mom/docs/tmp/
+mom/docs/forms/**/.backups/
+mom/docs/forms/**/*.bak
 mom/docs/system/agent-reports/
 mom/docs/system/*tranche*.md
 mom/release/module-builder-*
 mom/release/*-smoke-*.txt
 mom/release/*-sample-*.json
+mom/ops/local-runtime/.php-server.*
+tools/php82/
 
 # Root-level operational/audit documents must be promoted through release lanes,
 # not silently kept beside controlled source. Sanctioned templates under
@@ -44,6 +50,7 @@ mom/data/sessions/**
 !mom/data/sessions/README.md
 mom/data/log-archive/**
 !mom/data/log-archive/README.md
+mom/data/online-forms/schemas/_archive/**
 
 # Environment configuration (SECURITY FIX: Never commit secrets)
 .env

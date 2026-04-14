@@ -86,15 +86,21 @@ final class EvidenceFinalizationService
         }
 
         $record = $db->queryOne(
-            "INSERT INTO evidence_records
-                (evidence_key, subject_type, subject_id, record_state, retention_class,
-                 source_issuance_id, source_attempt_id, source_change_order_id, idempotency_key, metadata)
-             VALUES
-                (:evidence_key, :subject_type, :subject_id, 'open', :retention_class,
-                 CAST(:source_issuance_id AS uuid), CAST(:source_attempt_id AS uuid), CAST(:source_change_order_id AS uuid),
-                 :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (evidence_key) DO UPDATE SET updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO evidence_records
+                    (evidence_key, subject_type, subject_id, record_state, retention_class,
+                     source_issuance_id, source_attempt_id, source_change_order_id, idempotency_key, metadata)
+                VALUES
+                    (:evidence_key, :subject_type, :subject_id, 'open', :retention_class,
+                     CAST(:source_issuance_id AS uuid), CAST(:source_attempt_id AS uuid), CAST(:source_change_order_id AS uuid),
+                     :idempotency_key, CAST(:metadata AS jsonb))
+                ON CONFLICT (evidence_key) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM evidence_records WHERE evidence_key = :evidence_key
+             LIMIT 1",
             [
                 ':evidence_key' => $evidenceKey,
                 ':subject_type' => $subjectType,
@@ -112,24 +118,38 @@ final class EvidenceFinalizationService
         }
 
         $idempotencyBase = $this->nullableText($input['idempotency_key'] ?? null);
+        $amendmentNo = max(0, (int)($input['amendment_no'] ?? 0));
+        $sourceVersionId = $this->nullableUuid($input['source_version_id'] ?? $input['source_evidence_version_id'] ?? null);
+        $sourceChangeOrderId = $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null);
+        if (($amendmentNo > 0 || $sourceVersionId !== null) && $sourceChangeOrderId === null) {
+            throw new RuntimeException('evidence_amendment_change_order_required');
+        }
         $version = $db->queryOne(
-            "INSERT INTO evidence_versions
-                (evidence_record_id, version_no, version_state, amendment_no, source_change_order_id,
-                 canonical_payload, package_hash_sha256, manifest_hash_sha256,
-                 canonical_payload_hash_sha256, readable_snapshot_hash_sha256,
-                 finalized_at, idempotency_key, metadata)
-             VALUES
-                (CAST(:evidence_record_id AS uuid), :version_no, 'locked', :amendment_no, CAST(:source_change_order_id AS uuid),
-                 CAST(:canonical_payload AS jsonb), :package_hash_sha256, :manifest_hash_sha256,
-                 :canonical_payload_hash_sha256, :readable_snapshot_hash_sha256,
-                 now(), :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (package_hash_sha256) DO UPDATE SET metadata = evidence_versions.metadata || EXCLUDED.metadata
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO evidence_versions
+                    (evidence_record_id, version_no, version_state, amendment_no, source_version_id, source_change_order_id,
+                     canonical_payload, package_hash_sha256, manifest_hash_sha256,
+                     canonical_payload_hash_sha256, readable_snapshot_hash_sha256,
+                     finalized_at, idempotency_key, metadata)
+                VALUES
+                    (CAST(:evidence_record_id AS uuid), :version_no, 'locked', :amendment_no,
+                     CAST(:source_version_id AS uuid), CAST(:source_change_order_id AS uuid),
+                     CAST(:canonical_payload AS jsonb), :package_hash_sha256, :manifest_hash_sha256,
+                     :canonical_payload_hash_sha256, :readable_snapshot_hash_sha256,
+                     now(), :idempotency_key, CAST(:metadata AS jsonb))
+                ON CONFLICT (package_hash_sha256) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM evidence_versions WHERE package_hash_sha256 = :package_hash_sha256
+             LIMIT 1",
             [
                 ':evidence_record_id' => (string)$record['evidence_record_id'],
                 ':version_no' => max(1, (int)($input['version_no'] ?? 1)),
-                ':amendment_no' => max(0, (int)($input['amendment_no'] ?? 0)),
-                ':source_change_order_id' => $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null),
+                ':amendment_no' => $amendmentNo,
+                ':source_version_id' => $sourceVersionId,
+                ':source_change_order_id' => $sourceChangeOrderId,
                 ':canonical_payload' => $this->json($input['canonical_payload'] ?? []),
                 ':package_hash_sha256' => (string)$package['package_hash_sha256'],
                 ':manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
@@ -147,14 +167,23 @@ final class EvidenceFinalizationService
         foreach (['original', 'canonical_payload', 'readable_snapshot', 'hash_signature_manifest'] as $role) {
             $artifact = is_array($package['artifacts'][$role] ?? null) ? $package['artifacts'][$role] : [];
             $artifacts[$role] = $db->queryOne(
-                "INSERT INTO evidence_artifacts
-                    (evidence_version_id, artifact_role, storage_adapter, storage_uri, size_bytes,
-                     sha256, is_required_for_final, idempotency_key, metadata)
-                 VALUES
-                    (CAST(:evidence_version_id AS uuid), :artifact_role, :storage_adapter, :storage_uri, :size_bytes,
-                     :sha256, true, :idempotency_key, CAST(:metadata AS jsonb))
-                 ON CONFLICT (evidence_version_id, artifact_role, sha256) DO UPDATE SET metadata = evidence_artifacts.metadata || EXCLUDED.metadata
-                 RETURNING *",
+                "WITH inserted AS (
+                    INSERT INTO evidence_artifacts
+                        (evidence_version_id, artifact_role, storage_adapter, storage_uri, size_bytes,
+                         sha256, is_required_for_final, idempotency_key, metadata)
+                    VALUES
+                        (CAST(:evidence_version_id AS uuid), :artifact_role, :storage_adapter, :storage_uri, :size_bytes,
+                         :sha256, true, :idempotency_key, CAST(:metadata AS jsonb))
+                    ON CONFLICT (evidence_version_id, artifact_role, sha256) DO NOTHING
+                    RETURNING *
+                 )
+                 SELECT * FROM inserted
+                 UNION ALL
+                 SELECT * FROM evidence_artifacts
+                  WHERE evidence_version_id = CAST(:evidence_version_id AS uuid)
+                    AND artifact_role = :artifact_role
+                    AND sha256 = :sha256
+                 LIMIT 1",
                 [
                     ':evidence_version_id' => (string)$version['evidence_version_id'],
                     ':artifact_role' => $role,
@@ -175,18 +204,23 @@ final class EvidenceFinalizationService
 
         $publicationState = is_array($package['manifest']['publication_state'] ?? null) ? $package['manifest']['publication_state'] : [];
         $publication = $db->queryOne(
-            "INSERT INTO evidence_publications
-                (evidence_version_id, publication_target, publication_state, authority_role,
-                 source_package_hash_sha256, source_manifest_hash_sha256, publication_receipt, idempotency_key, metadata)
-             VALUES
-                (CAST(:evidence_version_id AS uuid), :publication_target, :publication_state, 'read_only_replica',
-                 :source_package_hash_sha256, :source_manifest_hash_sha256, CAST(:publication_receipt AS jsonb),
-                 :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (evidence_version_id, publication_target) DO UPDATE SET
-                 publication_state = EXCLUDED.publication_state,
-                 publication_receipt = EXCLUDED.publication_receipt,
-                 updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO evidence_publications
+                    (evidence_version_id, publication_target, publication_state, authority_role,
+                     source_package_hash_sha256, source_manifest_hash_sha256, publication_receipt, idempotency_key, metadata)
+                VALUES
+                    (CAST(:evidence_version_id AS uuid), :publication_target, :publication_state, 'read_only_replica',
+                     :source_package_hash_sha256, :source_manifest_hash_sha256, CAST(:publication_receipt AS jsonb),
+                     :idempotency_key, CAST(:metadata AS jsonb))
+                ON CONFLICT (evidence_version_id, publication_target) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM evidence_publications
+              WHERE evidence_version_id = CAST(:evidence_version_id AS uuid)
+                AND publication_target = :publication_target
+             LIMIT 1",
             [
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
                 ':publication_target' => $this->text($publicationState['target_type'] ?? 'sharepoint_graph') ?: 'sharepoint_graph',
@@ -206,6 +240,10 @@ final class EvidenceFinalizationService
                  updated_at = now(),
                  row_version = row_version + 1
              WHERE evidence_record_id = CAST(:evidence_record_id AS uuid)
+               AND (
+                   record_state <> 'finalized'
+                   OR current_version_id IS DISTINCT FROM CAST(:evidence_version_id AS uuid)
+               )
              RETURNING *",
             [
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
@@ -265,16 +303,22 @@ final class EvidenceFinalizationService
                 ?? hash('sha256', (string)$version['evidence_version_id'] . '|signature|' . $index . '|' . $signatureHash);
 
             $row = $db->queryOne(
-                "INSERT INTO signature_events
-                    (signed_object_type, signed_object_id, signed_object_version, signer_user_id, signer_ref,
-                     signer_role, signature_meaning, signature_state, signed_payload_hash_sha256,
-                     signature_hash_sha256, signed_at, idempotency_key, metadata)
-                 VALUES
-                    ('evidence_version', :signed_object_id, :signed_object_version, CAST(:signer_user_id AS uuid), :signer_ref,
-                     :signer_role, :signature_meaning, :signature_state, :signed_payload_hash_sha256,
-                     :signature_hash_sha256, CAST(:signed_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
-                 ON CONFLICT (idempotency_key) DO UPDATE SET metadata = signature_events.metadata || EXCLUDED.metadata
-                 RETURNING *",
+                "WITH inserted AS (
+                    INSERT INTO signature_events
+                        (signed_object_type, signed_object_id, signed_object_version, signer_user_id, signer_ref,
+                         signer_role, signature_meaning, signature_state, signed_payload_hash_sha256,
+                         signature_hash_sha256, signed_at, idempotency_key, metadata)
+                    VALUES
+                        ('evidence_version', :signed_object_id, :signed_object_version, CAST(:signer_user_id AS uuid), :signer_ref,
+                         :signer_role, :signature_meaning, :signature_state, :signed_payload_hash_sha256,
+                         :signature_hash_sha256, CAST(:signed_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
+                    ON CONFLICT (idempotency_key) DO NOTHING
+                    RETURNING *
+                 )
+                 SELECT * FROM inserted
+                 UNION ALL
+                 SELECT * FROM signature_events WHERE idempotency_key = :idempotency_key
+                 LIMIT 1",
                 [
                     ':signed_object_id' => (string)$version['evidence_version_id'],
                     ':signed_object_version' => $this->nullableText($version['version_no'] ?? null) ?? '1',

@@ -19,6 +19,7 @@ use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
+use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
 use MOM\Services\Publication\PublicationMonitorService;
@@ -49,20 +50,40 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $findings = (new RepoBoundaryScanner())->scanPaths([
             'HESEM_Security_Audit_Final.docx',
             'standards/templates/frm-000-master-template.xlsx',
+            '.ai/index.log',
+            '.vscode/launch.json',
+            'tools/php82/php.exe',
             'mom/data/registry/registry-manifest.json',
             'mom/data/audit/audit_2026-04.jsonl',
+            'mom/data/audit.log',
+            'mom/data/log-archive/README.md',
             'mom/data/online-forms/entries/FRM-208.json',
+            'mom/data/online-forms/schemas/_archive/FRM-208.json',
             'mom/data/ratelimit/login_127.0.0.1.json',
+            'mom/docs/forms/frm-500-production/.backups/FRM-511_Setup_and_First_Piece_Record.xlsx.v0.bak',
+            'mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx.bak',
+            'mom/ops/local-runtime/.php-server.log',
+            'mom/ops/local-runtime/docker-compose.yml',
             'mom/release/module-builder-ultra-round10-manifest-2026-04-08.json',
         ]);
 
-        $this->assertCount(6, $findings);
-        $this->assertSame('HESEM_Security_Audit_Final.docx', $findings[0]['path']);
-        $this->assertSame('mom/data/audit/audit_2026-04.jsonl', $findings[1]['path']);
-        $this->assertSame('mom/data/online-forms/entries/FRM-208.json', $findings[2]['path']);
-        $this->assertSame('mom/data/ratelimit/login_127.0.0.1.json', $findings[3]['path']);
-        $this->assertSame('mom/data/registry/registry-manifest.json', $findings[4]['path']);
-        $this->assertSame('mom/release/module-builder-ultra-round10-manifest-2026-04-08.json', $findings[5]['path']);
+        $paths = array_column($findings, 'path');
+        $this->assertContains('.ai/index.log', $paths);
+        $this->assertContains('.vscode/launch.json', $paths);
+        $this->assertContains('tools/php82/php.exe', $paths);
+        $this->assertContains('HESEM_Security_Audit_Final.docx', $paths);
+        $this->assertContains('mom/data/audit.log', $paths);
+        $this->assertContains('mom/data/audit/audit_2026-04.jsonl', $paths);
+        $this->assertContains('mom/data/log-archive/README.md', $paths);
+        $this->assertContains('mom/data/online-forms/entries/FRM-208.json', $paths);
+        $this->assertContains('mom/data/online-forms/schemas/_archive/FRM-208.json', $paths);
+        $this->assertContains('mom/data/ratelimit/login_127.0.0.1.json', $paths);
+        $this->assertContains('mom/data/registry/registry-manifest.json', $paths);
+        $this->assertContains('mom/docs/forms/frm-500-production/.backups/FRM-511_Setup_and_First_Piece_Record.xlsx.v0.bak', $paths);
+        $this->assertContains('mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx.bak', $paths);
+        $this->assertContains('mom/ops/local-runtime/.php-server.log', $paths);
+        $this->assertContains('mom/release/module-builder-ultra-round10-manifest-2026-04-08.json', $paths);
+        $this->assertNotContains('mom/ops/local-runtime/docker-compose.yml', $paths);
     }
 
     public function testReleaseGovernanceBuilderCreatesDeterministicManifestAndReceipts(): void
@@ -284,6 +305,51 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('publication.retry', $db->executeCalls[0]['params'][':handler_key']);
     }
 
+    public function testPublicationMonitorEnforcesStateMachineBeforeQueueingActions(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'evidence_publication_id' => '00000000-0000-0000-0000-000000000011',
+            'publication_state' => 'published',
+            'metadata' => '{"change_order_state":"approved"}',
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('change_authority_required');
+
+        (new PublicationMonitorService($db))->queueAction(
+            '00000000-0000-0000-0000-000000000011',
+            'withdraw',
+            'qa.user',
+            'Invalid test withdrawal',
+            'withdraw-1',
+        );
+    }
+
+    public function testPublicationMonitorAllowsReleasedChangeSupersessionAction(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'evidence_publication_id' => '00000000-0000-0000-0000-000000000012',
+            'publication_state' => 'published',
+            'metadata' => '{"change_order_state":"released"}',
+        ];
+
+        $result = (new PublicationMonitorService($db))->queueAction(
+            '00000000-0000-0000-0000-000000000012',
+            'supersede',
+            'qa.user',
+            'Superseded by released package.',
+            'supersede-1',
+        );
+
+        $this->assertTrue($result['queued']);
+        $this->assertSame('publication.supersede', $db->executeCalls[0]['params'][':handler_key']);
+        $payload = json_decode((string)$db->executeCalls[0]['params'][':payload'], true);
+        $this->assertSame('superseded', $payload['target_publication_state']);
+    }
+
+
     public function testPeriodicEvaluationServiceSchedulesAuthoritativeReviewRows(): void
     {
         $db = new CanonicalOutboxFakeDb();
@@ -446,6 +512,33 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringNotContainsString('docs_custom.json', $sql);
     }
 
+    public function testDocumentReadAcknowledgementAndSupersessionUseCanonicalLedgers(): void
+    {
+        $db = new DocumentFormControlFakeDb();
+        $service = new DocumentRevisionCommandService($db);
+
+        $ack = $service->acknowledgeRead([
+            'doc_revision_id' => '00000000-0000-0000-0000-000000000901',
+            'actor_ref' => 'operator-1',
+            'idempotency_key' => 'ack-1',
+        ], 'operator-1');
+
+        $superseded = $service->supersedeRevision([
+            'doc_revision_id' => '00000000-0000-0000-0000-000000000901',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000902',
+            'superseded_by_doc_revision_id' => '00000000-0000-0000-0000-000000000903',
+        ], 'qa-1');
+
+        $this->assertSame('canonical_document_control', $ack['authority']);
+        $this->assertSame('DOCACK-1', $ack['read_acknowledgement']['doc_read_acknowledgement_id']);
+        $this->assertSame('DOCREV-1', $superseded['doc_revision']['doc_revision_id']);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('doc_read_acknowledgements', $sql);
+        $this->assertStringContainsString("distribution_state = 'complete'", $sql);
+        $this->assertStringContainsString("lifecycle_state = 'superseded'", $sql);
+        $this->assertStringContainsString("distribution_state = 'superseded'", $sql);
+    }
+
     public function testFormIssuanceCommandServicePersistsIssuanceAndSubmissionAttemptWithoutLegacySchemas(): void
     {
         $db = new DocumentFormControlFakeDb();
@@ -469,7 +562,13 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'attempt_state' => 'valid',
             'submitted_by_ref' => 'operator-1',
             'original_hash_sha256' => str_repeat('c', 64),
+            'canonical_payload_hash_sha256' => str_repeat('d', 64),
             'parsed_payload' => ['result' => 'pass'],
+            'validation_errors' => [[
+                'severity' => 'info',
+                'error_code' => 'schema_ok',
+                'message' => 'Schema matched issued version.',
+            ]],
         ], 'operator-1');
 
         $this->assertSame('canonical_form_control', $issuance['authority']);
@@ -477,9 +576,15 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame($schemaVersionId, $issuance['version_semantics']['schema_version_id']);
         $this->assertSame('FRMISS-1', $issuance['issuance']['frm_issuance_id']);
         $this->assertSame('FRMATT-1', $attempt['submission_attempt']['frm_submission_attempt_id']);
+        $this->assertSame('passed', $attempt['validation_result']['validation_state']);
+        $this->assertNotEmpty($attempt['validation_errors']);
+        $this->assertNotEmpty($attempt['duplicate_detection_fingerprints']);
         $sql = $db->combinedSql();
         $this->assertStringContainsString('frm_issuances', $sql);
         $this->assertStringContainsString('frm_submission_attempts', $sql);
+        $this->assertStringContainsString('submission_validation_results', $sql);
+        $this->assertStringContainsString('submission_validation_errors', $sql);
+        $this->assertStringContainsString('duplicate_detection_fingerprints', $sql);
         $this->assertStringNotContainsString('form_schemas', $sql);
         $this->assertStringNotContainsString('record_counters.json', $sql);
     }
@@ -576,9 +681,54 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertTrue($db->sawSignatureEventInsert);
             $this->assertTrue($db->sawRetentionLockInsert);
             $this->assertGreaterThanOrEqual(9, count($db->queryOneCalls));
+            $sql = $db->combinedSql();
+            $this->assertStringContainsString('ON CONFLICT (package_hash_sha256) DO NOTHING', $sql);
+            $this->assertStringContainsString('ON CONFLICT (evidence_version_id, artifact_role, sha256) DO NOTHING', $sql);
+            $this->assertStringContainsString('ON CONFLICT (idempotency_key) DO NOTHING', $sql);
+            $this->assertStringContainsString('ON CONFLICT (evidence_version_id, publication_target) DO NOTHING', $sql);
+            $this->assertStringContainsString('ON CONFLICT (object_type, object_id, lock_type) WHERE lock_state =', $sql);
+            $this->assertStringNotContainsString('metadata = evidence_versions.metadata || EXCLUDED.metadata', $sql);
+            $this->assertStringNotContainsString('metadata = evidence_artifacts.metadata || EXCLUDED.metadata', $sql);
+            $this->assertStringNotContainsString('metadata = signature_events.metadata || EXCLUDED.metadata', $sql);
         } finally {
             $this->removeTree($dir);
         }
+    }
+
+    public function testEvidenceAmendmentCreatesDraftVersionUnderReleasedChangeAuthority(): void
+    {
+        $db = new EvidenceAmendmentFakeDb();
+        $result = (new EvidenceAmendmentService($db))->createAmendment([
+            'source_evidence_version_id' => '00000000-0000-0000-0000-000000000601',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000602',
+            'evidence_record_id' => 'EVREC-1',
+            'field_paths' => ['canonical_payload.result'],
+            'canonical_payload' => ['result' => 'amended'],
+            'idempotency_key' => 'amend-1',
+        ], 'qa-1');
+
+        $this->assertSame('canonical_evidence_control', $result['authority']);
+        $this->assertFalse($result['source_version_edited']);
+        $this->assertSame('EVVER-AMEND-1', $result['amendment_version']['evidence_version_id']);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('co.status =', $sql);
+        $this->assertStringContainsString('INSERT INTO evidence_versions', $sql);
+        $this->assertStringContainsString('source_version_id', $sql);
+        $this->assertStringNotContainsString('UPDATE evidence_versions', $sql);
+    }
+
+    public function testEvidenceAmendmentBlocksWithoutReleasedChangeAuthority(): void
+    {
+        $db = new EvidenceAmendmentFakeDb(false);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('evidence_amendment_change_authority_not_verified');
+
+        (new EvidenceAmendmentService($db))->createAmendment([
+            'source_evidence_version_id' => '00000000-0000-0000-0000-000000000601',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000602',
+            'field_paths' => ['canonical_payload.result'],
+        ], 'qa-1');
     }
 
     public function testCanonicalEvidenceReadServiceReturnsRecordVersionArtifactSignatureAndPublicationPackage(): void
@@ -910,6 +1060,13 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('process', $fact['from_object_type']);
         $this->assertSame('routing', $fact['to_object_type']);
         $this->assertTrue($db->sawProjectionWrite);
+        $snapshotCalls = array_filter(
+            $db->queryOneCalls,
+            static fn(array $call): bool => str_contains($call['sql'], 'as_manufactured_snapshots'),
+        );
+        $this->assertNotEmpty($snapshotCalls);
+        $snapshotCall = array_values($snapshotCalls)[0];
+        $this->assertSame('routing', $snapshotCall['params'][':subject_type']);
     }
 
     public function testGenealogyOntologyMigrationMatchesRuntimeNodeTypes(): void
@@ -931,6 +1088,14 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame(str_repeat('a', 64), $thread['graph_hash_sha256']);
         $this->assertNotEmpty($thread['edges']);
         $this->assertSame('material', $thread['edges'][0]['from_node_type']);
+    }
+
+    public function testAsManufacturedThreadAcceptsExpandedDigitalThreadSubjectTypes(): void
+    {
+        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('process', 'PROC-OP10');
+
+        $this->assertSame('process', $thread['subject_type']);
+        $this->assertSame('PROC-OP10', $thread['subject_id']);
     }
 
     private function removeTree(string $dir): void
@@ -1051,6 +1216,27 @@ final class DocumentFormControlFakeDb
         if (str_starts_with($trimmed, 'INSERT INTO doc_distributions')) {
             return ['doc_distribution_id' => 'DOCDIST-1', 'doc_revision_id' => (string)$params[':doc_revision_id']];
         }
+        if (str_starts_with($trimmed, 'INSERT INTO doc_read_acknowledgements')) {
+            return [
+                'doc_read_acknowledgement_id' => 'DOCACK-1',
+                'doc_revision_id' => (string)$params[':doc_revision_id'],
+                'actor_ref' => (string)$params[':actor_ref'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'UPDATE doc_distributions')) {
+            return [
+                'doc_distribution_id' => 'DOCDIST-1',
+                'doc_revision_id' => (string)$params[':doc_revision_id'],
+                'distribution_state' => str_contains($trimmed, "distribution_state = 'superseded'") ? 'superseded' : 'complete',
+            ];
+        }
+        if (str_starts_with($trimmed, 'UPDATE doc_revisions')) {
+            return [
+                'doc_revision_id' => 'DOCREV-1',
+                'lifecycle_state' => 'superseded',
+                'source_change_order_id' => (string)$params[':source_change_order_id'],
+            ];
+        }
         if (str_starts_with($trimmed, 'INSERT INTO frm_issuances')) {
             return [
                 'frm_issuance_id' => 'FRMISS-1',
@@ -1064,6 +1250,27 @@ final class DocumentFormControlFakeDb
                 'frm_submission_attempt_id' => 'FRMATT-1',
                 'frm_issuance_id' => (string)$params[':frm_issuance_id'],
                 'attempt_state' => (string)$params[':attempt_state'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO submission_validation_results')) {
+            return [
+                'submission_validation_result_id' => 'VAL-1',
+                'frm_submission_attempt_id' => (string)$params[':frm_submission_attempt_id'],
+                'validation_state' => (string)$params[':validation_state'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO submission_validation_errors')) {
+            return [
+                'submission_validation_error_id' => 'VALERR-1',
+                'submission_validation_result_id' => (string)$params[':submission_validation_result_id'],
+                'error_code' => (string)$params[':error_code'],
+            ];
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO duplicate_detection_fingerprints')) {
+            return [
+                'duplicate_detection_fingerprint_id' => 'DUP-1',
+                'fingerprint_scope' => (string)$params[':fingerprint_scope'],
+                'fingerprint_type' => (string)$params[':fingerprint_type'],
             ];
         }
         return [];
@@ -1182,8 +1389,8 @@ final class GenealogyGraphFakeDb
         if (str_contains($sql, 'FROM as_manufactured_snapshots')) {
             return [[
                 'as_manufactured_snapshot_id' => '00000000-0000-0000-0000-000000000501',
-                'subject_type' => 'work_order',
-                'subject_ref' => 'WO-1',
+                'subject_type' => (string)($params[':subject_type'] ?? 'work_order'),
+                'subject_ref' => (string)($params[':subject_id'] ?? 'WO-1'),
                 'snapshot_state' => 'current',
                 'snapshot_hash_sha256' => str_repeat('a', 64),
                 'snapshot_payload' => '{}',
@@ -1223,19 +1430,19 @@ final class EvidenceFinalizationFakeDb
     public function queryOne(string $sql, array $params = []): array
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
-        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_records')) {
+        if (str_contains($sql, 'INSERT INTO evidence_records')) {
             return ['evidence_record_id' => 'EVREC-1', 'evidence_key' => (string)$params[':evidence_key'], 'record_state' => 'open'];
         }
-        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_versions')) {
+        if (str_contains($sql, 'INSERT INTO evidence_versions')) {
             return ['evidence_version_id' => 'EVVER-1', 'evidence_record_id' => (string)$params[':evidence_record_id'], 'version_state' => 'locked'];
         }
-        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_artifacts')) {
+        if (str_contains($sql, 'INSERT INTO evidence_artifacts')) {
             return ['evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'], 'artifact_role' => (string)$params[':artifact_role']];
         }
-        if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_publications')) {
+        if (str_contains($sql, 'INSERT INTO evidence_publications')) {
             return ['evidence_publication_id' => 'PUB-1', 'publication_state' => (string)$params[':publication_state']];
         }
-        if (str_starts_with(ltrim($sql), 'INSERT INTO signature_events')) {
+        if (str_contains($sql, 'INSERT INTO signature_events')) {
             $this->sawSignatureEventInsert = true;
             return [
                 'signature_event_id' => 'SIG-1',
@@ -1245,7 +1452,7 @@ final class EvidenceFinalizationFakeDb
                 'signature_hash_sha256' => (string)$params[':signature_hash_sha256'],
             ];
         }
-        if (str_starts_with(ltrim($sql), 'INSERT INTO retention_locks')) {
+        if (str_contains($sql, 'INSERT INTO retention_locks')) {
             $this->sawRetentionLockInsert = true;
             return [
                 'retention_lock_id' => 'RET-1',
@@ -1259,6 +1466,79 @@ final class EvidenceFinalizationFakeDb
             return ['evidence_record_id' => 'EVREC-1', 'current_version_id' => (string)$params[':evidence_version_id'], 'record_state' => 'finalized'];
         }
         return [];
+    }
+
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
+    }
+}
+
+final class EvidenceAmendmentFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryCalls = [];
+
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    public function __construct(private readonly bool $authorityVerified = true)
+    {
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        $this->queryCalls[] = ['sql' => $sql, 'params' => $params];
+        if (!$this->authorityVerified) {
+            return [];
+        }
+
+        return [[
+            'plm_change_order_id' => (string)$params[':change_order_id'],
+            'change_order_number' => 'CO-EV-AMEND',
+            'status' => 'released',
+            'object_type' => 'evidence_version',
+            'object_id' => (string)$params[':source_evidence_version_id'],
+            'affected_fields' => '{canonical_payload.result}',
+        ]];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'INSERT INTO evidence_versions')) {
+            return [
+                'evidence_version_id' => 'EVVER-AMEND-1',
+                'version_state' => 'draft',
+                'source_version_id' => (string)$params[':source_evidence_version_id'],
+                'source_change_order_id' => (string)$params[':source_change_order_id'],
+            ];
+        }
+        return [];
+    }
+
+    public function combinedSql(): string
+    {
+        $calls = array_merge($this->queryCalls, $this->queryOneCalls);
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $calls,
+        ));
     }
 }
 

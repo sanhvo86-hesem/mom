@@ -5,7 +5,7 @@ This directory is the explicit semantic layer between:
 - storage authority in `database/migrations/*.sql`
 - generated runtime registry in `mom/data/registry/*.json`
 
-Tranche 13 correction, 2026-04-14: this directory's authored business-contract bundle is present, and a bootstrap runtime registry now exists in the checked-in `mom/data/registry` path consumed by the application. The generated bootstrap table registry is structural and may be skeletal for domains/columns, so runtime registry consumers overlay the authored `mom/contracts/table-registry.json` metadata until full publication produces a complete runtime artifact. That bootstrap is not full publication truth: required publication artifacts such as `endpoint-catalog.json`, `frontend-foundation-catalog.json`, workflow/wave policy files, and system-contract outputs remain unverified until the full publication pipeline runs successfully.
+Current correction, 2026-04-14: this directory's authored business-contract bundle is present, and the generated runtime registry layer is checked in under `mom/data/registry`, the path consumed by the application. Runtime registry consumers overlay authored `mom/contracts/table-registry.json` metadata when a runtime table-registry artifact is partial or skeletal. Do not treat contract bundle coverage or file presence alone as proof of release readiness; run `mom/tools/registry/verify_publication_truth.py` to verify artifact convergence and graphics release-blocker honesty for the current branch.
 
 Purpose:
 

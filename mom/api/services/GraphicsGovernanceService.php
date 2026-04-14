@@ -889,7 +889,7 @@ class GraphicsGovernanceService
                 'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
                 'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
-                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots',
+                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json',
                 'releaseBlocked' => $activeBlockers !== [],
                 'blockerCount' => count($activeBlockers),
                 'releaseBlockerCount' => count($activeBlockers),
@@ -1713,7 +1713,7 @@ class GraphicsGovernanceService
                 'multiSitePlantBrandingGovernanceRef' => 'mom/data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance',
                 'controlledEmergencyOverridePathRef' => 'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
-                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots',
+                'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json',
                 'releaseBlocked' => (bool)($blockers['summary']['releaseBlocked'] ?? false),
                 'blockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
                 'releaseBlockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
@@ -2527,28 +2527,28 @@ class GraphicsGovernanceService
     }
 
     /**
-     * @return array<int, array<string, string>>
+     * @return array<int, array<string, mixed>>
      */
     private function evidencePlanForSeverity(string $severity): array
     {
         $base = [
-            ['evidenceType' => 'impact-snapshot', 'required' => 'true', 'owner' => 'Frontend Platform'],
-            ['evidenceType' => 'rollback-plan', 'required' => 'true', 'owner' => 'Release Engineering'],
+            ['evidenceType' => 'impact-snapshot', 'required' => true, 'owner' => 'Frontend Platform'],
+            ['evidenceType' => 'rollback-plan', 'required' => true, 'owner' => 'Release Engineering'],
         ];
         if (in_array($severity, ['medium', 'high', 'regulated', 'shopfloor-critical'], true)) {
-            $base[] = ['evidenceType' => 'screenshot-diff', 'required' => 'true', 'owner' => 'UX QA'];
-            $base[] = ['evidenceType' => 'keyboard-focus-proof', 'required' => 'true', 'owner' => 'Accessibility QA'];
+            $base[] = ['evidenceType' => 'screenshot-diff', 'required' => true, 'owner' => 'UX QA'];
+            $base[] = ['evidenceType' => 'keyboard-focus-proof', 'required' => true, 'owner' => 'Accessibility QA'];
         }
         if (in_array($severity, ['high', 'regulated', 'shopfloor-critical'], true)) {
-            $base[] = ['evidenceType' => 'compliance-matrix-snapshot', 'required' => 'true', 'owner' => 'Design System Governance'];
-            $base[] = ['evidenceType' => 'drift-report', 'required' => 'true', 'owner' => 'Runtime Governance'];
+            $base[] = ['evidenceType' => 'compliance-matrix-snapshot', 'required' => true, 'owner' => 'Design System Governance'];
+            $base[] = ['evidenceType' => 'drift-report', 'required' => true, 'owner' => 'Runtime Governance'];
         }
         if ($severity === 'regulated') {
-            $base[] = ['evidenceType' => 'audit-traceability-pack', 'required' => 'true', 'owner' => 'Quality Systems'];
+            $base[] = ['evidenceType' => 'audit-traceability-pack', 'required' => true, 'owner' => 'Quality Systems'];
         }
         if ($severity === 'shopfloor-critical') {
-            $base[] = ['evidenceType' => 'shopfloor-kiosk-smoke', 'required' => 'true', 'owner' => 'MES Operations'];
-            $base[] = ['evidenceType' => 'touch-target-proof', 'required' => 'true', 'owner' => 'UX QA'];
+            $base[] = ['evidenceType' => 'shopfloor-kiosk-smoke', 'required' => true, 'owner' => 'MES Operations'];
+            $base[] = ['evidenceType' => 'touch-target-proof', 'required' => true, 'owner' => 'UX QA'];
         }
         return $base;
     }

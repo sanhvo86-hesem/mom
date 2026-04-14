@@ -52,7 +52,7 @@ class RegistryService
         }
 
         $runtimeRegistry = $this->readJsonFile($this->registryDir . '/' . $name . '.json');
-        if ($runtimeRegistry !== []) {
+        if ($runtimeRegistry !== [] && ($name !== 'table-registry' || $this->isUsableTableRegistry($runtimeRegistry))) {
             return $this->cache[$name] = $runtimeRegistry;
         }
 
@@ -66,6 +66,28 @@ class RegistryService
         }
 
         return $this->cache[$name] = [];
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     */
+    private function isUsableTableRegistry(array $registry): bool
+    {
+        $tables = is_array($registry['tables'] ?? null) ? $registry['tables'] : [];
+        if ($tables === []) {
+            return false;
+        }
+
+        foreach ($tables as $table) {
+            if (!is_array($table)) {
+                continue;
+            }
+            if (trim((string)($table['domain'] ?? '')) !== '' && !empty($table['columns']) && is_array($table['columns'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -105,6 +105,8 @@ Behavior:
 - Blank assignment does not create an open-to-all report path.
 - Response may include legacy task fields and compact task cards. The compact shape should preserve `target_id`, `wo_number`, `operation_seq`, `machine_id`, `equipment_id`, `work_center_id`, `shift_date`, `shift_code`, `target_quantity`, `reported_quantity`, `remaining_quantity`, and quality-gate status when available.
 - Mobile task completion persists `result`, `qty_completed`, `qty_scrap`, `quantity_completed`, `quantity_scrap`, and `completion_reason_code` on the existing mobile work queue snapshot. Non-`pass` outcomes and any scrap require a structured reason code; `qty_scrap` may not exceed `qty_completed`.
+- Mobile task assignment, start, and completion append `mobile.task_assigned`, `mobile.task_started`, and `mobile.task_completed` records to `mobile/task_events.json`; the queue row is the current snapshot.
+- Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
 - Mobile offline conflict resolution is owner-scoped. Supervisor/admin-style override requires explicit override reason and is audited.
 
 ## Production report
@@ -221,6 +223,7 @@ Validation rules:
 - `pass_fail` must be `pass`, `fail`, or `conditional`.
 - `overall_result` must be `pass`, `fail`, or `conditional`; it is derived from measurements when possible.
 - Offline capture requires a replay key: `client_capture_id` or `idempotency_key`.
+- The controller forwards replay identity fields: `capture_id`, `client_capture_id`, `client_record_id`, `idempotency_key`, and `captured_at`.
 - Exact replay returns the existing fact; conflicting replay under the same client/idempotency key is rejected.
 
 Storage behavior:
@@ -273,8 +276,8 @@ Rules:
 - Feedback write is idempotent.
 - Feedback is advisory analytics data only and cannot mutate dispatch or execution state.
 - Critical prediction recommendation records remain `pending` and carry `advisory_only: true`, `execution_authority: false`, and `requires_human_approval: true`. They may point a human to quality, maintenance, tooling, or planning review, but they do not create NCRs, maintenance work, tool orders, schedule moves, or machine commands.
-- AI model list and dashboard endpoints require AI read roles. Model config, metadata, and training source fields are only returned to admin roles.
-- Dashboard prediction metrics are plant-scoped where plant context is available, including mean time to action.
+- AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard endpoints require AI read roles. Model config, metadata, and training source fields are only returned to admin roles.
+- Dashboard prediction and schedule metrics are plant-scoped where plant context is available, including mean time to action.
 
 ## AI natural-language query
 

@@ -44,16 +44,26 @@ final class RetentionLockService
         $idempotencySeed = $this->nullableText($input['idempotency_key'] ?? null) ?? $recordId . '|' . $versionId;
 
         $row = $this->db->queryOne(
-            "INSERT INTO retention_locks
-                (object_type, object_id, lock_type, lock_state, locked_until, disposition_after,
-                 reason, created_by_user_id, idempotency_key, metadata)
-             VALUES
-                ('evidence_record', :object_id, :lock_type, 'active', CAST(:locked_until AS timestamptz),
-                 :disposition_after, :reason, CAST(:created_by_user_id AS uuid), :idempotency_key,
-                 CAST(:metadata AS jsonb))
-             ON CONFLICT (object_type, object_id, lock_type) WHERE lock_state = 'active'
-             DO UPDATE SET metadata = retention_locks.metadata || EXCLUDED.metadata, updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO retention_locks
+                    (object_type, object_id, lock_type, lock_state, locked_until, disposition_after,
+                     reason, created_by_user_id, idempotency_key, metadata)
+                VALUES
+                    ('evidence_record', :object_id, :lock_type, 'active', CAST(:locked_until AS timestamptz),
+                     :disposition_after, :reason, CAST(:created_by_user_id AS uuid), :idempotency_key,
+                     CAST(:metadata AS jsonb))
+                ON CONFLICT (object_type, object_id, lock_type) WHERE lock_state = 'active'
+                DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM retention_locks
+              WHERE object_type = 'evidence_record'
+                AND object_id = :object_id
+                AND lock_type = :lock_type
+                AND lock_state = 'active'
+             LIMIT 1",
             [
                 ':object_id' => $recordId,
                 ':lock_type' => $lockType,

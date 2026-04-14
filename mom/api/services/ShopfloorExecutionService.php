@@ -421,10 +421,19 @@ final class ShopfloorExecutionService
     public function assertReportActorCanSubmit(array $target, string $actorId, bool $hasPlannerOverride, array $context = []): ?array
     {
         $assignedOperator = $this->stringValue($target['operator_id'] ?? '');
+        $actorAliases = [$actorId];
+        foreach ((array)($context['actor_aliases'] ?? []) as $alias) {
+            $aliasValue = $this->stringValue($alias);
+            if ($aliasValue !== '') {
+                $actorAliases[] = $aliasValue;
+            }
+        }
+        $actorAliases = array_values(array_unique($actorAliases));
+
         if ($assignedOperator === '' && !$hasPlannerOverride) {
             throw new RuntimeException('missing_operator_assignment');
         }
-        if ($assignedOperator !== '' && $assignedOperator !== $actorId && !$hasPlannerOverride) {
+        if ($assignedOperator !== '' && !in_array($assignedOperator, $actorAliases, true) && !$hasPlannerOverride) {
             throw new RuntimeException('forbidden_operator_assignment');
         }
 
@@ -2113,7 +2122,7 @@ final class ShopfloorExecutionService
         if ($sheet === null) {
             return false;
         }
-        $status = strtolower($this->stringValue($sheet['status'] ?? $sheet['approval_status'] ?? 'released'));
+        $status = strtolower($this->stringValue($sheet['status'] ?? $sheet['approval_status'] ?? 'draft'));
 
         return in_array($status, ['released', 'approved', 'active'], true);
     }

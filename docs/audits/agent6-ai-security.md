@@ -1,6 +1,13 @@
 # Agent 6 - AI / Analytics / Security / Reliability / DevEx
 
-Branch audited: `codex/worldclass-reaudit-20260414-102059`
+Branch audited: `codex/worldclass-reaudit-20260414-122702`
+
+## 2026-04-14 Current-Pass Addendum
+
+- Confirmed P1 AI least-privilege gap: legacy prediction/SPC/tool-wear/dashboard reads only required authentication. Remediation adds AI read-role gates.
+- Confirmed P2 AI feedback mutation gap: prediction feedback could influence advisory confidence with read-only access. Remediation introduces feedback roles and requires them for feedback submission.
+- Confirmed P2 dashboard scoping gap: combined AI schedule metrics counted all plants. Remediation scopes DB and JSON fallback schedule metrics by plant where plant context exists.
+- Deferred: generic NLQ plant scoping remains blocked by relation-specific scope-column mapping.
 
 ## Findings
 

@@ -624,8 +624,15 @@ final class OrderService
         if ($this->findOrderRecord($store, 'wo', $woNumber) !== null) {
             throw new RuntimeException("Work Order {$woNumber} already exists.");
         }
-        if ($this->findOrderRecord($store, 'jo', $joNumber) === null) {
+        $parentJo = $this->findOrderRecord($store, 'jo', $joNumber);
+        if ($parentJo === null) {
             throw new RuntimeException("Parent Job Order {$joNumber} not found.");
+        }
+        $parentStatus = strtolower(trim((string)($parentJo['status'] ?? 'planned')));
+        if (!in_array($parentStatus, ['planned', 'released', 'active'], true)) {
+            throw new RuntimeException(
+                "Job Order {$joNumber} is not eligible for Work Order creation; current status: {$parentStatus}."
+            );
         }
         $woStatus = strtolower(trim((string)($wo['status'] ?? 'scheduled')));
         if (!in_array($woStatus, self::WO_STATUSES, true)) {

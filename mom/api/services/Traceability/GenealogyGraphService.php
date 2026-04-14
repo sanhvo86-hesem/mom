@@ -247,6 +247,7 @@ final class GenealogyGraphService
         if ($subjectType === '' || $subjectId === '') {
             throw new RuntimeException('genealogy_subject_required');
         }
+        $subjectType = $this->nodeType($subjectType);
 
         $snapshotRows = $this->db->query(
             "SELECT *
@@ -593,7 +594,7 @@ final class GenealogyGraphService
 
     private function snapshotSubjectType(string $type): string
     {
-        return in_array($type, ['job', 'work_order', 'lot', 'serial', 'shipment'], true) ? $type : '';
+        return $this->nodeType($type);
     }
 
     private function normalizeDb(?object $db): ?object

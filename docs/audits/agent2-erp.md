@@ -1,6 +1,12 @@
 # Agent 2 - ERP / Planning / Lifecycle Governance
 
-Branch audited: `codex/worldclass-reaudit-20260414-102059`
+Branch audited: `codex/worldclass-reaudit-20260414-122702`
+
+## 2026-04-14 Current-Pass Addendum
+
+- Confirmed P1 planning lifecycle gap: work orders could be created under terminal parent job orders. Remediation in this pass blocks WO creation unless the parent JO is `planned`, `released`, or `active`.
+- Confirmed P2 planning data-quality gap: JO quantity and date inputs, plus WO operation/setup/run estimates, needed stricter validation. Remediation in this pass adds positive/non-negative and date-format checks in the order API.
+- Deferred: active-hold lifecycle policy remains blocked by the need for a hold-category matrix across SO/JO/WO transition types.
 
 ## Findings
 

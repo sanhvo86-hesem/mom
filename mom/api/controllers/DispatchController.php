@@ -167,6 +167,54 @@ class DispatchController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    /**
+     * @return list<string>
+     */
+    private function dispatchActorIdentifiers(array $user): array
+    {
+        $ids = [];
+        foreach (['employee_id', 'username', 'user', 'user_id', 'id'] as $field) {
+            $value = trim((string)($user[$field] ?? ''));
+            if ($value !== '') {
+                $ids[] = $value;
+            }
+        }
+
+        $username = $this->userId($user);
+        $usersFile = $this->confDir . '/users.json';
+        $usersMap = $this->readJsonFile($usersFile);
+        if (is_array($usersMap)) {
+            foreach ($usersMap as $entry) {
+                if (!is_array($entry) || (string)($entry['username'] ?? '') !== $username) {
+                    continue;
+                }
+                foreach (['employee_id', 'user_id', 'id'] as $field) {
+                    $value = trim((string)($entry[$field] ?? ''));
+                    if ($value !== '') {
+                        $ids[] = $value;
+                    }
+                }
+            }
+        }
+
+        $ids[] = $username;
+        return array_values(array_unique(array_filter($ids, static fn(string $id): bool => $id !== '')));
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    private function dispatchExecutionActorId(array $user, array $target): string
+    {
+        $assigned = trim((string)($target['operator_id'] ?? ''));
+        if ($assigned !== '' && in_array($assigned, $this->dispatchActorIdentifiers($user), true)) {
+            return $assigned;
+        }
+
+        $ids = $this->dispatchActorIdentifiers($user);
+        return $ids[0] ?? $this->userId($user);
+    }
+
     private function sessionPlantScope(): string
     {
         return trim((string)($_SESSION['org_plant_id'] ?? $_SESSION['plant_id'] ?? $_SESSION['org_id'] ?? ''));
@@ -488,15 +536,16 @@ class DispatchController extends BaseController
         $this->requireDispatchOperatorAccess($user);
 
         $currentUserId = $this->userId($user);
-        $operatorId    = trim((string)($this->query('operator_id') ?? $currentUserId));
-        if ($operatorId === '') {
-            $operatorId = $currentUserId;
-        }
+        $actorIds = $this->dispatchActorIdentifiers($user);
+        $requestedOperatorId = trim((string)($this->query('operator_id') ?? ''));
+        $operatorId = $requestedOperatorId !== '' ? $requestedOperatorId : ($actorIds[0] ?? $currentUserId);
         // PROC-017: Validate operator_id format to prevent injection attacks
         if (!preg_match('/^[a-zA-Z0-9_\-\.@]{1,128}$/', $operatorId)) {
-            $operatorId = $currentUserId; // fallback to self
+            $operatorId = $actorIds[0] ?? $currentUserId; // fallback to self
         }
-        if ($operatorId !== $currentUserId && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
+        $selfLookup = $requestedOperatorId === '';
+        $operatorLookupIds = $selfLookup ? $actorIds : [$operatorId];
+        if (!$selfLookup && !in_array($operatorId, $actorIds, true) && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
             $this->error('forbidden', 403);
         }
 
@@ -535,7 +584,7 @@ class DispatchController extends BaseController
                 if (!in_array($status, ['dispatched', 'in_progress', 'completed'], true)) {
                     continue;
                 }
-                if (($t['operator_id'] ?? '') === $operatorId && ($t['shift_date'] ?? '') === $date) {
+                if (in_array((string)($t['operator_id'] ?? ''), $operatorLookupIds, true) && ($t['shift_date'] ?? '') === $date) {
                     // P1: Verify target belongs to current plant if plant_id is available
                     if ($plantId !== '' && $this->targetPlantScope($t) !== $plantId) {
                         continue;
@@ -552,7 +601,7 @@ class DispatchController extends BaseController
             }
 
             // P1: Return 403 if trying to access an operator outside current plant
-            if ($operatorId !== $currentUserId && $plantId !== '' && !$operatorFound) {
+            if (!$selfLookup && !in_array($operatorId, $actorIds, true) && $plantId !== '' && !$operatorFound) {
                 $this->error('forbidden', 403);
             }
 
@@ -573,6 +622,7 @@ class DispatchController extends BaseController
 
             $this->success([
                 'operator_id' => $operatorId,
+                'operator_aliases' => $selfLookup ? $actorIds : [],
                 'date'        => $date,
                 'shift_code'  => $shiftCode,
                 'tasks'       => $myTasks,
@@ -724,14 +774,16 @@ class DispatchController extends BaseController
 
             if (!$target) $this->error('target_not_found', 404);
 
-            // P4: Verify the authenticated operator matches the target's assigned operator
             $hasPlannerOverride = $this->userHasAnyRole($user, $this->dispatchWriteRoles());
-            if (!$hasPlannerOverride && ($target['operator_id'] ?? '') !== $uid) {
+            $actorIds = $this->dispatchActorIdentifiers($user);
+            if (!$hasPlannerOverride && !in_array((string)($target['operator_id'] ?? ''), $actorIds, true)) {
                 $this->error('forbidden', 403);
             }
+            $executionActorId = $this->dispatchExecutionActorId($user, $target);
 
             $this->shopfloor()->assertProductionReportGovernance($body, $target, $hasPlannerOverride, $now);
-            $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $uid, $hasPlannerOverride, [
+            $entitlement = $this->shopfloor()->assertReportActorCanSubmit($target, $executionActorId, $hasPlannerOverride, [
+                'actor_aliases' => $actorIds,
                 'action' => 'dispatch.report_production',
                 'request_id' => trim((string)($body['client_report_id'] ?? $body['idempotency_key'] ?? '')),
                 'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
@@ -772,7 +824,7 @@ class DispatchController extends BaseController
                 }
             }
 
-            $log = $this->shopfloor()->buildProductionLog($body, $target, $previousLog, $uid, $now, $hasPlannerOverride);
+            $log = $this->shopfloor()->buildProductionLog($body, $target, $previousLog, $executionActorId, $now, $hasPlannerOverride);
 
             $replayedLog = $this->shopfloor()->replayProductionLogForIdempotency($log, $logs, $events);
             if ($replayedLog !== null) {

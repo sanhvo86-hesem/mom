@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T05:25:47.940Z",
+    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "publication_truth": {
+    "scope": "platform_global",
+    "truth_model": "global_canonical_plus_slice_summary",
+    "publishability": {
+      "ready": false,
+      "blockedBy": [
+        "graphics_release_blockers_active"
+      ]
+    },
+    "releaseReadinessState": "blocked-by-graphics-governance"
+  }
+}
