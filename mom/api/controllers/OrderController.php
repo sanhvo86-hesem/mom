@@ -294,6 +294,12 @@ class OrderController extends BaseController
         try {
             $allItems = $this->orderService()->listSalesOrders($filters);
             $total    = count($allItems);
+
+            // Protect against large result sets that could cause memory exhaustion
+            if ($total > 10000) {
+                $this->error('result_set_too_large', 400, 'Result set contains too many items. Please add filters to narrow the results to fewer than 10,000 items.');
+            }
+
             $items    = array_slice($allItems, $offset, $limit);
 
             $this->paginated('sales_orders', array_values($items), $total, $offset, $limit);
@@ -380,6 +386,12 @@ class OrderController extends BaseController
         try {
             $allItems = $this->orderService()->listJobOrders($soNumber, $filters);
             $total    = count($allItems);
+
+            // Protect against large result sets that could cause memory exhaustion
+            if ($total > 10000) {
+                $this->error('result_set_too_large', 400, 'Result set contains too many items. Please add filters to narrow the results to fewer than 10,000 items.');
+            }
+
             $items    = array_slice($allItems, $offset, $limit);
 
             $this->paginated('job_orders', array_values($items), $total, $offset, $limit);

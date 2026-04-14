@@ -1,6 +1,6 @@
 # World-Class Gap Scorecard
 
-Audited branch: `codex/worldclass-reaudit-20260414-080436`
+Audited branch: `codex/worldclass-closure-20260414-0807`
 
 Date: 2026-04-14
 

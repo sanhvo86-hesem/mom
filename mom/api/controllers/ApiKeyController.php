@@ -69,7 +69,7 @@ class ApiKeyController extends BaseController
             'name'       => $name,
             'hash'       => $hashedKey,
             'scopes'     => is_array($scopes) ? $scopes : [$scopes],
-            'user_id'    => $body['user_id'] ?? 'api-service',
+            'user_id'    => $user['username'] ?? 'api-service',
             'active'     => true,
             'created_at' => gmdate('c'),
             'created_by' => $user['username'] ?? 'system',

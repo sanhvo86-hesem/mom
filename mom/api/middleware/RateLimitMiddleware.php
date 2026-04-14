@@ -305,6 +305,7 @@ class RateLimitMiddleware
     /**
      * Get the client IP address.
      * SEC-004 FIX (VERIFIED): Only trust X-Forwarded-For from validated trusted proxies.
+     * SECURITY FIX PIPE-RATELIMIT-002: Validate ALL IPs in the X-Forwarded-For chain.
      *
      * @return string
      */
@@ -330,9 +331,22 @@ class RateLimitMiddleware
         $forwarded = (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
         if ($forwarded !== '') {
             $ips = array_map('trim', explode(',', $forwarded));
-            $clientIp = $ips[0] ?? '';
-            if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
-                return $clientIp;
+
+            // SECURITY FIX PIPE-RATELIMIT-002: Validate ALL IPs in the chain, not just the first
+            // If any IP in the chain is invalid, fall back to REMOTE_ADDR
+            $validIps = [];
+            foreach ($ips as $ip) {
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $validIps[] = $ip;
+                } else {
+                    // Invalid IP in chain; reject the entire header
+                    return $remoteAddr;
+                }
+            }
+
+            // All IPs are valid; use the first one (client IP)
+            if (!empty($validIps)) {
+                return $validIps[0];
             }
         }
 

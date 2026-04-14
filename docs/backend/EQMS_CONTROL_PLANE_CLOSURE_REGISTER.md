@@ -34,6 +34,28 @@ This register is the backend closure ledger for the current world-class audit wa
 | Regulated audit sink had a duplicate JSONL authority in Postgres mode | `DataLayer::logEvent()` no longer writes JSONL when Postgres is active; JSONL remains only a non-Postgres migration fallback. |
 | Periodic evaluation had scheduling without closure evidence | `PeriodicEvaluationService::close()` now requires terminal state evidence: digest or audit-pack export for passed/failed, waiver signature for waived, and persists completion linkage. |
 
+## 2026-04-14 Closure Wave Re-Audit Remediation Evidence
+
+| Finding closed | Closure evidence |
+|---|---|
+| Runtime lanes under `mom/data` were still tracked as controlled source | Runtime artifacts for audit logs, online form entries/drafts, rate-limit files, dispatch/ERP/MES/order/passport/upload records, schema-studio workspaces, and backup/cache JSON were removed from the Git index with `git rm --cached`; `.gitignore` keeps them local-only. `RepoBoundaryScanner` now classifies those lanes as P1 if they re-enter tracked source. |
+| Release discipline was template-only | `ReleaseGovernanceBuilder` and `mom/tools/release/build_release_governance.php` now generate deterministic release manifests, promotion receipts, and reverse-sync intake payloads without writing transient artifacts into controlled source. |
+| Finalization carried signature metadata only in manifests | `EvidenceFinalizationService` now persists supplied `signature_events` against the locked `evidence_version`, using manifest/package hashes as the signed payload binding when caller-supplied hashes are absent. |
+| Legacy evidence reads looked authoritative | `CanonicalEvidenceReadService` and `GET /api/v1/eqms/evidence/package` expose canonical evidence record/version/artifact/signature/publication packages. Legacy `EvidenceController` read/search/verify responses now return `read_authority=legacy_compatibility_read_only` with canonical paths. |
+| Change request/order lifecycle diverged from the canonical state machine | `ChangeLifecycleCommandService` now uses `draft -> submitted -> triage -> approved_for_order` for CR and `draft -> impact_assessment -> in_review -> approved -> released -> implemented -> closed` for CO. Migration `114_world_class_closure_lifecycle_constraints.sql` aligns DB checks and maps old CR statuses. |
+| Resulting objects could be orphaned from affected objects | Resulting object persistence now resolves and stores `affected_object_id`; ambiguous/missing affected scope fails the command instead of creating a floating resulting object. |
+| WIP disposition, rollback, and emergency controls were schema-only in command paths | Change-order creation now persists `wip_dispositions`, `rollback_requirements`, and `emergency_change_controls`; release readiness consumes rollback/emergency rows as canonical sources. |
+| Genealogy unsupported node types silently became evidence records | `GenealogyGraphService` now validates node ontology before writes/projection and throws `unsupported_genealogy_node_type` for unknown types. |
+| Order workflow/status authority still allowed stale status sets | `WorkflowStatusAuthorityService` and `mom/tools/release/check_workflow_status_authority.php` now fail promotion when SO/JO/WO workflow tables reference legacy status sets. `table-registry.json` now uses `sales_order_status_runtime`, `job_order_status_runtime`, and `work_order_status_runtime` for SO, JO, `work_orders`, and singular MES `work_order`; migrations `115`-`120` map legacy aliases and add SO/JO/WO constraints. |
+
+Verification evidence:
+
+- `php -l` passed for changed control-plane, evidence, change-control, genealogy, route, controller, tool, and test files.
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit --filter 'WorldClassControlPlaneExecution|OrderWorkflowEngineeringReadiness|OrderServiceEngineeringGate|SecurityHardeningRegression' --testdox`: 44 tests, 224 assertions, passed.
+- `php mom/tools/release/check_repo_boundary.php`: P0/P1 clean, 33 P2 warnings.
+- `php mom/tools/release/build_release_governance.php --artifact=manifest --change-authority=CO-WORLDCLASS-CLOSURE`: emitted a valid release manifest hash.
+- `php mom/tools/release/check_workflow_status_authority.php`: workflow status authority clean.
+
 ## Accepted Waivers
 
 | Waiver | Severity | Owner | Review date | Rationale | Exit condition |

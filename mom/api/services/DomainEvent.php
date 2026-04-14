@@ -74,16 +74,34 @@ final class DomainEvent
         array $payload = [],
         array $metadata = []
     ) {
-        $this->eventId = sprintf('evt-%s-%s', gmdate('YmdHis'), bin2hex(random_bytes(4)));
+        // OPS-R6-005: Validate eventType, aggregateType, aggregateId
+        if (empty($aggregateType) || strlen($aggregateType) > 128) {
+            throw new \RuntimeException('invalid_aggregate_type');
+        }
+        if (empty($aggregateId) || strlen($aggregateId) > 256) {
+            throw new \RuntimeException('invalid_aggregate_id');
+        }
+
+        // OPS-R6-026: Increase entropy from 4 bytes to 8 bytes
+        $this->eventId = sprintf('evt-%s-%s', gmdate('YmdHis'), bin2hex(random_bytes(8)));
         $this->eventType = $eventType;
         $this->aggregateType = $aggregateType;
         $this->aggregateId = $aggregateId;
         $this->payload = $payload;
+
+        // OPS-R6-005: Whitelist metadata keys
+        $whitelistedMetadata = [];
+        foreach (['user_id', 'request_id', 'ip'] as $key) {
+            if (isset($metadata[$key])) {
+                $whitelistedMetadata[$key] = $metadata[$key];
+            }
+        }
+
         $this->metadata = array_merge([
             'user_id'    => $_SESSION['user'] ?? 'system',
             'ip'         => $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0',
             'request_id' => $_SERVER['HTTP_X_REQUEST_ID'] ?? null,
-        ], $metadata);
+        ], $whitelistedMetadata);
         $this->occurredAt = gmdate('c');
     }
 

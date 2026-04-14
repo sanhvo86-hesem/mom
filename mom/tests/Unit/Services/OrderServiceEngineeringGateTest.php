@@ -30,6 +30,7 @@ final class OrderServiceEngineeringGateTest extends TestCase
             'so_number' => 'SO-2026-0001',
             'status' => 'confirmed',
             'customer_name' => 'ACME',
+            'total_value' => 1,
             'created_at' => '2026-04-13T10:00:00+07:00',
         ]);
 
@@ -50,6 +51,7 @@ final class OrderServiceEngineeringGateTest extends TestCase
             'so_number' => 'SO-2026-0002',
             'status' => 'engineering_ready',
             'customer_name' => 'ACME',
+            'total_value' => 1,
             'created_at' => '2026-04-13T10:00:00+07:00',
         ]);
 

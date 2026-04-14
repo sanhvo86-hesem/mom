@@ -92,9 +92,9 @@ final class OrderWorkflowEngineeringReadinessTest extends TestCase
         $work = $service->validateTransition('wo', 'completed', 'cancelled', 'production_manager');
 
         $this->assertFalse($job->ok);
-        $this->assertSame('invalid_transition', $job->errorCode);
+        $this->assertSame('terminal_state_locked', $job->errorCode);
         $this->assertFalse($work->ok);
-        $this->assertSame('invalid_transition', $work->errorCode);
+        $this->assertSame('terminal_state_locked', $work->errorCode);
     }
 
     /**

@@ -795,6 +795,13 @@ class DocumentController extends BaseController
         $relPath = safe_rel_path($path);
         $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
         $ext = portal_get_doc_extension($relPath);
+
+        // Whitelist safe extensions for managed documents
+        $allowedExtensions = ['html', 'pdf', 'docx', 'xlsx', 'png', 'jpg', 'gif', 'txt', 'csv'];
+        if (empty($ext) || !in_array(strtolower($ext), $allowedExtensions, true)) {
+            $this->error('unsupported_type', 403);
+        }
+
         if (!portal_allowed_stream_extension($relPath) || !portal_doc_extension_is_enabled($ext, $displayConfig)) {
             $this->error('unsupported_type', 403);
         }
@@ -807,6 +814,12 @@ class DocumentController extends BaseController
         $absPath = join_in_root($this->rootDir, $relPath);
         if (!is_file($absPath) || !is_inside_root($absPath, $this->rootDir)) {
             $this->error('file_not_found', 404);
+        }
+
+        // Verify with realpath to prevent symlink attacks
+        $realPath = realpath($absPath);
+        if ($realPath === false || !is_inside_root($realPath, $this->rootDir)) {
+            $this->error('invalid_path', 403);
         }
 
         $hidden = array_values(array_unique(array_map(
@@ -825,15 +838,19 @@ class DocumentController extends BaseController
             @session_write_close();
         }
 
+        // Sanitize filename: use basename and replace non-safe characters
+        $filename = basename($relPath);
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Content-Type: ' . $mime);
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: same-origin');
         if ($asAttachment) {
-            header('Content-Disposition: attachment; filename="' . rawurlencode(basename($relPath)) . '"');
+            header('Content-Disposition: attachment; filename="' . rawurlencode($filename) . '"');
         } else {
-            header('Content-Disposition: inline; filename="' . rawurlencode(basename($relPath)) . '"');
+            header('Content-Disposition: inline; filename="' . rawurlencode($filename) . '"');
         }
         $size = @filesize($absPath);
         if ($size !== false) {

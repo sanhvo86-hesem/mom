@@ -219,9 +219,10 @@ final class CacheService
             }
         }
 
-        // Redis SCAN + DEL
+        // REAUDIT-R6-018: Redis SCAN + DEL with batched deletion
         if ($this->redisAvailable) {
             try {
+                $allKeys = [];
                 $cursor = '0';
                 do {
                     [$cursor, $keys] = $this->redis->scan($cursor, [
@@ -229,9 +230,16 @@ final class CacheService
                         'COUNT' => 100,
                     ]);
                     if (!empty($keys)) {
-                        $this->redis->del($keys);
+                        $allKeys = array_merge($allKeys, $keys);
                     }
                 } while ($cursor !== '0');
+
+                // Delete in batches to prevent timeout on large key sets
+                if (!empty($allKeys)) {
+                    foreach (array_chunk($allKeys, 100) as $batch) {
+                        $this->redis->del($batch);
+                    }
+                }
             } catch (\Throwable $e) {
                 @error_log("[CacheService] Redis invalidatePrefix error: {$e->getMessage()}");
             }

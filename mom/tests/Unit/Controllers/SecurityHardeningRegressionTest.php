@@ -58,6 +58,38 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertStringContainsString('question_hash', $source);
     }
 
+    public function testOrderScheduleCompatibilityAliasesUseExistingSchedulingController(): void
+    {
+        $routes = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/routes/operations-routes.php');
+
+        $this->assertStringContainsString("'order_schedule_get'      => [AiSchedulingController::class, 'getSchedule']", $routes);
+        $this->assertStringContainsString("'order_schedule_slot'     => [AiSchedulingController::class, 'createSlot']", $routes);
+        $this->assertStringContainsString("'order_schedule_update'   => [AiSchedulingController::class, 'updateSlot']", $routes);
+        $this->assertStringContainsString("'order_capacity_heatmap'  => [AiSchedulingController::class, 'getCapacityHeatmap']", $routes);
+        $this->assertStringContainsString("'order_promise_suggest'   => [AiSchedulingController::class, 'suggestPromiseDate']", $routes);
+        $this->assertStringNotContainsString("[OrderController::class, 'getSchedule']", $routes);
+        $this->assertStringNotContainsString("[OrderController::class, 'createScheduleSlot']", $routes);
+        $this->assertStringNotContainsString("[OrderController::class, 'updateScheduleSlot']", $routes);
+    }
+
+    public function testOrderHoldReleaseRequiresSourceOrderWritePermissionBeforeMutation(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/OrderController.php');
+
+        $this->assertMatchesRegularExpression('/public function releaseHold\(\): never\s*\{.*?\$permission = match \(\$orderType\).*?\'so\' => \'so_write\'.*?\'jo\' => \'jo_write\'.*?\'wo\' => \'wo_write\'.*?\$this->requireOrderPermission\(\$user, \$permission\);.*?\$h\[\'released\'\]\s+= true;/s', $source);
+        $this->assertStringContainsString('hold_order_type_invalid', $source);
+    }
+
+    public function testScheduleSlotWritesValidateDatesTimesAndPriority(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+
+        $this->assertStringContainsString('private function requireScheduleDate(string $date', $source);
+        $this->assertStringContainsString('private function requireScheduleTimeRange(string $startTime, string $endTime)', $source);
+        $this->assertMatchesRegularExpression('/public function createSlot\(\): never\s*\{.*?\$this->requireScheduleDate\(\$date\);.*?\$this->requireScheduleTimeRange\(\$startTime, \$endTime\);.*?invalid_priority/s', $source);
+        $this->assertMatchesRegularExpression('/public function updateSlot\(\): never\s*\{.*?requireScheduleDate.*?requireScheduleTimeRange.*?invalid_priority/s', $source);
+    }
+
     public function testOperationalOverridesUseCanonicalElevatedRolesAfterPermissionGate(): void
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/OperationalOverrideController.php');

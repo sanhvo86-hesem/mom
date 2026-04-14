@@ -225,10 +225,10 @@ final class EdgeConnectorService
         }
 
         try {
-            // FOUND-001 FIX: XXE protection for MTConnect XML parsing
+            // MES-R6-001 FIX: XXE protection for MTConnect XML parsing
             libxml_disable_entity_loader(true);
             libxml_use_internal_errors(true);
-            $options = LIBXML_NONET | LIBXML_NOENT | LIBXML_DTDLOAD | LIBXML_DTDATTR;
+            $options = LIBXML_NONET;
 
             $doc = @simplexml_load_string($xml, null, $options);
             if ($doc === false) {
@@ -311,8 +311,12 @@ final class EdgeConnectorService
         if (!is_numeric((string)$value)) {
             return null;
         }
+        // MES-R6-013 FIX: Return null for out-of-range values instead of silently clamping
         $number = (float)$value;
-        return $number < 0 ? 0.0 : $number;
+        if ($number < 0) {
+            return null;
+        }
+        return $number;
     }
 
     private function normalizeInt(mixed $value): ?int

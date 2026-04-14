@@ -231,6 +231,12 @@ final class WorkflowEngine
         $triggeredActions = [];
         $now = gmdate('Y-m-d\TH:i:s\Z');
 
+        // INT-R6-013: Sanitize comment to prevent log injection
+        if ($comment !== null) {
+            $comment = str_replace(["\n", "\r", "\0"], ' ', $comment);
+            $comment = substr($comment, 0, 1000); // Limit to 1000 chars
+        }
+
         $historyEntry = [
             'from'        => $currentState,
             'to'          => $targetState,

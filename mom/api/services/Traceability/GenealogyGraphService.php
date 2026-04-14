@@ -55,6 +55,33 @@ final class GenealogyGraphService
         $toId = $this->requiredText($fact, 'to_object_id');
         $this->nodeType($fromType);
         $this->nodeType($toType);
+
+        // MES-R6-004 FIX: Cycle detection
+        if ($fromId === $toId) {
+            throw new RuntimeException('genealogy_self_reference_not_allowed');
+        }
+
+        // Check if reverse edge already exists
+        $reverseEdgeExists = $this->db->queryOne(
+            "SELECT 1 FROM genealogy_edge_facts
+             WHERE edge_fact_type = :edge_fact_type
+               AND from_object_type = :to_object_type
+               AND from_object_id = :to_object_id
+               AND to_object_type = :from_object_type
+               AND to_object_id = :from_object_id
+             LIMIT 1",
+            [
+                ':edge_fact_type' => $edgeFactType,
+                ':to_object_type' => $toType,
+                ':to_object_id' => $toId,
+                ':from_object_type' => $fromType,
+                ':from_object_id' => $fromId,
+            ]
+        );
+
+        if ($reverseEdgeExists !== null) {
+            throw new RuntimeException('genealogy_cycle_detected');
+        }
         $sourceEventId = $this->text($fact['source_event_id'] ?? '');
         if ($sourceEventId === '') {
             $sourceEventId = 'portal-' . hash('sha256', implode('|', [$edgeFactType, $fromType, $fromId, $toType, $toId, $actorRef]));

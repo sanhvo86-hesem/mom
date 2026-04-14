@@ -270,6 +270,33 @@ final class CascadingDropdownService
         ?string $deliveryMode = null,
         ?string $series = null,
     ): array {
+        // INT-R6-004: Validate and sanitize filter inputs
+        // Validate department against registry
+        if ($department !== null && $department !== '') {
+            $availableDepts = $this->getDepartments();
+            $deptValues = array_map(fn(array $d) => $d['value'], $availableDepts);
+            if (!in_array($department, $deptValues, true)) {
+                return []; // Unknown department
+            }
+        }
+
+        // Validate deliveryMode: only allow 'online' or 'offline'
+        if ($deliveryMode !== null && $deliveryMode !== '') {
+            $mode = strtolower(trim($deliveryMode));
+            if (!in_array($mode, ['online', 'offline'], true)) {
+                return []; // Invalid delivery mode
+            }
+            $deliveryMode = $mode;
+        }
+
+        // Validate series: must be 3-digit numeric pattern
+        if ($series !== null && $series !== '') {
+            if (!preg_match('/^\d{3}$/', trim($series))) {
+                return []; // Invalid series format
+            }
+            $series = trim($series);
+        }
+
         $formRegistry = $this->loadFormRegistry();
         $typeRegistry = $this->loadTypeRegistry();
         $departments  = $typeRegistry['departments'] ?? [];

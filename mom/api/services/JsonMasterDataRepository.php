@@ -179,6 +179,6 @@ final class JsonMasterDataRepository implements MasterDataRepository
 
     private function nowIso(): string
     {
-        return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+        return gmdate('Y-m-d\TH:i:s\Z');
     }
 }

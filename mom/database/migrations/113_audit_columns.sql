@@ -20,22 +20,22 @@ BEGIN;
 -- User & Authentication Tables
 -- ============================================================================
 
-ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
-ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
-ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id);
-ALTER TABLE roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
 ALTER TABLE roles ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
-ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
-ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
 ALTER TABLE user_roles ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
-ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id);
-ALTER TABLE sessions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id) ON DELETE SET NULL;
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
 -- ============================================================================

@@ -479,12 +479,12 @@ final class EpicorTransportAdapter
                 continue;
             }
 
-            // Check for loopback (127.x.x.x, ::1)
-            if ($ip === '127.0.0.1' || $ip === '::1' || str_starts_with($ip, '127.')) {
-                throw new RuntimeException("Invalid Epicor {$name}: resolves to loopback address");
+            // Check for loopback (127.x.x.x, ::1, localhost)
+            if ($ip === '127.0.0.1' || $ip === '::1' || str_starts_with($ip, '127.') || $ip === '0.0.0.0' || strtolower($hostname) === 'localhost') {
+                throw new RuntimeException("Invalid Epicor {$name}: resolves to loopback or reserved address");
             }
 
-            // Check for RFC 1918 private addresses
+            // Check for RFC 1918 private addresses (10.x, 192.168.x, 172.16-31.x)
             if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === false) {
                 throw new RuntimeException("Invalid Epicor {$name}: resolves to private/reserved address");
             }

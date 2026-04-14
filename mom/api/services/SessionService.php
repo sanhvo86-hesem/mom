@@ -191,7 +191,8 @@ final class SessionService
     public static function setPreauth(string $username): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) self::init();
-        self::regenerateIdSafe(true);
+        // SECURITY FIX PIPE-SESSION-002: This is a critical auth path, require session regeneration to succeed
+        self::regenerateIdSafe(true, true);
         self::clearAuthState();
         $_SESSION['preauth_user'] = strtolower(trim($username));
         $_SESSION['preauth_started'] = time();
@@ -205,7 +206,8 @@ final class SessionService
     public static function setAuthenticated(string $username, array $user = []): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) self::init();
-        self::regenerateIdSafe(true);
+        // SECURITY FIX PIPE-SESSION-002: This is a critical auth path, require session regeneration to succeed
+        self::regenerateIdSafe(true, true);
         self::clearAuthState();
         $_SESSION['user'] = strtolower(trim($username));
         $_SESSION['mfa_ok'] = true;
@@ -251,8 +253,16 @@ final class SessionService
     /**
      * Safely regenerate session ID with fallback.
      * Equivalent to legacy: session_regenerate_id_safe($deleteOldSession)
+     *
+     * SECURITY FIX PIPE-SESSION-002: Add $required parameter. When called from critical auth
+     * paths (login), pass $required=true to throw RuntimeException instead of silently continuing.
+     *
+     * @param bool $deleteOldSession Whether to delete the old session file.
+     * @param bool $required If true and regeneration fails, throw RuntimeException instead of silently continuing.
+     * @return void
+     * @throws RuntimeException When $required is true and regeneration fails.
      */
-    public static function regenerateIdSafe(bool $deleteOldSession = true): void
+    public static function regenerateIdSafe(bool $deleteOldSession = true, bool $required = false): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             return;
@@ -264,6 +274,9 @@ final class SessionService
             }
         } catch (\Throwable $e) {
             error_log('[API] session_regenerate_id failed: ' . $e->getMessage());
+            if ($required) {
+                throw new \RuntimeException('session_regenerate_id failed in critical auth path', 0, $e);
+            }
         }
 
         if ($deleteOldSession) {
@@ -274,7 +287,14 @@ final class SessionService
                 }
             } catch (\Throwable $e) {
                 error_log('[API] session_regenerate_id fallback failed: ' . $e->getMessage());
+                if ($required) {
+                    throw new \RuntimeException('session_regenerate_id fallback failed in critical auth path', 0, $e);
+                }
             }
+        }
+
+        if ($required) {
+            throw new \RuntimeException('session_regenerate_id could not complete in critical auth path');
         }
 
         error_log('[API] session_regenerate_id skipped; continuing with current session id');
@@ -372,7 +392,8 @@ final class SessionService
 
         $primary = ($DATA_DIR ?? '') . '/sessions';
         if ($primary !== '/sessions' && $primary !== '' && !is_dir($primary)) {
-            mkdir($primary, 0775, true);
+            // SECURITY FIX PIPE-SESS-001: Use 0700 (owner only) instead of 0775 to prevent group/other read access
+            mkdir($primary, 0700, true);
         }
 
         $candidates = [

@@ -111,6 +111,16 @@ final class EqmsControlPlaneController extends BaseController
             $body['idempotency_key'] = $this->requestHeader('Idempotency-Key') ?? '';
         }
 
+        // REAUDIT-R6-010: Validate idempotency key length and format
+        $idempotencyKey = trim((string)($body['idempotency_key'] ?? ''));
+        if (strlen($idempotencyKey) < 16 || strlen($idempotencyKey) > 128) {
+            $this->error('idempotency_key_invalid_length', 400, 'Idempotency key must be between 16 and 128 characters.');
+        }
+        if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $idempotencyKey)) {
+            $this->error('idempotency_key_invalid_format', 400, 'Idempotency key must contain only alphanumeric characters, hyphens, underscores, and periods.');
+        }
+        $body['idempotency_key'] = $idempotencyKey;
+
         try {
             $result = (new ControlPlaneCommandService($this->data))->submit($body);
             if (!$result['accepted']) {
@@ -311,6 +321,16 @@ final class EqmsControlPlaneController extends BaseController
         $body = $this->jsonBody();
         $this->requireFields($body, ['publication_id', 'action', 'reason']);
         $idempotencyKey = trim((string)($body['idempotency_key'] ?? $this->requestHeader('Idempotency-Key') ?? ''));
+
+        // REAUDIT-R6-010: Validate idempotency key length and format
+        if ($idempotencyKey !== '') {
+            if (strlen($idempotencyKey) < 16 || strlen($idempotencyKey) > 128) {
+                $this->error('idempotency_key_invalid_length', 400, 'Idempotency key must be between 16 and 128 characters.');
+            }
+            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $idempotencyKey)) {
+                $this->error('idempotency_key_invalid_format', 400, 'Idempotency key must contain only alphanumeric characters, hyphens, underscores, and periods.');
+            }
+        }
 
         try {
             $result = (new PublicationMonitorService($this->data))->queueAction(

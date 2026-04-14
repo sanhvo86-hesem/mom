@@ -262,9 +262,11 @@ final class QueueService
                 }
             );
 
-            // WRK-002: Use wait() with timeout to prevent indefinite blocking
+            // REAUDIT-R6-019: Use wait() with timeout to prevent indefinite blocking
+            // Timeout should account for job timeout to avoid premature returns while job is processing
+            $waitTimeout = max(70, $timeoutPerJobSeconds + 10);
             while ($this->channel->is_consuming()) {
-                $this->channel->wait(null, false, 60); // 60 second timeout
+                $this->channel->wait(null, false, $waitTimeout);
             }
         } else {
             // File-based polling consumer with timeout

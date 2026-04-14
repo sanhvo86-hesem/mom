@@ -15,8 +15,8 @@ namespace MOM\Api\Services;
  */
 final class AuthGuard
 {
-    /** Idle session timeout: 4 hours */
-    private const IDLE_LIMIT = 4 * 60 * 60;
+    /** Idle session timeout: 30 minutes */
+    private const IDLE_LIMIT = 30 * 60;
 
     /**
      * Guard an authenticated endpoint.

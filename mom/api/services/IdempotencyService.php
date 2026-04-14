@@ -259,8 +259,15 @@ final class IdempotencyService
         if ($key === '') {
             return '';
         }
-        if (strlen($key) > 200 || preg_match('/^[A-Za-z0-9._:\-]+$/', $key) !== 1) {
-            throw new RuntimeException('Invalid idempotency key token.');
+        // OPS-R6-003: Validate idempotency key length and format
+        if (strlen($key) < 16) {
+            throw new RuntimeException('idempotency_key_invalid_length');
+        }
+        if (strlen($key) > 128) {
+            throw new RuntimeException('idempotency_key_invalid_length');
+        }
+        if (preg_match('/^[a-zA-Z0-9_\-\.]+$/', $key) !== 1) {
+            throw new RuntimeException('idempotency_key_invalid_format');
         }
 
         return $key;

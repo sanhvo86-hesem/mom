@@ -65,6 +65,15 @@ class QueryBuilder
     /** Auto-incrementing placeholder counter */
     private int $paramIndex = 0;
 
+    /** Flag to include soft-deleted records */
+    private bool $includeTrashed = false;
+
+    /** Flag to only return soft-deleted records */
+    private bool $onlyTrashed = false;
+
+    /** Cache for soft-delete table detection via schema introspection */
+    private static array $softDeleteTableCache = [];
+
     // ── Factory / Fluent Entry Points ───────────────────────────────────────
 
     /**
@@ -177,6 +186,9 @@ class QueryBuilder
      */
     public function whereIn(string $column, array $values): self
     {
+        if (count($values) > 5000) {
+            throw new InvalidArgumentException('WHERE IN clause limited to 5000 values');
+        }
         if ($values === []) {
             // Impossible condition
             $this->wheres[] = ['sql' => '1 = 0', 'params' => [], 'connector' => 'AND'];
@@ -231,6 +243,132 @@ class QueryBuilder
         return $this;
     }
 
+    // ── Soft Delete (Trashed Records) ───────────────────────────────────────
+
+    /**
+     * Include soft-deleted records (deleted_at IS NOT NULL) in query results.
+     *
+     * Use this when you need to query both active and deleted records.
+     * Automatically filters out hard-deleted records but includes soft-deleted ones.
+     *
+     * @return $this
+     */
+    public function withTrashed(): self
+    {
+        $this->includeTrashed = true;
+        return $this;
+    }
+
+    /**
+     * Only return soft-deleted records (deleted_at IS NOT NULL).
+     *
+     * Use this to query only records that have been soft-deleted.
+     * Automatically excludes active records.
+     *
+     * @return $this
+     */
+    public function onlyTrashed(): self
+    {
+        $this->onlyTrashed = true;
+        $this->includeTrashed = true; // onlyTrashed implies withTrashed
+        return $this;
+    }
+
+    /**
+     * Get the soft delete filter condition for the current table.
+     *
+     * @return array{sql: string, params: array, connector: string}|null
+     */
+    private function getSoftDeleteFilter(): ?array
+    {
+        // Check if the table has a deleted_at column
+        if (!$this->tableHasDeletedAt()) {
+            return null;
+        }
+
+        // Determine the column name (may be table_alias if aliased)
+        $tableRef = $this->alias !== '' ? $this->alias : $this->table;
+        $deletedAtCol = "{$tableRef}.deleted_at";
+
+        if ($this->onlyTrashed) {
+            // Only soft-deleted records: deleted_at IS NOT NULL
+            return [
+                'sql' => "{$deletedAtCol} IS NOT NULL",
+                'params' => [],
+                'connector' => 'AND',
+            ];
+        } elseif (!$this->includeTrashed) {
+            // Default: only active records (deleted_at IS NULL)
+            return [
+                'sql' => "{$deletedAtCol} IS NULL",
+                'params' => [],
+                'connector' => 'AND',
+            ];
+        }
+
+        // includeTrashed && !onlyTrashed: include both active and soft-deleted
+        return null;
+    }
+
+    /**
+     * Check if a table has a deleted_at column.
+     * Uses hardcoded list first for known tables, then falls back to schema introspection for new tables.
+     */
+    private function tableHasDeletedAt(): bool
+    {
+        // Quick lookup in cache
+        if (isset(self::$softDeleteTableCache[$this->table])) {
+            return self::$softDeleteTableCache[$this->table];
+        }
+
+        // Hardcoded list of known soft-delete tables
+        $tablesSoftDelete = [
+            'users', 'roles', 'user_roles', 'sessions',
+            'documents', 'document_versions', 'document_embeddings', 'document_distribution',
+            'form_schemas', 'form_entries', 'form_attachments',
+            'records', 'record_links', 'record_counters',
+            'items', 'item_revisions', 'bill_of_materials', 'bom_components',
+            'work_centers', 'routings', 'routing_operations',
+            'customers', 'sales_orders', 'sales_order_lines',
+            'vendors', 'vendor_ratings', 'purchase_orders', 'purchase_order_lines',
+            'warehouses', 'inventory_locations', 'lot_master', 'serial_master',
+            'job_orders', 'job_operations', 'production_schedule',
+            'inspection_plans', 'inspection_results', 'spc_data',
+            'ncr_records', 'capa_records', 'fai_records', 'fai_characteristics',
+            'certificates', 'npi_projects', 'ehs_incidents', 'contamination_checks',
+            'engineering_change_requests', 'equipment', 'calibration_records',
+            'maintenance_work_orders', 'tools', 'tool_transactions',
+            'employees', 'training_records', 'skills_matrix', 'employee_certifications',
+            'audits', 'audit_findings', 'audit_actions', 'risk_register',
+            'improvement_projects', 'management_reviews', 'cost_elements',
+            'shipments', 'packages', 'compliance',
+        ];
+
+        if (in_array($this->table, $tablesSoftDelete, true)) {
+            self::$softDeleteTableCache[$this->table] = true;
+            return true;
+        }
+
+        // Fall back to schema introspection for new tables with deleted_at column
+        try {
+            $conn = Connection::getInstance();
+            $result = $conn->query(
+                "SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = ? AND column_name = 'deleted_at'
+                )",
+                ['?' => $this->table]
+            );
+            $hasDeletedAt = !empty($result) && ($result[0][0] ?? false);
+            self::$softDeleteTableCache[$this->table] = $hasDeletedAt;
+            return $hasDeletedAt;
+        } catch (\Throwable) {
+            // If query fails, assume no deleted_at (safe default)
+            self::$softDeleteTableCache[$this->table] = false;
+            return false;
+        }
+    }
+
     // ── JSONB Operators ─────────────────────────────────────────────────────
 
     /**
@@ -243,12 +381,13 @@ class QueryBuilder
      */
     public function whereJsonText(string $column, string $key, mixed $value): self
     {
-        $phKey = $this->nextPlaceholder();
         $phVal = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
+        // Key must be a quoted string literal, not a parameter placeholder
+        $escapedKey = "'" . str_replace("'", "''", $key) . "'";
         $this->wheres[] = [
-            'sql'       => "{$safeCol}->>{$phKey} = {$phVal}",
-            'params'    => [$phKey => $key, $phVal => (string)$value],
+            'sql'       => "{$safeCol}>>{$escapedKey} = {$phVal}",
+            'params'    => [$phVal => (string)$value],
             'connector' => 'AND',
         ];
         return $this;
@@ -282,11 +421,12 @@ class QueryBuilder
      */
     public function whereJsonHasKey(string $column, string $key): self
     {
-        $ph = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
+        // Key must be a quoted string literal, not a parameter placeholder
+        $escapedKey = "'" . str_replace("'", "''", $key) . "'";
         $this->wheres[] = [
-            'sql'       => "{$safeCol} ?? {$ph}",
-            'params'    => [$ph => $key],
+            'sql'       => "{$safeCol} ? {$escapedKey}",
+            'params'    => [],
             'connector' => 'AND',
         ];
         return $this;
@@ -303,7 +443,7 @@ class QueryBuilder
      */
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        if (!$this->isValidIdentifier($column)) {
+        if (!$this->isValidOrderByIdentifier($column)) {
             throw new InvalidArgumentException("Invalid ORDER BY column: {$column}");
         }
         $dir = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
@@ -319,6 +459,11 @@ class QueryBuilder
      */
     public function groupBy(string ...$columns): self
     {
+        foreach ($columns as $col) {
+            if (!$this->isValidIdentifier($col)) {
+                throw new InvalidArgumentException("Invalid GROUP BY column: {$col}");
+            }
+        }
         $this->groupBy = $columns;
         return $this;
     }
@@ -344,6 +489,9 @@ class QueryBuilder
      */
     public function limit(int $limit): self
     {
+        if ($limit > 100000) {
+            throw new InvalidArgumentException('LIMIT cannot exceed 100000');
+        }
         $this->limit = max(0, $limit);
         return $this;
     }
@@ -624,17 +772,30 @@ class QueryBuilder
      */
     private function buildWheres(): string
     {
-        if ($this->wheres === []) {
+        $softDeleteFilter = $this->getSoftDeleteFilter();
+        $hasWheres = $this->wheres !== [] || $softDeleteFilter !== null;
+
+        if (!$hasWheres) {
             return '';
         }
+
         $parts = [];
+
+        // Add soft delete filter first (if applicable)
+        if ($softDeleteFilter !== null) {
+            $this->params = array_merge($this->params, $softDeleteFilter['params']);
+            $parts[] = $softDeleteFilter['sql'];
+        }
+
+        // Add user-defined WHERE conditions
         foreach ($this->wheres as $i => $w) {
             foreach ($w['params'] as $k => $v) {
                 $this->params[$k] = $v;
             }
-            $prefix = $i === 0 ? '' : " {$w['connector']} ";
+            $prefix = (count($parts) === 0 && $i === 0) ? '' : " {$w['connector']} ";
             $parts[] = $prefix . $w['sql'];
         }
+
         return ' WHERE ' . implode('', $parts);
     }
 
@@ -749,6 +910,9 @@ class QueryBuilder
      */
     private function prepareValue(mixed $value): mixed
     {
+        if ($value instanceof \JsonSerializable) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
         if (is_array($value)) {
             return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
@@ -775,8 +939,41 @@ class QueryBuilder
      */
     private function isValidIdentifier(string $identifier): bool
     {
-        // Allow alphanumeric, underscores, dots, colons (for casts), parens (for functions),
-        // arrows (for JSONB), spaces (for aliases), quotes
-        return (bool)preg_match('/^[a-zA-Z0-9_."\'():,>< \-]+$/', $identifier);
+        // Stricter validation: column names with optional schema/alias qualifiers.
+        // Pattern: [schema.]column[::cast] or function(args)
+        // Allow: alphanumeric, underscore, dot, colon (for ::cast), parentheses (for functions), spaces (for aliases)
+        // Reject: dangerous characters like <, >, arrows, quotes, etc.
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]{0,63}(?:\.[a-zA-Z_][a-zA-Z0-9_]{0,63})?(?:::[a-zA-Z_][a-zA-Z0-9_]{0,63})?(?:\s+[a-zA-Z_][a-zA-Z0-9_]{0,63})?(?:\([^)]*\))?$/i', $identifier)) {
+            return false;
+        }
+
+        // Additional check: reject SQL keywords that could be used for injection
+        $keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'UNION', 'WHERE', 'FROM', 'JOIN', 'ALTER', 'TRUNCATE', 'EXEC', 'EXECUTE'];
+        $colName = preg_replace('/\s.*$/', '', $identifier); // extract first token
+        if (in_array(strtoupper($colName), $keywords, true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Strict validation for ORDER BY columns: plain column names only, no function calls.
+     * Pattern: [schema.]column (no casts, no functions, no JSONB operators)
+     */
+    private function isValidOrderByIdentifier(string $identifier): bool
+    {
+        // Allow only: column_name or schema.column_name (no functions, no casts, no JSONB ops)
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]{0,63}(?:\.[a-zA-Z_][a-zA-Z0-9_]{0,63})?$/', $identifier)) {
+            return false;
+        }
+
+        // Reject SQL keywords
+        $keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'UNION', 'WHERE', 'FROM', 'JOIN', 'ALTER', 'TRUNCATE', 'EXEC', 'EXECUTE'];
+        if (in_array(strtoupper($identifier), $keywords, true)) {
+            return false;
+        }
+
+        return true;
     }
 }

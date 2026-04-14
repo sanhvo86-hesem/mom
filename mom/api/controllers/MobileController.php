@@ -123,10 +123,11 @@ class MobileController extends BaseController
     /**
      * Resolve employee_id from user record via users.json mapping.
      *
-     * Falls back to username if no explicit employee_id mapping exists.
+     * MES-R6-014 FIX: Throws exception if no explicit employee_id exists instead of falling back to username.
      *
      * @param array $user User record.
      * @return string Employee identifier.
+     * @throws RuntimeException If employee_id is not provisioned
      */
     private function resolveEmployeeId(array $user): string
     {
@@ -147,8 +148,8 @@ class MobileController extends BaseController
             }
         }
 
-        // Fallback to username
-        return $this->userId($user);
+        // MES-R6-014 FIX: Throw exception instead of silently falling back to username
+        throw new \RuntimeException('employee_id_not_provisioned_for_user');
     }
 
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -379,6 +380,22 @@ class MobileController extends BaseController
 
         $employeeId = $this->resolveEmployeeId($user);
         $userId     = $this->userId($user);
+
+        // MES-R6-002 FIX: Validate photo size to prevent DoS
+        $photosArray = (array)($body['photos'] ?? []);
+        if (!empty($photosArray)) {
+            $totalPhotoSize = 0;
+            foreach ($photosArray as $photo) {
+                if (is_string($photo)) {
+                    $totalPhotoSize += strlen($photo);
+                } elseif (is_array($photo) && isset($photo['data'])) {
+                    $totalPhotoSize += strlen((string)$photo['data']);
+                }
+            }
+            if ($totalPhotoSize > 52428800) { // 50MB
+                $this->error('photo_size_exceeded', 413, 'Total photo data exceeds 50MB limit.');
+            }
+        }
 
         try {
             $capture = $this->mobileService()->captureInspection($employeeId, [

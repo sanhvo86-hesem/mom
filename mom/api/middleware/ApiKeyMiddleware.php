@@ -129,12 +129,14 @@ class ApiKeyMiddleware
 
     /**
      * Authenticate via JWT.
+     * SECURITY FIX PIPE-JWT-001: Validate JWT_SECRET is strong enough (minimum 32 chars)
      */
     private function authenticateJwt(string $token): void
     {
         $jwtSecret = getenv('JWT_SECRET') ?: '';
-        if ($jwtSecret === '') {
-            $this->deny('jwt_not_configured', 500);
+        if ($jwtSecret === '' || strlen($jwtSecret) < 32) {
+            // Don't reveal whether JWT is configured or the secret is too short
+            $this->deny('invalid_token_format', 401);
         }
 
         try {
@@ -171,6 +173,12 @@ class ApiKeyMiddleware
 
             // Extract claims
             $claims = $parsedToken->claims();
+
+            // SECURITY FIX PIPE-AUTH-002: JWT must have an 'exp' claim
+            if (!$claims->has('exp')) {
+                $this->deny('jwt_missing_exp_claim', 401);
+            }
+
             $userId = $claims->get('sub', 'jwt-service');
             $scopes = $claims->get('scopes', ['*']);
 

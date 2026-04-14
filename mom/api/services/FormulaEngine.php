@@ -37,11 +37,20 @@ final class FormulaEngine
         '*'   => 6, '/'  => 6, '%'  => 6,
     ];
 
+    /** INT-R6-005: Maximum recursion depth for formula evaluation. */
+    private const MAX_RECURSION_DEPTH = 100;
+
+    /** INT-R6-005: Maximum token count to prevent DoS. */
+    private const MAX_TOKEN_COUNT = 10000;
+
     /** @var string Absolute path to the data directory. */
     private readonly string $dataDir;
 
     /** @var array<string, array>|null Cached formula definitions. */
     private ?array $formulaDefs = null;
+
+    /** INT-R6-005: Current recursion depth counter. */
+    private int $recursionDepth = 0;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -72,7 +81,15 @@ final class FormulaEngine
             return null;
         }
 
+        // INT-R6-005: Token count limit
         $tokens = $this->tokenize($formula);
+        if (count($tokens) > self::MAX_TOKEN_COUNT) {
+            throw new InvalidArgumentException('Formula is too complex (token count exceeds limit)');
+        }
+
+        // INT-R6-005: Reset recursion depth counter
+        $this->recursionDepth = 0;
+
         $tokens = $this->resolveVariables($tokens, $context);
 
         return $this->parseExpression($tokens, 0)[0];
@@ -323,26 +340,37 @@ final class FormulaEngine
      */
     private function parseExpression(array $tokens, int $pos, int $minPrec = 0): array
     {
-        [$left, $pos] = $this->parsePrimary($tokens, $pos);
-
-        while ($pos < count($tokens)) {
-            $token = $tokens[$pos];
-            if ($token['type'] !== 'operator') {
-                break;
-            }
-
-            $op   = $token['value'];
-            $prec = self::PRECEDENCE[$op] ?? null;
-            if ($prec === null || $prec < $minPrec) {
-                break;
-            }
-
-            $pos++;
-            [$right, $pos] = $this->parseExpression($tokens, $pos, $prec + 1);
-            $left = $this->applyOperator($op, $left, $right);
+        // INT-R6-005: Check recursion depth
+        $this->recursionDepth++;
+        if ($this->recursionDepth > self::MAX_RECURSION_DEPTH) {
+            throw new InvalidArgumentException('Formula recursion depth exceeded');
         }
 
-        return [$left, $pos];
+        try {
+            [$left, $pos] = $this->parsePrimary($tokens, $pos);
+
+            while ($pos < count($tokens)) {
+                $token = $tokens[$pos];
+                if ($token['type'] !== 'operator') {
+                    break;
+                }
+
+                $op   = $token['value'];
+                $prec = self::PRECEDENCE[$op] ?? null;
+                if ($prec === null || $prec < $minPrec) {
+                    break;
+                }
+
+                $pos++;
+                [$right, $pos] = $this->parseExpression($tokens, $pos, $prec + 1);
+                $left = $this->applyOperator($op, $left, $right);
+            }
+
+            return [$left, $pos];
+        } finally {
+            // INT-R6-005: Decrement on exit
+            $this->recursionDepth--;
+        }
     }
 
     /**

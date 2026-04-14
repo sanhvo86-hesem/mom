@@ -1150,7 +1150,10 @@ function rrmdir_guarded(string $path, string $rootReal, int &$count = 0): void {
     if (!@rmdir($path)) fail('file_delete_failed');
 }
 
-function copy_guarded(string $source, string $dest, string $rootReal, int &$count = 0): void {
+function copy_guarded(string $source, string $dest, string $rootReal, int &$count = 0, int $depth = 0): void {
+    // REAUDIT-R6-015: Add recursion depth limit to prevent stack exhaustion (max depth 19)
+    if ($depth >= 20) fail('file_recursion_depth_exceeded');
+
     $sourceReal = realpath($source);
     if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
     if (is_link($source)) fail('file_symlink_not_supported');
@@ -1169,11 +1172,14 @@ function copy_guarded(string $source, string $dest, string $rootReal, int &$coun
         if ($item === '.' || $item === '..') continue;
         $count += 1;
         if ($count > 6000) fail('file_operation_limit');
-        copy_guarded($source . '/' . $item, $dest . '/' . $item, $rootReal, $count);
+        copy_guarded($source . '/' . $item, $dest . '/' . $item, $rootReal, $count, $depth + 1);
     }
 }
 
-function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, string $rootReal, array $deny, int &$count = 0): void {
+function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, string $rootReal, array $deny, int &$count = 0, int $depth = 0): void {
+    // REAUDIT-R6-015: Add recursion depth limit to prevent stack exhaustion (max depth 19)
+    if ($depth >= 20) fail('file_recursion_depth_exceeded');
+
     $sourceReal = realpath($source);
     if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
     $baseRel = trim(str_replace('\\', '/', $baseRel), '/');
@@ -1196,7 +1202,7 @@ function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, st
         ensure_rel_not_denied($childRel, $deny);
         $count += 1;
         if ($count > 6000) fail('file_operation_limit');
-        add_to_zip_guarded($zip, $childAbs, $childRel, $rootReal, $deny, $count);
+        add_to_zip_guarded($zip, $childAbs, $childRel, $rootReal, $deny, $count, $depth + 1);
     }
 }
 
@@ -2454,6 +2460,16 @@ BASH;
                 if (!in_array(trim($host), $allowedHosts, true)) {
                     throw new RuntimeException('ssh_host_resolves_to_private_address');
                 }
+            }
+        }
+
+        // OPS-R6-009: Check VPS_SSH_ALLOWLIST if configured
+        $allowlistEnv = getenv('VPS_SSH_ALLOWLIST');
+        if (!empty($allowlistEnv)) {
+            $allowlist = array_map('trim', explode(',', $allowlistEnv));
+            $allowlist = array_filter($allowlist, static fn($h) => $h !== '');
+            if (!empty($allowlist) && !in_array($host, $allowlist, true)) {
+                throw new RuntimeException('ssh_host_not_in_allowlist');
             }
         }
     }

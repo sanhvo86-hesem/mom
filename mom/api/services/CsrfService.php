@@ -32,7 +32,6 @@ final class CsrfService
     private static array $csrfExempt = [
         '/api/webhooks/*',           // Webhook signatures validate instead
         '/api/auth/callback/*',      // OAuth/SAML redirects don't have CSRF tokens
-        '/api/auth/login',           // Login endpoint uses password auth
         '/api/health',               // Health checks are read-only info
         '/api/status',               // Status checks are read-only info
     ];
@@ -40,12 +39,14 @@ final class CsrfService
     /**
      * Get or generate a CSRF token for the current session.
      * Equivalent to legacy: csrf_token()
+     * SECURITY FIX PIPE-CSRF-002: Tokens expire after 1 hour (3600 seconds)
      */
     public static function token(): string
     {
         SessionService::init();
         if (empty($_SESSION['csrf'])) {
             $_SESSION['csrf'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_generated_at'] = time();
         }
         return (string)$_SESSION['csrf'];
     }
@@ -57,6 +58,7 @@ final class CsrfService
      *
      * NOTE: CsrfMiddleware automatically calls this for all state-changing requests.
      * Controllers should only call this if they bypass middleware or need custom handling.
+     * SECURITY FIX PIPE-CSRF-002: Also checks that token is not older than 3600 seconds (1 hour)
      */
     public static function validate(): void
     {
@@ -64,6 +66,14 @@ final class CsrfService
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if ($token === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], (string)$token)) {
             api_json(['ok' => false, 'error' => 'csrf_failed'], 403);
+        }
+
+        // SECURITY FIX PIPE-CSRF-002: Check token freshness
+        if (isset($_SESSION['csrf_generated_at'])) {
+            $tokenAge = time() - (int)$_SESSION['csrf_generated_at'];
+            if ($tokenAge > 3600) {
+                api_json(['ok' => false, 'error' => 'csrf_expired'], 403);
+            }
         }
     }
 
