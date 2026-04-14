@@ -414,7 +414,7 @@ final class CanonicalManufacturingSpineService
 
         $baseDir = rtrim($this->baseDir, '/');
         $path = $baseDir . '/data/registry/table-registry.json';
-        if (!is_file($path)) {
+        if (!is_file($path) || !$this->isUsableTableRegistryPath($path)) {
             $path = $baseDir . '/contracts/table-registry.json';
         }
         if (!is_file($path)) {
@@ -423,6 +423,31 @@ final class CanonicalManufacturingSpineService
         $decoded = json_decode((string)file_get_contents($path), true);
         $this->tableRegistry = is_array($decoded) ? $decoded : [];
         return (array)($this->tableRegistry['tables'] ?? []);
+    }
+
+    private function isUsableTableRegistryPath(string $path): bool
+    {
+        $raw = @file_get_contents($path);
+        if (!is_string($raw) || trim($raw) === '') {
+            return false;
+        }
+
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return false;
+        }
+
+        $tables = is_array($decoded['tables'] ?? null) ? $decoded['tables'] : [];
+        foreach ($tables as $table) {
+            if (!is_array($table)) {
+                continue;
+            }
+            if (trim((string)($table['domain'] ?? '')) !== '' && !empty($table['columns']) && is_array($table['columns'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

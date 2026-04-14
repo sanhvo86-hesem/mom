@@ -90,6 +90,16 @@ final class PublicationMonitorService
         if (!is_array($publication)) {
             throw new RuntimeException('publication_not_found');
         }
+        $publication = $this->decodeJsonColumns($publication);
+        $targetState = $this->actionTargetState($action);
+        $transition = (new PublicationStateService())->transition(
+            $publication,
+            $targetState,
+            $this->transitionContext($publication),
+        );
+        if (empty($transition['allowed'])) {
+            throw new RuntimeException((string)($transition['error_code'] ?? 'publication_action_not_allowed'));
+        }
 
         $this->outbox->enqueue(
             'evidence_publication',
@@ -100,6 +110,8 @@ final class PublicationMonitorService
                 'reason' => $reason,
                 'actor_ref' => $actorRef,
                 'publication_state' => (string)($publication['publication_state'] ?? ''),
+                'target_publication_state' => $targetState,
+                'transition' => $transition,
             ],
             [
                 'idempotency_key' => $idempotencyKey,
@@ -157,6 +169,38 @@ final class PublicationMonitorService
             }
         }
         return $row;
+    }
+
+    private function actionTargetState(string $action): string
+    {
+        return match ($action) {
+            'retry' => 'retry_scheduled',
+            'withdraw' => 'withdrawn',
+            'supersede' => 'superseded',
+            default => throw new RuntimeException('unsupported_publication_action'),
+        };
+    }
+
+    /**
+     * @param array<string, mixed> $publication
+     * @return array<string, mixed>
+     */
+    private function transitionContext(array $publication): array
+    {
+        $metadata = is_array($publication['metadata'] ?? null) ? $publication['metadata'] : [];
+        return [
+            'change_order_state' => $this->text(
+                $publication['change_order_state']
+                    ?? $publication['source_change_order_state']
+                    ?? $metadata['change_order_state']
+                    ?? '',
+            ),
+            'change_order_id' => $this->text(
+                $publication['source_change_order_id']
+                    ?? $metadata['source_change_order_id']
+                    ?? '',
+            ),
+        ];
     }
 
     private function text(mixed $value): string

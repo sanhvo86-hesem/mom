@@ -2573,7 +2573,9 @@ BASH;
             }
         }
 
-        // Dynamic service probe commands are validated separately.
+        if ($this->isAllowedServiceProbeCommand($command)) {
+            return true;
+        }
         // Dynamic site / control-endpoint probe commands are validated separately.
         if ($this->isAllowedSiteProbeCommand($command)) {
             return true;

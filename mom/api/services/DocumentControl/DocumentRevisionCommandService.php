@@ -101,6 +101,128 @@ final class DocumentRevisionCommandService
         ];
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function acknowledgeRead(array $input, string $actorRef): array
+    {
+        $db = $this->requireDb();
+        $revisionId = $this->requiredUuid($input, 'doc_revision_id');
+        $audienceUserId = $this->nullableUuid($input['audience_user_id'] ?? $input['user_id'] ?? null);
+        $effectiveActor = $this->nullableText($input['actor_ref'] ?? $actorRef);
+        if ($audienceUserId === null && $effectiveActor === null) {
+            throw new RuntimeException('document_read_ack_actor_required');
+        }
+
+        $ackHash = $this->nullableSha256($input['acknowledgement_hash_sha256'] ?? null)
+            ?? hash('sha256', $revisionId . '|' . ($audienceUserId ?? $effectiveActor) . '|read_ack');
+        $ack = $db->queryOne(
+            "INSERT INTO doc_read_acknowledgements
+                (doc_revision_id, audience_user_id, actor_ref, acknowledged_at, signature_event_id,
+                 acknowledgement_hash_sha256, idempotency_key, metadata)
+             VALUES
+                (CAST(:doc_revision_id AS uuid), CAST(:audience_user_id AS uuid), :actor_ref,
+                 CAST(:acknowledged_at AS timestamptz), CAST(:signature_event_id AS uuid),
+                 :acknowledgement_hash_sha256, :idempotency_key, CAST(:metadata AS jsonb))
+             ON CONFLICT DO NOTHING
+             RETURNING *",
+            [
+                ':doc_revision_id' => $revisionId,
+                ':audience_user_id' => $audienceUserId,
+                ':actor_ref' => $effectiveActor,
+                ':acknowledged_at' => $this->nullableText($input['acknowledged_at'] ?? null) ?? gmdate('c'),
+                ':signature_event_id' => $this->nullableUuid($input['signature_event_id'] ?? null),
+                ':acknowledgement_hash_sha256' => $ackHash,
+                ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
+                ':metadata' => $this->json([
+                    'authority' => 'DocumentRevisionCommandService',
+                    'actor_ref' => $actorRef,
+                    'read_acknowledgement_role' => 'effectivity_training_gate_evidence',
+                ]),
+            ],
+        );
+
+        $distribution = $db->queryOne(
+            "UPDATE doc_distributions
+             SET distribution_state = 'complete',
+                 updated_at = now(),
+                 row_version = row_version + 1
+             WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
+               AND read_ack_required = true
+               AND (
+                   audience_ref = :actor_ref
+                   OR audience_ref = :audience_user_id
+                   OR audience_type IN ('role', 'department', 'site', 'plant')
+               )
+             RETURNING *",
+            [
+                ':doc_revision_id' => $revisionId,
+                ':actor_ref' => $effectiveActor,
+                ':audience_user_id' => $audienceUserId,
+            ],
+        );
+
+        return [
+            'authority' => 'canonical_document_control',
+            'read_acknowledgement' => is_array($ack) ? $ack : null,
+            'distribution_update' => is_array($distribution) ? $distribution : null,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function supersedeRevision(array $input, string $actorRef): array
+    {
+        $db = $this->requireDb();
+        $revisionId = $this->requiredUuid($input, 'doc_revision_id');
+        $sourceChangeOrderId = $this->requiredUuid($input, 'source_change_order_id');
+        $supersededBy = $this->nullableUuid($input['superseded_by_doc_revision_id'] ?? null);
+
+        $revision = $db->queryOne(
+            "UPDATE doc_revisions
+             SET lifecycle_state = 'superseded',
+                 source_change_order_id = COALESCE(source_change_order_id, CAST(:source_change_order_id AS uuid)),
+                 metadata = metadata || CAST(:metadata AS jsonb),
+                 updated_at = now(),
+                 row_version = row_version + 1
+             WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
+               AND lifecycle_state IN ('released', 'approved')
+             RETURNING *",
+            [
+                ':doc_revision_id' => $revisionId,
+                ':source_change_order_id' => $sourceChangeOrderId,
+                ':metadata' => $this->json([
+                    'authority' => 'DocumentRevisionCommandService',
+                    'actor_ref' => $actorRef,
+                    'superseded_by_doc_revision_id' => $supersededBy,
+                ]),
+            ],
+        );
+        if (!is_array($revision) || $this->text($revision['doc_revision_id'] ?? '') === '') {
+            throw new RuntimeException('document_revision_supersession_not_allowed');
+        }
+
+        $distribution = $db->queryOne(
+            "UPDATE doc_distributions
+             SET distribution_state = 'superseded',
+                 updated_at = now(),
+                 row_version = row_version + 1
+             WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
+               AND distribution_state <> 'withdrawn'
+             RETURNING *",
+            [':doc_revision_id' => $revisionId],
+        );
+
+        return [
+            'authority' => 'canonical_document_control',
+            'doc_revision' => $revision,
+            'doc_distribution_supersession' => is_array($distribution) ? $distribution : null,
+        ];
+    }
+
     private function requireDb(): object
     {
         if ($this->db === null || !method_exists($this->db, 'queryOne')) {
@@ -259,6 +381,18 @@ final class DocumentRevisionCommandService
             throw new RuntimeException($key . '_required');
         }
         return $text;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function requiredUuid(array $data, string $key): string
+    {
+        $uuid = $this->nullableUuid($data[$key] ?? null);
+        if ($uuid === null) {
+            throw new RuntimeException($key . '_required');
+        }
+        return $uuid;
     }
 
     private function text(mixed $value): string

@@ -88,6 +88,19 @@ class AiSchedulingController extends BaseController
     }
 
     /**
+     * Roles allowed to submit prediction feedback that can affect advisory confidence.
+     *
+     * @return array<int, string>
+     */
+    private function aiFeedbackRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->aiWriteRoles(),
+            ['production_director', 'supervisor', 'shift_leader']
+        )));
+    }
+
+    /**
      * Roles allowed to ask natural-language questions over governed MOM data.
      *
      * @return array<int, string>
@@ -298,6 +311,7 @@ class AiSchedulingController extends BaseController
     public function listPredictions(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         // MES-001: Add plant_id scoping for multi-tenant isolation
         $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
@@ -621,6 +635,7 @@ class AiSchedulingController extends BaseController
     public function getSpcAnomalies(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         try {
             // Try DB first — query quality_predictions with prediction_type = 'spc_anomaly'
@@ -729,6 +744,7 @@ class AiSchedulingController extends BaseController
     public function getToolWearPredictions(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         try {
             // Try DB first — query quality_predictions with prediction_type = 'tool_wear'
@@ -826,6 +842,7 @@ class AiSchedulingController extends BaseController
     public function getDashboard(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         // MES-002: Add plant_id scoping for multi-tenant isolation
         $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
@@ -1810,7 +1827,7 @@ class AiSchedulingController extends BaseController
     public function aiFeedbackSubmit(): never
     {
         $user = $this->requireAuth();
-        $this->requireAiReadAccess($user);
+        $this->requireAnyRole($user, $this->aiFeedbackRoles());
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -2031,6 +2048,7 @@ class AiSchedulingController extends BaseController
             $predictionMetrics = $pipeline->getDashboardMetrics([
                 'plant_id' => (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? ''),
             ]);
+            $plantId = (string)($user['plant_id'] ?? $_SESSION['plant_id'] ?? '');
 
             // Get schedule metrics from DB or JSON
             $scheduleMetrics = [
@@ -2042,22 +2060,29 @@ class AiSchedulingController extends BaseController
             $db = $this->getDb();
             if ($db !== null) {
                 try {
+                    $scheduleWhere = $plantId !== '' ? 'WHERE org_plant_id = :schedule_plant_id' : 'WHERE 1=1';
+                    $scheduleParams = $plantId !== '' ? [':schedule_plant_id' => $plantId] : [];
                     $scheduleMetrics['total_slots'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM production_schedule_slots"
+                        "SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}",
+                        $scheduleParams
                     ) ?? 0);
 
                     $scheduleMetrics['active_slots'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM production_schedule_slots WHERE slot_date >= CURRENT_DATE"
+                        "SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere} AND slot_date >= CURRENT_DATE",
+                        $scheduleParams
                     ) ?? 0);
 
+                    $conflictWhere = $plantId !== '' ? 'resolved = FALSE AND org_plant_id = :schedule_plant_id' : 'resolved = FALSE';
                     $scheduleMetrics['conflict_count'] = (int)($db->queryScalar(
-                        "SELECT COUNT(*) FROM schedule_conflicts WHERE resolved = FALSE"
+                        "SELECT COUNT(*) FROM schedule_conflicts WHERE {$conflictWhere}",
+                        $scheduleParams
                     ) ?? 0);
                 } catch (Throwable $e) {
                     @error_log('[AiScheduling] aiDashboard schedule metrics DB fallback: ' . $e->getMessage());
 
                     // Fallback to JSON for schedule metrics
                     $slots = $this->readJsonFile($this->aiDir() . '/schedule-slots.json') ?? [];
+                    $slots = $this->filterAiRowsByPlant($slots, $plantId);
                     $scheduleMetrics['total_slots'] = count($slots);
                     $today = gmdate('Y-m-d');
                     $scheduleMetrics['active_slots'] = count(array_filter(
@@ -2068,6 +2093,7 @@ class AiSchedulingController extends BaseController
             } else {
                 // No DB, use JSON
                 $slots = $this->readJsonFile($this->aiDir() . '/schedule-slots.json') ?? [];
+                $slots = $this->filterAiRowsByPlant($slots, $plantId);
                 $scheduleMetrics['total_slots'] = count($slots);
                 $today = gmdate('Y-m-d');
                 $scheduleMetrics['active_slots'] = count(array_filter(

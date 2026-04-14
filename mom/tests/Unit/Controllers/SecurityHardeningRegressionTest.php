@@ -43,7 +43,8 @@ final class SecurityHardeningRegressionTest extends TestCase
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
 
-        $this->assertMatchesRegularExpression('/public function aiFeedbackSubmit\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
+        $this->assertStringContainsString('private function aiFeedbackRoles(): array', $source);
+        $this->assertMatchesRegularExpression('/public function aiFeedbackSubmit\(\): never\s*\{.*?\$this->requireAnyRole\(\$user, \$this->aiFeedbackRoles\(\)\);.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertMatchesRegularExpression('/public function aiFeedbackSubmit\(\): never\s*\{.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertStringContainsString('aiFeedbackIdempotency', $source);
         $this->assertStringContainsString('$this->idempotency()->execute', $source);
@@ -76,10 +77,23 @@ final class SecurityHardeningRegressionTest extends TestCase
         $pipeline = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/AiPredictionPipeline.php');
 
         $this->assertMatchesRegularExpression('/public function aiModelList\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function listPredictions\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function getSpcAnomalies\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function getToolWearPredictions\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function getDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertMatchesRegularExpression('/public function aiDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
+        $this->assertStringContainsString('SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}', $controller);
         $this->assertStringContainsString('$canViewModelInternals = $this->userHasAnyRole($user, admin_roles())', $controller);
         $this->assertStringContainsString('unset($row[\'training_data_source\'], $row[\'config\'], $row[\'metadata\']);', $controller);
         $this->assertStringContainsString('p.plant_id = :mtta_plant_id', $pipeline);
+    }
+
+    public function testCanonicalEvidenceFinalizationRequiresControlledRole(): void
+    {
+        $controller = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/EqmsControlPlaneController.php');
+
+        $this->assertStringContainsString('private function evidenceFinalizationRoles(): array', $controller);
+        $this->assertMatchesRegularExpression('/public function finalizeEvidencePackage\(\): never\s*\{.*?\$this->requireAnyRole\(\$user, \$this->evidenceFinalizationRoles\(\)\);.*?\$this->requireCsrf\(\);/s', $controller);
     }
 
     public function testEvidenceIdempotencyUsesPlatformKeyContract(): void

@@ -47,10 +47,22 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertSame(1, $clockOut['quantity_scrap']);
     }
 
+    public function testClockOutRejectsScrapWithoutCompletedQuantity(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $clockIn = $service->clockIn('operator-1', 'WO-1001', 20, 'MC-5AX-01');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('qty_scrap_exceeds_completed');
+
+        $service->clockOut((string)$clockIn['entry_id'], 0, 1, 'operator-1');
+    }
+
     public function testCompleteTaskPersistsResultQuantitiesAndRejectsContradictions(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);
         $task = $service->assignTask('operator-1', 'WO-1001', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
 
         $completed = $service->completeTask((string)$task['queue_id'], 'operator-1', [
             'result' => 'partial',
@@ -65,8 +77,12 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertSame(7, $completed['qty_completed']);
         $this->assertSame(1, $completed['qty_scrap']);
         $this->assertSame('INSERT_ISSUE', $completed['completion_reason_code']);
+        $events = json_decode((string)file_get_contents($this->tmpDir . '/mobile/task_events.json'), true);
+        $this->assertIsArray($events);
+        $this->assertSame(['mobile.task_assigned', 'mobile.task_started', 'mobile.task_completed'], array_column($events, 'event_type'));
 
         $task2 = $service->assignTask('operator-1', 'WO-1002', 'operation_complete', []);
+        $service->startTask((string)$task2['queue_id'], 'operator-1');
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('pass_result_cannot_have_scrap');
         $service->completeTask((string)$task2['queue_id'], 'operator-1', [
@@ -80,6 +96,7 @@ final class MobileWorkQueueServiceTest extends TestCase
     {
         $service = new MobileWorkQueueService($this->tmpDir);
         $task = $service->assignTask('operator-1', 'WO-1003', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
 
         try {
             $service->completeTask((string)$task['queue_id'], 'operator-1', [
@@ -93,6 +110,7 @@ final class MobileWorkQueueServiceTest extends TestCase
         }
 
         $task2 = $service->assignTask('operator-1', 'WO-1004', 'operation_complete', []);
+        $service->startTask((string)$task2['queue_id'], 'operator-1');
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('qty_scrap_exceeds_completed');
         $service->completeTask((string)$task2['queue_id'], 'operator-1', [
@@ -100,6 +118,46 @@ final class MobileWorkQueueServiceTest extends TestCase
             'qty_completed' => 0,
             'qty_scrap' => 1,
             'reason_code' => 'DEF-DIM',
+        ]);
+    }
+
+    public function testCompleteTaskAutoStartsPendingAndRejectsDoubleCompletion(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1005', 'operation_complete', []);
+
+        // Pending tasks are auto-started for backward compatibility
+        $completed = $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 1,
+            'qty_scrap' => 0,
+        ]);
+        $this->assertSame('completed', $completed['task_status']);
+        $this->assertNotEmpty($completed['started_at']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('task_already_completed');
+        $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 1,
+            'qty_scrap' => 0,
+        ]);
+    }
+
+    public function testCompleteTaskRejectsNegativeActualMinutes(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1005', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('invalid_actual_minutes');
+
+        $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 1,
+            'qty_scrap' => 0,
+            'actual_minutes' => -1,
         ]);
     }
 

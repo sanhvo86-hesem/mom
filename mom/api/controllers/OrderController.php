@@ -196,6 +196,52 @@ class OrderController extends BaseController
         }
     }
 
+    private function positiveIntField(mixed $value, string $field): int
+    {
+        $text = trim((string)$value);
+        if (preg_match('/^\d+$/', $text) !== 1 || (int)$text <= 0) {
+            $this->error('invalid_' . $field, 400, "{$field} must be a positive integer.");
+        }
+
+        return (int)$text;
+    }
+
+    private function nonNegativeFloatField(mixed $value, string $field): float
+    {
+        if ($value === null || $value === '') {
+            return 0.0;
+        }
+        if (!is_numeric($value) || (float)$value < 0.0) {
+            $this->error('invalid_' . $field, 400, "{$field} must be a non-negative number.");
+        }
+
+        return round((float)$value, 2);
+    }
+
+    private function optionalDateField(mixed $value, string $field): string
+    {
+        $date = trim((string)$value);
+        if ($date === '') {
+            return '';
+        }
+        $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        if ($parsed === false || $parsed->format('Y-m-d') !== $date) {
+            $this->error('invalid_' . $field, 400, "{$field} must use YYYY-MM-DD.");
+        }
+
+        return $date;
+    }
+
+    private function requiredDateField(mixed $value, string $field): string
+    {
+        $date = $this->optionalDateField($value, $field);
+        if ($date === '') {
+            $this->error('missing_' . $field, 400, "{$field} is required.");
+        }
+
+        return $date;
+    }
+
     /**
      * Get primary user role string.
      */
@@ -807,10 +853,10 @@ class OrderController extends BaseController
             'part_revision'   => trim((string)($body['part_revision'] ?? '')),
             'part_description'=> trim((string)($body['part_description'] ?? '')),
             'material_spec'   => trim((string)($body['material_spec'] ?? '')),
-            'qty_ordered'     => (int)($body['qty_ordered'] ?? 0),
-            'start_date'      => (string)($body['start_date'] ?? ''),
-            'release_target_date' => (string)($body['release_target_date'] ?? ''),
-            'due_date'        => (string)($body['due_date'] ?? ''),
+            'qty_ordered'     => $this->positiveIntField($body['qty_ordered'] ?? null, 'qty_ordered'),
+            'start_date'      => $this->optionalDateField($body['start_date'] ?? '', 'start_date'),
+            'release_target_date' => $this->optionalDateField($body['release_target_date'] ?? '', 'release_target_date'),
+            'due_date'        => $this->requiredDateField($body['due_date'] ?? '', 'due_date'),
             'routing_id'      => (string)($body['routing_id'] ?? ''),
             'bom_id'          => (string)($body['bom_id'] ?? ''),
             'control_plan_id' => (string)($body['control_plan_id'] ?? ''),
@@ -911,14 +957,14 @@ class OrderController extends BaseController
         $wo = [
             'wo_number'        => $this->orderService()->generateOrderNumber('wo'),
             'jo_number'        => trim((string)($body['jo_number'] ?? '')),
-            'operation_number' => (int)($body['operation_number'] ?? 10),
+            'operation_number' => $this->positiveIntField($body['operation_number'] ?? 10, 'operation_number'),
             'operation_desc'   => trim((string)($body['operation_desc'] ?? '')),
             'machine_id'       => trim((string)($body['machine_id'] ?? '')),
             'work_center_id'   => trim((string)($body['work_center_id'] ?? '')),
             'operator_id'      => (string)($body['operator_id'] ?? ''),
             'nc_program_id'    => (string)($body['nc_program_id'] ?? ''),
-            'setup_time_est'   => (float)($body['setup_time_est'] ?? 0),
-            'run_time_est'     => (float)($body['run_time_est'] ?? 0),
+            'setup_time_est'   => $this->nonNegativeFloatField($body['setup_time_est'] ?? 0, 'setup_time_est'),
+            'run_time_est'     => $this->nonNegativeFloatField($body['run_time_est'] ?? 0, 'run_time_est'),
             'scheduled_start'  => (string)($body['scheduled_start'] ?? ''),
             'scheduled_end'    => (string)($body['scheduled_end'] ?? ''),
             'fixture_id'       => (string)($body['fixture_id'] ?? ''),

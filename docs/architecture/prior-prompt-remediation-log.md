@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-reaudit-20260414-102059`
+Audited branch: `codex/worldclass-reaudit-20260414-122702`
 
 Date: 2026-04-14
 
@@ -40,6 +40,15 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | JO/WO generic update field drift | Fixed now | `OrderController` now rejects unknown JO/WO update fields before workflow validation and validates WO schedule window order. |
 | Evidence replay-key contract drift | Fixed now | `EvidenceController` idempotency keys now follow the 16-128 character platform token contract without colon separators. |
 | Mobile task completion data quality | Fixed now | Mobile completion rejects scrap greater than completed quantity and requires a reason code for fail/partial/scrap outcomes. |
+| Mobile task lifecycle event history | Fixed now | Mobile assignment/start/completion now writes `mobile/task_events.json`; completion requires `in_progress` and cannot overwrite completed tasks. |
+| Mobile clock-out scrap contradiction | Fixed now | Clock-out rejects `qty_scrap > qty_completed` even when completed quantity is zero. |
+| Mobile inspection replay identity through controller | Fixed now | `MobileController::captureInspection()` forwards capture/client/idempotency/captured timestamp fields into the service. |
+| Canonical evidence finalization role gate | Fixed now | `EqmsControlPlaneController::finalizeEvidencePackage()` now requires controlled evidence finalization roles. |
+| CNC setup-sheet release default | Fixed now | Setup sheet creation defaults to `draft`, and strict dispatch no longer treats missing setup status as released. |
+| MTConnect XML entity expansion | Fixed now | `EdgeConnectorService` rejects `DOCTYPE`/`ENTITY` payloads and parses MTConnect XML without `LIBXML_NOENT`. |
+| Legacy AI read surface gating | Fixed now | Prediction list, SPC anomalies, tool-wear, and legacy AI dashboard now require AI read roles. |
+| AI feedback role split | Fixed now | Feedback submission now requires AI feedback/write roles instead of broad read-only advisory roles. |
+| Parent JO lifecycle for WO creation | Fixed now | `OrderService::createWorkOrder()` rejects terminal parent job orders. |
 | Genealogy runtime/DB ontology drift | Fixed now | Migration `121_genealogy_runtime_ontology_constraints.sql` aligns DB checks with `GenealogyGraphService::nodeType()`. |
 
 ## Partially completed or staged

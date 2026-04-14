@@ -1,0 +1,25 @@
+{
+  "artifact_type": "promotion_receipt",
+  "receipt_id": "worldclass-closure-20260414-1212-premerge",
+  "manifest_id": "worldclass-closure-20260414-1212",
+  "branch": "codex/worldclass-closure-20260414-1212",
+  "target_branch": "main",
+  "promotion_state": "premerge_validation_passed",
+  "created_at": "2026-04-14T05:12:00Z",
+  "merge_strategy": "fast_forward_preferred_else_stop",
+  "validation_evidence": {
+    "focused_lint": "passed",
+    "world_class_control_plane_execution_test": "passed",
+    "manufacturing_event_and_mobile_tests": "passed",
+    "repo_boundary": "p0_p1_clean_p2_deferred",
+    "workflow_status_authority": "clean",
+    "composer_analyse": "passed",
+    "composer_test": "passed",
+    "full_composer_check": "passed"
+  },
+  "branch_cleanup_gate": {
+    "delete_remote_branch_after_merge": true,
+    "delete_local_branch_after_merge": true,
+    "do_not_delete_if_merge_blocked": true
+  }
+}

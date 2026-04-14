@@ -13,6 +13,8 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/v1/eqms/control-plane/commands/{command_id}', EqmsControlPlaneController::class, 'getCommand');
     $router->post('/api/v1/eqms/control-plane/commands/validate', EqmsControlPlaneController::class, 'validateCommand');
     $router->post('/api/v1/eqms/documents/revisions', EqmsControlPlaneController::class, 'createDocumentRevision');
+    $router->post('/api/v1/eqms/documents/read-acknowledgements', EqmsControlPlaneController::class, 'acknowledgeDocumentRead');
+    $router->post('/api/v1/eqms/documents/revisions/supersede', EqmsControlPlaneController::class, 'supersedeDocumentRevision');
     $router->post('/api/v1/eqms/forms/issuances', EqmsControlPlaneController::class, 'issueForm');
     $router->post('/api/v1/eqms/forms/issuance-manifest/validate', EqmsControlPlaneController::class, 'validateIssuanceManifest');
     $router->post('/api/v1/eqms/forms/submission-attempts', EqmsControlPlaneController::class, 'recordFormSubmissionAttempt');
@@ -26,6 +28,7 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/v1/eqms/publications/monitor', EqmsControlPlaneController::class, 'publicationMonitor');
     $router->post('/api/v1/eqms/publications/actions', EqmsControlPlaneController::class, 'requestPublicationAction');
     $router->post('/api/v1/eqms/evidence/finalize', EqmsControlPlaneController::class, 'finalizeEvidencePackage');
+    $router->post('/api/v1/eqms/evidence/amendments', EqmsControlPlaneController::class, 'createEvidenceAmendment');
     $router->get('/api/v1/eqms/evidence/package', EqmsControlPlaneController::class, 'canonicalEvidencePackage');
     $router->post('/api/v1/eqms/audit-packs/manifest', EqmsControlPlaneController::class, 'buildAuditPackManifest');
     $router->post('/api/v1/eqms/evidence-graph/preview', EqmsControlPlaneController::class, 'evidenceGraphPreview');

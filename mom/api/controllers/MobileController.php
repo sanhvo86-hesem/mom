@@ -465,6 +465,11 @@ class MobileController extends BaseController
                 'offline_created' => $body['offline_created'] ?? false,
                 'sync_status' => trim((string)($body['sync_status'] ?? 'synced')),
                 'device_id' => trim((string)($body['device_id'] ?? '')),
+                'capture_id' => trim((string)($body['capture_id'] ?? '')),
+                'client_capture_id' => trim((string)($body['client_capture_id'] ?? $body['client_record_id'] ?? '')),
+                'client_record_id' => trim((string)($body['client_record_id'] ?? '')),
+                'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
+                'captured_at' => trim((string)($body['captured_at'] ?? $body['created_at'] ?? '')),
                 'metadata' => array_merge(
                     is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
                     $inspectorId !== $employeeId ? [

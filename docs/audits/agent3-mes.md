@@ -1,6 +1,12 @@
 # Agent 3 - MOM / MES Execution Backbone
 
-Branch audited: `codex/worldclass-reaudit-20260414-102059`
+Branch audited: `codex/worldclass-reaudit-20260414-122702`
+
+## 2026-04-14 Current-Pass Addendum
+
+- Confirmed P1 mobile snapshot weakness: mobile task start/complete mutated queue rows without an event journal. Remediation in this pass adds `mobile/task_events.json` as an append-only compatibility ledger while keeping `work_queue.json` as the snapshot.
+- Confirmed P1 mobile lifecycle gap: tasks could be completed without start or overwritten after completion. Remediation enforces `pending -> in_progress -> completed`, rejects pending completion and completed overwrite, and records assignment/start/completion events.
+- Confirmed P2 labor validation gap: clock-out allowed scrap greater than zero with zero completed quantity. Remediation rejects `qty_scrap > qty_completed` unconditionally.
 
 ## Findings
 

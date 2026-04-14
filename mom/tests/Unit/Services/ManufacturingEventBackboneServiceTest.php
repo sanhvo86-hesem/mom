@@ -37,6 +37,15 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'jo_number' => 'JO-1001',
             'part_number' => 'PN-900',
             'lot_number' => 'LOT-900',
+            'equipment_id' => 'MC-5AX-01',
+            'operator_id' => 'operator-1',
+            'tool_id' => 'TOOL-EM10-01',
+            'process_id' => 'PROC-OP10',
+            'material_lot_id' => 'MAT-LOT-900',
+            'routing_id' => 'ROUTE-900',
+            'setup_sheet_id' => 'SETUP-900',
+            'inspection_plan_id' => 'IP-900',
+            'nc_program_id' => 'NC-900',
             'actor_id' => 'operator-1',
             'actor_role' => 'operator',
             'occurred_at' => '2026-04-13T01:00:00Z',
@@ -71,13 +80,20 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
 
         $timeline = $service->productionTimeline(['wo_number' => 'WO-1001']);
         $limited = $service->productionTimeline(['wo_number' => 'WO-1001', 'limit' => 2]);
+        $machineTimeline = $service->productionTimeline(['equipment_id' => 'MC-5AX-01']);
 
         $this->assertFalse($work['replayed']);
         $this->assertFalse($inspection['replayed']);
         $this->assertFalse($evidence['replayed']);
         $this->assertSame('1.0', $work['event']['payload_schema_version']);
+        $this->assertSame('MC-5AX-01', $work['event']['equipment_id']);
+        $this->assertSame('operator-1', $work['event']['operator_id']);
+        $this->assertSame('TOOL-EM10-01', $work['event']['tool_id']);
+        $this->assertSame('MAT-LOT-900', $work['event']['material_lot_id']);
         $this->assertSame(3, $timeline['count']);
         $this->assertSame(2, $limited['count']);
+        $this->assertSame(1, $machineTimeline['count']);
+        $this->assertSame('MC-5AX-01', $machineTimeline['filters']['equipment_id']);
         $this->assertSame([
             ManufacturingEventBackboneService::EVENT_ORDER_WORK_EXECUTION,
             ManufacturingEventBackboneService::EVENT_QUALITY_INSPECTION,
@@ -89,6 +105,32 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
         ], array_column($limited['events'], 'event_type'));
         $this->assertSame('NCR-1001', $timeline['events'][1]['ncr_id']);
         $this->assertSame('EVID-1001', $timeline['events'][2]['evidence_id']);
+    }
+
+    public function testTimelineFilterFieldsExposeWorldClass5MContext(): void
+    {
+        $fields = ManufacturingEventBackboneService::timelineFilterFields();
+
+        foreach ([
+            'equipment_id',
+            'operator_id',
+            'tool_id',
+            'process_id',
+            'material_id',
+            'material_lot_id',
+            'material_batch_id',
+            'routing_id',
+            'setup_sheet_id',
+            'inspection_plan_id',
+            'nc_program_id',
+            'cnc_program_id',
+        ] as $field) {
+            $this->assertContains($field, $fields);
+        }
+
+        $migration = (string)file_get_contents(QMS_TEST_BASE_DIR . '/database/migrations/122_digital_thread_event_context_filters.sql');
+        $this->assertStringContainsString('ADD COLUMN IF NOT EXISTS equipment_id', $migration);
+        $this->assertStringContainsString('idx_mes_operational_event_material_context', $migration);
     }
 
     public function testImmutableHistoryExtendsAggregateHashChain(): void

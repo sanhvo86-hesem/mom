@@ -368,6 +368,23 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->service()->assertReportActorCanSubmit($target, 'operator-2', false);
     }
 
+    public function testReportActorGuardAcceptsGovernedActorAlias(): void
+    {
+        $target = $this->target();
+        $target['operator_id'] = 'EMP-1001';
+
+        $this->service()->assertReportActorCanSubmit($target, 'operator-1', false, [
+            'actor_aliases' => ['operator-1', 'EMP-1001'],
+        ]);
+        $this->addToAssertionCount(1);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('forbidden_operator_assignment');
+        $this->service()->assertReportActorCanSubmit($target, 'operator-2', false, [
+            'actor_aliases' => ['operator-2', 'EMP-2002'],
+        ]);
+    }
+
     public function testBlankOperatorAssignmentRequiresPlannerOverride(): void
     {
         $target = $this->target();
@@ -919,6 +936,32 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('blocked', $target['reference_validation']['status']);
         $this->assertContains('unverified_cnc_program_reference', $target['reference_validation']['blockers']);
         $this->assertContains('unverified_setup_sheet_reference', $target['reference_validation']['blockers']);
+    }
+
+    public function testStrictReferencePolicyDoesNotTreatMissingSetupSheetStatusAsReleased(): void
+    {
+        mkdir($this->dataDir . '/cnc-programs', 0775, true);
+        file_put_contents($this->dataDir . '/cnc-programs/programs.json', json_encode([
+            ['id' => 'NC-REL', 'program_number' => 'NC-REL', 'status' => 'released'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        file_put_contents($this->dataDir . '/cnc-programs/setup-sheets.json', json_encode([
+            ['id' => 'SETUP-NO-STATUS', 'setup_number' => 'SETUP-NO-STATUS'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        $target = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-STRICT-SETUP-DRAFT',
+            'machine_id' => 'MC-5AX-01',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+            'cnc_program_id' => 'NC-REL',
+            'setup_sheet_id' => 'SETUP-NO-STATUS',
+            'inspection_plan_id' => 'IP-714-OP20',
+            'reference_policy' => 'enforce_dispatch',
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('blocked', $target['reference_validation']['status']);
+        $this->assertContains('setup_sheet_not_released', $target['reference_validation']['blockers']);
     }
 
     public function testExecutionStateTracksPauseResumeAndCompletionWithoutNewStatusModel(): void

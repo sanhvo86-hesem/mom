@@ -1,0 +1,53 @@
+{
+  "artifact_type": "source_promotion_manifest",
+  "manifest_id": "worldclass-closure-20260414-1212",
+  "branch": "codex/worldclass-closure-20260414-1212",
+  "base_branch": "main",
+  "record_state": "pre_merge_controlled_source_manifest",
+  "created_at": "2026-04-14T05:12:00Z",
+  "change_authority": {
+    "authority_type": "codex_remediation_request",
+    "authority_ref": "WORLDCLASS-CLOSURE-20260414",
+    "scope": "repo_hygiene_eqms_control_plane_digital_thread"
+  },
+  "source_boundaries": {
+    "controlled_source": [
+      "mom/api/controllers",
+      "mom/api/routes",
+      "mom/api/services",
+      "mom/database/migrations",
+      "mom/tests",
+      "mom/docs/backend",
+      "mom/release"
+    ],
+    "removed_from_controlled_source": [
+      ".ai/index.log",
+      ".vscode/launch.json",
+      "mom/.DS_Store",
+      "mom/data/audit.log",
+      "mom/data/log-archive",
+      "mom/data/sessions",
+      "mom/data/online-forms/schemas/_archive",
+      "mom/docs/forms/**/.backups",
+      "mom/docs/forms/**/*.bak",
+      "mom/docs/system/agent-reports/tranche12",
+      "mom/docs/system/*tranche12*.md",
+      "mom/ops/local-runtime/.php-server.*",
+      "tools/php82"
+    ]
+  },
+  "required_validation": [
+    "php -l touched PHP files",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php --testdox",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/ManufacturingEventBackboneServiceTest.php tests/Unit/Services/MobileWorkQueueServiceTest.php --testdox",
+    "php tools/release/check_repo_boundary.php",
+    "php tools/release/check_workflow_status_authority.php",
+    "./composer check"
+  ],
+  "merge_gate": {
+    "unresolved_p0": 0,
+    "unresolved_non_waived_p1": 0,
+    "runbooks_present": true,
+    "accepted_waivers_documented": true
+  }
+}

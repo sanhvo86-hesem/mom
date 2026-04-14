@@ -64,6 +64,46 @@ final class OrderServiceEngineeringGateTest extends TestCase
         $this->assertSame('JO-2026-0002', $job['jo_number']);
     }
 
+    public function testCreateWorkOrderRejectsTerminalParentJobOrder(): void
+    {
+        $service = new OrderService($this->dataDir);
+        $service->createSalesOrder([
+            'so_number' => 'SO-2026-0003',
+            'status' => 'engineering_ready',
+            'customer_name' => 'ACME',
+            'total_value' => 1,
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+        $service->createJobOrder([
+            'jo_number' => 'JO-2026-0003',
+            'so_number' => 'SO-2026-0003',
+            'status' => 'completed',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('not eligible for Work Order creation');
+
+        $service->createWorkOrder([
+            'wo_number' => 'WO-2026-0003-10',
+            'jo_number' => 'JO-2026-0003',
+            'status' => 'scheduled',
+        ]);
+    }
+
+    public function testListSalesOrdersDoesNotDuplicateRows(): void
+    {
+        $service = new OrderService($this->dataDir);
+        $service->createSalesOrder([
+            'so_number' => 'SO-2026-0004',
+            'status' => 'confirmed',
+            'customer_name' => 'ACME',
+            'total_value' => 1,
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+
+        $this->assertCount(1, $service->listSalesOrders());
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {

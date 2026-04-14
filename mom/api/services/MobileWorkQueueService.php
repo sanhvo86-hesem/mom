@@ -52,6 +52,13 @@ final class MobileWorkQueueService
     /** Valid mobile task completion results. */
     private const TASK_RESULTS = ['pass', 'fail', 'partial'];
 
+    /** Append-only mobile task event types. */
+    private const TASK_EVENT_TYPES = [
+        'mobile.task_assigned',
+        'mobile.task_started',
+        'mobile.task_completed',
+    ];
+
     // ── Construction ────────────────────────────────────────────────────────
 
     public function __construct(
@@ -158,9 +165,12 @@ final class MobileWorkQueueService
             'updated_at'        => $now,
         ];
 
-        $queue   = $this->loadFile('work_queue');
-        $queue[] = $record;
-        $this->saveFile('work_queue', $queue);
+        $this->withStoreLock('work_queue', function () use ($record): void {
+            $queue   = $this->loadFile('work_queue');
+            $queue[] = $record;
+            $this->saveFile('work_queue', $queue);
+        });
+        $this->appendTaskEvent($record, 'mobile.task_assigned');
 
         return $record;
     }
@@ -198,6 +208,13 @@ final class MobileWorkQueueService
                     if (($task['operator_id'] ?? '') !== $operatorId) {
                         throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
                     }
+                    $currentStatus = (string)($task['task_status'] ?? self::TASK_STATUSES[0]);
+                    if ($currentStatus === self::TASK_STATUSES[1]) {
+                        return $task;
+                    }
+                    if ($currentStatus !== self::TASK_STATUSES[0]) {
+                        throw new RuntimeException('invalid_task_start_transition');
+                    }
                     $qualification = $this->qualificationGate->assertCanStartTask($operatorId, $task);
 
                     $queue[$idx] = array_merge($task, [
@@ -209,6 +226,10 @@ final class MobileWorkQueueService
 
                     // Write data while still holding lock
                     $this->saveFile('work_queue', $queue);
+                    $this->appendTaskEvent($queue[$idx], 'mobile.task_started', [
+                        'previous_status' => $currentStatus,
+                        'qualification_gate' => $qualification,
+                    ]);
                     return $queue[$idx];
                 }
 
@@ -264,9 +285,26 @@ final class MobileWorkQueueService
                     if (($task['operator_id'] ?? '') !== $operatorId) {
                         throw new RuntimeException("Task {$queueId} is not assigned to operator {$operatorId}.");
                     }
+                    $currentStatus = (string)($task['task_status'] ?? self::TASK_STATUSES[0]);
+                    if ($currentStatus === self::TASK_STATUSES[2]) {
+                        throw new RuntimeException('task_already_completed');
+                    }
+                    // Auto-start pending tasks for backward compatibility with
+                    // clients that call completeTask without an explicit startTask.
+                    if ($currentStatus === self::TASK_STATUSES[0]) {
+                        $task['task_status'] = self::TASK_STATUSES[1];
+                        $task['started_at'] = $now;
+                        $currentStatus = self::TASK_STATUSES[1];
+                    }
+                    if ($currentStatus !== self::TASK_STATUSES[1]) {
+                        throw new RuntimeException('task_not_started');
+                    }
 
                     // Calculate actual minutes if started_at is set
                     $actualMinutes = $result['actual_minutes'] ?? null;
+                    if ($actualMinutes !== null) {
+                        $actualMinutes = $this->nonNegativeFloat($actualMinutes, 'actual_minutes');
+                    }
                     if ($actualMinutes === null && !empty($task['started_at'])) {
                         $startedAt = new \DateTimeImmutable($task['started_at']);
                         $nowDt     = new \DateTimeImmutable($now);
@@ -290,6 +328,13 @@ final class MobileWorkQueueService
 
                     // Write data while still holding lock
                     $this->saveFile('work_queue', $queue);
+                    $this->appendTaskEvent($queue[$idx], 'mobile.task_completed', [
+                        'previous_status' => $currentStatus,
+                        'result' => $completionResult,
+                        'qty_completed' => $qtyCompleted,
+                        'qty_scrap' => $qtyScrap,
+                        'completion_reason_code' => $completionReasonCode,
+                    ]);
                     return $queue[$idx];
                 }
 
@@ -360,7 +405,7 @@ final class MobileWorkQueueService
             $now     = $this->nowIso();
             $completed = $qtyCompleted === null ? null : $this->nonNegativeInt($qtyCompleted, 'qty_completed');
             $scrap = $qtyScrap === null ? null : $this->nonNegativeInt($qtyScrap, 'qty_scrap');
-            if ($completed !== null && $scrap !== null && $scrap > $completed && $completed > 0) {
+            if ($completed !== null && $scrap !== null && $scrap > $completed) {
                 throw new RuntimeException('qty_scrap_exceeds_completed');
             }
 
@@ -1093,6 +1138,51 @@ final class MobileWorkQueueService
     }
 
     /**
+     * @param array<string, mixed> $task
+     * @param array<string, mixed> $context
+     */
+    private function appendTaskEvent(array $task, string $eventType, array $context = []): void
+    {
+        if (!in_array($eventType, self::TASK_EVENT_TYPES, true)) {
+            throw new RuntimeException('invalid_mobile_task_event_type');
+        }
+
+        $now = $this->nowIso();
+        $event = [
+            'event_id' => 'MTE-' . bin2hex(random_bytes(8)),
+            'event_type' => $eventType,
+            'event_schema_version' => 'mobile_task_event.v1',
+            'queue_id' => $this->stringValue($task['queue_id'] ?? ''),
+            'operator_id' => $this->stringValue($task['operator_id'] ?? ''),
+            'wo_number' => $this->stringValue($task['wo_number'] ?? ''),
+            'jo_number' => $this->nullableString($task['jo_number'] ?? null),
+            'operation_seq' => $task['operation_seq'] ?? null,
+            'task_type' => $this->stringValue($task['task_type'] ?? ''),
+            'task_status' => $this->stringValue($task['task_status'] ?? ''),
+            'machine_id' => $this->nullableString($task['machine_id'] ?? null),
+            'work_center_id' => $this->nullableString($task['work_center_id'] ?? null),
+            'occurred_at' => $now,
+            'recorded_at' => $now,
+            'source_store' => 'mobile/work_queue.json',
+            'operational_truth' => true,
+            'context' => $context,
+        ];
+        $event['event_fingerprint'] = hash('sha256', $this->canonicalJson([
+            'event_type' => $event['event_type'],
+            'queue_id' => $event['queue_id'],
+            'operator_id' => $event['operator_id'],
+            'task_status' => $event['task_status'],
+            'context' => $context,
+        ]));
+
+        $this->withStoreLock('task_events', function () use ($event): void {
+            $events = $this->loadFile('task_events');
+            $events[] = $event;
+            $this->saveFile('task_events', $events);
+        });
+    }
+
+    /**
      * @param array<string, mixed> $entry
      */
     private function offlineEntryKey(array $entry, string $operatorId, string $type): string
@@ -1345,6 +1435,18 @@ final class MobileWorkQueueService
         return (int)$value;
     }
 
+    private function nonNegativeFloat(mixed $value, string $field): float
+    {
+        if ($value === null || $value === '') {
+            return 0.0;
+        }
+        if (!is_numeric($value) || (float)$value < 0.0) {
+            throw new RuntimeException('invalid_' . $field);
+        }
+
+        return round((float)$value, 2);
+    }
+
     private function normalizeTaskResult(mixed $value): string
     {
         $result = strtolower($this->stringValue($value));
@@ -1471,7 +1573,7 @@ final class MobileWorkQueueService
      */
     private function withStoreLock(string $name, callable $callback): mixed
     {
-        if (!in_array($name, ['work_queue', 'time_entries', 'inspections'], true)) {
+        if (!in_array($name, ['work_queue', 'time_entries', 'inspections', 'task_events'], true)) {
             throw new RuntimeException('invalid_mobile_store_lock');
         }
 

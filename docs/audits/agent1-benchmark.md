@@ -1,6 +1,13 @@
 # Agent 1 - Global Benchmark And Standards Refresh
 
-Branch audited: `codex/worldclass-reaudit-20260414-102059`
+Branch audited: `codex/worldclass-reaudit-20260414-122702`
+
+## 2026-04-14 Current-Pass Addendum
+
+- Confirmed P1 staged authority: dispatch/mobile/CNC execution still has JSON compatibility authority with DB bridge mirrors; this remains documented as a migration bridge, not the target state.
+- Confirmed P1 CNC/setup-sheet drift: setup sheets previously lacked explicit release status. Remediation in this pass makes newly created setup sheets `draft` and treats missing status as not released for strict dispatch reference enforcement.
+- Confirmed P1 EQMS closure gap: canonical evidence finalization needed a role gate. Remediation in this pass requires controlled evidence finalization roles before CSRF-protected finalization.
+- Confirmed P2 AI/security gap: legacy AI read surfaces were not consistently AI-role scoped. Remediation in this pass adds AI read gates to prediction, SPC anomaly, tool-wear, and legacy dashboard reads.
 
 ## Findings
 
