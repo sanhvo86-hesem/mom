@@ -187,6 +187,7 @@ try {
     $move = $service->mutateFile('local-vps', 'test_root', 'move', ['path' => 'copied.txt', 'target_path' => 'uploads', 'name' => 'moved.txt']);
     smoke_assert(($move['destination_path'] ?? null) === 'uploads/moved.txt' && is_file($explorerRoot . '/uploads/moved.txt') && !is_file($explorerRoot . '/copied.txt'), 'File explorer should move files for cut/paste and drag/drop.');
     $delete = $service->mutateFile('local-vps', 'test_root', 'delete', ['path' => 'uploads/moved.txt']);
+    clearstatcache(true, $explorerRoot . '/uploads/moved.txt');
     smoke_assert(($delete['mode'] ?? null) === 'delete' && !is_file($explorerRoot . '/uploads/moved.txt'), 'File explorer should delete files.');
     if (class_exists(ZipArchive::class)) {
         $zip = $service->mutateFile('local-vps', 'test_root', 'zip', ['path' => 'uploads/renamed.txt', 'target_path' => '', 'name' => 'renamed-test.zip']);
