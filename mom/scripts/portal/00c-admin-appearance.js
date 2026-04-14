@@ -1793,11 +1793,20 @@ function renderAuthorityStatusPanel(){
 }
 
 function renderControlledRegistrySummary(){
+  var snap = graphicsSnapshot();
   var templates = getAllTemplates();
+  var controlledTemplates = templates.filter(function(tpl){
+    return /backend-graphics-authority|backend|controlled/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''))
+      && !/preview-cache|unsaved-draft-cache|draft-cache|preview-seed/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''));
+  });
+  var overlayTemplates = templates.filter(function(tpl){
+    return /preview-cache|unsaved-draft-cache|draft-cache|preview-seed/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''));
+  });
   var counts = {};
   templates.forEach(function(tpl){ counts[tpl.status] = (counts[tpl.status] || 0) + 1; });
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px">'
-    + infoCard(L('Controlled registry', 'Controlled registry'), String(templates.length) + ' ' + T('templateCount'), 'full')
+    + infoCard(L('Controlled registry', 'Controlled registry'), String(controlledTemplates.length) + ' / ' + String(templates.length) + ' ' + T('templateCount'), snap.backendAvailable ? 'full' : 'partial')
+    + infoCard(L('Preview/draft overlays', 'Preview/draft overlays'), String(overlayTemplates.length), overlayTemplates.length ? 'preview' : 'neutral')
     + infoCard('Published', String(counts.published || 0), 'full')
     + infoCard('Validated', String(counts.validated || 0), 'full')
     + infoCard('Draft only', String(counts['draft-only'] || 0), 'preview')
@@ -2241,6 +2250,12 @@ function renderReleaseLinkagePanel(){
 
 function renderApiContractPanel(){
   var snap = graphicsSnapshot();
+  var statuses = snap.endpointStatus || {};
+  var endpointKeys = Object.keys(snap.endpoints || {});
+  var pendingCount = endpointKeys.filter(function(key){ return !statuses[key] || statuses[key] === 'pending backend'; }).length;
+  var apiChip = snap.backendAvailable && pendingCount === 0
+    ? statusChip('full', 'backend-ready')
+    : statusChip('partial', pendingCount ? ('contract catalog: ' + pendingCount + ' pending') : 'backend fallback');
   var rows = Object.keys(snap.endpoints || {}).map(function(key){
     var ep = snap.endpoints[key];
     return '<tr>'
@@ -2259,7 +2274,7 @@ function renderApiContractPanel(){
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Runtime status</th>'
       + '</tr></thead><tbody>'+rows+'</tbody></table>',
     false,
-    statusChip('admin', 'backend-ready')
+    apiChip
   );
 }
 

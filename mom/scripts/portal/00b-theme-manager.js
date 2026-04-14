@@ -38,6 +38,8 @@ var _adminConfig = null;
 var _adminConfigVersion = '';
 var _adminConfigEtag = '';
 var _adminConfigAuthorityState = 'unknown';
+var _adminConfigPreviewDirty = false;
+var _adminConfigPreviewReason = '';
 var _userPrefs = null;
 var _previewPrefs = null;
 var _templateStore = null;
@@ -86,6 +88,8 @@ function _loadAdminConfig(callback){
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = String((resp && resp.etag) || '');
         _adminConfigAuthorityState = 'backend-attested';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
         if(callback) callback(_adminConfig);
         return;
       } catch(e){}
@@ -101,7 +105,14 @@ function _loadAdminConfig(callback){
         _adminConfigVersion = String((_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || '');
         _adminConfigEtag = '';
         _adminConfigAuthorityState = 'backend-unavailable-preview-only';
-      } catch(e){ _adminConfig = _adminConfig || {}; _adminConfigAuthorityState = 'backend-unavailable-preview-only'; }
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
+      } catch(e){
+        _adminConfig = _adminConfig || {};
+        _adminConfigAuthorityState = 'backend-unavailable-preview-only';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
+      }
       if(callback) callback(_adminConfig);
     };
     xhr2.send();
@@ -497,6 +508,13 @@ function _applyCustomVars(){
      config and must be accompanied by waiver/governance evidence before rollout. */
   var customCSS = _resolveDeep('advanced.customCSS');
   _applyCustomCSS(customCSS || '');
+
+  var previewVars = (_loadPreviewPrefs() || {})._cssVarPreviewOverrides || {};
+  Object.keys(previewVars).forEach(function(varName){
+    if(/^--[A-Za-z0-9_-]+$/.test(varName)){
+      ROOT.style.setProperty(varName, String(previewVars[varName]));
+    }
+  });
 }
 
 /** Merge admin + user into one config (user wins) */
@@ -705,10 +723,19 @@ function clearPreviewOverrides(){
   _apply();
 }
 
-  /** Set a CSS variable directly for real-time preview only.
-      Exported as setPreviewVar to make the non-authority role explicit. */
+  /** Set a CSS variable for real-time preview only.
+      This records the override in the in-memory preview layer so authority
+      state, release eligibility and clearPreviewOverrides stay deterministic. */
   function setPreviewVar(varName, value){
-    ROOT.style.setProperty(varName, value);
+    if(!/^--[A-Za-z0-9_-]+$/.test(String(varName || ''))) return false;
+    var prefs = _loadPreviewPrefs();
+    prefs._cssVarPreviewOverrides = prefs._cssVarPreviewOverrides || {};
+    if(value === undefined || value === null || value === '') delete prefs._cssVarPreviewOverrides[varName];
+    else prefs._cssVarPreviewOverrides[varName] = value;
+    _adminConfigPreviewDirty = true;
+    _adminConfigPreviewReason = 'inline-css-var-preview';
+    _apply();
+    return true;
   }
 
 /** Persist personal appearance preferences only; Admin authority saves must use
@@ -760,13 +787,16 @@ function isDark(){
 function getAdminConfig(){ return _adminConfig || {}; }
 
 function getAdminConfigAuthority(){
+  var releaseEligible = _adminConfigAuthorityState === 'backend-attested' && !_adminConfigPreviewDirty;
   return {
     authority: 'backend_admin_design_config',
     cacheKey: ADMIN_STORAGE_KEY,
     cacheRole: 'legacy-disabled',
     localStorageAuthority: false,
     authorityState: _adminConfigAuthorityState,
-    releaseEligible: _adminConfigAuthorityState === 'backend-attested',
+    releaseEligible: releaseEligible,
+    previewDirty: _adminConfigPreviewDirty,
+    previewReason: _adminConfigPreviewReason,
     version: _adminConfigVersion,
     etag: _adminConfigEtag
   };
@@ -774,6 +804,9 @@ function getAdminConfigAuthority(){
 
 function saveAdminConfig(config, callback){
   _adminConfig = config;
+  _adminConfigAuthorityState = 'pending-backend-save';
+  _adminConfigPreviewDirty = true;
+  _adminConfigPreviewReason = 'backend-save-pending';
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'api.php?action=admin_design_config_save', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
@@ -781,7 +814,8 @@ function saveAdminConfig(config, callback){
   if(typeof csrfToken !== 'undefined' && csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
   xhr.onreadystatechange = function(){
     if(xhr.readyState !== 4) return;
-    if(xhr.status >= 200 && xhr.status < 300){
+    var ok = xhr.status >= 200 && xhr.status < 300;
+    if(ok){
       try {
         var resp = JSON.parse(xhr.responseText);
         var nextConfig = resp && resp.config ? resp.config : (resp && resp.data ? resp.data : config);
@@ -789,11 +823,17 @@ function saveAdminConfig(config, callback){
         _adminConfigVersion = String((resp && resp.version) || (_adminConfig && _adminConfig._meta && _adminConfig._meta.version) || _adminConfigVersion || '');
         _adminConfigEtag = String((resp && resp.etag) || _adminConfigEtag || '');
         _adminConfigAuthorityState = 'backend-attested';
+        _adminConfigPreviewDirty = false;
+        _adminConfigPreviewReason = '';
         _previewPrefs = {};
       } catch(e){}
+    } else {
+      _adminConfigAuthorityState = 'preview-unsaved';
+      _adminConfigPreviewDirty = true;
+      _adminConfigPreviewReason = 'backend-save-failed';
     }
     _apply();
-    if(callback) callback(xhr.status >= 200 && xhr.status < 300);
+    if(callback) callback(ok);
   };
   xhr.send(JSON.stringify({ config: config, expectedVersion: _adminConfigEtag || _adminConfigVersion || '' }));
 }
@@ -826,6 +866,9 @@ function importTheme(jsonStr){
   try {
     var config = JSON.parse(jsonStr);
     _adminConfig = config;
+    _adminConfigAuthorityState = 'preview-imported';
+    _adminConfigPreviewDirty = true;
+    _adminConfigPreviewReason = 'imported-theme-not-backend-attested';
     _apply();
     return true;
   } catch(e){ return false; }

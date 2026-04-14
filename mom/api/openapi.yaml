@@ -6174,9 +6174,17 @@ components:
           type: string
         waiversRef:
           type: string
+        changeSetRef:
+          type: string
+        lineageGraphRef:
+          type: string
         runtimeBeaconRef:
           type: string
         debtObservatoryRef:
+          type: string
+        environmentPolicyPacksRef:
+          type: string
+        releaseDashboardRef:
           type: string
         multiSitePlantBrandingGovernanceRef:
           type: string
@@ -6190,11 +6198,22 @@ components:
           type: boolean
         blockerCount:
           type: integer
+        releaseBlockerCount:
+          type: integer
+        runtimeBeaconSummary:
+          type: object
+          additionalProperties: true
+        debtSummary:
+          type: object
+          additionalProperties: true
         evidenceBundleRequirements:
           type: array
           items:
             type: string
         driftReportGeneratedAt:
+          type: string
+          format: date-time
+        generatedAt:
           type: string
           format: date-time
 
