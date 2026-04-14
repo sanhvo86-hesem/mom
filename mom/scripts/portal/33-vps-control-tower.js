@@ -384,6 +384,7 @@ async function _runAction(actionId){
 
 function _setTab(tabId){
   if(!tabId || tabId === state.tab) return;
+  state.fileContextMenu = null;
   state.tab = tabId;
   if(tabId === 'files' && !state.fileExplorer && state.selectedFileRootId){
     _loadFiles(state.filePath || '', false);
@@ -955,8 +956,9 @@ function _tabs(){
     {id:'observability', label:'Observability'},
     {id:'actions', label:_t('Actions', 'Actions')}
   ];
-  return '<div class="vps-tabs">' + tabs.map(function(tab){
-    return '<button class="vps-tab' + (state.tab === tab.id ? ' active' : '') + '" data-vps-tab="' + _esc(tab.id) + '">' + _esc(tab.label) + '</button>';
+  return '<div class="vps-tabs vps-control-tab-strip" role="tablist" aria-label="' + _esc(_t('Tab điều khiển VPS', 'VPS control tabs')) + '">' + tabs.map(function(tab){
+    var active = state.tab === tab.id;
+    return '<button type="button" role="tab" aria-selected="' + (active ? 'true' : 'false') + '" class="vps-tab' + (active ? ' active' : '') + '" data-vps-tab="' + _esc(tab.id) + '">' + _esc(tab.label) + '</button>';
   }).join('') + '</div>';
 }
 
@@ -1718,7 +1720,7 @@ function _paint(){
       }
     }
   }
-  state.container.innerHTML = '<div class="vps-ct' + (state.tab === 'files' ? ' vps-ct-file-mode' : '') + '">' + _body() + '</div>';
+  state.container.innerHTML = '<div class="vps-ct">' + _body() + '</div>';
   _bind();
   if(fileScroll){
     var nextMain = state.container.querySelector('.vps-win-main');

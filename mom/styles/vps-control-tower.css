@@ -213,6 +213,19 @@
   margin-bottom: 18px;
 }
 
+.vps-control-tab-strip{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid rgba(148,163,184,0.22);
+  border-radius: 16px;
+  background: rgba(248,250,252,0.92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 28px rgba(15,23,42,0.08);
+}
+
 .vps-tab{
   border: 1px solid rgba(148,163,184,0.2);
   background: rgba(255,255,255,0.74);
@@ -700,6 +713,12 @@
   background: rgba(15,23,42,0.84);
   border-color: rgba(148,163,184,0.24);
   color: #cbd5e1;
+}
+
+[data-color-mode="dark"] .vps-control-tab-strip{
+  background: rgba(15,23,42,0.92);
+  border-color: rgba(148,163,184,0.24);
+  box-shadow: 0 12px 28px rgba(2,6,23,0.34);
 }
 
 .vps-ct{
@@ -1211,14 +1230,9 @@
   line-height:1.7;
 }
 
-.vps-ct.vps-ct-file-mode{
-  max-width:none;
-  padding:10px 12px 18px;
-}
-
 .vps-win-explorer{
-  min-height:calc(100vh - 122px);
-  height:calc(100vh - 122px);
+  min-height:560px;
+  height:min(760px, calc(100vh - 220px));
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -2092,12 +2106,9 @@
   .vps-file-search{
     grid-template-columns:1fr;
   }
-  .vps-ct.vps-ct-file-mode{
-    padding:6px;
-  }
   .vps-win-explorer{
-    min-height:620px;
-    height:calc(100vh - 86px);
+    min-height:520px;
+    height:calc(100vh - 160px);
   }
   .vps-win-commandbar{
     overflow-x:auto;
