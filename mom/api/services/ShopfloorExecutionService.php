@@ -780,27 +780,18 @@ final class ShopfloorExecutionService
                 $gate['source'] = 'authoritative_traceability_5m_obligation';
                 return $gate;
             }
-            if ($this->traceability5MWaiver($body, $target) !== []) {
+            $waiver = $this->traceability5MWaiver($body, $target, $request, $gate, $operatorId);
+            if ($waiver !== []) {
                 return [
                     'allowed' => true,
                     'gate_state' => 'waived',
                     'source' => 'signed_traceability_5m_waiver',
-                    'waiver' => $this->traceability5MWaiver($body, $target),
+                    'waiver' => $waiver,
                     'blocked_gate' => $gate,
                 ];
             }
 
             throw new RuntimeException('traceability_5m_gate_not_met');
-        }
-
-        $waiver = $this->traceability5MWaiver($body, $target);
-        if ($waiver !== []) {
-            return [
-                'allowed' => true,
-                'gate_state' => 'waived',
-                'source' => 'signed_traceability_5m_waiver',
-                'waiver' => $waiver,
-            ];
         }
 
         throw new RuntimeException('traceability_5m_authoritative_store_required');
@@ -837,7 +828,7 @@ final class ShopfloorExecutionService
      * @param array<string, mixed> $target
      * @return array<string, mixed>
      */
-    private function traceability5MWaiver(array $body, array $target): array
+    private function traceability5MWaiver(array $body, array $target, array $request, array $blockedGate, string $operatorId): array
     {
         $signatureId = $this->stringValue($body['traceability_5m_waiver_signature_event_id'] ?? $target['traceability_5m_waiver_signature_event_id'] ?? '');
         $reason = $this->stringValue($body['traceability_5m_waiver_reason'] ?? $target['traceability_5m_waiver_reason'] ?? '');
@@ -845,11 +836,76 @@ final class ShopfloorExecutionService
             return [];
         }
 
+        $db = $this->signatureAuthorityConnection();
+        if ($db === null || !method_exists($db, 'queryOne')) {
+            return [];
+        }
+
+        $payloadHash = $this->traceability5MWaiverPayloadHash($request, $blockedGate, $reason);
+        $signature = $db->queryOne(
+            "SELECT se.signature_event_id, se.signer_ref, se.signature_meaning, se.signed_payload_hash_sha256
+             FROM signature_events se
+             JOIN e_signature_auth_challenges ac
+               ON ac.auth_challenge_id = se.auth_challenge_id
+              AND ac.challenge_state = 'consumed'
+              AND ac.consumed_at IS NOT NULL
+              AND ac.signature_action IN ('traceability_5m_waiver', 'shopfloor_5m_waiver')
+              AND ac.signed_payload_hash_sha256 = se.signed_payload_hash_sha256
+              AND ac.displayed_record_hash_sha256 = se.displayed_record_hash_sha256
+             WHERE se.signature_event_id = CAST(:signature_event_id AS uuid)
+               AND se.signature_state = 'applied'
+               AND se.signed_object_type IN ('traceability_5m_gate', 'shopfloor_5m_gate')
+               AND se.signed_object_id IN (:object_id, :gate_hash)
+               AND lower(replace(se.signature_meaning, ' ', '_')) IN ('traceability_5m_waiver', 'shopfloor_5m_waiver')
+               AND se.signed_payload_hash_sha256 = :payload_hash
+               AND se.displayed_record_hash_sha256 = :payload_hash
+               AND NULLIF(trim(COALESCE(se.signer_ref, '')), '') = :operator_id
+             LIMIT 1",
+            [
+                ':signature_event_id' => $signatureId,
+                ':object_id' => $this->stringValue($request['object_id'] ?? ''),
+                ':gate_hash' => hash('sha256', $this->canonicalJson($blockedGate)),
+                ':payload_hash' => $payloadHash,
+                ':operator_id' => $operatorId,
+            ],
+        );
+        if (!is_array($signature) || $this->stringValue($signature['signature_event_id'] ?? '') === '') {
+            return [];
+        }
+
         return [
             'waiver_signature_event_id' => $signatureId,
             'waiver_reason' => $reason,
             'waiver_scope' => 'shopfloor_production_5m_gate',
+            'signed_payload_hash_sha256' => $payloadHash,
+            'signer_ref' => $this->stringValue($signature['signer_ref'] ?? ''),
         ];
+    }
+
+    private function signatureAuthorityConnection(): ?object
+    {
+        if ($this->dataLayer === null) {
+            return null;
+        }
+        try {
+            return $this->dataLayer->getConnection();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $request
+     * @param array<string, mixed> $blockedGate
+     */
+    private function traceability5MWaiverPayloadHash(array $request, array $blockedGate, string $reason): string
+    {
+        return hash('sha256', $this->canonicalJson([
+            'waiver_scope' => 'shopfloor_production_5m_gate',
+            'waiver_reason' => $reason,
+            'request' => $request,
+            'blocked_gate' => $blockedGate,
+        ]));
     }
 
     /**

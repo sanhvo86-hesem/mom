@@ -5016,6 +5016,200 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /api/v1/eqms/control-plane/contract:
+    get:
+      operationId: eqmsControlPlaneContract
+      tags: [EQMS Control Plane]
+      summary: Read the governed EQMS control-plane contract
+      description: Returns the portal-first command contract, state responses, and policy registry used by controlled clients.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Control-plane contract returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/control-plane/state-machine:
+    get:
+      operationId: eqmsControlPlaneStateMachine
+      tags: [EQMS Control Plane]
+      summary: Read the governed EQMS state machine registry
+      description: Returns controlled state transitions for document, form, evidence, publication, change, genealogy, and periodic evaluation records.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: State machine registry returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/control-plane/commands:
+    post:
+      operationId: eqmsSubmitControlPlaneCommand
+      tags: [EQMS Control Plane]
+      summary: Submit a governed control-plane command
+      description: Command envelope requires authenticated portal actor, role policy, idempotency key, request hash, and auditable outcome.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command_name, idempotency_key]
+              additionalProperties: true
+      responses:
+        '202':
+          description: Command accepted or replayed.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Command blocked by policy or duplicate mismatch.
+
+  /api/v1/eqms/control-plane/commands/{command_id}:
+    get:
+      operationId: eqmsGetControlPlaneCommand
+      tags: [EQMS Control Plane]
+      summary: Read a governed command response
+      description: Returns command state, replay outcome, error code, and emitted event references.
+      security:
+        - sessionCookie: []
+      parameters:
+        - in: path
+          name: command_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Command state returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Command not found.
+
+  /api/v1/eqms/control-plane/commands/validate:
+    post:
+      operationId: eqmsValidateControlPlaneCommand
+      tags: [EQMS Control Plane]
+      summary: Validate a governed command envelope
+      description: Performs policy, actor, idempotency, and required-field validation without mutating authoritative records.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command_name, idempotency_key]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Validation decision returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/documents/revisions:
+    post:
+      operationId: eqmsCreateDocumentRevision
+      tags: [EQMS Control Plane]
+      summary: Create a canonical document revision
+      description: Released revisions require change authority plus authoritative release signature or controlled import receipt proof.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [doc_code, title, revision_label, lifecycle_state]
+              additionalProperties: true
+      responses:
+        '201':
+          description: Document revision created.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Document revision blocked by change authority, signature, or replay policy.
+
+  /api/v1/eqms/documents/read-acknowledgements:
+    post:
+      operationId: eqmsAcknowledgeDocumentRead
+      tags: [EQMS Control Plane]
+      summary: Record a document read acknowledgement
+      description: Stores read-and-understand acknowledgement as a canonical ledger entry and updates only that actor or audience distribution.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [doc_revision_id]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Read acknowledgement recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/documents/revisions/supersede:
+    post:
+      operationId: eqmsSupersedeDocumentRevision
+      tags: [EQMS Control Plane]
+      summary: Supersede a document revision under change authority
+      description: Supersession requires a released change order covering the exact revision lifecycle field and effectivity.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [doc_revision_id, source_change_order_id]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Revision superseded.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Supersession blocked by change authority or lifecycle state.
+
   /api/v1/eqms/forms/issuances:
     post:
       operationId: eqmsCreateFormIssuance
@@ -5129,6 +5323,58 @@ paths:
                   error:
                     type: string
                     enum: [form_submission_attempt_not_validated, submission_acceptance_signature_not_authoritative]
+
+  /api/v1/eqms/forms/issuance-manifest/validate:
+    post:
+      operationId: eqmsValidateIssuanceManifest
+      tags: [EQMS Control Plane]
+      summary: Validate a controlled form issuance manifest
+      description: Verifies issuance ledger state, template revision, schema version, carrier hash, and duplicate metadata before use.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [frm_issuance_id]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Issuance manifest validation returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/forms/submission-attempts/validate:
+    post:
+      operationId: eqmsValidateSubmissionAttempt
+      tags: [EQMS Control Plane]
+      summary: Validate a form submission attempt
+      description: Performs server-side canonical payload, schema, issuance, duplicate, and carrier-manifest checks before acceptance.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [frm_submission_attempt_id]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Submission validation returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
 
   /api/v1/eqms/evidence/finalize:
     post:
@@ -5312,6 +5558,92 @@ paths:
                     type: string
                     enum: [change_order_release_gate_blocked, change_order_release_signature_required, change_order_release_signature_not_authoritative, change_order_transition_actor_roles_required, change_order_transition_role_not_authorized, change_release_side_effect_failed]
 
+  /api/v1/eqms/change-orders/release-gate/evaluate:
+    post:
+      operationId: eqmsEvaluateChangeOrderReleaseGate
+      tags: [EQMS Control Plane]
+      summary: Evaluate change-order release readiness
+      description: Evaluates affected/resulting objects, effectivity, training, verification, WIP impact, rollback, emergency controls, and conflicts without releasing the order.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [change_order_id]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Release gate decision returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/publications/retry-plan:
+    get:
+      operationId: eqmsPublicationRetryPlan
+      tags: [EQMS Control Plane]
+      summary: Read publication retry plan
+      description: Lists asynchronous publication work needing retry; publication is read-only/discovery and separate from finalization.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Publication retry plan returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/publications/monitor:
+    get:
+      operationId: eqmsPublicationMonitor
+      tags: [EQMS Control Plane]
+      summary: Monitor asynchronous publication states
+      description: Returns publication queue, failure, receipt, and retry state without treating publication as authoritative record acceptance.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Publication monitor returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/publications/actions:
+    post:
+      operationId: eqmsRequestPublicationAction
+      tags: [EQMS Control Plane]
+      summary: Request a governed publication action
+      description: Enqueues retry, cancel, hold, or acknowledge actions for publication workers under role and reason policy.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [publication_id, action, reason]
+              additionalProperties: true
+      responses:
+        '202':
+          description: Publication action accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
   /api/v1/eqms/audit-packs/manifest:
     post:
       operationId: eqmsBuildAuditPack
@@ -5379,6 +5711,88 @@ paths:
                 additionalProperties: true
         '404':
           description: Audit pack export not found.
+
+  /api/v1/eqms/evidence/amendments:
+    post:
+      operationId: eqmsCreateEvidenceAmendment
+      tags: [EQMS Control Plane]
+      summary: Create an evidence amendment under change authority
+      description: Post-finalization amendment requires a released change order covering the exact evidence object, field set, and effectivity.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [evidence_record_id, source_change_order_id, amendment_reason]
+              additionalProperties: true
+      responses:
+        '201':
+          description: Evidence amendment created.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Amendment blocked by change authority or immutable record policy.
+
+  /api/v1/eqms/evidence/package:
+    get:
+      operationId: eqmsCanonicalEvidencePackage
+      tags: [EQMS Control Plane]
+      summary: Read a canonical evidence package
+      description: Returns the authoritative evidence package assembled from records, versions, artifacts, signatures, publication, retention, and audit trail.
+      security:
+        - sessionCookie: []
+      parameters:
+        - in: query
+          name: evidence_record_id
+          required: false
+          schema: { type: string }
+        - in: query
+          name: evidence_key
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Canonical evidence package returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Evidence package not found.
+
+  /api/v1/eqms/evidence-graph/preview:
+    post:
+      operationId: eqmsEvidenceGraphPreview
+      tags: [EQMS Control Plane]
+      summary: Preview unified evidence graph links
+      description: Shows evidence, change, document, publication, training, and genealogy link candidates without mutating authoritative records.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope_type, scope_ref]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Evidence graph preview returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
 
   /api/v1/eqms/genealogy/facts:
     post:
@@ -5476,6 +5890,90 @@ paths:
                   error:
                     type: string
                     enum: [forbidden, unauthorized_scope_field_in_request]
+
+  /api/v1/eqms/admin/repo-boundary-scan:
+    get:
+      operationId: eqmsRepoBoundaryScan
+      tags: [EQMS Control Plane]
+      summary: Run controlled-source boundary scan
+      description: Admin-only scan that separates controlled source from generated, temporary, browser-test, report, and runtime residue.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Repo boundary scan returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/periodic-evaluations:
+    get:
+      operationId: eqmsPeriodicEvaluationDashboard
+      tags: [EQMS Control Plane]
+      summary: Read periodic evaluation dashboard
+      description: Returns periodic evaluation register, due state, integrity/audit-pack references, exceptions, and closure state.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Periodic evaluation dashboard returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+    post:
+      operationId: eqmsSchedulePeriodicEvaluation
+      tags: [EQMS Control Plane]
+      summary: Schedule a periodic evaluation
+      description: Creates a governed periodic evaluation item with owner, due date, scope, and proof expectations.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [evaluation_scope, scope_ref, due_at]
+              additionalProperties: true
+      responses:
+        '201':
+          description: Periodic evaluation scheduled.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/eqms/periodic-evaluations/close:
+    post:
+      operationId: eqmsClosePeriodicEvaluation
+      tags: [EQMS Control Plane]
+      summary: Close a periodic evaluation
+      description: Closes periodic evaluation only when required integrity, audit-pack, exception, and reviewer proof are recorded.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [periodic_evaluation_id, closure_reason]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Periodic evaluation closed.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENTS

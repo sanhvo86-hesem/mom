@@ -613,7 +613,11 @@ final class ShopfloorExecutionServiceTest extends TestCase
             repository: new FileManufacturingEventRepository($this->dataDir),
             databaseConfig: ['use_postgres' => false],
         );
-        $service = new ShopfloorExecutionService($this->dataDir, eventBackbone: $eventBackbone);
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            eventBackbone: $eventBackbone,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
         $target = $this->target();
 
         $log = $service->buildProductionLog([
@@ -667,7 +671,11 @@ final class ShopfloorExecutionServiceTest extends TestCase
             repository: new ThrowingManufacturingEventRepository(),
             databaseConfig: ['use_postgres' => false],
         );
-        $service = new ShopfloorExecutionService($this->dataDir, eventBackbone: $eventBackbone);
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            eventBackbone: $eventBackbone,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
         $target = $this->target();
         $log = $service->buildProductionLog([
             'quantity_good' => 8,
@@ -697,9 +705,29 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('traceability_5m_authoritative_store_required');
 
-        $this->service()->buildProductionLog([
+        (new ShopfloorExecutionService($this->dataDir))->buildProductionLog([
             'quantity_good' => 8,
             'actual_run_minutes' => 40,
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+    }
+
+    public function testProductionReportRejectsCallerSupplied5MWaiverWithoutAuthority(): void
+    {
+        $target = $this->target();
+        $target['material_lot_number'] = '';
+        $target['inspection_plan_id'] = '';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_5m_gate_not_met');
+
+        (new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService(new BlockingShopfloorGenealogyGateFakeDb()),
+        ))->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'traceability_5m_waiver_signature_event_id' => '00000000-0000-0000-0000-000000009001',
+            'traceability_5m_waiver_reason' => 'caller supplied waiver must not be trusted',
         ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
     }
 
@@ -1221,7 +1249,10 @@ final class ShopfloorExecutionServiceTest extends TestCase
 
     private function service(): ShopfloorExecutionService
     {
-        return new ShopfloorExecutionService($this->dataDir);
+        return new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
     }
 
     private function removeDir(string $dir): void
@@ -1241,7 +1272,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
     }
 }
 
-final class ShopfloorGenealogyGateFakeDb
+class ShopfloorGenealogyGateFakeDb
 {
     /**
      * @var list<array{sql: string, params: array<string, mixed>}>
@@ -1256,7 +1287,15 @@ final class ShopfloorGenealogyGateFakeDb
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
         if (str_contains($sql, 'FROM traceability_5m_policy_rules')) {
-            return null;
+            return [
+                'material_required' => true,
+                'machine_required' => true,
+                'method_required' => true,
+                'measurement_required' => false,
+                'manpower_required' => true,
+                'policy_source' => 'control_plan',
+                'policy_state' => 'active',
+            ];
         }
 
         return [
@@ -1265,6 +1304,28 @@ final class ShopfloorGenealogyGateFakeDb
             'object_id' => (string)($params[':object_id'] ?? ''),
             'gate_state' => (string)($params[':gate_state'] ?? ''),
             'missing_context' => (string)($params[':missing_context'] ?? '[]'),
+        ];
+    }
+}
+
+final class BlockingShopfloorGenealogyGateFakeDb extends ShopfloorGenealogyGateFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        if (str_contains($sql, 'FROM traceability_5m_policy_rules')) {
+            return null;
+        }
+
+        return [
+            'operation_class' => (string)($params[':operation_class'] ?? ''),
+            'object_type' => (string)($params[':object_type'] ?? ''),
+            'object_id' => (string)($params[':object_id'] ?? ''),
+            'gate_state' => 'blocked',
+            'missing_context' => '["material","measurement"]',
         ];
     }
 }

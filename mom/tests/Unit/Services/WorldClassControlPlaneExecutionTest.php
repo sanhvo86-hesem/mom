@@ -42,20 +42,20 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertIsString($routes);
         $this->assertIsString($openapi);
 
-        foreach ([
-            '/api/v1/eqms/forms/submission-attempts/{attempt_id}/accept',
-            '/api/v1/eqms/change-requests',
-            '/api/v1/eqms/change-requests/transition',
-            '/api/v1/eqms/change-orders',
-            '/api/v1/eqms/change-orders/transition',
-            '/api/v1/eqms/audit-packs/manifest',
-            '/api/v1/eqms/audit-packs/export',
-            '/api/v1/eqms/genealogy/facts',
-            '/api/v1/eqms/genealogy/5m/evaluate',
-            '/api/v1/eqms/genealogy/as-manufactured',
-        ] as $path) {
-            $this->assertStringContainsString($path, $routes);
-            $this->assertStringContainsString($path . ':', $openapi);
+        preg_match_all("/router->(get|post)\\('([^']+)'/", $routes, $matches, PREG_SET_ORDER);
+        $this->assertNotEmpty($matches);
+
+        foreach ($matches as $match) {
+            $method = strtolower((string)$match[1]);
+            $path = (string)$match[2];
+            $this->assertStringContainsString($path . ':', $openapi, $path . ' is missing from OpenAPI.');
+            $pathOffset = strpos($openapi, $path . ':');
+            $this->assertIsInt($pathOffset);
+            $nextPathOffset = strpos($openapi, "\n  /api/v1/eqms/", $pathOffset + strlen($path));
+            $pathBlock = $nextPathOffset === false
+                ? substr($openapi, $pathOffset)
+                : substr($openapi, $pathOffset, $nextPathOffset - $pathOffset);
+            $this->assertStringContainsString("\n    " . $method . ':', (string)$pathBlock, strtoupper($method) . ' ' . $path . ' is missing from OpenAPI.');
         }
     }
 
@@ -1121,6 +1121,15 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                         'readable_snapshot' => ['sha256' => str_repeat('c', 64)],
                         'hash_signature_manifest' => ['sha256' => str_repeat('f', 64)],
                     ],
+                    'publication_records' => [[
+                        'evidence_publication_id' => 'PUB-1',
+                        'publication_state' => 'pending',
+                        'authority_role' => 'read_only_replica',
+                    ]],
+                    'retention_locks' => [[
+                        'retention_lock_id' => 'RET-1',
+                        'lock_state' => 'active',
+                    ]],
                 ]],
                 [[
                     'recorded_at' => '2026-04-14T09:00:00+07:00',
@@ -1800,6 +1809,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'audience_ref' => 'qa',
                 'training_requirement_type' => 'read_ack',
                 'requirement_state' => 'satisfied',
+                'satisfaction_signature_event_id' => '00000000-0000-0000-0000-000000000779',
                 'due_before_effective' => true,
             ]],
             'verifications' => [[
@@ -1966,6 +1976,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'audience_ref' => 'operator',
                 'training_requirement_type' => 'read_ack',
                 'requirement_state' => 'satisfied',
+                'satisfaction_signature_event_id' => '00000000-0000-0000-0000-000000000779',
             ]],
             'verifications' => [[
                 'verification_type' => 'implementation',
@@ -2041,6 +2052,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'audience_ref' => 'operator',
                 'training_requirement_type' => 'read_ack',
                 'requirement_state' => 'satisfied',
+                'satisfaction_signature_event_id' => '00000000-0000-0000-0000-000000000779',
             ]],
             'verifications' => [[
                 'verification_type' => 'implementation',
@@ -2450,6 +2462,26 @@ final class AuditPackExportFakeDb
                 ],
             ]];
         }
+        if (str_contains($sql, 'FROM evidence_publications')) {
+            return [[
+                'evidence_publication_id' => '00000000-0000-0000-0000-000000000904',
+                'evidence_version_id' => '00000000-0000-0000-0000-000000000902',
+                'publication_target' => 'sharepoint_graph',
+                'publication_state' => 'pending',
+                'authority_role' => 'read_only_replica',
+                'publication_receipt' => ['state' => 'pending'],
+                'org_id' => 'org-1',
+            ]];
+        }
+        if (str_contains($sql, 'FROM retention_locks')) {
+            return [[
+                'retention_lock_id' => '00000000-0000-0000-0000-000000000905',
+                'aggregate_type' => 'evidence_record',
+                'aggregate_id' => '00000000-0000-0000-0000-000000000901',
+                'lock_state' => 'active',
+                'org_id' => 'org-1',
+            ]];
+        }
         if (str_contains($sql, 'FROM audit_events')) {
             return [[
                 'org_id' => 'org-1',
@@ -2794,6 +2826,16 @@ final class DocumentFormControlFakeDb
         }
         if (str_contains($trimmed, 'INSERT INTO doc_families')) {
             return ['doc_family_id' => 'DOCFAM-1', 'doc_code' => (string)$params[':doc_code']];
+        }
+        if (str_contains($trimmed, 'FROM signature_events se')) {
+            return [
+                'signature_event_id' => (string)($params[':signature_event_id'] ?? '00000000-0000-0000-0000-000000000705'),
+            ];
+        }
+        if (str_contains($trimmed, 'FROM controlled_import_receipts')) {
+            return [
+                'controlled_import_receipt_id' => (string)($params[':controlled_import_receipt_id'] ?? 'IMPORT-1'),
+            ];
         }
         if (str_contains($trimmed, 'INSERT INTO doc_revisions')) {
             return [
@@ -3388,6 +3430,11 @@ class ChangeLifecycleFakeDb
     private array $changeOrders = [];
 
     /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $idempotencyLedger = [];
+
+    /**
      * @var list<array<string, mixed>>
      */
     private array $changeEffectivities = [];
@@ -3440,6 +3487,24 @@ class ChangeLifecycleFakeDb
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
         $trimmed = ltrim($sql);
+        if (str_contains($trimmed, 'INSERT INTO idempotency_replay_ledger')) {
+            $key = (string)$params[':scope_key_hash'] . '|' . (string)$params[':idempotency_key'];
+            $this->idempotencyLedger[$key] ??= [
+                'ledger_id' => '00000000-0000-0000-0000-000000000980',
+                'scope_key_hash' => (string)$params[':scope_key_hash'],
+                'idempotency_key' => (string)$params[':idempotency_key'],
+                'fingerprint_hash' => (string)$params[':fingerprint_hash'],
+                'status' => 'in_progress',
+            ];
+            return $this->idempotencyLedger[$key];
+        }
+        if (str_starts_with($trimmed, 'UPDATE idempotency_replay_ledger')) {
+            $key = (string)$params[':scope_key_hash'] . '|' . (string)$params[':idempotency_key'];
+            $this->idempotencyLedger[$key]['status'] = 'completed';
+            return [
+                'ledger_id' => $this->idempotencyLedger[$key]['ledger_id'] ?? '00000000-0000-0000-0000-000000000980',
+            ];
+        }
         if (str_contains($trimmed, 'FROM signature_events')) {
             return [
                 'signature_event_id' => (string)($params[':signature_event_id'] ?? '00000000-0000-0000-0000-000000000778'),
@@ -3454,6 +3519,9 @@ class ChangeLifecycleFakeDb
                 'auth_method' => 'password_mfa',
                 'auth_result_hash_sha256' => str_repeat('9', 64),
                 'signature_manifestation' => 'Release signed after re-authentication.',
+                'challenge_state' => 'consumed',
+                'consumed_at' => '2026-04-14T00:00:00Z',
+                'signature_action' => 'change_order_release',
             ];
         }
         if (str_contains($trimmed, 'INSERT INTO plm_change_requests')) {
@@ -3602,6 +3670,10 @@ class ChangeLifecycleFakeDb
                 'requirement_state' => (string)($params[':requirement_state'] ?? ''),
                 'due_at' => (string)($params[':due_at'] ?? ''),
                 'satisfied_at' => (string)($params[':satisfied_at'] ?? ''),
+                'satisfaction_signature_event_id' => (string)($params[':satisfaction_signature_event_id'] ?? ''),
+                'waiver_signature_event_id' => (string)($params[':waiver_signature_event_id'] ?? ''),
+                'training_evidence_record_id' => (string)($params[':training_evidence_record_id'] ?? ''),
+                'source_training_record_id' => (string)($params[':source_training_record_id'] ?? ''),
             ];
             $this->changeTrainingRequirements[] = $row;
             return $row;

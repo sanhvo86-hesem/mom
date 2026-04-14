@@ -308,6 +308,12 @@ final class AuditPackExporter
                 $missing[] = $hashKey;
             }
         }
+        if (!$this->hasPublicationRecord($package)) {
+            $missing[] = 'publication_state_record';
+        }
+        if (!$this->hasRetentionLockRecord($package)) {
+            $missing[] = 'retention_lock_record';
+        }
 
         return $missing;
     }
@@ -322,7 +328,11 @@ final class AuditPackExporter
             fn(array $package): string => $this->text($package['package_hash_sha256'] ?? ''),
             $evidencePackages,
         ), fn(string $hash): bool => $this->isSha256($hash)));
+        if ($packageHashes === []) {
+            return false;
+        }
 
+        $provedHashes = [];
         foreach ($auditEvents as $event) {
             $eventType = strtolower($this->text($event['event_type'] ?? ''));
             $aggregateType = strtolower($this->text($event['aggregate_type'] ?? ''));
@@ -338,17 +348,22 @@ final class AuditPackExporter
                 && in_array($aggregateType, ['evidence_record', 'evidence_version'], true)
                 && $this->text($payload['evidence_record_id'] ?? $event['aggregate_id'] ?? '') !== ''
                 && $this->isSha256($packageHash)
-                && ($packageHashes === [] || in_array($packageHash, $packageHashes, true))
+                && in_array($packageHash, $packageHashes, true)
                 && (int)($event['aggregate_sequence'] ?? 0) >= 1
                 && $this->isSha256($eventHash)
                 && $this->isSha256($chainHash)
                 && hash_equals($eventHash, $chainHash)
             ) {
-                return true;
+                $provedHashes[$packageHash] = true;
             }
         }
 
-        return false;
+        foreach ($packageHashes as $packageHash) {
+            if (!isset($provedHashes[$packageHash])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -366,10 +381,58 @@ final class AuditPackExporter
                 'package_hash_sha256' => $this->text($package['package_hash_sha256'] ?? ''),
                 'manifest_hash_sha256' => $this->text($package['manifest_hash_sha256'] ?? ''),
                 'publication_state' => $package['manifest']['publication_state'] ?? $package['publication_state'] ?? [],
+                'publication_records' => $package['publication_records'] ?? [],
+                'retention_locks' => $package['retention_locks'] ?? [],
                 'missing' => $this->missingPackageArtifacts($package),
             ];
         }
         return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function hasPublicationRecord(array $package): bool
+    {
+        $records = is_array($package['publication_records'] ?? null) ? $package['publication_records'] : [];
+        foreach ($records as $record) {
+            if (!is_array($record)) {
+                continue;
+            }
+            if ($this->text($record['evidence_publication_id'] ?? '') !== ''
+                && $this->text($record['publication_state'] ?? '') !== ''
+                && $this->text($record['authority_role'] ?? '') !== ''
+            ) {
+                return true;
+            }
+        }
+
+        $state = is_array($package['publication_state'] ?? null) ? $package['publication_state'] : [];
+        return $this->text($state['publication_state'] ?? $state['state'] ?? '') !== ''
+            && (
+                $this->text($state['evidence_publication_id'] ?? '') !== ''
+                || is_array($state['publication_receipt'] ?? null)
+            );
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function hasRetentionLockRecord(array $package): bool
+    {
+        $locks = is_array($package['retention_locks'] ?? null) ? $package['retention_locks'] : [];
+        foreach ($locks as $lock) {
+            if (!is_array($lock)) {
+                continue;
+            }
+            $state = strtolower($this->text($lock['lock_state'] ?? ''));
+            if ($this->text($lock['retention_lock_id'] ?? '') !== ''
+                && in_array($state, ['active', 'retained', 'locked'], true)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

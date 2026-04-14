@@ -52,6 +52,7 @@ final class AuditPackExportService
              GROUP BY er.evidence_record_id, ev.evidence_version_id",
             [':scope_ref' => $scopeRef, ':org_id' => $orgId],
         );
+        $evidencePackages = $this->attachPublicationAndRetentionRecords($evidencePackages, $orgId);
 
         $aggregateIds = $this->scopeAggregateIds($scopeRef, $evidencePackages);
         $auditEvents = $this->queryRows(
@@ -151,12 +152,134 @@ final class AuditPackExportService
 
     /**
      * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function readExportLifecycle(array $params): array
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            throw new RuntimeException('authoritative_audit_pack_store_required');
+        }
+
+        $exportId = $this->nullableUuid($params['audit_pack_export_id'] ?? null);
+        $scopeType = $this->nullableText($params['scope_type'] ?? null);
+        $scopeRef = $this->nullableText($params['scope_ref'] ?? null);
+        $packageHash = $this->nullableSha256($params['package_hash_sha256'] ?? $params['package_hash'] ?? null);
+        if ($exportId === null && ($scopeType === null || $scopeRef === null) && $packageHash === null) {
+            throw new RuntimeException('audit_pack_export_lookup_required');
+        }
+
+        $row = $this->db->queryOne(
+            "SELECT *
+             FROM audit_pack_exports
+             WHERE (:audit_pack_export_id IS NOT NULL AND audit_pack_export_id = CAST(:audit_pack_export_id AS uuid))
+                OR (:package_hash_sha256 IS NOT NULL AND package_hash_sha256 = :package_hash_sha256)
+                OR (:scope_type IS NOT NULL AND :scope_ref IS NOT NULL
+                    AND export_scope = :scope_type
+                    AND scope_ref = :scope_ref)
+             ORDER BY completed_at DESC NULLS LAST, created_at DESC
+             LIMIT 1",
+            [
+                ':audit_pack_export_id' => $exportId,
+                ':package_hash_sha256' => $packageHash,
+                ':scope_type' => $scopeType,
+                ':scope_ref' => $scopeRef,
+            ],
+        );
+
+        if (!is_array($row) || trim((string)($row['audit_pack_export_id'] ?? '')) === '') {
+            throw new RuntimeException('audit_pack_export_not_found');
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $params
      * @return list<array<string, mixed>>
      */
     private function queryRows(string $sql, array $params): array
     {
         $rows = $this->db?->query($sql, $params);
         return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $packages
+     * @return list<array<string, mixed>>
+     */
+    private function attachPublicationAndRetentionRecords(array $packages, string $orgId): array
+    {
+        if ($packages === []) {
+            return [];
+        }
+
+        $versionIds = array_values(array_unique(array_filter(array_map(
+            fn(array $package): string => $this->requiredTextOrNull($package['evidence_version_id'] ?? null) ?? '',
+            $packages,
+        ), static fn(string $id): bool => $id !== '')));
+        $recordIds = array_values(array_unique(array_filter(array_map(
+            fn(array $package): string => $this->requiredTextOrNull($package['evidence_record_id'] ?? null) ?? '',
+            $packages,
+        ), static fn(string $id): bool => $id !== '')));
+
+        $publications = $versionIds === [] ? [] : $this->queryRows(
+            "SELECT *, COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') AS org_id
+             FROM evidence_publications
+             WHERE evidence_version_id::text = ANY(CAST(:evidence_version_ids AS text[]))
+               AND (:org_id = '' OR COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id', :org_id) = :org_id)
+             ORDER BY created_at, evidence_publication_id",
+            [
+                ':evidence_version_ids' => $this->postgresTextArray($versionIds),
+                ':org_id' => $orgId,
+            ],
+        );
+        $retentionLocks = $recordIds === [] ? [] : $this->queryRows(
+            "SELECT *, COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') AS org_id
+             FROM retention_locks
+             WHERE aggregate_type = 'evidence_record'
+               AND aggregate_id = ANY(CAST(:evidence_record_ids AS text[]))
+               AND lock_state IN ('active', 'retained', 'locked')
+               AND (:org_id = '' OR COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id', :org_id) = :org_id)
+             ORDER BY created_at, retention_lock_id",
+            [
+                ':evidence_record_ids' => $this->postgresTextArray($recordIds),
+                ':org_id' => $orgId,
+            ],
+        );
+
+        $publicationsByVersion = $this->groupRows($publications, 'evidence_version_id');
+        $retentionByRecord = $this->groupRows($retentionLocks, 'aggregate_id');
+
+        foreach ($packages as &$package) {
+            $versionId = $this->requiredTextOrNull($package['evidence_version_id'] ?? null) ?? '';
+            $recordId = $this->requiredTextOrNull($package['evidence_record_id'] ?? null) ?? '';
+            $package['publication_records'] = $publicationsByVersion[$versionId] ?? [];
+            $package['retention_locks'] = $retentionByRecord[$recordId] ?? [];
+            if (!isset($package['publication_state']) && isset($package['publication_records'][0])) {
+                $package['publication_state'] = $package['publication_records'][0];
+            }
+        }
+        unset($package);
+
+        return $packages;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function groupRows(array $rows, string $field): array
+    {
+        $grouped = [];
+        foreach ($rows as $row) {
+            $key = $this->requiredTextOrNull($row[$field] ?? null) ?? '';
+            if ($key === '') {
+                continue;
+            }
+            $grouped[$key] ??= [];
+            $grouped[$key][] = $row;
+        }
+        return $grouped;
     }
 
     /**

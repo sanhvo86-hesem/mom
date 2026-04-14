@@ -602,13 +602,21 @@ final class EqmsControlPlaneController extends BaseController
     public function getAuditPackExport(): never
     {
         $this->requireAuth();
-        $packageHash = trim((string)($this->query('package_hash', '') ?: $this->query('package_hash_sha256', '')));
-        if ($packageHash === '') {
-            $this->error('package_hash_required', 400);
-        }
 
         try {
+            $service = new AuditPackExportService($this->data);
+            $lifecycle = $service->readExportLifecycle([
+                'audit_pack_export_id' => $this->query('audit_pack_export_id', ''),
+                'scope_type' => $this->query('scope_type', ''),
+                'scope_ref' => $this->query('scope_ref', ''),
+                'package_hash_sha256' => $this->query('package_hash_sha256', '') ?: $this->query('package_hash', ''),
+            ]);
+            $packageHash = trim((string)($lifecycle['package_hash_sha256'] ?? ''));
+            if ($packageHash === '') {
+                $this->success(['audit_pack_export_lifecycle' => $lifecycle]);
+            }
             $this->success([
+                'audit_pack_export_lifecycle' => $lifecycle,
                 'audit_pack_export' => (new AuditPackExporter($this->dataDir))->readExport($packageHash),
             ]);
         } catch (\Throwable $e) {

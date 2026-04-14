@@ -102,6 +102,10 @@ final class EffectivityGateService
                 continue;
             }
             if (in_array($gate, ['complete', 'satisfied', 'waived'], true)) {
+                if (!$this->hasAuthoritativeTrainingProof($requirement, $gate)) {
+                    $blockers[] = $this->blocker('training_gate_proof_required', 'Training/read-and-understand completion or waiver requires signature, evidence, or authoritative training decision proof.', $requirement);
+                    continue;
+                }
                 if ($gate === 'waived') {
                     $warnings[] = $this->blocker('training_gate_waived', 'Training gate was waived and must be visible in audit pack.', $requirement);
                 }
@@ -115,6 +119,21 @@ final class EffectivityGateService
         }
 
         return ['blockers' => $blockers, 'warnings' => $warnings];
+    }
+
+    /**
+     * @param array<string, mixed> $requirement
+     */
+    private function hasAuthoritativeTrainingProof(array $requirement, string $gate): bool
+    {
+        $metadata = is_array($requirement['metadata'] ?? null) ? $requirement['metadata'] : [];
+        $signatureId = $gate === 'waived'
+            ? $this->text($requirement['waiver_signature_event_id'] ?? $metadata['waiver_signature_event_id'] ?? '')
+            : $this->text($requirement['satisfaction_signature_event_id'] ?? $requirement['signature_event_id'] ?? $metadata['satisfaction_signature_event_id'] ?? '');
+        return $signatureId !== ''
+            || $this->text($requirement['training_evidence_record_id'] ?? $requirement['evidence_record_id'] ?? $metadata['training_evidence_record_id'] ?? '') !== ''
+            || $this->text($requirement['source_training_record_id'] ?? $requirement['training_record_id'] ?? $metadata['source_training_record_id'] ?? '') !== ''
+            || $this->text($metadata['authoritative_training_decision_id'] ?? '') !== '';
     }
 
     /**

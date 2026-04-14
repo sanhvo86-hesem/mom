@@ -308,7 +308,7 @@ final class EvidenceFinalizationService
             throw new RuntimeException('evidence_publication_state_mismatch');
         }
 
-        $record = $db->queryOne(
+        $recordUpdate = $db->queryOne(
             "UPDATE evidence_records
              SET record_state = 'finalized',
                  current_version_id = CAST(:evidence_version_id AS uuid),
@@ -324,7 +324,26 @@ final class EvidenceFinalizationService
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
                 ':evidence_record_id' => (string)$record['evidence_record_id'],
             ],
-        ) ?: $record;
+        );
+        if (is_array($recordUpdate) && $this->text($recordUpdate['evidence_record_id'] ?? '') !== '') {
+            $record = $recordUpdate;
+        } else {
+            $record = $db->queryOne(
+                "SELECT *
+                 FROM evidence_records
+                 WHERE evidence_record_id = CAST(:evidence_record_id AS uuid)
+                   AND record_state = 'finalized'
+                   AND current_version_id = CAST(:evidence_version_id AS uuid)
+                 LIMIT 1",
+                [
+                    ':evidence_version_id' => (string)$version['evidence_version_id'],
+                    ':evidence_record_id' => (string)$record['evidence_record_id'],
+                ],
+            );
+            if (!is_array($record) || $this->text($record['evidence_record_id'] ?? '') === '') {
+                throw new RuntimeException('evidence_record_finalization_update_required');
+            }
+        }
 
         $this->persistFinalizationAuditEvent($db, $input, $package, $record, $version, $signatureEvents, $retentionLock, $publication);
 
