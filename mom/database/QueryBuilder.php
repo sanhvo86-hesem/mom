@@ -386,9 +386,9 @@ class QueryBuilder
         $phKey = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
         // DB-004: Use parameterized key value to prevent injection
-        // The >> operator requires text literal but we use parameter for the key value itself
+        // The ->> operator extracts JSON field as text; key is safely bound via named parameter
         $this->wheres[] = [
-            'sql'       => "{$safeCol}>>{$phKey} = {$phVal}",
+            'sql'       => "{$safeCol}->>{$phKey} = {$phVal}",
             'params'    => [$phKey => (string)$key, $phVal => (string)$value],
             'connector' => 'AND',
         ];
@@ -426,8 +426,9 @@ class QueryBuilder
         $phKey = $this->nextPlaceholder();
         $safeCol = $this->quoteIdentifier($column);
         // DB-005: Use parameterized key to prevent injection
+        // Use ?? to escape PDO's ? placeholder; PDO sends single ? to PostgreSQL
         $this->wheres[] = [
-            'sql'       => "{$safeCol} ? {$phKey}",
+            'sql'       => "{$safeCol} ?? {$phKey}",
             'params'    => [$phKey => (string)$key],
             'connector' => 'AND',
         ];

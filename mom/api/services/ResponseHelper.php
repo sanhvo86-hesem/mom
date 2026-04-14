@@ -46,7 +46,8 @@ final class ResponseHelper
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: same-origin');
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo $encoded === false ? '{"ok":false,"error":"response_encode_failed"}' : $encoded;
         exit;
     }
 
@@ -60,7 +61,8 @@ final class ResponseHelper
             throw new \InvalidArgumentException('Invalid SSE event name');
         }
         echo 'event: ' . $event . "\n";
-        echo 'data: ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+        $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo 'data: ' . ($encoded === false ? '{"ok":false,"error":"sse_encode_failed"}' : $encoded) . "\n\n";
         @ob_flush();
         @flush();
     }

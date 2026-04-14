@@ -98,8 +98,8 @@ class CorsMiddleware
             // Handle preflight OPTIONS requests
             $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
             if ($method === 'OPTIONS') {
-                // INFRA-015 FIX: Return 403 for unauthorized CORS preflight requests
                 if ($origin !== '' && $self->isOriginAllowed($origin)) {
+                    // Authorized CORS preflight - return allowed methods/headers
                     $headers = [
                         'Access-Control-Allow-Methods' => implode(', ', $self->allowedMethods),
                         'Access-Control-Allow-Headers' => implode(', ', $self->allowedHeaders),
@@ -111,9 +111,12 @@ class CorsMiddleware
                         $headers['Access-Control-Allow-Credentials'] = 'true';
                     }
                     throw ExitException::empty(204, $headers);
+                } elseif ($origin !== '') {
+                    // INFRA-015 FIX: Return 403 for unauthorized CORS preflight from known cross-origin
+                    throw ExitException::empty(403, ['Vary' => 'Origin']);
                 } else {
-                    // Unauthorized preflight - return 403
-                    throw ExitException::empty(403, []);
+                    // No Origin header (same-origin or non-browser client) - allow through with 204
+                    throw ExitException::empty(204, []);
                 }
             }
 

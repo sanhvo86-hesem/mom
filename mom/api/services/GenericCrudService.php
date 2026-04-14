@@ -956,7 +956,7 @@ class GenericCrudService
             }
             if (isset($constraints['enumRef']) && is_scalar($value)) {
                 $allowed = array_map(
-                    static fn(array $option): string => (string)$option['value'],
+                    static fn(array $option): string => (string)($option['value'] ?? ''),
                     $this->registry->statusSet((string)$constraints['enumRef'])
                 );
                 if ($allowed !== [] && !in_array((string)$value, $allowed, true)) {
@@ -1326,7 +1326,7 @@ class GenericCrudService
         }
 
         $values = array_map(
-            static fn(array $option): string => (string)$option['value'],
+            static fn(array $option): string => (string)($option['value'] ?? ''),
             $this->registry->statusSet($statusSet)
         );
         if ($values !== [] && !in_array($toStatus, $values, true)) {

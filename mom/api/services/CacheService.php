@@ -172,7 +172,7 @@ final class CacheService
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         // WRK-011: Enforce minimum TTL to prevent memory exhaustion
-        if ($ttl !== null && $ttl <= 0) {
+        if ($ttl <= 0) {
             $ttl = 3600; // minimum 1 hour to prevent memory exhaustion
         }
 

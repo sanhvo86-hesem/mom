@@ -732,7 +732,7 @@ class DataLayer
         // NEW-R6-003: Validate user-supplied entry_id format to prevent injection via controlled IDs
         if (isset($data['entry_id'])) {
             $suppliedId = (string)$data['entry_id'];
-            if (!preg_match('/^[A-Z0-9_\-]{1,64}$/', $suppliedId)) {
+            if (!preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $suppliedId)) {
                 throw new \InvalidArgumentException('Invalid entry_id format');
             }
             $entryId = $suppliedId;

@@ -187,13 +187,15 @@ function api_json(array $payload, int $code = 200): void {
   header('X-Content-Type-Options: nosniff');
   header('X-Frame-Options: SAMEORIGIN');
   header('Referrer-Policy: same-origin');
-  echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  echo $encoded === false ? '{"ok":false,"error":"response_encode_failed"}' : $encoded;
   exit;
 }
 
 function api_stream_event(string $event, array $payload): void {
   echo 'event: ' . $event . "\n";
-  echo 'data: ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+  $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  echo 'data: ' . ($encoded === false ? '{"ok":false,"error":"sse_encode_failed"}' : $encoded) . "\n\n";
   @ob_flush();
   @flush();
 }

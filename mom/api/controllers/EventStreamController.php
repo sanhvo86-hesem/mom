@@ -154,7 +154,8 @@ class EventStreamController extends BaseController
     private function sendSseEvent(string $event, array $data): void
     {
         echo "event: {$event}\n";
-        echo "data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo "data: " . ($encoded === false ? '{"ok":false,"error":"sse_encode_failed"}' : $encoded) . "\n";
         echo "id: " . hrtime(true) . "\n";
         echo "\n";
         flush();
