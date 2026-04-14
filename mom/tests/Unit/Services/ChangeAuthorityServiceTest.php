@@ -34,6 +34,28 @@ final class ChangeAuthorityServiceTest extends TestCase
         $this->assertSame('missing_rule_controlled_state', $decision->data['governance_status'] ?? null);
     }
 
+    public function testPublishedRetainedAndLegalHoldStatesFailClosedWithoutGovernance(): void
+    {
+        foreach (['published', 'retained', 'legal_hold'] as $state) {
+            $db = new FakeChangeAuthorityDb();
+            $decision = (new ChangeAuthorityService($db))->assertFieldEditAllowed('evidence_record', 'EV-FINAL', 'package_metadata', 'a', 'b', $state);
+
+            $this->assertFalse($decision->allowed, $state);
+            $this->assertSame('change_authority_required', $decision->errorCode, $state);
+            $this->assertSame('missing_rule_controlled_state', $decision->data['governance_status'] ?? null, $state);
+        }
+    }
+
+    public function testPublishedRetainedAndLegalHoldStatesFailClosedWhenAuthorityUnavailable(): void
+    {
+        foreach (['published', 'retained', 'legal_hold'] as $state) {
+            $decision = (new ChangeAuthorityService())->assertFieldEditAllowed('evidence_record', 'EV-FINAL', 'package_metadata', 'a', 'b', $state);
+
+            $this->assertFalse($decision->allowed, $state);
+            $this->assertSame('change_authority_unavailable', $decision->errorCode, $state);
+        }
+    }
+
     public function testLockedGovernedFieldRequiresChangeAuthorityBeforeEdit(): void
     {
         $db = new FakeChangeAuthorityDb([
