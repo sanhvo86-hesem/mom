@@ -69,6 +69,7 @@ final class GenealogyGraphService
         $toId = $this->requiredText($fact, 'to_object_id');
         $this->nodeType($fromType);
         $this->nodeType($toType);
+        $scope = $this->trustedScope($fact);
 
         // MES-R6-004 FIX: Cycle detection
         if ($fromId === $toId) {
@@ -77,12 +78,13 @@ final class GenealogyGraphService
 
         // Check if reverse edge already exists
         $reverseEdgeExists = $this->db->queryOne(
-            "SELECT 1 FROM genealogy_edge_facts
-             WHERE edge_fact_type = :edge_fact_type
-               AND from_object_type = :to_object_type
-               AND from_object_id = :to_object_id
-               AND to_object_type = :from_object_type
-               AND to_object_id = :from_object_id
+            "SELECT 1 FROM genealogy_edge_facts gef
+             WHERE gef.edge_fact_type = :edge_fact_type
+               AND gef.from_object_type = :to_object_type
+               AND gef.from_object_id = :to_object_id
+               AND gef.to_object_type = :from_object_type
+               AND gef.to_object_id = :from_object_id
+               " . $this->scopeEqualitySql('gef') . "
              LIMIT 1",
             [
                 ':edge_fact_type' => $edgeFactType,
@@ -90,7 +92,7 @@ final class GenealogyGraphService
                 ':to_object_id' => $toId,
                 ':from_object_type' => $fromType,
                 ':from_object_id' => $fromId,
-            ]
+            ] + $this->scopeEqualityParams($scope)
         );
 
         if ($reverseEdgeExists !== null) {
@@ -100,25 +102,48 @@ final class GenealogyGraphService
         // MES-004 FIX: Transitive cycle detection using recursive CTE
         $cyclePath = $this->db->queryOne(
             "WITH RECURSIVE path AS (
-                SELECT from_object_id, to_object_id, 1 as depth
-                FROM genealogy_edge_facts
-                WHERE from_object_id = :to_id
+                SELECT from_object_id, to_object_id,
+                       org_company_code, org_legal_entity_code, org_plant_id, org_site_id,
+                       1 as depth
+                FROM genealogy_edge_facts e
+                WHERE e.from_object_id = :to_id
+                  " . $this->scopeEqualitySql('e') . "
                 UNION ALL
-                SELECT p.from_object_id, e.to_object_id, p.depth + 1
+                SELECT p.from_object_id, e.to_object_id,
+                       e.org_company_code, e.org_legal_entity_code, e.org_plant_id, e.org_site_id,
+                       p.depth + 1
                 FROM path p
-                JOIN genealogy_edge_facts e ON e.from_object_id = p.to_object_id
+                JOIN genealogy_edge_facts e
+                  ON e.from_object_id = p.to_object_id
+                 AND COALESCE(e.org_company_code, '') = COALESCE(p.org_company_code, '')
+                 AND COALESCE(e.org_legal_entity_code, '') = COALESCE(p.org_legal_entity_code, '')
+                 AND COALESCE(e.org_plant_id, '') = COALESCE(p.org_plant_id, '')
+                 AND COALESCE(e.org_site_id, '') = COALESCE(p.org_site_id, '')
 	                WHERE p.depth < " . self::MAX_GENEALOGY_DEPTH . "
             )
             SELECT 1 FROM path WHERE to_object_id = :from_id LIMIT 1",
-            [':to_id' => $toId, ':from_id' => $fromId]
+            [':to_id' => $toId, ':from_id' => $fromId] + $this->scopeEqualityParams($scope)
         );
 
         if ($cyclePath !== null) {
             throw new RuntimeException('genealogy_cycle_detected');
         }
         $sourceEventId = $this->text($fact['source_event_id'] ?? '');
+        $factFingerprint = hash('sha256', $this->json([
+            'edge_fact_type' => $edgeFactType,
+            'from_object_type' => $fromType,
+            'from_object_id' => $fromId,
+            'to_object_type' => $toType,
+            'to_object_id' => $toId,
+            'quantity' => isset($fact['quantity']) && is_numeric($fact['quantity']) ? (string)$fact['quantity'] : null,
+            'uom' => $this->nullableText($fact['uom'] ?? null),
+            'effective_at' => $this->nullableText($fact['effective_at'] ?? null),
+            'evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
+            'fact_state' => $this->text($fact['fact_state'] ?? 'active') ?: 'active',
+            'scope' => $scope,
+        ]));
         if ($sourceEventId === '') {
-            $sourceEventId = 'portal-' . hash('sha256', implode('|', [$edgeFactType, $fromType, $fromId, $toType, $toId, $actorRef]));
+            $sourceEventId = 'portal-' . hash('sha256', $factFingerprint . '|' . $actorRef);
         }
         $fieldPath = $this->text($fact['field_path'] ?? 'genealogy.' . $edgeFactType);
         $authority = $this->assertReleasedChangeAuthority($fact, $fieldPath, $fromType, $fromId, $toType, $toId);
@@ -127,23 +152,25 @@ final class GenealogyGraphService
         $metadata['actor_ref'] = $actorRef;
         $metadata['authority'] = 'canonical_genealogy_edge_fact';
         $metadata['change_authority'] = $authority;
+        $metadata['fact_fingerprint_sha256'] = $factFingerprint;
+        $metadata['scope'] = $scope;
 
         $row = $this->db->queryOne(
             "INSERT INTO genealogy_edge_facts
                 (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id,
                  quantity, uom, effective_at, evidence_record_id, change_order_id, source_event_id,
-                 fact_state, metadata)
+                 fact_state, metadata, org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (:edge_fact_type, :from_object_type, :from_object_id, :to_object_type, :to_object_id,
                  :quantity, :uom, :effective_at, CAST(:evidence_record_id AS uuid), CAST(:change_order_id AS uuid),
-                 :source_event_id, :fact_state, CAST(:metadata AS jsonb))
-             ON CONFLICT (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id)
-             DO UPDATE SET
-                 quantity = EXCLUDED.quantity,
-                 uom = EXCLUDED.uom,
-                 effective_at = COALESCE(EXCLUDED.effective_at, genealogy_edge_facts.effective_at),
-                 fact_state = EXCLUDED.fact_state,
-                 metadata = genealogy_edge_facts.metadata || EXCLUDED.metadata
+                 :source_event_id, :fact_state, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
+             ON CONFLICT (
+                edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             )
+             DO NOTHING
              RETURNING *",
             [
                 ':edge_fact_type' => $edgeFactType,
@@ -159,8 +186,36 @@ final class GenealogyGraphService
                 ':source_event_id' => $sourceEventId,
                 ':fact_state' => $this->text($fact['fact_state'] ?? 'active') ?: 'active',
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
+
+        if (!is_array($row)) {
+            $row = $this->db->queryOne(
+                "SELECT *
+                 FROM genealogy_edge_facts
+                 WHERE edge_fact_type = :edge_fact_type
+                   AND from_object_type = :from_object_type
+                   AND from_object_id = :from_object_id
+                   AND to_object_type = :to_object_type
+                   AND to_object_id = :to_object_id
+                   AND source_event_id = :source_event_id
+                   " . $this->scopeEqualitySql('genealogy_edge_facts') . "
+                 LIMIT 1",
+                [
+                    ':edge_fact_type' => $edgeFactType,
+                    ':from_object_type' => $fromType,
+                    ':from_object_id' => $fromId,
+                    ':to_object_type' => $toType,
+                    ':to_object_id' => $toId,
+                    ':source_event_id' => $sourceEventId,
+                ] + $this->scopeEqualityParams($scope),
+            );
+            $this->assertEdgeFactReplayEquivalent(is_array($row) ? $row : [], $factFingerprint);
+        }
 
         $projected = $this->projectGraph($edgeFactType, $fromType, $fromId, $toType, $toId, $sourceEventId, $fact, $metadata);
 
@@ -252,7 +307,11 @@ final class GenealogyGraphService
     /**
      * @return array<string, mixed>
      */
-    public function asManufacturedThread(string $subjectType, string $subjectId, int $limit = 200): array
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, mixed>
+     */
+    public function asManufacturedThread(string $subjectType, string $subjectId, int $limit = 200, array $scope = []): array
     {
         $this->requireDb();
         $subjectType = $this->normalizeToken($subjectType);
@@ -262,18 +321,20 @@ final class GenealogyGraphService
         }
         $subjectType = $this->nodeType($subjectType);
 
+        $scopeSql = $this->scopeSql('s', $scope);
         $snapshotRows = $this->db->query(
             "SELECT *
-             FROM as_manufactured_snapshots
+             FROM as_manufactured_snapshots s
              WHERE subject_type = :subject_type
                AND subject_ref = :subject_id
                AND snapshot_state = 'current'
+               {$scopeSql}
              ORDER BY built_at DESC
              LIMIT 1",
             [
                 ':subject_type' => $subjectType,
                 ':subject_id' => $subjectId,
-            ],
+            ] + $this->scopeParams($scope),
         );
 
         $rows = $this->db->query(
@@ -286,15 +347,17 @@ final class GenealogyGraphService
              FROM genealogy_edges e
              INNER JOIN genealogy_nodes from_node ON from_node.genealogy_node_id = e.from_node_id
              INNER JOIN genealogy_nodes to_node ON to_node.genealogy_node_id = e.to_node_id
-             WHERE (from_node.node_type = :subject_type AND from_node.node_ref = :subject_id)
+             WHERE ((from_node.node_type = :subject_type AND from_node.node_ref = :subject_id)
                 OR (to_node.node_type = :subject_type AND to_node.node_ref = :subject_id)
+                )
+               " . $this->scopeSql('e', $scope) . "
              ORDER BY e.event_time ASC NULLS LAST, e.created_at ASC
              LIMIT :limit",
             [
                 ':subject_type' => $subjectType,
                 ':subject_id' => $subjectId,
                 ':limit' => max(1, min(1000, $limit)),
-            ],
+            ] + $this->scopeParams($scope),
         );
 
         return [
@@ -432,8 +495,9 @@ final class GenealogyGraphService
         array $fact,
         array $metadata,
     ): array {
-        $fromNode = $this->upsertNode($fromType, $fromId, $metadata);
-        $toNode = $this->upsertNode($toType, $toId, $metadata);
+        $scope = is_array($metadata['scope'] ?? null) ? $metadata['scope'] : [];
+        $fromNode = $this->upsertNode($fromType, $fromId, $metadata, $scope);
+        $toNode = $this->upsertNode($toType, $toId, $metadata, $scope);
         $edge = $this->upsertProjectedEdge(
             (string)($fromNode['genealogy_node_id'] ?? ''),
             (string)($toNode['genealogy_node_id'] ?? ''),
@@ -441,6 +505,7 @@ final class GenealogyGraphService
             $sourceEventId,
             $fact,
             $metadata,
+            $scope,
         );
         $snapshot = $this->upsertSnapshot($toType, $toId, [
             'source_event_id' => $sourceEventId,
@@ -448,7 +513,7 @@ final class GenealogyGraphService
             'from' => ['type' => $fromType, 'id' => $fromId],
             'to' => ['type' => $toType, 'id' => $toId],
             'metadata' => $metadata,
-        ], $fact);
+        ], $fact, $scope);
 
         return ['from_node' => $fromNode, 'to_node' => $toNode, 'edge' => $edge, 'snapshot' => $snapshot];
     }
@@ -457,12 +522,20 @@ final class GenealogyGraphService
      * @param array<string, mixed> $metadata
      * @return array<string, mixed>
      */
-    private function upsertNode(string $type, string $id, array $metadata): array
+    private function upsertNode(string $type, string $id, array $metadata, array $scope): array
     {
         $row = $this->db->queryOne(
-            "INSERT INTO genealogy_nodes (node_type, node_ref, canonical_label, lifecycle_state, metadata)
-             VALUES (:node_type, :node_ref, :canonical_label, :lifecycle_state, CAST(:metadata AS jsonb))
-             ON CONFLICT (node_type, node_ref) DO UPDATE
+            "INSERT INTO genealogy_nodes
+                (node_type, node_ref, canonical_label, lifecycle_state, metadata,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
+             VALUES
+                (:node_type, :node_ref, :canonical_label, :lifecycle_state, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
+             ON CONFLICT (
+                node_type, node_ref,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             ) DO UPDATE
                 SET metadata = genealogy_nodes.metadata || EXCLUDED.metadata
              RETURNING *",
             [
@@ -471,6 +544,10 @@ final class GenealogyGraphService
                 ':canonical_label' => $type . ':' . $id,
                 ':lifecycle_state' => 'active',
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['node_type' => $type, 'node_ref' => $id];
@@ -481,14 +558,16 @@ final class GenealogyGraphService
      * @param array<string, mixed> $metadata
      * @return array<string, mixed>
      */
-    private function upsertProjectedEdge(string $fromNodeId, string $toNodeId, string $edgeType, string $sourceEventId, array $fact, array $metadata): array
+    private function upsertProjectedEdge(string $fromNodeId, string $toNodeId, string $edgeType, string $sourceEventId, array $fact, array $metadata, array $scope): array
     {
         $row = $this->db->queryOne(
             "INSERT INTO genealogy_edges
-                (from_node_id, to_node_id, edge_type, event_time, evidence_record_id, source_event_id, metadata)
+                (from_node_id, to_node_id, edge_type, event_time, evidence_record_id, source_event_id, metadata,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (CAST(:from_node_id AS uuid), CAST(:to_node_id AS uuid), :edge_type, CAST(:event_time AS timestamptz),
-                 CAST(:evidence_record_id AS uuid), :source_event_id, CAST(:metadata AS jsonb))
+                 CAST(:evidence_record_id AS uuid), :source_event_id, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
              ON CONFLICT (from_node_id, to_node_id, edge_type, source_event_id) DO UPDATE
                 SET metadata = genealogy_edges.metadata || EXCLUDED.metadata
              RETURNING *",
@@ -500,6 +579,10 @@ final class GenealogyGraphService
                 ':evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
                 ':source_event_id' => $sourceEventId,
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['edge_type' => $edgeType, 'source_event_id' => $sourceEventId];
@@ -510,7 +593,7 @@ final class GenealogyGraphService
      * @param array<string, mixed> $fact
      * @return array<string, mixed>
      */
-    private function upsertSnapshot(string $subjectType, string $subjectRef, array $payload, array $fact): array
+    private function upsertSnapshot(string $subjectType, string $subjectRef, array $payload, array $fact, array $scope): array
     {
         $snapshotSubject = $this->snapshotSubjectType($subjectType);
         if ($snapshotSubject === '') {
@@ -518,13 +601,43 @@ final class GenealogyGraphService
         }
         $payloadJson = $this->json($payload);
         $hash = hash('sha256', $payloadJson);
+        $this->db->queryOne(
+            "UPDATE as_manufactured_snapshots
+             SET snapshot_state = 'superseded',
+                 built_at = now(),
+                 row_version = row_version + 1
+             WHERE subject_type = :subject_type
+               AND subject_ref = :subject_ref
+               AND COALESCE(org_company_code, '') = COALESCE(:org_company_code, '')
+               AND COALESCE(org_legal_entity_code, '') = COALESCE(:org_legal_entity_code, '')
+               AND COALESCE(org_plant_id, '') = COALESCE(:org_plant_id, '')
+               AND COALESCE(org_site_id, '') = COALESCE(:org_site_id, '')
+               AND snapshot_state = 'current'
+               AND snapshot_hash_sha256 <> :snapshot_hash_sha256
+             RETURNING as_manufactured_snapshot_id",
+            [
+                ':subject_type' => $snapshotSubject,
+                ':subject_ref' => $subjectRef,
+                ':snapshot_hash_sha256' => $hash,
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
+            ],
+        );
         $row = $this->db->queryOne(
             "INSERT INTO as_manufactured_snapshots
-                (subject_type, subject_ref, snapshot_state, snapshot_payload, snapshot_hash_sha256, evidence_record_id)
+                (subject_type, subject_ref, snapshot_state, snapshot_payload, snapshot_hash_sha256, evidence_record_id,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (:subject_type, :subject_ref, 'current', CAST(:snapshot_payload AS jsonb), :snapshot_hash_sha256,
-                 CAST(:evidence_record_id AS uuid))
-             ON CONFLICT (subject_type, subject_ref, snapshot_hash_sha256) DO UPDATE
+                 CAST(:evidence_record_id AS uuid),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
+             ON CONFLICT (
+                subject_type, subject_ref, snapshot_hash_sha256,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             ) DO UPDATE
                 SET built_at = now()
              RETURNING *",
             [
@@ -533,6 +646,10 @@ final class GenealogyGraphService
                 ':snapshot_payload' => $payloadJson,
                 ':snapshot_hash_sha256' => $hash,
                 ':evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['subject_type' => $snapshotSubject, 'subject_ref' => $subjectRef, 'snapshot_hash_sha256' => $hash];
@@ -549,6 +666,97 @@ final class GenealogyGraphService
             'inspect', 'measure' => 'evidenced_by',
             default => 'authorized_by_change',
         };
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function assertEdgeFactReplayEquivalent(array $row, string $factFingerprint): void
+    {
+        if ($row === []) {
+            throw new RuntimeException('genealogy_edge_fact_replay_not_found');
+        }
+        $metadata = $row['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+        $recorded = is_array($metadata) ? $this->text($metadata['fact_fingerprint_sha256'] ?? '') : '';
+        if ($recorded === '') {
+            throw new RuntimeException('genealogy_edge_fact_fingerprint_required_for_replay');
+        }
+        if (!hash_equals($recorded, $factFingerprint)) {
+            throw new RuntimeException('genealogy_edge_fact_idempotency_conflict');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $fact
+     * @return array<string, string>
+     */
+    private function trustedScope(array $fact): array
+    {
+        $scope = is_array($fact['scope'] ?? null) ? $fact['scope'] : [];
+        $normalized = [];
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $value = $this->text($scope[$field] ?? $fact[$field] ?? '');
+            if ($value !== '') {
+                $normalized[$field] = $value;
+            }
+        }
+        return $normalized;
+    }
+
+    /**
+     * @param array<string, string> $scope
+     */
+    private function scopeSql(string $alias, array $scope): string
+    {
+        $clauses = [];
+        foreach (['org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $field) {
+            if (($scope[$field] ?? '') !== '') {
+                $clauses[] = $alias . '.' . $field . ' = :' . $field;
+            }
+        }
+        return $clauses === [] ? '' : ' AND ' . implode(' AND ', $clauses);
+    }
+
+    private function scopeEqualitySql(string $alias): string
+    {
+        $prefix = trim($alias) !== '' ? trim($alias) . '.' : '';
+        return " AND COALESCE({$prefix}org_company_code, '') = COALESCE(:org_company_code, '')
+                 AND COALESCE({$prefix}org_legal_entity_code, '') = COALESCE(:org_legal_entity_code, '')
+                 AND COALESCE({$prefix}org_plant_id, '') = COALESCE(:org_plant_id, '')
+                 AND COALESCE({$prefix}org_site_id, '') = COALESCE(:org_site_id, '')";
+    }
+
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, string|null>
+     */
+    private function scopeEqualityParams(array $scope): array
+    {
+        return [
+            ':org_company_code' => $scope['org_company_code'] ?? null,
+            ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+            ':org_plant_id' => $scope['org_plant_id'] ?? null,
+            ':org_site_id' => $scope['org_site_id'] ?? null,
+        ];
+    }
+
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, string>
+     */
+    private function scopeParams(array $scope): array
+    {
+        $params = [];
+        foreach (['org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $field) {
+            if (($scope[$field] ?? '') !== '') {
+                $params[':' . $field] = $scope[$field];
+            }
+        }
+        return $params;
     }
 
     private function nodeType(string $type): string

@@ -37,6 +37,12 @@ final class DocumentRevisionCommandService
         if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true) && $manifestHash === null) {
             throw new RuntimeException('document_revision_manifest_hash_required');
         }
+        if ($lifecycleState === 'released'
+            && $this->nullableUuid($input['release_signature_event_id'] ?? $input['signature_event_id'] ?? null) === null
+            && $this->nullableText($input['controlled_import_receipt_id'] ?? null) === null
+        ) {
+            throw new RuntimeException('document_release_signature_required');
+        }
 
         $family = $db->queryOne(
             "WITH inserted AS (
@@ -83,6 +89,9 @@ final class DocumentRevisionCommandService
                 $input,
             );
         }
+        if ($lifecycleState === 'released') {
+            $this->assertDocumentReleaseCeremony($db, $input, $actorRef, $manifestHash);
+        }
 
         $revision = $db->queryOne(
             "WITH inserted AS (
@@ -117,6 +126,8 @@ final class DocumentRevisionCommandService
                     'authority' => 'DocumentRevisionCommandService',
                     'actor_ref' => $actorRef,
                     'legacy_file_role' => 'carrier_not_authority',
+                    'release_signature_event_id' => $this->nullableUuid($input['release_signature_event_id'] ?? $input['signature_event_id'] ?? null),
+                    'controlled_import_receipt_id' => $this->nullableText($input['controlled_import_receipt_id'] ?? null),
                 ] + (is_array($input['revision_metadata'] ?? null) ? $input['revision_metadata'] : [])),
             ],
         );
@@ -192,9 +203,8 @@ final class DocumentRevisionCommandService
              WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
                AND read_ack_required = true
                AND (
-                   audience_ref = :actor_ref
-                   OR audience_ref = :audience_user_id
-                   OR audience_type IN ('role', 'department', 'site', 'plant')
+                   (audience_type = 'user' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
+                   OR (audience_type = 'individual' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
                )
              RETURNING *",
             [
@@ -605,6 +615,69 @@ final class DocumentRevisionCommandService
             }
         }
         return $db;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function assertDocumentReleaseCeremony(object $db, array $input, string $actorRef, ?string $manifestHash): void
+    {
+        $signatureEventId = $this->nullableUuid($input['release_signature_event_id'] ?? $input['signature_event_id'] ?? null);
+        if ($signatureEventId !== null) {
+            $row = $db->queryOne(
+                "SELECT se.signature_event_id
+                 FROM signature_events se
+                 JOIN e_signature_auth_challenges ac
+                   ON ac.auth_challenge_id = se.auth_challenge_id
+                  AND ac.challenge_state = 'consumed'
+                  AND ac.consumed_at IS NOT NULL
+                  AND ac.signature_action IN ('document_release', 'document_revision_release')
+                  AND ac.signed_payload_hash_sha256 = se.signed_payload_hash_sha256
+                  AND ac.displayed_record_hash_sha256 = se.displayed_record_hash_sha256
+                 WHERE se.signature_event_id = CAST(:signature_event_id AS uuid)
+                   AND se.signed_object_type IN ('document_revision', 'doc_revision')
+                   AND se.signature_state = 'applied'
+                   AND lower(replace(se.signature_meaning, ' ', '_')) IN ('document_release', 'document_revision_release')
+                   AND se.signed_payload_hash_sha256 = :manifest_hash_sha256
+                   AND se.displayed_record_hash_sha256 = :manifest_hash_sha256
+                   AND NULLIF(trim(COALESCE(se.signer_ref, '')), '') = :actor_ref
+                 LIMIT 1",
+                [
+                    ':signature_event_id' => $signatureEventId,
+                    ':manifest_hash_sha256' => $manifestHash,
+                    ':actor_ref' => $actorRef,
+                ],
+            );
+            if (!is_array($row) || $this->text($row['signature_event_id'] ?? '') === '') {
+                throw new RuntimeException('document_release_signature_not_authoritative');
+            }
+            return;
+        }
+
+        $receiptId = $this->nullableText($input['controlled_import_receipt_id'] ?? null);
+        if ($receiptId !== null) {
+            $row = $db->queryOne(
+                "SELECT controlled_import_receipt_id
+                 FROM controlled_import_receipts
+                 WHERE controlled_import_receipt_id = :controlled_import_receipt_id
+                   AND receipt_state = 'accepted'
+                   AND imported_object_type IN ('document_revision', 'doc_revision')
+                   AND manifest_hash_sha256 = :manifest_hash_sha256
+                   AND imported_by_ref = :actor_ref
+                 LIMIT 1",
+                [
+                    ':controlled_import_receipt_id' => $receiptId,
+                    ':manifest_hash_sha256' => $manifestHash,
+                    ':actor_ref' => $actorRef,
+                ],
+            );
+            if (!is_array($row) || $this->text($row['controlled_import_receipt_id'] ?? '') === '') {
+                throw new RuntimeException('controlled_import_receipt_not_authoritative');
+            }
+            return;
+        }
+
+        throw new RuntimeException('document_release_signature_required');
     }
 
     private function docType(mixed $value): string

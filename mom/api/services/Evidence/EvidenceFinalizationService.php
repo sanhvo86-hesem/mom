@@ -179,13 +179,13 @@ final class EvidenceFinalizationService
                     (evidence_record_id, version_no, version_state, amendment_no, source_version_id, source_change_order_id,
                      canonical_payload, package_hash_sha256, manifest_hash_sha256,
                      canonical_payload_hash_sha256, readable_snapshot_hash_sha256,
-                     finalized_at, idempotency_key, metadata)
+                     finalized_at, finalized_by_user_id, idempotency_key, metadata)
                 VALUES
                     (CAST(:evidence_record_id AS uuid), :version_no, 'locked', :amendment_no,
                      CAST(:source_version_id AS uuid), CAST(:source_change_order_id AS uuid),
                      CAST(:canonical_payload AS jsonb), :package_hash_sha256, :manifest_hash_sha256,
                      :canonical_payload_hash_sha256, :readable_snapshot_hash_sha256,
-                     now(), :idempotency_key, CAST(:metadata AS jsonb))
+                     now(), CAST(:finalized_by_user_id AS uuid), :idempotency_key, CAST(:metadata AS jsonb))
                 ON CONFLICT (package_hash_sha256) DO NOTHING
                 RETURNING *
              )
@@ -204,8 +204,12 @@ final class EvidenceFinalizationService
                 ':manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
                 ':canonical_payload_hash_sha256' => (string)$package['canonical_payload_hash_sha256'],
                 ':readable_snapshot_hash_sha256' => (string)$package['readable_snapshot_hash_sha256'],
+                ':finalized_by_user_id' => $this->nullableUuid($input['finalized_by_user_id'] ?? $input['authenticated_user_id'] ?? $input['actor_id'] ?? null),
                 ':idempotency_key' => $idempotencyBase !== null ? $idempotencyBase . ':version' : null,
-                ':metadata' => $this->json(['finalization_state' => 'finalized']),
+                ':metadata' => $this->json([
+                    'finalization_state' => 'finalized',
+                    'record_content_hash_sha256' => (string)($package['record_content_hash_sha256'] ?? ''),
+                ]),
             ],
         );
         if (!is_array($version) || $this->text($version['evidence_version_id'] ?? '') === '') {
@@ -253,12 +257,16 @@ final class EvidenceFinalizationService
                     ':metadata' => $this->json(['required_for_final' => true]),
                 ],
             );
+            $this->assertArtifactPersisted($artifacts[$role], $role, $artifact);
         }
 
         $signatureEvents = $this->persistSignatureEvents($db, $input, $package, $record, $version);
         $retentionLock = (new RetentionLockService($db))->ensureForFinalEvidence($record, $version, [
             'package_hash_sha256' => (string)$package['package_hash_sha256'],
         ] + $input);
+        if (!is_array($retentionLock) || $this->text($retentionLock['retention_lock_id'] ?? '') === '' || $this->text($retentionLock['lock_state'] ?? 'active') !== 'active') {
+            throw new RuntimeException('retention_lock_required_for_final_evidence');
+        }
 
         $publicationState = is_array($package['manifest']['publication_state'] ?? null) ? $package['manifest']['publication_state'] : [];
         $publication = $db->queryOne(
@@ -278,23 +286,29 @@ final class EvidenceFinalizationService
              SELECT * FROM evidence_publications
               WHERE evidence_version_id = CAST(:evidence_version_id AS uuid)
                 AND publication_target = :publication_target
-             LIMIT 1",
+            LIMIT 1",
             [
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
-            ':publication_target' => $this->text($publicationState['target_type'] ?? 'sharepoint_graph') ?: 'sharepoint_graph',
-            ':publication_state' => $this->text($publicationState['publication_state'] ?? 'pending') ?: 'pending',
-            ':source_package_hash_sha256' => (string)$package['package_hash_sha256'],
-            ':source_manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
-            ':publication_receipt' => $this->json($publicationState['publication_receipt'] ?? []),
-            ':idempotency_key' => hash('sha256', (string)$version['evidence_version_id'] . '|publication|sharepoint_graph'),
-            ':metadata' => $this->json([
-                'publication_boundary' => 'async_read_only_replica',
-                'source_change_order_id' => $sourceChangeOrderId,
-            ]),
-        ],
-    );
+                ':publication_target' => $this->text($publicationState['target_type'] ?? 'sharepoint_graph') ?: 'sharepoint_graph',
+                ':publication_state' => $this->text($publicationState['publication_state'] ?? $publicationState['state'] ?? 'pending') ?: 'pending',
+                ':source_package_hash_sha256' => (string)$package['package_hash_sha256'],
+                ':source_manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
+                ':publication_receipt' => $this->json($publicationState['publication_receipt'] ?? []),
+                ':idempotency_key' => hash('sha256', (string)$version['evidence_version_id'] . '|publication|sharepoint_graph'),
+                ':metadata' => $this->json([
+                    'publication_boundary' => 'async_read_only_replica',
+                    'source_change_order_id' => $sourceChangeOrderId,
+                ]),
+            ],
+        );
+        if (!is_array($publication) || $this->text($publication['evidence_publication_id'] ?? '') === '') {
+            throw new RuntimeException('evidence_publication_state_record_required');
+        }
+        if ($this->text($publication['publication_state'] ?? '') !== $this->text($publicationState['publication_state'] ?? $publicationState['state'] ?? 'pending')) {
+            throw new RuntimeException('evidence_publication_state_mismatch');
+        }
 
-        $record = $db->queryOne(
+        $recordUpdate = $db->queryOne(
             "UPDATE evidence_records
              SET record_state = 'finalized',
                  current_version_id = CAST(:evidence_version_id AS uuid),
@@ -310,7 +324,28 @@ final class EvidenceFinalizationService
                 ':evidence_version_id' => (string)$version['evidence_version_id'],
                 ':evidence_record_id' => (string)$record['evidence_record_id'],
             ],
-        ) ?: $record;
+        );
+        if (is_array($recordUpdate) && $this->text($recordUpdate['evidence_record_id'] ?? '') !== '') {
+            $record = $recordUpdate;
+        } else {
+            $record = $db->queryOne(
+                "SELECT *
+                 FROM evidence_records
+                 WHERE evidence_record_id = CAST(:evidence_record_id AS uuid)
+                   AND record_state = 'finalized'
+                   AND current_version_id = CAST(:evidence_version_id AS uuid)
+                 LIMIT 1",
+                [
+                    ':evidence_version_id' => (string)$version['evidence_version_id'],
+                    ':evidence_record_id' => (string)$record['evidence_record_id'],
+                ],
+            );
+            if (!is_array($record) || $this->text($record['evidence_record_id'] ?? '') === '') {
+                throw new RuntimeException('evidence_record_finalization_update_required');
+            }
+        }
+
+        $this->persistFinalizationAuditEvent($db, $input, $package, $record, $version, $signatureEvents, $retentionLock, $publication);
 
         return [
             'evidence_record' => $record,
@@ -493,7 +528,7 @@ final class EvidenceFinalizationService
         if (!is_array($row) || $this->text($row['frm_submission_attempt_id'] ?? '') === '') {
             throw new RuntimeException('source_submission_attempt_not_found');
         }
-        if (!in_array($this->text($row['attempt_state'] ?? ''), ['accepted', 'valid'], true)) {
+        if ($this->text($row['attempt_state'] ?? '') !== 'accepted') {
             throw new RuntimeException('source_submission_attempt_not_accepted');
         }
         $validationState = $this->text($row['validation_state'] ?? '');
@@ -536,10 +571,7 @@ final class EvidenceFinalizationService
     private function assertSignedPayloadBelongsToPackage(string $payloadHash, array $package): void
     {
         $allowed = array_filter([
-            $this->nullableHash($package['manifest_hash_sha256'] ?? null),
-            $this->nullableHash($package['package_hash_sha256'] ?? null),
-            $this->nullableHash($package['canonical_payload_hash_sha256'] ?? null),
-            $this->nullableHash($package['readable_snapshot_hash_sha256'] ?? null),
+            $this->nullableHash($package['record_content_hash_sha256'] ?? null),
         ]);
         foreach ($allowed as $allowedHash) {
             if (hash_equals((string)$allowedHash, $payloadHash)) {
@@ -548,6 +580,219 @@ final class EvidenceFinalizationService
         }
 
         throw new RuntimeException('signature_payload_hash_not_in_evidence_package');
+    }
+
+    /**
+     * @param array<string, mixed>|mixed $row
+     * @param array<string, mixed> $artifact
+     */
+    private function assertArtifactPersisted(mixed $row, string $role, array $artifact): void
+    {
+        if (!is_array($row) || $this->text($row['evidence_artifact_id'] ?? '') === '') {
+            throw new RuntimeException('evidence_artifact_persistence_required_' . $role);
+        }
+        if ($this->text($row['artifact_role'] ?? '') !== $role) {
+            throw new RuntimeException('evidence_artifact_role_mismatch_' . $role);
+        }
+        if (!hash_equals($this->text($artifact['sha256'] ?? ''), $this->text($row['sha256'] ?? ''))) {
+            throw new RuntimeException('evidence_artifact_hash_mismatch_' . $role);
+        }
+        if ($this->text($row['storage_uri'] ?? '') === '') {
+            throw new RuntimeException('evidence_artifact_storage_uri_required_' . $role);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $package
+     * @param array<string, mixed> $record
+     * @param array<string, mixed> $version
+     * @param list<array<string, mixed>> $signatureEvents
+     * @param array<string, mixed> $retentionLock
+     * @param array<string, mixed> $publication
+     */
+    private function persistFinalizationAuditEvent(
+        object $db,
+        array $input,
+        array $package,
+        array $record,
+        array $version,
+        array $signatureEvents,
+        array $retentionLock,
+        array $publication,
+    ): void {
+        if (!method_exists($db, 'queryOne')) {
+            throw new RuntimeException('authoritative_audit_store_required_for_finalization');
+        }
+
+        $recordId = $this->text($record['evidence_record_id'] ?? '');
+        $versionId = $this->text($version['evidence_version_id'] ?? '');
+        if ($recordId === '' || $versionId === '') {
+            throw new RuntimeException('finalization_audit_subject_required');
+        }
+
+        $payload = [
+            'evidence_record_id' => $recordId,
+            'evidence_version_id' => $versionId,
+            'package_hash_sha256' => (string)$package['package_hash_sha256'],
+            'manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
+            'record_content_hash_sha256' => (string)($package['record_content_hash_sha256'] ?? ''),
+            'source_attempt_id' => $this->nullableUuid($input['source_attempt_id'] ?? $input['frm_submission_attempt_id'] ?? null),
+            'source_issuance_id' => $this->nullableUuid($input['source_issuance_id'] ?? $input['frm_issuance_id'] ?? null),
+            'source_change_order_id' => $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null),
+            'signature_event_ids' => array_values(array_filter(array_map(
+                fn(array $event): string => $this->text($event['signature_event_id'] ?? ''),
+                $signatureEvents,
+            ))),
+            'retention_lock_id' => $this->text($retentionLock['retention_lock_id'] ?? ''),
+            'evidence_publication_id' => $this->text($publication['evidence_publication_id'] ?? ''),
+        ];
+        $metadata = array_filter([
+            'authority' => 'EvidenceFinalizationService',
+            'authoritative_audit_required' => true,
+            'canonical_hash_contract' => 'AuditTrail.canonicalHashRecord.v1',
+            'org_id' => $this->nullableText($input['org_id'] ?? null),
+            'session_id' => $this->nullableText($input['session_id'] ?? null),
+        ], static fn(mixed $value): bool => $value !== null && $value !== '');
+        $actorUuid = $this->nullableUuid($input['authenticated_user_id'] ?? $input['finalized_by_user_id'] ?? $input['actor_id'] ?? null);
+        $actorRef = $this->nullableText($input['authenticated_signer_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null);
+        $actorOriginal = $actorUuid ?? $actorRef ?? '';
+        $eventId = $this->deterministicUuid('evidence.finalized|' . $recordId . '|' . $versionId . '|' . (string)$package['package_hash_sha256']);
+
+        $existing = $db->queryOne(
+            "SELECT event_id, event_type, aggregate_type, aggregate_id, payload, metadata,
+                    source_event_hash, aggregate_sequence
+             FROM audit_events
+             WHERE event_id = CAST(:event_id AS uuid)
+               AND event_type = 'evidence.finalized'
+               AND aggregate_type = 'evidence_record'
+               AND aggregate_id = :aggregate_id
+             LIMIT 1",
+            [
+                ':event_id' => $eventId,
+                ':aggregate_id' => $recordId,
+            ],
+        );
+        if (is_array($existing) && $this->text($existing['event_type'] ?? '') === 'evidence.finalized') {
+            $this->assertFinalizationAuditEventVerifiable($existing, $payload);
+            return;
+        }
+
+        $db->queryOne(
+            'SELECT pg_advisory_xact_lock(hashtext(:audit_chain_key)) AS locked',
+            [':audit_chain_key' => 'audit_events|evidence_record|' . $recordId],
+        );
+        $chain = $db->queryOne(
+            "SELECT
+                COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence,
+                COALESCE(
+                    (ARRAY_AGG(COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash')
+                        ORDER BY COALESCE(aggregate_sequence, 0) DESC, recorded_at DESC))[1],
+                    ''
+                ) AS prev_hash
+             FROM audit_events
+             WHERE aggregate_type = 'evidence_record'
+               AND aggregate_id = :aggregate_id",
+            [':aggregate_id' => $recordId],
+        );
+        $aggregateSequence = max(1, (int)($chain['next_sequence'] ?? 1));
+        $prevHash = $this->text($chain['prev_hash'] ?? '');
+        $recordedAt = gmdate('Y-m-d\TH:i:s.v\Z');
+        $eventHash = $this->canonicalAuditEventHash([
+            'event_id' => $eventId,
+            'event_type' => 'evidence.finalized',
+            'aggregate_type' => 'evidence_record',
+            'aggregate_id' => $recordId,
+            'actor_id' => $actorOriginal,
+            'payload' => $payload,
+            'metadata' => $metadata,
+            'esig_reason' => null,
+            'recorded_at' => $recordedAt,
+            'prev_hash' => $prevHash,
+        ]);
+
+        $row = $db->queryOne(
+            "WITH inserted AS (
+                 INSERT INTO audit_events
+                    (event_id, event_type, aggregate_type, aggregate_id, actor_id, actor_name,
+                     payload, metadata, recorded_at, source_event_hash, aggregate_sequence)
+                 VALUES
+                    (CAST(:event_id AS uuid), 'evidence.finalized', 'evidence_record', :aggregate_id,
+                     CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb),
+                     CAST(:metadata AS jsonb) || jsonb_build_object(
+                        'audit_chain',
+                        jsonb_build_object(
+                            'prev_hash', :prev_hash,
+                            'event_hash', :event_hash,
+                            'esig_reason', NULL,
+                            'original_actor_id', :actor_original
+                        )
+                     ),
+                     CAST(:recorded_at AS timestamptz),
+                     :event_hash,
+                     :aggregate_sequence)
+                 ON CONFLICT DO NOTHING
+                 RETURNING event_id, event_type, aggregate_type, aggregate_id, payload,
+                           source_event_hash, aggregate_sequence, metadata
+             )
+             SELECT event_id, event_type, aggregate_type, aggregate_id, payload,
+                    source_event_hash, aggregate_sequence, metadata
+             FROM inserted
+             UNION ALL
+             SELECT event_id, event_type, aggregate_type, aggregate_id, payload,
+                    source_event_hash, aggregate_sequence, metadata
+             FROM audit_events
+             WHERE event_id = CAST(:event_id AS uuid)
+               AND event_type = 'evidence.finalized'
+               AND aggregate_type = 'evidence_record'
+               AND aggregate_id = :aggregate_id
+             LIMIT 1",
+            [
+                ':event_id' => $eventId,
+                ':aggregate_id' => $recordId,
+                ':actor_id' => $actorUuid,
+                ':actor_name' => $actorUuid === null ? $actorRef : null,
+                ':actor_original' => $actorOriginal,
+                ':payload' => $this->json($payload),
+                ':metadata' => $this->json($metadata),
+                ':recorded_at' => $recordedAt,
+                ':event_hash' => $eventHash,
+                ':prev_hash' => $prevHash,
+                ':aggregate_sequence' => $aggregateSequence,
+            ],
+        );
+        if (!is_array($row)) {
+            throw new RuntimeException('finalization_audit_event_required');
+        }
+        $this->assertFinalizationAuditEventVerifiable($row, $payload);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expectedPayload
+     */
+    private function assertFinalizationAuditEventVerifiable(array $row, array $expectedPayload): void
+    {
+        $eventHash = $this->nullableHash($row['source_event_hash'] ?? $row['event_hash'] ?? null);
+        $metadata = $this->arrayValue($row['metadata'] ?? []);
+        $chain = $this->arrayValue($metadata['audit_chain'] ?? []);
+        $chainHash = $this->nullableHash($chain['event_hash'] ?? null);
+        if ($this->text($row['event_type'] ?? '') !== 'evidence.finalized'
+            || $this->text($row['aggregate_type'] ?? '') !== 'evidence_record'
+            || (int)($row['aggregate_sequence'] ?? 0) < 1
+            || $eventHash === null
+            || $chainHash === null
+            || !hash_equals($eventHash, $chainHash)
+        ) {
+            throw new RuntimeException('finalization_audit_event_required');
+        }
+
+        $payload = $this->arrayValue($row['payload'] ?? []);
+        foreach (['evidence_record_id', 'evidence_version_id', 'package_hash_sha256', 'manifest_hash_sha256'] as $field) {
+            if ($this->text($payload[$field] ?? '') !== $this->text($expectedPayload[$field] ?? '')) {
+                throw new RuntimeException('finalization_audit_event_payload_mismatch');
+            }
+        }
     }
 
     /**
@@ -766,6 +1011,66 @@ final class EvidenceFinalizationService
         if (isset($row['signer_ref']) && $this->text($row['signer_ref']) !== $this->text($expected['signer_ref'] ?? '')) {
             throw new RuntimeException('evidence_finalization_idempotency_conflict');
         }
+    }
+
+    private function deterministicUuid(string $seed): string
+    {
+        $hex = substr(hash('sha256', $seed), 0, 32);
+        $hex[12] = '5';
+        $hex[16] = dechex((hexdec($hex[16]) & 0x3) | 0x8);
+
+        return substr($hex, 0, 8) . '-'
+            . substr($hex, 8, 4) . '-'
+            . substr($hex, 12, 4) . '-'
+            . substr($hex, 16, 4) . '-'
+            . substr($hex, 20, 12);
+    }
+
+    /**
+     * Mirrors AuditTrail::canonicalHashRecord() so evidence finalization events
+     * can be verified by the same tamper-evident event-hash contract.
+     *
+     * @param array<string, mixed> $event
+     */
+    private function canonicalAuditEventHash(array $event): string
+    {
+        $metadata = is_array($event['metadata'] ?? null) ? $event['metadata'] : [];
+        unset($metadata['audit_chain'], $metadata['esig']);
+
+        $record = [
+            'event_id' => (string)($event['event_id'] ?? ''),
+            'event_type' => (string)($event['event_type'] ?? ''),
+            'aggregate_type' => (string)($event['aggregate_type'] ?? ''),
+            'aggregate_id' => (string)($event['aggregate_id'] ?? ''),
+            'actor_id' => (string)($event['actor_id'] ?? ''),
+            'payload' => is_array($event['payload'] ?? null) ? $event['payload'] : [],
+            'metadata' => $metadata,
+            'esig_reason' => $event['esig_reason'] ?? null,
+            'recorded_at' => (string)($event['recorded_at'] ?? ''),
+            'prev_hash' => (string)($event['prev_hash'] ?? ''),
+        ];
+
+        $json = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('finalization_audit_hash_encode_failed');
+        }
+
+        return hash('sha256', $json);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function arrayValue(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && trim($value) !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
     }
 
     private function normalizeDb(?object $db): ?object

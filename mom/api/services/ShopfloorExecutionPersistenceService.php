@@ -237,6 +237,10 @@ final class ShopfloorExecutionPersistenceService
         }
 
         $this->advisoryLock($db, 'shift_production_log:' . $logId);
+        $hasTraceability5MColumns = $this->columnAvailable($db, 'shift_production_log', 'traceability_5m_gate')
+            && $this->columnAvailable($db, 'shift_production_log', 'traceability_5m_waiver_signature_event_id');
+        $traceability5MGate = is_array($log['traceability_5m_gate'] ?? null) ? $log['traceability_5m_gate'] : [];
+        $traceability5MWaiver = is_array($traceability5MGate['waiver'] ?? null) ? $traceability5MGate['waiver'] : [];
 
         $params = [
             ':target_id' => $targetUuid !== '' ? $targetUuid : null,
@@ -273,7 +277,22 @@ final class ShopfloorExecutionPersistenceService
             ':idempotency_key' => $this->nullableString($log['idempotency_key'] ?? null),
             ':report_fingerprint' => $this->nullableString($log['report_fingerprint'] ?? null),
             ':client_report_id' => $this->nullableString($log['client_report_id'] ?? null),
+            ':traceability_5m_gate' => $this->json($traceability5MGate),
+            ':traceability_5m_waiver_signature_event_id' => $this->nullableString($traceability5MWaiver['waiver_signature_event_id'] ?? null),
         ] + $this->governanceScopeParams($log);
+        $traceabilityUpdateSql = $hasTraceability5MColumns
+            ? ",
+                    traceability_5m_gate = :traceability_5m_gate::jsonb,
+                    traceability_5m_waiver_signature_event_id = CAST(:traceability_5m_waiver_signature_event_id AS uuid)"
+            : '';
+        $traceabilityInsertColumns = $hasTraceability5MColumns
+            ? ',
+                traceability_5m_gate, traceability_5m_waiver_signature_event_id'
+            : '';
+        $traceabilityInsertValues = $hasTraceability5MColumns
+            ? ',
+                :traceability_5m_gate::jsonb, CAST(:traceability_5m_waiver_signature_event_id AS uuid)'
+            : '';
 
         $row = $db->queryOne(
             "UPDATE shift_production_log
@@ -312,6 +331,7 @@ final class ShopfloorExecutionPersistenceService
                     org_legal_entity_code = :org_legal_entity_code,
                     org_plant_id = :org_plant_id,
                     org_site_id = :org_site_id
+                    {$traceabilityUpdateSql}
               WHERE source_system = :source_system
                 AND source_record_id = :source_record_id
               RETURNING log_id::text AS log_id",
@@ -332,6 +352,7 @@ final class ShopfloorExecutionPersistenceService
                 created_at, updated_at, source_system, source_record_id, payload_schema_version,
                 execution_event_type, report_mode, idempotency_key, report_fingerprint,
                 client_report_id, org_company_code, org_legal_entity_code, org_plant_id, org_site_id
+                {$traceabilityInsertColumns}
              ) VALUES (
                 :target_id, :wo_number, :jo_number, :machine_id, :operator_id, :shift_date, :shift_code,
                 :quantity_good, :quantity_ng, :quantity_rework, :actual_start, :actual_end,
@@ -342,6 +363,7 @@ final class ShopfloorExecutionPersistenceService
                 :source_system, :source_record_id, :payload_schema_version,
                 :execution_event_type, :report_mode, :idempotency_key, :report_fingerprint,
                 :client_report_id, :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id
+                {$traceabilityInsertValues}
              )
              RETURNING log_id::text AS log_id",
             $params,

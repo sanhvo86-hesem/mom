@@ -62,6 +62,12 @@ final class AuditPackExporter
                 ];
             }
         }
+        if ($evidencePackages !== [] && !$this->hasFinalizationAuditEvent($auditEvents, $evidencePackages)) {
+            $exceptions[] = [
+                'exception_code' => 'audit_timeline_missing_finalization_event',
+                'missing' => ['chain-verifiable evidence.finalized audit event'],
+            ];
+        }
 
         $manifest = [
             'manifest_version' => 1,
@@ -302,8 +308,62 @@ final class AuditPackExporter
                 $missing[] = $hashKey;
             }
         }
+        if (!$this->hasPublicationRecord($package)) {
+            $missing[] = 'publication_state_record';
+        }
+        if (!$this->hasRetentionLockRecord($package)) {
+            $missing[] = 'retention_lock_record';
+        }
 
         return $missing;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $auditEvents
+     * @param list<array<string, mixed>> $evidencePackages
+     */
+    private function hasFinalizationAuditEvent(array $auditEvents, array $evidencePackages): bool
+    {
+        $packageHashes = array_values(array_filter(array_map(
+            fn(array $package): string => $this->text($package['package_hash_sha256'] ?? ''),
+            $evidencePackages,
+        ), fn(string $hash): bool => $this->isSha256($hash)));
+        if ($packageHashes === []) {
+            return false;
+        }
+
+        $provedHashes = [];
+        foreach ($auditEvents as $event) {
+            $eventType = strtolower($this->text($event['event_type'] ?? ''));
+            $aggregateType = strtolower($this->text($event['aggregate_type'] ?? ''));
+            $payload = $this->arrayValue($event['payload'] ?? []);
+            $metadata = $this->arrayValue($event['metadata'] ?? []);
+            $chain = $this->arrayValue($metadata['audit_chain'] ?? []);
+            $eventHash = strtolower($this->text(
+                $event['event_hash'] ?? $event['source_event_hash'] ?? $event['event_hash_sha256'] ?? ''
+            ));
+            $chainHash = strtolower($this->text($chain['event_hash'] ?? ''));
+            $packageHash = strtolower($this->text($payload['package_hash_sha256'] ?? ''));
+            if ($eventType === 'evidence.finalized'
+                && in_array($aggregateType, ['evidence_record', 'evidence_version'], true)
+                && $this->text($payload['evidence_record_id'] ?? $event['aggregate_id'] ?? '') !== ''
+                && $this->isSha256($packageHash)
+                && in_array($packageHash, $packageHashes, true)
+                && (int)($event['aggregate_sequence'] ?? 0) >= 1
+                && $this->isSha256($eventHash)
+                && $this->isSha256($chainHash)
+                && hash_equals($eventHash, $chainHash)
+            ) {
+                $provedHashes[$packageHash] = true;
+            }
+        }
+
+        foreach ($packageHashes as $packageHash) {
+            if (!isset($provedHashes[$packageHash])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -321,10 +381,58 @@ final class AuditPackExporter
                 'package_hash_sha256' => $this->text($package['package_hash_sha256'] ?? ''),
                 'manifest_hash_sha256' => $this->text($package['manifest_hash_sha256'] ?? ''),
                 'publication_state' => $package['manifest']['publication_state'] ?? $package['publication_state'] ?? [],
+                'publication_records' => $package['publication_records'] ?? [],
+                'retention_locks' => $package['retention_locks'] ?? [],
                 'missing' => $this->missingPackageArtifacts($package),
             ];
         }
         return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function hasPublicationRecord(array $package): bool
+    {
+        $records = is_array($package['publication_records'] ?? null) ? $package['publication_records'] : [];
+        foreach ($records as $record) {
+            if (!is_array($record)) {
+                continue;
+            }
+            if ($this->text($record['evidence_publication_id'] ?? '') !== ''
+                && $this->text($record['publication_state'] ?? '') !== ''
+                && $this->text($record['authority_role'] ?? '') !== ''
+            ) {
+                return true;
+            }
+        }
+
+        $state = is_array($package['publication_state'] ?? null) ? $package['publication_state'] : [];
+        return $this->text($state['publication_state'] ?? $state['state'] ?? '') !== ''
+            && (
+                $this->text($state['evidence_publication_id'] ?? '') !== ''
+                || is_array($state['publication_receipt'] ?? null)
+            );
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function hasRetentionLockRecord(array $package): bool
+    {
+        $locks = is_array($package['retention_locks'] ?? null) ? $package['retention_locks'] : [];
+        foreach ($locks as $lock) {
+            if (!is_array($lock)) {
+                continue;
+            }
+            $state = strtolower($this->text($lock['lock_state'] ?? ''));
+            if ($this->text($lock['retention_lock_id'] ?? '') !== ''
+                && $state === 'active'
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -342,7 +450,9 @@ final class AuditPackExporter
                 'aggregate_type' => $this->text($event['aggregate_type'] ?? ''),
                 'aggregate_id' => $this->text($event['aggregate_id'] ?? ''),
                 'actor_id' => $this->text($event['actor_id'] ?? $event['actor_ref'] ?? ''),
-                'event_hash_sha256' => $this->text($event['event_hash'] ?? $event['event_hash_sha256'] ?? ''),
+                'aggregate_sequence' => (int)($event['aggregate_sequence'] ?? 0),
+                'prev_hash_sha256' => $this->text($event['prev_hash'] ?? ''),
+                'event_hash_sha256' => $this->text($event['event_hash'] ?? $event['source_event_hash'] ?? $event['event_hash_sha256'] ?? ''),
             ];
         }
         usort($out, static fn(array $a, array $b): int => strcmp($a['recorded_at'], $b['recorded_at']));
@@ -389,6 +499,21 @@ final class AuditPackExporter
     private function text(mixed $value): string
     {
         return is_scalar($value) ? trim((string)$value) : '';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function arrayValue(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && trim($value) !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
     }
 
     private function isSha256(string $value): bool

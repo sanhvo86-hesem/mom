@@ -9,6 +9,7 @@ use MOM\Api\Services\FileManufacturingEventRepository;
 use MOM\Api\Services\ManufacturingEventBackboneService;
 use MOM\Api\Services\ManufacturingEventRepository;
 use MOM\Services\ShopfloorExecutionService;
+use MOM\Services\Traceability\GenealogyGraphService;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -612,7 +613,11 @@ final class ShopfloorExecutionServiceTest extends TestCase
             repository: new FileManufacturingEventRepository($this->dataDir),
             databaseConfig: ['use_postgres' => false],
         );
-        $service = new ShopfloorExecutionService($this->dataDir, eventBackbone: $eventBackbone);
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            eventBackbone: $eventBackbone,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
         $target = $this->target();
 
         $log = $service->buildProductionLog([
@@ -666,7 +671,11 @@ final class ShopfloorExecutionServiceTest extends TestCase
             repository: new ThrowingManufacturingEventRepository(),
             databaseConfig: ['use_postgres' => false],
         );
-        $service = new ShopfloorExecutionService($this->dataDir, eventBackbone: $eventBackbone);
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            eventBackbone: $eventBackbone,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
         $target = $this->target();
         $log = $service->buildProductionLog([
             'quantity_good' => 8,
@@ -686,6 +695,64 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('manufacturing_event_projection', $deadLetter['dead_letter_type']);
         $this->assertSame('pending_reconciliation', $deadLetter['dead_letter_state']);
         $this->assertSame($log['log_id'], $deadLetter['source_record_id']);
+    }
+
+    public function testProductionReportRequiresAuthoritative5MGateOrSignedWaiver(): void
+    {
+        $target = $this->target();
+        unset($target['traceability_5m_waiver_signature_event_id'], $target['traceability_5m_waiver_reason']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_5m_authoritative_store_required');
+
+        (new ShopfloorExecutionService($this->dataDir))->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+    }
+
+    public function testProductionReportRejectsCallerSupplied5MWaiverWithoutAuthority(): void
+    {
+        $target = $this->target();
+        $target['material_lot_number'] = '';
+        $target['inspection_plan_id'] = '';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_5m_gate_not_met');
+
+        (new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService(new BlockingShopfloorGenealogyGateFakeDb()),
+        ))->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'traceability_5m_waiver_signature_event_id' => '00000000-0000-0000-0000-000000009001',
+            'traceability_5m_waiver_reason' => 'caller supplied waiver must not be trusted',
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+    }
+
+    public function testProductionReportPersistsComplete5MGateWhenGenealogyStoreAvailable(): void
+    {
+        $target = $this->target();
+        unset($target['traceability_5m_waiver_signature_event_id'], $target['traceability_5m_waiver_reason']);
+        $target['material_lot_number'] = 'MAT-LOT-1';
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+
+        $db = new ShopfloorGenealogyGateFakeDb();
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService($db),
+        );
+
+        $log = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'inspection_result_id' => 'IPQC-RESULT-1',
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $this->assertSame('complete', $log['traceability_5m_gate']['gate_state']);
+        $this->assertSame('authoritative_traceability_5m_obligation', $log['traceability_5m_gate']['source']);
+        $this->assertNotEmpty($db->queryOneCalls);
     }
 
     public function testProductionReportIdempotencyReplaysSameFingerprint(): void
@@ -1173,6 +1240,8 @@ final class ShopfloorExecutionServiceTest extends TestCase
             'cycle_time_minutes' => 4.5,
             'cnc_program_id' => 'NC-714-1101-OP20',
             'setup_sheet_id' => 'SETUP-714-OP20',
+            'traceability_5m_waiver_signature_event_id' => '00000000-0000-0000-0000-000000009001',
+            'traceability_5m_waiver_reason' => 'unit-test legacy file-backed shopfloor capture',
             'status' => 'dispatched',
             'started_at' => '2026-04-13T07:00:00Z',
         ];
@@ -1180,7 +1249,10 @@ final class ShopfloorExecutionServiceTest extends TestCase
 
     private function service(): ShopfloorExecutionService
     {
-        return new ShopfloorExecutionService($this->dataDir);
+        return new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
+        );
     }
 
     private function removeDir(string $dir): void
@@ -1197,6 +1269,64 @@ final class ShopfloorExecutionServiceTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         rmdir($dir);
+    }
+}
+
+class ShopfloorGenealogyGateFakeDb
+{
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM traceability_5m_policy_rules')) {
+            return [
+                'material_required' => true,
+                'machine_required' => true,
+                'method_required' => true,
+                'measurement_required' => false,
+                'manpower_required' => true,
+                'policy_source' => 'control_plan',
+                'policy_state' => 'active',
+            ];
+        }
+
+        return [
+            'operation_class' => (string)($params[':operation_class'] ?? ''),
+            'object_type' => (string)($params[':object_type'] ?? ''),
+            'object_id' => (string)($params[':object_id'] ?? ''),
+            'gate_state' => (string)($params[':gate_state'] ?? ''),
+            'missing_context' => (string)($params[':missing_context'] ?? '[]'),
+        ];
+    }
+}
+
+final class BlockingShopfloorGenealogyGateFakeDb extends ShopfloorGenealogyGateFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        if (str_contains($sql, 'FROM traceability_5m_policy_rules')) {
+            return null;
+        }
+
+        return [
+            'operation_class' => (string)($params[':operation_class'] ?? ''),
+            'object_type' => (string)($params[':object_type'] ?? ''),
+            'object_id' => (string)($params[':object_id'] ?? ''),
+            'gate_state' => 'blocked',
+            'missing_context' => '["material","measurement"]',
+        ];
     }
 }
 

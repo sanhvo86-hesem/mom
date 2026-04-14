@@ -32,6 +32,9 @@ final class ChangeLifecycleCommandService
         if ($status === 'approved_for_order') {
             throw new RuntimeException('change_request_terminal_status_requires_transition');
         }
+        $idempotencyKey = $this->requiredText($input, 'idempotency_key');
+        $requestHash = $this->requestHash($input);
+        $this->assertCreateIdempotencyLedger('change_request:create', $idempotencyKey, $requestHash);
 
         $number = $this->text($input['change_request_number'] ?? '');
         if ($number === '') {
@@ -39,14 +42,20 @@ final class ChangeLifecycleCommandService
         }
 
         $row = $this->db->queryOne(
-            "INSERT INTO plm_change_requests
-                (change_request_number, request_type, title, problem_statement, proposed_solution,
-                 impact_summary, priority, status, target_effective_date, metadata)
-             VALUES
-                (:number, :request_type, :title, :problem_statement, :proposed_solution,
-                 :impact_summary, :priority, :status, :target_effective_date, CAST(:metadata AS jsonb))
-             ON CONFLICT (change_request_number) DO UPDATE SET updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO plm_change_requests
+                    (change_request_number, request_type, title, problem_statement, proposed_solution,
+                     impact_summary, priority, status, target_effective_date, metadata)
+                VALUES
+                    (:number, :request_type, :title, :problem_statement, :proposed_solution,
+                     :impact_summary, :priority, :status, :target_effective_date, CAST(:metadata AS jsonb))
+                ON CONFLICT (change_request_number) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM plm_change_requests WHERE change_request_number = :number
+             LIMIT 1",
             [
                 ':number' => $number,
                 ':request_type' => $this->enum($input['request_type'] ?? 'internal', ['ecr', 'customer_change', 'supplier_change', 'internal']),
@@ -57,14 +66,21 @@ final class ChangeLifecycleCommandService
                 ':priority' => $this->enum($input['priority'] ?? 'medium', ['low', 'medium', 'high', 'critical']),
                 ':status' => $status,
                 ':target_effective_date' => $this->nullableText($input['target_effective_date'] ?? null),
-                ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command']),
+                ':metadata' => $this->json([
+                    'actor_ref' => $actorRef,
+                    'authority' => 'change_lifecycle_command',
+                    'idempotency_key' => $idempotencyKey,
+                    'request_hash_sha256' => $requestHash,
+                ]),
             ],
         );
 
         if (!is_array($row)) {
             throw new RuntimeException('change_request_create_failed');
         }
+        $this->assertRequestReplayEquivalent($row, $requestHash, 'change_request');
         $this->persistAffectedObjects($row['plm_change_request_id'] ?? null, null, $input['affected_objects'] ?? []);
+        $this->completeCreateIdempotencyLedger('change_request:create', $idempotencyKey, $requestHash, $this->normalizeRow($row));
         return $this->normalizeRow($row);
     }
 
@@ -79,6 +95,7 @@ final class ChangeLifecycleCommandService
         $id = $this->requiredText($input, 'change_request_id');
         $current = $this->loadChangeRequestRow($id);
         $this->assertAllowedRequestTransition(strtolower($this->text($current['status'] ?? '')), $target);
+        $this->assertTransitionGovernance($input, $actorRef, 'change_request', strtolower($this->text($current['status'] ?? '')), $target, $current);
 
         $row = $this->db->queryOne(
             "UPDATE plm_change_requests
@@ -124,6 +141,9 @@ final class ChangeLifecycleCommandService
         if (in_array($status, ['released', 'implemented', 'closed'], true)) {
             throw new RuntimeException('change_order_release_requires_transition');
         }
+        $idempotencyKey = $this->requiredText($input, 'idempotency_key');
+        $requestHash = $this->requestHash($input);
+        $this->assertCreateIdempotencyLedger('change_order:create', $idempotencyKey, $requestHash);
 
         $number = $this->text($input['change_order_number'] ?? '');
         if ($number === '') {
@@ -131,16 +151,22 @@ final class ChangeLifecycleCommandService
         }
 
         $row = $this->db->queryOne(
-            "INSERT INTO plm_change_orders
-                (change_order_number, plm_change_request_id, order_type, title, effectivity_type,
-                 effective_from_date, effective_to_date, serial_effective_from, serial_effective_to,
-                 status, implementation_due_date, metadata)
-             VALUES
-                (:number, CAST(:request_id AS uuid), :order_type, :title, :effectivity_type,
-                 :effective_from_date, :effective_to_date, :serial_effective_from, :serial_effective_to,
-                 :status, :implementation_due_date, CAST(:metadata AS jsonb))
-             ON CONFLICT (change_order_number) DO UPDATE SET updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO plm_change_orders
+                    (change_order_number, plm_change_request_id, order_type, title, effectivity_type,
+                     effective_from_date, effective_to_date, serial_effective_from, serial_effective_to,
+                     status, implementation_due_date, metadata)
+                VALUES
+                    (:number, CAST(:request_id AS uuid), :order_type, :title, :effectivity_type,
+                     :effective_from_date, :effective_to_date, :serial_effective_from, :serial_effective_to,
+                     :status, :implementation_due_date, CAST(:metadata AS jsonb))
+                ON CONFLICT (change_order_number) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM plm_change_orders WHERE change_order_number = :number
+             LIMIT 1",
             [
                 ':number' => $number,
                 ':request_id' => $this->nullableUuid($input['plm_change_request_id'] ?? $input['change_request_id'] ?? null),
@@ -153,13 +179,17 @@ final class ChangeLifecycleCommandService
                 ':serial_effective_to' => $this->nullableText($input['serial_effective_to'] ?? null),
                 ':status' => $status,
                 ':implementation_due_date' => $this->nullableText($input['implementation_due_date'] ?? null),
-                ':metadata' => $this->json($this->changeOrderMetadata($input, $actorRef)),
+                ':metadata' => $this->json($this->changeOrderMetadata($input, $actorRef) + [
+                    'idempotency_key' => $idempotencyKey,
+                    'request_hash_sha256' => $requestHash,
+                ]),
             ],
         );
 
         if (!is_array($row)) {
             throw new RuntimeException('change_order_create_failed');
         }
+        $this->assertRequestReplayEquivalent($row, $requestHash, 'change_order');
         $orderId = $row['plm_change_order_id'] ?? null;
         $affectedObjects = $this->persistAffectedObjects(null, $orderId, $input['affected_objects'] ?? []);
         $this->persistResultingObjects($orderId, $input['resulting_objects'] ?? [], $affectedObjects);
@@ -170,6 +200,7 @@ final class ChangeLifecycleCommandService
         $this->persistWipDispositions($orderId, $input['wip_dispositions'] ?? [], $actorRef);
         $this->persistRollbackRequirements($orderId, $input['rollback_requirements'] ?? $input['affected_objects'] ?? [], $input['rollback_plan'] ?? null, $actorRef);
         $this->persistEmergencyControl($orderId, $input, $actorRef);
+        $this->completeCreateIdempotencyLedger('change_order:create', $idempotencyKey, $requestHash, $this->normalizeRow($row));
         return $this->normalizeRow($row);
     }
 
@@ -180,12 +211,29 @@ final class ChangeLifecycleCommandService
     public function transitionChangeOrder(array $input, string $actorRef): array
     {
         $this->requireDb();
+        if (method_exists($this->db, 'transactional')) {
+            return $this->db->transactional(fn(): array => $this->transitionChangeOrderInsideTransaction($input, $actorRef));
+        }
+
+        return $this->transitionChangeOrderInsideTransaction($input, $actorRef);
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private function transitionChangeOrderInsideTransaction(array $input, string $actorRef): array
+    {
         $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled']);
         $id = $this->requiredText($input, 'change_order_id');
         $current = $this->loadChangeOrderRow($id);
         $this->assertAllowedOrderTransition(strtolower($this->text($current['status'] ?? '')), $target);
+        $this->assertTransitionGovernance($input, $actorRef, 'change_order', strtolower($this->text($current['status'] ?? '')), $target, $current);
 
         $releaseGate = null;
+        $releaseSideEffects = null;
+        $releaseSignature = null;
+        $releasePackageHash = null;
         if ($target === 'released') {
             $releaseGate = $this->evaluateChangeOrderReleaseReadiness($id, $input);
             if (!$releaseGate['allowed']) {
@@ -194,6 +242,23 @@ final class ChangeLifecycleCommandService
                     $releaseGate['blockers'],
                 )));
             }
+            $releasePackageHash = $this->releasePackageHash($current, $releaseGate);
+            $releaseSignatureEventId = $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null);
+            if ($releaseSignatureEventId === null) {
+                throw new RuntimeException('change_order_release_signature_required');
+            }
+            $releaseSignature = (new ChangeReleaseSignatureValidator($this->db))->requireValidReleaseSignature(
+                $releaseSignatureEventId,
+                $current,
+                $releasePackageHash,
+                $actorRef,
+            );
+            $releaseSideEffects = (new ChangeReleaseSideEffectService($this->db))->apply($current, [
+                'change_order_id' => $this->text($current['plm_change_order_id'] ?? $id),
+                'actor_ref' => $actorRef,
+                'signature_event_id' => $releaseSignatureEventId,
+                'release_package_hash_sha256' => $releasePackageHash,
+            ]);
         }
 
         if ($target === 'closed') {
@@ -208,6 +273,8 @@ final class ChangeLifecycleCommandService
             "UPDATE plm_change_orders
              SET status = :status,
                  approved_at = CASE WHEN :status IN ('approved', 'released') AND approved_at IS NULL THEN now() ELSE approved_at END,
+                 release_signature_event_id = CASE WHEN :status = 'released' THEN CAST(:release_signature_event_id AS uuid) ELSE release_signature_event_id END,
+                 release_package_hash_sha256 = CASE WHEN :status = 'released' THEN :release_package_hash_sha256 ELSE release_package_hash_sha256 END,
                  metadata = COALESCE(metadata, '{}'::jsonb) || CAST(:metadata AS jsonb),
                  updated_at = now()
              WHERE plm_change_order_id::text = :id OR change_order_number = :id
@@ -215,10 +282,15 @@ final class ChangeLifecycleCommandService
             [
                 ':status' => $target,
                 ':id' => $id,
+                ':release_signature_event_id' => is_array($releaseSignature) ? $this->nullableUuid($releaseSignature['signature_event_id'] ?? null) : null,
+                ':release_package_hash_sha256' => $releasePackageHash,
                 ':metadata' => $this->json(array_filter([
                     'transitioned_by' => $actorRef,
                     'reason' => $this->text($input['reason'] ?? ''),
                     'release_gate' => $releaseGate,
+                    'release_package_hash_sha256' => $releasePackageHash,
+                    'release_signature_event_id' => is_array($releaseSignature) ? $this->text($releaseSignature['signature_event_id'] ?? '') : null,
+                    'release_side_effects' => $releaseSideEffects,
                 ], static fn(mixed $value): bool => $value !== null && $value !== '')),
             ],
         );
@@ -236,6 +308,11 @@ final class ChangeLifecycleCommandService
     public function evaluateChangeOrderReleaseReadiness(string $changeOrderId, array $overrides = []): array
     {
         $package = $this->loadChangeLifecyclePackage($changeOrderId);
+        $detectedConflicts = (new EffectivityConflictService($this->db))->detectAndPersist(
+            $this->text($package['change_order']['plm_change_order_id'] ?? $changeOrderId),
+            $package['effectivities'],
+        );
+        $conflicts = array_merge($package['conflicts'], $detectedConflicts);
         $gate = (new EffectivityGateService())->evaluateChangeOrderRelease(
             $package['change_order'],
             $package['affected_objects'],
@@ -243,7 +320,7 @@ final class ChangeLifecycleCommandService
             $package['effectivities'],
             $package['training_requirements'],
             $package['verifications'],
-            $package['conflicts'],
+            $conflicts,
         );
 
         $blockers = $gate['blockers'];
@@ -255,6 +332,9 @@ final class ChangeLifecycleCommandService
 
         foreach ($this->blockedTraceabilityGates($package['affected_objects'], $package['resulting_objects']) as $gate) {
             $blockers[] = $this->blocker('traceability_5m_gate_blocked', 'Required 5M traceability context is incomplete.', $gate);
+        }
+        foreach ($this->unresolvedWipDispositions($package['wip_dispositions']) as $disposition) {
+            $blockers[] = $this->blocker('wip_disposition_unresolved', 'WIP, on-order, or finished-goods impact disposition must be approved, executed, or signed-waived before release.', $disposition);
         }
 
         $rollbackRequired = $this->releaseRequiresRollback($package['effectivities']);
@@ -293,6 +373,7 @@ final class ChangeLifecycleCommandService
                 'emergency_change_controls',
                 'effectivity_conflicts',
             ],
+            'release_package_payload' => $this->canonicalReleasePackagePayload($package, $conflicts),
         ];
     }
 
@@ -380,7 +461,7 @@ final class ChangeLifecycleCommandService
             if (!is_array($object)) {
                 continue;
             }
-            $affectedObjectId = $this->resolveAffectedObjectId($object, $affectedObjects);
+            $affectedObjectId = $this->resolveAffectedObjectId($orderId, $object, $affectedObjects);
             $this->db->queryOne(
                 "INSERT INTO plm_change_resulting_objects
                     (plm_change_order_id, affected_object_id, object_type, object_id, resulting_revision, result_role, release_state,
@@ -409,10 +490,29 @@ final class ChangeLifecycleCommandService
      * @param array<string, mixed> $resultingObject
      * @param list<array<string, mixed>> $affectedObjects
      */
-    private function resolveAffectedObjectId(array $resultingObject, array $affectedObjects): string
+    private function resolveAffectedObjectId(mixed $orderId, array $resultingObject, array $affectedObjects): string
     {
         $explicit = $this->nullableUuid($resultingObject['affected_object_id'] ?? null);
         if ($explicit !== null) {
+            foreach ($affectedObjects as $affected) {
+                if ($this->text($affected['plm_change_affected_object_id'] ?? '') === $explicit) {
+                    return $explicit;
+                }
+            }
+            $row = $this->db->queryOne(
+                "SELECT plm_change_affected_object_id
+                 FROM plm_change_affected_objects
+                 WHERE plm_change_order_id = CAST(:order_id AS uuid)
+                   AND plm_change_affected_object_id = CAST(:affected_object_id AS uuid)
+                 LIMIT 1",
+                [
+                    ':order_id' => $this->nullableUuid($orderId),
+                    ':affected_object_id' => $explicit,
+                ],
+            );
+            if (!is_array($row) || $this->text($row['plm_change_affected_object_id'] ?? '') !== $explicit) {
+                throw new RuntimeException('resulting_object_affected_object_not_in_change_order');
+            }
             return $explicit;
         }
 
@@ -611,10 +711,14 @@ final class ChangeLifecycleCommandService
                 "INSERT INTO plm_change_training_requirements
                     (plm_change_order_id, object_type, object_id, audience_type, audience_ref,
                      training_requirement_type, due_before_effective, requirement_state, due_at, satisfied_at,
+                     satisfaction_signature_event_id, waiver_signature_event_id, training_evidence_record_id,
+                     source_training_record_id,
                      idempotency_key, metadata)
                  VALUES
                     (CAST(:order_id AS uuid), :object_type, :object_id, :audience_type, :audience_ref,
                      :requirement_type, :due_before_effective, :requirement_state, :due_at, :satisfied_at,
+                     CAST(:satisfaction_signature_event_id AS uuid), CAST(:waiver_signature_event_id AS uuid),
+                     CAST(:training_evidence_record_id AS uuid), :source_training_record_id,
                      :idempotency_key, CAST(:metadata AS jsonb))
                  ON CONFLICT (idempotency_key) DO UPDATE SET updated_at = now()
                  RETURNING *",
@@ -629,8 +733,12 @@ final class ChangeLifecycleCommandService
                     ':requirement_state' => $this->enum($requirement['requirement_state'] ?? 'open', ['open', 'satisfied', 'waived', 'expired', 'superseded', 'cancelled']),
                     ':due_at' => $this->nullableText($requirement['due_at'] ?? null),
                     ':satisfied_at' => $this->nullableText($requirement['satisfied_at'] ?? null),
+                    ':satisfaction_signature_event_id' => $this->nullableUuid($requirement['satisfaction_signature_event_id'] ?? $requirement['signature_event_id'] ?? null),
+                    ':waiver_signature_event_id' => $this->nullableUuid($requirement['waiver_signature_event_id'] ?? null),
+                    ':training_evidence_record_id' => $this->nullableUuid($requirement['training_evidence_record_id'] ?? $requirement['evidence_record_id'] ?? null),
+                    ':source_training_record_id' => $this->nullableText($requirement['source_training_record_id'] ?? $requirement['training_record_id'] ?? null),
                     ':idempotency_key' => hash('sha256', 'training|' . $this->text($orderId) . '|' . $this->requiredText($requirement, 'object_type') . '|' . $this->requiredText($requirement, 'object_id') . '|' . $this->enum($requirement['audience_type'] ?? 'role', ['user', 'role', 'department', 'site', 'plant']) . '|' . $this->requiredText($requirement, 'audience_ref') . '|' . $this->enum($requirement['training_requirement_type'] ?? 'read_ack', ['read_ack', 'qualification', 'training_course', 'practical_assessment']) . '|' . ($this->bool($requirement['due_before_effective'] ?? true) ? 'due_before' : 'advisory')),
-                    ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command']),
+                    ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command'] + (is_array($requirement['metadata'] ?? null) ? $requirement['metadata'] : [])),
                 ],
             );
         }
@@ -814,6 +922,127 @@ final class ChangeLifecycleCommandService
         }
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $currentRow
+     */
+    private function assertTransitionGovernance(
+        array $input,
+        string $actorRef,
+        string $aggregateType,
+        string $current,
+        string $target,
+        array $currentRow,
+    ): void {
+        if ($this->text($input['reason'] ?? '') === '' && !in_array($target, ['cancelled', 'rejected'], true)) {
+            throw new RuntimeException($aggregateType . '_transition_reason_required');
+        }
+
+        $roles = $this->normalizedRoles($input['actor_roles'] ?? $input['_actor_roles'] ?? []);
+        if ($roles === []) {
+            throw new RuntimeException($aggregateType . '_transition_actor_roles_required');
+        }
+        if (!$this->transitionRoleAllowed($aggregateType, $target, $roles)) {
+            throw new RuntimeException($aggregateType . '_transition_role_not_authorized');
+        }
+
+        if ($aggregateType === 'change_order' && in_array($target, ['approved', 'released', 'closed'], true)) {
+            $creator = $this->creatorRef($currentRow);
+            if ($creator !== '' && hash_equals($creator, $actorRef)) {
+                throw new RuntimeException('change_order_transition_sod_violation');
+            }
+        }
+
+        if ($target === 'released' && $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null) === null) {
+            throw new RuntimeException('change_order_release_signature_required');
+        }
+    }
+
+    /**
+     * @param list<string>|mixed $roles
+     * @return list<string>
+     */
+    private function normalizedRoles(mixed $roles): array
+    {
+        if (!is_array($roles)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn(mixed $role): string => strtolower(trim((string)$role)),
+            $roles,
+        ))));
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    private function transitionRoleAllowed(string $aggregateType, string $target, array $roles): bool
+    {
+        $policy = $aggregateType === 'change_request'
+            ? [
+                'submitted' => ['requester', 'author', 'qa', 'qms_engineer', 'change_coordinator', 'admin'],
+                'triage' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'approved_for_order' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'rejected' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'cancelled' => ['requester', 'change_coordinator', 'admin'],
+            ]
+            : [
+                'impact_assessment' => ['change_coordinator', 'qa_manager', 'qms_manager', 'engineering_manager', 'admin'],
+                'in_review' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'approved' => ['qa_manager', 'qms_manager', 'engineering_manager', 'compliance_manager', 'admin'],
+                'released' => ['qa_manager', 'qms_manager', 'change_coordinator', 'compliance_manager', 'admin'],
+                'implemented' => ['implementation_owner', 'production_manager', 'change_coordinator', 'admin'],
+                'closed' => ['qa_manager', 'qms_manager', 'compliance_manager', 'admin'],
+                'cancelled' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+            ];
+
+        $allowed = $policy[$target] ?? [];
+        if ($allowed === []) {
+            return true;
+        }
+        foreach ($roles as $role) {
+            if (in_array($role, $allowed, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function creatorRef(array $row): string
+    {
+        $metadata = $row['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+        return is_array($metadata) ? $this->text($metadata['actor_ref'] ?? $metadata['created_by_actor_ref'] ?? '') : '';
+    }
+
+    /**
+     * @param array<string, mixed> $changeOrder
+     * @param array<string, mixed> $releaseGate
+     */
+    private function releasePackageHash(array $changeOrder, array $releaseGate): string
+    {
+        return hash('sha256', $this->json([
+            'package_type' => 'change_order_release',
+            'change_order_id' => $this->text($changeOrder['plm_change_order_id'] ?? ''),
+            'change_order_number' => $this->text($changeOrder['change_order_number'] ?? ''),
+            'from_state' => $this->text($changeOrder['status'] ?? ''),
+            'to_state' => 'released',
+            'release_gate' => [
+                'allowed' => (bool)($releaseGate['allowed'] ?? false),
+                'blockers' => $releaseGate['blockers'] ?? [],
+                'canonical_lifecycle_sources' => $releaseGate['canonical_lifecycle_sources'] ?? [],
+                'release_package_payload' => $releaseGate['release_package_payload'] ?? [],
+            ],
+        ]));
+    }
+
     private function assertAllowedOrderTransition(string $current, string $target): void
     {
         $allowed = [
@@ -829,6 +1058,96 @@ final class ChangeLifecycleCommandService
         $current = $current === '' ? 'draft' : $current;
         if (!in_array($target, $allowed[$current] ?? [], true)) {
             throw new RuntimeException('invalid_change_order_transition');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function requestHash(array $input): string
+    {
+        $copy = $input;
+        unset($copy['idempotency_key']);
+        return hash('sha256', $this->json($copy));
+    }
+
+    private function assertCreateIdempotencyLedger(string $scopeKey, string $idempotencyKey, string $fingerprintHash): void
+    {
+        $row = $this->db->queryOne(
+            "WITH inserted AS (
+                INSERT INTO idempotency_replay_ledger
+                    (scope_key, scope_key_hash, idempotency_key, fingerprint_hash, status, response_payload, expires_at, metadata)
+                VALUES
+                    (:scope_key, :scope_key_hash, :idempotency_key, :fingerprint_hash, 'in_progress', '{}'::jsonb,
+                     now() + interval '24 hours', CAST(:metadata AS jsonb))
+                ON CONFLICT (scope_key_hash, idempotency_key) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM idempotency_replay_ledger
+              WHERE scope_key_hash = :scope_key_hash
+                AND idempotency_key = :idempotency_key
+             LIMIT 1",
+            [
+                ':scope_key' => $scopeKey,
+                ':scope_key_hash' => hash('sha256', $scopeKey),
+                ':idempotency_key' => $idempotencyKey,
+                ':fingerprint_hash' => $fingerprintHash,
+                ':metadata' => $this->json(['authority' => 'ChangeLifecycleCommandService']),
+            ],
+        );
+
+        if (!is_array($row) || $this->text($row['ledger_id'] ?? '') === '') {
+            throw new RuntimeException('change_lifecycle_idempotency_ledger_required');
+        }
+        if (!hash_equals($this->text($row['fingerprint_hash'] ?? ''), $fingerprintHash)) {
+            throw new RuntimeException('change_lifecycle_idempotency_conflict');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     */
+    private function completeCreateIdempotencyLedger(string $scopeKey, string $idempotencyKey, string $fingerprintHash, array $response): void
+    {
+        $row = $this->db->queryOne(
+            "UPDATE idempotency_replay_ledger
+             SET status = 'completed',
+                 status_code = 201,
+                 response_payload = CAST(:response_payload AS jsonb),
+                 completed_at = now(),
+                 updated_at = now()
+             WHERE scope_key_hash = :scope_key_hash
+               AND idempotency_key = :idempotency_key
+               AND fingerprint_hash = :fingerprint_hash
+             RETURNING ledger_id",
+            [
+                ':scope_key_hash' => hash('sha256', $scopeKey),
+                ':idempotency_key' => $idempotencyKey,
+                ':fingerprint_hash' => $fingerprintHash,
+                ':response_payload' => $this->json($response),
+            ],
+        );
+        if (!is_array($row) || $this->text($row['ledger_id'] ?? '') === '') {
+            throw new RuntimeException('change_lifecycle_idempotency_completion_required');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function assertRequestReplayEquivalent(array $row, string $requestHash, string $aggregateType): void
+    {
+        $metadata = $row['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+
+        $storedHash = is_array($metadata) ? $this->text($metadata['request_hash_sha256'] ?? '') : '';
+        if ($storedHash === '' || !hash_equals($storedHash, $requestHash)) {
+            throw new RuntimeException($aggregateType . '_idempotency_conflict');
         }
     }
 
@@ -891,6 +1210,63 @@ final class ChangeLifecycleCommandService
             }
         }
         return $blocked;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $wipDispositions
+     * @return list<array<string, mixed>>
+     */
+    private function unresolvedWipDispositions(array $wipDispositions): array
+    {
+        $unresolved = [];
+        foreach ($wipDispositions as $disposition) {
+            $state = strtolower($this->text($disposition['disposition_state'] ?? ''));
+            $metadata = is_array($disposition['metadata'] ?? null) ? $disposition['metadata'] : [];
+            if (!in_array($state, ['approved', 'executed', 'waived', 'cancelled'], true)) {
+                $unresolved[] = $disposition;
+                continue;
+            }
+            if ($state === 'waived'
+                && $this->text($disposition['waiver_signature_event_id'] ?? $metadata['waiver_signature_event_id'] ?? '') === ''
+            ) {
+                $unresolved[] = $disposition + ['unresolved_reason' => 'waived_disposition_signature_required'];
+            }
+        }
+        return $unresolved;
+    }
+
+    /**
+     * @param array{
+     *   change_order: array<string, mixed>,
+     *   affected_objects: list<array<string, mixed>>,
+     *   resulting_objects: list<array<string, mixed>>,
+     *   effectivities: list<array<string, mixed>>,
+     *   training_requirements: list<array<string, mixed>>,
+     *   verifications: list<array<string, mixed>>,
+     *   effectiveness_reviews: list<array<string, mixed>>,
+     *   wip_dispositions: list<array<string, mixed>>,
+     *   rollback_requirements: list<array<string, mixed>>,
+     *   emergency_change_controls: list<array<string, mixed>>,
+     *   conflicts: list<array<string, mixed>>
+     * } $package
+     * @param list<array<string, mixed>> $conflicts
+     * @return array<string, mixed>
+     */
+    private function canonicalReleasePackagePayload(array $package, array $conflicts): array
+    {
+        return $this->canonicalize([
+            'change_order' => $package['change_order'],
+            'affected_objects' => $package['affected_objects'],
+            'resulting_objects' => $package['resulting_objects'],
+            'effectivities' => $package['effectivities'],
+            'training_requirements' => $package['training_requirements'],
+            'verifications' => $package['verifications'],
+            'effectiveness_reviews' => $package['effectiveness_reviews'],
+            'wip_dispositions' => $package['wip_dispositions'],
+            'rollback_requirements' => $package['rollback_requirements'],
+            'emergency_change_controls' => $package['emergency_change_controls'],
+            'effectivity_conflicts' => $conflicts,
+        ]);
     }
 
     /**
@@ -964,6 +1340,9 @@ final class ChangeLifecycleCommandService
         $riskWaiver = $this->text($overrides['risk_acceptance_waiver_id'] ?? $metadata['risk_acceptance_waiver_id'] ?? $riskPayload['risk_acceptance_waiver_id'] ?? '');
         if ($riskSignature === '' && $riskWaiver === '') {
             $blockers[] = $this->blocker('emergency_risk_signature_or_waiver_required', 'Emergency change requires a durable risk-acceptance e-signature or approved waiver record.');
+        }
+        if ($riskWaiver !== '' && $riskSignature === '') {
+            $blockers[] = $this->blocker('emergency_risk_waiver_signature_required', 'Emergency risk waiver must be bound to an authoritative signature event.');
         }
         foreach (['rollback_strategy', 'rollback_trigger'] as $field) {
             if ($this->text($rollback[$field] ?? '') === '') {
@@ -1110,5 +1489,33 @@ final class ChangeLifecycleCommandService
             throw new RuntimeException('json_encode_failed');
         }
         return $json;
+    }
+
+    private function canonicalize(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        $normalized = [];
+        foreach ($value as $key => $item) {
+            if ($key === 'created_at' || $key === 'updated_at' || $key === 'row_version') {
+                continue;
+            }
+            $normalized[$key] = $this->canonicalize($item);
+        }
+
+        if (array_is_list($normalized)) {
+            usort($normalized, static function (mixed $left, mixed $right): int {
+                return strcmp(
+                    json_encode($left, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '',
+                    json_encode($right, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '',
+                );
+            });
+            return $normalized;
+        }
+
+        ksort($normalized);
+        return $normalized;
     }
 }

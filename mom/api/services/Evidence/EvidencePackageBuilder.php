@@ -54,15 +54,28 @@ final class EvidencePackageBuilder
             $snapshotBytes,
         );
 
+        $publicationState = $this->publicationState($input);
+        $recordContentHash = hash('sha256', $this->canonicalJson([
+            'subject_type' => $subjectType,
+            'subject_id' => $subjectId,
+            'publication_state' => $publicationState,
+            'artifacts' => [
+                'original' => $this->contentArtifactManifest($artifacts['original']),
+                'canonical_payload' => $this->contentArtifactManifest($artifacts['canonical_payload']),
+                'readable_snapshot' => $this->contentArtifactManifest($artifacts['readable_snapshot']),
+            ],
+        ]));
+
         $manifest = [
             'manifest_version' => 1,
             'subject_type' => $subjectType,
             'subject_id' => $subjectId,
-            'created_at' => $this->nowIso(),
+            'created_at' => $this->manifestCreatedAt($input),
             'actor_id' => (string)($input['actor_id'] ?? ''),
             'source' => is_array($input['source'] ?? null) ? $input['source'] : [],
+            'record_content_hash_sha256' => $recordContentHash,
             'signature_events' => is_array($input['signature_events'] ?? null) ? $input['signature_events'] : [],
-            'publication_state' => $this->publicationState($input),
+            'publication_state' => $publicationState,
             'artifacts' => [
                 'original' => $this->artifactManifest($artifacts['original']),
                 'canonical_payload' => $this->artifactManifest($artifacts['canonical_payload']),
@@ -91,6 +104,7 @@ final class EvidencePackageBuilder
             'subject_id' => $subjectId,
             'package_hash_sha256' => $packageHash,
             'manifest_hash_sha256' => $manifestHash,
+            'record_content_hash_sha256' => $recordContentHash,
             'canonical_payload_hash_sha256' => $artifacts['canonical_payload']['sha256'],
             'readable_snapshot_hash_sha256' => $artifacts['readable_snapshot']['sha256'],
             // Backward-compatible alias for migration 103 callers.
@@ -152,6 +166,18 @@ final class EvidencePackageBuilder
     }
 
     /**
+     * @param array<string, mixed> $artifact
+     * @return array{sha256: string, size_bytes: int}
+     */
+    private function contentArtifactManifest(array $artifact): array
+    {
+        return [
+            'sha256' => (string)$artifact['sha256'],
+            'size_bytes' => (int)$artifact['size_bytes'],
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
@@ -167,7 +193,7 @@ final class EvidencePackageBuilder
             ];
         }
 
-        $publicationState = strtolower(trim((string)($state['state'] ?? 'pending')));
+        $publicationState = strtolower(trim((string)($state['publication_state'] ?? $state['state'] ?? 'pending')));
         if (!in_array($publicationState, self::PUBLICATION_STATES, true)) {
             throw new RuntimeException('Invalid publication_state.state for evidence package.');
         }
@@ -181,7 +207,8 @@ final class EvidencePackageBuilder
             throw new RuntimeException('Evidence package cannot represent direct user upload to publication target.');
         }
 
-        $state['state'] = $publicationState;
+        $state['publication_state'] = $publicationState;
+        unset($state['state']);
         $state['authority_role'] = $authorityRole;
         return $state;
     }
@@ -242,8 +269,24 @@ final class EvidencePackageBuilder
         return $subjectType . '_' . $subjectId . '_' . $suffix;
     }
 
-    private function nowIso(): string
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function manifestCreatedAt(array $input): string
     {
-        return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+        foreach (['created_at', 'finalized_at', 'command_created_at', 'finalization_command_at'] as $key) {
+            if (is_scalar($input[$key] ?? null) && trim((string)$input[$key]) !== '') {
+                return trim((string)$input[$key]);
+            }
+        }
+
+        $signatureEvents = is_array($input['signature_events'] ?? null) ? $input['signature_events'] : [];
+        foreach ($signatureEvents as $event) {
+            if (is_array($event) && is_scalar($event['signed_at'] ?? null) && trim((string)$event['signed_at']) !== '') {
+                return trim((string)$event['signed_at']);
+            }
+        }
+
+        return '1970-01-01T00:00:00+00:00';
     }
 }

@@ -1,0 +1,46 @@
+{
+  "artifact_type": "promotion_receipt",
+  "receipt_id": "worldclass-closure-20260414-2020-premerge",
+  "manifest_id": "worldclass-closure-20260414-2020",
+  "branch": "codex/worldclass-closure-20260414-2020",
+  "target_branch": "main",
+  "original_base_head": "c7c3cdaa0c83",
+  "synced_base_head": "88b79955b5654dd9a936e698a923326e6bce411c",
+  "validated_head": "f4b752327f34b484be6efeb060bbda648b948017",
+  "validated_head_role": "post_agent2_retention_schema_remediation_head_before_governed_manifest_receipt_update",
+  "promotion_state": "premerge_validation_passed_after_closure_loop",
+  "created_at": "2026-04-14T13:46:31Z",
+  "merge_strategy": "fast_forward_preferred_else_stop",
+  "validation_evidence": {
+    "repo_boundary": "passed: repo boundary clean",
+    "workflow_status_authority": "passed: workflow status authority clean",
+    "focused_phpunit": "passed: AuditPackExportService filter (3 tests, 18 assertions); WorldClassControlPlaneExecutionTest (79 tests, 490 assertions); ShopfloorExecutionServiceTest (48 tests, 179 assertions)",
+    "composer_analyse": "passed",
+    "composer_test": "passed: 462 tests, 2688 assertions, 1 skipped",
+    "composer_check": "passed: PHPStan clean; PHPUnit 462 tests, 2688 assertions, 1 skipped"
+  },
+  "closure_counts": {
+    "unresolved_p0": 0,
+    "unresolved_non_waived_p1": 0,
+    "accepted_waivers": [
+      "Graph publication worker dependency-blocked on production Microsoft Graph configuration",
+      "WORM/Object Lock adapter dependency-blocked on selected immutable storage provider",
+      "Daily integrity digest worker dependency-blocked on approved scheduler and digest scope",
+      "Full training assignment/completion product workflow dependency-blocked on training owner rollout; backend release gate now requires authoritative training proof",
+      "Full deterministic as-built closure builder dependency-blocked on Wave 5 product rollout",
+      "Tracked manifest self-commit binding is mathematically impossible; external CI/deploy promotion manifest must bind the post-merge commit"
+    ],
+    "p2_roadmap": [
+      "Productized effectivity manager UI/API",
+      "Affected/resulting object browser",
+      "Change impact explorer",
+      "Periodic evaluation dashboard",
+      "Prompt-file hygiene"
+    ]
+  },
+  "branch_cleanup_gate": {
+    "delete_remote_branch_after_merge": true,
+    "delete_local_branch_after_merge": true,
+    "do_not_delete_if_merge_blocked": true
+  }
+}

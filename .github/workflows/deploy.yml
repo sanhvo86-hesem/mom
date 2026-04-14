@@ -43,9 +43,12 @@ jobs:
         env:
           RELEASE_MANIFEST_REF: ${{ vars.RELEASE_MANIFEST_REF }}
           CHANGE_AUTHORITY_REF: ${{ vars.CHANGE_AUTHORITY_REF }}
+          DEPLOY_COMMIT_SHA: ${{ github.sha }}
         run: |
-          test -n "$RELEASE_MANIFEST_REF"
-          test -n "$CHANGE_AUTHORITY_REF"
+          php mom/tools/release/verify_release_manifest_binding.php \
+            --manifest-ref="$RELEASE_MANIFEST_REF" \
+            --change-authority-ref="$CHANGE_AUTHORITY_REF" \
+            --commit-sha="$DEPLOY_COMMIT_SHA"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1

@@ -172,6 +172,61 @@ Six-agent closure loop result after remediation:
 - Regulated records/data integrity: P0 = 0, non-waived P1 = 0.
 - Product benchmark: P0 = 0, non-waived P1 = 0; WORM provider remains accepted P1 waiver; durable audit-pack bundle and productized impact/effectivity explorer remain P2 roadmap.
 
+## 2026-04-14 21:40 Agent 5 Chain-Proof Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Finalization audit event was present but not chain-verifiable under the regulated audit contract. | `EvidenceFinalizationService` now persists/replays `evidence.finalized` with deterministic event id, aggregate advisory lock, aggregate sequence, previous hash, canonical `AuditTrail.canonicalHashRecord.v1` hash, and `metadata.audit_chain.event_hash`. |
+| Audit-pack readiness accepted syntactic finalization markers. | `AuditPackExportService` selects `aggregate_sequence`, `event_hash`, and `prev_hash`; `AuditPackExporter` requires finalization event hash, chain hash, sequence, and package-hash match before reporting `ready`. |
+| Missing proof-of-completion for chain failure path. | `WorldClassControlPlaneExecutionTest` now covers rejection of a finalization event without chain proof plus the finalization persistence path; latest `composer check` passed with PHPStan clean and 461 PHPUnit tests / 2681 assertions / 1 skipped. |
+
+## 2026-04-14 22:05 Agent 4 Genealogy / 5M Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Genealogy fact replay, reverse-cycle checks, recursive cycle checks, node identity, and snapshot hash identity were still globally keyed. | Migration `130_genealogy_scope_identity_and_5m_gate.sql` drops global uniqueness and adds scoped unique indexes for `genealogy_edge_facts`, `genealogy_nodes`, and `as_manufactured_snapshots`; `GenealogyGraphService` now scopes reverse-cycle checks, recursive traversal, replay lookup, fact conflict target, node conflict target, and snapshot conflict target. |
+| Shopfloor production could be accepted without authoritative 5M evaluation or waiver. | `ShopfloorExecutionService::buildProductionLog()` now requires `GenealogyGraphService::evaluateAndPersist5M()` for production-relevant reports; any waiver must be server-verified through `signature_events` plus consumed challenge; `appendProductionReportEvent()` rejects production logs without a complete/waived/not-applicable gate. |
+| Missing proof-of-completion for shopfloor 5M closure. | `ShopfloorExecutionServiceTest` covers failure without authoritative store, caller-supplied waiver rejection, and success with a persisted authoritative gate; `WorldClassControlPlaneExecutionTest` covers scoped genealogy SQL and migration evidence; latest `composer check` passed with PHPStan clean and 461 PHPUnit tests / 2681 assertions / 1 skipped. |
+
+## 2026-04-14 22:20 Main Sync Boundary Closure Addendum
+
+| Late sync finding | Closure evidence |
+|---|---|
+| Latest `origin/main` introduced segmented registry artifacts that were valid governed registry outputs but still classified as uncontrolled generated reports by the repo boundary scanner. | `RepoBoundaryScanner` now allows `mom/data/registry/system-contract-runtime-projections.segments/*.json`; `WorldClassControlPlaneExecutionTest` covers the allowed path and `php tools/release/check_repo_boundary.php` reports `repo boundary clean`. |
+
+## 2026-04-14 22:55 Final Authority Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Audit-pack export completeness and per-package proof were still under-specified. | `AuditPackExportService` attaches publication and retention records; `AuditPackExporter` requires publication/retention proof and finalization proof for every package hash. |
+| Document release authority remained syntactic. | `DocumentRevisionCommandService` validates release signature challenge proof or governed `controlled_import_receipts` rows from migration `131_world_class_closure_authority_proof.sql`. |
+| Change release signature, idempotency, training, WIP, and emergency controls were not strict enough. | `ChangeReleaseSignatureValidator`, `ChangeLifecycleCommandService`, and `EffectivityGateService` now require consumed challenge proof, idempotency ledger proof, full release package hash, authoritative training proof, WIP disposition closure, and signed emergency waiver proof. |
+| Shopfloor 5M waiver was caller-shaped and DB mirror omitted 5M columns. | `ShopfloorExecutionService` verifies waiver signatures against `signature_events` plus consumed challenge and `ShopfloorExecutionPersistenceService` writes migrated 5M columns. |
+| OpenAPI parity was curated. | `api/openapi.yaml` now covers every EQMS control-plane route and tests parse all runtime routes. |
+
+Validation:
+- `php tools/release/check_repo_boundary.php`: `repo boundary clean`.
+- `php tools/release/check_workflow_status_authority.php`: `workflow status authority clean`.
+- `vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php`: 78 tests, 483 assertions, passed.
+- `vendor/bin/phpunit tests/Unit/Services/ShopfloorExecutionServiceTest.php`: 48 tests, 179 assertions, passed.
+- `composer check`: PHPStan clean; 461 tests, 2681 assertions, 1 skipped, passed.
+
+Accepted governance waiver:
+- Tracked manifest self-binding limitation: a manifest committed in the same Git tree cannot contain its own final commit SHA. External CI/deployment packaging must generate the post-merge promotion manifest and deploy receipt bound to the merge commit.
+
+## 2026-04-14 22:48 Agent 2 Retention Schema Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Audit-pack retention attachment was a false closure because `AuditPackExportService` queried `retention_locks.aggregate_type/aggregate_id`, while migration `106_eqms_world_class_control_plane.sql`, `RetentionLockService`, and `CanonicalEvidenceReadService` use canonical `object_type/object_id`. | `AuditPackExportService` now queries `object_type = 'evidence_record'`, `object_id = ANY(...)`, and migration-valid `lock_state = 'active'`; retention grouping uses `object_id`; `AuditPackExporter` no longer accepts impossible lock states; `WorldClassControlPlaneExecutionTest` adds a focused schema-parity test that rejects `aggregate_type/aggregate_id` retention SQL. |
+
+Validation:
+- `composer test -- --filter AuditPackExportService`: 3 tests, 18 assertions, passed.
+- `composer test -- --filter WorldClassControlPlaneExecutionTest`: 79 tests, 490 assertions, passed.
+- `php tools/release/check_repo_boundary.php`: `repo boundary clean`.
+- `php tools/release/check_workflow_status_authority.php`: `workflow status authority clean`.
+- `composer check`: PHPStan clean; 462 tests, 2688 assertions, 1 skipped, passed.
+
 ## Non-Authority Legacy Surfaces
 
 The following paths may remain for read/import compatibility only and must not be used as governed write authority:

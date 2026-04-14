@@ -19,6 +19,7 @@ use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
+use MOM\Services\FormControl\FormSubmissionAcceptanceService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Traceability\GenealogyGraphService;
@@ -339,6 +340,27 @@ final class EqmsControlPlaneController extends BaseController
         }
     }
 
+    public function acceptSubmissionAttempt(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'qa_manager', 'qms_engineer', 'quality_manager', 'document_control']);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $body['attempt_id'] = (string)$this->query('attempt_id', $body['attempt_id'] ?? '');
+        $this->requireFields($body, ['attempt_id', 'signature_event_id', 'reason']);
+
+        try {
+            $this->success([
+                'form_control' => (new FormSubmissionAcceptanceService($this->data))->accept(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function evaluateChangeRelease(): never
     {
         $this->requireAuth();
@@ -379,9 +401,14 @@ final class EqmsControlPlaneController extends BaseController
     public function createChangeRequest(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeRequesterRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
-        $this->requireFields($body, ['title']);
+        if (!isset($body['idempotency_key'])) {
+            $body['idempotency_key'] = trim((string)($this->requestHeader('Idempotency-Key') ?? ''));
+        }
+        $this->requireFields($body, ['idempotency_key', 'title']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -398,12 +425,14 @@ final class EqmsControlPlaneController extends BaseController
     public function transitionChangeRequest(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeCoordinatorRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         if (!isset($body['change_request_id'])) {
             $body['change_request_id'] = (string)$this->query('change_request_id', '');
         }
         $this->requireFields($body, ['change_request_id', 'target_status']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -420,9 +449,14 @@ final class EqmsControlPlaneController extends BaseController
     public function createChangeOrder(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeCoordinatorRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
-        $this->requireFields($body, ['title']);
+        if (!isset($body['idempotency_key'])) {
+            $body['idempotency_key'] = trim((string)($this->requestHeader('Idempotency-Key') ?? ''));
+        }
+        $this->requireFields($body, ['idempotency_key', 'title']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -439,12 +473,14 @@ final class EqmsControlPlaneController extends BaseController
     public function transitionChangeOrder(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeApproverRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         if (!isset($body['change_order_id'])) {
             $body['change_order_id'] = (string)$this->query('change_order_id', '');
         }
         $this->requireFields($body, ['change_order_id', 'target_status']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -533,8 +569,14 @@ final class EqmsControlPlaneController extends BaseController
                 }
             }
 
-            $manifest = (new AuditPackExportService($this->data))->buildForScope((array)$body['scope'], (string)$userOrgId);
+            $auditPackService = new AuditPackExportService($this->data);
+            $manifest = $auditPackService->buildForScope((array)$body['scope'], (string)$userOrgId);
             $export = (new AuditPackExporter($this->dataDir))->exportManifest($manifest);
+            $lifecycle = $auditPackService->recordExportLifecycle(
+                $manifest,
+                $export,
+                is_scalar($user['user_id'] ?? null) ? (string)$user['user_id'] : null,
+            );
 
             // GOV-008: Final assertion - verify no cross-org records made it through
             if (!$this->assertAuditPackIsOrgScoped($manifest, $userOrgId)) {
@@ -550,6 +592,7 @@ final class EqmsControlPlaneController extends BaseController
             $this->success([
                 'audit_pack_manifest' => $manifest,
                 'audit_pack_export' => $export,
+                'audit_pack_export_lifecycle' => $lifecycle,
             ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
@@ -559,13 +602,21 @@ final class EqmsControlPlaneController extends BaseController
     public function getAuditPackExport(): never
     {
         $this->requireAuth();
-        $packageHash = trim((string)($this->query('package_hash', '') ?: $this->query('package_hash_sha256', '')));
-        if ($packageHash === '') {
-            $this->error('package_hash_required', 400);
-        }
 
         try {
+            $service = new AuditPackExportService($this->data);
+            $lifecycle = $service->readExportLifecycle([
+                'audit_pack_export_id' => $this->query('audit_pack_export_id', ''),
+                'scope_type' => $this->query('scope_type', ''),
+                'scope_ref' => $this->query('scope_ref', ''),
+                'package_hash_sha256' => $this->query('package_hash_sha256', '') ?: $this->query('package_hash', ''),
+            ]);
+            $packageHash = trim((string)($lifecycle['package_hash_sha256'] ?? ''));
+            if ($packageHash === '') {
+                $this->success(['audit_pack_export_lifecycle' => $lifecycle]);
+            }
             $this->success([
+                'audit_pack_export_lifecycle' => $lifecycle,
                 'audit_pack_export' => (new AuditPackExporter($this->dataDir))->readExport($packageHash),
             ]);
         } catch (\Throwable $e) {
@@ -693,6 +744,8 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['edge_fact_type', 'from_object_type', 'from_object_id', 'to_object_type', 'to_object_id']);
+        $this->rejectCallerScopeFields($body);
+        $body['scope'] = $this->requiredSessionOrgScope($user);
 
         try {
             $fact = (new GenealogyGraphService($this->data))->recordEdgeFact(
@@ -726,7 +779,14 @@ final class EqmsControlPlaneController extends BaseController
 
     public function asManufacturedThread(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->traceabilityReadRoles());
+        foreach (['plant_id', 'org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $scopeField) {
+            $value = $this->query($scopeField, '');
+            if ($value !== null && trim($value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be provided in request. Scope is derived from user session.');
+            }
+        }
         $subjectType = (string)$this->query('subject_type', '');
         $subjectId = (string)$this->query('subject_id', '');
         if ($subjectType === '' || $subjectId === '') {
@@ -739,6 +799,7 @@ final class EqmsControlPlaneController extends BaseController
                     $subjectType,
                     $subjectId,
                     (int)$this->query('limit', '200'),
+                    $this->requiredSessionOrgScope($user),
                 ),
             ]);
         } catch (\Throwable $e) {
@@ -799,6 +860,121 @@ final class EqmsControlPlaneController extends BaseController
             ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeRequesterRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'requester',
+            'author',
+            'engineering',
+            'qa',
+            'qms_engineer',
+            'change_coordinator',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeCoordinatorRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'change_coordinator',
+            'qa_manager',
+            'qms_manager',
+            'document_control',
+            'engineering_manager',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeApproverRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'qa_manager',
+            'qms_manager',
+            'production_director',
+            'engineering_manager',
+            'compliance_manager',
+            'change_coordinator',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function traceabilityReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'production_director',
+            'production_manager',
+            'cnc_workshop_manager',
+            'shift_leader',
+            'quality_manager',
+            'qa_manager',
+            'quality_engineer',
+            'qms_engineer',
+            'internal_auditor',
+            'auditor',
+        ])));
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return list<string>
+     */
+    private function rolesForUser(array $user): array
+    {
+        $roles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+        return array_values(array_filter(array_map(static fn(mixed $role): string => strtolower(trim((string)$role)), $roles)));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function sessionOrgScope(): array
+    {
+        return array_filter([
+            'plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_id' => (string)($_SESSION['org_id'] ?? ''),
+            'org_company_code' => (string)($_SESSION['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($_SESSION['org_legal_entity_code'] ?? ''),
+            'org_site_id' => (string)($_SESSION['org_site_id'] ?? ''),
+        ], static fn(string $value): bool => $value !== '');
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return array<string, string>
+     */
+    private function requiredSessionOrgScope(array $user): array
+    {
+        $scope = $this->sessionOrgScope();
+        if ($scope === [] && array_intersect($this->rolesForUser($user), admin_roles()) === []) {
+            $this->error('scope_context_required', 403, 'Traceability operations require an authenticated session scope.');
+        }
+        return $scope;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    private function rejectCallerScopeFields(array $body): void
+    {
+        $scope = is_array($body['scope'] ?? null) ? $body['scope'] : [];
+        foreach (['plant_id', 'org_plant_id', 'org_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $field) {
+            $value = $body[$field] ?? $scope[$field] ?? null;
+            if (is_scalar($value) && trim((string)$value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be supplied by request body.');
+            }
         }
     }
 }
