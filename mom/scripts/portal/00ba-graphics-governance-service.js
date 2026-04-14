@@ -710,6 +710,12 @@ function refresh(seedTemplates){
   var environmentPacks = callEndpoint('environmentPacks', {}).catch(function(){ return null; });
   var releaseDashboard = callEndpoint('releaseDashboard', {}).catch(function(){ return null; });
   var releaseLink = callEndpoint('releaseLink', {}).catch(function(){ return null; });
+  // Probe-only: populate endpointStatus for GET endpoints not consumed in the main flow.
+  // nonCompliant is on-demand normally but should appear as probed in the contract panel.
+  // designConfig is fetched separately via getDesignConfig() but probing here ensures the
+  // contract panel shows its liveness even when the design panel hasn't been opened yet.
+  callEndpoint('nonCompliant', {}).catch(function(){ return null; });
+  callEndpoint('designConfig', {}).catch(function(){ return null; });
 
   return Promise.all([
     registry,
