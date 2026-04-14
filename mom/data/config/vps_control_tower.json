@@ -290,7 +290,10 @@
         "ports",
         "recent_logs",
         "terminal_gateway_logs",
-        "observability_logs"
+        "observability_logs",
+        "git_pull",
+        "db_migrate",
+        "reload_php"
       ],
       "sites": [
         {

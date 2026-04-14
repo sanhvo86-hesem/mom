@@ -18,7 +18,8 @@ final class VpsService
      */
     private const ALLOWED_VPS_ACTIONS = [
         'health', 'docker_ps', 'nginx_test', 'ports', 'recent_logs',
-        'terminal_gateway_logs', 'observability_logs'
+        'terminal_gateway_logs', 'observability_logs',
+        'git_pull', 'db_migrate', 'reload_php',
     ];
 
     /** @var list<string> */
@@ -2564,6 +2565,11 @@ BASH;
             'ls -la /opt/observability/ 2>/dev/null || echo none',
             'curl -s http://127.0.0.1:19999/api/v1/info 2>/dev/null | head -1 || echo offline',
             'curl -s http://127.0.0.1:3000/api/health 2>/dev/null | head -1 || echo offline',
+
+            // --- Deployment actions (actionCatalog: git_pull, db_migrate, reload_php) ---
+            'cd /var/www/eqms.hesemeng.com && git pull --ff-only 2>&1',
+            'cd /var/www/eqms.hesemeng.com/mom && php database/migrate.php 2>&1',
+            "for v in php8.2-fpm php8.3-fpm php8.4-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
         ];
 
         $command = trim($command);
@@ -2962,6 +2968,23 @@ BASH;
                 'label' => 'Observability logs',
                 'command' => "journalctl -u netdata -u grafana-server -n 120 --no-pager 2>/dev/null || echo 'observability_logs_unavailable'",
                 'requires_write' => false,
+            ],
+            'git_pull' => [
+                'label' => 'Git pull (deploy latest)',
+                'command' => 'cd /var/www/eqms.hesemeng.com && git pull --ff-only 2>&1',
+                'requires_write' => true,
+                'emphasis' => true,
+            ],
+            'db_migrate' => [
+                'label' => 'Run DB migrations',
+                'command' => 'cd /var/www/eqms.hesemeng.com/mom && php database/migrate.php 2>&1',
+                'requires_write' => true,
+                'emphasis' => true,
+            ],
+            'reload_php' => [
+                'label' => 'Reload PHP-FPM',
+                'command' => "for v in php8.2-fpm php8.3-fpm php8.4-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
+                'requires_write' => true,
             ],
         ];
     }
