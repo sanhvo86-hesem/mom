@@ -1,6 +1,6 @@
 # World-Class Target Architecture
 
-Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+Audited branch: `codex/worldclass-reaudit-20260415-055057`
 
 Date: 2026-04-15
 
@@ -23,6 +23,7 @@ This target keeps the custom PHP MVC framework, router, middleware, DataLayer, E
 - Keep `ShopfloorExecutionPersistenceService` as the DB bridge for `shift_targets`, `shift_production_log`, `shift_production_report_events`, and `shift_dispatch_execution_events`.
 - Dispatch promotion must be a lifecycle transition from `planned` only. Started, terminal, paused, blocked, and correction states must flow through report/correction paths, not through redispatch.
 - Keep scheduling/capacity endpoints owned by the existing scheduling controller. Order-prefixed aliases are compatibility routes only and must not drift into missing `OrderController` methods.
+- Work-order creation must validate parent JO/routing context before persistence. Caller-supplied plant/site/routing/work-center/CNC/setup fields may not silently cross parent boundaries.
 - Hold set/release are controlled planning/governance mutations. Hold set must validate the source order exists; hold release must require source-order write authority before the hold row/file is changed.
 - Hold set/release keeps the legacy hold snapshot but also appends hold lifecycle events so planning governance has a replayable audit trail.
 
@@ -56,6 +57,7 @@ Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database geneal
 - AI prediction, SPC anomaly, tool-wear, legacy dashboard, model, and combined dashboard surfaces are advisory read APIs and require the same AI read role boundary; model internals are admin-only.
 - AI feedback that can alter advisory confidence requires feedback/write roles and remains idempotent.
 - RCA analysis is a write-like advisory surface because it can call an external LLM and cache/store outputs; it requires CSRF and quality/admin role scope.
+- Scheduled AI ETL must run only for explicit org scopes from a scheduler, session, environment, or configured users. If no org scope is available, it must fail closed with skipped advisory snapshots rather than extracting unscoped data.
 
 ## Staged cutover rules
 

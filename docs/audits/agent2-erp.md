@@ -1,6 +1,12 @@
 # Agent 2 - ERP / Planning / Lifecycle Governance
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Confirmed P1 WO context-coherence gap: work orders accepted plant/site/routing/work-center/CNC/setup context without validating against parent JO context. Remediation now rejects mismatched parent fields and operation-context mismatches, and inherits missing parent/operation context where the parent JO defines it.
+- Confirmed P2 planning source-of-truth blocker: SO/JO/WO remains JSON compatibility authority with workflow history and DB bridges rather than DB-primary event authority. This remains explicitly staged, not hidden as complete.
+- Refuted broad lifecycle looseness for the core workflow: transition bounds, terminal-state blocking, role checks, hold release permission checks, and quantity completion checks are materially present.
 
 ## 2026-04-14 Current-Pass Addendum
 

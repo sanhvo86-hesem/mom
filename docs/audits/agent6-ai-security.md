@@ -1,6 +1,12 @@
 # Agent 6 - AI / Analytics / Security / Reliability / DevEx
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Confirmed P1 AI ETL scope-contract defect: scheduled ETL called `snapshotForModel($modelType)` without org scope, while the ETL service requires `org_id`. Remediation now resolves explicit/session/env/configured org scopes and passes each org to `snapshotForModel`; if no scope exists, the job records explicit skipped results instead of running unscoped.
+- Confirmed P2 NLQ grounding remains static and prompt-driven. It is safely read-only and scoped, but not yet generated from canonical metadata with answer provenance.
+- Refuted execution-authority risk for AI actioning: prediction actions remain advisory/pending human review, with idempotency, CSRF, and read/write role boundaries present.
 
 ## 2026-04-14 Current-Pass Addendum
 

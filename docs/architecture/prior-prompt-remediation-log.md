@@ -103,6 +103,10 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | CNC program execution context | CNC setup sheets carried plant/work-center/revision fields, but programs and versions did not. | Program and version records now carry the same scope/digital-thread fields used by setup and dispatch. |
 | Required documentation names | Previous docs existed under related names but not all requested names. | Added exact required documents and updated the benchmark doc. |
 | Mobile work-queue factory date | Queue assignments used factory `+07:00` timestamps while default queue/dashboard reads used the PHP process date, hiding today's tasks near UTC day boundaries. | Mobile queue and dashboard default dates now use the same factory calendar as assignment timestamps, with a regression test. |
+| Work-order context coherence | WO creation preserved plant/site/CNC/routing fields, but did not verify they matched the parent JO/routing operation when those facts existed. | `OrderService::createWorkOrder()` now rejects parent/context mismatches and inherits parent/operation context where defined, with regression tests. |
+| Mobile derived-index cache miss | A structurally valid queue index with a missing operator/date bucket could return a false empty queue. | Missing buckets now force source reconstruction and index rebuild, with regression coverage. |
+| Shopfloor overview factory date | Overview counts used process-local `date('Y-m-d')` instead of the factory calendar used by queue assignment bucketing. | Overview now uses `factoryToday()` and `queueAssignedDate()`. |
+| Scheduled AI ETL scope contract | Scheduler called AI ETL snapshots without the required `org_id`, so daily projection refresh could fail for every model. | Scheduler now resolves explicit/session/env/configured org scopes, calls `snapshotForModel($modelType, $orgId)`, and records explicit skipped results if no scope exists. |
 
 ## Still blocked by evidence
 
@@ -113,3 +117,5 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.
 - Full DB-backed CNC program/setup-sheet authority remains blocked by required JSON-to-DB reconciliation and compatibility testing.
 - Online mobile clock-in, clock-out, and completion replay are implemented for the existing compatibility store. Full labor correction/reopen governance remains staged because it needs supervisor disposition, payroll/timekeeping reconciliation, and audit-signature semantics.
+- Full NLQ schema grounding remains blocked by the absence of a canonical NLQ schema/provenance registry; current NLQ remains read-only, scoped, and advisory.
+- Full quality sidecar closure remains blocked by missing canonical command-service ownership for `QualityIntegrationService` and OQC JSONL/hold sidecar writes.

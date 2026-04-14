@@ -681,6 +681,7 @@ final class OrderService
                 "Job Order {$joNumber} is not eligible for Work Order creation; current status: {$parentStatus}."
             );
         }
+        $wo = $this->assertWorkOrderMatchesParentContext($wo, $parentJo);
         $woStatus = strtolower(trim((string)($wo['status'] ?? 'scheduled')));
         if (!in_array($woStatus, self::WO_STATUSES, true)) {
             throw new RuntimeException("Invalid Work Order status: {$woStatus}.");
@@ -691,6 +692,116 @@ final class OrderService
         $store['work_orders'][] = $wo;
         $this->writeStore($store);
         return $wo;
+    }
+
+    /**
+     * @param array<string, mixed> $wo
+     * @param array<string, mixed> $parentJo
+     * @return array<string, mixed>
+     */
+    private function assertWorkOrderMatchesParentContext(array $wo, array $parentJo): array
+    {
+        foreach ([
+            'org_plant_id',
+            'org_site_id',
+            'routing_id',
+            'inspection_plan_id',
+            'part_number',
+            'part_revision',
+        ] as $field) {
+            $parentValue = $this->stringValue($parentJo[$field] ?? '');
+            if ($parentValue === '') {
+                continue;
+            }
+            $workValue = $this->stringValue($wo[$field] ?? '');
+            if ($workValue === '') {
+                $wo[$field] = $parentValue;
+                continue;
+            }
+            if ($workValue !== $parentValue) {
+                throw new RuntimeException('work_order_context_mismatch:' . $field);
+            }
+        }
+
+        $operation = $this->findParentOperationForWorkOrder($wo, $parentJo);
+        if ($operation === null) {
+            return $wo;
+        }
+
+        foreach ([
+            'routing_operation_id',
+            'job_operation_id',
+            'work_center_id',
+            'machine_id',
+            'setup_sheet_id',
+            'cnc_program_version_id',
+            'org_plant_id',
+            'org_site_id',
+        ] as $field) {
+            $expected = $this->stringValue($operation[$field] ?? '');
+            if ($expected === '') {
+                continue;
+            }
+            $actual = $this->stringValue($wo[$field] ?? '');
+            if ($actual === '') {
+                $wo[$field] = $expected;
+                continue;
+            }
+            if ($actual !== $expected) {
+                throw new RuntimeException('work_order_operation_context_mismatch:' . $field);
+            }
+        }
+
+        return $wo;
+    }
+
+    /**
+     * @param array<string, mixed> $wo
+     * @param array<string, mixed> $parentJo
+     * @return array<string, mixed>|null
+     */
+    private function findParentOperationForWorkOrder(array $wo, array $parentJo): ?array
+    {
+        $operationRows = [];
+        foreach (['operations', 'routing_operations', 'job_operations'] as $field) {
+            if (is_array($parentJo[$field] ?? null)) {
+                foreach ((array)$parentJo[$field] as $row) {
+                    if (is_array($row)) {
+                        $operationRows[] = $row;
+                    }
+                }
+            }
+        }
+        if ($operationRows === []) {
+            return null;
+        }
+
+        $operationNumber = $this->stringValue($wo['operation_number'] ?? $wo['operation_seq'] ?? '');
+        $routingOperationId = $this->stringValue($wo['routing_operation_id'] ?? '');
+        $jobOperationId = $this->stringValue($wo['job_operation_id'] ?? '');
+
+        foreach ($operationRows as $operation) {
+            if (
+                $routingOperationId !== ''
+                && $routingOperationId === $this->stringValue($operation['routing_operation_id'] ?? $operation['operation_id'] ?? '')
+            ) {
+                return $operation;
+            }
+            if (
+                $jobOperationId !== ''
+                && $jobOperationId === $this->stringValue($operation['job_operation_id'] ?? $operation['operation_id'] ?? '')
+            ) {
+                return $operation;
+            }
+            if (
+                $operationNumber !== ''
+                && $operationNumber === $this->stringValue($operation['operation_number'] ?? $operation['operation_seq'] ?? $operation['seq'] ?? '')
+            ) {
+                return $operation;
+            }
+        }
+
+        throw new RuntimeException('work_order_operation_not_in_parent_routing');
     }
 
     /**
@@ -1004,6 +1115,15 @@ final class OrderService
     private function compareOperationNumber(array $a, array $b): int
     {
         return (int)($a['operation_number'] ?? 0) <=> (int)($b['operation_number'] ?? 0);
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        if (is_scalar($value)) {
+            return trim((string)$value);
+        }
+
+        return '';
     }
 
     private function generateUuidV4(): string

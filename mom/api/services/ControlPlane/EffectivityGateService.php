@@ -65,7 +65,7 @@ final class EffectivityGateService
             }
         }
 
-        $verificationDecision = $this->evaluateVerifications($verifications);
+        $verificationDecision = $this->evaluateVerifications($verifications, array_merge($affectedObjects, $resultingObjects));
         $blockers = array_merge($blockers, $verificationDecision['blockers']);
         $warnings = array_merge($warnings, $verificationDecision['warnings']);
 
@@ -138,9 +138,10 @@ final class EffectivityGateService
 
     /**
      * @param list<array<string, mixed>> $verifications
+     * @param list<array<string, mixed>> $releaseObjects
      * @return array{blockers: list<array<string, mixed>>, warnings: list<array<string, mixed>>}
      */
-    public function evaluateVerifications(array $verifications): array
+    public function evaluateVerifications(array $verifications, array $releaseObjects = []): array
     {
         $blockers = [];
         $warnings = [];
@@ -151,6 +152,7 @@ final class EffectivityGateService
             ];
         }
 
+        $coveredObjects = [];
         foreach ($verifications as $verification) {
             $state = strtolower($this->text($verification['verification_state'] ?? $verification['state'] ?? 'planned'));
             if ($state === 'failed') {
@@ -167,10 +169,51 @@ final class EffectivityGateService
             }
             if ($state !== 'passed') {
                 $blockers[] = $this->blocker('verification_not_complete', 'Verification must be passed or formally waived.', $verification);
+                continue;
+            }
+            $key = $this->verificationObjectKey($verification);
+            if ($key !== '') {
+                $coveredObjects[$key] = true;
+            }
+        }
+
+        foreach ($this->releaseObjectKeys($releaseObjects) as $key => $object) {
+            if (!isset($coveredObjects[$key])) {
+                $blockers[] = $this->blocker('verification_missing_for_object', 'Each affected and resulting object requires object-specific passed or signed-waived verification before release.', $object);
             }
         }
 
         return ['blockers' => $blockers, 'warnings' => $warnings];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $objects
+     * @return array<string, array<string, mixed>>
+     */
+    private function releaseObjectKeys(array $objects): array
+    {
+        $keys = [];
+        foreach ($objects as $object) {
+            $type = strtolower($this->text($object['object_type'] ?? ''));
+            $id = $this->text($object['object_id'] ?? '');
+            if ($type === '' || $id === '') {
+                continue;
+            }
+            $keys[$type . '|' . $id] = ['object_type' => $type, 'object_id' => $id];
+        }
+        return $keys;
+    }
+
+    /**
+     * @param array<string, mixed> $verification
+     */
+    private function verificationObjectKey(array $verification): string
+    {
+        $metadata = is_array($verification['metadata'] ?? null) ? $verification['metadata'] : [];
+        $scope = is_array($verification['verification_scope'] ?? null) ? $verification['verification_scope'] : [];
+        $type = strtolower($this->text($verification['object_type'] ?? $verification['target_object_type'] ?? $scope['object_type'] ?? $metadata['object_type'] ?? ''));
+        $id = $this->text($verification['object_id'] ?? $verification['target_object_id'] ?? $scope['object_id'] ?? $metadata['object_id'] ?? '');
+        return $type !== '' && $id !== '' ? $type . '|' . $id : '';
     }
 
     /**

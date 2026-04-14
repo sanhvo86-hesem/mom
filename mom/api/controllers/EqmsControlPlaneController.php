@@ -17,6 +17,7 @@ use MOM\Services\Evidence\AuditPackExportService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
+use MOM\Services\Evidence\ElectronicSignatureChallengeService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
 use MOM\Services\FormControl\FormSubmissionAcceptanceService;
@@ -682,6 +683,42 @@ final class EqmsControlPlaneController extends BaseController
         }
     }
 
+    public function issueSignatureChallenge(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->evidenceFinalizationRoles());
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['signed_payload_hash_sha256', 'displayed_record_hash_sha256']);
+        $orgId = $this->requireOrgContext($user);
+        $bodyOrgId = trim((string)($body['org_id'] ?? ''));
+        if ($bodyOrgId !== '' && $bodyOrgId !== $orgId) {
+            $this->error('signature_challenge_scope_violation', 403);
+        }
+
+        $signerRef = trim((string)($user['username'] ?? $user['email'] ?? $user['user_id'] ?? $user['id'] ?? ''));
+        if ($signerRef === '') {
+            $signerRef = 'authenticated_user';
+        }
+        $body['signer_user_id'] = trim((string)($user['user_id'] ?? $user['id'] ?? '')) ?: null;
+        $body['signer_ref'] = $signerRef;
+        $body['session_id'] = session_status() === PHP_SESSION_ACTIVE && session_id() !== '' ? session_id() : null;
+        $body['org_id'] = $orgId;
+        $body['signature_action'] = trim((string)($body['signature_action'] ?? '')) ?: 'evidence_finalize';
+        $body['metadata'] = array_merge(
+            is_array($body['metadata'] ?? null) ? $body['metadata'] : [],
+            ['authority' => 'portal_first_signature_challenge']
+        );
+
+        try {
+            $this->success([
+                'signature_challenge' => (new ElectronicSignatureChallengeService($this->data))->issueChallenge($body),
+            ], 201);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function createEvidenceAmendment(): never
     {
         $user = $this->requireAuth();
@@ -765,6 +802,8 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['operation_class', 'object_type', 'object_id']);
+        $this->rejectCallerScopeFields($body);
+        $body['scope'] = $this->requiredSessionOrgScope($user);
 
         try {
             $result = (new GenealogyGraphService($this->data))->evaluateAndPersist5M($body);

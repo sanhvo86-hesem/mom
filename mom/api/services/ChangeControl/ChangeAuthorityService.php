@@ -518,8 +518,7 @@ final class ChangeAuthorityService
             $rows = $this->queryRows(
                 $db,
                 "SELECT
-                    fca.field_change_authorization_id::text AS field_change_authorization_id,
-                    fca.field_change_authorization_id::text AS field_change_authorization_id,
+                    NULL::text AS field_change_authorization_id,
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
                     co.status,

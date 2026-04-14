@@ -144,6 +144,18 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertStringContainsString("metadata->>'org_id' = :org_id", $readService);
     }
 
+    public function testScheduledAiEtlRequiresExplicitOrgScope(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/ScheduledJobs.php');
+
+        $this->assertStringContainsString('public function runAiDataEtl(array $orgIds = []): array', $source);
+        $this->assertStringContainsString('$scopedOrgIds = $this->resolveAiEtlOrgIds($orgIds);', $source);
+        $this->assertStringContainsString("'status'     => 'skipped'", $source);
+        $this->assertStringContainsString("'error'      => 'ai_etl_org_scope_required'", $source);
+        $this->assertStringContainsString('$dataset = $etl->snapshotForModel($modelType, $orgId);', $source);
+        $this->assertStringNotContainsString('$etl->snapshotForModel($modelType);', $source);
+    }
+
     public function testEvidenceIdempotencyUsesPlatformKeyContract(): void
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/EvidenceController.php');

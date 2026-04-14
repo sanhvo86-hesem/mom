@@ -166,6 +166,10 @@ final class DocumentRevisionCommandService
         if ($audienceUserId === null && $effectiveActor === null) {
             throw new RuntimeException('document_read_ack_actor_required');
         }
+        $signatureEventId = $this->nullableUuid($input['signature_event_id'] ?? null);
+        if ($this->requiresSignatureBackedAcknowledgement($input) && $signatureEventId === null) {
+            throw new RuntimeException('document_read_ack_signature_required');
+        }
 
         $ackHash = $this->nullableSha256($input['acknowledgement_hash_sha256'] ?? null)
             ?? hash('sha256', $revisionId . '|' . ($audienceUserId ?? $effectiveActor) . '|read_ack');
@@ -184,7 +188,7 @@ final class DocumentRevisionCommandService
                 ':audience_user_id' => $audienceUserId,
                 ':actor_ref' => $effectiveActor,
                 ':acknowledged_at' => $this->nullableText($input['acknowledged_at'] ?? null) ?? gmdate('c'),
-                ':signature_event_id' => $this->nullableUuid($input['signature_event_id'] ?? null),
+                ':signature_event_id' => $signatureEventId,
                 ':acknowledgement_hash_sha256' => $ackHash,
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
                 ':metadata' => $this->json([
@@ -770,6 +774,31 @@ final class DocumentRevisionCommandService
     {
         $text = strtolower($this->text($value));
         return preg_match('/^[a-f0-9]{64}$/', $text) === 1 ? $text : null;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function requiresSignatureBackedAcknowledgement(array $input): bool
+    {
+        $metadata = is_array($input['metadata'] ?? null) ? $input['metadata'] : [];
+        return $this->truthy($input['signature_required'] ?? false)
+            || $this->truthy($input['training_gate'] ?? false)
+            || $this->truthy($input['read_ack_required'] ?? false)
+            || $this->truthy($metadata['signature_required'] ?? false)
+            || $this->truthy($metadata['training_gate'] ?? false)
+            || $this->truthy($metadata['effectivity_gate'] ?? false);
+    }
+
+    private function truthy(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        return in_array(strtolower($this->text($value)), ['1', 'true', 'yes', 'y', 'on'], true);
     }
 
     private function json(mixed $value): string

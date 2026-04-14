@@ -172,6 +172,9 @@ final class EvidenceFinalizationService
             }
             $this->assertReleasedEvidenceChangeAuthority($db, $sourceChangeOrderId, $record, $sourceVersionId, $input);
         }
+        if ($this->text($record['record_state'] ?? '') !== 'finalized' && ($amendmentNo > 0 || $sourceVersionId !== null)) {
+            $this->assertReleasedEvidenceChangeAuthority($db, (string)$sourceChangeOrderId, $record, (string)$sourceVersionId, $input);
+        }
 
         $version = $db->queryOne(
             "WITH inserted AS (

@@ -923,7 +923,7 @@ final class MobileWorkQueueService
      */
     public function getShopFloorOverview(): array
     {
-        $today   = date('Y-m-d');
+        $today   = $this->factoryToday();
         $queue   = $this->loadFile('work_queue');
         $entries = $this->loadFile('time_entries');
 
@@ -934,7 +934,7 @@ final class MobileWorkQueueService
             if (!is_array($task)) {
                 continue;
             }
-            $assignedDate = substr($task['assigned_at'] ?? $task['created_at'] ?? '', 0, 10);
+            $assignedDate = $this->queueAssignedDate($task);
             if ($assignedDate !== $today) {
                 continue;
             }
@@ -1252,6 +1252,9 @@ final class MobileWorkQueueService
         }
 
         $key = $this->queueIndexKey($operatorId, $targetDate);
+        if (!array_key_exists($key, (array)($index['by_operator_date'] ?? []))) {
+            return null;
+        }
         $rows = (array)($index['by_operator_date'][$key] ?? []);
         $tasks = [];
         foreach ($rows as $row) {

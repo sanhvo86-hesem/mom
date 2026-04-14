@@ -176,6 +176,27 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertCount(2, $index['by_operator_date'] ?? []);
     }
 
+    public function testOperatorQueueRebuildsWhenDerivedIndexMissesExistingBucket(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+
+        $service->assignTask('operator-1', 'WO-INDEX', 'operation_complete', ['priority' => 10]);
+        $this->assertSame(['WO-INDEX'], array_column($service->getOperatorQueue('operator-1'), 'wo_number'));
+
+        $indexPath = $this->tmpDir . '/mobile/work_queue.index.json';
+        $index = json_decode((string)file_get_contents($indexPath), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertIsArray($index);
+        $index['by_operator_date'] = [];
+        file_put_contents($indexPath, json_encode($index, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $rebuilt = $service->getOperatorQueue('operator-1');
+
+        $this->assertSame(['WO-INDEX'], array_column($rebuilt, 'wo_number'));
+        $rebuiltIndex = json_decode((string)file_get_contents($indexPath), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertIsArray($rebuiltIndex);
+        $this->assertNotEmpty($rebuiltIndex['by_operator_date'] ?? []);
+    }
+
     public function testOperatorQueueUsesPlantLocalDateForAssignedAt(): void
     {
         $previousTimezone = date_default_timezone_get();

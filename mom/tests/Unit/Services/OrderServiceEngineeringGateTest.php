@@ -90,6 +90,87 @@ final class OrderServiceEngineeringGateTest extends TestCase
         ]);
     }
 
+    public function testCreateWorkOrderRejectsPlantContextDriftFromParentJobOrder(): void
+    {
+        $service = new OrderService($this->dataDir);
+        $service->createSalesOrder([
+            'so_number' => 'SO-2026-0007',
+            'status' => 'engineering_ready',
+            'customer_name' => 'ACME',
+            'total_value' => 1,
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+        $service->createJobOrder([
+            'jo_number' => 'JO-2026-0007',
+            'so_number' => 'SO-2026-0007',
+            'status' => 'released',
+            'org_plant_id' => 'PLANT-A',
+            'org_site_id' => 'SITE-A',
+            'routing_id' => 'ROUTE-A',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('work_order_context_mismatch:org_plant_id');
+
+        $service->createWorkOrder([
+            'wo_number' => 'WO-2026-0007-10',
+            'jo_number' => 'JO-2026-0007',
+            'status' => 'scheduled',
+            'org_plant_id' => 'PLANT-B',
+        ]);
+    }
+
+    public function testCreateWorkOrderInheritsParentContextAndRejectsOperationMismatch(): void
+    {
+        $service = new OrderService($this->dataDir);
+        $service->createSalesOrder([
+            'so_number' => 'SO-2026-0008',
+            'status' => 'engineering_ready',
+            'customer_name' => 'ACME',
+            'total_value' => 1,
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+        $service->createJobOrder([
+            'jo_number' => 'JO-2026-0008',
+            'so_number' => 'SO-2026-0008',
+            'status' => 'released',
+            'org_plant_id' => 'PLANT-A',
+            'org_site_id' => 'SITE-A',
+            'routing_id' => 'ROUTE-A',
+            'operations' => [[
+                'operation_number' => 10,
+                'routing_operation_id' => 'ROUTE-A-OP10',
+                'work_center_id' => 'WC-5AX',
+                'machine_id' => 'MC-5AX-01',
+                'setup_sheet_id' => 'SETUP-OP10',
+                'cnc_program_version_id' => 'NC-OP10-V1',
+            ]],
+        ]);
+
+        $workOrder = $service->createWorkOrder([
+            'wo_number' => 'WO-2026-0008-10',
+            'jo_number' => 'JO-2026-0008',
+            'status' => 'scheduled',
+            'operation_number' => 10,
+        ]);
+
+        $this->assertSame('PLANT-A', $workOrder['org_plant_id'] ?? null);
+        $this->assertSame('SITE-A', $workOrder['org_site_id'] ?? null);
+        $this->assertSame('ROUTE-A-OP10', $workOrder['routing_operation_id'] ?? null);
+        $this->assertSame('WC-5AX', $workOrder['work_center_id'] ?? null);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('work_order_operation_context_mismatch:work_center_id');
+
+        $service->createWorkOrder([
+            'wo_number' => 'WO-2026-0008-20',
+            'jo_number' => 'JO-2026-0008',
+            'status' => 'scheduled',
+            'operation_number' => 10,
+            'work_center_id' => 'WC-TURN',
+        ]);
+    }
+
     public function testListSalesOrdersDoesNotDuplicateRows(): void
     {
         $service = new OrderService($this->dataDir);

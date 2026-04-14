@@ -1,6 +1,13 @@
 # Agent 1 - Global Benchmark And Standards Refresh
 
-Branch audited: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Official benchmark refresh reconfirmed the target pattern: governed MES execution, integrated quality, explicit ISA-95 boundaries, contextualized digital-thread data, OT/IT least privilege, and advisory-only AI.
+- Confirmed P1 staged authority remains: CNC program/setup-sheet state and canonical manufacturing-event fallback still have JSON compatibility authority or fallback probes. Safe remediation this pass tightened bridge behavior and docs; DB-primary cutover remains a documented blocker.
+- Confirmed P2 mobile queue/read-model risk from the MES workstream: derived indexes must be treated as cache only. Remediation in this pass makes missing index buckets rebuild from source.
+- Refuted direct machine-control drift: MTConnect/OPC UA remain contextualization/readiness surfaces and no execution command path was introduced.
 
 ## 2026-04-15 Current-Pass Addendum
 

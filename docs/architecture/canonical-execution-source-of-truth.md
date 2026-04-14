@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+Audited branch: `codex/worldclass-reaudit-20260415-055057`
 
 Date: 2026-04-15
 
@@ -14,6 +14,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Job order | Existing planning/order/work-order enrichment | Dispatch target `jo_number` copy | Dispatch stores job reference for execution context, not planning authority. |
 | Work order | Existing work order/order store joined by `wo_number` | Mobile queue work items, dispatch copies | `wo_number` is the Phase 1 execution join key. |
 | Work order operation | Operation fields on dispatch target/report: `operation_seq`, `operation_id`, `operation_revision` | Routing/job-operation DB tables | Dispatch preserves operation context; routing remains planning/master truth. |
+| Work-order creation context | Parent JO and defined JO operation context | Caller-supplied WO plant/site/routing/work-center/CNC/setup fields | Work orders must match parent JO context where present. Missing WO context may be inherited; mismatched parent/operation context is rejected. |
 | Dispatch target | Existing dispatch target store through `DispatchController` | `shift_targets` PostgreSQL bridge, analytics projections | Existing dispatch target path is live Phase 1 operational truth; DB is bridge until cutover. |
 | Operator assignment | Dispatch target `operator_id` plus dispatch actor checks | Mobile queue assignee fields | Reports require assigned operator or supervisor/planner override. Blank assignment is not open execution. |
 | Operator time entry | Mobile work queue service time-entry store | MES labor/time tables, production report actual times | Mobile time entry remains capture truth; online clock-in and clock-out replay keys protect retry-safe capture. Report times are production-event context. |
@@ -34,6 +35,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
 | AI model/dashboard/read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard reads require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
+| AI training ETL | `AiDataEtlService` snapshots scoped by `org_id` | Scheduled job calls without tenant/org context | Scheduled ETL must run per explicit org scope. If no scope is available, it records skipped results and does not run unscoped projection extraction. |
 | AI schedule apply / PM proposal | Advisory review/proposal responses from `AiSchedulingController` | Schedule slot and maintenance work-order stores | AI-named apply/PM endpoints do not mutate schedules or create maintenance execution. They return `applied=false`/`scheduled=false`, `execution_authority=false`, and human action requirements. |
 | Evidence artifact | `EvidenceVaultService` custody/hash chain and canonical evidence DB tables where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. Canonical package reads require EQMS read roles and org scope; finalization requires at least one signature event. |
 | Genealogy ontology | `GenealogyGraphService` runtime ontology plus migration 121 DB constraints | Older migration 108 constraints | Runtime and DB now agree on expanded MOM/MES/EQMS/PLM node and snapshot subject types. |
@@ -45,7 +47,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - Target and production-log snapshots are compatibility/read-model state.
 - Mobile inspection capture is append-only by behavior for offline replay: matching replay returns existing fact; divergent replay is rejected.
 - Mobile task assignment/start/completion writes append task events and then exposes the queue row as the current snapshot.
-- `mobile/work_queue.index.json` is a derived operator/date read model. If stale or absent, the service rebuilds it from `work_queue.json`.
+- `mobile/work_queue.index.json` is a derived operator/date read model. If stale, absent, or missing the requested bucket, the service rebuilds it from `work_queue.json`.
 - Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` lifecycle facts for set/release audit history.
 - Order hold set rejects invalid order types and missing source orders before writing the compatibility snapshot or lifecycle fact.
 - DB bridge writes are migration/readiness mirrors. They are not allowed to override JSON compatibility truth in this Phase 1 patch.

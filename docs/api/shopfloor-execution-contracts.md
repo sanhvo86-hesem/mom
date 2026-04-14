@@ -59,6 +59,18 @@ Rules:
 - Digital-thread fields are copied as execution context and do not redefine master data truth.
 - JSON target store remains compatibility authority; DB bridge writes are migration/readiness mirrors.
 
+## Work-order creation context
+
+Handler: existing work-order create route in `OrderController`.
+
+Rules:
+
+- Parent JO must exist and be eligible for WO creation.
+- If the parent JO defines `org_plant_id`, `org_site_id`, `routing_id`, `inspection_plan_id`, `part_number`, or `part_revision`, a WO cannot provide a conflicting value.
+- If the parent JO defines operation rows, the WO operation must match by `operation_number`, `routing_operation_id`, or `job_operation_id`.
+- Operation-scoped `routing_operation_id`, `job_operation_id`, `work_center_id`, `machine_id`, `setup_sheet_id`, `cnc_program_version_id`, plant, and site values are inherited when omitted and rejected when conflicting.
+- These checks prevent cross-site, cross-work-center, or cross-CNC-context drift before dispatch.
+
 ## Target dispatch and lifecycle
 
 Handler: existing dispatch route in `DispatchController`.
@@ -148,7 +160,7 @@ Behavior:
 - Response may include legacy task fields and compact task cards. The compact shape should preserve `target_id`, `wo_number`, `operation_seq`, `machine_id`, `equipment_id`, `work_center_id`, `shift_date`, `shift_code`, `target_quantity`, `reported_quantity`, `remaining_quantity`, and quality-gate status when available.
 - Mobile task completion persists `result`, `qty_completed`, `qty_scrap`, `quantity_completed`, `quantity_scrap`, and `completion_reason_code` on the existing mobile work queue snapshot. Non-`pass` outcomes and any scrap require a structured reason code; `qty_scrap` may not exceed `qty_completed`.
 - Mobile task assignment, start, and completion append `mobile.task_assigned`, `mobile.task_started`, and `mobile.task_completed` records to `mobile/task_events.json`; the queue row is the current snapshot.
-- Mobile operator queue reads may use `mobile/work_queue.index.json` as a derived read model keyed by operator/date. The index is rebuilt from `work_queue.json` when stale and is never execution authority. Default queue and dashboard dates use the same factory calendar as mobile assignment timestamps.
+- Mobile operator queue reads may use `mobile/work_queue.index.json` as a derived read model keyed by operator/date. The index is rebuilt from `work_queue.json` when stale or missing the requested bucket and is never execution authority. Default queue, dashboard, and overview dates use the same factory calendar as mobile assignment timestamps.
 - Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
 - Mobile task completion accepts optional `idempotency_key`. A repeated completion with the same key and same completion payload returns the completed task as an idempotent replay and does not append another completion event; same-key/different-payload replay is rejected as `completion_idempotency_conflict`.
 - Mobile clock-in accepts optional `idempotency_key`. A repeated clock-in with the same key and same work context returns the original clock-in; a same-key/different-context replay is rejected as `clock_in_idempotency_conflict`.

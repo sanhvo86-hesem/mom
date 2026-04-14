@@ -28,6 +28,7 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/v1/eqms/publications/retry-plan', EqmsControlPlaneController::class, 'publicationRetryPlan');
     $router->get('/api/v1/eqms/publications/monitor', EqmsControlPlaneController::class, 'publicationMonitor');
     $router->post('/api/v1/eqms/publications/actions', EqmsControlPlaneController::class, 'requestPublicationAction');
+    $router->post('/api/v1/eqms/signature-challenges', EqmsControlPlaneController::class, 'issueSignatureChallenge');
     $router->post('/api/v1/eqms/evidence/finalize', EqmsControlPlaneController::class, 'finalizeEvidencePackage');
     $router->post('/api/v1/eqms/evidence/amendments', EqmsControlPlaneController::class, 'createEvidenceAmendment');
     $router->get('/api/v1/eqms/evidence/package', EqmsControlPlaneController::class, 'canonicalEvidencePackage');

@@ -1,6 +1,12 @@
 # Agent 3 - MOM / MES Execution Backbone
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Confirmed P1 mobile queue derived-index bug: a structurally valid index with a missing operator/date bucket returned an empty queue even when `work_queue.json` contained source work. Remediation treats missing buckets as cache misses and rebuilds from source.
+- Confirmed P2 shopfloor overview date drift: overview used process-local `date('Y-m-d')` while assignment bucketing uses factory `+07:00`. Remediation now uses `factoryToday()` and `queueAssignedDate()`.
+- Confirmed P2 dual-authority compatibility posture: dispatch/mobile JSON stores remain live compatibility writers while event ledgers and DB bridges mature. This is documented as staged bridge debt.
 
 ## 2026-04-14 Current-Pass Addendum
 

@@ -115,6 +115,8 @@ final class ChangeAuthorityServiceTest extends TestCase
         $this->assertSame('ECO-2026-001', $decision->data['change_order_number'] ?? null);
         $this->assertSame('affected_object', $decision->data['authority_source'] ?? null);
         $this->assertSame('ECO-2026-001', $db->lastAffectedParams[':co_ref_number'] ?? null);
+        $this->assertStringNotContainsString('fca.', $db->lastAffectedSql);
+        $this->assertStringContainsString('NULL::text AS field_change_authorization_id', $db->lastAffectedSql);
     }
 
     public function testCanonicalAffectedObjectFieldScopeMustAuthorizeExactField(): void
@@ -363,6 +365,8 @@ final class FakeChangeAuthorityDb
     /** @var array<string, mixed> */
     public array $lastAffectedParams = [];
 
+    public string $lastAffectedSql = '';
+
     /** @var list<string> */
     public array $consumedAuthorizationIds = [];
 
@@ -406,10 +410,12 @@ final class FakeChangeAuthorityDb
             return $this->filterByChangeOrder($this->explicit, (string)($params[':fca_co_ref_number'] ?? ''));
         }
         if (str_contains($sql, 'plm_change_affected_objects')) {
+            $this->lastAffectedSql = $sql;
             $this->lastAffectedParams = $params;
             return $this->filterByChangeOrder($this->affected, (string)($params[':co_ref_number'] ?? ''));
         }
         if (str_contains($sql, 'eqms_change_affected_object')) {
+            $this->lastAffectedSql = $sql;
             $this->lastAffectedParams = $params;
             return $this->filterByChangeOrder($this->affected, (string)($params[':co_ref_number'] ?? ''));
         }

@@ -104,8 +104,12 @@ final class PeriodicEvaluationService
             throw new RuntimeException('periodic_evaluation_identity_required');
         }
 
-        if ($target === 'waived' && $this->nullableText($request['waiver_signature_event_id'] ?? null) === null) {
-            throw new RuntimeException('waiver_signature_event_required');
+        $waiverSignatureEventId = $this->nullableText($request['waiver_signature_event_id'] ?? null);
+        if ($target === 'waived') {
+            if ($waiverSignatureEventId === null) {
+                throw new RuntimeException('waiver_signature_event_required');
+            }
+            $this->assertWaiverSignatureAuthoritative($waiverSignatureEventId, $request);
         }
         if (in_array($target, ['passed', 'failed'], true)
             && $this->nullableText($request['integrity_digest_id'] ?? null) === null
@@ -149,6 +153,72 @@ final class PeriodicEvaluationService
         if ($this->db === null || !method_exists($this->db, 'query')) {
             throw new RuntimeException('authoritative_periodic_evaluation_store_required');
         }
+    }
+
+    /**
+     * @param array<string, mixed> $request
+     */
+    private function assertWaiverSignatureAuthoritative(string $signatureEventId, array $request): void
+    {
+        if (!method_exists($this->db, 'queryOne')) {
+            throw new RuntimeException('authoritative_periodic_evaluation_signature_store_required');
+        }
+        $payloadHash = $this->waiverPayloadHash($request);
+        $row = $this->db->queryOne(
+            "SELECT
+                se.signature_event_id,
+                se.signature_state,
+                se.signature_meaning,
+                se.signed_payload_hash_sha256,
+                se.auth_challenge_id,
+                esc.challenge_state,
+                esc.consumed_at,
+                esc.signature_action,
+                esc.signed_payload_hash_sha256 AS challenge_payload_hash_sha256
+             FROM signature_events se
+             INNER JOIN e_signature_auth_challenges esc
+                ON esc.auth_challenge_id = se.auth_challenge_id
+             WHERE se.signature_event_id = CAST(:signature_event_id AS uuid)
+               AND se.signature_state = 'applied'
+               AND se.signature_meaning = 'periodic_evaluation_waiver'
+               AND se.signed_payload_hash_sha256 = :waiver_payload_hash_sha256
+               AND esc.challenge_state = 'consumed'
+               AND esc.consumed_at IS NOT NULL
+               AND esc.signature_action = 'periodic_evaluation_waiver'
+               AND esc.signed_payload_hash_sha256 = :waiver_payload_hash_sha256
+             LIMIT 1",
+            [
+                ':signature_event_id' => $signatureEventId,
+                ':waiver_payload_hash_sha256' => $payloadHash,
+            ],
+        );
+        if (!is_array($row) || $this->nullableText($row['signature_event_id'] ?? null) === null) {
+            throw new RuntimeException('periodic_evaluation_waiver_signature_not_authoritative');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $request
+     */
+    private function waiverPayloadHash(array $request): string
+    {
+        $explicit = strtolower($this->nullableText($request['waiver_payload_hash_sha256'] ?? $request['signed_payload_hash_sha256'] ?? '') ?? '');
+        if (preg_match('/^[a-f0-9]{64}$/', $explicit) === 1) {
+            return $explicit;
+        }
+        $payload = [
+            'periodic_evaluation_id' => $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null),
+            'evaluation_scope' => $this->nullableText($request['evaluation_scope'] ?? null),
+            'scope_ref' => $this->nullableText($request['scope_ref'] ?? null),
+            'evaluation_state' => 'waived',
+            'closure_reason' => $this->nullableText($request['closure_reason'] ?? $request['reason'] ?? null),
+            'result_payload' => (array)($request['result_payload'] ?? []),
+        ];
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('periodic_evaluation_waiver_payload_hash_failed');
+        }
+        return hash('sha256', $json);
     }
 
     private function normalizeDb(?object $db): ?object

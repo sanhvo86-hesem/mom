@@ -43,7 +43,8 @@ Run the maximum safe subset for every change:
 
 ## Merge To Main Cleanup
 
-- Merge to `main` only after remediation is integrated, validation is run or blocked with evidence, and the worktree is clean.
+- Merge to `main` only after remediation is integrated, validation is run or blocked with evidence, the worktree is clean, and the merge gate is GO.
+- Do not merge to `main` with any confirmed P0 defect open. Do not merge with confirmed P1 defects open unless each has explicit documented rationale, owner path, and next remediation step.
 - Prefer a fast-forward merge from the root remediation branch into local `main`; when `main` has moved, rebase the root branch onto `main`, rerun critical validation, and retry the fast-forward. If conflicts or validation failures cannot be resolved safely, stop and keep the remediation branch intact.
 - After a successful merge, delete the root remediation branch and temporary agent branches/worktrees created for that remediation.
 - Never delete `main` or the user's original branch.

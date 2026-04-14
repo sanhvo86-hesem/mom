@@ -129,12 +129,14 @@ final class GenealogyGraphService
             throw new RuntimeException('genealogy_cycle_detected');
         }
         $sourceEventId = $this->text($fact['source_event_id'] ?? '');
+        $changeRef = $this->text($fact['change_order_id'] ?? $fact['change_order_number'] ?? $fact['change_authority_id'] ?? '');
         $factFingerprint = hash('sha256', $this->json([
             'edge_fact_type' => $edgeFactType,
             'from_object_type' => $fromType,
             'from_object_id' => $fromId,
             'to_object_type' => $toType,
             'to_object_id' => $toId,
+            'change_authority_ref' => $changeRef,
             'quantity' => isset($fact['quantity']) && is_numeric($fact['quantity']) ? (string)$fact['quantity'] : null,
             'uom' => $this->nullableText($fact['uom'] ?? null),
             'effective_at' => $this->nullableText($fact['effective_at'] ?? null),
@@ -146,12 +148,17 @@ final class GenealogyGraphService
             $sourceEventId = 'portal-' . hash('sha256', $factFingerprint . '|' . $actorRef);
         }
         $fieldPath = $this->text($fact['field_path'] ?? 'genealogy.' . $edgeFactType);
-        $authority = $this->assertReleasedChangeAuthority($fact, $fieldPath, $fromType, $fromId, $toType, $toId);
+        $edgeFactId = $this->text($fact['edge_fact_id'] ?? '');
+        if ($edgeFactId === '') {
+            $edgeFactId = hash('sha256', $factFingerprint);
+        }
+        $authority = $this->assertReleasedChangeAuthority($fact, $fieldPath, $fromType, $fromId, $toType, $toId, $edgeFactId);
 
         $metadata = is_array($fact['metadata'] ?? null) ? $fact['metadata'] : [];
         $metadata['actor_ref'] = $actorRef;
         $metadata['authority'] = 'canonical_genealogy_edge_fact';
         $metadata['change_authority'] = $authority;
+        $metadata['edge_fact_id'] = $edgeFactId;
         $metadata['fact_fingerprint_sha256'] = $factFingerprint;
         $metadata['scope'] = $scope;
 
@@ -248,6 +255,7 @@ final class GenealogyGraphService
         $operationClass = $this->requiredToken($request, 'operation_class');
         $objectType = $this->requiredToken($request, 'object_type');
         $objectId = $this->requiredText($request, 'object_id');
+        $scope = $this->requireTrustedScope($request);
         $context = is_array($request['context'] ?? null) ? $request['context'] : $request;
         $required5M = $this->required5M($request);
 
@@ -266,12 +274,16 @@ final class GenealogyGraphService
             "INSERT INTO traceability_5m_obligations
                 (operation_class, object_type, object_id, material_required, machine_required,
                  method_required, measurement_required, manpower_required, gate_state,
-                 missing_context, decided_at)
+                 missing_context, decided_at, org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (:operation_class, :object_type, :object_id, :material_required, :machine_required,
                  :method_required, :measurement_required, :manpower_required, :gate_state,
-                CAST(:missing_context AS jsonb), now())
-             ON CONFLICT (operation_class, object_type, object_id)
+                CAST(:missing_context AS jsonb), now(), :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
+             ON CONFLICT (
+                operation_class, object_type, object_id,
+                (COALESCE(org_company_code, '')), (COALESCE(org_legal_entity_code, '')),
+                (COALESCE(org_plant_id, '')), (COALESCE(org_site_id, ''))
+             )
              DO UPDATE SET
                  material_required = EXCLUDED.material_required,
                  machine_required = EXCLUDED.machine_required,
@@ -280,7 +292,11 @@ final class GenealogyGraphService
                  manpower_required = EXCLUDED.manpower_required,
                  gate_state = EXCLUDED.gate_state,
                  missing_context = EXCLUDED.missing_context,
-                 decided_at = now()
+                 decided_at = now(),
+                 org_company_code = EXCLUDED.org_company_code,
+                 org_legal_entity_code = EXCLUDED.org_legal_entity_code,
+                 org_plant_id = EXCLUDED.org_plant_id,
+                 org_site_id = EXCLUDED.org_site_id
              RETURNING *",
             [
                 ':operation_class' => $operationClass,
@@ -293,6 +309,10 @@ final class GenealogyGraphService
                 ':manpower_required' => $this->boolSql($required5M['manpower']),
                 ':gate_state' => $gateState,
                 ':missing_context' => $this->json($missing),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
 
@@ -429,6 +449,7 @@ final class GenealogyGraphService
         string $fromId,
         string $toType,
         string $toId,
+        string $edgeFactId,
     ): array {
         $changeRef = $this->text($fact['change_order_id'] ?? $fact['change_order_number'] ?? $fact['change_authority_id'] ?? '');
         if ($changeRef === '') {
@@ -446,30 +467,54 @@ final class GenealogyGraphService
                 co.plm_change_order_id::text AS plm_change_order_id,
                 co.change_order_number,
                 co.status,
-                cao.object_type,
-                cao.object_id,
-                cao.affected_fields,
-                cao.effectivity_rule,
-                eff.plm_change_effectivity_id::text AS plm_change_effectivity_id,
-                eff.effectivity_scope,
-                eff.effective_from,
-                eff.effective_to
+                from_ao.object_type AS from_object_type,
+                from_ao.object_id AS from_object_id,
+                from_ao.affected_fields AS from_affected_fields,
+                to_ao.object_type AS to_object_type,
+                to_ao.object_id AS to_object_id,
+                to_ao.affected_fields AS to_affected_fields,
+                ro.object_type AS resulting_object_type,
+                ro.object_id AS resulting_object_id,
+                from_eff.plm_change_effectivity_id::text AS from_effectivity_id,
+                from_eff.effectivity_scope AS from_effectivity_scope,
+                from_eff.effective_from AS from_effective_from,
+                from_eff.effective_to AS from_effective_to,
+                to_eff.plm_change_effectivity_id::text AS to_effectivity_id,
+                to_eff.effectivity_scope AS to_effectivity_scope,
+                to_eff.effective_from AS to_effective_from,
+                to_eff.effective_to AS to_effective_to
              FROM plm_change_orders co
-             INNER JOIN plm_change_affected_objects cao
-                ON cao.plm_change_order_id = co.plm_change_order_id
-             INNER JOIN plm_change_effectivities eff
-                ON eff.plm_change_order_id = co.plm_change_order_id
+             INNER JOIN plm_change_affected_objects from_ao
+                ON from_ao.plm_change_order_id = co.plm_change_order_id
+               AND lower(from_ao.object_type) = :from_type
+               AND from_ao.object_id = :from_id
+               AND from_ao.disposition = 'accepted'
+             INNER JOIN plm_change_affected_objects to_ao
+                ON to_ao.plm_change_order_id = co.plm_change_order_id
+               AND lower(to_ao.object_type) = :to_type
+               AND to_ao.object_id = :to_id
+               AND to_ao.disposition = 'accepted'
+             INNER JOIN plm_change_resulting_objects ro
+                ON ro.plm_change_order_id = co.plm_change_order_id
+               AND lower(ro.object_type) = 'genealogy_edge_fact'
+               AND ro.object_id = :edge_fact_id
+             INNER JOIN plm_change_effectivities from_eff
+                ON from_eff.plm_change_order_id = co.plm_change_order_id
+               AND lower(from_eff.object_type) = :from_type
+               AND from_eff.object_id = :from_id
+             INNER JOIN plm_change_effectivities to_eff
+                ON to_eff.plm_change_order_id = co.plm_change_order_id
+               AND lower(to_eff.object_type) = :to_type
+               AND to_eff.object_id = :to_id
              WHERE (co.plm_change_order_id::text = :change_ref OR co.change_order_number = :change_ref)
                AND co.status = 'released'
-               AND lower(cao.object_type) IN (:from_type, :to_type)
-               AND cao.object_id IN (:from_id, :to_id)
-               AND cao.disposition = 'accepted'
-               AND :field_path = ANY(cao.affected_fields)
-               AND lower(eff.object_type) IN (:from_type, :to_type)
-               AND eff.object_id IN (:from_id, :to_id)
-               AND eff.effective_from <= COALESCE(CAST(:effective_at AS timestamptz), now())
-               AND (eff.effective_to IS NULL OR eff.effective_to > COALESCE(CAST(:effective_at AS timestamptz), now()))
-             ORDER BY eff.effective_from DESC
+               AND :field_path = ANY(from_ao.affected_fields)
+               AND :field_path = ANY(to_ao.affected_fields)
+               AND from_eff.effective_from <= COALESCE(CAST(:effective_at AS timestamptz), now())
+               AND (from_eff.effective_to IS NULL OR from_eff.effective_to > COALESCE(CAST(:effective_at AS timestamptz), now()))
+               AND to_eff.effective_from <= COALESCE(CAST(:effective_at AS timestamptz), now())
+               AND (to_eff.effective_to IS NULL OR to_eff.effective_to > COALESCE(CAST(:effective_at AS timestamptz), now()))
+             ORDER BY from_eff.effective_from DESC, to_eff.effective_from DESC
              LIMIT 1",
             [
                 ':change_ref' => $changeRef,
@@ -477,6 +522,7 @@ final class GenealogyGraphService
                 ':to_type' => $toType,
                 ':from_id' => $fromId,
                 ':to_id' => $toId,
+                ':edge_fact_id' => $edgeFactId,
                 ':field_path' => $fieldPath,
                 ':effective_at' => $this->nullableText($fact['effective_at'] ?? null),
             ],

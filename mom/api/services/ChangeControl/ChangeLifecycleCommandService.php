@@ -336,6 +336,9 @@ final class ChangeLifecycleCommandService
         foreach ($this->unresolvedWipDispositions($package['wip_dispositions']) as $disposition) {
             $blockers[] = $this->blocker('wip_disposition_unresolved', 'WIP, on-order, or finished-goods impact disposition must be approved, executed, or signed-waived before release.', $disposition);
         }
+        foreach ($this->missingWipImpactDispositionCoverage($package['effectivities'], $package['wip_dispositions']) as $impact) {
+            $blockers[] = $this->blocker('wip_impact_disposition_required', 'Every WIP, on-order, finished-goods, or retroactive effectivity impact requires an explicit disposition row before release.', $impact);
+        }
 
         $rollbackRequired = $this->releaseRequiresRollback($package['effectivities']);
         $emergency = $this->isEmergencyChange($package['change_order'], $overrides);
@@ -1199,11 +1202,12 @@ final class ChangeLifecycleCommandService
                  FROM traceability_5m_obligations
                  WHERE lower(object_type) = :object_type
                    AND object_id = :object_id
+                   " . $this->traceabilityScopeFilterSql($object) . "
                    AND gate_state = 'blocked'",
                 [
                     ':object_type' => strtolower($objectType),
                     ':object_id' => $objectId,
-                ],
+                ] + $this->traceabilityScopeParams($object),
             );
             foreach ($rows as $row) {
                 $blocked[] = $row;
@@ -1233,6 +1237,105 @@ final class ChangeLifecycleCommandService
             }
         }
         return $unresolved;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $effectivities
+     * @param list<array<string, mixed>> $wipDispositions
+     * @return list<array<string, mixed>>
+     */
+    private function missingWipImpactDispositionCoverage(array $effectivities, array $wipDispositions): array
+    {
+        $dispositionKeys = [];
+        foreach ($wipDispositions as $disposition) {
+            $type = strtolower($this->text($disposition['wip_object_type'] ?? $disposition['object_type'] ?? ''));
+            $id = $this->text($disposition['wip_object_id'] ?? $disposition['object_id'] ?? '');
+            if ($type !== '' && $id !== '') {
+                $dispositionKeys[$type . '|' . $id] = true;
+            }
+        }
+
+        $missing = [];
+        $hasDisposition = $dispositionKeys !== [];
+        foreach ($effectivities as $effectivity) {
+            $impact = strtolower($this->text($effectivity['release_impact'] ?? ''));
+            if (!in_array($impact, ['retroactive', 'wip_hold', 'wip_rework', 'ship_hold'], true)) {
+                continue;
+            }
+            $type = strtolower($this->text($effectivity['object_type'] ?? ''));
+            $id = $this->text($effectivity['object_id'] ?? '');
+            if ($hasDisposition && !in_array($type, ['work_order', 'job_order', 'lot', 'batch', 'serial', 'finished_good', 'sales_order', 'purchase_order'], true)) {
+                continue;
+            }
+            if ($type === '' || $id === '') {
+                $missing[] = $effectivity + ['missing_reason' => 'effectivity_object_required_for_wip_impact_disposition'];
+                continue;
+            }
+            if (!isset($dispositionKeys[$type . '|' . $id])) {
+                $missing[] = $effectivity + ['missing_reason' => 'wip_impact_disposition_not_enumerated'];
+            }
+        }
+        return $missing;
+    }
+
+    /**
+     * @param array<string, mixed> $object
+     */
+    private function traceabilityScopeFilterSql(array $object): string
+    {
+        $scope = $this->objectScope($object);
+        if ($scope === []) {
+            return '';
+        }
+        $clauses = [];
+        foreach ($scope as $field => $_value) {
+            $clauses[] = "AND COALESCE({$field}, '') = COALESCE(:{$field}, '')";
+        }
+        return "\n                   " . implode("\n                   ", $clauses);
+    }
+
+    /**
+     * @param array<string, mixed> $object
+     * @return array<string, string|null>
+     */
+    private function traceabilityScopeParams(array $object): array
+    {
+        $params = [];
+        foreach ($this->objectScope($object) as $field => $value) {
+            $params[':' . $field] = $value;
+        }
+        return $params;
+    }
+
+    /**
+     * @param array<string, mixed> $object
+     * @return array<string, string>
+     */
+    private function objectScope(array $object): array
+    {
+        $scope = [];
+        foreach (['metadata', 'effectivity_rule', 'effectivity_scope', 'scope'] as $container) {
+            $raw = $object[$container] ?? null;
+            if (is_string($raw)) {
+                $decoded = json_decode($raw, true);
+                $raw = is_array($decoded) ? $decoded : null;
+            }
+            if (is_array($raw)) {
+                foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+                    $value = $this->text($raw[$field] ?? '');
+                    if ($value !== '') {
+                        $scope[$field] = $value;
+                    }
+                }
+            }
+        }
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $value = $this->text($object[$field] ?? '');
+            if ($value !== '') {
+                $scope[$field] = $value;
+            }
+        }
+        return $scope;
     }
 
     /**

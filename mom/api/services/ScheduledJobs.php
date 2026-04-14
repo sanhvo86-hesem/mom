@@ -872,36 +872,100 @@ final class ScheduledJobs
      *
      * Schedule: Daily at 02:00.
      *
+     * @param list<string> $orgIds Optional explicit org scopes for scheduler-controlled batch execution.
      * @return array{job: string, status: string, results: list<array>, duration_ms: float}
      */
-    public function runAiDataEtl(): array
+    public function runAiDataEtl(array $orgIds = []): array
     {
-        return $this->executeJob('ai_data_etl', function (): array {
+        return $this->executeJob('ai_data_etl', function () use ($orgIds): array {
             require_once __DIR__ . '/AiDataEtlService.php';
 
             $etl = new \MOM\Api\Services\AiDataEtlService($this->dataDir, $this->db);
             $results = [];
+            $scopedOrgIds = $this->resolveAiEtlOrgIds($orgIds);
+            if ($scopedOrgIds === []) {
+                foreach (['tool_wear', 'quality_prediction', 'scheduling', 'shopfloor_execution'] as $modelType) {
+                    $results[] = [
+                        'model_type' => $modelType,
+                        'status'     => 'skipped',
+                        'error'      => 'ai_etl_org_scope_required',
+                    ];
+                }
 
-            foreach (['tool_wear', 'quality_prediction', 'scheduling', 'shopfloor_execution'] as $modelType) {
-                try {
-                    $dataset = $etl->snapshotForModel($modelType);
-                    $results[] = [
-                        'model_type' => $modelType,
-                        'status'     => 'success',
-                        'row_count'  => $dataset['row_count'] ?? 0,
-                        'dataset_id' => $dataset['dataset_id'] ?? null,
-                    ];
-                } catch (Throwable $e) {
-                    $results[] = [
-                        'model_type' => $modelType,
-                        'status'     => 'failed',
-                        'error'      => $e->getMessage(),
-                    ];
+                return ['results' => $results, 'scope_status' => 'blocked'];
+            }
+
+            foreach ($scopedOrgIds as $orgId) {
+                foreach (['tool_wear', 'quality_prediction', 'scheduling', 'shopfloor_execution'] as $modelType) {
+                    try {
+                        $dataset = $etl->snapshotForModel($modelType, $orgId);
+                        $results[] = [
+                            'org_id'     => $orgId,
+                            'model_type' => $modelType,
+                            'status'     => 'success',
+                            'row_count'  => $dataset['row_count'] ?? 0,
+                            'dataset_id' => $dataset['dataset_id'] ?? null,
+                        ];
+                    } catch (Throwable $e) {
+                        $results[] = [
+                            'org_id'     => $orgId,
+                            'model_type' => $modelType,
+                            'status'     => 'failed',
+                            'error'      => $e->getMessage(),
+                        ];
+                    }
                 }
             }
 
             return ['results' => $results];
         });
+    }
+
+    /**
+     * @param list<string> $explicitOrgIds
+     * @return list<string>
+     */
+    private function resolveAiEtlOrgIds(array $explicitOrgIds = []): array
+    {
+        $orgIds = [];
+        foreach ($explicitOrgIds as $orgId) {
+            $this->appendAiEtlOrgId($orgIds, $orgId);
+        }
+
+        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
+        $this->appendAiEtlOrgId($orgIds, $sessionOrgId);
+
+        $envOrgIds = trim((string)(getenv('MOM_AI_ETL_ORG_IDS') ?: ''));
+        if ($envOrgIds !== '') {
+            foreach (explode(',', $envOrgIds) as $orgId) {
+                $this->appendAiEtlOrgId($orgIds, $orgId);
+            }
+        }
+
+        $usersFile = $this->dataDir . '/config/users.json';
+        if (is_file($usersFile)) {
+            $decoded = json_decode((string)file_get_contents($usersFile), true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $user) {
+                    if (is_array($user)) {
+                        $this->appendAiEtlOrgId($orgIds, (string)($user['org_id'] ?? ''));
+                    }
+                }
+            }
+        }
+
+        return array_values($orgIds);
+    }
+
+    /**
+     * @param array<string, string> $orgIds
+     */
+    private function appendAiEtlOrgId(array &$orgIds, string $orgId): void
+    {
+        $orgId = trim($orgId);
+        if ($orgId !== '') {
+            $orgIds[$orgId] = $orgId;
+        }
     }
 
     /**

@@ -1,6 +1,12 @@
 # Agent 4 - EQMS / Quality / SPC / Compliance
 
-Branch audited: `codex/worldclass-erp-mom-mes-eqms-reaudit-20260415-000556`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Confirmed P2 EQMS drift remains in legacy sidecars: `QualityIntegrationService` and OQC failure handling still write JSON/JSONL quality/NCR/hold sidecars while canonical EQMS tables exist.
+- Confirmed P3 reason-code coverage is partial: active OQC and sidecar paths still use literals such as `oqc_failure`, `open`, and `blocked` rather than a single governed lookup.
+- No broad EQMS rewrite was safe in this pass because no existing canonical quality command-service entrypoint cleanly owns the sidecar migration. The blocker is documented; canonical evidence/finalization surfaces remain materially stronger and role/org/signature scoped.
 
 ## 2026-04-15 Current-Pass Addendum
 

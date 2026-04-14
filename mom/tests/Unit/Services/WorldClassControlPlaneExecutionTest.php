@@ -10,6 +10,8 @@ use MOM\Services\ControlPlane\ControlPlaneCommandGuard;
 use MOM\Services\ControlPlane\ControlPlaneCommandService;
 use MOM\Services\ControlPlane\EffectivityGateService;
 use MOM\Services\ControlPlane\EqmsFormExecutionService;
+use MOM\Services\ControlPlane\IntegrityDigestService;
+use MOM\Services\ControlPlane\IntegrityDigestWorker;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
@@ -471,6 +473,66 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('passed', $row['evaluation_state']);
         $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[0]['sql']);
+    }
+
+    public function testPeriodicEvaluationWaiverRequiresAuthoritativeSignatureChallengeProof(): void
+    {
+        $payloadHash = str_repeat('a', 64);
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'signature_event_id' => '00000000-0000-0000-0000-000000000030',
+            'signature_state' => 'applied',
+            'signature_meaning' => 'periodic_evaluation_waiver',
+            'challenge_state' => 'consumed',
+            'signature_action' => 'periodic_evaluation_waiver',
+            'signed_payload_hash_sha256' => $payloadHash,
+        ];
+        $db->queryOneRows[] = [
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'waived',
+            'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
+            'result_payload' => '{"waiver":"risk accepted"}',
+        ];
+
+        $row = (new PeriodicEvaluationService($db))->close([
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_state' => 'waived',
+            'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
+            'waiver_payload_hash_sha256' => $payloadHash,
+            'result_payload' => ['waiver' => 'risk accepted'],
+        ]);
+
+        $this->assertSame('waived', $row['evaluation_state']);
+        $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString("signature_action = 'periodic_evaluation_waiver'", $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[1]['sql']);
+    }
+
+    public function testIntegrityDigestWorkerComputesDailyDigestRows(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryRows = [[
+            'source_high_watermark' => '2026-04-15T00:00:00Z',
+            'source_event_count' => 3,
+            'source_digest' => str_repeat('b', 64),
+        ]];
+        $db->queryOneRows[] = [
+            'integrity_digest_id' => '00000000-0000-0000-0000-000000000040',
+            'digest_scope' => 'daily',
+            'object_type' => 'audit_chain',
+            'object_id' => 'global',
+            'digest_value' => str_repeat('c', 64),
+            'digest_state' => 'valid',
+        ];
+
+        $result = (new IntegrityDigestWorker(new IntegrityDigestService($db)))->runDaily();
+
+        $this->assertSame(1, $result['processed']);
+        $this->assertSame('valid', $result['digests'][0]['digest_state']);
+        $this->assertStringContainsString('FROM audit_events', $db->lastQuerySql);
+        $this->assertStringContainsString('INSERT INTO integrity_digests', $db->queryOneCalls[0]['sql']);
     }
 
     public function testCanonicalOutboxWorkerDispatchesByHandlerKey(): void
@@ -1846,6 +1908,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'object_type' => 'form_template',
                 'object_id' => 'FRM-001',
                 'verified_at' => '2026-04-14T00:00:00Z',
+            ], [
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'form_template',
+                'object_id' => 'FRM-001-REV-B',
+                'verified_at' => '2026-04-14T00:00:00Z',
             ]],
             'effectiveness_reviews' => [[
                 'review_state' => 'scheduled',
@@ -2010,6 +2078,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'verification_type' => 'implementation',
                 'verification_state' => 'passed',
                 'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ], [
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'process_route',
                 'object_id' => 'ROUTE-10-TEMP',
                 'verified_at' => '2026-04-14T00:00:00Z',
             ]],
@@ -2169,11 +2243,14 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringContainsString("COALESCE(gef.org_plant_id, '') = COALESCE(:org_plant_id, '')", $sql);
         $this->assertStringContainsString("COALESCE(e.org_plant_id, '') = COALESCE(:org_plant_id, '')", $sql);
         $this->assertStringContainsString("(COALESCE(org_plant_id, ''))", $sql);
+        $this->assertStringContainsString('plm_change_resulting_objects ro', $sql);
+        $this->assertStringContainsString(':edge_fact_id', $sql);
 
         $gate = $service->evaluateAndPersist5M([
             'operation_class' => 'cnc_milling',
             'object_type' => 'work_order',
             'object_id' => 'WO-1',
+            'scope' => ['org_site_id' => 'SITE-1'],
             'context' => [
                 'material_lot_id' => 'MAT-LOT-1',
                 'equipment_id' => 'MILL-1',
@@ -2184,6 +2261,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertContains('method', $gate['missing_context']);
         $this->assertContains('measurement', $gate['missing_context']);
         $this->assertContains('manpower', $gate['missing_context']);
+        $this->assertStringContainsString('ux_traceability_5m_obligations_scoped', file_get_contents(dirname(__DIR__, 3) . '/database/migrations/133_world_class_closure_scope_change_integrity.sql'));
     }
 
     public function test5MGateIgnoresCallerSuppliedRequiredBooleansWithoutPolicy(): void
@@ -2192,6 +2270,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'operation_class' => 'cnc_milling',
             'object_type' => 'work_order',
             'object_id' => 'WO-1',
+            'scope' => ['org_site_id' => 'SITE-1'],
             'material_required' => false,
             'machine_required' => false,
             'method_required' => false,
@@ -2215,6 +2294,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'operation_class' => 'cnc_milling',
             'object_type' => 'work_order',
             'object_id' => 'WO-1',
+            'scope' => ['org_site_id' => 'SITE-1'],
             'required_5m_policy_source' => 'control_plan',
             'required_5m_policy' => [
                 'material_required' => false,
@@ -2655,6 +2735,8 @@ final class CanonicalOutboxFakeDb
      */
     public array $queryOneRows = [];
 
+    public string $lastQuerySql = '';
+
     /**
      * @param array<string, mixed> $params
      */
@@ -2670,6 +2752,7 @@ final class CanonicalOutboxFakeDb
      */
     public function query(string $sql, array $params = []): array
     {
+        $this->lastQuerySql = $sql;
         return $this->queryRows;
     }
 
@@ -2992,7 +3075,7 @@ final class DocumentFormControlFakeDb
     {
         return implode("\n", array_map(
             static fn(array $call): string => $call['sql'],
-            $this->queryOneCalls,
+            array_merge($this->queryOneCalls, $this->queryCalls),
         ));
     }
 }

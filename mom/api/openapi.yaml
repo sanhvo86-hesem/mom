@@ -5412,6 +5412,49 @@ paths:
                     type: string
                     enum: [source_submission_attempt_not_accepted, signature_auth_challenge_not_valid, retention_lock_required_for_final_evidence, finalization_audit_event_required, evidence_amendment_change_order_required]
 
+  /api/v1/eqms/signature-challenges:
+    post:
+      operationId: eqmsIssueSignatureChallenge
+      tags: [EQMS Control Plane]
+      summary: Issue a portal-bound electronic signature challenge
+      description: Creates a server-side user/session/org-bound re-authentication challenge for regulated signature ceremonies.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [signed_payload_hash_sha256, displayed_record_hash_sha256]
+              additionalProperties: true
+              properties:
+                signature_action:
+                  type: string
+                  default: evidence_finalize
+                signed_payload_hash_sha256:
+                  type: string
+                  pattern: '^[a-f0-9]{64}$'
+                displayed_record_hash_sha256:
+                  type: string
+                  pattern: '^[a-f0-9]{64}$'
+                expires_at:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Signature challenge issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
   /api/v1/eqms/change-requests:
     post:
       operationId: eqmsCreateChangeRequest

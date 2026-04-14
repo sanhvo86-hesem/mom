@@ -1,6 +1,12 @@
 # Agent 5 - CNC / Digital Thread / Traceability / Connectivity
 
-Branch audited: `codex/worldclass-reaudit-20260414-203827`
+Branch audited: `codex/worldclass-reaudit-20260415-055057`
+
+## 2026-04-15 05:50 Current-Pass Addendum
+
+- Confirmed P1 CNC authority split remains: `CncProgramController` still uses `data/cnc-programs/*.json` while DB schema exists for the same domain. This remains the largest digital-thread blocker.
+- Confirmed P2 CNC qualification and inspection-plan enforcement are incomplete: role gates exist, but CNC author/reviewer qualification and released inspection-plan validation are not yet canonical.
+- Confirmed P2 genealogy/digital-thread events are contextual but not fully automatic from CNC release/setup/version actions. No direct machine-control path exists.
 
 ## 2026-04-14 Current-Pass Addendum
 
