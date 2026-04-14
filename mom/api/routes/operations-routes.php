@@ -186,6 +186,8 @@ return static function (Router $router, string $dataDir): void {
         'master_data_history'         => [MasterDataController::class, 'getHistory'],
         'master_data_entities'        => [MasterDataController::class, 'listEntities'],
         'master_data_snapshot'        => [MasterDataController::class, 'listRecords'],
+        // Upsert alias: 13-master-data-control.js Save button (create if no record_id, else update)
+        'master_data_upsert'          => [MasterDataController::class, 'upsert'],
         // Shifts
         'shift_list'                  => [MasterDataController::class, 'listShifts'],
         'shift_save'                  => [MasterDataController::class, 'saveShift'],
@@ -409,5 +411,21 @@ return static function (Router $router, string $dataDir): void {
         'mes_connector_snapshot'           => [AdminDataLayerController::class, 'connectorSnapshot'],
         'manual_runtime_summary'           => [ManualRuntimeController::class, 'summary'],
         'manual_runtime_endpoint_contracts'=> [ManualRuntimeController::class, 'endpointContracts'],
+    ]);
+
+    // Form Fill runtime (10-eqms-form-runtime.js, 09b-form-fill-download.js, 09h-allocation-tracker.js)
+    $router->actions([
+        // Read-only form schema lookup (from online-forms/schemas/)
+        'form_fill_load_schema'    => [FormController::class, 'fillLoadSchema'],
+        // Draft read/discard/history
+        'form_fill_get_draft'      => [FormController::class, 'fillGetDraft'],
+        'form_fill_discard_draft'  => [FormController::class, 'fillDiscardDraft'],
+        'form_fill_history'        => [FormController::class, 'fillHistory'],
+        // Write actions: these canonically require the EQMS control-plane path.
+        // Routing them here returns 410 with guidance instead of 400 unknown_action.
+        'form_fill_save_draft'     => [FormController::class, 'saveDraft'],
+        'form_fill_submit_online'  => [FormController::class, 'submit'],
+        // Offline package issue (09h-allocation-tracker.js)
+        'form_fill_download_offline' => [AllocationController::class, 'downloadOffline'],
     ]);
 };

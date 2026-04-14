@@ -913,6 +913,127 @@ class FormController extends BaseController
         $this->success(['drafts' => $drafts]);
     }
 
+    // ── Form Fill Runtime (10-eqms-form-runtime.js / 09b / 09h) ────────────
+
+    /**
+     * GET fillLoadSchema — Load the JSON schema for a form by code.
+     *
+     * Reads from `data/online-forms/schemas/{code}.json`.
+     * Action: `form_fill_load_schema`
+     *
+     * @return never
+     */
+    public function fillLoadSchema(): never
+    {
+        $this->requireAuth();
+
+        $code = trim((string)($this->query('form_code') ?? ''));
+        if ($code === '') $this->error('missing_form_code', 400);
+        if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) $this->error('invalid_form_code', 400);
+
+        $schemasDir = $this->dataDir . '/online-forms/schemas';
+        $file = $schemasDir . '/' . $code . '.json';
+        if (!is_file($file)) $this->error('schema_not_found', 404);
+
+        $schema = $this->readJsonFile($file);
+        if (!$schema) $this->error('invalid_schema', 500);
+
+        $this->success(['schema' => $schema]);
+    }
+
+    /**
+     * GET fillGetDraft — Retrieve a form fill draft by allocation_id.
+     *
+     * Reads from `data/online-forms/drafts/{allocation_id}.json`
+     * (flat legacy structure).
+     * Action: `form_fill_get_draft`
+     *
+     * @return never
+     */
+    public function fillGetDraft(): never
+    {
+        $this->requireAuth();
+
+        $allocId = trim((string)($this->query('allocation_id') ?? ''));
+        if ($allocId === '') $this->error('missing_allocation_id', 400);
+        if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocId)) $this->error('invalid_allocation_id', 400);
+
+        $draftFile = $this->dataDir . '/online-forms/drafts/' . $allocId . '.json';
+        $draft = is_file($draftFile) ? $this->readJsonFile($draftFile) : null;
+
+        $this->success(['draft' => $draft, 'server_time' => $this->nowIso()]);
+    }
+
+    /**
+     * POST fillDiscardDraft — Delete a form fill draft by allocation_id.
+     *
+     * Action: `form_fill_discard_draft`
+     *
+     * @return never
+     */
+    public function fillDiscardDraft(): never
+    {
+        $this->requireAuth();
+        $this->requireCsrf();
+
+        $body    = $this->jsonBody();
+        $allocId = trim((string)($body['allocation_id'] ?? ''));
+        if ($allocId === '') $this->error('missing_allocation_id', 400);
+        if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocId)) $this->error('invalid_allocation_id', 400);
+
+        $draftFile = $this->dataDir . '/online-forms/drafts/' . $allocId . '.json';
+        if (is_file($draftFile)) @unlink($draftFile);
+
+        $this->success(['allocation_id' => $allocId, 'server_time' => $this->nowIso()]);
+    }
+
+    /**
+     * GET fillHistory — List form fill submission history for a form code.
+     *
+     * Query params: form_code (required), user (optional filter), page, page_size.
+     * Action: `form_fill_history`
+     *
+     * @return never
+     */
+    public function fillHistory(): never
+    {
+        $this->requireAuth();
+
+        $formCode = trim((string)($this->query('form_code') ?? ''));
+        if ($formCode === '') $this->error('missing_form_code', 400);
+
+        $userFilter = trim((string)($this->query('user') ?? ''));
+        $page       = max(1, (int)($this->query('page') ?? 1));
+        $pageSize   = max(1, min(100, (int)($this->query('page_size') ?? 20)));
+
+        $entryFile = $this->dataDir . '/online-forms/entries/' . strtoupper($formCode) . '.json';
+        $entries   = [];
+        if (is_file($entryFile)) {
+            $raw     = @file_get_contents($entryFile);
+            $entries = $raw ? (json_decode($raw, true) ?? []) : [];
+        }
+
+        if ($userFilter !== '') {
+            $filterLc = strtolower($userFilter);
+            $entries  = array_values(array_filter(
+                $entries,
+                static fn(array $e) => strtolower(trim((string)($e['submitted_by'] ?? $e['created_by'] ?? $e['_session_user'] ?? ''))) === $filterLc
+            ));
+        }
+
+        $total  = count($entries);
+        $pages  = max(1, (int)ceil($total / $pageSize));
+        $offset = ($page - 1) * $pageSize;
+        $slice  = array_slice($entries, $offset, $pageSize);
+
+        $this->success([
+            'entries'  => $slice,
+            'total'    => $total,
+            'page'     => $page,
+            'pages'    => $pages,
+        ]);
+    }
+
     // ── PostgreSQL Helpers ──────────────────────────────────────────────────
 
     /**

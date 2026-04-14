@@ -114,4 +114,32 @@ return static function (Router $router, string $dataDir): void {
         'order_wo_update_status' => [OrderController::class, 'transition'],
         'order_get_linked_forms' => [OrderController::class, 'getHierarchy'],
     ]);
+
+    // Module 13: master-data-control.js alias
+    $router->actions([
+        // Upsert: creates or updates based on presence of record_id
+        'quality_exception_update' => [ExceptionController::class, 'updateComplaint'],
+    ]);
+
+    // Module 22/22b/22c: additional AI action aliases (name variants used by JS)
+    $router->actions([
+        // tool_wear_predictions: alternate name for ai_tool_wear
+        'tool_wear_predictions'  => [AiSchedulingController::class, 'getToolWearPredictions'],
+        // ai_feedback: alternate name for ai_feedback_submit (22c-ai-recommendations.js)
+        'ai_feedback'            => [AiSchedulingController::class, 'aiFeedbackSubmit'],
+        // ai_conversation_detail: load messages for a specific conversation_id
+        'ai_conversation_detail' => [AiSchedulingController::class, 'aiConversationDetail'],
+        // ai_spc_predict: SPC forecast overlay
+        'ai_spc_predict'         => [AiSchedulingController::class, 'aiSpcPredict'],
+        // ai_schedule_optimize: returns schedule optimization suggestions
+        'ai_schedule_optimize'   => [AiSchedulingController::class, 'aiScheduleOptimize'],
+        // ai_schedule_apply: applies an optimization result
+        'ai_schedule_apply'      => [AiSchedulingController::class, 'aiScheduleApply'],
+        // ai_schedule_pm: schedule preventive maintenance for a tool/machine
+        'ai_schedule_pm'         => [AiSchedulingController::class, 'aiSchedulePm'],
+        // ai_machine_telemetry: machine metrics timeseries
+        'ai_machine_telemetry'   => [AiSchedulingController::class, 'aiMachineTelemetry'],
+        // ai_operator_guidance: per-machine operator tips
+        'ai_operator_guidance'   => [AiSchedulingController::class, 'aiOperatorGuidance'],
+    ]);
 };

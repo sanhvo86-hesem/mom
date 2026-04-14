@@ -44,6 +44,19 @@ return static function (Router $router, string $dataDir): void {
         'form_draft_get'      => [FormController::class, 'getDraft'],
         'form_draft_list'     => [FormController::class, 'listDrafts'],
     ]);
+
+    // Form Schema Lifecycle (09f-form-builder-engine.js)
+    $router->actions([
+        'form_schema_history'       => [FormSchemaController::class, 'history'],
+        'form_schema_version'       => [FormSchemaController::class, 'getVersion'],
+        'form_schema_save_draft'    => [FormSchemaController::class, 'saveDraft'],
+        'form_schema_submit_review' => [FormSchemaController::class, 'submitReview'],
+        'form_schema_publish'       => [FormSchemaController::class, 'publish'],
+        'form_schema_reject'        => [FormSchemaController::class, 'reject'],
+        'form_schema_rollback'      => [FormSchemaController::class, 'rollback'],
+        // 09-online-forms.js: create new EQMS form schema
+        'eqms_form_schema_save'     => [FormSchemaController::class, 'createSchema'],
+    ]);
     
     // Files & Folders
     $router->actions([

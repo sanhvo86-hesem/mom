@@ -229,6 +229,56 @@ class MasterDataController extends BaseController
     }
 
     /**
+     * POST upsert — Create or update a master data record.
+     *
+     * Called by 13-master-data-control.js with:
+     *   entity, scope, record_id (empty = create), item (the record payload).
+     *
+     * Delegates to createRecord() when record_id is absent/empty,
+     * or to updateRecord() when record_id is present.
+     *
+     * Body: entity (required), record_id (optional), item (required), scope (optional)
+     */
+    public function upsert(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
+        $this->requireCsrf();
+
+        $body     = $this->jsonBody();
+        $entity   = trim((string)($body['entity'] ?? ''));
+        $recordId = trim((string)($body['record_id'] ?? ''));
+        $item     = is_array($body['item'] ?? null) ? $body['item'] : [];
+
+        if ($entity === '') $this->error('missing_entity', 400);
+        if (empty($item))   $this->error('missing_item', 400);
+
+        $uid    = $this->userId($user);
+        $reason = trim((string)($body['reason'] ?? 'Upserted'));
+
+        try {
+            if ($recordId === '') {
+                $result = $this->mdService()->create($entity, $item, $uid);
+                if (!$result->ok) {
+                    $this->error($result->errorCode ?? 'create_failed', 400, $result->message);
+                }
+                $this->auditLog('master_data_upsert_create', ['entity' => $entity], $uid);
+                $this->success(['record' => $result->data ?? $item], 201);
+            } else {
+                $result = $this->mdService()->update($entity, $recordId, $item, $uid, $reason);
+                if (!$result->ok) {
+                    $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+                }
+                $this->auditLog('master_data_upsert_update', ['entity' => $entity, 'id' => $recordId], $uid);
+                $this->success(['record' => $result->data ?? $item]);
+            }
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('upsert_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * POST update — Update existing master data record.
      * Body: entity, id, data (required)
      */

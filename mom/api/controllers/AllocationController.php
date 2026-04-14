@@ -542,7 +542,86 @@ class AllocationController extends BaseController
         }
     }
 
-    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * POST downloadOffline — Issue an offline workbook package for a form allocation.
+     *
+     * Called by 09h-allocation-tracker.js `form_fill_download_offline`.
+     * Copies the blank form template, embeds a hidden payload, records
+     * the issue in the allocation store, and returns the download URL.
+     *
+     * Body: allocation_id (required), form_code (optional override), master_context (optional)
+     *
+     * @return never
+     */
+    public function downloadOffline(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body         = $this->jsonBody();
+        $allocationId = trim((string)($body['allocation_id'] ?? ''));
+        if ($allocationId === '') $this->error('missing_allocation_id', 400);
+
+        $allocationStore = load_allocation_store();
+        $allocation      = &allocation_find_ref($allocationStore, $allocationId);
+        if (!is_array($allocation)) $this->error('allocation_not_found', 404);
+        if ((string)($allocation['delivery_mode'] ?? '') !== 'offline') $this->error('form_not_offline', 409);
+
+        $formCode  = trim((string)($body['form_code'] ?? $allocation['form_code'] ?? ''));
+        $formEntry = load_form_registry_entry($formCode);
+        if (!$formEntry || empty($formEntry['path'])) $this->error('blank_form_not_found', 404);
+
+        $sourcePath = join_in_root($this->rootDir, (string)$formEntry['path']);
+        if (!is_file($sourcePath)) $this->error('blank_form_missing_on_disk', 404);
+
+        $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+        $ext      = pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'xlsx';
+        $filename = build_issued_filename(
+            $formCode,
+            (string)($allocation['form_revision'] ?? 'V0'),
+            (string)($allocation['record_id'] ?? ''),
+            $username,
+            $ext
+        );
+
+        $issueDir   = allocation_base_dir() . '/downloads/' . $allocationId;
+        ensure_dir($issueDir);
+        $issuedPath = $issueDir . '/' . $filename;
+
+        $allocation['master_context'] = normalize_master_context(array_merge(
+            (array)($allocation['master_context'] ?? []),
+            (array)($body['master_context'] ?? [])
+        ));
+        $allocation['downloaded_at']             = $this->nowIso();
+        $allocation['downloaded_by']             = $username;
+        $allocation['template_checksum']         = (string)($formEntry['sha256'] ?? hash_file('sha256', $sourcePath));
+        $allocation['expected_filename_pattern'] = build_expected_filename_pattern(
+            $formCode,
+            (string)($allocation['form_revision'] ?? 'V0'),
+            (string)($allocation['record_id'] ?? ''),
+            $ext
+        );
+
+        $hiddenPayload = build_hidden_sheet_payload($allocation, $formEntry);
+        issue_offline_workbook_package($sourcePath, $issuedPath, $hiddenPayload);
+
+        $allocation['offline_package'] = [
+            'issued_path' => $issuedPath,
+            'filename'    => $filename,
+            'issued_at'   => $allocation['downloaded_at'],
+        ];
+        allocation_append_event($allocation, 'downloaded', $username, 'offline_package_issued', ['filename' => $filename]);
+        save_allocation_store($allocationStore);
+
+        $this->success([
+            'allocation_id' => $allocationId,
+            'filename'      => $filename,
+            'download_url'  => 'api.php?action=form_fill_download_offline&allocation_id=' . rawurlencode($allocationId) . '&download=1',
+            'allocation'    => $allocation,
+        ]);
+    }
+
+    // ── Private Helpers ──────────────────────────────────────────────────────
 
     /**
      * Find all departments that include a given record type.
