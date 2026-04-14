@@ -267,6 +267,9 @@ final class AdminMetadataStudioController extends BaseController
             'requiresRevision' => true,
             'maxPayloadBytes' => DataSchemaService::DETAIL_SAVE_MAX_BYTES,
             'conflictMode' => 'reject_stale_write',
+            'segmentedReads' => true,
+            'targetedRebuilds' => true,
+            'checksumGuard' => 'sha256',
             'auditTrail' => true,
         ];
     }

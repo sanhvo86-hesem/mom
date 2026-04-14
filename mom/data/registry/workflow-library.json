@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-14T14:17:11.540Z",
+    "generatedAt": "2026-04-14T14:56:45.549Z",
     "workflowCount": 335
   },
   "workflows": {
@@ -2306,7 +2306,7 @@
       ],
       "stateField": "status_code",
       "statusSet": "audit_status_code",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "guarded_transition_runtime",
       "states": [
         {
           "id": "draft",
@@ -8763,7 +8763,7 @@
       ],
       "stateField": "status_code",
       "statusSet": "deviation_status_code",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "guarded_transition_runtime",
       "states": [
         {
           "id": "pending",
@@ -12248,7 +12248,7 @@
       ],
       "stateField": "ecr_status",
       "statusSet": "engineering_change_requests_ecr_status",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "guarded_transition_runtime",
       "states": [
         {
           "id": "pending",
@@ -20015,7 +20015,7 @@
       ],
       "stateField": "improvement_status",
       "statusSet": "improvement_projects_improvement_status",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "guarded_transition_runtime",
       "states": [
         {
           "id": "draft",

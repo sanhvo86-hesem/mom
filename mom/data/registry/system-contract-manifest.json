@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T14:23:43.721Z",
+    "generatedAt": "2026-04-14T14:57:02.872Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
+    "publication_run_id": "6b44c138-a80f-4197-9680-48de7c9392ca",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -55,10 +55,31 @@
   },
   "artifacts": {
     "runtimeProjections": "data/registry/system-contract-runtime-projections.json",
+    "runtimeProjectionSegments": "data/registry/system-contract-runtime-projections-segments.json",
     "registryContracts": "data/registry/system-contract-registry-contracts.json",
     "diagnostics": "data/registry/system-contract-diagnostics.json",
     "manifest": "data/registry/system-contract-manifest.json",
     "graphicsGovernance": "data/registry/graphics-governance-registry.json"
+  },
+  "runtimeProjectionSegmentation": {
+    "status": "managed_by_sidecar_manifest",
+    "manifest": "data/registry/system-contract-runtime-projections-segments.json",
+    "segmentDirectory": "data/registry/system-contract-runtime-projections.segments",
+    "readPolicy": "Use segment manifest for section-level reads; reserve the full projection file for rebuild/proof.",
+    "revisionGuard": "sourceSha256",
+    "targetedRebuildPolicy": "Rebuild changed authority sections and refresh checksums before release.",
+    "summary": {
+      "segmentCount": 7,
+      "sourceSizeBytes": 11155222,
+      "totalSegmentSizeBytes": 11163719,
+      "largestSegmentId": "tables",
+      "largestSegmentSizeBytes": 6678095,
+      "allSegmentsChecksummed": true,
+      "segmentedReadReady": true,
+      "revisionGuard": "sourceSha256",
+      "staleWritePolicy": "reject_if_source_sha256_changed",
+      "targetedRebuildPolicy": "rebuild_changed_sections_then_refresh_manifest"
+    }
   },
   "graphicsReleaseLink": {
     "graphicsAuthorityRefs": [
@@ -110,7 +131,7 @@
     "endpointSource": "data/registry/endpoint-catalog.json",
     "workflowSource": "data/registry/workflow-library.json",
     "relationSource": "data/registry/relation-map.json",
-    "registryManifestRunId": "345bed0d-c9ce-4dcb-9119-4609292dde62",
+    "registryManifestRunId": "6b44c138-a80f-4197-9680-48de7c9392ca",
     "graphicsGovernanceSource": "data/registry/graphics-governance-registry.json"
   },
   "deletePolicy": {

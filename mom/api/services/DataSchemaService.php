@@ -63,6 +63,7 @@ final class DataSchemaService
         $systemContractManifest = $this->readJson($this->registryPath('system-contract-manifest'));
         $systemContractDiagnostics = $this->readJson($this->registryPath('system-contract-diagnostics'));
         $systemContractRuntimeProjections = $this->readArtifactEnvelope($this->registryPath('system-contract-runtime-projections'), ['_meta', 'summary']);
+        $systemContractRuntimeProjectionSegments = $this->readJson($this->registryPath('system-contract-runtime-projections-segments'));
         $systemContractRegistryContracts = $this->readJson($this->registryPath('system-contract-registry-contracts'));
         $schemaStudioManifest = $this->readJson($this->registryPath('schema-studio-enterprise-manifest'));
         $schemaStudioDiagnostics = $this->readJson($this->registryPath('schema-studio-diagnostics'));
@@ -128,6 +129,7 @@ final class DataSchemaService
             'contract_deprecation_ledger' => $contractDeprecationLedger,
             'contract_migration_manifest' => $contractMigrationManifest,
             'system_contract_runtime_projections' => $systemContractRuntimeProjections,
+            'system_contract_runtime_projection_segments' => $systemContractRuntimeProjectionSegments,
             'system_contract_registry_contracts' => $systemContractRegistryContracts,
             'system_contract_diagnostics' => $systemContractDiagnostics,
             'system_contract_manifest' => $systemContractManifest,
@@ -1073,6 +1075,7 @@ final class DataSchemaService
                 'path' => $this->registryPath('system-contract-runtime-projections'),
                 'targetAgeSeconds' => 14400,
                 'requiredForRelease' => true,
+                'segmentManifestPath' => $this->registryPath('system-contract-runtime-projections-segments'),
                 'dependencyPaths' => [
                     $this->registryPath('table-registry'),
                     $this->registryPath('relation-map'),
@@ -1080,6 +1083,16 @@ final class DataSchemaService
                     $this->registryPath('workflow-library'),
                     $this->registryPath('schema-authority-summary'),
                     $this->registryPath('global-erp-mom-capability-audit'),
+                ],
+            ],
+            'system_contract_runtime_projection_segments' => [
+                'label' => 'System contract runtime projection segment manifest',
+                'category' => 'authority',
+                'path' => $this->registryPath('system-contract-runtime-projections-segments'),
+                'targetAgeSeconds' => 14400,
+                'requiredForRelease' => true,
+                'dependencyPaths' => [
+                    $this->registryPath('system-contract-runtime-projections'),
                 ],
             ],
             'system_contract_registry_contracts' => [
@@ -1361,7 +1374,8 @@ final class DataSchemaService
                 (array)($documents[$id] ?? []),
                 !empty($spec['requiredForRelease']),
                 array_values(array_filter((array)$spec['dependencyPaths'], 'is_string')),
-                $knownDependencyTimestamps
+                $knownDependencyTimestamps,
+                (string)($spec['segmentManifestPath'] ?? '')
             );
             $items[] = $item;
             if (($item['exists'] ?? false) === true && is_int($item['ageSeconds'] ?? null)) {
@@ -1428,7 +1442,7 @@ final class DataSchemaService
     /**
      * @return array<string, mixed>
      */
-    private function artifactInventoryItem(string $id, string $label, string $category, string $path, int $targetAgeSeconds, array $payload, bool $requiredForRelease, array $dependencyPaths, array $knownDependencyTimestamps = []): array
+    private function artifactInventoryItem(string $id, string $label, string $category, string $path, int $targetAgeSeconds, array $payload, bool $requiredForRelease, array $dependencyPaths, array $knownDependencyTimestamps = [], string $segmentManifestPath = ''): array
     {
         clearstatcache(true, $path);
         $exists = is_file($path);
@@ -1461,6 +1475,7 @@ final class DataSchemaService
         $dependencyStatus = $dependencyPaths === []
             ? 'source_authority'
             : ($missingDependencyPaths !== [] ? 'source_missing' : ($sourceDriftSeconds > self::ARTIFACT_DEPENDENCY_GRACE_SECONDS ? 'outdated' : 'aligned'));
+        $segmentation = $this->artifactSegmentationStatus($path, $segmentManifestPath, $sizeBytes);
 
         $status = 'missing';
         if ($exists) {
@@ -1486,6 +1501,8 @@ final class DataSchemaService
             'sizeBytes' => $sizeBytes,
             'sizeLabel' => $this->humanBytes($sizeBytes),
             'dependencyStatus' => $dependencyStatus,
+            'segmented' => !empty($segmentation['ready']),
+            'segmentation' => $segmentation,
             'missingDependencyCount' => count($missingDependencyPaths),
             'missingDependencyPaths' => array_slice($missingDependencyPaths, 0, 8),
             'sourceDriftSeconds' => $sourceDriftSeconds,
@@ -1493,6 +1510,152 @@ final class DataSchemaService
             'latestDependencyAt' => $latestDependencyTimestamp !== null ? gmdate('c', $latestDependencyTimestamp) : '',
             'latestDependencyPath' => $latestDependencyPath !== '' ? $this->relativePath($latestDependencyPath) : '',
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function artifactSegmentationStatus(string $artifactPath, string $manifestPath, int $artifactSizeBytes): array
+    {
+        if ($manifestPath === '') {
+            return [
+                'ready' => false,
+                'status' => 'not_configured',
+                'manifestPath' => '',
+                'reason' => 'No segment manifest is configured for this artifact.',
+            ];
+        }
+
+        $relativeManifestPath = $this->relativePath($manifestPath);
+        if (!is_file($manifestPath)) {
+            return [
+                'ready' => false,
+                'status' => 'missing_manifest',
+                'manifestPath' => $relativeManifestPath,
+                'reason' => 'The configured segment manifest is missing.',
+            ];
+        }
+
+        $manifest = $this->readJson($manifestPath);
+        $summary = is_array($manifest['summary'] ?? null) ? $manifest['summary'] : [];
+        $segments = array_values(array_filter((array)($manifest['segments'] ?? []), 'is_array'));
+        $sourceArtifact = (string)($manifest['_meta']['sourceArtifact'] ?? $manifest['sourceGovernance']['fullArtifact'] ?? '');
+        $sourceSha256 = (string)($manifest['_meta']['sourceSha256'] ?? '');
+        $actualSourceSha256 = is_file($artifactPath) ? $this->sha256File($artifactPath) : '';
+        $issues = [];
+
+        if ($sourceArtifact !== '' && !in_array($sourceArtifact, $this->relativePathAliases($artifactPath), true)) {
+            $issues[] = 'source_artifact_mismatch';
+        }
+        if ((int)($summary['sourceSizeBytes'] ?? $manifest['_meta']['sourceSizeBytes'] ?? 0) !== $artifactSizeBytes) {
+            $issues[] = 'source_size_mismatch';
+        }
+        if ($sourceSha256 === '' || $actualSourceSha256 === '' || !hash_equals($sourceSha256, $actualSourceSha256)) {
+            $issues[] = 'source_checksum_mismatch';
+        }
+        if ($segments === []) {
+            $issues[] = 'segments_missing';
+        }
+
+        $largestSegmentSize = 0;
+        $checkedSegments = 0;
+        foreach ($segments as $segment) {
+            $relativePath = trim((string)($segment['path'] ?? ''));
+            $expectedSize = (int)($segment['sizeBytes'] ?? 0);
+            $expectedSha256 = (string)($segment['sha256'] ?? '');
+            if ($relativePath === '' || $expectedSha256 === '') {
+                $issues[] = 'segment_metadata_missing';
+                continue;
+            }
+            $segmentPath = $this->workspacePath($relativePath);
+            if ($segmentPath === '' || !is_file($segmentPath)) {
+                $issues[] = 'segment_file_missing';
+                continue;
+            }
+            $actualSize = (int)(filesize($segmentPath) ?: 0);
+            $largestSegmentSize = max($largestSegmentSize, $actualSize);
+            if ($expectedSize > 0 && $expectedSize !== $actualSize) {
+                $issues[] = 'segment_size_mismatch';
+                continue;
+            }
+            if (!hash_equals($expectedSha256, $this->sha256File($segmentPath))) {
+                $issues[] = 'segment_checksum_mismatch';
+                continue;
+            }
+            $checkedSegments++;
+        }
+
+        $issues = array_values(array_unique($issues));
+        $ready = $issues === []
+            && $checkedSegments >= 2
+            && $artifactSizeBytes > 0
+            && $largestSegmentSize > 0
+            && $largestSegmentSize < $artifactSizeBytes;
+
+        return [
+            'ready' => $ready,
+            'status' => $ready ? 'ready' : 'invalid',
+            'manifestPath' => $relativeManifestPath,
+            'segmentCount' => count($segments),
+            'checkedSegmentCount' => $checkedSegments,
+            'sourceSha256' => $sourceSha256,
+            'sourceSizeBytes' => (int)($summary['sourceSizeBytes'] ?? $manifest['_meta']['sourceSizeBytes'] ?? 0),
+            'largestSegmentSizeBytes' => max($largestSegmentSize, (int)($summary['largestSegmentSizeBytes'] ?? 0)),
+            'largestSegmentSizeLabel' => $this->humanBytes(max($largestSegmentSize, (int)($summary['largestSegmentSizeBytes'] ?? 0))),
+            'revisionGuard' => (string)($summary['revisionGuard'] ?? 'sourceSha256'),
+            'targetedRebuildPolicy' => (string)($summary['targetedRebuildPolicy'] ?? ''),
+            'readProfiles' => is_array($manifest['readProfiles'] ?? null) ? $manifest['readProfiles'] : [],
+            'issues' => $issues,
+            'reason' => $ready ? 'Segment manifest matches the full artifact checksum and all segment checksums.' : implode(', ', $issues),
+        ];
+    }
+
+    private function workspacePath(string $relativePath): string
+    {
+        $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+        if ($relativePath === '' || str_contains($relativePath, "\0")) {
+            return '';
+        }
+        $candidates = [$this->rootDir . '/' . $relativePath];
+        if (!str_starts_with($relativePath, 'mom/')) {
+            $candidates[] = $this->rootDir . '/mom/' . $relativePath;
+        }
+
+        foreach ($candidates as $path) {
+            try {
+                $this->relativePath($path);
+            } catch (Throwable) {
+                continue;
+            }
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function relativePathAliases(string $path): array
+    {
+        $relative = $this->relativePath($path);
+        $aliases = [$relative];
+        if (str_starts_with($relative, 'mom/')) {
+            $aliases[] = substr($relative, 4);
+        }
+
+        return array_values(array_unique(array_filter($aliases, static fn(string $item): bool => $item !== '')));
+    }
+
+    private function sha256File(string $path): string
+    {
+        if (!is_file($path)) {
+            return '';
+        }
+        $hash = hash_file('sha256', $path);
+        return is_string($hash) ? $hash : '';
     }
 
     private function artifactTimestampForPath(string $path, array $payload = []): ?int
@@ -2004,6 +2167,7 @@ final class DataSchemaService
 
         $staleAuthority = [];
         $heavyArtifacts = [];
+        $segmentedArtifacts = [];
         $dependencyOutdated = [];
         foreach ($artifactItems as $item) {
             $status = (string)($item['status'] ?? '');
@@ -2011,12 +2175,16 @@ final class DataSchemaService
             if (!empty($item['requiredForRelease']) && in_array($status, ['missing', 'stale'], true) && $category === 'authority') {
                 $staleAuthority[] = (string)($item['label'] ?? $item['id'] ?? 'artifact');
             }
+            if (!empty($item['segmented']) && is_array($item['segmentation'] ?? null)) {
+                $segmentedArtifacts[] = $item;
+            }
             if (
                 (int)($item['sizeBytes'] ?? 0) >= self::LARGE_ARTIFACT_WARN_BYTES
                 && !(
                     $endpointCatalogIndexAvailable
                     && (string)($item['id'] ?? '') === 'endpoint_catalog'
                 )
+                && empty($item['segmented'])
             ) {
                 $heavyArtifacts[] = $item;
             }
@@ -2306,6 +2474,26 @@ final class DataSchemaService
                 'reasons' => array_slice($releaseReasons, 0, 8),
             ],
             'saveGuard' => $savePolicy,
+            'artifactAccess' => [
+                'segmentedArtifactCount' => count($segmentedArtifacts),
+                'largeArtifactRiskCount' => count($heavyArtifacts),
+                'policy' => 'Large generated registry files must expose indexed or segmented reads plus revision/checksum guarded regeneration before they are considered operationally safe.',
+                'segmentedArtifacts' => array_map(static function (array $item): array {
+                    $segmentation = $item['segmentation'];
+                    if (!is_array($segmentation)) {
+                        $segmentation = [];
+                    }
+                    return [
+                        'id' => (string)($item['id'] ?? ''),
+                        'label' => (string)($item['label'] ?? ''),
+                        'manifestPath' => (string)($segmentation['manifestPath'] ?? ''),
+                        'segmentCount' => (int)($segmentation['segmentCount'] ?? 0),
+                        'largestSegmentSizeLabel' => (string)($segmentation['largestSegmentSizeLabel'] ?? ''),
+                        'revisionGuard' => (string)($segmentation['revisionGuard'] ?? ''),
+                        'targetedRebuildPolicy' => (string)($segmentation['targetedRebuildPolicy'] ?? ''),
+                    ];
+                }, array_slice($segmentedArtifacts, 0, 8)),
+            ],
             'quality' => [
                 'publishabilityStatus' => (string)($publishability['status'] ?? ''),
                 'publishabilityReady' => (bool)($publishability['ready'] ?? false),
@@ -2328,6 +2516,9 @@ final class DataSchemaService
             'requiresRevision' => true,
             'maxPayloadBytes' => self::DETAIL_SAVE_MAX_BYTES,
             'conflictMode' => 'reject_stale_write',
+            'segmentedReads' => true,
+            'targetedRebuilds' => true,
+            'checksumGuard' => 'sha256',
             'auditTrail' => true,
         ];
     }

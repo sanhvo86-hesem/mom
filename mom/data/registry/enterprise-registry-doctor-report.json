@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T14:17:22.586947+00:00",
+    "generatedAt": "2026-04-14T14:56:57.305745+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -36,7 +36,7 @@
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
       "runtimeUnsafeExposed": 0,
-      "runtimeUnsafeBlocked": 1047,
+      "runtimeUnsafeBlocked": 1032,
       "missingWriteRequestSchemaRef": 0
     },
     "businessContracts": {
@@ -53,7 +53,7 @@
     },
     "governance": {
       "manifestDeletionModes": {
-        "hard_delete": 0,
+        "hard_delete": 12,
         "soft_delete": 63,
         "archive_only": 697
       },
@@ -70,7 +70,7 @@
       "evidence": {
         "gapCounts": {
           "generic_runtime_classification": 555,
-          "runtime_safe_false": 1047
+          "runtime_safe_false": 1032
         },
         "classificationSummary": {
           "authorityClass": {
@@ -84,8 +84,8 @@
           "exposure": {
             "admin_governance": 258,
             "admin_or_internal": 333,
-            "blocked_runtime_internal": 1047,
-            "frontend_process": 1595,
+            "blocked_runtime_internal": 1032,
+            "frontend_process": 1610,
             "machine_or_operator_ui": 404,
             "needs_owner_review": 555
           },
@@ -97,7 +97,7 @@
           },
           "gapCounts": {
             "generic_runtime_classification": 555,
-            "runtime_safe_false": 1047
+            "runtime_safe_false": 1032
           }
         }
       },

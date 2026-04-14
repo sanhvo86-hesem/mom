@@ -324,7 +324,125 @@ function applyCanonicalPatternOverrides(tableRegistry, canonicalCatalog) {
 }
 
 function writeJson(filePath, value) {
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  const existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+  const pretty = existing.startsWith('{\n') || existing.startsWith('[\n');
+  const text = pretty ? JSON.stringify(value, null, 2) : JSON.stringify(value);
+  fs.writeFileSync(filePath, `${text}\n`, 'utf8');
+}
+
+function mergeExistingEndpointCatalog(generatedCatalog) {
+  const filePath = path.join(registryDir, 'endpoint-catalog.json');
+  if (!fs.existsSync(filePath)) return generatedCatalog;
+  const existing = readJson(filePath);
+  const existingEndpoints = existing?.endpoints && typeof existing.endpoints === 'object' ? existing.endpoints : {};
+  const generatedEndpoints = generatedCatalog?.endpoints && typeof generatedCatalog.endpoints === 'object' ? generatedCatalog.endpoints : {};
+  const endpoints = { ...existingEndpoints, ...generatedEndpoints };
+  const endpointCount = Object.keys(endpoints).length;
+  return {
+    ...generatedCatalog,
+    _meta: {
+      ...(existing?._meta || {}),
+      ...(generatedCatalog?._meta || {}),
+      endpointCount,
+      totalEndpoints: endpointCount,
+      preservedEndpointCount: endpointCount - Object.keys(generatedEndpoints).length,
+    },
+    endpoints,
+  };
+}
+
+function mergeExistingDomainFieldPacks(generatedPacks) {
+  const filePath = path.join(registryDir, 'domain-field-packs.json');
+  if (!fs.existsSync(filePath)) return generatedPacks;
+  const existing = readJson(filePath);
+  const existingPacks = existing?.packs && typeof existing.packs === 'object' ? existing.packs : {};
+  const nextPacks = generatedPacks?.packs && typeof generatedPacks.packs === 'object' ? generatedPacks.packs : {};
+  const packs = { ...existingPacks, ...nextPacks };
+  return {
+    ...generatedPacks,
+    _meta: {
+      ...(existing?._meta || {}),
+      ...(generatedPacks?._meta || {}),
+      packCount: Object.keys(packs).length,
+      preservedPackCount: Object.keys(packs).length - Object.keys(nextPacks).length,
+    },
+    packs,
+  };
+}
+
+function frontendSummaryFromEntities(entities) {
+  const values = Object.values(entities || {}).filter((entity) => entity && typeof entity === 'object');
+  const ready = values.filter((entity) => entity?.readiness?.verdict === 'ready');
+  const partial = values.filter((entity) => entity?.readiness?.verdict === 'partial');
+  const blocked = values.filter((entity) => entity?.readiness?.verdict === 'blocked');
+  return {
+    entity_count: values.length,
+    ready_entities: ready.length,
+    partial_entities: partial.length,
+    blocked_entities: blocked.length,
+    archive_isolation_entities: values.filter((entity) => entity?.readiness?.archive_isolation === true).length,
+    workflow_ready_entities: values.filter((entity) => entity?.capabilities?.workflow?.state === 'ready' || entity?.readiness?.workflow_ready === true).length,
+    related_ready_entities: values.filter((entity) => entity?.capabilities?.related_data?.state === 'ready').length,
+    analytics_ready_entities: values.filter((entity) => entity?.capabilities?.analytics?.state === 'ready').length,
+    planning_console_entities: values.filter((entity) => entity?.profile === 'planning_console').length,
+    operator_console_entities: values.filter((entity) => entity?.profile === 'operator_console').length,
+    attachment_contract_entities: values.filter((entity) => entity?.interaction_contracts?.attachments?.list_endpoint).length,
+    comment_contract_entities: values.filter((entity) => entity?.interaction_contracts?.comments?.list_endpoint).length,
+    activity_contract_entities: values.filter((entity) => entity?.interaction_contracts?.activities?.list_endpoint).length,
+  };
+}
+
+function mergeExistingFrontendFoundationCatalog(generatedCatalog) {
+  const filePath = path.join(registryDir, 'frontend-foundation-catalog.json');
+  if (!fs.existsSync(filePath)) return generatedCatalog;
+  const existing = readJson(filePath);
+  const existingEntities = existing?.entities && typeof existing.entities === 'object' ? existing.entities : {};
+  const generatedEntities = generatedCatalog?.entities && typeof generatedCatalog.entities === 'object' ? generatedCatalog.entities : {};
+  const entities = { ...existingEntities, ...generatedEntities };
+  return {
+    ...generatedCatalog,
+    _meta: {
+      ...(existing?._meta || {}),
+      ...(generatedCatalog?._meta || {}),
+      preservedEntityCount: Object.keys(entities).length - Object.keys(generatedEntities).length,
+    },
+    summary: frontendSummaryFromEntities(entities),
+    entities,
+  };
+}
+
+function mergeExistingManifest(generatedManifest) {
+  const filePath = path.join(registryDir, 'registry-manifest.json');
+  if (!fs.existsSync(filePath)) return generatedManifest;
+  const existing = readJson(filePath);
+  return {
+    ...generatedManifest,
+    _meta: {
+      ...(existing?._meta || {}),
+      ...(generatedManifest?._meta || {}),
+    },
+    coverage: {
+      ...(existing?.coverage || {}),
+      ...(generatedManifest?.coverage || {}),
+    },
+    assets: {
+      ...(existing?.assets || {}),
+      ...(generatedManifest?.assets || {}),
+    },
+  };
+}
+
+function mergeExistingQualityReport(generatedReport) {
+  const filePath = path.join(registryDir, 'registry-quality-report.json');
+  if (!fs.existsSync(filePath)) return generatedReport;
+  const existing = readJson(filePath);
+  return {
+    ...generatedReport,
+    _meta: {
+      ...(existing?._meta || {}),
+      ...(generatedReport?._meta || {}),
+    },
+  };
 }
 
 function loadWave1LifecycleNormalization(registryDir) {
@@ -348,6 +466,10 @@ function applyWave1LifecycleOverrides(tableRegistry, workflowLibrary, normalizat
     }
     if (statusSet) {
       table.statusSet = statusSet;
+    }
+    const lifecycleMode = String(override.lifecycle_mode || '').trim();
+    if (workflow && lifecycleMode) {
+      workflow.lifecycleMode = lifecycleMode;
     }
   }
   return tableRegistry;
@@ -572,6 +694,54 @@ function loadDataFields() {
   delete merged.parts;
   delete merged.split;
   return merged;
+}
+
+function registryTableFields(dataFields, domain, tableName) {
+  const direct = dataFields[`${domain}.${tableName}.fields`];
+  if (Array.isArray(direct)) return direct;
+  const registry = dataFields[`registry.${tableName}.fields`];
+  if (Array.isArray(registry)) return registry;
+  return [];
+}
+
+function fieldsForRuntimeKind(table, fields, kind) {
+  const normalized = Array.isArray(fields) ? fields : [];
+  if (kind === 'list' || kind === 'detail') return normalized;
+  const columns = table?.columns || {};
+  const isWritable = (field) => {
+    const key = String(field?.dbColumn || field?.key || '').trim();
+    if (!key) return false;
+    if (SYSTEM_MANAGED_FIELDS.has(key)) return false;
+    if (field?.primaryKey === true) return false;
+    const column = columns[key] || {};
+    return column?.generated !== true;
+  };
+  if (kind === 'transition') {
+    const statusColumn = String(table?.statusColumn || '').trim();
+    return normalized.filter((field) => String(field?.dbColumn || field?.key || '') === statusColumn);
+  }
+  return normalized.filter(isWritable);
+}
+
+function normalizeDataFieldsForRuntime(dataFields, tableRegistry) {
+  const normalized = { ...dataFields };
+  for (const [tableName, table] of Object.entries(tableRegistry?.tables || {})) {
+    const domain = String(table?.domain || '').trim();
+    if (!domain) continue;
+    const fields = registryTableFields(dataFields, domain, tableName);
+    if (!fields.length) continue;
+    for (const kind of supportedEndpointKinds(table)) {
+      const action = `${domain}.${tableName}.${kind}`;
+      if (!Array.isArray(normalized[action])) {
+        normalized[action] = fieldsForRuntimeKind(table, fields, kind);
+      }
+    }
+  }
+  normalized._meta = {
+    ...(normalized._meta || {}),
+    runtimeActionProjection: 'derived_from_registry_table_fields',
+  };
+  return normalized;
 }
 
 function primaryKeyMeta(table) {
@@ -2520,12 +2690,13 @@ function buildEndpointCatalogIndex(endpointCatalog) {
 
   return {
     _meta: {
-      version: '1.0',
-      description: 'Compact endpoint index for admin/runtime workspace lists and metrics.',
+      version: '1.1',
+      description: 'Compact endpoint index for admin/runtime workspace lists and metrics. Rebuilt from endpoint-catalog.json after canonical onboarding.',
       generatedAt,
       endpointCount: rows.length,
-      activeEndpoints: Number(endpointCatalog?._meta?.activeEndpoints || 0),
+      activeEndpoints: rows.length - Number(endpointCatalog?._meta?.blockedEndpoints || 0),
       blockedEndpoints: Number(endpointCatalog?._meta?.blockedEndpoints || 0),
+      implementationLinkedCount: rows.length,
       sourceArtifact: 'endpoint-catalog.json',
     },
     rows,
@@ -3080,7 +3251,7 @@ function buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, r
     { id: 'idempotency_contracts', passed: idempotencyContractIssues.length === 0, actual: idempotencyContractIssues.length, target: 0 },
     { id: 'org_scope_contracts', passed: orgScopeContractIssues.length === 0, actual: orgScopeContractIssues.length, target: 0 },
     { id: 'frontend_record_readiness', passed: missingPkTables.length === 0, actual: missingPkTables.length, target: 0 },
-    { id: 'frontend_foundation_coverage', passed: frontendContracts.length === tableNames.length, actual: frontendContracts.length, target: tableNames.length },
+    { id: 'frontend_foundation_coverage', passed: frontendContracts.length >= tableNames.length, actual: frontendContracts.length, target: tableNames.length },
     { id: 'no_unsupported_record_endpoints', passed: unsupportedRecordEndpoints.length === 0, actual: unsupportedRecordEndpoints.length, target: 0 },
     { id: 'endpoint_contract_readiness', passed: contractIssues.length === 0, actual: contractIssues.length, target: 0 },
     { id: 'workflow_status_alignment', passed: workflowAlignmentIssues.length === 0, actual: workflowAlignmentIssues.length, target: 0 },
@@ -3228,7 +3399,7 @@ function main() {
   const tableRegistry = readJson(path.join(registryDir, 'table-registry.json'));
   const domainArchitecture = readJson(path.join(registryDir, 'domain-architecture.json'));
   const canonicalCatalog = readJson(path.join(registryDir, 'canonical-backend-standardization-catalog.json'));
-  const dataFields = loadDataFields();
+  const rawDataFields = loadDataFields();
   const workflowLibrary = readJson(path.join(registryDir, 'workflow-library.json'));
   const wave1LifecycleNormalization = loadWave1LifecycleNormalization(registryDir);
   const validationRules = readJson(path.join(registryDir, 'validation-rules.json'));
@@ -3237,13 +3408,14 @@ function main() {
   const fieldTypes = readJson(path.join(registryDir, 'field-types.json'));
   applyWave1LifecycleOverrides(tableRegistry, workflowLibrary, wave1LifecycleNormalization);
   applyCanonicalPatternOverrides(tableRegistry, canonicalCatalog);
+  const dataFields = normalizeDataFieldsForRuntime(rawDataFields, tableRegistry);
 
-  const endpointCatalog = buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions);
+  const endpointCatalog = mergeExistingEndpointCatalog(buildEndpointCatalog(tableRegistry, domainArchitecture, dataFields, workflowLibrary, statusOptions));
   const endpointCatalogIndex = buildEndpointCatalogIndex(endpointCatalog);
   const runtimeAccessPolicy = buildRuntimeAccessPolicy(tableRegistry, domainArchitecture);
-  const packs = buildDomainFieldPacks(tableRegistry, dataFields);
+  const packs = mergeExistingDomainFieldPacks(buildDomainFieldPacks(tableRegistry, dataFields));
   const relationMap = buildRelationMap(tableRegistry);
-  const frontendFoundation = buildFrontendFoundationCatalog(
+  const frontendFoundation = mergeExistingFrontendFoundationCatalog(buildFrontendFoundationCatalog(
     tableRegistry,
     dataFields,
     endpointCatalog,
@@ -3251,9 +3423,9 @@ function main() {
     workflowLibrary,
     formulas,
     isolatedLegacyTables(canonicalCatalog),
-  );
-  const manifest = buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields, frontendFoundation);
-  const qualityReport = buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, frontendFoundation);
+  ));
+  const manifest = mergeExistingManifest(buildManifest(endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, fieldTypes, dataFields, frontendFoundation));
+  const qualityReport = mergeExistingQualityReport(buildQualityReport(tableRegistry, dataFields, endpointCatalog, packs, relationMap, workflowLibrary, validationRules, formulas, statusOptions, frontendFoundation));
 
   writeJson(path.join(registryDir, 'endpoint-catalog.json'), endpointCatalog);
   writeJson(path.join(registryDir, 'endpoint-catalog-index.json'), endpointCatalogIndex);

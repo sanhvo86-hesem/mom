@@ -492,6 +492,21 @@ smoke_assert(
     count((array)($response['payload']['workspace']['lists']['tables'] ?? [])) > 0,
     'Admin data schema summary payload should include table summaries.'
 );
+$operational = (array)($response['payload']['workspace']['operational'] ?? []);
+$artifactAccess = (array)($operational['artifactAccess'] ?? []);
+$runtimeProjectionArtifact = null;
+foreach ((array)($operational['freshness']['artifacts'] ?? []) as $artifact) {
+    if (is_array($artifact) && (string)($artifact['id'] ?? '') === 'system_contract_runtime_projections') {
+        $runtimeProjectionArtifact = $artifact;
+        break;
+    }
+}
+smoke_assert((int)($artifactAccess['largeArtifactRiskCount'] ?? -1) === 0, 'Segmented registry artifacts should not be reported as large-artifact operational risks.');
+smoke_assert((int)($artifactAccess['segmentedArtifactCount'] ?? 0) >= 1, 'Data Schema operational state should expose segmented artifact proof.');
+smoke_assert(is_array($runtimeProjectionArtifact), 'Runtime projection artifact should be present in freshness inventory.');
+smoke_assert(!empty($runtimeProjectionArtifact['segmented']), 'Runtime projection artifact should be covered by a segment manifest.');
+smoke_assert((string)(($runtimeProjectionArtifact['segmentation'] ?? [])['status'] ?? '') === 'ready', 'Runtime projection segment manifest should validate as ready.');
+smoke_assert((int)(($runtimeProjectionArtifact['segmentation'] ?? [])['segmentCount'] ?? 0) >= 2, 'Runtime projection segment manifest should expose multiple bounded sections.');
 
 data_schema_smoke_reset_request_state();
 data_schema_smoke_trace('summary-viewer');

@@ -6,7 +6,7 @@ Fails if any publication artifact is missing, stale, inconsistent, or contradict
 Designed to be run as a CI/smoke gate.
 """
 from __future__ import annotations
-import json, sys, os, subprocess
+import hashlib, json, sys, os, subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -66,6 +66,7 @@ REQUIRED_ARTIFACTS = [
     REG / "global-erp-mom-capability-catalog.json",
     REG / "global-erp-mom-capability-audit.json",
     REG / "system-contract-runtime-projections.json",
+    REG / "system-contract-runtime-projections-segments.json",
     REG / "system-contract-registry-contracts.json",
     REG / "system-contract-diagnostics.json",
     REG / "system-contract-manifest.json",
@@ -132,6 +133,17 @@ def collect_graphics_evidence_refs(value, refs: set[str]) -> None:
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+def sha256_file(path: Path) -> str:
+    hasher = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+def portal_relative_path(path_text: str) -> Path:
+    clean = path_text.strip().replace("\\", "/").lstrip("/")
+    return PORTAL / clean
 
 def finish() -> int:
     total = checks_passed + checks_failed
@@ -328,11 +340,13 @@ def main() -> int:
     # Gate J2: System contract authority must be full and DB-derived
     print("\nGate J2: System contract authority")
     system_runtime_path = REG / "system-contract-runtime-projections.json"
+    system_segments_path = REG / "system-contract-runtime-projections-segments.json"
     system_contracts_path = REG / "system-contract-registry-contracts.json"
     system_diagnostics_path = REG / "system-contract-diagnostics.json"
     system_manifest_path = REG / "system-contract-manifest.json"
-    if all(p.is_file() for p in [system_runtime_path, system_contracts_path, system_diagnostics_path, system_manifest_path]):
+    if all(p.is_file() for p in [system_runtime_path, system_segments_path, system_contracts_path, system_diagnostics_path, system_manifest_path]):
         system_runtime = load(system_runtime_path)
+        system_segments = load(system_segments_path)
         system_contracts = load(system_contracts_path)
         system_diagnostics = load(system_diagnostics_path)
         system_manifest = load(system_manifest_path)
@@ -373,6 +387,38 @@ def main() -> int:
         check("system_contract_diagnostics_clear_blockers",
               diagnostics_summary.get("criticalGapCount") == 0 and diagnostics_summary.get("blockerCount") == 0,
               f"critical={diagnostics_summary.get('criticalGapCount')} blockers={diagnostics_summary.get('blockerCount')}")
+        segment_meta = system_segments.get("_meta", {})
+        segment_summary = system_segments.get("summary", {})
+        segments = [row for row in (system_segments.get("segments") or []) if isinstance(row, dict)]
+        runtime_sha256 = sha256_file(system_runtime_path)
+        checked_segments = 0
+        segment_errors = []
+        for segment in segments:
+            segment_path = portal_relative_path(str(segment.get("path") or ""))
+            if not segment_path.is_file():
+                segment_errors.append(f"missing:{segment.get('id')}")
+                continue
+            if int(segment.get("sizeBytes") or 0) != segment_path.stat().st_size:
+                segment_errors.append(f"size:{segment.get('id')}")
+                continue
+            if str(segment.get("sha256") or "") != sha256_file(segment_path):
+                segment_errors.append(f"sha:{segment.get('id')}")
+                continue
+            checked_segments += 1
+        check("system_contract_runtime_segments_manifest_present",
+              system_segments_path.is_file() and system_manifest.get("artifacts", {}).get("runtimeProjectionSegments"),
+              "runtime projection segment manifest not linked from system-contract-manifest")
+        check("system_contract_runtime_segments_source_checksum",
+              segment_meta.get("sourceSha256") == runtime_sha256,
+              f"manifest={segment_meta.get('sourceSha256')} runtime={runtime_sha256}")
+        check("system_contract_runtime_segments_all_checksummed",
+              checked_segments == len(segments) and len(segments) >= 2 and not segment_errors,
+              f"checked={checked_segments} total={len(segments)} errors={segment_errors[:5]}")
+        check("system_contract_runtime_segments_bound_large_artifact",
+              int(segment_summary.get("largestSegmentSizeBytes") or 0) > 0
+              and int(segment_summary.get("largestSegmentSizeBytes") or 0) < system_runtime_path.stat().st_size
+              and segment_summary.get("segmentedReadReady") is True,
+              f"largest={segment_summary.get('largestSegmentSizeBytes')} source={system_runtime_path.stat().st_size} ready={segment_summary.get('segmentedReadReady')}")
 
     # Gate J3: Graphics governance authority contract
     active_graphics_release_blockers = []

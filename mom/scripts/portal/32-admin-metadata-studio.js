@@ -907,6 +907,7 @@ function _renderOverview(){
   var coverageGaps = Array.isArray(operational.coverageGaps) ? operational.coverageGaps : [];
   var freshness = operational.freshness || {};
   var freshnessArtifacts = Array.isArray(freshness.artifacts) ? freshness.artifacts : [];
+  var artifactAccess = operational.artifactAccess || {};
   var releaseGate = operational.releaseGate || {};
   var saveGuard = operational.saveGuard || ws.save_policy || {};
   var blindSpotSummary = audits.blind_spots && audits.blind_spots.summary ? audits.blind_spots.summary : {};
@@ -958,7 +959,7 @@ function _renderOverview(){
         '<div class="ds-hero-card">',
           '<small>' + _esc(_t('Save guard', 'Save guard')) + '</small>',
           '<strong class="tone-' + _esc(saveGuard.requiresRevision ? 'good' : 'warn') + '">' + _esc(saveGuard.requiresRevision ? _t('Revision locked', 'Revision locked') : _t('Unsafe', 'Unsafe')) + '</strong>',
-          '<p>' + _esc(_t('Payload limit', 'Payload limit') + ': ' + _fmtBytes(saveGuard.maxPayloadBytes || 0)) + '</p>',
+          '<p>' + _esc(_t('Payload limit', 'Payload limit') + ': ' + _fmtBytes(saveGuard.maxPayloadBytes || 0) + (saveGuard.segmentedReads ? ' · ' + _t('Segmented reads', 'Segmented reads') : '')) + '</p>',
         '</div>',
       '</div>',
     '</section>',
@@ -1006,6 +1007,8 @@ function _renderOverview(){
             '<div><span>' + _esc(_t('Unlinked components', 'Unlinked components')) + '</span><strong class="tone-' + _esc((Number(metrics.unlinked_endpoint_count || 0) + Number(metrics.unlinked_table_count || 0)) ? 'bad' : 'good') + '">' + _esc(_fmtInt(Number(metrics.unlinked_endpoint_count || 0) + Number(metrics.unlinked_table_count || 0))) + '</strong></div>',
             '<div><span>' + _esc(_t('Artifact drift', 'Artifact drift')) + '</span><strong class="tone-' + _esc(_tone(freshness.driftStatus || 'neutral')) + '">' + _esc(freshness.driftLabel || '—') + '</strong></div>',
             '<div><span>' + _esc(_t('Dependency drift', 'Dependency drift')) + '</span><strong class="tone-' + _esc((metrics.dependency_outdated_artifact_count ? 'warn' : 'good')) + '">' + _esc(_fmtInt(metrics.dependency_outdated_artifact_count)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Segmented artifacts', 'Segmented artifacts')) + '</span><strong class="tone-' + _esc((artifactAccess.segmentedArtifactCount ? 'good' : 'warn')) + '">' + _esc(_fmtInt(artifactAccess.segmentedArtifactCount || 0)) + '</strong></div>',
+            '<div><span>' + _esc(_t('Large artifact risks', 'Large artifact risks')) + '</span><strong class="tone-' + _esc((artifactAccess.largeArtifactRiskCount ? 'warn' : 'good')) + '">' + _esc(_fmtInt(artifactAccess.largeArtifactRiskCount || 0)) + '</strong></div>',
             '<div><span>' + _esc(_t('Blind spots critical', 'Blind spots critical')) + '</span><strong class="tone-' + _esc((blindSpotSummary.critical ? 'bad' : 'good')) + '">' + _esc(_fmtInt(blindSpotSummary.critical)) + '</strong></div>',
             '<div><span>' + _esc(_t('Stress paths critical', 'Stress paths critical')) + '</span><strong class="tone-' + _esc((stressSummary.critical ? 'bad' : 'good')) + '">' + _esc(_fmtInt(stressSummary.critical)) + '</strong></div>',
             '<div><span>' + _esc(_t('Release gate', 'Release gate')) + '</span><strong class="tone-' + _esc(_tone(releaseGate.blocking ? 'blocked' : (releaseGate.status || 'neutral'))) + '">' + _esc(releaseGate.status || '—') + '</strong></div>',
@@ -1118,7 +1121,12 @@ function _renderArtifactFreshnessTable(rows){
       : dependencyStatus;
     var sourceDrift = _badge(dependencyLabel, _tone(dependencyStatus || 'neutral'));
     var releaseBadge = row.requiredForRelease ? _badge(_t('release', 'release'), 'warn') : '';
-    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div><div class="ds-chip-row">' + releaseBadge + '</div></td><td>' + _badge(row.category || 'artifact', 'neutral') + '</td><td>' + _badge(row.status || 'unknown', _tone(row.status || 'neutral')) + '</td><td>' + _esc(row.ageLabel || '—') + '<div class="ds-table-note">' + _esc(_fmtTime(row.generatedAt || row.fileMtime)) + '</div></td><td>' + sourceDrift + '<div class="ds-table-note">' + _esc(row.sourceDriftLabel || '0s') + (row.latestDependencyAt ? ' · ' + _esc(_fmtTime(row.latestDependencyAt)) : '') + '</div>' + (row.latestDependencyPath ? '<div class="ds-table-note"><code>' + _esc(row.latestDependencyPath) + '</code></div>' : '') + '</td><td>' + _esc(row.sizeLabel || _fmtBytes(row.sizeBytes || 0)) + '</td><td><code>' + _esc(row.path || '') + '</code></td></tr>';
+    var segmentation = row.segmentation || {};
+    var segmentBadge = row.segmented ? _badge(_t('segmented', 'segmented'), 'good') : '';
+    var segmentNote = row.segmented
+      ? '<div class="ds-table-note">' + _esc(_t('Segments', 'Segments') + ': ' + _fmtInt(segmentation.segmentCount || 0) + ' · ' + _t('largest', 'largest') + ': ' + (segmentation.largestSegmentSizeLabel || '—')) + '</div>'
+      : '';
+    return '<tr><td><strong>' + _esc(row.label || row.id) + '</strong><div class="ds-table-note">' + _esc(row.id || '') + '</div><div class="ds-chip-row">' + releaseBadge + segmentBadge + '</div></td><td>' + _badge(row.category || 'artifact', 'neutral') + '</td><td>' + _badge(row.status || 'unknown', _tone(row.status || 'neutral')) + '</td><td>' + _esc(row.ageLabel || '—') + '<div class="ds-table-note">' + _esc(_fmtTime(row.generatedAt || row.fileMtime)) + '</div></td><td>' + sourceDrift + '<div class="ds-table-note">' + _esc(row.sourceDriftLabel || '0s') + (row.latestDependencyAt ? ' · ' + _esc(_fmtTime(row.latestDependencyAt)) : '') + '</div>' + (row.latestDependencyPath ? '<div class="ds-table-note"><code>' + _esc(row.latestDependencyPath) + '</code></div>' : '') + '</td><td>' + _esc(row.sizeLabel || _fmtBytes(row.sizeBytes || 0)) + segmentNote + '</td><td><code>' + _esc(row.path || '') + '</code>' + (row.segmented && segmentation.manifestPath ? '<div class="ds-table-note"><code>' + _esc(segmentation.manifestPath) + '</code></div>' : '') + '</td></tr>';
   }).join('') + '</tbody></table></div>';
 }
 

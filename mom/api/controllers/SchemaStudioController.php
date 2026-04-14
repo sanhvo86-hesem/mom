@@ -185,6 +185,9 @@ class SchemaStudioController extends BaseController
             'requiresRevision' => true,
             'maxPayloadBytes' => self::DESIGN_SAVE_MAX_BYTES,
             'conflictMode' => 'reject_stale_write',
+            'segmentedReads' => true,
+            'targetedRebuilds' => true,
+            'checksumGuard' => 'sha256',
             'auditTrail' => true,
         ];
     }

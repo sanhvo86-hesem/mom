@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T14:57:02.872Z",
+    "source": "system_contract_authority_generator",
+    "authorityLayer": "system_contract_registry",
+    "authorityViewKind": "db_derived_contract",
+    "designId": "system_contract_registry",
+    "designEditable": false,
+    "physicalDbSchema": "public",
+    "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
+    "publication_run_id": "6b44c138-a80f-4197-9680-48de7c9392ca",
+    "sourceFiles": [
+      "data/registry/table-registry.json",
+      "data/registry/relation-map.json",
+      "data/registry/endpoint-catalog.json",
+      "data/registry/workflow-library.json",
+      "data/registry/schema-authority-summary.json",
+      "data/registry/global-erp-mom-capability-audit.json",
+      "data/registry/registry-manifest.json",
+      "data/registry/graphics-governance-registry.json"
+    ],
+    "workspaceDraftUsed": false,
+    "artifact": "system-contract-runtime-projections-segment",
+    "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
+    "segmentId": "graphicsReleaseLink",
+    "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
+    "sourceSha256": "bc872a68f37277ae16ae07f52ce45e26f08e104bdda604c0961f8a453ec66339",
+    "sourceGeneratedAt": "2026-04-14T14:57:02.872Z",
+    "writePolicy": "generated_segment_do_not_edit",
+    "revisionGuard": "sourceSha256"
+  },
+  "section": "graphicsReleaseLink",
+  "data": {
+    "graphicsAuthorityRefs": [
+      "data/registry/graphics-governance-registry.json"
+    ],
+    "templateRegistryVersion": "2026.04.11-p0",
+    "templateRegistryChecksum": "sha256:0e21e6ac62a9891d4664598f9e1fa709",
+    "complianceMatrixRef": "data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+    "impactAnalysisRef": "data/graphics-governance/state.json#/pendingImpact",
+    "waiversRef": "data/graphics-governance/waivers.json#/waivers",
+    "changeSetRef": "data/registry/graphics-governance-registry.json#/changeSetModel",
+    "lineageGraphRef": "data/registry/graphics-governance-registry.json#/moduleGraphicsLineageGraph",
+    "runtimeBeaconRef": "data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+    "debtObservatoryRef": "data/registry/graphics-governance-registry.json#/visualDebtObservatory",
+    "environmentPolicyPacksRef": "data/registry/graphics-governance-registry.json#/environmentPolicyPacks",
+    "releaseDashboardRef": "data/registry/graphics-governance-registry.json#/graphicsReleaseDashboard",
+    "multiSitePlantBrandingGovernanceRef": "data/registry/graphics-governance-registry.json#/multiSitePlantBrandingGovernance",
+    "controlledEmergencyOverridePathRef": "data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath",
+    "rolloutDecisionRef": "data/graphics-governance/rollouts.json#/rollouts",
+    "rollbackPlanRef": "data/graphics-governance/snapshots",
+    "driftReportGeneratedAt": "2026-04-14T13:46:12+00:00",
+    "blockerCount": 0,
+    "releaseBlockerCount": 0,
+    "runtimeBeaconSummary": {
+      "reportedModules": 2,
+      "releaseBlockingModules": 0,
+      "authority": "runtime diagnostics feed into backend graphics compliance"
+    },
+    "debtSummary": {
+      "moduleDebtCount": 0,
+      "uncontrolledLegacyShellDebt": 0
+    },
+    "evidenceBundleRequirements": [
+      "affectedModulesSnapshot",
+      "complianceMatrixSnapshot",
+      "debtDriftSnapshot",
+      "runtimeBeaconSnapshot",
+      "rolloutDecision",
+      "rollbackPlan",
+      "waiverRegisterSnapshot"
+    ],
+    "generatedAt": "2026-04-14T13:46:12+00:00",
+    "releaseBlocked": false
+  }
+}

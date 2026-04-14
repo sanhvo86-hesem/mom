@@ -17,6 +17,13 @@ use MOM\Database\DataLayer;
  */
 final class ApprovalGroupService
 {
+    /**
+     * The approval_group decision path is bridged through ApprovalWorkflowAdapter.
+     * This is a readiness signal consumed by runtime/publication gates; it does
+     * not introduce a second workflow authority.
+     */
+    public const WORKFLOW_BRIDGE_READY = true;
+
     private DataLayer $data;
     private FoundationGovernanceService $fgService;
     private ?ApprovalWorkflowAdapter $workflowAdapter = null;

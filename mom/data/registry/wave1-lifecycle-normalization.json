@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T14:17:19.468Z",
+    "generatedAt": "2026-04-14T14:56:53.957Z",
     "description": "Wave 1 lifecycle normalization overlay for core operational entities, recovery objects, and execution-critical masters."
   },
   "mode_default_for_normalized_core": "guarded_transition_runtime",
@@ -652,7 +652,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "pdca",
       "status_set_key": "improvement_projects_improvement_status",
-      "lifecycle_mode": "persisted",
+      "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
         {
           "value": "draft",
@@ -2070,7 +2070,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "management_review",
       "status_set_key": "audit_status_code",
-      "lifecycle_mode": "persisted",
+      "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
         {
           "value": "draft",
@@ -2156,7 +2156,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "capa",
       "status_set_key": "deviation_status_code",
-      "lifecycle_mode": "persisted",
+      "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
         {
           "value": "pending",
@@ -2203,7 +2203,7 @@
       "ci_loop": "capa",
       "status_field_override": "status",
       "status_set_key": "exception_status",
-      "lifecycle_mode": "persisted",
+      "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
         {
           "value": "open",
@@ -2254,7 +2254,7 @@
       "audit_class": "workflow_audit_trail",
       "ci_loop": "engineering_change",
       "status_set_key": "engineering_change_requests_ecr_status",
-      "lifecycle_mode": "persisted",
+      "lifecycle_mode": "guarded_transition_runtime",
       "status_options": [
         {
           "value": "pending",

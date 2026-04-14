@@ -10,6 +10,7 @@ authority, and global capability audit.
 from __future__ import annotations
 
 import json
+import hashlib
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,9 +30,21 @@ REGISTRY_MANIFEST = REGISTRY_DIR / "registry-manifest.json"
 GRAPHICS_GOVERNANCE = REGISTRY_DIR / "graphics-governance-registry.json"
 
 RUNTIME_PROJECTIONS = REGISTRY_DIR / "system-contract-runtime-projections.json"
+RUNTIME_PROJECTION_SEGMENT_DIR = REGISTRY_DIR / "system-contract-runtime-projections.segments"
+RUNTIME_PROJECTION_SEGMENT_MANIFEST = REGISTRY_DIR / "system-contract-runtime-projections-segments.json"
 REGISTRY_CONTRACTS = REGISTRY_DIR / "system-contract-registry-contracts.json"
 DIAGNOSTICS = REGISTRY_DIR / "system-contract-diagnostics.json"
 MANIFEST = REGISTRY_DIR / "system-contract-manifest.json"
+
+RUNTIME_PROJECTION_SEGMENTS: dict[str, str] = {
+    "tables": "tables.json",
+    "relations": "relations.json",
+    "workflowBindings": "workflow-bindings.json",
+    "endpointBindings": "endpoint-bindings.json",
+    "domains": "domains.json",
+    "graphicsGovernance": "graphics-governance.json",
+    "graphicsReleaseLink": "graphics-release-link.json",
+}
 
 
 def utc_now() -> str:
@@ -63,8 +76,121 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     tmp.replace(path)
 
 
+def canonical_json_bytes(payload: Any) -> bytes:
+    return (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
 def source_path(path: Path) -> str:
     return str(path.relative_to(PORTAL_ROOT)).replace("\\", "/")
+
+
+def segment_record_count(value: Any) -> int:
+    if isinstance(value, list):
+        return len(value)
+    if isinstance(value, dict):
+        return len(value)
+    return 1 if value is not None else 0
+
+
+def write_runtime_projection_segments(runtime_projection: dict[str, Any], generated_at: str) -> dict[str, Any]:
+    RUNTIME_PROJECTION_SEGMENT_DIR.mkdir(parents=True, exist_ok=True)
+    expected_files = set(RUNTIME_PROJECTION_SEGMENTS.values())
+    for path in RUNTIME_PROJECTION_SEGMENT_DIR.glob("*.json"):
+        if path.name not in expected_files:
+            path.unlink()
+
+    source_bytes = canonical_json_bytes(runtime_projection)
+    segment_rows: list[dict[str, Any]] = []
+    total_segment_size = 0
+    largest_segment_size = 0
+    largest_segment_id = ""
+
+    for section, filename in RUNTIME_PROJECTION_SEGMENTS.items():
+        value = runtime_projection.get(section)
+        segment_payload = {
+            "_meta": {
+                **runtime_projection.get("_meta", {}),
+                "artifact": "system-contract-runtime-projections-segment",
+                "segmentId": section,
+                "sourceArtifact": source_path(RUNTIME_PROJECTIONS),
+                "sourceSha256": sha256_bytes(source_bytes),
+                "sourceGeneratedAt": scalar(runtime_projection.get("_meta", {}).get("generatedAt")),
+                "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
+                "writePolicy": "generated_segment_do_not_edit",
+                "revisionGuard": "sourceSha256",
+            },
+            "section": section,
+            "data": value,
+        }
+        segment_bytes = canonical_json_bytes(segment_payload)
+        segment_path = RUNTIME_PROJECTION_SEGMENT_DIR / filename
+        tmp = segment_path.with_suffix(segment_path.suffix + ".tmp")
+        tmp.write_bytes(segment_bytes)
+        tmp.replace(segment_path)
+        size = len(segment_bytes)
+        total_segment_size += size
+        if size > largest_segment_size:
+            largest_segment_size = size
+            largest_segment_id = section
+        segment_rows.append(
+            {
+                "id": section,
+                "section": section,
+                "path": source_path(segment_path),
+                "sizeBytes": size,
+                "sha256": sha256_bytes(segment_bytes),
+                "recordCount": segment_record_count(value),
+                "readPolicy": "load_segment_by_section",
+                "writePolicy": "generated_segment_do_not_edit",
+                "rebuildScope": "targeted_section_from_authority_inputs",
+            }
+        )
+
+    manifest = {
+        "_meta": {
+            **runtime_projection.get("_meta", {}),
+            "artifact": "system-contract-runtime-projections-segments",
+            "generatedAt": generated_at,
+            "sourceArtifact": source_path(RUNTIME_PROJECTIONS),
+            "sourceSha256": sha256_bytes(source_bytes),
+            "sourceSizeBytes": len(source_bytes),
+            "purpose": "Sidecar manifest for segmented runtime-projection reads, checksum proof, and revision-guarded regeneration.",
+            "worldClassPattern": "partial response/read-model segmentation plus optimistic concurrency guard",
+        },
+        "summary": {
+            "segmentCount": len(segment_rows),
+            "sourceSizeBytes": len(source_bytes),
+            "totalSegmentSizeBytes": total_segment_size,
+            "largestSegmentId": largest_segment_id,
+            "largestSegmentSizeBytes": largest_segment_size,
+            "allSegmentsChecksummed": all(row["sha256"] for row in segment_rows),
+            "segmentedReadReady": len(segment_rows) >= 2 and largest_segment_size < len(source_bytes),
+            "revisionGuard": "sourceSha256",
+            "staleWritePolicy": "reject_if_source_sha256_changed",
+            "targetedRebuildPolicy": "rebuild_changed_sections_then_refresh_manifest",
+        },
+        "segments": segment_rows,
+        "readProfiles": {
+            "summary": ["_meta", "summary"],
+            "tableDetail": ["tables"],
+            "relationGraph": ["relations"],
+            "workflowBridge": ["workflowBindings"],
+            "endpointBridge": ["endpointBindings"],
+            "graphicsGate": ["graphicsGovernance", "graphicsReleaseLink"],
+        },
+        "sourceGovernance": {
+            "authority": "system_contract_registry",
+            "fullArtifact": source_path(RUNTIME_PROJECTIONS),
+            "segmentDirectory": source_path(RUNTIME_PROJECTION_SEGMENT_DIR),
+            "guard": "Consumers must compare sourceSha256 before applying segment edits or generated rebuild outputs.",
+        },
+    }
+    write_json(RUNTIME_PROJECTION_SEGMENT_MANIFEST, manifest)
+    return manifest
 
 
 def table_key(table: str) -> str:
@@ -667,10 +793,19 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         },
         "artifacts": {
             "runtimeProjections": source_path(RUNTIME_PROJECTIONS),
+            "runtimeProjectionSegments": source_path(RUNTIME_PROJECTION_SEGMENT_MANIFEST),
             "registryContracts": source_path(REGISTRY_CONTRACTS),
             "diagnostics": source_path(DIAGNOSTICS),
             "manifest": source_path(MANIFEST),
             "graphicsGovernance": source_path(GRAPHICS_GOVERNANCE) if graphics_governance else "",
+        },
+        "runtimeProjectionSegmentation": {
+            "status": "managed_by_sidecar_manifest",
+            "manifest": source_path(RUNTIME_PROJECTION_SEGMENT_MANIFEST),
+            "segmentDirectory": source_path(RUNTIME_PROJECTION_SEGMENT_DIR),
+            "readPolicy": "Use segment manifest for section-level reads; reserve the full projection file for rebuild/proof.",
+            "revisionGuard": "sourceSha256",
+            "targetedRebuildPolicy": "Rebuild changed authority sections and refresh checksums before release.",
         },
         "graphicsReleaseLink": graphics_release_link,
         "sourceAuthority": {
@@ -696,6 +831,8 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
 def main() -> int:
     runtime_projection, registry_contracts, diagnostics, manifest = build_artifacts()
     write_json(RUNTIME_PROJECTIONS, runtime_projection)
+    segment_manifest = write_runtime_projection_segments(runtime_projection, scalar(runtime_projection.get("_meta", {}).get("generatedAt")) or utc_now())
+    manifest["runtimeProjectionSegmentation"]["summary"] = segment_manifest["summary"]
     write_json(REGISTRY_CONTRACTS, registry_contracts)
     write_json(DIAGNOSTICS, diagnostics)
     write_json(MANIFEST, manifest)
@@ -710,6 +847,7 @@ def main() -> int:
                 "criticalGapCount": manifest["summary"]["criticalGapCount"],
                 "outputs": [
                     source_path(RUNTIME_PROJECTIONS),
+                    source_path(RUNTIME_PROJECTION_SEGMENT_MANIFEST),
                     source_path(REGISTRY_CONTRACTS),
                     source_path(DIAGNOSTICS),
                     source_path(MANIFEST),
