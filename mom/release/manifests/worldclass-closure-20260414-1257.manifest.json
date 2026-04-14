@@ -1,0 +1,99 @@
+{
+  "artifact_type": "source_promotion_manifest",
+  "manifest_id": "worldclass-closure-20260414-1257",
+  "branch": "codex/worldclass-closure-20260414-1257",
+  "base_branch": "main",
+  "record_state": "pre_merge_controlled_source_manifest",
+  "created_at": "2026-04-14T05:57:00Z",
+  "change_authority": {
+    "authority_type": "codex_remediation_request",
+    "authority_ref": "WORLDCLASS-CLOSURE-20260414",
+    "scope": "eqms_control_plane_p1_closure_publication_digital_thread_repo_boundary"
+  },
+  "branch_activity_note": {
+    "note": "The earlier codex/worldclass-closure-20260414-1212 remediation was superseded after an external merge advanced main to 48f32775. This manifest governs the follow-on closure branch created from the advanced main head.",
+    "supersedes_manifest": "worldclass-closure-20260414-1212"
+  },
+  "source_boundaries": {
+    "controlled_source": [
+      "mom/api/controllers",
+      "mom/api/routes",
+      "mom/api/services",
+      "mom/database/migrations",
+      "mom/tests",
+      "mom/docs/backend",
+      "mom/release",
+      "mom/contracts"
+    ],
+    "generated_or_runtime_artifacts_removed_from_controlled_source": [
+      "mom/data/registry/*.json"
+    ],
+    "runtime_authority_replacement": [
+      "mom/contracts/table-registry.json",
+      "RegistryService contract fallback and runtime authority checks"
+    ]
+  },
+  "closed_p1_findings": [
+    {
+      "finding": "Offline form issuance accepted caller-authored template/schema metadata without authoritative server validation.",
+      "closure_evidence": [
+        "FormIssuanceCommandService loads template revision and schema version from DB",
+        "EqmsFormExecutionService builds the issuance manifest",
+        "caller manifest hash mismatch is rejected"
+      ]
+    },
+    {
+      "finding": "Submission attempt validation state was caller-driven.",
+      "closure_evidence": [
+        "FormIssuanceCommandService reloads issuance server-side",
+        "EqmsFormExecutionService validates attempt hashes, duplicates, and carrier manifest",
+        "server-authored validation state/errors/summary are persisted"
+      ]
+    },
+    {
+      "finding": "Evidence finalization retry safety was not fully atomic or collision-proof.",
+      "closure_evidence": [
+        "EvidenceFinalizationService persists canonical rows inside a transaction when available",
+        "signature idempotency collisions are checked for payload equivalence"
+      ]
+    },
+    {
+      "finding": "Publication withdraw/supersede lacked persisted worker trail and could trust caller authority payloads.",
+      "closure_evidence": [
+        "PublicationMonitorService reloads change authority from persisted publication/version/order rows",
+        "processQueuedAction records publication attempts and receipts",
+        "PublicationStateService requires released change order id for withdraw/supersede"
+      ]
+    },
+    {
+      "finding": "MES digital-thread repository probe did not prove migration 122 context columns were present.",
+      "closure_evidence": [
+        "PostgresManufacturingEventRepository checks information_schema for required 5M/context columns",
+        "probe reports schema_complete and missing_columns"
+      ]
+    },
+    {
+      "finding": "Generated registry projections lived under controlled source.",
+      "closure_evidence": [
+        "mom/data/registry generated JSON projections removed",
+        "repo boundary scanner reports P0/P1 clean",
+        "canonical registry/runtime authority focused tests pass"
+      ]
+    }
+  ],
+  "required_validation": [
+    "php -l touched PHP files",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php tests/Unit/Services/ManufacturingEventBackboneServiceTest.php --testdox",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/CanonicalManufacturingSpineServiceTest.php tests/Unit/Services/GenericCrudServiceEventBusTest.php tests/Unit/Controllers/HealthControllerRuntimeAuthorityTest.php tests/Unit/Services/RuntimeAuthorityServiceTest.php --testdox",
+    "php tools/release/check_repo_boundary.php",
+    "php tools/release/check_workflow_status_authority.php",
+    "./composer check"
+  ],
+  "merge_gate": {
+    "unresolved_p0": 0,
+    "unresolved_non_waived_p1": 0,
+    "runbooks_present": true,
+    "accepted_waivers_documented": true,
+    "merge_strategy": "fast_forward_preferred_else_stop"
+  }
+}
