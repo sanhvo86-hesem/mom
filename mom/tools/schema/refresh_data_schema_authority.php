@@ -178,6 +178,8 @@ $schema = invoke_private($controller, 'normalizeEnterpriseSchema', [$schema, $ac
 $bundle = invoke_private($controller, 'buildCompilerBundle', [$schema, $designId, $actor]);
 $manifest = invoke_private($controller, 'updateEnterpriseRegistryArtifacts', [$bundle, null]);
 run_refresh_command(['php', $portalRoot . '/tools/schema/refresh_schema_authority_summary.php'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_canonical_backend_standardization_catalog.py'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_data_fields_from_table_registry.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_blind_spot_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_stress_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_publication_truth_summaries.py'], $projectRoot);

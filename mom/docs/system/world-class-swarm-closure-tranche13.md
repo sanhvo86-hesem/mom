@@ -10,10 +10,10 @@ Date: 2026-04-14
 | PHASE 0 | Complete: six existing agent threads reused because the app agent limit was reached |
 | PHASE 1 | Complete: six first-pass reports committed and merged into integration |
 | PHASE 2 | Complete: coordinator synthesis created from six reports and local verifier output |
-| PHASE 3 | Complete for code-fixable registry path, dry-run, strict-authority, and hygiene fixes |
+| PHASE 3 | Complete for code-fixable registry path, dry-run, strict-authority, generated-source, prior-hardening, and hygiene fixes |
 | PHASE 4 | Complete: six pass-2 reports merged into integration |
-| PHASE 5 | In progress: pass-2 Loki readiness defect fixed, final verification pending |
-| PHASE 6 | Pending merge gate |
+| PHASE 5 | Complete: pass-2 Loki readiness defect fixed; current-main publication artifacts and prior local hardening branch reconciled into integration |
+| PHASE 6 | In progress: final merge-gate verification pending |
 | PHASE 7 | Pending merge to `main` |
 | PHASE 8 | Pending cleanup |
 
@@ -58,13 +58,17 @@ Priority order for this tranche:
 | Agent 1 repo reality | Registry path, overlay, strict-authority surface, and verifier truthfulness are verified; final repo cleanup remains pending. | No code defect; keep cleanup in final git phase. |
 | Agent 2 standards | Benchmark claims are qualified, but configured/unverified Loki was a readiness false-confidence risk. | Fixed in `HealthController::componentHealthy()` with regression coverage. |
 | Agent 3 vendor benchmark | No new vendor parity overclaim; proof-layer work improves auditability, not vendor parity. | No code defect; keep vendor gaps explicit. |
-| Agent 4 architecture authority | Table overlay and schema count split are real; endpoint publication remains synthetic/missing until full artifacts exist. | Full endpoint publication remains blocked by missing source artifacts; no fabricated endpoint catalog. |
+| Agent 4 architecture authority | Table overlay and schema count split are real; pass-2 flagged missing endpoint publication before current-main reconciliation. | Superseded after merging current `main` publication artifacts and adding required canonical/data-fields inputs; publication verifier now passes 244/244. |
 | Agent 5 reliability/security/compliance | VPS command allowlist, dry-run truth, and strict authority visibility are stronger; strict authority remains false by design. | No additional code defect after Loki readiness fix. |
-| Agent 6 defects/backlog | Bootstrap path and tracked hygiene are fixed; full publication truth remains blocked; ignored runtime residue must be cleaned. | Clean ignored residue before merge; keep full publication blocker explicit. |
+| Agent 6 defects/backlog | Bootstrap path and tracked hygiene are fixed; pass-2 flagged missing generated publication inputs and ignored residue. | Canonical/data-fields inputs are now generated and required by the verifier; ignored residue must still be cleaned before final merge. |
 - Added strict mixed-authority summary fields to `RuntimeAuthorityService` and exposed `runtime_authority_strict` in health checks.
 - Added regression tests for registry bootstrap path alignment, registry metadata overlay, canonical-spine bootstrap overlay, and dry-run truthfulness.
+- Reconciled local `main` commit `48f32775` into the tranche13 integration branch and preserved the full publication artifact set; `verify_publication_truth.py` now verifies 244/244 gates after adding canonical/data-fields source inputs to the required artifact set.
+- Integrated the prior clean local hardening branch `codex/worldclass-closure-20260414-1257` for server-authoritative form issuance/submission validation, transactional evidence finalization, publication action processing, schema-completeness probing, and regression coverage, while rejecting its stale deletion of registry artifacts.
+- Added deterministic generators for `canonical-backend-standardization-catalog.json` and baseline split `data-fields` artifacts from authored object contracts and table-registry columns. These close the generator traceback/source-input gap without claiming full vendor parity.
 
 ## Remaining after implementation
 
-- Full publication verifier still fails because the repo does not contain controlled source inputs such as `data-fields.json`, `orphan-resolution.json`, `domain-architecture.json`, wave governance policies, and frontend/system-contract publication artifacts.
-- This is now a precise source-input blocker, not a root-path drift and not a DB-password-only blocker.
+- Full publication truth verifier passes in the reconciled integration branch. Publication remains `blocked-by-graphics-governance` by design because active graphics release blockers are still recorded in the generated governance registry.
+- `refresh_data_schema_authority.php --skip-publication` now runs without tracebacks after the canonical/data-fields generators execute. It is still a workspace-only refresh mode and can produce review-required publication outputs if used as a release publication path; the release gate remains `verify_publication_truth.py` against the committed publication artifact set.
+- Remaining unproven areas are external or product-decision scope: live OT segmentation/recovery evidence, live OpenTelemetry/Loki infrastructure proof, formal Part 11 validation scope, multisite rollout thresholds, and vendor-suite parity.

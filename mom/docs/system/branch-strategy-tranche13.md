@@ -6,7 +6,9 @@ Date: 2026-04-14
 
 - Branch: `codex/tranche13-zero-trust-closure-20260414`
 - Base: local `main` at `a42f0d16`, matching `origin/main` after `git fetch --prune origin`
-- Root worktree `/Users/a10/Documents/mom` remained checked out on `main` during audit and implementation.
+- Current-main reconciliation: local `main` later advanced to `48f32775`; that committed state was merged into the integration branch before the final merge gate.
+- Prior local hardening reconciliation: clean branch `codex/worldclass-closure-20260414-1257` was reviewed for code-fixable control-plane hardening and integrated into the tranche13 branch without importing its stale registry artifact deletions.
+- Root worktree `/Users/a10/Documents/mom` was found on clean branch `codex/worldclass-closure-20260414-1257` during final reconciliation. It must be switched back to `main` in the final git phase after the integration branch is ready.
 - Integration worktree: `/Users/a10/Documents/mom-tranche13-integration`
 
 ## Helper branches and worktrees
@@ -24,7 +26,9 @@ Date: 2026-04-14
 
 - Pass-1 helper branches were merged into the integration branch with an octopus merge.
 - Coordinator changes and implementation changes are committed only on the integration branch.
-- Pass-2 helper branches will be reset or fast-forwarded to the integrated implementation commit before the second audit, then merged back into the integration branch as report-only commits.
+- Pass-2 helper branches were merged back into the integration branch as report-only commits.
+- Current `main` was merged into the integration branch and conflict-resolved in favor of verified publication artifacts plus tranche13 runtime/path fixes.
+- The prior local hardening branch was selectively cherry-picked into integration for service/test/doc changes only; `mom/data/registry` deletions from that branch were explicitly restored from integration.
 
 ## Final merge strategy
 
@@ -43,4 +47,3 @@ Date: 2026-04-14
   - `git status --short --branch` is clean
   - `git worktree list` contains no tranche13 worktrees
   - `git branch --list 'codex/tranche13-*'` is empty
-
