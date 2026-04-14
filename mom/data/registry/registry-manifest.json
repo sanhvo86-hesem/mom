@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-14T11:32:51.631Z",
+    "generatedAt": "2026-04-14T14:17:16.715Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
-    "enterpriseAuthorityGeneratedAt": "2026-04-14T11:32:57.946687+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T11:32:58.149431+00:00"
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
+    "enterpriseAuthorityGeneratedAt": "2026-04-14T14:17:22.586947+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T14:17:22.742360+00:00"
   },
   "coverage": {
     "router_actions": 4160,
@@ -34,16 +34,16 @@
       "archive_only": 697
     },
     "workflow_engine_bridge": {
-      "ready": 344,
-      "blocked": 5,
+      "ready": 349,
+      "blocked": 0,
       "unneeded": 411
     },
     "frontend_foundation": {
       "entity_count": 771,
-      "ready_entities": 766,
-      "partial_entities": 5,
+      "ready_entities": 771,
+      "partial_entities": 0,
       "blocked_entities": 0,
-      "workflow_ready_entities": 381,
+      "workflow_ready_entities": 386,
       "related_ready_entities": 734,
       "analytics_ready_entities": 373,
       "planning_console_entities": 34,
@@ -188,7 +188,7 @@
       "hard_delete_endpoint_count": 0,
       "quarantined_delete_endpoint_count": 0,
       "runtime_unsafe_exposed_endpoint_count": 0,
-      "runtime_unsafe_blocked_endpoint_count": 1062,
+      "runtime_unsafe_blocked_endpoint_count": 1047,
       "generic_runtime_classification_count": 555,
       "bound_command_runtime_binding_count": 276,
       "unbound_command_runtime_binding_count": 0

@@ -441,9 +441,17 @@ def main() -> int:
         check("truth_publishability_matches_qr", pub_ready == qr_ready,
               f"truth={pub_ready} qr={qr_ready}")
         if active_graphics_release_blockers:
-            check("truth_publishability_blocked_by_graphics",
-                  pub_ready is False and "graphics_release_blockers_active" in (pt.get("publishability", {}).get("blockedBy") or []),
-                  f"truth_publishability={pt.get('publishability')}")
+            graphics_gate = pt.get("graphics_release_gate", {})
+            check("truth_graphics_release_gate_blocked",
+                  graphics_gate.get("ready") is False
+                  and "graphics_release_blockers_active" in (graphics_gate.get("blockedBy") or [])
+                  and int(graphics_gate.get("active_blocker_count") or 0) == len(active_graphics_release_blockers),
+                  f"graphics_release_gate={graphics_gate}")
+        else:
+            graphics_gate = pt.get("graphics_release_gate", {})
+            check("truth_graphics_release_gate_ready",
+                  graphics_gate.get("ready") is True,
+                  f"graphics_release_gate={graphics_gate}")
 
     # Gate L: Entity accounting
     print("\nGate L: Entity accounting")

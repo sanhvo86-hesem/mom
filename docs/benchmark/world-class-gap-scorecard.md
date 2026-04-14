@@ -21,8 +21,8 @@ Scale: 0 means absent or unsafe. 5 means benchmark-class, governed, tested, and 
 | Interoperability readiness | 3.1 | 3.3 | 4.2 | MTConnect XML parsing no longer expands entities and rejects DOCTYPE/ENTITY payloads. |
 | AI / copilot architecture quality | 3.3 | 4.5 | 4.6 | Legacy AI reads now require AI read roles, feedback requires feedback/write roles, schedule metrics and JSON prediction fallback are plant-scoped, conversation fallback reads validate ID/owner, and AI schedule apply/PM routes are explicitly advisory-only. |
 | OT/IT security and governance | 3.2 | 4.3 | 4.5 | AI read/write surfaces, AI schedule advisory boundaries, evidence finalization/read scoping, XML parsing, exception lifecycle updates, order hold event audit, and mobile conflict overrides are hardened. |
-| Reliability / idempotency / offline resilience | 3.4 | 3.9 | 4.3 | Evidence replay key contract is aligned; mobile task events and inspection replay identity are preserved; DB and JSON schedule writes share conflict guards. |
-| Performance / scalability | 3.0 | 3.0 | 4.1 | No broad performance refactor; mobile JSON full-scan path remains a staged risk for 50+ machines. |
+| Reliability / idempotency / offline resilience | 3.4 | 4.1 | 4.3 | Evidence replay key contract is aligned; mobile task events and inspection replay identity are preserved; DB and JSON schedule writes share conflict guards; online mobile clock-in and completion support same-key replay. |
+| Performance / scalability | 3.0 | 3.3 | 4.1 | Mobile operator queue retrieval now uses a derived operator/date index instead of always scanning the full work queue. Broader mobile/offline and dashboard indexes remain staged. |
 | Developer architecture / maintainability | 3.3 | 3.9 | 4.3 | Added root branch/cleanup rules, six audit artifacts, targeted regression tests, current-branch provenance, and focused service tests. |
 
 ## Confirmed defects and disposition

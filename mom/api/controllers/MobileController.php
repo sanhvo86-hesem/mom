@@ -276,6 +276,7 @@ class MobileController extends BaseController
                 'qty_completed' => (int)($body['qty_completed'] ?? 0),
                 'qty_scrap'     => (int)($body['qty_scrap'] ?? 0),
                 'reason_code'   => trim((string)($body['reason_code'] ?? $body['completion_reason_code'] ?? $body['defect_code'] ?? '')),
+                'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
                 'notes'         => trim((string)($body['notes'] ?? '')),
             ]);
 
@@ -321,7 +322,12 @@ class MobileController extends BaseController
                 trim((string)($body['wo_number'] ?? '')),
                 (int)($body['operation_seq'] ?? 0),
                 trim((string)($body['machine_id'] ?? '')),
-                strtolower(trim((string)($body['labor_type'] ?? 'run')))
+                strtolower(trim((string)($body['labor_type'] ?? 'run'))),
+                [
+                    'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
+                    'device_id' => trim((string)($body['device_id'] ?? '')),
+                    'metadata' => is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
+                ],
             );
 
             $this->auditLog('mobile_clock_in', [

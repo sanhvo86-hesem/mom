@@ -2,14 +2,14 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
-    "generated_at": "2026-04-14T11:33:01.899Z",
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
+    "generated_at": "2026-04-14T14:18:40.372Z",
     "schema_authority": "table-registry.json backed by database/migrations and publication generators",
     "table_count": 760,
     "entity_counts": {
       "total": 771,
-      "ready": 766,
-      "partial": 5,
+      "ready": 771,
+      "partial": 0,
       "blocked": 0,
       "explanation": "771 frontend entities are published from 760 registered tables, with 8 non-table entities and 3 additional view aliases."
     },
@@ -19,8 +19,8 @@
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
-      "ready": 344,
-      "blocked": 5,
+      "ready": 349,
+      "blocked": 0,
       "unneeded": 422,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
@@ -30,17 +30,22 @@
       "foundation_governance_paths": 10
     },
     "publishability": {
+      "ready": true,
+      "verdict": "PASS",
+      "blockedBy": [],
+      "review_required_entities": 0,
+      "enhancement_backlog_entities": 0,
+      "blockers": [],
+      "anti_false_green": "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."
+    },
+    "graphics_release_gate": {
       "ready": false,
-      "verdict": "REVIEW_REQUIRED",
+      "verdict": "BLOCKED",
       "blockedBy": [
         "graphics_release_blockers_active"
       ],
-      "review_required_entities": 4,
-      "enhancement_backlog_entities": 5,
-      "blockers": [
-        "2 publishability checks still fail, so platform-global publication cannot be claimed yet."
-      ],
-      "anti_false_green": "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."
+      "active_blocker_count": 2,
+      "anti_false_green": "Registry publishability and graphics-governance release readiness are separate gates; active graphics blockers must keep release readiness blocked even when registry quality is publishable."
     },
     "benchmark": {
       "mode": "stability_probe",

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T11:33:02.787Z",
+    "generatedAt": "2026-04-14T14:18:40.339Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -46,7 +46,7 @@
     "graphicsNonCompliantModuleCount": 2,
     "graphicsReleaseBlockerCount": 2,
     "graphicsGovernanceReleaseBlocked": true,
-    "releaseReadinessScore": 90,
+    "releaseReadinessScore": 0,
     "projectionCount": 760,
     "fieldCount": 14572,
     "canonicalCoveragePercent": 100,
@@ -110,7 +110,7 @@
     "endpointSource": "data/registry/endpoint-catalog.json",
     "workflowSource": "data/registry/workflow-library.json",
     "relationSource": "data/registry/relation-map.json",
-    "registryManifestRunId": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
+    "registryManifestRunId": "345bed0d-c9ce-4dcb-9119-4609292dde62",
     "graphicsGovernanceSource": "data/registry/graphics-governance-registry.json"
   },
   "deletePolicy": {

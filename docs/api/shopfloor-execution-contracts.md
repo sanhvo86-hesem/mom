@@ -147,7 +147,10 @@ Behavior:
 - Response may include legacy task fields and compact task cards. The compact shape should preserve `target_id`, `wo_number`, `operation_seq`, `machine_id`, `equipment_id`, `work_center_id`, `shift_date`, `shift_code`, `target_quantity`, `reported_quantity`, `remaining_quantity`, and quality-gate status when available.
 - Mobile task completion persists `result`, `qty_completed`, `qty_scrap`, `quantity_completed`, `quantity_scrap`, and `completion_reason_code` on the existing mobile work queue snapshot. Non-`pass` outcomes and any scrap require a structured reason code; `qty_scrap` may not exceed `qty_completed`.
 - Mobile task assignment, start, and completion append `mobile.task_assigned`, `mobile.task_started`, and `mobile.task_completed` records to `mobile/task_events.json`; the queue row is the current snapshot.
+- Mobile operator queue reads may use `mobile/work_queue.index.json` as a derived read model keyed by operator/date. The index is rebuilt from `work_queue.json` when stale and is never execution authority.
 - Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
+- Mobile task completion accepts optional `idempotency_key`. A repeated completion with the same key and same completion payload returns the completed task as an idempotent replay and does not append another completion event; same-key/different-payload replay is rejected as `completion_idempotency_conflict`.
+- Mobile clock-in accepts optional `idempotency_key`. A repeated clock-in with the same key and same work context returns the original clock-in; a same-key/different-context replay is rejected as `clock_in_idempotency_conflict`.
 - Mobile offline conflict resolution is owner-scoped. Supervisor/admin-style override requires explicit override reason and is audited.
 
 ## CNC program/version context

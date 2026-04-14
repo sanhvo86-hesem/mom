@@ -1791,6 +1791,7 @@ smoke_assert(is_array($qualityReport['publishability'] ?? null), 'Registry quali
 if ($publishabilityReady) {
     smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'ready', 'Registry publishability status must surface ready when no unpublishable entities remain.');
     smoke_assert($publishabilityReviewRequired === 0, 'Registry quality report must clear review-required entity counts once publishability blockers are gone.');
+    smoke_assert($workflowBridgeBlocked === 0, 'Registry quality report must clear workflow-engine bridge blockers before publishability is ready.');
 } else {
     smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'review_required', 'Registry publishability status must stay review_required while blockers remain.');
     smoke_assert($workflowBridgeBlocked > 0 || $publishabilityReviewRequired > 0, 'Registry publishability must surface concrete blockers when it is not ready.');

@@ -17,7 +17,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Dispatch target | Existing dispatch target store through `DispatchController` | `shift_targets` PostgreSQL bridge, analytics projections | Existing dispatch target path is live Phase 1 operational truth; DB is bridge until cutover. |
 | Operator assignment | Dispatch target `operator_id` plus dispatch actor checks | Mobile queue assignee fields | Reports require assigned operator or supervisor/planner override. Blank assignment is not open execution. |
 | Operator time entry | Mobile work queue service time-entry store | MES labor/time tables, production report actual times | Mobile time entry remains capture truth; report times are production-event context. |
-| Mobile task completion | Mobile work queue service task snapshot plus `mobile/task_events.json` event journal | Dispatch production report events | Queue row is a derived task snapshot. Assignment/start/completion events are mobile task history truth; dispatch report remains production quantity truth. |
+| Mobile task completion | Mobile work queue service task snapshot plus `mobile/task_events.json` event journal | Dispatch production report events, `mobile/work_queue.index.json` read model | Queue row is a derived task snapshot. Assignment/start/completion events are mobile task history truth; dispatch report remains production quantity truth. The queue index is retrieval-only and cannot override the snapshot or events. |
 | Production report event | `ShopfloorExecutionService` report event journal | Production log snapshot, DB bridge | Event journal is audit/replay truth. Snapshot is derived latest state. |
 | Production report snapshot | `production_logs.json` through dispatch reporting | `shift_production_log` bridge | Snapshot is a read model for dashboards and compatibility. |
 | Inspection capture | `MobileWorkQueueService::captureInspection()` with JSON compatibility and DB bridge | Dispatch report quality gate fields | Mobile capture is quality evidence truth for Phase 1 first-piece/in-process checks. |
@@ -44,6 +44,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - Target and production-log snapshots are compatibility/read-model state.
 - Mobile inspection capture is append-only by behavior for offline replay: matching replay returns existing fact; divergent replay is rejected.
 - Mobile task assignment/start/completion writes append task events and then exposes the queue row as the current snapshot.
+- `mobile/work_queue.index.json` is a derived operator/date read model. If stale or absent, the service rebuilds it from `work_queue.json`.
 - Order holds keep `orders/holds.json` as the compatibility snapshot and append `orders/hold_events.json` lifecycle facts for set/release audit history.
 - DB bridge writes are migration/readiness mirrors. They are not allowed to override JSON compatibility truth in this Phase 1 patch.
 - If event history and snapshot disagree, event history wins for audit and reconciliation.

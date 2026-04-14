@@ -27,6 +27,8 @@ final class MobileWorkQueueService
     private WorkforceQualificationGateService $qualificationGate;
     private ?object $db;
 
+    private const WORK_QUEUE_INDEX_SCHEMA = 'mobile_work_queue_index.v1';
+
     /** Valid task types. */
     private const TASK_TYPES = [
         'clock_in', 'clock_out', 'first_piece', 'in_process_inspection',
@@ -92,6 +94,11 @@ final class MobileWorkQueueService
     public function getOperatorQueue(string $operatorId, ?string $date = null): array
     {
         $targetDate = $date ?? date('Y-m-d');
+        $indexed = $this->operatorQueueFromIndex($operatorId, $targetDate);
+        if ($indexed !== null) {
+            return $indexed;
+        }
+
         $queue      = $this->loadFile('work_queue');
         $result     = [];
 
@@ -112,15 +119,8 @@ final class MobileWorkQueueService
             $result[] = $task;
         }
 
-        usort($result, function (array $a, array $b) {
-            // Sort by priority (ascending), then by assigned_at
-            $pA = (int)($a['priority'] ?? 50);
-            $pB = (int)($b['priority'] ?? 50);
-            if ($pA !== $pB) {
-                return $pA <=> $pB;
-            }
-            return strcmp($a['assigned_at'] ?? '', $b['assigned_at'] ?? '');
-        });
+        $this->sortQueueTasks($result);
+        $this->writeWorkQueueIndex($queue);
 
         return $result;
     }
@@ -274,6 +274,15 @@ final class MobileWorkQueueService
                     throw new RuntimeException('pass_result_cannot_have_scrap');
                 }
                 $completionReasonCode = $this->normalizeCompletionReasonCode($result['reason_code'] ?? null, $completionResult, $qtyScrap);
+                $completionIdempotencyKey = $this->stringValue($result['idempotency_key'] ?? '');
+                $completionFingerprint = $this->taskCompletionFingerprint(
+                    $queueId,
+                    $operatorId,
+                    $completionResult,
+                    $qtyCompleted,
+                    $qtyScrap,
+                    $completionReasonCode,
+                );
 
                 foreach ($queue as $idx => $task) {
                     if (!is_array($task)) {
@@ -287,6 +296,16 @@ final class MobileWorkQueueService
                     }
                     $currentStatus = (string)($task['task_status'] ?? self::TASK_STATUSES[0]);
                     if ($currentStatus === self::TASK_STATUSES[2]) {
+                        if (
+                            $completionIdempotencyKey !== ''
+                            && hash_equals($this->stringValue($task['completion_idempotency_key'] ?? ''), $completionIdempotencyKey)
+                        ) {
+                            if (!hash_equals($this->stringValue($task['completion_fingerprint'] ?? ''), $completionFingerprint)) {
+                                throw new RuntimeException('completion_idempotency_conflict');
+                            }
+                            $task['idempotent_replay'] = true;
+                            return $task;
+                        }
                         throw new RuntimeException('task_already_completed');
                     }
                     if ($currentStatus !== self::TASK_STATUSES[1]) {
@@ -315,6 +334,8 @@ final class MobileWorkQueueService
                         'quantity_completed' => $qtyCompleted,
                         'quantity_scrap'  => $qtyScrap,
                         'completion_reason_code' => $completionReasonCode,
+                        'completion_idempotency_key' => $completionIdempotencyKey !== '' ? $completionIdempotencyKey : null,
+                        'completion_fingerprint' => $completionIdempotencyKey !== '' ? $completionFingerprint : null,
                         'notes'          => $result['notes'] ?? $task['notes'],
                         'updated_at'     => $now,
                     ]);
@@ -325,6 +346,7 @@ final class MobileWorkQueueService
                         'qty_completed' => $qtyCompleted,
                         'qty_scrap' => $qtyScrap,
                         'completion_reason_code' => $completionReasonCode,
+                        'idempotency_key' => $completionIdempotencyKey,
                     ]);
                     return $queue[$idx];
                 }
@@ -348,42 +370,66 @@ final class MobileWorkQueueService
         string $woNumber,
         int $operationSeq,
         string $machineId,
-        string $laborType = 'run'
+        string $laborType = 'run',
+        array $options = [],
     ): array {
         if (!in_array($laborType, self::LABOR_TYPES, true)) {
             throw new RuntimeException("Invalid labor type: {$laborType}.");
         }
 
-        $now = $this->nowIso();
-        $id  = $this->generateUuidV4();
-
-        $entry = [
-            'entry_id'           => $id,
-            'operator_id'        => $operatorId,
-            'wo_number'          => $woNumber,
-            'jo_number'          => null,
-            'operation_seq'      => $operationSeq,
-            'machine_id'         => $machineId,
-            'entry_type'         => 'clock_in',
-            'entry_time'         => $now,
-            'duration_minutes'   => null,
-            'labor_type'         => $laborType,
-            'quantity_completed' => null,
-            'quantity_scrap'     => null,
-            'offline_created'    => false,
-            'sync_status'        => 'synced',
-            'device_id'          => null,
-            'metadata'           => new \stdClass(),
-            'created_at'         => $now,
-        ];
-
-        $this->withStoreLock('time_entries', function () use ($entry): void {
+        return $this->withStoreLock('time_entries', function () use ($operatorId, $woNumber, $operationSeq, $machineId, $laborType, $options): array {
+            $now = $this->nowIso();
+            $id  = $this->generateUuidV4();
+            $idempotencyKey = $this->stringValue($options['idempotency_key'] ?? '');
+            $fingerprint = $this->clockInFingerprint($operatorId, $woNumber, $operationSeq, $machineId, $laborType);
             $entries   = $this->loadFile('time_entries');
+
+            if ($idempotencyKey !== '') {
+                foreach ($entries as $existing) {
+                    if (!is_array($existing)) {
+                        continue;
+                    }
+                    if ($this->stringValue($existing['entry_type'] ?? '') !== 'clock_in') {
+                        continue;
+                    }
+                    if (!hash_equals($this->stringValue($existing['idempotency_key'] ?? ''), $idempotencyKey)) {
+                        continue;
+                    }
+                    if (!hash_equals($this->stringValue($existing['clock_in_fingerprint'] ?? ''), $fingerprint)) {
+                        throw new RuntimeException('clock_in_idempotency_conflict');
+                    }
+                    $existing['idempotent_replay'] = true;
+                    return $existing;
+                }
+            }
+
+            $entry = [
+                'entry_id'           => $id,
+                'operator_id'        => $operatorId,
+                'wo_number'          => $woNumber,
+                'jo_number'          => null,
+                'operation_seq'      => $operationSeq,
+                'machine_id'         => $machineId,
+                'entry_type'         => 'clock_in',
+                'entry_time'         => $now,
+                'duration_minutes'   => null,
+                'labor_type'         => $laborType,
+                'quantity_completed' => null,
+                'quantity_scrap'     => null,
+                'offline_created'    => false,
+                'sync_status'        => 'synced',
+                'device_id'          => $this->nullableString($options['device_id'] ?? null),
+                'idempotency_key'    => $idempotencyKey !== '' ? $idempotencyKey : null,
+                'clock_in_fingerprint' => $idempotencyKey !== '' ? $fingerprint : null,
+                'metadata'           => is_array($options['metadata'] ?? null) ? (array)$options['metadata'] : new \stdClass(),
+                'created_at'         => $now,
+            ];
+
             $entries[] = $entry;
             $this->saveFile('time_entries', $entries);
-        });
 
-        return $entry;
+            return $entry;
+        });
     }
 
     /**
@@ -1152,6 +1198,114 @@ final class MobileWorkQueueService
     }
 
     /**
+     * @return list<array<string, mixed>>|null
+     */
+    private function operatorQueueFromIndex(string $operatorId, string $targetDate): ?array
+    {
+        $indexPath = $this->mobileDir . '/work_queue.index.json';
+        $index = $this->readJson($indexPath);
+        if (!is_array($index) || !$this->workQueueIndexMatchesSource($index)) {
+            return null;
+        }
+
+        $key = $this->queueIndexKey($operatorId, $targetDate);
+        $rows = (array)($index['by_operator_date'][$key] ?? []);
+        $tasks = [];
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $tasks[] = $row;
+            }
+        }
+        $this->sortQueueTasks($tasks);
+
+        return $tasks;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $queue
+     */
+    private function writeWorkQueueIndex(array $queue): void
+    {
+        $sourcePath = $this->mobileDir . '/work_queue.json';
+        clearstatcache(true, $sourcePath);
+        $byOperatorDate = [];
+        foreach ($queue as $task) {
+            if (!is_array($task)) {
+                continue;
+            }
+            $operatorId = $this->stringValue($task['operator_id'] ?? '');
+            if ($operatorId === '') {
+                continue;
+            }
+            $assignedDate = substr($this->stringValue($task['assigned_at'] ?? $task['created_at'] ?? ''), 0, 10);
+            if ($assignedDate === '') {
+                continue;
+            }
+            $byOperatorDate[$this->queueIndexKey($operatorId, $assignedDate)][] = $task;
+        }
+
+        foreach ($byOperatorDate as $key => $rows) {
+            $this->sortQueueTasks($rows);
+            $byOperatorDate[$key] = $rows;
+        }
+
+        $index = [
+            '_meta' => [
+                'schema' => self::WORK_QUEUE_INDEX_SCHEMA,
+                'source_store' => 'mobile/work_queue.json',
+                'source_mtime' => is_file($sourcePath) ? (int)filemtime($sourcePath) : 0,
+                'source_size' => is_file($sourcePath) ? (int)filesize($sourcePath) : 0,
+                'source_count' => count($queue),
+                'generated_at' => $this->nowIso(),
+                'authority' => 'derived_read_model',
+            ],
+            'by_operator_date' => $byOperatorDate,
+        ];
+
+        $this->writeJson($this->mobileDir . '/work_queue.index.json', $index);
+    }
+
+    /**
+     * @param array<string, mixed> $index
+     */
+    private function workQueueIndexMatchesSource(array $index): bool
+    {
+        $meta = is_array($index['_meta'] ?? null) ? (array)$index['_meta'] : [];
+        if (($meta['schema'] ?? '') !== self::WORK_QUEUE_INDEX_SCHEMA) {
+            return false;
+        }
+
+        $sourcePath = $this->mobileDir . '/work_queue.json';
+        clearstatcache(true, $sourcePath);
+        if (!is_file($sourcePath)) {
+            return (int)($meta['source_count'] ?? -1) === 0;
+        }
+
+        return (int)($meta['source_mtime'] ?? 0) === (int)filemtime($sourcePath)
+            && (int)($meta['source_size'] ?? 0) === (int)filesize($sourcePath);
+    }
+
+    private function queueIndexKey(string $operatorId, string $date): string
+    {
+        return hash('sha256', $operatorId . '|' . $date);
+    }
+
+    /**
+     * @param list<array<string, mixed>> $tasks
+     */
+    private function sortQueueTasks(array &$tasks): void
+    {
+        usort($tasks, static function (array $a, array $b): int {
+            $pA = (int)($a['priority'] ?? 50);
+            $pB = (int)($b['priority'] ?? 50);
+            if ($pA !== $pB) {
+                return $pA <=> $pB;
+            }
+            return strcmp((string)($a['assigned_at'] ?? ''), (string)($b['assigned_at'] ?? ''));
+        });
+    }
+
+    /**
      * @param array<string, mixed> $task
      * @param array<string, mixed> $context
      * @return array<string, mixed>
@@ -1251,6 +1405,40 @@ final class MobileWorkQueueService
         unset($copy['synced_at'], $copy['updated_at']);
 
         return hash('sha256', $this->canonicalJson($copy));
+    }
+
+    private function clockInFingerprint(
+        string $operatorId,
+        string $woNumber,
+        int $operationSeq,
+        string $machineId,
+        string $laborType,
+    ): string {
+        return hash('sha256', $this->canonicalJson([
+            'operator_id' => $operatorId,
+            'wo_number' => $woNumber,
+            'operation_seq' => $operationSeq,
+            'machine_id' => $machineId,
+            'labor_type' => $laborType,
+        ]));
+    }
+
+    private function taskCompletionFingerprint(
+        string $queueId,
+        string $operatorId,
+        string $result,
+        int $qtyCompleted,
+        int $qtyScrap,
+        string $reasonCode,
+    ): string {
+        return hash('sha256', $this->canonicalJson([
+            'queue_id' => $queueId,
+            'operator_id' => $operatorId,
+            'result' => $result,
+            'qty_completed' => $qtyCompleted,
+            'qty_scrap' => $qtyScrap,
+            'reason_code' => $reasonCode,
+        ]));
     }
 
     private function normalizeOfflineType(mixed $value): string
@@ -1644,6 +1832,10 @@ final class MobileWorkQueueService
     {
         $file = $this->mobileDir . '/' . $name . '.json';
         $this->writeJson($file, array_values($data));
+        if ($name === 'work_queue') {
+            $queue = array_values(array_filter($data, 'is_array'));
+            $this->writeWorkQueueIndex($queue);
+        }
     }
 
     private function readJson(string $path): ?array

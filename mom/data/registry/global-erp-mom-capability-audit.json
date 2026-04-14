@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T11:32:58.253Z",
+    "generatedAt": "2026-04-14T14:17:22.832Z",
     "description": "Global ERP+MOM+MES+EQMS backend capability audit mapped against current registry, contracts, workflows, endpoint catalog and OpenAPI.",
     "authority": "Read-only governance artifact. Storage authority remains database/migrations/*.sql -> database/schema.sql."
   },

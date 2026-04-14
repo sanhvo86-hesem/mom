@@ -42,6 +42,9 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Evidence replay-key contract drift | Fixed now | `EvidenceController` idempotency keys now follow the 16-128 character platform token contract without colon separators. |
 | Mobile task completion data quality | Fixed now | Mobile completion rejects scrap greater than completed quantity and requires a reason code for fail/partial/scrap outcomes. |
 | Mobile task lifecycle event history | Fixed now | Mobile assignment/start/completion now writes `mobile/task_events.json`; completion requires `in_progress` and cannot overwrite completed tasks. |
+| Mobile operator queue scan risk | Fixed now | `MobileWorkQueueService::getOperatorQueue()` now uses `mobile/work_queue.index.json` as a derived operator/date read model and rebuilds it from `work_queue.json` when stale. |
+| Online mobile completion replay | Fixed now | `completeTask()` now stores an optional completion idempotency key/fingerprint, returns exact same-key retries without duplicate completion events, and rejects same-key/different-payload conflicts. |
+| Online mobile clock-in replay | Fixed now | `clockIn()` now accepts optional `idempotency_key`, returns exact same-key replays, and rejects same-key/different-context conflicts. |
 | Mobile clock-out scrap contradiction | Fixed now | Clock-out rejects `qty_scrap > qty_completed` even when completed quantity is zero. |
 | Mobile inspection replay identity through controller | Fixed now | `MobileController::captureInspection()` forwards capture/client/idempotency/captured timestamp fields into the service. |
 | Canonical evidence finalization role gate | Fixed now | `EqmsControlPlaneController::finalizeEvidencePackage()` now requires controlled evidence finalization roles. |
@@ -103,4 +106,4 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full EQMS enforcement is blocked by the need to connect inspection results to NCR, disposition, CAPA, and SPC workflows.
 - Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.
 - Full DB-backed CNC program/setup-sheet authority remains blocked by required JSON-to-DB reconciliation and compatibility testing.
-- Online mobile clock-in/task-completion idempotency and indexed mobile queue projections remain staged because they require a broader mobile replay-contract migration.
+- Online mobile clock-in and completion replay are implemented for the existing compatibility store. Clock-out idempotency remains staged because it needs a broader labor-entry close/reopen replay contract.

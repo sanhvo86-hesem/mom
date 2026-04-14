@@ -210,8 +210,17 @@ def main() -> int:
     )
     publishability_failed_checks = quality_report.get("publishability", {}).get("failed_checks") or []
     publishability_blocked_by = []
-    if not publishability_ready and graphics_release_blocked(graphics_governance):
-        publishability_blocked_by.append("graphics_release_blockers_active")
+    graphics_blocked = graphics_release_blocked(graphics_governance)
+    graphics_blockers = (
+        graphics_governance.get("releaseBlockers", {}).get("blockers", [])
+        if isinstance(graphics_governance.get("releaseBlockers"), dict)
+        else []
+    )
+    graphics_active_blocker_count = len([
+        row for row in graphics_blockers
+        if isinstance(row, dict)
+        and str(row.get("status") or "").strip().lower() not in {"closed", "resolved", "waived", "accepted_risk"}
+    ])
     truth_summary = {
         "publication_truth": {
             "scope": "platform_global",
@@ -271,6 +280,15 @@ def main() -> int:
                 ),
                 "anti_false_green": (
                     "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."
+                ),
+            },
+            "graphics_release_gate": {
+                "ready": not graphics_blocked,
+                "verdict": "PASS" if not graphics_blocked else "BLOCKED",
+                "blockedBy": ["graphics_release_blockers_active"] if graphics_blocked else [],
+                "active_blocker_count": graphics_active_blocker_count,
+                "anti_false_green": (
+                    "Registry publishability and graphics-governance release readiness are separate gates; active graphics blockers must keep release readiness blocked even when registry quality is publishable."
                 ),
             },
             "benchmark": {

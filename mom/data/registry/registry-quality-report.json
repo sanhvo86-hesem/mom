@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-14T11:32:51.631Z",
+    "generatedAt": "2026-04-14T14:17:16.715Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a"
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62"
   },
   "summary": {
     "endpoint_count": 4192,
@@ -30,8 +30,8 @@
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
     "transition_runtime_warnings": 349,
-    "workflow_engine_bridge_ready": 344,
-    "workflow_engine_bridge_blocked": 5,
+    "workflow_engine_bridge_ready": 349,
+    "workflow_engine_bridge_blocked": 0,
     "archive_only_tables": 697,
     "soft_delete_tables": 63,
     "hard_delete_tables": 0,
@@ -43,49 +43,32 @@
       "unknown": 0
     },
     "frontend_foundation_entities": 771,
-    "frontend_ready_entities": 766,
-    "frontend_partial_entities": 5,
+    "frontend_ready_entities": 771,
+    "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 6,
-    "frontend_publishable_entities": 750,
-    "frontend_unpublishable_entities": 4,
+    "frontend_publishable_entities": 754,
+    "frontend_unpublishable_entities": 0,
     "attachment_contract_entities": 758,
     "comment_contract_entities": 758,
     "activity_contract_entities": 583,
-    "publishability_ready": false,
-    "publishability_review_required_entities": 4
+    "publishability_ready": true,
+    "publishability_review_required_entities": 0
   },
   "publishability": {
-    "ready": false,
-    "status": "review_required",
-    "review_required": true,
-    "failed_checks": [
-      {
-        "id": "frontend_entities_publishable",
-        "passed": false,
-        "actual": 4,
-        "target": 0
-      },
-      {
-        "id": "workflow_engine_bridges_ready",
-        "passed": false,
-        "actual": 5,
-        "target": 0
-      }
-    ],
+    "ready": true,
+    "status": "ready",
+    "review_required": false,
+    "failed_checks": [],
     "blocking_counts": {
-      "frontend_partial_entities": 5,
+      "frontend_partial_entities": 0,
       "frontend_blocked_entities": 0,
-      "frontend_unpublishable_entities": 4,
-      "workflow_engine_bridge_blocked": 5,
+      "frontend_unpublishable_entities": 0,
+      "workflow_engine_bridge_blocked": 0,
       "unsupported_record_endpoints": 0,
       "contract_issues": 0
     },
-    "recommended_next_actions": [
-      "Close remaining unpublishable record surfaces before rollout.",
-      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
-      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
-    ]
+    "recommended_next_actions": []
   },
   "checks": [
     {
@@ -1268,7 +1251,7 @@
         "table": "audit",
         "workflowId": "wf_audit",
         "lifecycle_mode": "persisted",
-        "execution_mode": "workflow_engine_required",
+        "execution_mode": "workflow_engine",
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       },
       {
@@ -1461,63 +1444,7 @@
         "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
       }
     ],
-    "workflow_engine_bridge": [
-      {
-        "table": "audit",
-        "workflowId": "wf_audit",
-        "record_type": "AUD",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0.125,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "deviation",
-        "workflowId": "wf_deviation",
-        "record_type": "DEVIATION",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "deviations",
-        "workflowId": "wf_deviation",
-        "record_type": "DEVIATION",
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "engineering_change_requests",
-        "workflowId": "wf_engineering_change_request",
-        "record_type": "ECR",
-        "identity_field": "source_record_id",
-        "state_alignment_ratio": 0,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      },
-      {
-        "table": "improvement_projects",
-        "workflowId": "wf_improvement_project",
-        "record_type": "IMP",
-        "identity_field": "record_id",
-        "state_alignment_ratio": 0.2,
-        "block_reasons": [
-          "state_model_mismatch"
-        ],
-        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
-      }
-    ],
+    "workflow_engine_bridge": [],
     "delete_governance": [
       {
         "table": "ai_conversations",
@@ -1882,5 +1809,5 @@
     ],
     "frontend_foundation": []
   },
-  "all_passed": false
+  "all_passed": true
 }
