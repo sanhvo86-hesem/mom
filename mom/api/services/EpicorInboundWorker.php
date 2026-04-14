@@ -186,9 +186,9 @@ final class EpicorInboundWorker
         if ($requestedDomains === []) {
             return array_values(array_unique($available));
         }
-        // Filter requested domains to only include whitelisted ones
-        $filtered = array_filter($requestedDomains, fn($d) => in_array($d, $whitelistedDomains, true));
-        return array_values(array_unique($filtered));
+        // Explicitly requested unsupported domains must be processed as skipped
+        // results, not silently filtered into an all-green no-op.
+        return array_values(array_unique($requestedDomains));
     }
 
     /** @param array<string, mixed> $runtime */

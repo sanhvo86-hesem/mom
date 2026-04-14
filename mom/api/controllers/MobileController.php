@@ -127,7 +127,7 @@ class MobileController extends BaseController
      *
      * @param array $user User record.
      * @return string Employee identifier.
-     * @throws RuntimeException If employee_id is not provisioned
+     * @throws \RuntimeException If employee_id is not provisioned
      */
     private function resolveEmployeeId(array $user): string
     {

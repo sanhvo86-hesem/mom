@@ -55,6 +55,9 @@ Verification evidence:
 - `php mom/tools/release/check_repo_boundary.php`: P0/P1 clean, 33 P2 warnings.
 - `php mom/tools/release/build_release_governance.php --artifact=manifest --change-authority=CO-WORLDCLASS-CLOSURE`: emitted a valid release manifest hash.
 - `php mom/tools/release/check_workflow_status_authority.php`: workflow status authority clean.
+- `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors.
+- `./composer test`: 349 tests, 2002 assertions, 1 skipped, passed.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 349 tests, 2002 assertions, 1 skipped.
 
 ## Accepted Waivers
 

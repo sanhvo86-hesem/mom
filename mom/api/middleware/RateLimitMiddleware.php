@@ -344,10 +344,9 @@ class RateLimitMiddleware
                 }
             }
 
-            // All IPs are valid; use the first one (client IP)
-            if (!empty($validIps)) {
-                return $validIps[0];
-            }
+            // All IPs are valid; explode() on a non-empty header yields at
+            // least one element, so the first validated IP is the client IP.
+            return $validIps[0];
         }
 
         return $remoteAddr;

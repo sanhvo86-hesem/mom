@@ -260,7 +260,7 @@ final class SessionService
      * @param bool $deleteOldSession Whether to delete the old session file.
      * @param bool $required If true and regeneration fails, throw RuntimeException instead of silently continuing.
      * @return void
-     * @throws RuntimeException When $required is true and regeneration fails.
+     * @throws \RuntimeException When $required is true and regeneration fails.
      */
     public static function regenerateIdSafe(bool $deleteOldSession = true, bool $required = false): void
     {
