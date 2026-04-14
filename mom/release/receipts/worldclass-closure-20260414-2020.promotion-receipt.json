@@ -5,18 +5,19 @@
   "branch": "codex/worldclass-closure-20260414-2020",
   "target_branch": "main",
   "original_base_head": "c7c3cdaa0c83",
-  "synced_base_head": "7d562788b05f90b21b8d6e7292fdaec9edb135c3",
-  "validated_head": "431e4319315563a580f52f9dfa1ee71671255eaa",
+  "synced_base_head": "88b79955b5654dd9a936e698a923326e6bce411c",
+  "validated_head": "5aab122518e44b6cfceeff2a7e238cf842bee0a0",
+  "validated_head_role": "post_remediation_runtime_head_before_governed_manifest_receipt_update",
   "promotion_state": "premerge_validation_passed_after_closure_loop",
   "created_at": "2026-04-14T13:46:31Z",
   "merge_strategy": "fast_forward_preferred_else_stop",
   "validation_evidence": {
     "repo_boundary": "passed: repo boundary clean",
     "workflow_status_authority": "passed: workflow status authority clean",
-    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest and release manifest binding focused checks",
+    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest (78 tests, 483 assertions) and ShopfloorExecutionServiceTest (48 tests, 179 assertions)",
     "composer_analyse": "passed",
-    "composer_test": "passed: 456 tests, 2574 assertions, 1 skipped",
-    "composer_check": "passed: PHPStan clean; PHPUnit 456 tests, 2574 assertions, 1 skipped"
+    "composer_test": "passed: 461 tests, 2681 assertions, 1 skipped",
+    "composer_check": "passed: PHPStan clean; PHPUnit 461 tests, 2681 assertions, 1 skipped"
   },
   "closure_counts": {
     "unresolved_p0": 0,
@@ -25,8 +26,9 @@
       "Graph publication worker dependency-blocked on production Microsoft Graph configuration",
       "WORM/Object Lock adapter dependency-blocked on selected immutable storage provider",
       "Daily integrity digest worker dependency-blocked on approved scheduler and digest scope",
-      "Full training task lifecycle dependency-blocked on training owner rollout",
-      "Full deterministic as-built closure builder dependency-blocked on Wave 5 product rollout"
+      "Full training assignment/completion product workflow dependency-blocked on training owner rollout; backend release gate now requires authoritative training proof",
+      "Full deterministic as-built closure builder dependency-blocked on Wave 5 product rollout",
+      "Tracked manifest self-commit binding is mathematically impossible; external CI/deploy promotion manifest must bind the post-merge commit"
     ],
     "p2_roadmap": [
       "Productized effectivity manager UI/API",
