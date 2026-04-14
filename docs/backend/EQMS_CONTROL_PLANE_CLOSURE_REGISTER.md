@@ -178,7 +178,7 @@ Six-agent closure loop result after remediation:
 |---|---|
 | Finalization audit event was present but not chain-verifiable under the regulated audit contract. | `EvidenceFinalizationService` now persists/replays `evidence.finalized` with deterministic event id, aggregate advisory lock, aggregate sequence, previous hash, canonical `AuditTrail.canonicalHashRecord.v1` hash, and `metadata.audit_chain.event_hash`. |
 | Audit-pack readiness accepted syntactic finalization markers. | `AuditPackExportService` selects `aggregate_sequence`, `event_hash`, and `prev_hash`; `AuditPackExporter` requires finalization event hash, chain hash, sequence, and package-hash match before reporting `ready`. |
-| Missing proof-of-completion for chain failure path. | `WorldClassControlPlaneExecutionTest` now covers rejection of a finalization event without chain proof plus the finalization persistence path; latest `composer check` passed with PHPStan clean and 460 PHPUnit tests / 2595 assertions / 1 skipped. |
+| Missing proof-of-completion for chain failure path. | `WorldClassControlPlaneExecutionTest` now covers rejection of a finalization event without chain proof plus the finalization persistence path; latest `composer check` passed with PHPStan clean and 460 PHPUnit tests / 2596 assertions / 1 skipped. |
 
 ## 2026-04-14 22:05 Agent 4 Genealogy / 5M Closure Addendum
 
@@ -186,7 +186,13 @@ Six-agent closure loop result after remediation:
 |---|---|
 | Genealogy fact replay, reverse-cycle checks, recursive cycle checks, node identity, and snapshot hash identity were still globally keyed. | Migration `130_genealogy_scope_identity_and_5m_gate.sql` drops global uniqueness and adds scoped unique indexes for `genealogy_edge_facts`, `genealogy_nodes`, and `as_manufactured_snapshots`; `GenealogyGraphService` now scopes reverse-cycle checks, recursive traversal, replay lookup, fact conflict target, node conflict target, and snapshot conflict target. |
 | Shopfloor production could be accepted without authoritative 5M evaluation or waiver. | `ShopfloorExecutionService::buildProductionLog()` now requires `GenealogyGraphService::evaluateAndPersist5M()` for production-relevant reports when a genealogy store is available, otherwise a signed 5M waiver; `appendProductionReportEvent()` rejects production logs without a complete/waived/not-applicable gate. |
-| Missing proof-of-completion for shopfloor 5M closure. | `ShopfloorExecutionServiceTest` covers failure without authoritative store or signed waiver and success with a persisted authoritative gate; `WorldClassControlPlaneExecutionTest` covers scoped genealogy SQL and migration evidence; latest `composer check` passed with PHPStan clean and 460 PHPUnit tests / 2595 assertions / 1 skipped. |
+| Missing proof-of-completion for shopfloor 5M closure. | `ShopfloorExecutionServiceTest` covers failure without authoritative store or signed waiver and success with a persisted authoritative gate; `WorldClassControlPlaneExecutionTest` covers scoped genealogy SQL and migration evidence; latest `composer check` passed with PHPStan clean and 460 PHPUnit tests / 2596 assertions / 1 skipped. |
+
+## 2026-04-14 22:20 Main Sync Boundary Closure Addendum
+
+| Late sync finding | Closure evidence |
+|---|---|
+| Latest `origin/main` introduced segmented registry artifacts that were valid governed registry outputs but still classified as uncontrolled generated reports by the repo boundary scanner. | `RepoBoundaryScanner` now allows `mom/data/registry/system-contract-runtime-projections.segments/*.json`; `WorldClassControlPlaneExecutionTest` covers the allowed path and `php tools/release/check_repo_boundary.php` reports `repo boundary clean`. |
 
 ## Non-Authority Legacy Surfaces
 

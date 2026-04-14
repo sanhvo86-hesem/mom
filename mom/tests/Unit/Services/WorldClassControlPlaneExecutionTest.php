@@ -83,6 +83,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             '.vscode/launch.json',
             'tools/php82/php.exe',
             'mom/data/registry/registry-manifest.json',
+            'mom/data/registry/system-contract-runtime-projections.segments/tables.json',
             'mom/docs/system/agent-reports/tranche14/agent1-repo-reality.md',
             'mom/docs/system/world-class-swarm-closure-tranche14.md',
             'mom/data/audit/audit_2026-04.jsonl',
@@ -110,6 +111,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertContains('mom/data/online-forms/schemas/_archive/FRM-208.json', $paths);
         $this->assertContains('mom/data/ratelimit/login_127.0.0.1.json', $paths);
         $this->assertNotContains('mom/data/registry/registry-manifest.json', $paths);
+        $this->assertNotContains('mom/data/registry/system-contract-runtime-projections.segments/tables.json', $paths);
         $this->assertNotContains('mom/docs/system/agent-reports/tranche14/agent1-repo-reality.md', $paths);
         $this->assertNotContains('mom/docs/system/world-class-swarm-closure-tranche14.md', $paths);
         $this->assertContains('mom/docs/forms/frm-500-production/.backups/FRM-511_Setup_and_First_Piece_Record.xlsx.v0.bak', $paths);

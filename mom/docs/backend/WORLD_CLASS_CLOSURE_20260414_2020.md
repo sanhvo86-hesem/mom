@@ -3,7 +3,7 @@
 Branch: `codex/worldclass-closure-20260414-2020`
 Base branch: `main`
 Original base head: `c7c3cdaa0c83`
-Synced base heads: `7d3500918270`, `13ef99b2f1bb`, `a5171d020e3e`, `7d562788b05f`
+Synced base heads: `7d3500918270`, `13ef99b2f1bb`, `a5171d020e3e`, `7d562788b05f`, `ca9710588e83`
 Current validated code head before Agent 5 final chain-proof remediation: `76f3c5bbc447`
 Sync strategy: initial `git fetch origin main` + `git merge --ff-only origin/main`; later `git merge --no-ff origin/main` when `main` moved during remediation.
 Record state: post-remediation controlled closure register for the branch-level remediation pass.
@@ -42,6 +42,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Shopfloor production reporting did not enforce 5M before acceptance | P1 | Closed | `ShopfloorExecutionService::buildProductionLog()` now requires an authoritative `GenealogyGraphService::evaluateAndPersist5M()` result or explicit signed 5M waiver; `appendProductionReportEvent()` rejects production logs that lack a complete/waived/not-applicable 5M gate. |
 | EQMS control-plane routes lacked OpenAPI coverage | P1 | Closed | `api/openapi.yaml` now documents issuance, submission attempt, finalization, change order, audit pack, and as-manufactured query contracts and error states. |
 | Deploy workflow only checked promotion refs were non-empty | P1 | Closed | Added `ReleaseManifestBindingVerifier`, `verify_release_manifest_binding.php`, workflow deploy step, and focused test proving commit/authority/hash mismatch blocks deployment. |
+| Latest `origin/main` registry segmentation tripped repo boundary scanner | P1 | Closed | `RepoBoundaryScanner` now treats `mom/data/registry/system-contract-runtime-projections.segments/*.json` as governed segmented registry artifacts, not uncontrolled generated reports; boundary test and `check_repo_boundary.php` pass. |
 | Graph publication worker, WORM adapter, daily digest worker, full training task lifecycle, and full as-built closure | P1 | Dependency-waived | External/provider/product rollout dependencies are documented in the accepted waiver register with owner, review date, and exit criteria. |
 
 ## B. Branch Creation Details
@@ -227,8 +228,8 @@ Final validation evidence after latest `origin/main` sync and deploy-binding rem
 - `php tools/release/check_workflow_status_authority.php`: passed, `workflow status authority clean`.
 - Focused PHPUnit: `WorldClassControlPlaneExecutionTest` and `ShopfloorExecutionServiceTest` passed, including chain-proof audit-pack rejection, evidence finalization audit-chain persistence, scoped genealogy identity, and shopfloor 5M gate enforcement; release manifest binding focused test passed.
 - `composer analyse -- --memory-limit=1G`: passed.
-- `composer test`: passed, 460 tests, 2595 assertions, 1 skipped.
-- `composer check`: passed, PHPStan clean plus 460 tests, 2595 assertions, 1 skipped.
+- `composer test`: passed, 460 tests, 2596 assertions, 1 skipped.
+- `composer check`: passed, PHPStan clean plus 460 tests, 2596 assertions, 1 skipped.
 
 ## N. Second Six-Agent Re-Audit
 
@@ -323,7 +324,7 @@ Rollback:
 | Unresolved non-waived P1 = 0 | Closed by code/migration/API/test evidence; dependency waivers are explicit below. |
 | Required migrations present | Present: migrations 128 and 129. |
 | Required backend changes present | Present. |
-| Required tests green | Passed after latest `origin/main` sync plus Agent 5 chain-proof and Agent 4 genealogy/5M remediation: 460 tests, 2595 assertions, 1 skipped; PHPStan clean. |
+| Required tests green | Passed after latest `origin/main` sync plus Agent 5 chain-proof, Agent 4 genealogy/5M remediation, and registry segmentation boundary update: 460 tests, 2596 assertions, 1 skipped; PHPStan clean. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |
 | Waivers documented | Present. |
 | PR summary updated | Draft body prepared above. |
