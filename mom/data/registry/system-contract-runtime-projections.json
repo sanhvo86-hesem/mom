@@ -1,0 +1,2266 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T05:20:39.709Z",
+    "publication_run_id": "ce72481e-a4ef-4d69-b538-9c87b8b73a9e",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "summary": {
+    "tableCount": 750,
+    "relationCount": 0,
+    "workflowCount": 0,
+    "endpointCount": 22
+  },
+  "tables": [
+    {
+      "table": "ai_conversations"
+    },
+    {
+      "table": "ai_feedback_loops"
+    },
+    {
+      "table": "ai_recommendation_actions"
+    },
+    {
+      "table": "ai_training_datasets"
+    },
+    {
+      "table": "alarm_event"
+    },
+    {
+      "table": "allocation"
+    },
+    {
+      "table": "allocation_events"
+    },
+    {
+      "table": "allocations"
+    },
+    {
+      "table": "ap_ar_invoices"
+    },
+    {
+      "table": "ap_invoice_lines"
+    },
+    {
+      "table": "ap_invoices"
+    },
+    {
+      "table": "approval"
+    },
+    {
+      "table": "approved_supplier_list"
+    },
+    {
+      "table": "apqp_gate_reviews"
+    },
+    {
+      "table": "apqp_projects"
+    },
+    {
+      "table": "aps_capacity_buckets"
+    },
+    {
+      "table": "aps_constraint_resources"
+    },
+    {
+      "table": "aps_demand_forecast_lines"
+    },
+    {
+      "table": "aps_demand_forecasts"
+    },
+    {
+      "table": "aps_kpi_snapshots"
+    },
+    {
+      "table": "aps_material_availability"
+    },
+    {
+      "table": "aps_pegging_links"
+    },
+    {
+      "table": "aps_planning_horizons"
+    },
+    {
+      "table": "aps_planning_scenarios"
+    },
+    {
+      "table": "aps_schedule_blocks"
+    },
+    {
+      "table": "aps_schedule_conflicts"
+    },
+    {
+      "table": "aps_setup_matrices"
+    },
+    {
+      "table": "as_manufactured_snapshots"
+    },
+    {
+      "table": "attachment"
+    },
+    {
+      "table": "audit"
+    },
+    {
+      "table": "audit_actions"
+    },
+    {
+      "table": "audit_events"
+    },
+    {
+      "table": "audit_findings"
+    },
+    {
+      "table": "audit_pack_exports"
+    },
+    {
+      "table": "audit_program"
+    },
+    {
+      "table": "audit_trail"
+    },
+    {
+      "table": "audits"
+    },
+    {
+      "table": "background_jobs"
+    },
+    {
+      "table": "bill_of_materials"
+    },
+    {
+      "table": "bom"
+    },
+    {
+      "table": "bom_components"
+    },
+    {
+      "table": "bom_line"
+    },
+    {
+      "table": "bom_substitute"
+    },
+    {
+      "table": "bom_version"
+    },
+    {
+      "table": "calendar"
+    },
+    {
+      "table": "calibration_grr_studies"
+    },
+    {
+      "table": "calibration_oot_investigations"
+    },
+    {
+      "table": "calibration_records"
+    },
+    {
+      "table": "capa"
+    },
+    {
+      "table": "capa_8d_steps"
+    },
+    {
+      "table": "capa_effectiveness_checks"
+    },
+    {
+      "table": "capa_records"
+    },
+    {
+      "table": "capacity_snapshots"
+    },
+    {
+      "table": "certificates"
+    },
+    {
+      "table": "change_control"
+    },
+    {
+      "table": "cnc_program_approvals"
+    },
+    {
+      "table": "cnc_program_versions"
+    },
+    {
+      "table": "cnc_programs"
+    },
+    {
+      "table": "com_contract_amendments"
+    },
+    {
+      "table": "com_contract_lines"
+    },
+    {
+      "table": "com_contracts"
+    },
+    {
+      "table": "com_credit_profiles"
+    },
+    {
+      "table": "com_customer_scorecards"
+    },
+    {
+      "table": "com_incoterms_profiles"
+    },
+    {
+      "table": "com_order_promises"
+    },
+    {
+      "table": "com_payment_terms_profiles"
+    },
+    {
+      "table": "com_price_list_lines"
+    },
+    {
+      "table": "com_price_lists"
+    },
+    {
+      "table": "com_rebate_accruals"
+    },
+    {
+      "table": "com_rebate_programs"
+    },
+    {
+      "table": "comments"
+    },
+    {
+      "table": "commercial_accounts"
+    },
+    {
+      "table": "competency"
+    },
+    {
+      "table": "complaint"
+    },
+    {
+      "table": "compliance_records"
+    },
+    {
+      "table": "concessions"
+    },
+    {
+      "table": "container"
+    },
+    {
+      "table": "contamination_checks"
+    },
+    {
+      "table": "contract_review_items"
+    },
+    {
+      "table": "control_plan_characteristics"
+    },
+    {
+      "table": "control_plane_object_registry"
+    },
+    {
+      "table": "control_plans"
+    },
+    {
+      "table": "copq_ledger"
+    },
+    {
+      "table": "cost_elements"
+    },
+    {
+      "table": "cost_ledger"
+    },
+    {
+      "table": "crm_accounts"
+    },
+    {
+      "table": "crm_activities"
+    },
+    {
+      "table": "crm_campaigns"
+    },
+    {
+      "table": "crm_contacts"
+    },
+    {
+      "table": "crm_customer_touchpoints"
+    },
+    {
+      "table": "crm_forecasts"
+    },
+    {
+      "table": "crm_leads"
+    },
+    {
+      "table": "crm_opportunities"
+    },
+    {
+      "table": "crm_opportunity_lines"
+    },
+    {
+      "table": "crm_quotes_pipeline"
+    },
+    {
+      "table": "customer_complaints"
+    },
+    {
+      "table": "customer_sites"
+    },
+    {
+      "table": "customers"
+    },
+    {
+      "table": "data_archival_runs"
+    },
+    {
+      "table": "demand"
+    },
+    {
+      "table": "demand_classifications"
+    },
+    {
+      "table": "demand_history_buckets"
+    },
+    {
+      "table": "departments"
+    },
+    {
+      "table": "deviation"
+    },
+    {
+      "table": "deviations"
+    },
+    {
+      "table": "dispatch_queue"
+    },
+    {
+      "table": "doc_distributions"
+    },
+    {
+      "table": "doc_effectivities"
+    },
+    {
+      "table": "doc_families"
+    },
+    {
+      "table": "doc_read_acknowledgements"
+    },
+    {
+      "table": "doc_revisions"
+    },
+    {
+      "table": "document"
+    },
+    {
+      "table": "document_distribution"
+    },
+    {
+      "table": "document_embeddings"
+    },
+    {
+      "table": "document_revision"
+    },
+    {
+      "table": "document_versions"
+    },
+    {
+      "table": "documents"
+    },
+    {
+      "table": "domain_outbox_events"
+    },
+    {
+      "table": "downtime_event"
+    },
+    {
+      "table": "duplicate_detection_fingerprints"
+    },
+    {
+      "table": "dw_customer_dim"
+    },
+    {
+      "table": "dw_employee_dim"
+    },
+    {
+      "table": "dw_etl_runs"
+    },
+    {
+      "table": "dw_fact_delivery"
+    },
+    {
+      "table": "dw_fact_financial"
+    },
+    {
+      "table": "dw_fact_production"
+    },
+    {
+      "table": "dw_fact_quality"
+    },
+    {
+      "table": "dw_item_dim"
+    },
+    {
+      "table": "dw_kpi_scorecards"
+    },
+    {
+      "table": "dw_machine_dim"
+    },
+    {
+      "table": "dw_supplier_dim"
+    },
+    {
+      "table": "dw_time_dim"
+    },
+    {
+      "table": "effectivity_conflicts"
+    },
+    {
+      "table": "ehs_contractors"
+    },
+    {
+      "table": "ehs_corrective_actions"
+    },
+    {
+      "table": "ehs_emergency_drills"
+    },
+    {
+      "table": "ehs_emissions_monitoring"
+    },
+    {
+      "table": "ehs_energy_targets"
+    },
+    {
+      "table": "ehs_exposure_assessments"
+    },
+    {
+      "table": "ehs_hazardous_materials"
+    },
+    {
+      "table": "ehs_incidents"
+    },
+    {
+      "table": "ehs_material_safety_data"
+    },
+    {
+      "table": "ehs_permit_register"
+    },
+    {
+      "table": "ehs_ppe_issue_logs"
+    },
+    {
+      "table": "ehs_ppe_requirements"
+    },
+    {
+      "table": "ehs_regulatory_submissions"
+    },
+    {
+      "table": "ehs_sustainability_projects"
+    },
+    {
+      "table": "ehs_training_matrix"
+    },
+    {
+      "table": "ehs_waste_shipments"
+    },
+    {
+      "table": "ehs_waste_streams"
+    },
+    {
+      "table": "electronic_signature"
+    },
+    {
+      "table": "electronic_signatures"
+    },
+    {
+      "table": "employee_certifications"
+    },
+    {
+      "table": "employees"
+    },
+    {
+      "table": "eng_capacity_models"
+    },
+    {
+      "table": "eng_changeover_standards"
+    },
+    {
+      "table": "eng_factory_calendar_days"
+    },
+    {
+      "table": "eng_factory_calendars"
+    },
+    {
+      "table": "eng_line_balancing_studies"
+    },
+    {
+      "table": "eng_process_families"
+    },
+    {
+      "table": "eng_process_validation"
+    },
+    {
+      "table": "eng_resource_group_members"
+    },
+    {
+      "table": "eng_resource_groups"
+    },
+    {
+      "table": "eng_standard_operations"
+    },
+    {
+      "table": "eng_time_standards"
+    },
+    {
+      "table": "eng_tooling_requirements"
+    },
+    {
+      "table": "eng_work_instruction_steps"
+    },
+    {
+      "table": "eng_work_instructions"
+    },
+    {
+      "table": "engineering_change_requests"
+    },
+    {
+      "table": "eqms_change_affected_object"
+    },
+    {
+      "table": "eqms_change_resulting_object"
+    },
+    {
+      "table": "eqms_command_ledger"
+    },
+    {
+      "table": "eqms_controlled_revision_rollout"
+    },
+    {
+      "table": "eqms_document_distribution"
+    },
+    {
+      "table": "eqms_document_effectivity"
+    },
+    {
+      "table": "eqms_document_family"
+    },
+    {
+      "table": "eqms_document_read_ack"
+    },
+    {
+      "table": "eqms_document_revision"
+    },
+    {
+      "table": "eqms_electronic_signature_event"
+    },
+    {
+      "table": "eqms_evidence_artifact"
+    },
+    {
+      "table": "eqms_evidence_manifest"
+    },
+    {
+      "table": "eqms_evidence_record"
+    },
+    {
+      "table": "eqms_evidence_version"
+    },
+    {
+      "table": "eqms_execution_entitlement_decision"
+    },
+    {
+      "table": "eqms_field_change_authorization"
+    },
+    {
+      "table": "eqms_field_governance_rule"
+    },
+    {
+      "table": "eqms_form_family"
+    },
+    {
+      "table": "eqms_form_issuance"
+    },
+    {
+      "table": "eqms_form_record"
+    },
+    {
+      "table": "eqms_form_record_version"
+    },
+    {
+      "table": "eqms_form_schema_version"
+    },
+    {
+      "table": "eqms_form_submission_attempt"
+    },
+    {
+      "table": "eqms_form_template_revision"
+    },
+    {
+      "table": "eqms_integrity_digest"
+    },
+    {
+      "table": "eqms_integrity_exception"
+    },
+    {
+      "table": "eqms_publication_event"
+    },
+    {
+      "table": "eqms_publication_job"
+    },
+    {
+      "table": "eqms_publication_target"
+    },
+    {
+      "table": "eqms_retention_lock"
+    },
+    {
+      "table": "eqms_training_obligation"
+    },
+    {
+      "table": "equipment"
+    },
+    {
+      "table": "escalation_log"
+    },
+    {
+      "table": "escalation_rules"
+    },
+    {
+      "table": "evidence_artifacts"
+    },
+    {
+      "table": "evidence_chain_custody"
+    },
+    {
+      "table": "evidence_fts"
+    },
+    {
+      "table": "evidence_links"
+    },
+    {
+      "table": "evidence_publications"
+    },
+    {
+      "table": "evidence_records"
+    },
+    {
+      "table": "evidence_vault"
+    },
+    {
+      "table": "evidence_versions"
+    },
+    {
+      "table": "export_licenses"
+    },
+    {
+      "table": "fai_characteristics"
+    },
+    {
+      "table": "fai_records"
+    },
+    {
+      "table": "fai_trigger_log"
+    },
+    {
+      "table": "field_governance_rules"
+    },
+    {
+      "table": "file_attachments"
+    },
+    {
+      "table": "fin_asset_depreciation"
+    },
+    {
+      "table": "fin_bank_reconciliations"
+    },
+    {
+      "table": "fin_budget_lines"
+    },
+    {
+      "table": "fin_budget_versions"
+    },
+    {
+      "table": "fin_cash_accounts"
+    },
+    {
+      "table": "fin_cash_transactions"
+    },
+    {
+      "table": "fin_cost_versions"
+    },
+    {
+      "table": "fin_country_tax_profiles"
+    },
+    {
+      "table": "fin_currencies"
+    },
+    {
+      "table": "fin_customs_declarations"
+    },
+    {
+      "table": "fin_customs_tariff_codes"
+    },
+    {
+      "table": "fin_exchange_rate_types"
+    },
+    {
+      "table": "fin_exchange_rates"
+    },
+    {
+      "table": "fin_fixed_assets"
+    },
+    {
+      "table": "fin_intercompany_pairs"
+    },
+    {
+      "table": "fin_lc_draw_requests"
+    },
+    {
+      "table": "fin_letters_of_credit"
+    },
+    {
+      "table": "fin_multi_book_ledgers"
+    },
+    {
+      "table": "fin_realized_fx_gains"
+    },
+    {
+      "table": "fin_revenue_schedules"
+    },
+    {
+      "table": "fin_standard_cost_rollups"
+    },
+    {
+      "table": "fin_tax_jurisdictions"
+    },
+    {
+      "table": "fin_withholding_tax_codes"
+    },
+    {
+      "table": "finding"
+    },
+    {
+      "table": "fixture_maintenance_logs"
+    },
+    {
+      "table": "fixture_master"
+    },
+    {
+      "table": "fmea_actions"
+    },
+    {
+      "table": "fmea_failure_modes"
+    },
+    {
+      "table": "fmea_records"
+    },
+    {
+      "table": "fmea_revisions"
+    },
+    {
+      "table": "forecast"
+    },
+    {
+      "table": "form_attachments"
+    },
+    {
+      "table": "form_drafts"
+    },
+    {
+      "table": "form_entries"
+    },
+    {
+      "table": "form_schemas"
+    },
+    {
+      "table": "freight_order_stops"
+    },
+    {
+      "table": "freight_orders"
+    },
+    {
+      "table": "frm_families"
+    },
+    {
+      "table": "frm_issuances"
+    },
+    {
+      "table": "frm_schema_versions"
+    },
+    {
+      "table": "frm_submission_attempts"
+    },
+    {
+      "table": "frm_template_revisions"
+    },
+    {
+      "table": "genealogy_edges"
+    },
+    {
+      "table": "genealogy_link"
+    },
+    {
+      "table": "genealogy_nodes"
+    },
+    {
+      "table": "gl_transactions"
+    },
+    {
+      "table": "hcm_attendance_records"
+    },
+    {
+      "table": "hcm_certifications"
+    },
+    {
+      "table": "hcm_disciplinary_actions"
+    },
+    {
+      "table": "hcm_employee_certifications"
+    },
+    {
+      "table": "hcm_employee_skills"
+    },
+    {
+      "table": "hcm_employees"
+    },
+    {
+      "table": "hcm_leave_balances"
+    },
+    {
+      "table": "hcm_org_units"
+    },
+    {
+      "table": "hcm_payroll_lines"
+    },
+    {
+      "table": "hcm_payroll_periods"
+    },
+    {
+      "table": "hcm_payroll_runs"
+    },
+    {
+      "table": "hcm_positions"
+    },
+    {
+      "table": "hcm_qualification_requirements"
+    },
+    {
+      "table": "hcm_skills_catalog"
+    },
+    {
+      "table": "idempotency_replay_ledger"
+    },
+    {
+      "table": "immutable_storage_objects"
+    },
+    {
+      "table": "improvement_projects"
+    },
+    {
+      "table": "incoming_inspection_results"
+    },
+    {
+      "table": "incoming_inspections"
+    },
+    {
+      "table": "inspection_characteristic"
+    },
+    {
+      "table": "inspection_lot"
+    },
+    {
+      "table": "inspection_plan"
+    },
+    {
+      "table": "inspection_plans"
+    },
+    {
+      "table": "inspection_result"
+    },
+    {
+      "table": "inspection_results"
+    },
+    {
+      "table": "integration_monitors"
+    },
+    {
+      "table": "integrity_digests"
+    },
+    {
+      "table": "integrity_exceptions"
+    },
+    {
+      "table": "inventory_balance_snapshot"
+    },
+    {
+      "table": "inventory_buffer_profiles"
+    },
+    {
+      "table": "inventory_ledger"
+    },
+    {
+      "table": "inventory_locations"
+    },
+    {
+      "table": "inventory_transactions"
+    },
+    {
+      "table": "inventory_valuations"
+    },
+    {
+      "table": "ipqc_inspection_results"
+    },
+    {
+      "table": "ipqc_inspections"
+    },
+    {
+      "table": "item"
+    },
+    {
+      "table": "item_attr"
+    },
+    {
+      "table": "item_class"
+    },
+    {
+      "table": "item_revision"
+    },
+    {
+      "table": "item_revisions"
+    },
+    {
+      "table": "item_site"
+    },
+    {
+      "table": "item_spec"
+    },
+    {
+      "table": "item_variant"
+    },
+    {
+      "table": "items"
+    },
+    {
+      "table": "job"
+    },
+    {
+      "table": "job_costing"
+    },
+    {
+      "table": "job_event"
+    },
+    {
+      "table": "job_operations"
+    },
+    {
+      "table": "job_orders"
+    },
+    {
+      "table": "job_release_gates"
+    },
+    {
+      "table": "kpi_definitions"
+    },
+    {
+      "table": "kpi_snapshots"
+    },
+    {
+      "table": "labor_capture"
+    },
+    {
+      "table": "labor_transactions"
+    },
+    {
+      "table": "lean_5s_audits"
+    },
+    {
+      "table": "lean_andon_events"
+    },
+    {
+      "table": "lean_gemba_walks"
+    },
+    {
+      "table": "lean_kaizen_events"
+    },
+    {
+      "table": "lean_qrqc_events"
+    },
+    {
+      "table": "lean_smed_events"
+    },
+    {
+      "table": "lean_tier_escalations"
+    },
+    {
+      "table": "lean_tier_meetings"
+    },
+    {
+      "table": "legal_holds"
+    },
+    {
+      "table": "location_balance"
+    },
+    {
+      "table": "lot"
+    },
+    {
+      "table": "lot_master"
+    },
+    {
+      "table": "lot_policy"
+    },
+    {
+      "table": "machine_event"
+    },
+    {
+      "table": "machine_rate_cards"
+    },
+    {
+      "table": "machine_telemetry_extended"
+    },
+    {
+      "table": "maintenance_work_orders"
+    },
+    {
+      "table": "management_reviews"
+    },
+    {
+      "table": "master_data_store"
+    },
+    {
+      "table": "material_consumption"
+    },
+    {
+      "table": "material_cost_templates"
+    },
+    {
+      "table": "material_review_board"
+    },
+    {
+      "table": "mdm_approval_policies"
+    },
+    {
+      "table": "mdm_attribute_sets"
+    },
+    {
+      "table": "mdm_attribute_values"
+    },
+    {
+      "table": "mdm_data_stewards"
+    },
+    {
+      "table": "mdm_duplicate_candidates"
+    },
+    {
+      "table": "mdm_form_series"
+    },
+    {
+      "table": "mdm_governance_issues"
+    },
+    {
+      "table": "mdm_incoterms"
+    },
+    {
+      "table": "mdm_item_classes"
+    },
+    {
+      "table": "mdm_number_series"
+    },
+    {
+      "table": "mdm_payment_terms"
+    },
+    {
+      "table": "mdm_promise_policies"
+    },
+    {
+      "table": "mdm_reference_code_values"
+    },
+    {
+      "table": "mdm_reference_codes"
+    },
+    {
+      "table": "mdm_shipping_methods"
+    },
+    {
+      "table": "mdm_site_parameters"
+    },
+    {
+      "table": "mdm_uom_conversions"
+    },
+    {
+      "table": "mes_alarm_catalog"
+    },
+    {
+      "table": "mes_alarm_playbooks"
+    },
+    {
+      "table": "mes_areas"
+    },
+    {
+      "table": "mes_connectivity_adapters"
+    },
+    {
+      "table": "mes_connectivity_events"
+    },
+    {
+      "table": "mes_cost_tracking"
+    },
+    {
+      "table": "mes_cycle_events"
+    },
+    {
+      "table": "mes_dispatch_queue"
+    },
+    {
+      "table": "mes_downtime_events"
+    },
+    {
+      "table": "mes_dpp_passports"
+    },
+    {
+      "table": "mes_energy_snapshots"
+    },
+    {
+      "table": "mes_equipment_extended"
+    },
+    {
+      "table": "mes_erp_inbound_queue"
+    },
+    {
+      "table": "mes_erp_outbound_queue"
+    },
+    {
+      "table": "mes_erp_reconciliation_exceptions"
+    },
+    {
+      "table": "mes_erp_sync_runs"
+    },
+    {
+      "table": "mes_event_subscriptions"
+    },
+    {
+      "table": "mes_fixture_assignments"
+    },
+    {
+      "table": "mes_genealogy_operations"
+    },
+    {
+      "table": "mes_inline_measurements"
+    },
+    {
+      "table": "mes_job_execution"
+    },
+    {
+      "table": "mes_machine_alarms"
+    },
+    {
+      "table": "mes_machine_snapshot"
+    },
+    {
+      "table": "mes_machine_state_events"
+    },
+    {
+      "table": "mes_machine_telemetry"
+    },
+    {
+      "table": "mes_material_consumption"
+    },
+    {
+      "table": "mes_nc_download_receipts"
+    },
+    {
+      "table": "mes_nc_release_packages"
+    },
+    {
+      "table": "mes_oee_loss_events"
+    },
+    {
+      "table": "mes_oee_snapshots"
+    },
+    {
+      "table": "mes_on_time_delivery"
+    },
+    {
+      "table": "mes_operation_execution"
+    },
+    {
+      "table": "mes_operational_event_ledger"
+    },
+    {
+      "table": "mes_operator_qualifications"
+    },
+    {
+      "table": "mes_operator_sessions"
+    },
+    {
+      "table": "mes_part_genealogy"
+    },
+    {
+      "table": "mes_pm_execution"
+    },
+    {
+      "table": "mes_production_kpi_daily"
+    },
+    {
+      "table": "mes_program_events"
+    },
+    {
+      "table": "mes_shift_handover"
+    },
+    {
+      "table": "mes_shop_floor_layout"
+    },
+    {
+      "table": "mes_sites"
+    },
+    {
+      "table": "mes_spare_parts_consumption"
+    },
+    {
+      "table": "mes_spc_control_limits"
+    },
+    {
+      "table": "mes_spc_violations"
+    },
+    {
+      "table": "mes_tool_assemblies"
+    },
+    {
+      "table": "mes_tool_life_events"
+    },
+    {
+      "table": "mes_tool_preset_offsets"
+    },
+    {
+      "table": "mes_trusted_release_record"
+    },
+    {
+      "table": "mes_wip_location"
+    },
+    {
+      "table": "mes_wip_movements"
+    },
+    {
+      "table": "mobile_inspection_captures"
+    },
+    {
+      "table": "mobile_time_entries"
+    },
+    {
+      "table": "mobile_work_queue"
+    },
+    {
+      "table": "mrp_planned_orders"
+    },
+    {
+      "table": "mrp_signal"
+    },
+    {
+      "table": "naming_patterns"
+    },
+    {
+      "table": "ncr_human_factors"
+    },
+    {
+      "table": "ncr_mrb_decisions"
+    },
+    {
+      "table": "ncr_records"
+    },
+    {
+      "table": "nonconformance"
+    },
+    {
+      "table": "notifications"
+    },
+    {
+      "table": "npi_projects"
+    },
+    {
+      "table": "online_form_sessions"
+    },
+    {
+      "table": "operation"
+    },
+    {
+      "table": "operation_material"
+    },
+    {
+      "table": "operation_output"
+    },
+    {
+      "table": "operation_resource"
+    },
+    {
+      "table": "oqc_inspections"
+    },
+    {
+      "table": "order_collaboration_events"
+    },
+    {
+      "table": "order_document_requirements"
+    },
+    {
+      "table": "order_documents_required"
+    },
+    {
+      "table": "order_holds"
+    },
+    {
+      "table": "order_milestones"
+    },
+    {
+      "table": "order_notes"
+    },
+    {
+      "table": "order_timeline_events"
+    },
+    {
+      "table": "org_companies"
+    },
+    {
+      "table": "org_company"
+    },
+    {
+      "table": "org_enterprise"
+    },
+    {
+      "table": "org_legal_entities"
+    },
+    {
+      "table": "org_plant"
+    },
+    {
+      "table": "org_plants"
+    },
+    {
+      "table": "org_site"
+    },
+    {
+      "table": "org_warehouse"
+    },
+    {
+      "table": "org_work_center"
+    },
+    {
+      "table": "org_work_unit"
+    },
+    {
+      "table": "osc_dispatch_batch_lines"
+    },
+    {
+      "table": "osc_dispatch_batches"
+    },
+    {
+      "table": "osc_subcontract_operations"
+    },
+    {
+      "table": "osc_subcontract_plans"
+    },
+    {
+      "table": "osc_supplier_capacity_reservations"
+    },
+    {
+      "table": "osc_supplier_chargebacks"
+    },
+    {
+      "table": "osc_supplier_nonconformances"
+    },
+    {
+      "table": "osc_supplier_portal_documents"
+    },
+    {
+      "table": "osc_supplier_receipts"
+    },
+    {
+      "table": "osc_supplier_recovery_claims"
+    },
+    {
+      "table": "osc_supplier_score_trends"
+    },
+    {
+      "table": "osc_supplier_shipment_notices"
+    },
+    {
+      "table": "outbox_events"
+    },
+    {
+      "table": "outside_processing_orders"
+    },
+    {
+      "table": "packing_list_items"
+    },
+    {
+      "table": "packing_lists"
+    },
+    {
+      "table": "party"
+    },
+    {
+      "table": "party_contact"
+    },
+    {
+      "table": "party_role"
+    },
+    {
+      "table": "party_site"
+    },
+    {
+      "table": "passport_access_log"
+    },
+    {
+      "table": "passport_events"
+    },
+    {
+      "table": "pause_resume"
+    },
+    {
+      "table": "pegging"
+    },
+    {
+      "table": "planned_supply"
+    },
+    {
+      "table": "plant_performance_snapshots"
+    },
+    {
+      "table": "plm_change_affected_objects"
+    },
+    {
+      "table": "plm_change_effectiveness_reviews"
+    },
+    {
+      "table": "plm_change_effectivities"
+    },
+    {
+      "table": "plm_change_order_lines"
+    },
+    {
+      "table": "plm_change_orders"
+    },
+    {
+      "table": "plm_change_requests"
+    },
+    {
+      "table": "plm_change_resulting_objects"
+    },
+    {
+      "table": "plm_change_review_board"
+    },
+    {
+      "table": "plm_change_training_requirements"
+    },
+    {
+      "table": "plm_change_verifications"
+    },
+    {
+      "table": "plm_design_reviews"
+    },
+    {
+      "table": "plm_deviation_permits"
+    },
+    {
+      "table": "plm_obsolescence_tracking"
+    },
+    {
+      "table": "plm_product_configurations"
+    },
+    {
+      "table": "plm_requirement_traces"
+    },
+    {
+      "table": "plm_requirements"
+    },
+    {
+      "table": "plm_test_plans"
+    },
+    {
+      "table": "plm_test_results"
+    },
+    {
+      "table": "pm_condition_monitoring"
+    },
+    {
+      "table": "pm_condition_thresholds"
+    },
+    {
+      "table": "pm_equipment_counters"
+    },
+    {
+      "table": "pm_equipment_master"
+    },
+    {
+      "table": "pm_failure_codes"
+    },
+    {
+      "table": "pm_failure_history"
+    },
+    {
+      "table": "pm_functional_locations"
+    },
+    {
+      "table": "pm_maintenance_budgets"
+    },
+    {
+      "table": "pm_maintenance_plan_items"
+    },
+    {
+      "table": "pm_maintenance_plans"
+    },
+    {
+      "table": "pm_reliability_metrics"
+    },
+    {
+      "table": "pm_spare_parts_inventory"
+    },
+    {
+      "table": "pm_work_order_operations"
+    },
+    {
+      "table": "pm_work_order_parts"
+    },
+    {
+      "table": "pm_work_orders"
+    },
+    {
+      "table": "portal_access_tokens"
+    },
+    {
+      "table": "portal_complaint_submissions"
+    },
+    {
+      "table": "portal_document_access"
+    },
+    {
+      "table": "portal_order_views"
+    },
+    {
+      "table": "portal_sessions"
+    },
+    {
+      "table": "portal_users"
+    },
+    {
+      "table": "ppap_submissions"
+    },
+    {
+      "table": "prediction_models"
+    },
+    {
+      "table": "prj_billing_milestones"
+    },
+    {
+      "table": "prj_change_requests"
+    },
+    {
+      "table": "prj_cost_collections"
+    },
+    {
+      "table": "prj_earned_value_snapshots"
+    },
+    {
+      "table": "prj_milestones"
+    },
+    {
+      "table": "prj_projects"
+    },
+    {
+      "table": "prj_resource_assignments"
+    },
+    {
+      "table": "prj_risk_register"
+    },
+    {
+      "table": "prj_time_entries"
+    },
+    {
+      "table": "prj_wbs_elements"
+    },
+    {
+      "table": "process_param_capture"
+    },
+    {
+      "table": "product_passports"
+    },
+    {
+      "table": "production_completion"
+    },
+    {
+      "table": "production_order"
+    },
+    {
+      "table": "production_order_bom_snapshot"
+    },
+    {
+      "table": "production_order_route_snapshot"
+    },
+    {
+      "table": "production_schedule"
+    },
+    {
+      "table": "production_schedule_slots"
+    },
+    {
+      "table": "project_milestones"
+    },
+    {
+      "table": "project_resources"
+    },
+    {
+      "table": "projects"
+    },
+    {
+      "table": "promotion_receipts"
+    },
+    {
+      "table": "publication_attempts"
+    },
+    {
+      "table": "publication_receipts"
+    },
+    {
+      "table": "purchase_order"
+    },
+    {
+      "table": "purchase_order_line"
+    },
+    {
+      "table": "purchase_order_lines"
+    },
+    {
+      "table": "purchase_orders"
+    },
+    {
+      "table": "purchase_receipt_correction_lines"
+    },
+    {
+      "table": "purchase_receipt_corrections"
+    },
+    {
+      "table": "purchase_receipt_lines"
+    },
+    {
+      "table": "purchase_receipts"
+    },
+    {
+      "table": "purchase_requisition_lines"
+    },
+    {
+      "table": "purchase_requisitions"
+    },
+    {
+      "table": "qual_audit_programs"
+    },
+    {
+      "table": "qual_certificate_revisions"
+    },
+    {
+      "table": "qual_certificate_templates"
+    },
+    {
+      "table": "qual_compliance_evidence"
+    },
+    {
+      "table": "qual_compliance_obligations"
+    },
+    {
+      "table": "qual_containment_actions"
+    },
+    {
+      "table": "qual_customer_requirements"
+    },
+    {
+      "table": "qual_effectiveness_reviews"
+    },
+    {
+      "table": "qual_escape_events"
+    },
+    {
+      "table": "qual_first_article_packages"
+    },
+    {
+      "table": "qual_lab_equipment"
+    },
+    {
+      "table": "qual_root_cause_sessions"
+    },
+    {
+      "table": "qual_sample_batches"
+    },
+    {
+      "table": "qual_sample_plans"
+    },
+    {
+      "table": "qual_test_labs"
+    },
+    {
+      "table": "qual_test_methods"
+    },
+    {
+      "table": "quality_case_link"
+    },
+    {
+      "table": "quality_order"
+    },
+    {
+      "table": "quality_predictions"
+    },
+    {
+      "table": "quote_history"
+    },
+    {
+      "table": "quote_lines"
+    },
+    {
+      "table": "quotes"
+    },
+    {
+      "table": "read_ack_gate_decisions"
+    },
+    {
+      "table": "reason_code"
+    },
+    {
+      "table": "record_counters"
+    },
+    {
+      "table": "record_links"
+    },
+    {
+      "table": "records"
+    },
+    {
+      "table": "release_manifests"
+    },
+    {
+      "table": "retention_locks"
+    },
+    {
+      "table": "retention_policies"
+    },
+    {
+      "table": "reverse_sync_intakes"
+    },
+    {
+      "table": "rework"
+    },
+    {
+      "table": "risk_register"
+    },
+    {
+      "table": "rma_orders"
+    },
+    {
+      "table": "roles"
+    },
+    {
+      "table": "routing_operations"
+    },
+    {
+      "table": "routings"
+    },
+    {
+      "table": "safety_observation_actions"
+    },
+    {
+      "table": "safety_observations"
+    },
+    {
+      "table": "sales_order"
+    },
+    {
+      "table": "sales_order_line"
+    },
+    {
+      "table": "sales_order_lines"
+    },
+    {
+      "table": "sales_orders"
+    },
+    {
+      "table": "scar_records"
+    },
+    {
+      "table": "schedule_conflicts"
+    },
+    {
+      "table": "scrap"
+    },
+    {
+      "table": "serial"
+    },
+    {
+      "table": "serial_master"
+    },
+    {
+      "table": "serial_policy"
+    },
+    {
+      "table": "sessions"
+    },
+    {
+      "table": "setup_sheet_items"
+    },
+    {
+      "table": "setup_sheets"
+    },
+    {
+      "table": "shelf_life_policy"
+    },
+    {
+      "table": "shift"
+    },
+    {
+      "table": "shift_assignments"
+    },
+    {
+      "table": "shift_calendar_holidays"
+    },
+    {
+      "table": "shift_definitions"
+    },
+    {
+      "table": "shift_dispatch_execution_events"
+    },
+    {
+      "table": "shift_production_log"
+    },
+    {
+      "table": "shift_production_report_events"
+    },
+    {
+      "table": "shift_targets"
+    },
+    {
+      "table": "shipment_packages"
+    },
+    {
+      "table": "shipment_releases"
+    },
+    {
+      "table": "shipments"
+    },
+    {
+      "table": "signature_events"
+    },
+    {
+      "table": "skills_matrix"
+    },
+    {
+      "table": "skip_lot_tracking"
+    },
+    {
+      "table": "sop_action_items"
+    },
+    {
+      "table": "sop_demand_consensus"
+    },
+    {
+      "table": "sop_inventory_policies"
+    },
+    {
+      "table": "sop_meeting_cycles"
+    },
+    {
+      "table": "sop_plan_versions"
+    },
+    {
+      "table": "sop_plans"
+    },
+    {
+      "table": "sop_scenario_assumptions"
+    },
+    {
+      "table": "sop_supply_consensus"
+    },
+    {
+      "table": "source_boundary_violations"
+    },
+    {
+      "table": "source_system_registry"
+    },
+    {
+      "table": "spc_anomaly_rules"
+    },
+    {
+      "table": "spc_data"
+    },
+    {
+      "table": "srm_bid_comparisons"
+    },
+    {
+      "table": "srm_sourcing_bids"
+    },
+    {
+      "table": "srm_sourcing_events"
+    },
+    {
+      "table": "srm_supplier_action_requests"
+    },
+    {
+      "table": "srm_supplier_capabilities"
+    },
+    {
+      "table": "srm_supplier_capacity"
+    },
+    {
+      "table": "srm_supplier_contract_lines"
+    },
+    {
+      "table": "srm_supplier_contracts"
+    },
+    {
+      "table": "srm_supplier_development_plans"
+    },
+    {
+      "table": "srm_supplier_portal_messages"
+    },
+    {
+      "table": "srm_supplier_portal_users"
+    },
+    {
+      "table": "srm_supplier_ppap_packages"
+    },
+    {
+      "table": "srm_supplier_risk_events"
+    },
+    {
+      "table": "srm_vendor_managed_inventory"
+    },
+    {
+      "table": "state_transition_events"
+    },
+    {
+      "table": "status_code"
+    },
+    {
+      "table": "stock_balances"
+    },
+    {
+      "table": "subcontract_orders"
+    },
+    {
+      "table": "subcontract_receipts"
+    },
+    {
+      "table": "submission_validation_errors"
+    },
+    {
+      "table": "submission_validation_results"
+    },
+    {
+      "table": "supplier_asn_lines"
+    },
+    {
+      "table": "supplier_asns"
+    },
+    {
+      "table": "supplier_audit_schedule"
+    },
+    {
+      "table": "supplier_quality_case"
+    },
+    {
+      "table": "supplier_scorecards"
+    },
+    {
+      "table": "supply_replenishment_policies"
+    },
+    {
+      "table": "svc_contract_lines"
+    },
+    {
+      "table": "svc_customer_assets"
+    },
+    {
+      "table": "svc_field_visit_reports"
+    },
+    {
+      "table": "svc_installed_base"
+    },
+    {
+      "table": "svc_return_authorizations"
+    },
+    {
+      "table": "svc_service_contracts"
+    },
+    {
+      "table": "svc_service_kpi_snapshots"
+    },
+    {
+      "table": "svc_service_parts"
+    },
+    {
+      "table": "svc_service_requests"
+    },
+    {
+      "table": "svc_service_work_order_lines"
+    },
+    {
+      "table": "svc_service_work_orders"
+    },
+    {
+      "table": "svc_warranty_claims"
+    },
+    {
+      "table": "tags"
+    },
+    {
+      "table": "tms_carriers"
+    },
+    {
+      "table": "tms_customs_documents"
+    },
+    {
+      "table": "tms_dangerous_goods"
+    },
+    {
+      "table": "tms_delivery_events"
+    },
+    {
+      "table": "tms_export_screenings"
+    },
+    {
+      "table": "tms_freight_audits"
+    },
+    {
+      "table": "tms_freight_quotes"
+    },
+    {
+      "table": "tms_routes"
+    },
+    {
+      "table": "tms_shipment_lines"
+    },
+    {
+      "table": "tms_shipments"
+    },
+    {
+      "table": "tool_transactions"
+    },
+    {
+      "table": "tool_usage"
+    },
+    {
+      "table": "tooling_assemblies"
+    },
+    {
+      "table": "tooling_calibration_links"
+    },
+    {
+      "table": "tooling_components"
+    },
+    {
+      "table": "tooling_crib_transactions"
+    },
+    {
+      "table": "tooling_families"
+    },
+    {
+      "table": "tooling_kit_items"
+    },
+    {
+      "table": "tooling_kits"
+    },
+    {
+      "table": "tooling_life_limits"
+    },
+    {
+      "table": "tooling_life_measurements"
+    },
+    {
+      "table": "tooling_locations"
+    },
+    {
+      "table": "tooling_presets"
+    },
+    {
+      "table": "tooling_regrind_cycles"
+    },
+    {
+      "table": "tools"
+    },
+    {
+      "table": "trace_dispatch_events"
+    },
+    {
+      "table": "trace_genealogy_batches"
+    },
+    {
+      "table": "trace_genealogy_links"
+    },
+    {
+      "table": "trace_heat_lot_register"
+    },
+    {
+      "table": "trace_job_traveler_steps"
+    },
+    {
+      "table": "trace_job_travelers"
+    },
+    {
+      "table": "trace_label_print_jobs"
+    },
+    {
+      "table": "trace_label_templates"
+    },
+    {
+      "table": "trace_lot_attributes"
+    },
+    {
+      "table": "trace_material_certificates"
+    },
+    {
+      "table": "trace_recall_campaigns"
+    },
+    {
+      "table": "trace_serial_events"
+    },
+    {
+      "table": "traceability_exceptions"
+    },
+    {
+      "table": "track_in"
+    },
+    {
+      "table": "track_out"
+    },
+    {
+      "table": "trade_broker_profiles"
+    },
+    {
+      "table": "trade_certificate_of_origin"
+    },
+    {
+      "table": "trade_compliance_audits"
+    },
+    {
+      "table": "trade_duty_drawbacks"
+    },
+    {
+      "table": "trade_eccn_master"
+    },
+    {
+      "table": "trade_end_use_certificates"
+    },
+    {
+      "table": "trade_import_bonds"
+    },
+    {
+      "table": "trade_license_exceptions"
+    },
+    {
+      "table": "trade_license_usage_logs"
+    },
+    {
+      "table": "trade_preference_programs"
+    },
+    {
+      "table": "trade_restricted_party_lists"
+    },
+    {
+      "table": "trade_screening_hits"
+    },
+    {
+      "table": "training_gate_decisions"
+    },
+    {
+      "table": "training_matrix"
+    },
+    {
+      "table": "training_record"
+    },
+    {
+      "table": "training_records"
+    },
+    {
+      "table": "uom"
+    },
+    {
+      "table": "user_roles"
+    },
+    {
+      "table": "users"
+    },
+    {
+      "table": "variable_registry"
+    },
+    {
+      "table": "vendor_ratings"
+    },
+    {
+      "table": "vendors"
+    },
+    {
+      "table": "warehouses"
+    },
+    {
+      "table": "wip_dispositions"
+    },
+    {
+      "table": "wip_ledger"
+    },
+    {
+      "table": "wms_bin_contents"
+    },
+    {
+      "table": "wms_cycle_count_plans"
+    },
+    {
+      "table": "wms_cycle_count_results"
+    },
+    {
+      "table": "wms_material_handling_units"
+    },
+    {
+      "table": "wms_pick_list_lines"
+    },
+    {
+      "table": "wms_pick_lists"
+    },
+    {
+      "table": "wms_putaway_rules"
+    },
+    {
+      "table": "wms_quarantine_holds"
+    },
+    {
+      "table": "wms_storage_bins"
+    },
+    {
+      "table": "wms_transfer_order_lines"
+    },
+    {
+      "table": "wms_transfer_orders"
+    },
+    {
+      "table": "wms_wave_plans"
+    },
+    {
+      "table": "wms_zones"
+    },
+    {
+      "table": "work_centers"
+    },
+    {
+      "table": "work_definition"
+    },
+    {
+      "table": "work_definition_version"
+    },
+    {
+      "table": "work_instruction"
+    },
+    {
+      "table": "work_order"
+    },
+    {
+      "table": "work_orders"
+    },
+    {
+      "table": "workflow_definitions"
+    },
+    {
+      "table": "workflow_instances"
+    },
+    {
+      "table": "workflow_step_data"
+    }
+  ]
+}

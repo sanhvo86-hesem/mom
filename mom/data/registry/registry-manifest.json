@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T05:20:39.709Z",
+    "publication_run_id": "ce72481e-a4ef-4d69-b538-9c87b8b73a9e",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "coverage": {
+    "frontend_foundation": {
+      "entity_count": 3
+    },
+    "workflow_engine_bridge": {
+      "ready": 1,
+      "blocked": 0
+    }
+  },
+  "assets": {
+    "endpoint-catalog.json": {
+      "records": 22,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "frontend-foundation-catalog.json": {
+      "records": 3,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "registry-manifest.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "registry-quality-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave0-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave0-governance-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "operational-blind-spot-catalog.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "operational-blind-spot-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave1-lifecycle-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave1-lifecycle-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave1-lifecycle-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave2-canonical-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave2-canonical-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave2-canonical-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave3-process-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave3-process-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave3-process-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave4-production-quality-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave4-production-quality-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave4-production-quality-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave5-maintenance-ehs-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave5-maintenance-ehs-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave5-maintenance-ehs-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave6-finance-projection-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave6-finance-projection-normalization.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave6-finance-projection-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "operational-stress-governance-policy.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "operational-stress-catalog.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "operational-stress-report.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "global-erp-mom-capability-catalog.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "global-erp-mom-capability-audit.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "system-contract-runtime-projections.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "system-contract-registry-contracts.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "system-contract-diagnostics.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "system-contract-manifest.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "wave-gap-ledger.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "publication-truth-summary.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "publication-entity-accounting.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "foundation-governance-publication-summary.json": {
+      "records": 1,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    },
+    "graphics-governance-registry.json": {
+      "records": 2,
+      "generatedAt": "2026-04-14T05:20:39.709Z"
+    }
+  }
+}

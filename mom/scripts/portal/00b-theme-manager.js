@@ -20,6 +20,7 @@
 var STORAGE_KEY = 'hesem_user_appearance';
 var ADMIN_STORAGE_KEY = 'hesem_admin_appearance_cache'; /* legacy key; no longer written as authority/cache */
 var TEMPLATE_PREVIEW_CACHE_KEY = 'hesem_graphics_template_preview_cache';
+var FORBIDDEN_TEMPLATE_AUTHORITY_KEYS = ['hesem_layout_templates', 'hesem_module_template_binding'];
 var ROOT = document.documentElement;
 
 /* ── Default values ─────────────────────────────────────────────────────── */
@@ -74,6 +75,22 @@ function _loadTemplatePreviewCache(){
 
 function _saveTemplatePreviewCache(){
   try { localStorage.setItem(TEMPLATE_PREVIEW_CACHE_KEY, JSON.stringify(_templateStore || {})); } catch(e){}
+}
+
+function _purgeForbiddenTemplateAuthorityKeys(){
+  if(!window.localStorage) return;
+  FORBIDDEN_TEMPLATE_AUTHORITY_KEYS.forEach(function(key){
+    try {
+      if(localStorage.getItem(key) !== null){
+        localStorage.removeItem(key);
+        _emit('template-authority-key-purged', {
+          key: key,
+          reason: 'browser-storage-template-authority-forbidden',
+          replacementAuthority: 'backend_graphics_governance_template_registry'
+        });
+      }
+    } catch(e){}
+  });
 }
 
 function _loadAdminConfig(callback){
@@ -696,6 +713,7 @@ function _emit(event, detail){
    ══════════════════════════════════════════════════════════════════════════ */
 
 function init(callback){
+  _purgeForbiddenTemplateAuthorityKeys();
   _ensureColorSchemeListener();
   _loadUserPrefs();
   _loadAdminConfig(function(){
@@ -977,6 +995,171 @@ var VISUAL_THEME_PRESETS = {
     colorsDark: { bgPage: '#052e16', bgSurface: '#14532d', bgSurfaceAlt: '#166534' },
     colorMode: 'light'
   },
+  'sunrise-warm': {
+    brandPrimary: '#b45309',
+    brandLight: '#fbbf24',
+    brandDark: '#7c2d12',
+    brandDarkest: '#431407',
+    accent: '#0f766e',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#fffbeb', bgSurface: '#ffffff', bgSurfaceAlt: '#fef3c7' },
+    colorsDark: { bgPage: '#1c1917', bgSurface: '#292524', bgSurfaceAlt: '#44403c' },
+    colorMode: 'light'
+  },
+  'sunset-ember': {
+    brandPrimary: '#b91c1c',
+    brandLight: '#f87171',
+    brandDark: '#7f1d1d',
+    brandDarkest: '#450a0a',
+    accent: '#0e7490',
+    accentLight: '#67e8f9',
+    colorsLight: { bgPage: '#fff7ed', bgSurface: '#ffffff', bgSurfaceAlt: '#fee2e2' },
+    colorsDark: { bgPage: '#1f1412', bgSurface: '#3f1d1d', bgSurfaceAlt: '#7f1d1d' },
+    colorMode: 'light'
+  },
+  'arctic-snow': {
+    brandPrimary: '#2563eb',
+    brandLight: '#93c5fd',
+    brandDark: '#1e3a8a',
+    brandDarkest: '#172554',
+    accent: '#0d9488',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e2e8f0' },
+    colorsDark: { bgPage: '#0f172a', bgSurface: '#1e293b', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  },
+  'cherry-blossom': {
+    brandPrimary: '#be123c',
+    brandLight: '#fb7185',
+    brandDark: '#881337',
+    brandDarkest: '#4c0519',
+    accent: '#0f766e',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#fdf2f8', bgSurface: '#ffffff', bgSurfaceAlt: '#fce7f3' },
+    colorsDark: { bgPage: '#2a0f1c', bgSurface: '#4c0519', bgSurfaceAlt: '#831843' },
+    colorMode: 'light'
+  },
+  'lavender-dream': {
+    brandPrimary: '#4f46e5',
+    brandLight: '#818cf8',
+    brandDark: '#3730a3',
+    brandDarkest: '#1e1b4b',
+    accent: '#0d9488',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e0e7ff' },
+    colorsDark: { bgPage: '#111827', bgSurface: '#1f2937', bgSurfaceAlt: '#312e81' },
+    colorMode: 'light'
+  },
+  'industrial-steel': {
+    brandPrimary: '#475569',
+    brandLight: '#94a3b8',
+    brandDark: '#334155',
+    brandDarkest: '#0f172a',
+    accent: '#ca8a04',
+    accentLight: '#fde047',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e2e8f0' },
+    colorsDark: { bgPage: '#111827', bgSurface: '#1f2937', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  },
+  'shopfloor-signal': {
+    brandPrimary: '#dc2626',
+    brandLight: '#f87171',
+    brandDark: '#991b1b',
+    brandDarkest: '#450a0a',
+    accent: '#16a34a',
+    accentLight: '#86efac',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#f1f5f9' },
+    colorsDark: { bgPage: '#18181b', bgSurface: '#27272a', bgSurfaceAlt: '#3f3f46' },
+    colorMode: 'light'
+  },
+  'executive-glass': {
+    brandPrimary: '#2563eb',
+    brandLight: '#93c5fd',
+    brandDark: '#1e3a8a',
+    brandDarkest: '#172554',
+    accent: '#0f766e',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#eef4ff', bgSurface: '#ffffff', bgSurfaceAlt: '#dbeafe' },
+    colorsDark: { bgPage: '#0f172a', bgSurface: '#1e293b', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  },
+  'compliance-paper': {
+    brandPrimary: '#57534e',
+    brandLight: '#a8a29e',
+    brandDark: '#44403c',
+    brandDarkest: '#1c1917',
+    accent: '#0f766e',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#fafaf9', bgSurface: '#ffffff', bgSurfaceAlt: '#f5f5f4' },
+    colorsDark: { bgPage: '#1c1917', bgSurface: '#292524', bgSurfaceAlt: '#44403c' },
+    colorMode: 'light'
+  },
+  'focus-mode': {
+    brandPrimary: '#27272a',
+    brandLight: '#71717a',
+    brandDark: '#18181b',
+    brandDarkest: '#09090b',
+    accent: '#0d9488',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#fafafa', bgSurface: '#ffffff', bgSurfaceAlt: '#f4f4f5' },
+    colorsDark: { bgPage: '#09090b', bgSurface: '#18181b', bgSurfaceAlt: '#27272a' },
+    colorMode: 'light'
+  },
+  'vibrant-energy': {
+    brandPrimary: '#2563eb',
+    brandLight: '#60a5fa',
+    brandDark: '#1d4ed8',
+    brandDarkest: '#172554',
+    accent: '#f97316',
+    accentLight: '#fdba74',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#e0f2fe' },
+    colorsDark: { bgPage: '#111827', bgSurface: '#1f2937', bgSurfaceAlt: '#334155' },
+    colorMode: 'light'
+  },
+  'soft-pastel': {
+    brandPrimary: '#4f46e5',
+    brandLight: '#a5b4fc',
+    brandDark: '#3730a3',
+    brandDarkest: '#1e1b4b',
+    accent: '#be123c',
+    accentLight: '#fda4af',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#f1f5f9' },
+    colorsDark: { bgPage: '#111827', bgSurface: '#1f2937', bgSurfaceAlt: '#312e81' },
+    colorMode: 'light'
+  },
+  'earth-tone': {
+    brandPrimary: '#166534',
+    brandLight: '#86efac',
+    brandDark: '#365314',
+    brandDarkest: '#1a2e05',
+    accent: '#ca8a04',
+    accentLight: '#fde047',
+    colorsLight: { bgPage: '#f7fee7', bgSurface: '#ffffff', bgSurfaceAlt: '#ecfccb' },
+    colorsDark: { bgPage: '#1a2e05', bgSurface: '#365314', bgSurfaceAlt: '#3f6212' },
+    colorMode: 'light'
+  },
+  'neon-pulse': {
+    brandPrimary: '#22c55e',
+    brandLight: '#86efac',
+    brandDark: '#15803d',
+    brandDarkest: '#052e16',
+    accent: '#06b6d4',
+    accentLight: '#67e8f9',
+    colorsLight: { bgPage: '#f8fafc', bgSurface: '#ffffff', bgSurfaceAlt: '#dcfce7' },
+    colorsDark: { bgPage: '#09090b', bgSurface: '#18181b', bgSurfaceAlt: '#27272a' },
+    colorMode: 'dark'
+  },
+  'zen-minimal': {
+    brandPrimary: '#525252',
+    brandLight: '#a3a3a3',
+    brandDark: '#404040',
+    brandDarkest: '#171717',
+    accent: '#0d9488',
+    accentLight: '#5eead4',
+    colorsLight: { bgPage: '#fafafa', bgSurface: '#ffffff', bgSurfaceAlt: '#f5f5f5' },
+    colorsDark: { bgPage: '#171717', bgSurface: '#262626', bgSurfaceAlt: '#404040' },
+    colorMode: 'light'
+  },
   'ember-industrial': {
     brandPrimary: '#f97316',
     brandLight: '#fdba74',
@@ -1073,6 +1256,18 @@ function graphicsAuthorityClient(){
   return window.HmGraphicsGovernance || null;
 }
 
+function getVisualThemePresets(){
+  var out = {};
+  Object.keys(VISUAL_THEME_PRESETS).forEach(function(key){
+    out[key] = JSON.parse(JSON.stringify(VISUAL_THEME_PRESETS[key]));
+  });
+  return out;
+}
+
+function getVisualThemePresetIds(){
+  return Object.keys(VISUAL_THEME_PRESETS);
+}
+
 function applyVisualTheme(themeId){
   var theme = VISUAL_THEME_PRESETS[String(themeId || '')];
   if(!theme) return false;
@@ -1140,10 +1335,12 @@ window.HmTheme = {
   getTemplates: getTemplates,
   saveTemplate: saveTemplate,
   deleteTemplate: deleteTemplate,
-  getTemplateAuthorityStatus: getTemplateAuthorityStatus,
-  graphicsAuthorityClient: graphicsAuthorityClient,
-  resolveWithTemplate: resolveWithTemplate,
-  applyVisualTheme: applyVisualTheme,
+	  getTemplateAuthorityStatus: getTemplateAuthorityStatus,
+	  graphicsAuthorityClient: graphicsAuthorityClient,
+	  resolveWithTemplate: resolveWithTemplate,
+	  getVisualThemePresets: getVisualThemePresets,
+	  getVisualThemePresetIds: getVisualThemePresetIds,
+	  applyVisualTheme: applyVisualTheme,
   DEFAULTS: DEFAULTS
 };
 

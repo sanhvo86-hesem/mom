@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T05:20:39.709Z",
+    "publication_run_id": "ce72481e-a4ef-4d69-b538-9c87b8b73a9e",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "must_introduce_first_class_resources": {
+    "graphics_change_set": {}
+  },
+  "do_not_create_duplicate": {
+    "d0": {},
+    "d1": {},
+    "d2": {},
+    "d3": {}
+  }
+}

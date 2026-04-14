@@ -7091,11 +7091,11 @@ Không copy pattern này vào runtime.</pre>
 </div>
 </section>
 <section class="section" id="visual-themes">
-<h2 class="section-title"><span class="section-number">36</span>20 Visual Theme Presets <span class="chip chip-amber" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">PARTIAL</span></h2>
+<h2 class="section-title"><span class="section-number">36</span>20 Visual Theme Presets <span class="chip chip-green" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">RUNTIME-MAPPED</span></h2>
 <p class="section-subtitle">Bộ giao diện sẵn có. Admin chọn theme → tự động áp dụng toàn hệ thống. User có thể override bằng preference cá nhân.</p>
-<div class="info-box info-box-red">
-<strong>DOC-VS-CODE MISMATCH</strong>
-  File <code>00b-theme-manager.js</code> có <code>8</code> <code>VISUAL_THEME_PRESETS</code>. File <code>00c-admin-appearance.js</code> có <code>20</code> <code>VISUAL_THEMES</code>. Chỉ <code>5</code> ID trùng: <code>professional-light</code>, <code>professional-dark</code>, <code>midnight-navy</code>, <code>ocean-breeze</code>, <code>forest-calm</code>. <code>15</code> theme có thể chọn trong admin UI nhưng KHÔNG có runtime preset trong theme manager; <code>applyVisualTheme()</code> có nguy cơ bỏ qua hoặc fallback không rõ ràng. PHẢI đồng bộ <code>00b-theme-manager.js</code> trước khi deploy. Xem thêm runtime contract tại <a href="#runtime-api-spec">Section 35</a> và cascade tại <a href="#token-cascade">Section 55</a>.
+<div class="info-box info-box-green">
+<strong>Runtime mapping rule</strong>
+  File <code>00c-admin-appearance.js</code> công bố <code>20</code> <code>VISUAL_THEMES</code> cho Admin. File <code>00b-theme-manager.js</code> phải resolve đủ toàn bộ ID đó qua <code>VISUAL_THEME_PRESETS</code> và <code>applyVisualTheme()</code>. Theme chỉ được hiện trong Admin nếu runtime có thể áp dụng token patch đầy đủ hoặc nếu được gắn nhãn preview-only và bị chặn publish/apply. Xem thêm runtime contract tại <a href="#runtime-api-spec">Section 35</a> và cascade tại <a href="#token-cascade">Section 55</a>.
 </div>
 <div class="card">
 <div class="card-header"><span class="chip chip-red">Controlled Rule</span>Ánh xạ theme runtime: Admin UI so với Theme Manager</div>
@@ -7114,21 +7114,21 @@ Không copy pattern này vào runtime.</pre>
 <tr><td><code>midnight-navy</code></td><td>Có</td><td>OK. Verify contrast tokens khi dark mode.</td></tr>
 <tr><td><code>ocean-breeze</code></td><td>Có</td><td>OK. Verify tên hiển thị đồng nhất với Section 36.</td></tr>
 <tr><td><code>forest-calm</code></td><td>Có</td><td>OK. Verify semantic success không bị lẫn brand green.</td></tr>
-<tr><td><code>sunrise-warm</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc khai báo alias rõ với <code>ember-industrial</code>; không rename âm thầm.</td></tr>
-<tr><td><code>sunset-ember</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
-<tr><td><code>arctic-snow</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc map có kiểm soát với <code>slate-ice</code>.</td></tr>
-<tr><td><code>cherry-blossom</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
-<tr><td><code>lavender-dream</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
-<tr><td><code>industrial-steel</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc loại khỏi admin UI nếu chưa runtime-ready.</td></tr>
-<tr><td><code>shopfloor-signal</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra contrast kiosk/shop-floor.</td></tr>
-<tr><td><code>executive-glass</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>; nếu dùng glass effect, phải có fallback không blur.</td></tr>
-<tr><td><code>compliance-paper</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra print/readability với <a href="#print-layouts">Section 17</a>.</td></tr>
-<tr><td><code>focus-mode</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
-<tr><td><code>vibrant-energy</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>; không để gradient phá token-first rule.</td></tr>
-<tr><td><code>soft-pastel</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
-<tr><td><code>earth-tone</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> hoặc loại khỏi runtime nếu contrast fail.</td></tr>
-<tr><td><code>neon-pulse</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code> và kiểm tra motion/reduced motion.</td></tr>
-<tr><td><code>zen-minimal</code></td><td>Không</td><td>THÊM vào <code>VISUAL_THEME_PRESETS</code>.</td></tr>
+<tr><td><code>sunrise-warm</code></td><td>Có</td><td>Runtime token patch đầy đủ; kiểm soát contrast trước publish.</td></tr>
+<tr><td><code>sunset-ember</code></td><td>Có</td><td>Runtime token patch đầy đủ; regulated/shopfloor change phải chạy impact analysis.</td></tr>
+<tr><td><code>arctic-snow</code></td><td>Có</td><td>Runtime token patch đầy đủ; không còn phụ thuộc fallback preview.</td></tr>
+<tr><td><code>cherry-blossom</code></td><td>Có</td><td>Runtime token patch đầy đủ; chỉ publish qua backend graphics authority.</td></tr>
+<tr><td><code>lavender-dream</code></td><td>Có</td><td>Runtime token patch đầy đủ; không được bypass shared token layer.</td></tr>
+<tr><td><code>industrial-steel</code></td><td>Có</td><td>Runtime token patch đầy đủ; phù hợp industrial shell không private CSS.</td></tr>
+<tr><td><code>shopfloor-signal</code></td><td>Có</td><td>Runtime token patch đầy đủ; kiosk/shop-floor contrast là gate bắt buộc.</td></tr>
+<tr><td><code>executive-glass</code></td><td>Có</td><td>Runtime token patch đầy đủ; blur/glass không được là dependency bắt buộc.</td></tr>
+<tr><td><code>compliance-paper</code></td><td>Có</td><td>Runtime token patch đầy đủ; kiểm tra print/readability với <a href="#print-layouts">Section 17</a>.</td></tr>
+<tr><td><code>focus-mode</code></td><td>Có</td><td>Runtime token patch đầy đủ; giảm nhiễu nhưng vẫn giữ focus indicator.</td></tr>
+<tr><td><code>vibrant-energy</code></td><td>Có</td><td>Runtime token patch đầy đủ; gradient chỉ được dùng qua governed tokens.</td></tr>
+<tr><td><code>soft-pastel</code></td><td>Có</td><td>Runtime token patch đầy đủ; contrast validation bắt buộc.</td></tr>
+<tr><td><code>earth-tone</code></td><td>Có</td><td>Runtime token patch đầy đủ; tránh palette một tông khi publish.</td></tr>
+<tr><td><code>neon-pulse</code></td><td>Có</td><td>Runtime token patch đầy đủ; reduced-motion và night-shift checks bắt buộc.</td></tr>
+<tr><td><code>zen-minimal</code></td><td>Có</td><td>Runtime token patch đầy đủ; không làm mất state text/badges.</td></tr>
 </tbody>
 </table>
 </div>
