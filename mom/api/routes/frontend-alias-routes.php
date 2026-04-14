@@ -133,9 +133,9 @@ return static function (Router $router, string $dataDir): void {
         'ai_spc_predict'         => [AiSchedulingController::class, 'aiSpcPredict'],
         // ai_schedule_optimize: returns schedule optimization suggestions
         'ai_schedule_optimize'   => [AiSchedulingController::class, 'aiScheduleOptimize'],
-        // ai_schedule_apply: applies an optimization result
+        // ai_schedule_apply: records advisory review intent; it does not mutate schedule truth
         'ai_schedule_apply'      => [AiSchedulingController::class, 'aiScheduleApply'],
-        // ai_schedule_pm: schedule preventive maintenance for a tool/machine
+        // ai_schedule_pm: proposes PM for planner review; scheduling remains a planner action
         'ai_schedule_pm'         => [AiSchedulingController::class, 'aiSchedulePm'],
         // ai_machine_telemetry: machine metrics timeseries
         'ai_machine_telemetry'   => [AiSchedulingController::class, 'aiMachineTelemetry'],

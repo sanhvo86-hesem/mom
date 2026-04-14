@@ -20,6 +20,7 @@ This repository is an integrated ERP + MOM + MES + EQMS platform for CNC/discret
 - Append-only event history is preferred for production reporting, corrections, overrides, quality evidence, and traceability.
 - File-backed stores may remain compatibility authority only when documented with a DB bridge or migration path.
 - Advisory AI must never silently replace, mutate, complete, dispatch, approve, or command execution truth.
+- AI-named scheduling, maintenance, quality, and copilot routes must return advisory proposals or human-review intent unless they delegate to an explicit governed planning/EQMS write path.
 
 ## Validation Commands
 

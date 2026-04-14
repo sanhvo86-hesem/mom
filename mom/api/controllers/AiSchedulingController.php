@@ -348,6 +348,100 @@ class AiSchedulingController extends BaseController
         }
     }
 
+    /**
+     * @param array<int|string, mixed> $slots
+     */
+    private function assertJsonScheduleSlotAvailable(
+        array $slots,
+        string $machineId,
+        string $date,
+        string $startTime,
+        string $endTime,
+        string $ignoreSlotId = '',
+    ): void {
+        $startMinutes = $this->timeToMinutes($startTime);
+        $endMinutes = $this->timeToMinutes($endTime);
+
+        foreach ($slots as $existing) {
+            if (!is_array($existing)) {
+                continue;
+            }
+            if ($ignoreSlotId !== '' && (string)($existing['id'] ?? $existing['slot_id'] ?? '') === $ignoreSlotId) {
+                continue;
+            }
+            if (($existing['machine_id'] ?? '') !== $machineId) {
+                continue;
+            }
+            if (($existing['date'] ?? $existing['slot_date'] ?? '') !== $date) {
+                continue;
+            }
+
+            $existingStart = $this->timeToMinutes((string)($existing['start_time'] ?? ''));
+            $existingEnd = $this->timeToMinutes((string)($existing['end_time'] ?? ''));
+            if ($startMinutes < $existingEnd && $endMinutes > $existingStart) {
+                $this->error('schedule_conflict', 409, 'Schedule conflict: machine already booked for this time slot', [
+                    'machine_id' => $machineId,
+                    'date' => $date,
+                    'requested_time' => $startTime . '-' . $endTime,
+                    'existing_slot' => [
+                        'id' => $existing['id'] ?? $existing['slot_id'] ?? '',
+                        'start_time' => $existing['start_time'] ?? '',
+                        'end_time' => $existing['end_time'] ?? '',
+                    ],
+                ]);
+            }
+        }
+    }
+
+    private function assertDbScheduleSlotAvailable(
+        Connection $db,
+        string $machineId,
+        string $date,
+        string $startTime,
+        string $endTime,
+        string $ignoreSlotId = '',
+    ): void {
+        $where = [
+            'machine_id = :machine_id',
+            'slot_date = :slot_date::date',
+            "COALESCE(start_time, '00:00'::time) < :end_time::time",
+            "COALESCE(end_time, '23:59'::time) > :start_time::time",
+        ];
+        $params = [
+            ':machine_id' => $machineId,
+            ':slot_date' => $date,
+            ':start_time' => $startTime,
+            ':end_time' => $endTime,
+        ];
+        if ($ignoreSlotId !== '') {
+            $where[] = 'slot_id::text <> :ignore_slot_id';
+            $params[':ignore_slot_id'] = $ignoreSlotId;
+        }
+
+        $row = $db->queryOne(
+            'SELECT slot_id::text AS slot_id, start_time::text AS start_time, end_time::text AS end_time
+               FROM production_schedule_slots
+              WHERE ' . implode(' AND ', $where) . '
+              ORDER BY slot_date, start_time
+              LIMIT 1',
+            $params,
+        );
+        if (!is_array($row)) {
+            return;
+        }
+
+        $this->error('schedule_conflict', 409, 'Schedule conflict: machine already booked for this time slot', [
+            'machine_id' => $machineId,
+            'date' => $date,
+            'requested_time' => $startTime . '-' . $endTime,
+            'existing_slot' => [
+                'id' => $row['slot_id'] ?? '',
+                'start_time' => $row['start_time'] ?? '',
+                'end_time' => $row['end_time'] ?? '',
+            ],
+        ]);
+    }
+
     // -- Prediction Endpoints -------------------------------------------------
 
     /**
@@ -1151,6 +1245,8 @@ class AiSchedulingController extends BaseController
             $db = $this->getDb();
             if ($db !== null) {
                 try {
+                    $this->assertDbScheduleSlotAvailable($db, $machineId, $date, $startTime, $endTime);
+
                     // Calculate duration in minutes
                     $start = strtotime($startTime);
                     $end   = strtotime($endTime);
@@ -1232,33 +1328,7 @@ class AiSchedulingController extends BaseController
             // Fallback to JSON / Du phong doc JSON
             $file = $this->aiDir() . '/schedule-slots.json';
             $all  = $this->readJsonFile($file) ?? [];
-
-            // P8: Check for overlapping slots on the same machine
-            $startMinutes = $this->timeToMinutes($startTime);
-            $endMinutes = $this->timeToMinutes($endTime);
-
-            foreach ($all as $existing) {
-                if (!is_array($existing)) continue;
-                if (($existing['machine_id'] ?? '') !== $machineId) continue;
-                if (($existing['date'] ?? '') !== $date) continue;
-
-                $existingStart = $this->timeToMinutes($existing['start_time'] ?? '');
-                $existingEnd = $this->timeToMinutes($existing['end_time'] ?? '');
-
-                // P8: Check for overlap: (start < existingEnd AND end > existingStart)
-                if ($startMinutes < $existingEnd && $endMinutes > $existingStart) {
-                    $this->error('schedule_conflict', 409, 'Schedule conflict: machine already booked for this time slot', [
-                        'machine_id' => $machineId,
-                        'date' => $date,
-                        'requested_time' => $startTime . '-' . $endTime,
-                        'existing_slot' => [
-                            'id' => $existing['id'] ?? '',
-                            'start_time' => $existing['start_time'] ?? '',
-                            'end_time' => $existing['end_time'] ?? '',
-                        ],
-                    ]);
-                }
-            }
+            $this->assertJsonScheduleSlotAvailable($all, $machineId, $date, $startTime, $endTime);
 
             $slot = [
                 'id'         => 'SLOT-' . bin2hex(random_bytes(8)),
@@ -1337,25 +1407,55 @@ class AiSchedulingController extends BaseController
                 try {
                     // MES-003: Strict whitelist for SET clause — prevent SQL injection
                     $allowedColumns = [
+                        'machine_id' => 'machine_id',
+                        'job_number' => 'wo_number',
                         'date' => 'slot_date',
                         'start_time' => 'start_time',
                         'end_time' => 'end_time',
-                        'status' => 'status',
+                        'priority' => 'priority',
                         'notes' => 'notes',
                     ];
                     $setClauses = ['updated_at = NOW()'];
                     $params = [':id' => $id];
 
+                    $current = $db->queryOne(
+                        'SELECT slot_id::text AS slot_id,
+                                machine_id,
+                                slot_date::text AS slot_date,
+                                start_time::text AS start_time,
+                                end_time::text AS end_time
+                           FROM production_schedule_slots
+                          WHERE slot_id = :id',
+                        [':id' => $id],
+                    );
+                    if (!is_array($current)) {
+                        $this->error('not_found', 404, "Schedule slot {$id} not found.");
+                    }
+
                     foreach ($allowedColumns as $inputKey => $dbColumn) {
                         if (isset($body[$inputKey])) {
                             $phKey = ':' . $dbColumn;
                             $setClauses[] = "{$dbColumn} = {$phKey}";
-                            $params[$phKey] = $body[$inputKey];
+                            if ($inputKey === 'priority') {
+                                $priorityMap = ['low' => 25, 'normal' => 50, 'high' => 75, 'urgent' => 100];
+                                $params[$phKey] = $priorityMap[strtolower(trim((string)$body[$inputKey]))];
+                            } else {
+                                $params[$phKey] = $body[$inputKey];
+                            }
                         }
                     }
 
                     if (count($setClauses) <= 1) {
                         $this->error('no_fields_to_update', 400, 'No updatable fields provided');
+                    }
+
+                    $candidateMachine = trim((string)($body['machine_id'] ?? $current['machine_id'] ?? ''));
+                    $candidateDate = trim((string)($body['date'] ?? $current['slot_date'] ?? ''));
+                    $candidateStart = substr(trim((string)($body['start_time'] ?? $current['start_time'] ?? '')), 0, 5);
+                    $candidateEnd = substr(trim((string)($body['end_time'] ?? $current['end_time'] ?? '')), 0, 5);
+                    if ($candidateMachine !== '' && $candidateDate !== '' && $candidateStart !== '' && $candidateEnd !== '') {
+                        $this->requireScheduleTimeRange($candidateStart, $candidateEnd);
+                        $this->assertDbScheduleSlotAvailable($db, $candidateMachine, $candidateDate, $candidateStart, $candidateEnd, $id);
                     }
 
                     $setSql = implode(', ', $setClauses);
@@ -1416,6 +1516,22 @@ class AiSchedulingController extends BaseController
 
             if (!$found) {
                 $this->error('not_found', 404, "Schedule slot {$id} not found.");
+            }
+
+            if (
+                trim((string)($updated['machine_id'] ?? '')) !== ''
+                && trim((string)($updated['date'] ?? '')) !== ''
+                && trim((string)($updated['start_time'] ?? '')) !== ''
+                && trim((string)($updated['end_time'] ?? '')) !== ''
+            ) {
+                $this->assertJsonScheduleSlotAvailable(
+                    $all,
+                    trim((string)$updated['machine_id']),
+                    trim((string)$updated['date']),
+                    trim((string)$updated['start_time']),
+                    trim((string)$updated['end_time']),
+                    $id,
+                );
             }
 
             $this->writeJsonFile($file, $all);
@@ -2249,7 +2365,11 @@ class AiSchedulingController extends BaseController
     }
 
     /**
-     * POST aiScheduleApply — Apply a previously generated schedule optimization.
+     * POST aiScheduleApply — Record human review intent for an AI schedule suggestion.
+     *
+     * AI schedule recommendations are advisory-only. This compatibility action
+     * deliberately does not mutate schedule slots; planners must use the normal
+     * schedule create/update endpoints for controlled planning writes.
      *
      * Body: optimization_id (required).
      * Action: `ai_schedule_apply`
@@ -2266,18 +2386,30 @@ class AiSchedulingController extends BaseController
         $optimizationId = trim((string)($body['optimization_id'] ?? ''));
         if ($optimizationId === '') $this->error('missing_optimization_id', 400);
 
-        // Stub: in production this would apply slot moves from the optimization result.
+        $uid = $this->userId($user);
+        $reviewReason = trim((string)($body['review_reason'] ?? $body['reason'] ?? ''));
+
+        $this->auditLog('ai_schedule_apply_advisory_review', [
+            'optimization_id' => $optimizationId,
+            'review_reason' => $reviewReason,
+            'advisory_only' => true,
+            'execution_authority' => false,
+        ], $uid);
+
         $this->success([
             'optimization_id' => $optimizationId,
-            'applied'         => true,
+            'applied'         => false,
             'slots_moved'     => 0,
-            'applied_at'      => $this->nowIso(),
-            'note'            => 'Optimization applied. Reload schedule to see updated slots.',
+            'reviewed_at'     => $this->nowIso(),
+            'advisory_only'   => true,
+            'execution_authority' => false,
+            'requires_human_planning_action' => true,
+            'next_action'     => 'Use order_schedule_slot or order_schedule_update after planner approval.',
         ]);
     }
 
     /**
-     * POST aiSchedulePm — Schedule preventive maintenance for a tool/machine.
+     * POST aiSchedulePm — Propose preventive maintenance for planner review.
      *
      * Body: tool_id (required), scheduled_date (optional).
      * Action: `ai_schedule_pm`
@@ -2296,42 +2428,30 @@ class AiSchedulingController extends BaseController
 
         $scheduledDate = trim((string)($body['scheduled_date'] ?? gmdate('Y-m-d', strtotime('+7 days'))));
         $uid           = $this->userId($user);
+        $this->requireScheduleDate($scheduledDate, 'scheduled_date');
+        $reason = trim((string)($body['reason'] ?? $body['maintenance_reason'] ?? ''));
 
-        try {
-            $db = $this->getDb();
-            if ($db !== null) {
-                $rawBytes = random_bytes(16);
-                $rawBytes[6] = chr(ord($rawBytes[6]) & 0x0f | 0x40);
-                $rawBytes[8] = chr(ord($rawBytes[8]) & 0x3f | 0x80);
-                $pmId = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($rawBytes), 4));
-                $db->execute(
-                    'INSERT INTO production_schedule_slots
-                     (slot_id, slot_date, machine_id, slot_type, status, created_by, org_plant_id)
-                     VALUES (:sid::uuid, :dt::date, :mid, \'pm\', \'scheduled\', :cb,
-                             (SELECT plant_id FROM users WHERE username = :uname LIMIT 1))',
-                    [
-                        ':sid'   => $pmId,
-                        ':dt'    => $scheduledDate,
-                        ':mid'   => $toolId,
-                        ':cb'    => $uid,
-                        ':uname' => $uid,
-                    ]
-                );
-                $this->auditLog('ai_schedule_pm', ['tool_id' => $toolId, 'date' => $scheduledDate], $uid);
-                $this->success(['pm_id' => $pmId, 'tool_id' => $toolId, 'scheduled_date' => $scheduledDate]);
-            }
+        $proposalId = 'PM-PROP-' . substr(hash('sha256', $toolId . '|' . $scheduledDate . '|' . $uid), 0, 16);
+        $this->auditLog('ai_schedule_pm_advisory_proposed', [
+            'proposal_id' => $proposalId,
+            'tool_id' => $toolId,
+            'scheduled_date' => $scheduledDate,
+            'reason' => $reason,
+            'advisory_only' => true,
+            'execution_authority' => false,
+        ], $uid);
 
-            // JSON fallback
-            $this->success([
-                'pm_id'          => 'PM-' . $toolId . '-' . gmdate('Ymd'),
-                'tool_id'        => $toolId,
-                'scheduled_date' => $scheduledDate,
-                'note'           => 'PM scheduled (JSON mode — will sync on DB reconnect).',
-            ]);
-        } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('ai_schedule_pm_failed', 500, $e->getMessage());
-        }
+        $this->success([
+            'proposal_id' => $proposalId,
+            'tool_id' => $toolId,
+            'scheduled_date' => $scheduledDate,
+            'reason' => $reason,
+            'scheduled' => false,
+            'advisory_only' => true,
+            'execution_authority' => false,
+            'requires_human_planning_action' => true,
+            'next_action' => 'Create an approved PM schedule slot through the normal schedule planning API.',
+        ]);
     }
 
     /**

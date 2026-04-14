@@ -96,6 +96,24 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertStringContainsString('p.plant_id = :mtta_plant_id', $pipeline);
     }
 
+    public function testAiSchedulingAliasesRemainAdvisoryAndScheduleWritesUseSharedConflictGuard(): void
+    {
+        $controller = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+        $routes = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/routes/frontend-alias-routes.php');
+
+        $this->assertStringContainsString('private function assertDbScheduleSlotAvailable(', $controller);
+        $this->assertStringContainsString('private function assertJsonScheduleSlotAvailable(', $controller);
+        $this->assertMatchesRegularExpression('/public function createSlot\(\): never\s*\{.*?\$this->assertDbScheduleSlotAvailable\(\$db, \$machineId, \$date, \$startTime, \$endTime\);.*?\$this->assertJsonScheduleSlotAvailable\(\$all, \$machineId, \$date, \$startTime, \$endTime\);/s', $controller);
+        $this->assertMatchesRegularExpression('/public function updateSlot\(\): never\s*\{.*?\$this->assertDbScheduleSlotAvailable\(\$db, \$candidateMachine, \$candidateDate, \$candidateStart, \$candidateEnd, \$id\);.*?\$this->assertJsonScheduleSlotAvailable\(/s', $controller);
+        $this->assertStringContainsString('ai_schedule_apply_advisory_review', $controller);
+        $this->assertMatchesRegularExpression('/public function aiScheduleApply\(\): never\s*\{.*?\'applied\'\s*=> false,.*?\'execution_authority\'\s*=> false,.*?\'requires_human_planning_action\'\s*=> true,/s', $controller);
+        $this->assertStringContainsString('ai_schedule_pm_advisory_proposed', $controller);
+        $this->assertMatchesRegularExpression('/public function aiSchedulePm\(\): never\s*\{.*?\'scheduled\'\s*=> false,.*?\'advisory_only\'\s*=> true,.*?\'execution_authority\'\s*=> false,/s', $controller);
+        $this->assertStringNotContainsString('Optimization applied. Reload schedule to see updated slots.', $controller);
+        $this->assertStringContainsString('records advisory review intent; it does not mutate schedule truth', $routes);
+        $this->assertStringContainsString('proposes PM for planner review; scheduling remains a planner action', $routes);
+    }
+
     public function testAiConversationFallbackIsRoleGuardedValidatedAndOwnerScoped(): void
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
