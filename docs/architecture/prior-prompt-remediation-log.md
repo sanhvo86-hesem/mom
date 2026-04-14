@@ -106,4 +106,4 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full EQMS enforcement is blocked by the need to connect inspection results to NCR, disposition, CAPA, and SPC workflows.
 - Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.
 - Full DB-backed CNC program/setup-sheet authority remains blocked by required JSON-to-DB reconciliation and compatibility testing.
-- Online mobile clock-in and completion replay are implemented for the existing compatibility store. Clock-out idempotency remains staged because it needs a broader labor-entry close/reopen replay contract.
+- Online mobile clock-in, clock-out, and completion replay are implemented for the existing compatibility store. Full labor correction/reopen governance remains staged because it needs supervisor disposition, payroll/timekeeping reconciliation, and audit-signature semantics.

@@ -151,6 +151,7 @@ Behavior:
 - Mobile task completion requires the task to be `in_progress`. Completed tasks cannot be overwritten through the normal completion endpoint.
 - Mobile task completion accepts optional `idempotency_key`. A repeated completion with the same key and same completion payload returns the completed task as an idempotent replay and does not append another completion event; same-key/different-payload replay is rejected as `completion_idempotency_conflict`.
 - Mobile clock-in accepts optional `idempotency_key`. A repeated clock-in with the same key and same work context returns the original clock-in; a same-key/different-context replay is rejected as `clock_in_idempotency_conflict`.
+- Mobile clock-out accepts optional `idempotency_key`. A repeated clock-out with the same key and same close payload returns the original clock-out entry and does not create another time event; same-key/different-payload replay is rejected as `clock_out_idempotency_conflict`.
 - Mobile offline conflict resolution is owner-scoped. Supervisor/admin-style override requires explicit override reason and is audited.
 
 ## CNC program/version context

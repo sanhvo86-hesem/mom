@@ -58,6 +58,39 @@ final class MobileWorkQueueServiceTest extends TestCase
         $service->clockOut((string)$clockIn['entry_id'], 0, 1, 'operator-1');
     }
 
+    public function testClockOutAllowsExactOnlineIdempotentReplayAndRejectsConflict(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $clockIn = $service->clockIn('operator-1', 'WO-1001', 20, 'MC-5AX-01');
+
+        $first = $service->clockOut((string)$clockIn['entry_id'], 3, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+            'device_id' => 'tablet-1',
+        ]);
+        $second = $service->clockOut((string)$clockIn['entry_id'], 3, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+            'device_id' => 'tablet-1',
+        ]);
+
+        $this->assertSame($first['entry_id'], $second['entry_id']);
+        $this->assertTrue($second['idempotent_replay']);
+        $this->assertSame('tablet-1-clockout-0001', $second['idempotency_key']);
+        $this->assertSame('tablet-1', $second['device_id']);
+
+        $entries = json_decode((string)file_get_contents($this->tmpDir . '/mobile/time_entries.json'), true);
+        $this->assertIsArray($entries);
+        $this->assertCount(2, $entries);
+        $this->assertSame('tablet-1-clockout-0001', $entries[0]['clock_out_idempotency_key']);
+        $this->assertSame($first['entry_id'], $entries[0]['clocked_out_entry_id']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('clock_out_idempotency_conflict');
+
+        $service->clockOut((string)$clockIn['entry_id'], 4, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+        ]);
+    }
+
     public function testClockInAllowsExactOnlineIdempotentReplayAndRejectsConflict(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);

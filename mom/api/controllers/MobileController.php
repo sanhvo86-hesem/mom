@@ -352,6 +352,7 @@ class MobileController extends BaseController
      *   - entry_id      (string, required): Time clock entry ID.
      *   - qty_completed (int, required): Quantity completed during this period.
      *   - qty_scrap     (int, optional): Scrap quantity.
+     *   - idempotency_key (string, optional): Client replay key for retry-safe clock-out.
      *
      * @return never
      */
@@ -375,6 +376,11 @@ class MobileController extends BaseController
                 (int)($body['qty_completed'] ?? 0),
                 (int)($body['qty_scrap'] ?? 0),
                 $operatorId,  // Always use authenticated session user
+                [
+                    'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
+                    'device_id' => trim((string)($body['device_id'] ?? '')),
+                    'metadata' => is_array($body['metadata'] ?? null) ? (array)$body['metadata'] : [],
+                ],
             );
 
             $this->auditLog('mobile_clock_out', [
@@ -382,6 +388,7 @@ class MobileController extends BaseController
                 'employee_id'   => $operatorId,
                 'qty_completed' => $body['qty_completed'],
                 'qty_scrap'     => $body['qty_scrap'] ?? 0,
+                'idempotency_key' => trim((string)($body['idempotency_key'] ?? '')),
             ], $userId);
 
             $this->success(['entry' => $entry]);

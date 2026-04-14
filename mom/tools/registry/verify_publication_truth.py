@@ -6,11 +6,12 @@ Fails if any publication artifact is missing, stale, inconsistent, or contradict
 Designed to be run as a CI/smoke gate.
 """
 from __future__ import annotations
-import json, sys, os
+import json, sys, os, subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
 PORTAL = Path(__file__).resolve().parent.parent.parent
+ROOT = PORTAL.parent
 REPORTS = PORTAL.parent / "_reports"
 
 
@@ -103,6 +104,31 @@ def check(name: str, condition: bool, detail: str = ""):
         checks_failed += 1
         failures.append(f"{name}: {detail}")
         print(f"  [FAIL] {name} -- {detail}")
+
+
+def git_tracked(rel_path: str) -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-files", "--error-unmatch", rel_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+
+def collect_graphics_evidence_refs(value, refs: set[str]) -> None:
+    if isinstance(value, dict):
+        for child in value.values():
+            collect_graphics_evidence_refs(child, refs)
+    elif isinstance(value, list):
+        for child in value:
+            collect_graphics_evidence_refs(child, refs)
+    elif isinstance(value, str) and value.startswith("mom/data/graphics-governance/evidence/"):
+        refs.add(value.split("#", 1)[0])
+
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -399,8 +425,13 @@ def main() -> int:
             "complianceMatrixRef",
             "impactAnalysisRef",
             "waiversRef",
+            "changeSetRef",
+            "lineageGraphRef",
             "runtimeBeaconRef",
             "debtObservatoryRef",
+            "environmentPolicyPacksRef",
+            "releaseDashboardRef",
+            "releaseEvidencePackRef",
             "multiSitePlantBrandingGovernanceRef",
             "controlledEmergencyOverridePathRef",
             "rolloutDecisionRef",
@@ -425,6 +456,11 @@ def main() -> int:
             check("graphics_no_active_blockers_mark_ready",
                   (not release_blocked) and release_link.get("releaseReadinessState", "ready") == "ready",
                   f"releaseBlocked={release_blocked} state={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
+        evidence_refs: set[str] = set()
+        collect_graphics_evidence_refs(graphics, evidence_refs)
+        untracked_evidence_refs = sorted(ref for ref in evidence_refs if not git_tracked(ref))
+        check("graphics_release_evidence_refs_tracked", not untracked_evidence_refs,
+              f"untracked={untracked_evidence_refs[:10]}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")

@@ -726,7 +726,13 @@ window._hmApplyAdminLayoutTemplate = function(template){
     payload.layout.admin = Object.assign({ template: next }, ADMIN_LAYOUT_PRESETS[next]);
   }
   if(HmTheme.setPreviewAll) HmTheme.setPreviewAll(payload);
-  else HmTheme.setAll(payload);
+  else if(HmTheme.setPreviewDeep){
+    HmTheme.setPreviewDeep('layout.admin', payload.layout.admin);
+  } else {
+    announceGraphics(L('Layout preview runtime is stale; draft was not cached.', 'Layout preview runtime is stale; draft was not cached.'));
+    if(typeof showToast === 'function') showToast(L('Layout preview runtime is stale; draft was not cached.', 'Layout preview runtime is stale; draft was not cached.'), 'warning');
+    return;
+  }
   if(typeof renderAdminAppearance === 'function') renderAdminAppearance();
 };
 
@@ -2446,18 +2452,9 @@ window._admTplApplyTheme = function(themeId){
     applied = HmTheme.applyVisualTheme(themeId) === true;
   }
 	  if(!applied){
-	    var theme = VISUAL_THEMES.find(function(item){ return item.id === themeId; });
-	    if(!theme) return;
-    window._hmSet('--brand', 'brand.dark', theme.colors.brand);
-    window._hmSet('--brand-2', 'brand.primary', theme.colors.brand2);
-    window._hmSet('--accent', 'brand.accent', theme.colors.accent);
-    window._hmSet('--bg-page-light', 'colorsLight.bgPage', theme.colors.bgPage);
-	    window._hmSet('--bg-surface-light', 'colorsLight.bgSurface', theme.colors.bgSurface);
-	    if(HmTheme.setPreviewDeep) HmTheme.setPreviewDeep('appearance.visualThemePreset', themeId);
-	    else {
-	      announceGraphics(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'));
-	      if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; preset state was not cached.', 'Theme preview runtime is stale; preset state was not cached.'), 'warning');
-	    }
+	    announceGraphics(L('Theme preview runtime is stale; full preset was not applied.', 'Theme preview runtime is stale; full preset was not applied.'));
+	    if(typeof showToast === 'function') showToast(L('Theme preview runtime is stale; full preset was not applied.', 'Theme preview runtime is stale; full preset was not applied.'), 'warning');
+	    return;
 	  }
 	  announceGraphics(L('Preset giao diện đã áp dụng trong preview; impact analysis được ghi nhận.', 'Visual theme preset applied in preview; impact analysis recorded.'));
 	  if(typeof showToast === 'function') showToast(L('Đã áp dụng preset giao diện','Visual theme applied'), 'success');
@@ -2466,13 +2463,13 @@ window._admTplApplyTheme = function(themeId){
 	};
 
 	window._admExportTheme = function(){
-	  var j = HmTheme.exportTheme();
+	  var j = HmTheme.getAdminConfigDraft ? JSON.stringify(HmTheme.getAdminConfigDraft(), null, 2) : HmTheme.exportTheme();
 	  var b = new Blob([j], { type:'application/json' });
 	  var a = document.createElement('a');
 	  a.href = URL.createObjectURL(b);
 	  a.download = 'hesem-theme.json';
 	  a.click();
-	  announceGraphics(L('Đã export theme JSON; đây không phải template registry authority.', 'Theme JSON exported; this is not template registry authority.'));
+	  announceGraphics(L('Đã export admin draft theme JSON; unsaved preview edits đi kèm như draft, không phải production authority.', 'Admin draft theme JSON exported; unsaved preview edits are included as draft, not production authority.'));
 	};
 
 	window._admImportTheme = function(){
@@ -2808,10 +2805,10 @@ function render(el, subTab, currentLang){
 
 /* ── Save all ────────────────────────────────────────────────────────────── */
 window._saveAllAppearance = function(){
-  var cfg = HmTheme.getFullConfig();
-  announceGraphics(L('Đang lưu design config qua backend admin authority.', 'Saving design config through backend admin authority.'));
+  var cfg = HmTheme.getAdminConfigDraft ? HmTheme.getAdminConfigDraft() : HmTheme.getFullConfig();
+  announceGraphics(L('Đang lưu admin draft qua backend authority; unsaved preview chỉ được promote khi backend chấp nhận.', 'Saving admin draft through backend authority; unsaved preview is promoted only if backend accepts it.'));
   HmTheme.saveAdminConfig(cfg, function(ok){
-    announceGraphics(ok ? L('Design config đã lưu qua backend authority.', 'Design config saved through backend authority.') : L('Lưu design config thất bại; authority không đổi.', 'Design config save failed; authority unchanged.'));
+    announceGraphics(ok ? L('Admin draft đã lưu qua backend authority.', 'Admin draft saved through backend authority.') : L('Lưu admin draft thất bại; authority không đổi.', 'Admin draft save failed; authority unchanged.'));
     if(typeof showToast==='function') showToast(T(ok?'saved':'error'), ok?'success':'error');
   });
 };

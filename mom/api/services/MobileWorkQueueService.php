@@ -435,9 +435,15 @@ final class MobileWorkQueueService
     /**
      * Clock out (creates clock_out entry, calculates duration on the clock_in).
      */
-    public function clockOut(string $entryId, ?int $qtyCompleted = null, ?int $qtyScrap = null, ?string $operatorId = null): array
+    public function clockOut(
+        string $entryId,
+        ?int $qtyCompleted = null,
+        ?int $qtyScrap = null,
+        ?string $operatorId = null,
+        array $options = [],
+    ): array
     {
-        return $this->withStoreLock('time_entries', function () use ($entryId, $qtyCompleted, $qtyScrap, $operatorId): array {
+        return $this->withStoreLock('time_entries', function () use ($entryId, $qtyCompleted, $qtyScrap, $operatorId, $options): array {
             $entries = $this->loadFile('time_entries');
             $now     = $this->nowIso();
             $completed = $qtyCompleted === null ? null : $this->nonNegativeInt($qtyCompleted, 'qty_completed');
@@ -445,6 +451,10 @@ final class MobileWorkQueueService
             if ($completed !== null && $scrap !== null && $scrap > $completed) {
                 throw new RuntimeException('qty_scrap_exceeds_completed');
             }
+            $idempotencyKey = $this->stringValue($options['idempotency_key'] ?? '');
+            $fingerprint = $idempotencyKey === ''
+                ? null
+                : $this->clockOutFingerprint($entryId, $completed, $scrap, $operatorId);
 
             // Find the clock_in entry
             $clockInIdx = null;
@@ -467,6 +477,29 @@ final class MobileWorkQueueService
                 throw new RuntimeException('forbidden_clock_out_operator');
             }
             if (($clockIn['duration_minutes'] ?? null) !== null) {
+                if ($idempotencyKey !== '') {
+                    $storedKey = $this->stringValue($clockIn['clock_out_idempotency_key'] ?? '');
+                    $storedFingerprint = $this->stringValue($clockIn['clock_out_fingerprint'] ?? '');
+                    if ($storedKey !== '' && hash_equals($storedKey, $idempotencyKey)) {
+                        if ($fingerprint === null || $storedFingerprint === '' || !hash_equals($storedFingerprint, $fingerprint)) {
+                            throw new RuntimeException('clock_out_idempotency_conflict');
+                        }
+                        foreach ($entries as $entry) {
+                            if (!is_array($entry)) {
+                                continue;
+                            }
+                            $metadata = is_array($entry['metadata'] ?? null) ? (array)$entry['metadata'] : [];
+                            if (($entry['entry_type'] ?? '') === 'clock_out'
+                                && ($metadata['clock_in_entry_id'] ?? '') === $entryId
+                                && hash_equals($this->stringValue($entry['idempotency_key'] ?? ''), $idempotencyKey)
+                            ) {
+                                $entry['idempotent_replay'] = true;
+                                return $entry;
+                            }
+                        }
+                        throw new RuntimeException('clock_out_replay_record_missing');
+                    }
+                }
                 throw new RuntimeException('clock_in_already_closed');
             }
 
@@ -474,15 +507,23 @@ final class MobileWorkQueueService
             $inTime    = new \DateTimeImmutable($clockIn['entry_time']);
             $outTime   = new \DateTimeImmutable($now);
             $duration  = round(($outTime->getTimestamp() - $inTime->getTimestamp()) / 60, 2);
+            $outEntryId = $this->generateUuidV4();
 
             // Update clock_in with duration
             $entries[$clockInIdx]['duration_minutes']   = $duration;
             $entries[$clockInIdx]['quantity_completed']  = $completed;
             $entries[$clockInIdx]['quantity_scrap']      = $scrap;
+            $entries[$clockInIdx]['clocked_out_entry_id'] = $outEntryId;
+            $entries[$clockInIdx]['clocked_out_at'] = $now;
+            $entries[$clockInIdx]['clock_out_idempotency_key'] = $idempotencyKey !== '' ? $idempotencyKey : null;
+            $entries[$clockInIdx]['clock_out_fingerprint'] = $fingerprint;
+
+            $metadata = is_array($options['metadata'] ?? null) ? (array)$options['metadata'] : [];
+            $metadata['clock_in_entry_id'] = $entryId;
 
             // Create clock_out entry
             $outEntry = [
-                'entry_id'           => $this->generateUuidV4(),
+                'entry_id'           => $outEntryId,
                 'operator_id'        => $clockIn['operator_id'],
                 'wo_number'          => $clockIn['wo_number'],
                 'jo_number'          => $clockIn['jo_number'],
@@ -496,8 +537,10 @@ final class MobileWorkQueueService
                 'quantity_scrap'     => $scrap,
                 'offline_created'    => false,
                 'sync_status'        => 'synced',
-                'device_id'          => $clockIn['device_id'],
-                'metadata'           => ['clock_in_entry_id' => $entryId],
+                'device_id'          => $this->nullableString($options['device_id'] ?? ($clockIn['device_id'] ?? null)),
+                'idempotency_key'    => $idempotencyKey !== '' ? $idempotencyKey : null,
+                'clock_out_fingerprint' => $fingerprint,
+                'metadata'           => $metadata,
                 'created_at'         => $now,
             ];
 
@@ -1420,6 +1463,16 @@ final class MobileWorkQueueService
             'operation_seq' => $operationSeq,
             'machine_id' => $machineId,
             'labor_type' => $laborType,
+        ]));
+    }
+
+    private function clockOutFingerprint(string $entryId, ?int $qtyCompleted, ?int $qtyScrap, ?string $operatorId): string
+    {
+        return hash('sha256', $this->canonicalJson([
+            'entry_id' => $entryId,
+            'operator_id' => $operatorId ?? '',
+            'qty_completed' => $qtyCompleted,
+            'qty_scrap' => $qtyScrap,
         ]));
     }
 

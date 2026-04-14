@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T14:18:40.339Z",
+    "generatedAt": "2026-04-14T14:23:43.721Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -38,19 +38,19 @@
     "domainCount": 49,
     "contractCount": 760,
     "criticalGapCount": 0,
-    "warningCount": 3,
+    "warningCount": 2,
     "capabilityCount": 15,
     "capabilityBlockingGapCount": 0,
     "graphicsTemplateCount": 2,
     "graphicsComponentContractCount": 10,
-    "graphicsNonCompliantModuleCount": 2,
-    "graphicsReleaseBlockerCount": 2,
-    "graphicsGovernanceReleaseBlocked": true,
-    "releaseReadinessScore": 0,
+    "graphicsNonCompliantModuleCount": 0,
+    "graphicsReleaseBlockerCount": 0,
+    "graphicsGovernanceReleaseBlocked": false,
+    "releaseReadinessScore": 100,
     "metadataCompletenessPercent": 100,
     "graphDensityScore": 100,
     "blockerCount": 0,
-    "hotspotCount": 3,
+    "hotspotCount": 2,
     "workspaceDraftLeakCount": 0
   },
   "blockers": [],
@@ -108,12 +108,6 @@
         "period_close_controls"
       ],
       "interpretation": "Service/projection endpoints may not map one-to-one to storage tables; keep them explicit in contracts."
-    },
-    {
-      "id": "graphics_governance_release_blockers_present",
-      "severity": "release-blocker",
-      "count": 2,
-      "interpretation": "Graphics compliance/debt/drift must be resolved or covered by approved waiver before new module release."
     }
   ],
   "checks": {
@@ -123,6 +117,6 @@
     "globalCapabilityBlockingGapsClosed": true,
     "workspaceDraftUsed": false,
     "graphicsGovernanceRegistryPresent": true,
-    "graphicsReleaseBlockersClosed": false
+    "graphicsReleaseBlockersClosed": true
   }
 }

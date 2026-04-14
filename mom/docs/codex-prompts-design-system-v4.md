@@ -27,7 +27,7 @@ QUY TẮC BẮT BUỘC:
 
 ---
 
-## PROMPT 1/6: Tài liệu thiết kế — CSS + Header + Kiến trúc + Quy chuẩn đồ họa + 20 Visual Theme Presets
+## PROMPT 1/6: Tài liệu thiết kế — CSS + Header + Kiến trúc + Quy chuẩn đồ họa + 23 Visual Theme Presets
 
 ### Mục tiêu
 Tạo file HTML `mom/docs/module-layout-template-design-system-v4.html` — phần đầu của tài liệu thiết kế toàn diện cho hệ thống Module Layout Template của phần mềm HESEM MOM (Manufacturing Operations Management).
@@ -71,15 +71,15 @@ HESEM MOM là phần mềm quản lý sản xuất cấp doanh nghiệp cho ngà
 - Gradient background: `linear-gradient(135deg, #0a1628 0%, #0c2d48 30%, #1565c0 70%, #1e88e5 100%)`
 - Decorative circles (radial-gradient pseudo-elements)
 - Title: "Module Layout Template Design System v4.0"
-- Subtitle mô tả: "Tài liệu thiết kế toàn diện — 150+ preset templates bao phủ 34 modules, 90 block types, 20 visual themes. Template là trung tâm quyết định đồ họa toàn bộ phần mềm."
-- Meta badges: `HESEM MOM Platform`, `v4.0 Enterprise`, `2026-04-10`, `150+ Templates`, `12 Nhóm module`, `8 Zone Types`, `90 Block Types`, `20 Visual Themes`, `34 Modules`
+- Subtitle mô tả: "Tài liệu thiết kế toàn diện — 150+ preset templates bao phủ 34 modules, 90 block types, 23 visual themes. Template là trung tâm quyết định đồ họa toàn bộ phần mềm."
+- Meta badges: `HESEM MOM Platform`, `v4.0 Enterprise`, `2026-04-10`, `150+ Templates`, `12 Nhóm module`, `8 Zone Types`, `90 Block Types`, `23 Visual Themes`, `34 Modules`
 
 #### PHẦN 3: Table of Contents — sticky nav
 Links đến tất cả sections:
 - Tổng quan, Kiến trúc, Quy chuẩn, Visual Themes, Bảng điều khiển, Bán hàng, Kỹ thuật, Mua hàng, Sản xuất, Chất lượng, Kho vận, Tài chính, Nhân sự, Tài liệu, Quản trị, Block Engine, Component Presets, Module Editor, Zone System, Scroll UX, Token Cascade, Governance
 
 #### PHẦN 4: Executive Summary (~100 dòng HTML)
-- 8 stat-cards trong grid hiển thị: 150+ Templates, 34 Modules, 90 Block Types, 12 Nhóm, 20 Visual Themes, 8 Zone Types, 181 CSS Tokens, 139 Components
+- 8 stat-cards trong grid hiển thị: 150+ Templates, 34 Modules, 90 Block Types, 12 Nhóm, 23 Visual Themes, 8 Zone Types, 181 CSS Tokens, 139 Components
 - Info box giải thích: Template là gì, tại sao là trung tâm, cách hoạt động
 - So sánh Before/After (comparison-grid): Trước (8 tab rời rạc, không có template) vs Sau (6 tab graphics-control-plane; template là một authority artifact, không phải browser authority)
 
@@ -178,14 +178,14 @@ Links đến tất cả sections:
 - Status: Badge component với semantic colors, text-[10px] uppercase
 - Percentage: với progress bar visual kèm số
 
-#### PHẦN 7: 20 Visual Theme Presets (~250 dòng HTML) — MỚI HOÀN TOÀN
+#### PHẦN 7: 23 Visual Theme Presets (~280 dòng HTML) — MỚI HOÀN TOÀN
 Mỗi theme preset hiển thị dưới dạng card với:
 - Tên theme (vi + en)
 - Color swatch bar (5 ô màu: brand, surface, text, accent, status)
 - Mô tả use case
 - CSS variables chính (5-8 biến)
 
-**20 themes:**
+**23 themes:**
 1. **Chuyên nghiệp Sáng** (Professional Light) — Mặc định. Brand navy #0c2d48, surface #ffffff, clean corporate
 2. **Chuyên nghiệp Tối** (Professional Dark) — Surface #1e293b, text #f1f5f9, navy accent
 3. **Nửa đêm** (Midnight Navy) — Deep navy #0f172a, teal accent #0891b2, dành cho ca đêm
@@ -206,6 +206,9 @@ Mỗi theme preset hiển thị dưới dạng card với:
 18. **Đất** (Earth Tone) — Brand #78350f, surface #fefce8, warm browns, organic
 19. **Neon** (Neon Pulse) — Dark bg #09090b, neon green #22c55e, cyan #06b6d4, tech/gaming vibe
 20. **Thiền** (Zen Minimal) — Brand #737373, surface #fafafa, minimal decoration, maximum whitespace
+21. **Than công nghiệp** (Ember Industrial) — Warm industrial alert palette, impact analysis required before rollout
+22. **Graphite Amber** (Graphite Amber) — Dark graphite surface with amber focus cues for rugged review workstations
+23. **Slate Ice** (Slate Ice) — Cool slate/ice palette for low-glare office and engineering review surfaces
 
 Mỗi theme card có:
 ```html
@@ -249,7 +252,7 @@ Hiển thị trong grid-4 (4 cột).
 Viết phần Template Catalog cho 6 nhóm module đầu tiên, chèn vào file `mom/docs/module-layout-template-design-system-v4.html` (sau phần Visual Theme Presets, trước `</body>`).
 
 ### Context dự án
-HESEM MOM — phần mềm quản lý sản xuất CNC precision machining. File này là tài liệu thiết kế v4.0 cho hệ thống Module Layout Template. Phần trước (Prompt 1) đã tạo CSS, header, kiến trúc, quy chuẩn đồ họa, và 20 visual themes.
+HESEM MOM — phần mềm quản lý sản xuất CNC precision machining. File này là tài liệu thiết kế v4.0 cho hệ thống Module Layout Template. Phần trước (Prompt 1) đã tạo CSS, header, kiến trúc, quy chuẩn đồ họa, và 23 visual themes.
 
 ### Hệ thống 34 modules
 Sidebar navigation gồm 12 nhóm:
@@ -719,7 +722,7 @@ Mô tả đặc tả kỹ thuật cho các công cụ chỉnh sửa module:
 - Right panel (60%): Live Preview
   - Render template với mock data
   - Responsive preview: desktop / tablet / mobile
-  - Theme preview: switch giữa 20 visual themes
+  - Theme preview: switch giữa 23 visual themes
   - Dark/light toggle
 
 **C.3 Module Builder Integration**
@@ -784,8 +787,8 @@ Viết lại hoàn toàn file `mom/scripts/portal/00c-admin-appearance.js` (~250
 ### Context kỹ thuật
 
 **File cần viết lại**: `mom/scripts/portal/00c-admin-appearance.js`
-**Hiện tại**: 1893 dòng, IIFE, 8 tabs (overview/typography/colors/layout/effects/components/governance/advanced)
-**Mục tiêu**: 6 tabs mới, Template Studio là Tab 1
+**Hiện tại**: Admin Appearance đã theo 6-tab graphics-control-plane architecture (templates/tokens/components/effects/governance/advanced)
+**Mục tiêu**: giữ 6 tabs, Template Studio là controlled graphics authority console
 
 **Cách file được load**:
 - `02-state-auth-ui.js` gọi `renderAdminAppearance()` tại dòng 6529
@@ -2019,7 +2022,7 @@ Trả về báo cáo ngắn gồm:
 ## PROMPT 11/12: Bổ sung 6 Sections Đặc Thù MOM/eQMS
 
 ### Mục tiêu
-Thêm 6 sections chuyên biệt cho ngành sản xuất CNC precision machining, chèn SAU section "Content Guidelines" (id="content-guidelines") và TRƯỚC section "20 Visual Theme Presets" (id="visual-themes").
+Thêm 6 sections chuyên biệt cho ngành sản xuất CNC precision machining, chèn SAU section "Content Guidelines" (id="content-guidelines") và TRƯỚC section "23 Visual Theme Presets" (id="visual-themes").
 
 ### File
 `mom/docs/module-layout-template-design-system-v4.html`
@@ -2296,7 +2299,7 @@ R. Giao diện vận hành máy (operator-interface)
 S. Dashboard thời gian thực (realtime-dashboard)
 
 ═══ PHẦN IV: VISUAL THEMES ═══
-C. 20 Visual Theme Presets (visual-themes)
+C. 23 Visual Theme Presets (visual-themes)
 
 ═══ PHẦN V: TEMPLATE CATALOG ═══
 14. Block Engine (block-engine)                           ← di chuyển TRƯỚC templates

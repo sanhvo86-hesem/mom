@@ -18,7 +18,26 @@ final class ReleaseGovernanceBuilder
      */
     public function buildManifest(array $trackedFiles, array $context): array
     {
+        $normalizedFiles = $this->normalizeFiles($trackedFiles);
+        $sourceTreeHash = hash('sha256', implode("\n", $normalizedFiles));
+        $manifestState = $this->text($context['manifest_state'] ?? 'draft');
+        $requiredChecks = $context['required_checks'] ?? [
+            'repo_boundary_scan_clean',
+            'migration_lint_passed',
+            'targeted_tests_passed',
+            'authority_map_reviewed',
+            'graphics_compliance_matrix_attested',
+            'graphics_release_blockers_clear',
+        ];
+        if (!is_array($requiredChecks)) {
+            $requiredChecks = [];
+        }
         $payload = [
+            'release_ref' => $this->text($context['release_ref'] ?? ''),
+            'promotion_scope' => $this->text($context['promotion_scope'] ?? 'controlled_source'),
+            'source_commit_sha' => $this->required($context, 'commit_sha'),
+            'source_tree_hash_sha256' => $sourceTreeHash,
+            'artifact_manifest_hash_sha256' => '',
             'artifact_type' => 'release_manifest',
             'schema_version' => '1.0.0',
             'generated_at' => $this->generatedAt($context),
@@ -27,14 +46,16 @@ final class ReleaseGovernanceBuilder
                 'branch' => $this->required($context, 'branch'),
                 'commit_sha' => $this->required($context, 'commit_sha'),
             ],
+            'manifest_state' => $manifestState !== '' ? $manifestState : 'draft',
+            'required_checks' => array_values(array_map('strval', $requiredChecks)),
             'change_authority' => [
                 'required' => true,
                 'authority_ref' => $this->required($context, 'change_authority_ref'),
                 'authority_state' => $this->text($context['change_authority_state'] ?? 'released'),
             ],
             'controlled_source' => [
-                'file_count' => count($trackedFiles),
-                'tracked_files_hash_sha256' => hash('sha256', implode("\n", $this->normalizeFiles($trackedFiles))),
+                'file_count' => count($normalizedFiles),
+                'tracked_files_hash_sha256' => $sourceTreeHash,
             ],
             'boundary_policy' => [
                 'portal_first' => true,
@@ -42,9 +63,13 @@ final class ReleaseGovernanceBuilder
                 'sharepoint_authority_role' => 'read_only_publication_only',
                 'runtime_artifacts_in_controlled_source' => 'blocked',
             ],
+            'approver' => $this->text($context['approver'] ?? ''),
+            'signature_event_id' => $this->text($context['signature_event_id'] ?? ''),
+            'notes' => $this->text($context['notes'] ?? ''),
         ];
 
-        $payload['manifest_hash_sha256'] = $this->payloadHash($payload);
+        $payload['artifact_manifest_hash_sha256'] = $this->payloadHash($payload);
+        $payload['manifest_hash_sha256'] = $payload['artifact_manifest_hash_sha256'];
         return $payload;
     }
 
@@ -135,7 +160,7 @@ final class ReleaseGovernanceBuilder
     private function payloadHash(array $payload): string
     {
         $copy = $payload;
-        unset($copy['manifest_hash_sha256'], $copy['receipt_hash_sha256'], $copy['intake_hash_sha256']);
+        unset($copy['manifest_hash_sha256'], $copy['artifact_manifest_hash_sha256'], $copy['receipt_hash_sha256'], $copy['intake_hash_sha256']);
         $json = json_encode($copy, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
         if (!is_string($json)) {
             throw new RuntimeException('release_governance_hash_failed');

@@ -1,368 +1,367 @@
 {
-  "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
-    "publication_scope": "platform_global",
-    "slice_publication_pass": "foundation_governance_contract_slice",
-    "source": "graphics_governance_backend",
-    "authority": "mom/design/template-registry.json"
-  },
-  "templates": [
-    {
-      "templateId": "T13",
-      "canonicalId": "T-list-report-sales-order-control",
-      "legacyCode": "T13",
-      "aliases": [
-        "T13",
-        "sales-order-control",
-        "M2-orders-default"
-      ],
-      "version": "1.0.0",
-      "status": "published",
-      "registryStatus": "approved",
-      "owner": "Frontend Architecture Council",
-      "moduleArchetype": "list-report-workspace",
-      "description": {
-        "vi": "Workspace điều hành đơn hàng có KPI, bộ lọc, bảng chính, form phát hành, cây truy xuất, lifecycle và timeline.",
-        "en": "Order-control workspace with KPIs, filters, primary register, release forms, traceability tree, lifecycle, and timeline."
-      },
-      "zones": [
-        {
-          "zoneId": "notice",
-          "type": "contextual-guidance",
-          "required": false
-        },
-        {
-          "zoneId": "summary",
-          "type": "kpi-summary",
-          "required": false
-        },
-        {
-          "zoneId": "filter",
-          "type": "query-controls",
-          "required": false
-        },
-        {
-          "zoneId": "primary",
-          "type": "primary-work-surface",
-          "required": true
-        },
-        {
-          "zoneId": "form",
-          "type": "transaction-entry",
-          "required": false
-        },
-        {
-          "zoneId": "detail",
-          "type": "record-detail",
-          "required": false
-        },
-        {
-          "zoneId": "workflow",
-          "type": "state-transition",
-          "required": false
-        },
-        {
-          "zoneId": "actions",
-          "type": "command-surface",
-          "required": false
-        },
-        {
-          "zoneId": "timeline",
-          "type": "activity-history",
-          "required": false
-        }
-      ],
-      "allowedBlocksByZone": {
-        "notice": [
-          "info-banner"
-        ],
-        "summary": [
-          "kpi-row"
-        ],
-        "filter": [
-          "filter-bar"
-        ],
-        "primary": [
-          "data-table",
-          "data-tree"
-        ],
-        "form": [
-          "form-standard"
-        ],
-        "detail": [
-          "data-detail"
-        ],
-        "workflow": [
-          "action-status-flow"
-        ],
-        "actions": [
-          "action-toolbar"
-        ],
-        "timeline": [
-          "data-timeline"
-        ]
-      },
-      "defaultDensity": "default",
-      "supportedDensities": [
-        "compact",
-        "default",
-        "comfortable",
-        "shopfloor"
-      ],
-      "themePolicy": {
-        "modes": [
-          "light",
-          "dark",
-          "high-contrast"
-        ],
-        "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
-        "inlineStylePolicy": "forbidden-after-P0-exception-window",
-        "requiredTokenGroups": [
-          "color",
-          "surface",
-          "spacing",
-          "radius",
-          "shadow",
-          "type",
-          "state"
-        ]
-      },
-      "responsivePolicy": {
-        "breakpoints": [
-          "320",
-          "390",
-          "768",
-          "1024",
-          "1440",
-          "1920"
-        ],
-        "zoomLevels": [
-          "100",
-          "200",
-          "400"
-        ],
-        "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
-      },
-      "qaEvidence": {
-        "status": "IMPLEMENTED",
-        "gateRef": "mom/design/qa-gates.json",
-        "validator": "mom/tools/design/validate-frontend-contracts.mjs",
-        "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-      },
-      "allowedZones": [
-        "notice",
-        "summary",
-        "filter",
-        "primary",
-        "form",
-        "detail",
-        "workflow",
-        "actions",
-        "timeline"
-      ],
-      "allowedBlocks": [
-        "info-banner",
-        "kpi-row",
-        "filter-bar",
-        "data-table",
-        "data-tree",
-        "form-standard",
-        "data-detail",
-        "action-status-flow",
-        "action-toolbar",
-        "data-timeline"
-      ],
-      "governedModules": [
-        "M2-orders"
-      ],
-      "regulatedCompatibility": "explicit-required",
-      "shopfloorCompatibility": "explicit-required",
-      "updatedBy": "Frontend Architecture Council",
-      "updatedAt": "2026-04-11T00:00:00+07:00",
-      "evidenceRefs": [
-        "mom/design/qa-gates.json",
-        "mom/tools/design/validate-frontend-contracts.mjs",
-        "2026-04-11T00:00:00+07:00"
-      ]
+    "_meta": {
+        "generatedAt": "2026-04-14T13:46:13+00:00",
+        "source": "graphics_governance_backend",
+        "authority": "mom/design/template-registry.json",
+        "registryVersion": "2026.04.11-p0",
+        "registryEtag": "sha256:0e21e6ac62a9891d4664598f9e1fa709"
     },
-    {
-      "templateId": "T29",
-      "canonicalId": "T-list-report-purchasing-po-control",
-      "legacyCode": "T29",
-      "aliases": [
-        "T29",
-        "purchasing-po-control",
-        "M4-purchasing-default"
-      ],
-      "version": "1.0.0",
-      "status": "published",
-      "registryStatus": "approved",
-      "owner": "Frontend Architecture Council",
-      "moduleArchetype": "list-report-workspace",
-      "description": {
-        "vi": "Workspace mua hàng có chuẩn nhập liệu supplier PO, danh sách PO, PO line, receiving/IQC, lifecycle và traceability.",
-        "en": "Purchasing workspace for supplier PO governance, PO register, PO lines, receiving/IQC, lifecycle, and traceability."
-      },
-      "zones": [
+    "templates": [
         {
-          "zoneId": "notice",
-          "type": "contextual-guidance",
-          "required": false
+            "templateId": "T13",
+            "canonicalId": "T-list-report-sales-order-control",
+            "legacyCode": "T13",
+            "aliases": [
+                "T13",
+                "sales-order-control",
+                "M2-orders-default"
+            ],
+            "version": "1.0.0",
+            "status": "published",
+            "registryStatus": "approved",
+            "owner": "Frontend Architecture Council",
+            "moduleArchetype": "list-report-workspace",
+            "description": {
+                "vi": "Workspace điều hành đơn hàng có KPI, bộ lọc, bảng chính, form phát hành, cây truy xuất, lifecycle và timeline.",
+                "en": "Order-control workspace with KPIs, filters, primary register, release forms, traceability tree, lifecycle, and timeline."
+            },
+            "zones": [
+                {
+                    "zoneId": "notice",
+                    "type": "contextual-guidance",
+                    "required": false
+                },
+                {
+                    "zoneId": "summary",
+                    "type": "kpi-summary",
+                    "required": false
+                },
+                {
+                    "zoneId": "filter",
+                    "type": "query-controls",
+                    "required": false
+                },
+                {
+                    "zoneId": "primary",
+                    "type": "primary-work-surface",
+                    "required": true
+                },
+                {
+                    "zoneId": "form",
+                    "type": "transaction-entry",
+                    "required": false
+                },
+                {
+                    "zoneId": "detail",
+                    "type": "record-detail",
+                    "required": false
+                },
+                {
+                    "zoneId": "workflow",
+                    "type": "state-transition",
+                    "required": false
+                },
+                {
+                    "zoneId": "actions",
+                    "type": "command-surface",
+                    "required": false
+                },
+                {
+                    "zoneId": "timeline",
+                    "type": "activity-history",
+                    "required": false
+                }
+            ],
+            "allowedBlocksByZone": {
+                "notice": [
+                    "info-banner"
+                ],
+                "summary": [
+                    "kpi-row"
+                ],
+                "filter": [
+                    "filter-bar"
+                ],
+                "primary": [
+                    "data-table",
+                    "data-tree"
+                ],
+                "form": [
+                    "form-standard"
+                ],
+                "detail": [
+                    "data-detail"
+                ],
+                "workflow": [
+                    "action-status-flow"
+                ],
+                "actions": [
+                    "action-toolbar"
+                ],
+                "timeline": [
+                    "data-timeline"
+                ]
+            },
+            "defaultDensity": "default",
+            "supportedDensities": [
+                "compact",
+                "default",
+                "comfortable",
+                "shopfloor"
+            ],
+            "themePolicy": {
+                "modes": [
+                    "light",
+                    "dark",
+                    "high-contrast"
+                ],
+                "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
+                "inlineStylePolicy": "forbidden-after-P0-exception-window",
+                "requiredTokenGroups": [
+                    "color",
+                    "surface",
+                    "spacing",
+                    "radius",
+                    "shadow",
+                    "type",
+                    "state"
+                ]
+            },
+            "responsivePolicy": {
+                "breakpoints": [
+                    "320",
+                    "390",
+                    "768",
+                    "1024",
+                    "1440",
+                    "1920"
+                ],
+                "zoomLevels": [
+                    "100",
+                    "200",
+                    "400"
+                ],
+                "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
+            },
+            "qaEvidence": {
+                "status": "IMPLEMENTED",
+                "gateRef": "mom/design/qa-gates.json",
+                "validator": "mom/tools/design/validate-frontend-contracts.mjs",
+                "lastReviewedAt": "2026-04-11T00:00:00+07:00"
+            },
+            "allowedZones": [
+                "notice",
+                "summary",
+                "filter",
+                "primary",
+                "form",
+                "detail",
+                "workflow",
+                "actions",
+                "timeline"
+            ],
+            "allowedBlocks": [
+                "info-banner",
+                "kpi-row",
+                "filter-bar",
+                "data-table",
+                "data-tree",
+                "form-standard",
+                "data-detail",
+                "action-status-flow",
+                "action-toolbar",
+                "data-timeline"
+            ],
+            "governedModules": [
+                "M2-orders"
+            ],
+            "regulatedCompatibility": "explicit-required",
+            "shopfloorCompatibility": "explicit-required",
+            "updatedBy": "Frontend Architecture Council",
+            "updatedAt": "2026-04-11T00:00:00+07:00",
+            "evidenceRefs": [
+                "mom/design/qa-gates.json",
+                "mom/tools/design/validate-frontend-contracts.mjs",
+                "2026-04-11T00:00:00+07:00"
+            ]
         },
         {
-          "zoneId": "summary",
-          "type": "kpi-summary",
-          "required": false
-        },
-        {
-          "zoneId": "filter",
-          "type": "query-controls",
-          "required": false
-        },
-        {
-          "zoneId": "primary",
-          "type": "primary-work-surface",
-          "required": true
-        },
-        {
-          "zoneId": "form",
-          "type": "transaction-entry",
-          "required": false
-        },
-        {
-          "zoneId": "detail",
-          "type": "record-detail",
-          "required": false
-        },
-        {
-          "zoneId": "workflow",
-          "type": "state-transition",
-          "required": false
-        },
-        {
-          "zoneId": "actions",
-          "type": "command-surface",
-          "required": false
-        },
-        {
-          "zoneId": "timeline",
-          "type": "activity-history",
-          "required": false
+            "templateId": "T29",
+            "canonicalId": "T-list-report-purchasing-po-control",
+            "legacyCode": "T29",
+            "aliases": [
+                "T29",
+                "purchasing-po-control",
+                "M4-purchasing-default"
+            ],
+            "version": "1.0.0",
+            "status": "published",
+            "registryStatus": "approved",
+            "owner": "Frontend Architecture Council",
+            "moduleArchetype": "list-report-workspace",
+            "description": {
+                "vi": "Workspace mua hàng có chuẩn nhập liệu supplier PO, danh sách PO, PO line, receiving/IQC, lifecycle và traceability.",
+                "en": "Purchasing workspace for supplier PO governance, PO register, PO lines, receiving/IQC, lifecycle, and traceability."
+            },
+            "zones": [
+                {
+                    "zoneId": "notice",
+                    "type": "contextual-guidance",
+                    "required": false
+                },
+                {
+                    "zoneId": "summary",
+                    "type": "kpi-summary",
+                    "required": false
+                },
+                {
+                    "zoneId": "filter",
+                    "type": "query-controls",
+                    "required": false
+                },
+                {
+                    "zoneId": "primary",
+                    "type": "primary-work-surface",
+                    "required": true
+                },
+                {
+                    "zoneId": "form",
+                    "type": "transaction-entry",
+                    "required": false
+                },
+                {
+                    "zoneId": "detail",
+                    "type": "record-detail",
+                    "required": false
+                },
+                {
+                    "zoneId": "workflow",
+                    "type": "state-transition",
+                    "required": false
+                },
+                {
+                    "zoneId": "actions",
+                    "type": "command-surface",
+                    "required": false
+                },
+                {
+                    "zoneId": "timeline",
+                    "type": "activity-history",
+                    "required": false
+                }
+            ],
+            "allowedBlocksByZone": {
+                "notice": [
+                    "info-banner"
+                ],
+                "summary": [
+                    "kpi-row"
+                ],
+                "filter": [
+                    "filter-bar"
+                ],
+                "primary": [
+                    "data-table",
+                    "data-tree"
+                ],
+                "form": [
+                    "form-standard"
+                ],
+                "detail": [
+                    "data-detail"
+                ],
+                "workflow": [
+                    "action-status-flow"
+                ],
+                "actions": [
+                    "action-toolbar"
+                ],
+                "timeline": [
+                    "data-timeline"
+                ]
+            },
+            "defaultDensity": "default",
+            "supportedDensities": [
+                "compact",
+                "default",
+                "comfortable",
+                "shopfloor"
+            ],
+            "themePolicy": {
+                "modes": [
+                    "light",
+                    "dark",
+                    "high-contrast"
+                ],
+                "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
+                "inlineStylePolicy": "forbidden-after-P0-exception-window",
+                "requiredTokenGroups": [
+                    "color",
+                    "surface",
+                    "spacing",
+                    "radius",
+                    "shadow",
+                    "type",
+                    "state"
+                ]
+            },
+            "responsivePolicy": {
+                "breakpoints": [
+                    "320",
+                    "390",
+                    "768",
+                    "1024",
+                    "1440",
+                    "1920"
+                ],
+                "zoomLevels": [
+                    "100",
+                    "200",
+                    "400"
+                ],
+                "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
+            },
+            "qaEvidence": {
+                "status": "IMPLEMENTED",
+                "gateRef": "mom/design/qa-gates.json",
+                "validator": "mom/tools/design/validate-frontend-contracts.mjs",
+                "lastReviewedAt": "2026-04-11T00:00:00+07:00"
+            },
+            "allowedZones": [
+                "notice",
+                "summary",
+                "filter",
+                "primary",
+                "form",
+                "detail",
+                "workflow",
+                "actions",
+                "timeline"
+            ],
+            "allowedBlocks": [
+                "info-banner",
+                "kpi-row",
+                "filter-bar",
+                "data-table",
+                "data-tree",
+                "form-standard",
+                "data-detail",
+                "action-status-flow",
+                "action-toolbar",
+                "data-timeline"
+            ],
+            "governedModules": [
+                "M4-purchasing"
+            ],
+            "regulatedCompatibility": "explicit-required",
+            "shopfloorCompatibility": "explicit-required",
+            "updatedBy": "Frontend Architecture Council",
+            "updatedAt": "2026-04-11T00:00:00+07:00",
+            "evidenceRefs": [
+                "mom/design/qa-gates.json",
+                "mom/tools/design/validate-frontend-contracts.mjs",
+                "2026-04-11T00:00:00+07:00"
+            ]
         }
-      ],
-      "allowedBlocksByZone": {
-        "notice": [
-          "info-banner"
-        ],
-        "summary": [
-          "kpi-row"
-        ],
-        "filter": [
-          "filter-bar"
-        ],
-        "primary": [
-          "data-table",
-          "data-tree"
-        ],
-        "form": [
-          "form-standard"
-        ],
-        "detail": [
-          "data-detail"
-        ],
-        "workflow": [
-          "action-status-flow"
-        ],
-        "actions": [
-          "action-toolbar"
-        ],
-        "timeline": [
-          "data-timeline"
-        ]
-      },
-      "defaultDensity": "default",
-      "supportedDensities": [
-        "compact",
-        "default",
-        "comfortable",
-        "shopfloor"
-      ],
-      "themePolicy": {
-        "modes": [
-          "light",
-          "dark",
-          "high-contrast"
-        ],
-        "tokenSource": "mom/docs/module-layout-template-design-system-v4.html#tokens",
-        "inlineStylePolicy": "forbidden-after-P0-exception-window",
-        "requiredTokenGroups": [
-          "color",
-          "surface",
-          "spacing",
-          "radius",
-          "shadow",
-          "type",
-          "state"
-        ]
-      },
-      "responsivePolicy": {
-        "breakpoints": [
-          "320",
-          "390",
-          "768",
-          "1024",
-          "1440",
-          "1920"
-        ],
-        "zoomLevels": [
-          "100",
-          "200",
-          "400"
-        ],
-        "reflowRequirement": "No horizontal scroll except intentional data-grid overflow with keyboard-accessible sticky controls."
-      },
-      "qaEvidence": {
-        "status": "IMPLEMENTED",
-        "gateRef": "mom/design/qa-gates.json",
-        "validator": "mom/tools/design/validate-frontend-contracts.mjs",
-        "lastReviewedAt": "2026-04-11T00:00:00+07:00"
-      },
-      "allowedZones": [
-        "notice",
-        "summary",
-        "filter",
-        "primary",
-        "form",
-        "detail",
-        "workflow",
-        "actions",
-        "timeline"
-      ],
-      "allowedBlocks": [
-        "info-banner",
-        "kpi-row",
-        "filter-bar",
-        "data-table",
-        "data-tree",
-        "form-standard",
-        "data-detail",
-        "action-status-flow",
-        "action-toolbar",
-        "data-timeline"
-      ],
-      "governedModules": [
-        "M4-purchasing"
-      ],
-      "regulatedCompatibility": "explicit-required",
-      "shopfloorCompatibility": "explicit-required",
-      "updatedBy": "Frontend Architecture Council",
-      "updatedAt": "2026-04-11T00:00:00+07:00",
-      "evidenceRefs": [
-        "mom/design/qa-gates.json",
-        "mom/tools/design/validate-frontend-contracts.mjs",
-        "2026-04-11T00:00:00+07:00"
-      ]
-    }
-  ]
+    ]
 }

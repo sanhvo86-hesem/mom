@@ -892,6 +892,7 @@ class GraphicsGovernanceService
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
                 'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json',
                 'releaseBlocked' => $activeBlockers !== [],
+                'releaseReadinessState' => $activeBlockers !== [] ? 'blocked-by-graphics-governance' : 'ready',
                 'blockerCount' => count($activeBlockers),
                 'releaseBlockerCount' => count($activeBlockers),
                 'evidenceBundleRequirements' => [
@@ -1719,6 +1720,7 @@ class GraphicsGovernanceService
                 ],
                 'templateRegistryVersion' => $this->documentVersion($registry),
                 'templateRegistryChecksum' => $this->etag($registry),
+                'complianceMatrixVersion' => (string)($matrix['version'] ?? ''),
                 'complianceMatrixRef' => 'mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance',
                 'impactAnalysisRef' => 'mom/data/graphics-governance/state.json#/pendingImpact',
                 'waiversRef' => 'mom/data/graphics-governance/waivers.json#/waivers',
@@ -1734,6 +1736,7 @@ class GraphicsGovernanceService
                 'rolloutDecisionRef' => 'mom/data/graphics-governance/rollouts.json#/rollouts',
                 'rollbackPlanRef' => 'mom/data/graphics-governance/snapshots/bootstrap-rollback-plan.json',
                 'releaseBlocked' => (bool)($blockers['summary']['releaseBlocked'] ?? false),
+                'releaseReadinessState' => (bool)($blockers['summary']['releaseBlocked'] ?? false) ? 'blocked-by-graphics-governance' : 'ready',
                 'blockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
                 'releaseBlockerCount' => (int)($blockers['summary']['blockerCount'] ?? 0),
                 'runtimeBeaconSummary' => (array)($runtimeBeacon['runtimeBeacon']['summary'] ?? []),
@@ -2722,6 +2725,9 @@ class GraphicsGovernanceService
         }
 
         return array_values(array_filter($active, static function (array $blocker) use ($targetModules): bool {
+            if ((string)($blocker['scope'] ?? '') !== 'module') {
+                return true;
+            }
             $target = (string)($blocker['targetId'] ?? $blocker['moduleId'] ?? '');
             return $target === '' || in_array($target, $targetModules, true);
         }));
@@ -2955,6 +2961,7 @@ class GraphicsGovernanceService
         $this->assertControlledEvidenceRef('runtimeBeaconRef', $runtimeBeaconRef);
         $this->assertControlledEvidenceRef('driftReportRef', $driftReportRef);
         $this->assertControlledEvidenceRef('moduleOwnerSignoffRef', $moduleOwnerSignoffRef);
+        $this->assertControlledReleaseRefList('postCanaryVerification.releaseManifestRefs', $manifestRefs);
     }
 
     private function assertControlledEvidenceRef(string $field, string $ref): void

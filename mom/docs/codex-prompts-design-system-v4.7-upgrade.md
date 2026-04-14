@@ -693,12 +693,12 @@ C. **Manufacturing + Manifests (P4)**:
    - Patches E-F (manifests) → Them vao Section 56/77 va Section 83
 
 D. **Cap nhat numbering**:
-   - Changelog section → Section 89
-   - TOC cap nhat cho 89 sections
+   - Changelog section → Section 90
+   - TOC cap nhat cho 90 sections
 
 E. **Cap nhat footer**:
 ```
-HESEM MOM — Module Layout Template Design System v4.7 Enterprise — 123 templates · 95+ block types · 20 visual themes · 30 component presets · 34 modules · 384+ CSS custom properties · 89 sections — 2026-04-11
+HESEM MOM — Module Layout Template Design System v4.7 Enterprise — 123 templates · 95+ block types · 23 visual themes · 30 component presets · 34 modules · 384+ CSS custom properties · 90 sections — 2026-04-11
 ```
 
 F. **Cap nhat self-audit evidence table**:
@@ -713,7 +713,7 @@ Them rows:
 | Machine-readable manifests | Pass | Status label manifest + QA gate manifest in JSON. |
 
 ### Kiem tra sau khi xong
-- 89 sections
+- 90 sections
 - TOC day du
 - Changelog v4.7
 - KHONG con font-size px
@@ -808,7 +808,7 @@ grep "v4.7" file.html | head -5  # Xac nhan version
 **Buoc 5**: Validation stamp:
 ```html
 <!-- VALIDATION STAMP -->
-<!-- v4.7 validated: 89 sections, 384+ CSS tokens, ~12500 dong -->
+<!-- v4.7 validated: 90 sections, 384+ CSS tokens, ~12500 dong -->
 <!-- Standard 36 alignment: FULL — all 23 S36 fields present in build packet -->
 <!-- Typography: 100% rem-based, 0 hardcoded px font-size -->
 <!-- WCAG 2.2 AA: all SCs marked Dat, forced-colors supported -->

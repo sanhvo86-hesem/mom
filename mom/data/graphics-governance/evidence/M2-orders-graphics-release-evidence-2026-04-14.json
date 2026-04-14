@@ -1,0 +1,40 @@
+{
+  "evidenceId": "M2-orders-graphics-release-evidence-2026-04-14",
+  "moduleId": "M2-orders",
+  "authority": "Admin Graphics Control Plane",
+  "sourceRefs": [
+    "mom/design/build-packets/M2-orders.json",
+    "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance/M2-orders",
+    "mom/docs/module-layout-template-design-system-v4.html#graphics-release-evidence-pack"
+  ],
+  "generatedAt": "2026-04-14T00:00:00Z",
+  "owner": "Frontend Platform + Commercial Operations",
+  "evidence": {
+    "gates": {
+      "G07": {
+        "status": "controlled-evidence-attached",
+        "method": "keyboard-and-contrast-route-review",
+        "scope": ["overview", "create-so", "release-jo", "release-wo", "shipping", "detail"],
+        "result": "No graphics-control-plane blocker remains for WCAG automated-equivalent release gating; route-level automated axe remains P1 debt under G09/G10."
+      },
+      "G08": {
+        "status": "controlled-evidence-attached",
+        "method": "keyboard-primary-path-review",
+        "scope": ["filter", "table", "form", "toolbar", "status-flow", "timeline"],
+        "result": "Primary keyboard path is documented against shared hm-* component contracts and controlled template zones."
+      },
+      "G14": {
+        "status": "controlled-evidence-attached",
+        "method": "audit-event-contract-review",
+        "scope": ["sales_order_created", "sales_order_transitioned", "job_order_released", "work_order_released", "packing_list_created"],
+        "result": "Audit events are declared in the controlled build packet and bound to backend-governed workflow endpoints."
+      },
+      "G19": {
+        "status": "controlled-evidence-attached",
+        "method": "graphics-governance-release-evidence-pack",
+        "scope": ["template-binding", "impact-analysis", "compliance-matrix", "runtime-beacon", "rollback-plan"],
+        "result": "Graphics evidence is linked through release evidence pack refs and no active graphics release blocker remains for this module."
+      }
+    }
+  }
+}

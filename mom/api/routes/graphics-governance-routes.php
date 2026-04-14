@@ -48,6 +48,12 @@ return static function (Router $router, string $dataDir): void {
         'graphics_release_link_get'            => [GraphicsGovernanceController::class, 'releaseLink'],
         'graphics_release_evidence_pack_get'   => [GraphicsGovernanceController::class, 'releaseEvidencePack'],
 
+        // Backward-compatible Admin Appearance aliases. These override the
+        // older platform-route mapping so Admin cannot bypass graphics-specific
+        // read/write permissions, CSRF/version handling, audit, or backend
+        // authority semantics.
+        'admin_design_config'                  => [GraphicsGovernanceController::class, 'getDesignConfig'],
+        'admin_design_config_save'             => [GraphicsGovernanceController::class, 'saveDesignConfig'],
         'admin_template_registry_get'          => [GraphicsGovernanceController::class, 'listTemplates'],
         'admin_template_get'                   => [GraphicsGovernanceController::class, 'getTemplate'],
         'admin_template_draft_save'            => [GraphicsGovernanceController::class, 'saveDraftTemplate'],

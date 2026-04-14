@@ -1,0 +1,40 @@
+{
+  "evidenceId": "M4-purchasing-graphics-release-evidence-2026-04-14",
+  "moduleId": "M4-purchasing",
+  "authority": "Admin Graphics Control Plane",
+  "sourceRefs": [
+    "mom/design/build-packets/M4-purchasing.json",
+    "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance/M4-purchasing",
+    "mom/docs/module-layout-template-design-system-v4.html#graphics-release-evidence-pack"
+  ],
+  "generatedAt": "2026-04-14T00:00:00Z",
+  "owner": "Frontend Platform + Purchasing / Quality",
+  "evidence": {
+    "gates": {
+      "G07": {
+        "status": "controlled-evidence-attached",
+        "method": "keyboard-and-contrast-route-review",
+        "scope": ["overview", "purchase-order", "supplier-quality", "receiving", "detail"],
+        "result": "No graphics-control-plane blocker remains for WCAG automated-equivalent release gating; route-level automated axe remains P1 debt under G09/G10."
+      },
+      "G08": {
+        "status": "controlled-evidence-attached",
+        "method": "keyboard-primary-path-review",
+        "scope": ["filter", "table", "form", "toolbar", "approval-flow", "inspection-link"],
+        "result": "Primary keyboard path is documented against shared hm-* component contracts and controlled template zones."
+      },
+      "G14": {
+        "status": "controlled-evidence-attached",
+        "method": "audit-event-contract-review",
+        "scope": ["purchase_order_created", "purchase_order_released", "supplier_quality_hold_created", "receiving_inspection_linked"],
+        "result": "Audit events are declared in the controlled build packet and bound to backend-governed purchasing and quality endpoints."
+      },
+      "G19": {
+        "status": "controlled-evidence-attached",
+        "method": "graphics-governance-release-evidence-pack",
+        "scope": ["template-binding", "impact-analysis", "compliance-matrix", "runtime-beacon", "rollback-plan"],
+        "result": "Graphics evidence is linked through release evidence pack refs and no active graphics release blocker remains for this module."
+      }
+    }
+  }
+}
