@@ -14,6 +14,7 @@ use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExportService;
+use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
@@ -533,18 +534,42 @@ final class EqmsControlPlaneController extends BaseController
             }
 
             $manifest = (new AuditPackExportService($this->data))->buildForScope((array)$body['scope'], (string)$userOrgId);
+            $export = (new AuditPackExporter($this->dataDir))->exportManifest($manifest);
 
             // GOV-008: Final assertion - verify no cross-org records made it through
             if (!$this->assertAuditPackIsOrgScoped($manifest, $userOrgId)) {
                 $this->error('audit_pack_scope_violation', 403, 'Audit pack contains records from multiple organizations.');
             }
 
-            if ($manifest['export_state'] !== 'ready') {
-                $this->error('audit_pack_incomplete', 409, 'Audit pack manifest is incomplete.', ['audit_pack_manifest' => $manifest]);
+            if (($export['export_state'] ?? '') !== 'ready') {
+                $this->error('audit_pack_incomplete', 409, 'Audit pack manifest is incomplete.', [
+                    'audit_pack_manifest' => $manifest,
+                    'audit_pack_export' => $export,
+                ]);
             }
-            $this->success(['audit_pack_manifest' => $manifest]);
+            $this->success([
+                'audit_pack_manifest' => $manifest,
+                'audit_pack_export' => $export,
+            ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
+        }
+    }
+
+    public function getAuditPackExport(): never
+    {
+        $this->requireAuth();
+        $packageHash = trim((string)($this->query('package_hash', '') ?: $this->query('package_hash_sha256', '')));
+        if ($packageHash === '') {
+            $this->error('package_hash_required', 400);
+        }
+
+        try {
+            $this->success([
+                'audit_pack_export' => (new AuditPackExporter($this->dataDir))->readExport($packageHash),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 404);
         }
     }
 

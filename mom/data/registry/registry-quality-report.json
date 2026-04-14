@@ -1,0 +1,1886 @@
+{
+  "_meta": {
+    "version": "5.0",
+    "description": "Internal quality report for registry-backed Module Builder assets.",
+    "generatedAt": "2026-04-14T09:37:18.620Z",
+    "integrity_gate": "all_passed",
+    "publishability_gate": "publishability.ready",
+    "slice_publication_pass": "foundation_governance_contract_slice",
+    "publication_scope": "platform_global",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86"
+  },
+  "summary": {
+    "endpoint_count": 4180,
+    "pack_count": 4548,
+    "relation_edge_count": 3448,
+    "workflow_count": 333,
+    "status_set_count": 877,
+    "validation_rule_count": 48509,
+    "formula_count": 1347,
+    "formula_reference_count": 1347,
+    "field_context_count": 55922,
+    "row_version_tables": 613,
+    "org_scoped_tables": 575,
+    "composite_pk_tables": 21,
+    "missing_primary_key_tables": 0,
+    "unsupported_record_endpoints": 0,
+    "optimistic_concurrency_issues": 0,
+    "idempotency_contract_issues": 0,
+    "org_scope_contract_issues": 0,
+    "contract_issues": 0,
+    "workflow_alignment_issues": 0,
+    "transition_runtime_warnings": 347,
+    "workflow_engine_bridge_ready": 342,
+    "workflow_engine_bridge_blocked": 5,
+    "archive_only_tables": 695,
+    "soft_delete_tables": 63,
+    "hard_delete_tables": 0,
+    "workflow_lifecycle_modes": {
+      "stateless": 366,
+      "generic_status_only": 45,
+      "guarded_transition_runtime": 0,
+      "persisted": 347,
+      "unknown": 0
+    },
+    "frontend_foundation_entities": 769,
+    "frontend_ready_entities": 764,
+    "frontend_partial_entities": 5,
+    "frontend_blocked_entities": 0,
+    "frontend_archive_isolation_entities": 6,
+    "frontend_publishable_entities": 748,
+    "frontend_unpublishable_entities": 4,
+    "attachment_contract_entities": 756,
+    "comment_contract_entities": 756,
+    "activity_contract_entities": 583,
+    "publishability_ready": false,
+    "publishability_review_required_entities": 4
+  },
+  "publishability": {
+    "ready": false,
+    "status": "review_required",
+    "review_required": true,
+    "failed_checks": [
+      {
+        "id": "frontend_entities_publishable",
+        "passed": false,
+        "actual": 4,
+        "target": 0
+      },
+      {
+        "id": "workflow_engine_bridges_ready",
+        "passed": false,
+        "actual": 5,
+        "target": 0
+      }
+    ],
+    "blocking_counts": {
+      "frontend_partial_entities": 5,
+      "frontend_blocked_entities": 0,
+      "frontend_unpublishable_entities": 4,
+      "workflow_engine_bridge_blocked": 5,
+      "unsupported_record_endpoints": 0,
+      "contract_issues": 0
+    },
+    "recommended_next_actions": [
+      "Close remaining unpublishable record surfaces before rollout.",
+      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
+      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
+    ]
+  },
+  "checks": [
+    {
+      "id": "tables_have_fields",
+      "passed": true,
+      "actual": 758,
+      "target": 758
+    },
+    {
+      "id": "tables_have_endpoint_catalog",
+      "passed": true,
+      "actual": 758,
+      "target": 758
+    },
+    {
+      "id": "tables_have_pack",
+      "passed": true,
+      "actual": 758,
+      "target": 758
+    },
+    {
+      "id": "fk_edges_covered",
+      "passed": true,
+      "actual": 3448,
+      "target": 3448
+    },
+    {
+      "id": "workflow_coverage",
+      "passed": true,
+      "actual": 473,
+      "target": 473
+    },
+    {
+      "id": "status_coverage",
+      "passed": true,
+      "actual": 379,
+      "target": 379
+    },
+    {
+      "id": "scalar_pk_tables",
+      "passed": true,
+      "actual": 737,
+      "target": 726
+    },
+    {
+      "id": "optimistic_concurrency_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "idempotency_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "org_scope_contracts",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "frontend_record_readiness",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "frontend_foundation_coverage",
+      "passed": true,
+      "actual": 758,
+      "target": 758
+    },
+    {
+      "id": "no_unsupported_record_endpoints",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "endpoint_contract_readiness",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "workflow_status_alignment",
+      "passed": true,
+      "actual": 0,
+      "target": 0
+    },
+    {
+      "id": "workflow_count_target",
+      "passed": true,
+      "actual": 333,
+      "target": 60
+    },
+    {
+      "id": "domain_workflow_target",
+      "passed": true,
+      "actual": 49,
+      "target": 49
+    },
+    {
+      "id": "status_set_target",
+      "passed": true,
+      "actual": 877,
+      "target": 180
+    },
+    {
+      "id": "validation_rule_target",
+      "passed": true,
+      "actual": 48509,
+      "target": 5000
+    },
+    {
+      "id": "formula_target",
+      "passed": true,
+      "actual": 1347,
+      "target": 200
+    },
+    {
+      "id": "formula_reference_target",
+      "passed": true,
+      "actual": 1347,
+      "target": 1347
+    }
+  ],
+  "warnings": {
+    "row_version_tables": [
+      {
+        "table": "ai_conversations",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_feedback_loops",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ai_training_datasets",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "allocation",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "allocation_events",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ap_ar_invoices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ap_invoice_lines",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "ap_invoices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "approval",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "approved_supplier_list",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "apqp_projects",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_capacity_buckets",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_constraint_resources",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_demand_forecasts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_material_availability",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_planning_horizons",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_schedule_conflicts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "aps_setup_matrices",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "as_manufactured_snapshots",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "attachment",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_actions",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_findings",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_program",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audit_trail",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "audits",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "background_jobs",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bill_of_materials",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom_components",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom_line",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom_substitute",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "bom_version",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calendar",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_grr_studies",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "calibration_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capa",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capa_records",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "capacity_snapshots",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "certificates",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "change_control",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "cnc_program_approvals",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "cnc_programs",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_contract_amendments",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_contracts",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_credit_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_customer_scorecards",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_incoterms_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_order_promises",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_payment_terms_profiles",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_price_lists",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_rebate_accruals",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "com_rebate_programs",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "comments",
+        "concurrency_field": "row_version"
+      }
+    ],
+    "org_scoped_tables": [
+      {
+        "table": "ai_conversations",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_feedback_loops",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ai_training_datasets",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "allocation",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "allocation_events",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ap_ar_invoices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "ap_invoices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "approval",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "approved_supplier_list",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "apqp_projects",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_capacity_buckets",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_constraint_resources",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_demand_forecasts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_material_availability",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_planning_horizons",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_schedule_conflicts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "aps_setup_matrices",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "as_manufactured_snapshots",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "attachment",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_actions",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_findings",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_program",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audit_trail",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "audits",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "background_jobs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bill_of_materials",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom_components",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom_line",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom_substitute",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "bom_version",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calendar",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_grr_studies",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "calibration_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capa",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capa_records",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "capacity_snapshots",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "certificates",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "change_control",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "cnc_program_approvals",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "cnc_programs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_contract_amendments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_contracts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_credit_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_customer_scorecards",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_incoterms_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_order_promises",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_payment_terms_profiles",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_price_lists",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_rebate_accruals",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "com_rebate_programs",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "comments",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "commercial_accounts",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      }
+    ],
+    "composite_pk_tables": [
+      {
+        "table": "audit_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "recorded_at"
+        ]
+      },
+      {
+        "table": "bill_of_materials",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "bom_id",
+          "bom_revision"
+        ]
+      },
+      {
+        "table": "control_plane_object_registry",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "object_type",
+          "object_id"
+        ]
+      },
+      {
+        "table": "form_schemas",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "form_code",
+          "version"
+        ]
+      },
+      {
+        "table": "inventory_transactions",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "txn_id",
+          "recorded_at"
+        ]
+      },
+      {
+        "table": "labor_transactions",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "labor_txn_id",
+          "recorded_at"
+        ]
+      },
+      {
+        "table": "mes_cycle_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "cycle_id",
+          "cycle_end_time"
+        ]
+      },
+      {
+        "table": "mes_downtime_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "downtime_id",
+          "start_time"
+        ]
+      },
+      {
+        "table": "mes_inline_measurements",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "measurement_id",
+          "measured_at"
+        ]
+      },
+      {
+        "table": "mes_machine_alarms",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "alarm_id",
+          "alarm_time"
+        ]
+      },
+      {
+        "table": "mes_machine_state_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_machine_telemetry",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "equipment_id",
+          "ts"
+        ]
+      },
+      {
+        "table": "mes_oee_loss_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "loss_id",
+          "loss_time"
+        ]
+      },
+      {
+        "table": "mes_production_kpi_daily",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "kpi_date",
+          "dimension_type",
+          "dimension_id",
+          "shift_code"
+        ]
+      },
+      {
+        "table": "mes_program_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_spc_violations",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "violation_id",
+          "detected_at"
+        ]
+      },
+      {
+        "table": "mes_tool_life_events",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "event_id",
+          "event_time"
+        ]
+      },
+      {
+        "table": "mes_wip_movements",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "movement_id",
+          "moved_at"
+        ]
+      },
+      {
+        "table": "record_counters",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "record_type",
+          "fiscal_year"
+        ]
+      },
+      {
+        "table": "routings",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "routing_id",
+          "routing_revision"
+        ]
+      },
+      {
+        "table": "user_roles",
+        "primary_key_mode": "composite",
+        "primary_key_fields": [
+          "user_id",
+          "role_id"
+        ]
+      }
+    ],
+    "missing_primary_key_tables": [],
+    "unsupported_record_endpoints": [],
+    "optimistic_concurrency_issues": [],
+    "idempotency_contract_issues": [],
+    "org_scope_contract_issues": [],
+    "contract_issues": [],
+    "workflow_alignment_issues": [],
+    "transition_runtime_warnings": [
+      {
+        "table": "ai_recommendation_actions",
+        "workflowId": "wf_ai_recommendation_action",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "ai_training_datasets",
+        "workflowId": "wf_ai_training_dataset",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "allocations",
+        "workflowId": "wf_allocation",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "ap_ar_invoices",
+        "workflowId": "wf_ap_ar_invoice",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "ap_invoices",
+        "workflowId": "wf_ap_invoice",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "approval",
+        "workflowId": "wf_approval",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "approved_supplier_list",
+        "workflowId": "wf_approved_supplier_list",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "workflowId": "wf_apqp_project",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "apqp_projects",
+        "workflowId": "wf_apqp_project",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "aps_planning_horizons",
+        "workflowId": "wf_aps_planning_horizon",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "workflowId": "wf_aps_scenario",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "workflowId": "wf_aps_schedule_block",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "audit",
+        "workflowId": "wf_audit",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine_required",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "audit_actions",
+        "workflowId": "wf_audit_action",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "audit_pack_exports",
+        "workflowId": "wf_audit_pack_export",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "background_jobs",
+        "workflowId": "wf_background_job",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "bill_of_materials",
+        "workflowId": "wf_bill_of_material",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "bom",
+        "workflowId": "wf_bom",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "bom_version",
+        "workflowId": "wf_bom_version",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "calendar",
+        "workflowId": "wf_calendar",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "workflowId": "wf_calibration_control",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "calibration_records",
+        "workflowId": "wf_calibration_record",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "capa",
+        "workflowId": "wf_capa",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "capa_8d_steps",
+        "workflowId": "wf_capa",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "workflowId": "wf_capa",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "capa_records",
+        "workflowId": "wf_capa",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "certificates",
+        "workflowId": "wf_certificate",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "change_control",
+        "workflowId": "wf_change_control",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "cnc_program_approvals",
+        "workflowId": "wf_cnc_program_approval",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "cnc_program_versions",
+        "workflowId": "wf_cnc_program_approval",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "cnc_programs",
+        "workflowId": "wf_cnc_program_approval",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "com_contracts",
+        "workflowId": "wf_contract_lifecycle",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "com_credit_profiles",
+        "workflowId": "wf_com_credit_profile",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "com_order_promises",
+        "workflowId": "wf_order_promise",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "commercial_accounts",
+        "workflowId": "wf_commercial_account",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "complaint",
+        "workflowId": "wf_complaint",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "compliance_records",
+        "workflowId": "wf_compliance_record",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "concessions",
+        "workflowId": "wf_concession",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "container",
+        "workflowId": "wf_container",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      },
+      {
+        "table": "control_plane_command_handlers",
+        "workflowId": "wf_control_plane_command_handler",
+        "lifecycle_mode": "persisted",
+        "execution_mode": "workflow_engine",
+        "warning": "Persisted workflow currently exceeds the guarantees of plain generic status updates."
+      }
+    ],
+    "workflow_engine_bridge": [
+      {
+        "table": "audit",
+        "workflowId": "wf_audit",
+        "record_type": "AUD",
+        "identity_field": "source_record_id",
+        "state_alignment_ratio": 0.125,
+        "block_reasons": [
+          "state_model_mismatch"
+        ],
+        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
+      },
+      {
+        "table": "deviation",
+        "workflowId": "wf_deviation",
+        "record_type": "DEVIATION",
+        "identity_field": "source_record_id",
+        "state_alignment_ratio": 0,
+        "block_reasons": [
+          "state_model_mismatch"
+        ],
+        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
+      },
+      {
+        "table": "deviations",
+        "workflowId": "wf_deviation",
+        "record_type": "DEVIATION",
+        "identity_field": "record_id",
+        "state_alignment_ratio": 0,
+        "block_reasons": [
+          "state_model_mismatch"
+        ],
+        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
+      },
+      {
+        "table": "engineering_change_requests",
+        "workflowId": "wf_engineering_change_request",
+        "record_type": "ECR",
+        "identity_field": "source_record_id",
+        "state_alignment_ratio": 0,
+        "block_reasons": [
+          "state_model_mismatch"
+        ],
+        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
+      },
+      {
+        "table": "improvement_projects",
+        "workflowId": "wf_improvement_project",
+        "record_type": "IMP",
+        "identity_field": "record_id",
+        "state_alignment_ratio": 0.2,
+        "block_reasons": [
+          "state_model_mismatch"
+        ],
+        "advisory": "Persisted workflow cannot safely use the workflow engine bridge yet; resolve identity and state-model mismatches before production transitions."
+      }
+    ],
+    "delete_governance": [
+      {
+        "table": "ai_conversations",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "ai_feedback_loops",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "ai_recommendation_actions",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "ai_training_datasets",
+        "domain": "ai_predictive",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "alarm_event",
+        "domain": "mes_execution",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "allocation",
+        "domain": "demand_supply_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "allocation_events",
+        "domain": "record_system",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "allocations",
+        "domain": "record_system",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "ap_ar_invoices",
+        "domain": "finance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "ap_invoice_lines",
+        "domain": "finance",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "ap_invoices",
+        "domain": "finance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "approval",
+        "domain": "foundation_governance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "approved_supplier_list",
+        "domain": "supplier_relationship",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "apqp_gate_reviews",
+        "domain": "fmea_apqp",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "apqp_projects",
+        "domain": "fmea_apqp",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "aps_capacity_buckets",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "aps_constraint_resources",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "aps_demand_forecast_lines",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "aps_demand_forecasts",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "aps_kpi_snapshots",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "aps_material_availability",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "aps_pegging_links",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "aps_planning_horizons",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "aps_planning_scenarios",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "aps_schedule_blocks",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "aps_schedule_conflicts",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "aps_setup_matrices",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "as_manufactured_snapshots",
+        "domain": "traceability_serialization",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "attachment",
+        "domain": "foundation_governance",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "audit",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_events",
+        "domain": "core_system",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "audit_pack_exports",
+        "domain": "record_system",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_program",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "audit_trail",
+        "domain": "audit_risk",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "background_jobs",
+        "domain": "system_infrastructure",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "bom",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "bom_line",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "bom_substitute",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "bom_version",
+        "domain": "mfg_engineering",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "calendar",
+        "domain": "foundation_governance",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "calibration_grr_studies",
+        "domain": "calibration_equipment",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "calibration_oot_investigations",
+        "domain": "calibration_equipment",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "capa",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "capa_8d_steps",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "capa_effectiveness_checks",
+        "domain": "quality_management",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "capacity_snapshots",
+        "domain": "advanced_planning",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "change_control",
+        "domain": "plm_change_control",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "cnc_program_approvals",
+        "domain": "cnc_programs",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "cnc_program_versions",
+        "domain": "cnc_programs",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "cnc_programs",
+        "domain": "cnc_programs",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "com_contract_amendments",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "com_contract_lines",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "com_contracts",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "com_credit_profiles",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "com_customer_scorecards",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "com_incoterms_profiles",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "com_order_promises",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
+        "table": "com_payment_terms_profiles",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      },
+      {
+        "table": "com_price_list_lines",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "support"
+      },
+      {
+        "table": "com_price_lists",
+        "domain": "commercial_contracts",
+        "mode": "archive_only",
+        "governance_level": "default_no_data_loss"
+      }
+    ],
+    "frontend_foundation": []
+  },
+  "all_passed": false
+}

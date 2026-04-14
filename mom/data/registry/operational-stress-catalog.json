@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T09:37:28.410Z",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "STR-001"
+    },
+    {
+      "scenario_id": "STR-002"
+    },
+    {
+      "scenario_id": "STR-003"
+    },
+    {
+      "scenario_id": "STR-004"
+    },
+    {
+      "scenario_id": "STR-005"
+    },
+    {
+      "scenario_id": "STR-006"
+    },
+    {
+      "scenario_id": "STR-007"
+    },
+    {
+      "scenario_id": "STR-008"
+    },
+    {
+      "scenario_id": "STR-009"
+    },
+    {
+      "scenario_id": "STR-010"
+    },
+    {
+      "scenario_id": "STR-011"
+    },
+    {
+      "scenario_id": "STR-012"
+    }
+  ]
+}

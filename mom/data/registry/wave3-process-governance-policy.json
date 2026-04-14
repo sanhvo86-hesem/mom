@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:22.518Z",
+    "description": "Wave 3 process-object governance policy for extracting missing lifecycle owners and blocking duplicate process objects."
+  },
+  "objective": {
+    "wave": 3,
+    "name": "Process Object Introduction And Duplicate Suppression",
+    "statement": "Each process object must exist only when it closes a real operational blind spot. If the process object already exists as a governed lifecycle owner, the platform must not create a duplicate. If the object is still embedded inside another lifecycle owner and that embedding hides demand, gate, KPI, or audit truth, Wave 3 must extract it into a first-class canonical object.",
+    "operating_mode": "backend_first_process_object_normalization"
+  },
+  "build_questions": [
+    {
+      "id": "wave3_birth_purpose",
+      "question": "What business commitment, gate, KPI, or audit trail is this process object born to protect, and what operational blind spot remains if it stays embedded?"
+    },
+    {
+      "id": "wave3_duplicate_guard",
+      "question": "Does this object already exist as a governed lifecycle owner elsewhere in runtime, making a new table or endpoint a harmful duplicate?"
+    },
+    {
+      "id": "wave3_parent_extraction",
+      "question": "If the object is embedded in a parent record today, what exact fields and lifecycle transitions must be extracted so the parent stops acting as a split truth container?"
+    },
+    {
+      "id": "wave3_gate_control",
+      "question": "What gate is enforced by this object, and can that gate be defended without a dedicated lifecycle owner?"
+    },
+    {
+      "id": "wave3_alias_policy",
+      "question": "If a candidate object is only an alias today, what objective criteria would justify separating it later, and until then what canonical successor remains active?"
+    },
+    {
+      "id": "wave3_linkage_audit",
+      "question": "Can the extracted object trace cleanly to quote, sales order, production, shipping, or inspection records without dual ownership?"
+    },
+    {
+      "id": "wave3_mutation_safety",
+      "question": "Do create and transition actions for the extracted object replay safely under retry and preserve status history?"
+    },
+    {
+      "id": "wave3_unused_boundary",
+      "question": "If the candidate object adds no distinct gate or KPI, has it been explicitly classified as duplicate, alias, unused, or archive instead of left ambiguous?"
+    }
+  ],
+  "acceptance_criteria": {
+    "required_for_wave3_completion": [
+      "embedded_customer_demand_object_extracted_into_first_class_runtime",
+      "linkage_back_to_sales_orders_is_canonical_and_bidirectional",
+      "already_first_class_wave3_objects_are_marked_no_duplicate",
+      "conditional_alias_objects_have_explicit_successor_and_split_criteria",
+      "no_remaining_wave3_gap_is_left_unclassified"
+    ]
+  },
+  "rejection_criteria": [
+    "new_process_object_created_where_a_governed_lifecycle_owner_already_exists",
+    "embedded_customer_commitment_left_only_as_parent_text_field",
+    "wave3_alias_candidate_left_without_successor_or_split_criteria",
+    "new_process_object_missing_transition_or_idempotency_contract",
+    "wave3_gap_reported_without_duplicate_vs_extraction_decision"
+  ]
+}

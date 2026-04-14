@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:22.834Z",
+    "description": "Wave 4 production-quality governance policy for IQC/IPQC/OQC closure, QA/QC role split, and continuous-improvement reaction loops."
+  },
+  "objective": {
+    "wave": 4,
+    "name": "Production And Quality Execution Closure",
+    "statement": "Every quality gate from incoming through in-process and outbound release must have one governed owner, explicit QA/QC role split, and a closed reaction loop into NCR/CAPA/SPC/MSA. Result rows and raw measurements remain subordinate evidence, never accidental lifecycle owners.",
+    "operating_mode": "backend_first_production_quality_governance"
+  },
+  "build_questions": [
+    {
+      "id": "wave4_gate_owner",
+      "question": "This object exists to own exactly which gate: receiving, in-process, outbound release, inspection evidence, or reaction-loop escalation?"
+    },
+    {
+      "id": "wave4_qa_qc_split",
+      "question": "Which server-side roles may start, reinspect, disposition, waive, or close the quality gate, and where must QA authority stay distinct from production or logistics handoff?"
+    },
+    {
+      "id": "wave4_measurement_child",
+      "question": "Is this row a governed lifecycle owner, or only a result/measurement child that must never inherit the parent workflow?"
+    },
+    {
+      "id": "wave4_sampling_backbone",
+      "question": "Can the backend trace inspection plan, lot, execution result, and usage decision without split truth or alias drift?"
+    },
+    {
+      "id": "wave4_reaction_loop",
+      "question": "If the process trends out of control or fails, does it escalate into NCR/CAPA and feed SPC/MSA or other continuous-improvement loops?"
+    },
+    {
+      "id": "wave4_alias_need",
+      "question": "Is FQC a truly separate finished-goods gate, or only an alias of OQC until a distinct release authority and KPI exist?"
+    },
+    {
+      "id": "wave4_traceability",
+      "question": "Can an auditor trace from PO, SO, JO, WO, or shipment to inspection disposition, sample results, and follow-up action through one canonical chain?"
+    },
+    {
+      "id": "wave4_unused_isolation",
+      "question": "If this quality element has no active operational purpose, has it been isolated into unused/archive instead of left live by habit?"
+    }
+  ],
+  "acceptance_criteria": {
+    "required_for_quality_execution_owner": [
+      "canonical_resource_maps_to_live_runtime_entity",
+      "transition_endpoint_uses_workflow_engine_for_release_or_disposition_gate",
+      "engine_bridge_ready_and_state_aligned",
+      "row_version_and_idempotent_mutation_present",
+      "server_side_role_guards_cover_start_and_disposition"
+    ],
+    "required_for_measurement_backbone": [
+      "inspection_plan_and_inspection_lot_entities_present",
+      "result_rows_publish_as_transactional_or_assessment_records",
+      "child_measurement_rows_do_not_own_parent_workflow",
+      "traceable_link_to_parent_gate_or_source_record"
+    ],
+    "required_for_reaction_loop": [
+      "ncr_and_capa_are_first_class_governed_cases",
+      "spc_and_msa_publish_as_transactional_or_assessment_records",
+      "quality_execution_can_link_to_ncr_or_capa",
+      "final_outbound_aliases_do_not_duplicate_existing_gate"
+    ]
+  },
+  "rejection_criteria": [
+    "inspection_result_or_measurement_row_inherits_parent_workflow_owner",
+    "quality_gate_published_without_server_side_role_split_for_qa_qc_handoff",
+    "receiving_ipqc_or_oqc_release_gate_left_on_generic_or_unbridged_runtime",
+    "fqc_duplicate_created_without_distinct_finished_goods_release_gate",
+    "spc_or_msa_left_outside_quality_reaction_loop",
+    "canonical_quality_resource_names_non_live_table_while_live_owner_exists"
+  ]
+}

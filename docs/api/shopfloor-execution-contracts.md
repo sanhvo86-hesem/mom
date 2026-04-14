@@ -305,7 +305,7 @@ Rules:
 - Feedback is advisory analytics data only and cannot mutate dispatch or execution state.
 - Critical prediction recommendation records remain `pending` and carry `advisory_only: true`, `execution_authority: false`, and `requires_human_approval: true`. They may point a human to quality, maintenance, tooling, or planning review, but they do not create NCRs, maintenance work, tool orders, schedule moves, or machine commands.
 - AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard endpoints require AI read roles. Model config, metadata, and training source fields are only returned to admin roles.
-- Dashboard prediction and schedule metrics are plant-scoped where plant context is available, including mean time to action.
+- Dashboard prediction and schedule metrics are plant-scoped where plant context is available, including mean time to action; scoped users do not receive blank-plant JSON fallback advisory rows.
 
 ## AI natural-language query
 

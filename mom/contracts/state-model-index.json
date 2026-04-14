@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T23:08:39.549544+00:00",
+    "generatedAt": "2026-04-14T09:52:19.297561+00:00",
     "description": "Explicit lifecycle and state-contract index for canonical business objects.",
     "stateModelCount": 65
   },
@@ -425,7 +425,7 @@
         "ap_ar_invoices"
       ],
       "statusSetKey": "ap_ar_invoices_payment_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "purpose": "Controls invoice payment state, dispute handling, and financial close visibility before cash recognition is considered complete.",
       "usageZone": "core_value_stream",
       "gateType": "financial_gate",
@@ -1408,7 +1408,7 @@
         "engineering_change_requests"
       ],
       "statusSetKey": "engineering_change_requests_ecr_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "purpose": "Controls engineering change request progression under guarded runtime so release governance exists before any separate PLM workflow engine is introduced.",
       "usageZone": "governed_support",
       "gateType": "change_gate",
@@ -1879,7 +1879,7 @@
         "fin_fixed_assets"
       ],
       "statusSetKey": "fin_fixed_assets_asset_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "lifecycleMode": "persisted",
       "purpose": "Controls fixed-asset operational availability, hold, retirement, and disposal governance for accounting and maintenance alignment.",
       "usageZone": "core_value_stream",
       "gateType": "financial_gate",
@@ -2448,8 +2448,8 @@
       "storageTables": [
         "tools"
       ],
-      "statusSetKey": "tools_tool_status",
-      "lifecycleMode": "guarded_transition_runtime",
+      "statusSetKey": "tool_status",
+      "lifecycleMode": "persisted",
       "purpose": "Controls tool and measuring-device release, wear containment, and retirement before use on production or inspection operations.",
       "usageZone": "core_value_stream",
       "gateType": "process_gate",

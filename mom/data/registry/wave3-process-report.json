@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:22.778Z",
+    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "policyVersion": "1.0",
+    "description": "Wave 3 process-object governance verification report."
+  },
+  "summary": {
+    "must_introduce_first_class_targets": 1,
+    "must_introduce_first_class_failed": 0,
+    "already_first_class_targets": 4,
+    "already_first_class_failed": 0,
+    "conditional_alias_targets": 1,
+    "conditional_alias_failed": 0,
+    "duplicate_guard_targets": 5,
+    "duplicate_guard_failed": 0,
+    "remaining_wave3_gaps": 0,
+    "remaining_unused_candidate_entities": 0
+  },
+  "policy_gates": {
+    "build_questions": [
+      "wave3_birth_purpose",
+      "wave3_duplicate_guard",
+      "wave3_parent_extraction",
+      "wave3_gate_control",
+      "wave3_alias_policy",
+      "wave3_linkage_audit",
+      "wave3_mutation_safety",
+      "wave3_unused_boundary"
+    ],
+    "acceptance_criteria": {
+      "required_for_wave3_completion": [
+        "embedded_customer_demand_object_extracted_into_first_class_runtime",
+        "linkage_back_to_sales_orders_is_canonical_and_bidirectional",
+        "already_first_class_wave3_objects_are_marked_no_duplicate",
+        "conditional_alias_objects_have_explicit_successor_and_split_criteria",
+        "no_remaining_wave3_gap_is_left_unclassified"
+      ]
+    },
+    "rejection_criteria": [
+      "new_process_object_created_where_a_governed_lifecycle_owner_already_exists",
+      "embedded_customer_commitment_left_only_as_parent_text_field",
+      "wave3_alias_candidate_left_without_successor_or_split_criteria",
+      "new_process_object_missing_transition_or_idempotency_contract",
+      "wave3_gap_reported_without_duplicate_vs_extraction_decision"
+    ]
+  },
+  "must_introduce_first_class_resources": [
+    {
+      "resource_key": "commercial_customer.customer-purchase-orders",
+      "entity_key": "commercial_customer.customer_purchase_orders",
+      "required_endpoints": [
+        "commercial_customer.customer_purchase_orders.list",
+        "commercial_customer.customer_purchase_orders.detail",
+        "commercial_customer.customer_purchase_orders.create",
+        "commercial_customer.customer_purchase_orders.transition"
+      ],
+      "missing_endpoints": [],
+      "missing_actions": [],
+      "legacy_embedding_table": "sales_orders",
+      "required_sales_order_link_fields": [
+        "customer_po_id",
+        "customer_po_number"
+      ],
+      "required_lifecycle_statuses": [
+        "received",
+        "acknowledged",
+        "confirmed",
+        "closed",
+        "cancelled"
+      ],
+      "passed": true,
+      "purpose": "Protect customer commercial commitment, customer-order acknowledgment, and quote/SO linkage as an auditable object instead of leaving demand truth embedded in Sales Order text fields."
+    }
+  ],
+  "already_first_class_resources": [
+    {
+      "resource_key": "procurement_supplier_quality.purchase-requisitions",
+      "entity_key": "purchasing.purchase_requisitions",
+      "required_endpoints": [
+        "purchasing.purchase_requisitions.list",
+        "purchasing.purchase_requisitions.detail",
+        "purchasing.purchase_requisitions.create",
+        "purchasing.purchase_requisitions.transition"
+      ],
+      "missing_endpoints": [],
+      "passed": true,
+      "reason": "Purchase requisition is already a governed lifecycle owner in runtime and must not be recreated."
+    },
+    {
+      "resource_key": "procurement_supplier_quality.supplier-asns",
+      "entity_key": "purchasing.supplier_asns",
+      "required_endpoints": [
+        "purchasing.supplier_asns.list",
+        "purchasing.supplier_asns.detail",
+        "purchasing.supplier_asns.create",
+        "purchasing.supplier_asns.transition"
+      ],
+      "missing_endpoints": [],
+      "passed": true,
+      "reason": "Supplier ASN already owns inbound shipment notice and discrepancy lifecycle."
+    },
+    {
+      "resource_key": "procurement_supplier_quality.purchase-receipts",
+      "entity_key": "purchasing.purchase_receipts",
+      "required_endpoints": [
+        "purchasing.purchase_receipts.list",
+        "purchasing.purchase_receipts.detail",
+        "purchasing.purchase_receipts.create",
+        "purchasing.purchase_receipts.transition"
+      ],
+      "missing_endpoints": [],
+      "passed": true,
+      "reason": "Purchase receipt is already the governed receiving and IQC handoff object."
+    },
+    {
+      "resource_key": "planning_production.ipqc-inspections",
+      "entity_key": "quality_management.ipqc_inspections",
+      "required_endpoints": [
+        "quality_management.ipqc_inspections.list",
+        "quality_management.ipqc_inspections.detail",
+        "quality_management.ipqc_inspections.create",
+        "quality_management.ipqc_inspections.transition"
+      ],
+      "missing_endpoints": [],
+      "passed": true,
+      "reason": "IPQC already exists as a first-class in-process inspection owner."
+    }
+  ],
+  "conditional_alias_retention": [
+    {
+      "resource_key": "quality_improvement.fqc-inspections",
+      "successor_entity_key": "quality_management.oqc_inspections",
+      "missing_successor_endpoints": [],
+      "alias_entity_present": false,
+      "decision": "Retain as alias only. Do not create a duplicate FQC object until a distinct finished-goods release gate exists before outbound OQC/shipping.",
+      "split_criteria": [
+        "A dedicated finished-goods release gate exists before outbound inspection or dispatch.",
+        "FQC owns a distinct sampling plan or defect taxonomy from OQC.",
+        "FQC is owned by a separate KPI or approval authority from OQC."
+      ],
+      "passed": true
+    }
+  ],
+  "duplicate_guards": [
+    {
+      "entity_key": "purchasing.purchase_requisitions",
+      "present": true,
+      "reason": "Already first-class in runtime."
+    },
+    {
+      "entity_key": "purchasing.supplier_asns",
+      "present": true,
+      "reason": "Already first-class in runtime."
+    },
+    {
+      "entity_key": "purchasing.purchase_receipts",
+      "present": true,
+      "reason": "Already first-class in runtime."
+    },
+    {
+      "entity_key": "quality_management.ipqc_inspections",
+      "present": true,
+      "reason": "Already first-class in runtime."
+    },
+    {
+      "entity_key": "quality_management.oqc_inspections",
+      "present": true,
+      "reason": "Canonical successor for FQC alias until a distinct gate is proven."
+    }
+  ],
+  "recommendations": [
+    "Extract customer demand objects only when the parent lifecycle owner cannot defend the commercial gate, audit trail, or KPI on its own.",
+    "Keep requisition, ASN, receipt, and IPQC on their existing lifecycle owners; do not create cosmetic duplicates.",
+    "Retain FQC as an alias until a distinct finished-goods release gate exists that cannot be served by OQC.",
+    "Treat any new process object that lacks a unique gate, KPI, or audit purpose as duplicate or unused by default."
+  ]
+}

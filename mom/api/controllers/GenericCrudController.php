@@ -20,6 +20,10 @@ class GenericCrudController extends BaseController
 {
     private const MUTATION_KINDS = ['create', 'update', 'delete', 'transition'];
 
+    private const RUNTIME_POLICY_HARD_DENY = [
+        'audit_events' => ['update', 'delete'],
+    ];
+
     private const DOMAIN_COMMAND_REQUIRED_DOMAINS = [
         'sales',
         'commercial_contracts',
@@ -1083,6 +1087,15 @@ class GenericCrudController extends BaseController
     {
         $permissions = $this->runtimePermissionKeys($ctx);
         $policyRoles = $this->runtimeAccessRoles($ctx);
+
+        $table = strtolower(trim((string)($ctx['table'] ?? '')));
+        $kind = strtolower(trim((string)($ctx['kind'] ?? '')));
+        if (in_array($kind, self::RUNTIME_POLICY_HARD_DENY[$table] ?? [], true)) {
+            $this->error('forbidden', 403, 'Operation disabled by runtime access policy', [
+                'permission_keys' => $permissions,
+                'policy' => 'runtime_policy_hard_deny',
+            ]);
+        }
 
         if ($policyRoles === []) {
             $this->error('forbidden', 403, 'Operation disabled by runtime access policy', [

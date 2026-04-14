@@ -49,6 +49,11 @@
       "close_or_revoke_requires_reason_trace"
     ]
   },
+  "controls": {
+    "eSignatureRequired": true,
+    "reasonCodeField": "reason_code",
+    "timeboxedExpiryRequired": true
+  },
   "workflow": {
     "implemented": true,
     "truthStatus": "implemented_runtime",
@@ -82,6 +87,7 @@
       "approved_period_code -> period_close_controls.period_code",
       "subject_ref -> ap_invoices.ap_invoice_id",
       "subject_ref -> ar_invoices.ar_invoice_id",
+      "subject_ref -> inventory_transactions.inventory_transaction_id",
       "subject_ref -> tms_shipments.shipment_id"
     ],
     "events": [

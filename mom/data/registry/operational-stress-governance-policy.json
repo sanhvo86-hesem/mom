@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T09:37:28.410Z",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "build_questions": [
+    "Q01",
+    "Q02",
+    "Q03",
+    "Q04",
+    "Q05",
+    "Q06",
+    "Q07",
+    "Q08",
+    "Q09",
+    "Q10"
+  ],
+  "rejection_criteria": [
+    "create_or_side_effect_action_without_duplicate_or_retry_control"
+  ],
+  "lifecycle_modes": {
+    "guarded_transition_runtime": "required"
+  }
+}

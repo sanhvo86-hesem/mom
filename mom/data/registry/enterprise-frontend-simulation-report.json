@@ -1,0 +1,2343 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-13T16:59:13.078523+00:00",
+    "simulationType": "contract_level_frontend_interaction",
+    "sourceArtifacts": [
+      "mom/data/registry/table-registry.json",
+      "mom/data/registry/endpoint-governance-classification.json",
+      "mom/data/registry/table-governance-overlay.json",
+      "mom/data/registry/destructive-endpoint-quarantine.json",
+      "mom/contracts/object-index.json",
+      "mom/contracts/state-model-index.json",
+      "mom/contracts/command-index.json",
+      "mom/data/registry/command-runtime-bindings.json",
+      "mom/contracts/event-index.json",
+      "mom/contracts/deprecation-ledger.json",
+      "mom/data/registry/enterprise-registry-doctor-report.json"
+    ]
+  },
+  "status": "watch",
+  "summary": {
+    "scenarioCount": 10,
+    "scenarioStatus": {
+      "pass": 7,
+      "watch": 3
+    },
+    "blockerCounts": {},
+    "warningCounts": {
+      "frontend_surface_not_explicit": 1,
+      "missing_command_or_state_model": 2
+    },
+    "doctorStatus": "watch"
+  },
+  "frontendOperatingStandard": [
+    "System Contract Registry is the default read-only source for frontend discovery.",
+    "Workspace Draft is design sandbox only and must never define runtime truth.",
+    "Manual Runtime may edit only machine/MES support tables.",
+    "Operators are governed by Admin users/org chart, not by manual runtime.",
+    "Core process records must use command/workflow endpoints, not generic CRUD as the primary frontend contract.",
+    "Destructive endpoints in the quarantine file must not be exposed to frontend.",
+    "Every frontend mutation must carry idempotency, audit, correlation, validation, and allowed-next-action metadata."
+  ],
+  "scenarios": [
+    {
+      "id": "executive_cockpit",
+      "persona": "CEO / plant director",
+      "goal": "KPI cockpit drills from OEE, OTD, COPQ, inventory, finance and safety KPI to source records.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "mes_oee_snapshots",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "mes_oee_snapshots"
+          ],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:025_mes_tables.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 2,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "GET"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 1,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "inventory_balance_snapshot",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "inventory",
+          "systemOfRecord": "postgres_migration:077_canonical_inventory_cost_traceability.sql",
+          "authorityMode": "analytics_projection",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "inventory_data_steward",
+          "retentionClass": "traceability_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "kpi_dashboard",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 2,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "GET"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 1,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "copq_ledger",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:034_exception_management.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ap_ar_invoices",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:015_finance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 13,
+          "stateModelCount": 1,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "safety_observations",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "safety_observations"
+          ],
+          "existsInRegistry": true,
+          "domain": "ehs_sustainability",
+          "systemOfRecord": "postgres_migration:087_canonical_ehs_safety_observations.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "ehs_manager",
+          "stewardRole": "ehs_data_steward",
+          "retentionClass": "ehs_record_10y_or_legal_hold",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 4,
+          "boundCommandCount": 4,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "quote_to_cash",
+      "persona": "Sales / customer service",
+      "goal": "Quote, customer PO, SO confirmation, shipment, invoice and customer care are traceable end-to-end.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "customers",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "customers"
+          ],
+          "existsInRegistry": true,
+          "domain": "sales",
+          "systemOfRecord": "postgres_migration:007_customers_sales.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "sales_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 4,
+          "boundCommandCount": 4,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "quotes",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "sales",
+          "systemOfRecord": "postgres_migration:036_quoting_estimation.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "sales_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 7,
+          "boundCommandCount": 7,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "quote_lines",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "sales",
+          "systemOfRecord": "postgres_migration:036_quoting_estimation.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "sales_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 7,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "sales_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "sales_order",
+            "sales_orders"
+          ],
+          "existsInRegistry": true,
+          "domain": "sales",
+          "systemOfRecord": "postgres_migration:007_customers_sales.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "sales_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 10,
+          "stateModelCount": 1,
+          "eventCount": 5,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "sales_order_lines",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "sales",
+          "systemOfRecord": "postgres_migration:007_customers_sales.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "sales_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 10,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "shipments",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "tms_shipments"
+          ],
+          "existsInRegistry": true,
+          "domain": "shipping_compliance",
+          "systemOfRecord": "postgres_migration:016_shipping_compliance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "logistics_manager",
+          "stewardRole": "shipping_compliance_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ap_ar_invoices",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:015_finance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 13,
+          "stateModelCount": 1,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "crm_customer_touchpoints",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "crm",
+          "systemOfRecord": "postgres_migration:053_crm_pipeline_management.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "commercial_director",
+          "stewardRole": "customer_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "procure_to_pay_supplier_quality",
+      "persona": "Buyer / supplier quality",
+      "goal": "Supplier PO, ASN/receipt, IQC, supplier NCR and AP invoice are gated without bypassing supplier quality.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "suppliers",
+          "resolvedRuntimeTable": "vendors",
+          "aliasCandidates": [
+            "vendors"
+          ],
+          "existsInRegistry": true,
+          "domain": "purchasing",
+          "systemOfRecord": "postgres_migration:008_vendors_purchasing.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "procurement_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "purchase_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "purchasing",
+          "systemOfRecord": "postgres_migration:008_vendors_purchasing.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "procurement_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 6,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "purchase_order_lines",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "purchasing",
+          "systemOfRecord": "postgres_migration:008_vendors_purchasing.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "procurement_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 6,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "supplier_asns",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "supplier_asns"
+          ],
+          "existsInRegistry": true,
+          "domain": "purchasing",
+          "systemOfRecord": "postgres_migration:083_procurement_recovery_chain.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "procurement_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 5,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "purchase_receipts",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "incoming_inspections"
+          ],
+          "existsInRegistry": true,
+          "domain": "purchasing",
+          "systemOfRecord": "postgres_migration:083_procurement_recovery_chain.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "procurement_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "incoming_inspections",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:035_supplier_quality_management.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 11,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ncr_records",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:011_quality.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ap_invoices",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "ap_ar_invoices"
+          ],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:083_procurement_recovery_chain.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "plan_to_produce",
+      "persona": "Planner",
+      "goal": "Demand, APS/MRP, capacity, JO/WO release and dispatch are simulated before committing production.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "aps_demand_forecasts",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "advanced_planning",
+          "systemOfRecord": "postgres_migration:047_advanced_planning_scheduling.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "planning_director",
+          "stewardRole": "aps_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 7,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "aps_capacity_buckets",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "advanced_planning",
+          "systemOfRecord": "postgres_migration:047_advanced_planning_scheduling.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "planning_director",
+          "stewardRole": "aps_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 7,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "mrp_planned_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "advanced_planning",
+          "systemOfRecord": "postgres_migration:018_projects_kpi.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "planning_director",
+          "stewardRole": "aps_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 7,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "production_schedule",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "production",
+          "systemOfRecord": "postgres_migration:010_production.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "production_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 7,
+          "boundCommandCount": 7,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "job_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "job_orders"
+          ],
+          "existsInRegistry": true,
+          "domain": "production",
+          "systemOfRecord": "postgres_migration:010_production.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "production_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "work_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "work_orders"
+          ],
+          "existsInRegistry": true,
+          "domain": "production",
+          "systemOfRecord": "postgres_migration:084_execution_quality_projection.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "production_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "mes_dispatch_queue",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:025_mes_tables.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 7,
+          "boundCommandCount": 7,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "machine_execution_operator",
+      "persona": "Operator / line leader",
+      "goal": "Machine status, alarms, downtime, tooling and work-center runtime are captured with machine-source timestamps.",
+      "status": "watch",
+      "blockers": [],
+      "warnings": [
+        {
+          "code": "frontend_surface_not_explicit",
+          "tables": [
+            "work_centers",
+            "equipment",
+            "tools"
+          ]
+        }
+      ],
+      "tableEvidence": [
+        {
+          "table": "work_centers",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "master_data",
+          "systemOfRecord": "postgres_migration:006_erp_master_data.sql",
+          "authorityMode": "asset_lifecycle",
+          "ownerRole": "master_data_governor",
+          "stewardRole": "master_data_steward",
+          "retentionClass": "master_data_lifecycle",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "equipment",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "equipment",
+            "pm_equipment_master"
+          ],
+          "existsInRegistry": true,
+          "domain": "calibration_equipment",
+          "systemOfRecord": "postgres_migration:012_calibration_equipment.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "calibration_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "mes_machine_snapshot",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:025_mes_tables.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "mes_machine_telemetry",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:025_mes_tables.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "mes_machine_alarms",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:025_mes_tables.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 3,
+          "boundCommandCount": 3,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "downtime_event",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "mes_execution",
+          "systemOfRecord": "postgres_migration:076_canonical_mes_execution_spine.sql",
+          "authorityMode": "machine_runtime",
+          "ownerRole": "production_manager",
+          "stewardRole": "mes_data_steward",
+          "retentionClass": "machine_trace_record_3y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "manual_machine_runtime",
+            "operator_mes_console",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 3,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "tools",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "tools"
+          ],
+          "existsInRegistry": true,
+          "domain": "calibration_equipment",
+          "systemOfRecord": "postgres_migration:012_calibration_equipment.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "calibration_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 3,
+          "eventCount": 7,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "qa_qc_closed_loop",
+      "persona": "QA/QC engineer",
+      "goal": "IQC/IPQC/OQC/FQC, NCR, CAPA, MSA and SPC are gated as first-class quality workflows.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "incoming_inspections",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:035_supplier_quality_management.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 11,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ipqc_inspections",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "ipqc_inspections"
+          ],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:084_execution_quality_projection.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "oqc_inspections",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "oqc_inspections"
+          ],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:045_oqc_packing_outsource.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 4,
+          "boundCommandCount": 4,
+          "stateModelCount": 3,
+          "eventCount": 6,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ncr_records",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:011_quality.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "capa_records",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:011_quality.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 5,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "calibration_grr_studies",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "calibration_equipment",
+          "systemOfRecord": "postgres_migration:069_lean_manufacturing_world_class.sql",
+          "authorityMode": "asset_lifecycle",
+          "ownerRole": "quality_manager",
+          "stewardRole": "calibration_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 3,
+          "boundCommandCount": 9,
+          "stateModelCount": 1,
+          "eventCount": 2,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "spc_data",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "quality_management",
+          "systemOfRecord": "postgres_migration:011_quality.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "quality_data_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 3,
+          "boundCommandCount": 3,
+          "stateModelCount": 1,
+          "eventCount": 2,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "control_plans",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "fmea_apqp",
+          "systemOfRecord": "postgres_migration:042_fmea_apqp_control_plan_mobile.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "apqp_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 3,
+          "boundCommandCount": 3,
+          "stateModelCount": 1,
+          "eventCount": 3,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "maintenance_ehs_5s",
+      "persona": "Maintenance / EHS",
+      "goal": "Maintenance, calibration, EHS incidents, safety observations and 5S audits preserve release-to-service evidence.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "maintenance_work_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "maintenance_work_orders"
+          ],
+          "existsInRegistry": true,
+          "domain": "calibration_equipment",
+          "systemOfRecord": "postgres_migration:012_calibration_equipment.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "calibration_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 8,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "pm_maintenance_plans",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "plant_maintenance",
+          "systemOfRecord": "postgres_migration:046_plant_maintenance_cmms.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "maintenance_manager",
+          "stewardRole": "asset_maintenance_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "calibration_records",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "calibration_equipment",
+          "systemOfRecord": "postgres_migration:012_calibration_equipment.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "calibration_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 6,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ehs_incidents",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "ehs_sustainability",
+          "systemOfRecord": "postgres_migration:011_quality.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "ehs_manager",
+          "stewardRole": "ehs_data_steward",
+          "retentionClass": "ehs_record_10y_or_legal_hold",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "safety_observations",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "safety_observations"
+          ],
+          "existsInRegistry": true,
+          "domain": "ehs_sustainability",
+          "systemOfRecord": "postgres_migration:087_canonical_ehs_safety_observations.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "ehs_manager",
+          "stewardRole": "ehs_data_steward",
+          "retentionClass": "ehs_record_10y_or_legal_hold",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 4,
+          "boundCommandCount": 4,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "lean_5s_audits",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "lean_manufacturing",
+          "systemOfRecord": "postgres_migration:069_lean_manufacturing_world_class.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "continuous_improvement_lead",
+          "stewardRole": "lean_system_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 5,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "warehouse_shipping_returns",
+      "persona": "Warehouse / logistics",
+      "goal": "Inventory movements, stock balance, shipment, package, carrier, RMA and traceability are closed-loop.",
+      "status": "watch",
+      "blockers": [],
+      "warnings": [
+        {
+          "code": "missing_command_or_state_model",
+          "tables": [
+            "stock_balances",
+            "inventory_locations"
+          ]
+        }
+      ],
+      "tableEvidence": [
+        {
+          "table": "inventory_transactions",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "inventory",
+          "systemOfRecord": "postgres_migration:009_inventory.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "inventory_data_steward",
+          "retentionClass": "traceability_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 5,
+          "stateModelCount": 1,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "stock_balances",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "inventory",
+          "systemOfRecord": "postgres_migration:084_execution_quality_projection.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "inventory_data_steward",
+          "retentionClass": "traceability_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 2,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "GET"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 1,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "inventory_locations",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "inventory",
+          "systemOfRecord": "postgres_migration:009_inventory.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "supply_chain_manager",
+          "stewardRole": "inventory_data_steward",
+          "retentionClass": "traceability_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "shipments",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "tms_shipments"
+          ],
+          "existsInRegistry": true,
+          "domain": "shipping_compliance",
+          "systemOfRecord": "postgres_migration:016_shipping_compliance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "logistics_manager",
+          "stewardRole": "shipping_compliance_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "shipment_packages",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "shipping_compliance",
+          "systemOfRecord": "postgres_migration:016_shipping_compliance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "logistics_manager",
+          "stewardRole": "shipping_compliance_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 6,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "rma_orders",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "service_warranty",
+          "systemOfRecord": "postgres_migration:017_subcontracting_rma.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "customer_success_manager",
+          "stewardRole": "service_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 7,
+          "boundCommandCount": 7,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "lot_genealogy",
+          "resolvedRuntimeTable": "genealogy_link",
+          "aliasCandidates": [
+            "genealogy_link",
+            "mes_part_genealogy",
+            "trace_genealogy_batches",
+            "trace_genealogy_links"
+          ],
+          "existsInRegistry": true,
+          "domain": "traceability_serialization",
+          "systemOfRecord": "postgres_migration:076_canonical_mes_execution_spine.sql",
+          "authorityMode": "governed_support",
+          "ownerRole": "quality_manager",
+          "stewardRole": "traceability_steward",
+          "retentionClass": "traceability_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 2,
+          "boundCommandCount": 2,
+          "stateModelCount": 1,
+          "eventCount": 3,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "finance_posting_close",
+      "persona": "Finance controller",
+      "goal": "AP/AR, costing, WIP, inventory valuation, assets and period controls use reversal/correction, not deletion.",
+      "status": "watch",
+      "blockers": [],
+      "warnings": [
+        {
+          "code": "missing_command_or_state_model",
+          "tables": [
+            "cost_ledger",
+            "wip_ledger",
+            "inventory_valuations"
+          ]
+        }
+      ],
+      "tableEvidence": [
+        {
+          "table": "ap_invoices",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "ap_ar_invoices"
+          ],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:083_procurement_recovery_chain.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 6,
+          "boundCommandCount": 6,
+          "stateModelCount": 1,
+          "eventCount": 4,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ap_invoice_lines",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:083_procurement_recovery_chain.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 6,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "ap_ar_invoices",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:015_finance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 13,
+          "stateModelCount": 1,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "cost_ledger",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:077_canonical_inventory_cost_traceability.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "wip_ledger",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:077_canonical_inventory_cost_traceability.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 4,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "inventory_valuations",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [
+            "inventory_valuations"
+          ],
+          "existsInRegistry": true,
+          "domain": "finance",
+          "systemOfRecord": "postgres_migration:088_canonical_finance_inventory_valuations.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "finance_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 2,
+          "frontendSafeEndpointCount": 2,
+          "endpointMethods": [
+            "GET"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 1,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "fin_fixed_assets",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "finance_treasury",
+          "systemOfRecord": "postgres_migration:060_finance_treasury_assets.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "finance_controller",
+          "stewardRole": "treasury_data_steward",
+          "retentionClass": "financial_record_10y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 5,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 8,
+          "stateModelCount": 1,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    },
+    {
+      "id": "admin_ai_governance",
+      "persona": "Admin / AI assistant",
+      "goal": "AI and administrators see a read-only authority registry, explicit editable surfaces and data-loss guards.",
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "tableEvidence": [
+        {
+          "table": "users",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "core_system",
+          "systemOfRecord": "postgres_migration:002_core_system.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "platform_owner",
+          "stewardRole": "platform_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_governance",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "org_work_unit",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "foundation_governance",
+          "systemOfRecord": "postgres_migration:072_canonical_foundation_governance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "platform_owner",
+          "stewardRole": "foundation_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_governance",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "approval",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "foundation_governance",
+          "systemOfRecord": "postgres_migration:072_canonical_foundation_governance.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "platform_owner",
+          "stewardRole": "foundation_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_governance",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "audit_events",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "core_system",
+          "systemOfRecord": "postgres_migration:002_core_system.sql",
+          "authorityMode": "platform_governance",
+          "ownerRole": "platform_owner",
+          "stewardRole": "platform_data_steward",
+          "retentionClass": "operational_record_3y",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "admin_data_schema",
+            "admin_governance",
+            "system_contract_registry"
+          ],
+          "endpointCount": 5,
+          "frontendSafeEndpointCount": 0,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        },
+        {
+          "table": "documents",
+          "resolvedRuntimeTable": "",
+          "aliasCandidates": [],
+          "existsInRegistry": true,
+          "domain": "document_control",
+          "systemOfRecord": "postgres_migration:003_document_management.sql",
+          "authorityMode": "process_runtime",
+          "ownerRole": "quality_manager",
+          "stewardRole": "document_control_steward",
+          "retentionClass": "quality_record_7y_or_customer_specific",
+          "targetDeletionMode": "archive_only",
+          "uiSurfaces": [
+            "process_command_workspace",
+            "system_contract_registry"
+          ],
+          "endpointCount": 6,
+          "frontendSafeEndpointCount": 3,
+          "endpointMethods": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "commandCount": 0,
+          "boundCommandCount": 0,
+          "stateModelCount": 0,
+          "eventCount": 0,
+          "quarantinedDeleteCount": 0,
+          "runtimeUnsafeEndpointCount": 0
+        }
+      ],
+      "frontendRule": "Use only command/service endpoints for process records, machine-runtime scope for machine support data, and System Contract Registry for read-only authority."
+    }
+  ]
+}

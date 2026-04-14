@@ -56,6 +56,8 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             '.vscode/launch.json',
             'tools/php82/php.exe',
             'mom/data/registry/registry-manifest.json',
+            'mom/docs/system/agent-reports/tranche14/agent1-repo-reality.md',
+            'mom/docs/system/world-class-swarm-closure-tranche14.md',
             'mom/data/audit/audit_2026-04.jsonl',
             'mom/data/audit.log',
             'mom/data/log-archive/README.md',
@@ -80,7 +82,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertContains('mom/data/online-forms/entries/FRM-208.json', $paths);
         $this->assertContains('mom/data/online-forms/schemas/_archive/FRM-208.json', $paths);
         $this->assertContains('mom/data/ratelimit/login_127.0.0.1.json', $paths);
-        $this->assertContains('mom/data/registry/registry-manifest.json', $paths);
+        $this->assertNotContains('mom/data/registry/registry-manifest.json', $paths);
+        $this->assertNotContains('mom/docs/system/agent-reports/tranche14/agent1-repo-reality.md', $paths);
+        $this->assertNotContains('mom/docs/system/world-class-swarm-closure-tranche14.md', $paths);
         $this->assertContains('mom/docs/forms/frm-500-production/.backups/FRM-511_Setup_and_First_Piece_Record.xlsx.v0.bak', $paths);
         $this->assertContains('mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx.bak', $paths);
         $this->assertContains('mom/ops/local-runtime/.php-server.log', $paths);
@@ -982,6 +986,32 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('org-1', $manifest['audit_timeline'][0]['org_id']);
     }
 
+    public function testAuditPackExportServiceWritesDurableBundleFromCanonicalScope(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-audit-pack-service-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $manifest = (new AuditPackExportService(new AuditPackExportFakeDb()))->buildForScope([
+                'scope_type' => 'evidence_record',
+                'scope_ref' => 'EV-1',
+            ], 'org-1');
+            $exporter = new AuditPackExporter($dir);
+            $export = $exporter->exportManifest($manifest);
+
+            $this->assertSame('ready', $export['export_state']);
+            $this->assertSame($manifest['manifest_hash_sha256'], $export['manifest_hash_sha256']);
+            $this->assertFileExists($dir . '/' . $export['package_uri']);
+            $this->assertFileExists($dir . '/' . $export['receipt_uri']);
+
+            $readback = $exporter->readExport((string)$export['package_hash_sha256']);
+            $this->assertSame('verified', $readback['integrity_status']);
+            $this->assertSame('org-1', $readback['bundle']['audit_pack_manifest']['evidence_packages'][0]['org_id']);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
     public function testVpsDeploymentAuthorityRequiresExactManifestEnvironmentActionAndEffect(): void
     {
         $manifestHash = str_repeat('a', 64);
@@ -1009,6 +1039,53 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             } catch (\RuntimeException $e) {
                 $this->assertSame('deployment_change_authority_not_verified', $e->getMessage(), $label);
             }
+        }
+    }
+
+    public function testAuditPackExporterWritesDurableBundleReceiptAndReadback(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-audit-pack-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $exporter = new AuditPackExporter($dir);
+            $export = $exporter->exportBundle(
+                ['scope_type' => 'evidence_record', 'scope_ref' => 'EV-1'],
+                [[
+                    'subject_type' => 'ncr',
+                    'subject_id' => 'NCR-1',
+                    'org_id' => 'ORG-1',
+                    'package_hash_sha256' => str_repeat('d', 64),
+                    'manifest_hash_sha256' => str_repeat('e', 64),
+                    'artifacts' => [
+                        'original' => ['sha256' => str_repeat('a', 64)],
+                        'canonical_payload' => ['sha256' => str_repeat('b', 64)],
+                        'readable_snapshot' => ['sha256' => str_repeat('c', 64)],
+                        'hash_signature_manifest' => ['sha256' => str_repeat('f', 64)],
+                    ],
+                ]],
+                [[
+                    'recorded_at' => '2026-04-14T09:00:00+07:00',
+                    'event_type' => 'evidence.finalized',
+                    'aggregate_type' => 'evidence_record',
+                    'aggregate_id' => 'EV-1',
+                    'actor_id' => 'qa-1',
+                    'org_id' => 'ORG-1',
+                    'event_hash_sha256' => str_repeat('1', 64),
+                ]],
+            );
+
+            $this->assertSame('ready', $export['export_state']);
+            $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $export['package_hash_sha256']);
+            $this->assertFileExists($dir . '/' . $export['package_uri']);
+            $this->assertFileExists($dir . '/' . $export['receipt_uri']);
+
+            $readback = $exporter->readExport((string)$export['package_hash_sha256']);
+            $this->assertSame('verified', $readback['integrity_status']);
+            $this->assertSame($export['package_hash_sha256'], $readback['bundle']['package_hash_sha256']);
+            $this->assertSame($export['receipt_hash_sha256'], $readback['receipt']['receipt_hash_sha256']);
+        } finally {
+            $this->removeTree($dir);
         }
     }
 

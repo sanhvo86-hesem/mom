@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T09:52:19.897Z",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86",
+    "publication_scope": "platform_global",
+    "slice_publication_pass": "foundation_governance_contract_slice"
+  },
+  "capabilities": [
+    {
+      "id": "cap-01"
+    },
+    {
+      "id": "cap-02"
+    },
+    {
+      "id": "cap-03"
+    },
+    {
+      "id": "cap-04"
+    },
+    {
+      "id": "cap-05"
+    },
+    {
+      "id": "cap-06"
+    },
+    {
+      "id": "cap-07"
+    },
+    {
+      "id": "cap-08"
+    },
+    {
+      "id": "cap-09"
+    },
+    {
+      "id": "cap-10"
+    },
+    {
+      "id": "cap-11"
+    },
+    {
+      "id": "cap-12"
+    },
+    {
+      "id": "cap-13"
+    },
+    {
+      "id": "cap-14"
+    },
+    {
+      "id": "cap-15"
+    }
+  ],
+  "sourceRefs": {
+    "isa_95_iec_62264": {
+      "label": "ISA-95 / IEC 62264 enterprise-control integration",
+      "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa95"
+    },
+    "isa_88": {
+      "label": "ISA-88 batch/procedural control",
+      "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa88"
+    },
+    "iso_9001": {
+      "label": "ISO 9001 quality management",
+      "url": "https://www.iso.org/iso-9001-quality-management.html"
+    },
+    "iatf_aiag_core_tools": {
+      "label": "AIAG / IATF automotive core tools: APQP, PPAP, FMEA, MSA, SPC",
+      "url": "https://www.aiag.org/quality/automotive-core-tools"
+    },
+    "iso_55000": {
+      "label": "ISO 55000 asset management",
+      "url": "https://www.iso.org/standard/55088.html"
+    },
+    "iso_45001": {
+      "label": "ISO 45001 occupational health and safety",
+      "url": "https://www.iso.org/iso-45001-occupational-health-and-safety.html"
+    },
+    "iso_14001": {
+      "label": "ISO 14001 environmental management",
+      "url": "https://www.iso.org/iso-14001-environmental-management.html"
+    },
+    "iso_10012_17025": {
+      "label": "ISO 10012 / ISO/IEC 17025 measurement and calibration control",
+      "url": "https://www.iso.org/standard/81230.html"
+    },
+    "fda_21_cfr_11": {
+      "label": "21 CFR Part 11 electronic records and signatures",
+      "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+    },
+    "apqc_pcf": {
+      "label": "APQC Process Classification Framework",
+      "url": "https://www.apqc.org/process-performance-management/process-frameworks"
+    },
+    "scor_ds": {
+      "label": "ASCM SCOR Digital Standard",
+      "url": "https://www.ascm.org/corporate-transformation/standards-tools/scor-ds/"
+    },
+    "nist_ot": {
+      "label": "NIST SP 800-82 OT security",
+      "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final"
+    },
+    "opc_ua": {
+      "label": "OPC UA industrial interoperability",
+      "url": "https://www.opcfoundation.org/about/opc-technologies/opc-ua/"
+    },
+    "gs1_epcis": {
+      "label": "GS1 EPCIS traceability event data",
+      "url": "https://www.gs1.org/standards/epcis"
+    },
+    "openapi_json_schema_rfc9457": {
+      "label": "OpenAPI 3.1, JSON Schema 2020-12, RFC 9457 API errors",
+      "url": "https://spec.openapis.org/oas/v3.1.1.html"
+    },
+    "src-01": {},
+    "src-02": {},
+    "src-03": {},
+    "src-04": {},
+    "src-05": {},
+    "src-06": {},
+    "src-07": {},
+    "src-08": {},
+    "src-09": {},
+    "src-10": {}
+  }
+}

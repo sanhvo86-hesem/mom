@@ -30,6 +30,8 @@ use Throwable;
  */
 class AiSchedulingController extends BaseController
 {
+    private const MISSING_PLANT_SCOPE_SENTINEL = '__missing_plant_scope__';
+
     /** @var string Base directory for AI scheduling data (JSON fallback). */
     private string $aiDir = '';
     private ?IdempotencyService $idempotencyService = null;
@@ -177,7 +179,7 @@ class AiSchedulingController extends BaseController
     {
         $field = ($alias !== '' ? $alias . '.' : '') . 'plant_id';
         if ($plantId === '') {
-            return ['where' => 'WHERE 1=1', 'params' => []];
+            return ['where' => 'WHERE ' . $field . ' = :plant_id', 'params' => [':plant_id' => self::MISSING_PLANT_SCOPE_SENTINEL]];
         }
 
         return ['where' => 'WHERE ' . $field . ' = :plant_id', 'params' => [':plant_id' => $plantId]];
@@ -190,7 +192,7 @@ class AiSchedulingController extends BaseController
     private function filterAiRowsByPlant(array $rows, string $plantId): array
     {
         if ($plantId === '') {
-            return $rows;
+            return [];
         }
 
         return array_values(array_filter($rows, static function (mixed $row) use ($plantId): bool {
@@ -2446,8 +2448,8 @@ class AiSchedulingController extends BaseController
             $db = $this->getDb();
             if ($db !== null) {
                 try {
-                    $scheduleWhere = $plantId !== '' ? 'WHERE org_plant_id = :schedule_plant_id' : 'WHERE 1=1';
-                    $scheduleParams = $plantId !== '' ? [':schedule_plant_id' => $plantId] : [];
+                    $scheduleWhere = 'WHERE org_plant_id = :schedule_plant_id';
+                    $scheduleParams = [':schedule_plant_id' => $plantId !== '' ? $plantId : self::MISSING_PLANT_SCOPE_SENTINEL];
                     $scheduleMetrics['total_slots'] = (int)($db->queryScalar(
                         "SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}",
                         $scheduleParams
@@ -2458,7 +2460,7 @@ class AiSchedulingController extends BaseController
                         $scheduleParams
                     ) ?? 0);
 
-                    $conflictWhere = $plantId !== '' ? 'resolved = FALSE AND org_plant_id = :schedule_plant_id' : 'resolved = FALSE';
+                    $conflictWhere = 'resolved = FALSE AND org_plant_id = :schedule_plant_id';
                     $scheduleMetrics['conflict_count'] = (int)($db->queryScalar(
                         "SELECT COUNT(*) FROM schedule_conflicts WHERE {$conflictWhere}",
                         $scheduleParams

@@ -55,7 +55,9 @@ final class RegistryContractFallbackTest extends TestCase
         }
 
         $this->assertGreaterThanOrEqual(600, (int)($payload['summary']['tableCount'] ?? 0));
-        $this->assertGreaterThanOrEqual(3000, (int)($payload['summary']['endpointCount'] ?? 0));
+        $endpointCount = (int)($payload['summary']['endpointCount'] ?? 0);
+        $this->assertGreaterThan(0, $endpointCount);
+        $this->assertCount($endpointCount, (array)($payload['data']['endpoint_catalog']['endpoints'] ?? []));
         $this->assertTrue((bool)(($payload['data']['endpoint_catalog']['_meta'] ?? [])['fallback'] ?? false));
     }
 

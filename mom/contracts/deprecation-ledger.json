@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T23:08:39.549544+00:00",
+    "generatedAt": "2026-04-14T09:52:19.297561+00:00",
     "description": "Ledger of legacy object names and tables retained for non-destructive migration and compatibility.",
-    "entryCount": 217
+    "entryCount": 218
   },
   "entries": [
     {
@@ -179,6 +179,12 @@
       "successorCanonicalResource": "commercial_customer.quotations",
       "status": "compatibility_supported",
       "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "crm_quotes_pipeline",
+      "successorCanonicalResource": "commercial_customer.quotations",
+      "status": "archived_legacy",
+      "reason": "Legacy surface explicitly marked for isolation once read compatibility is complete."
     },
     {
       "legacyKey": "customer_complaints",

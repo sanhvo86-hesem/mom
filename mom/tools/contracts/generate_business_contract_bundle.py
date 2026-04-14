@@ -85,6 +85,26 @@ def authored_or_fallback_string_list(preferred: Any, fallback: Any) -> list[str]
     return normalize_string_list(fallback)
 
 
+def recommended_actions_from_package(package: Any, fallback: Any) -> list[str]:
+    fallback_actions = normalize_string_list(fallback)
+    if not isinstance(package, dict):
+        return fallback_actions
+
+    workflow = package.get("workflow")
+    if not isinstance(workflow, dict):
+        return fallback_actions
+
+    actions: list[str] = []
+    for command in workflow.get("commands") or []:
+        if not isinstance(command, dict):
+            continue
+        action = str(command.get("command") or "").strip()
+        if action != "":
+            actions.append(action)
+
+    return actions or fallback_actions
+
+
 def normalize_state_options(values: Any) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     if not isinstance(values, list):
@@ -580,7 +600,7 @@ def build_object_index(
                     "legacyTables": sorted(set(authored_or_fallback_string_list(storage.get("legacyTables"), resource_def.get("legacy_tables")))),
                     "legacyTablesToIsolate": sorted(set(authored_or_fallback_string_list(storage.get("legacyTablesToIsolate"), resource_def.get("legacy_tables_to_isolate")))),
                     "childTables": sorted(set(authored_or_fallback_string_list(storage.get("childTables"), resource_def.get("child_tables")))),
-                    "recommendedActions": normalize_string_list(resource_def.get("recommended_actions") or []),
+                    "recommendedActions": recommended_actions_from_package(package, resource_def.get("recommended_actions") or []),
                     "keyRelationships": authored_or_fallback_string_list(integration.get("keyRelationships"), resource_def.get("key_relationships")),
                     "currentRuntimeEndpoints": endpoint_rows,
                     "contractAuthority": "authored_package" if package is not None else "generated_registry",

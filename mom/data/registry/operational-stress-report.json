@@ -1,0 +1,325 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:28.410Z",
+    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "description": "Operational stress assessment for real-world backend failure and recovery conditions."
+  },
+  "summary": {
+    "scenario_count": 12,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "watch": 12,
+    "idempotency_mentions": 21998,
+    "idempotency_contract_coverage_ratio": 1.0,
+    "default_retry_safe_ratio": 1.0,
+    "create_endpoints_requiring_client_key": 0,
+    "compensation_markers": 5,
+    "correction_markers": 2259,
+    "period_close_mentions": 40,
+    "credit_memo_mentions": 24,
+    "debit_memo_mentions": 24,
+    "override_resources": 3,
+    "snapshot_resources": 5,
+    "mes_execution_blockers": 0
+  },
+  "stress_policy": {
+    "stress_dimensions": [],
+    "build_questions": [
+      "Q01",
+      "Q02",
+      "Q03",
+      "Q04",
+      "Q05",
+      "Q06",
+      "Q07",
+      "Q08",
+      "Q09",
+      "Q10"
+    ],
+    "acceptance_criteria": {},
+    "rejection_criteria": [
+      "create_or_side_effect_action_without_duplicate_or_retry_control"
+    ]
+  },
+  "current_local_signals": {
+    "signal_counts": {
+      "idempotency_mentions": 21998,
+      "optimistic_concurrency_mentions": 8296,
+      "if_match_mentions": 3379,
+      "row_version_mentions": 26845,
+      "compensation_markers": 5,
+      "correction_markers": 2259,
+      "effective_dating_markers": 812,
+      "override_mentions": 139,
+      "waiver_mentions": 124,
+      "heartbeat_mentions": 33,
+      "quarantine_mentions": 364,
+      "disposition_mentions": 786,
+      "period_close_mentions": 40,
+      "credit_memo_mentions": 24,
+      "debit_memo_mentions": 24,
+      "backdate_exception_mentions": 35,
+      "archive_mentions": 27424,
+      "snapshot_mentions": 1447,
+      "esign_mentions": 260,
+      "cycle_count_mentions": 342
+    },
+    "idempotency_runtime_contract": {
+      "mutating_endpoint_count": 2644,
+      "idempotent_endpoint_count": 2644,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_endpoint_count": 2644,
+      "default_retry_safe_ratio": 1.0,
+      "create_endpoints_requiring_client_key": 0,
+      "response_replay_documented_count": 2644
+    },
+    "override_resources": [
+      "quality_improvement.concessions",
+      "quality_improvement.deviations",
+      "quality_improvement.override-controls"
+    ],
+    "strong_override_resources": [
+      "quality_improvement.override-controls"
+    ],
+    "snapshot_resources": [
+      "analytics.inventory-balance-snapshots",
+      "analytics.mes-oee-snapshots",
+      "analytics.plant-performance-snapshots",
+      "analytics.production-bom-snapshots",
+      "analytics.production-route-snapshots"
+    ],
+    "reconciliation_resources": [
+      "integration_resilience.reconciliation-exceptions"
+    ],
+    "mes_execution_blockers": {},
+    "missing_resources_observed": [],
+    "missing_transition_entities": []
+  },
+  "assessments": [
+    {
+      "scenario_id": "STR-001",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "idempotency_mentions": 21998,
+        "if_match_mentions": 3379,
+        "row_version_mentions": 26845,
+        "mutating_endpoint_count": 2644,
+        "idempotent_endpoint_count": 2644,
+        "idempotency_contract_coverage_ratio": 1.0,
+        "default_retry_safe_endpoint_count": 2644,
+        "default_retry_safe_ratio": 1.0,
+        "create_endpoints_requiring_client_key": 0,
+        "response_replay_documented_count": 2644
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-002",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Compensation markers, correction semantics, and reconciliation resources now exist together, so partial-completion recovery has moved out of the active remediation tier."
+      ],
+      "evidence": {
+        "compensation_markers": 5,
+        "correction_markers": 2259,
+        "reconciliation_resources": [
+          "integration_resilience.reconciliation-exceptions"
+        ]
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-003",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Backdate exceptions, period-close controls, and credit/debit memo semantics are now explicit, so remaining risk is residual operating discipline rather than a modeling gap."
+      ],
+      "evidence": {
+        "period_close_mentions": 40,
+        "credit_memo_mentions": 24,
+        "debit_memo_mentions": 24,
+        "backdate_exception_mentions": 35,
+        "backdate_exception_resources": [
+          "finance.backdate-exceptions"
+        ]
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-004",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
+      ],
+      "evidence": {
+        "effective_dating_markers": 812,
+        "snapshot_mentions": 1447,
+        "snapshot_resources": [
+          "analytics.inventory-balance-snapshots",
+          "analytics.mes-oee-snapshots",
+          "analytics.plant-performance-snapshots",
+          "analytics.production-bom-snapshots",
+          "analytics.production-route-snapshots"
+        ]
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-005",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Containment resources are now modeled well enough that this path has moved into residual-watch territory."
+      ],
+      "evidence": {
+        "blind_spot_severity": "watch",
+        "missing_resources": [],
+        "missing_transition_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-006",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
+      ],
+      "evidence": {
+        "override_mentions": 139,
+        "waiver_mentions": 124,
+        "esign_mentions": 260,
+        "override_resources": [
+          "quality_improvement.concessions",
+          "quality_improvement.deviations",
+          "quality_improvement.override-controls"
+        ],
+        "strong_override_resources": [
+          "quality_improvement.override-controls"
+        ]
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-007",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Heartbeat visibility, retry controls, and reconciliation resources now exist together, so this path no longer represents an active architecture gap."
+      ],
+      "evidence": {
+        "heartbeat_mentions": 33,
+        "idempotency_mentions": 21998,
+        "compensation_markers": 5,
+        "reconciliation_resources": [
+          "integration_resilience.reconciliation-exceptions"
+        ]
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-008",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
+      ],
+      "evidence": {
+        "archive_mentions": 27424,
+        "correction_markers": 2259,
+        "esign_mentions": 260
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-009",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Cycle-count resources are now modeled alongside inventory truth, so discrepancy handling is no longer an active structural gap."
+      ],
+      "evidence": {
+        "cycle_count_mentions": 342,
+        "cycle_resources": [
+          "inventory_logistics.cycle-count-plans"
+        ],
+        "missing_transition_entities": [],
+        "missing_resources": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-010",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "The critical MES execution entities are no longer reporting coverage blockers in the wave-gap ledger."
+      ],
+      "evidence": {
+        "mes_execution_blockers": {},
+        "blocker_count": 0
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-011",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "The return/complaint loop is now modeled strongly enough that only residual operational rigor remains."
+      ],
+      "evidence": {
+        "blind_spot_severity": "watch",
+        "missing_resources": [],
+        "missing_transition_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "STR-012",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Dedicated AP/AR correction and close objects are now explicit, so the remaining issue is model elegance rather than an active finance control gap."
+      ],
+      "evidence": {
+        "unified_ap_ar_present": true,
+        "period_close_mentions": 40,
+        "credit_memo_mentions": 24,
+        "debit_memo_mentions": 24,
+        "finance_correction_resources": [
+          "finance.credit-memos",
+          "finance.period-closes"
+        ],
+        "split_finance_resources": [
+          "finance.ap-invoices",
+          "finance.ar-invoices",
+          "finance.credit-memos",
+          "finance.debit-memos",
+          "finance.period-closes"
+        ]
+      },
+      "required_controls": []
+    }
+  ],
+  "decision_rule": "Anything still critical or high here is not operationally hardened enough for broad frontline rollout."
+}

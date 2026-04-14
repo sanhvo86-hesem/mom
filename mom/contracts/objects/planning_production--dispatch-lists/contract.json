@@ -17,6 +17,9 @@
     "legacyTables": [
       "dispatch_lists",
       "dispatch_queue"
+    ],
+    "legacyTablesToIsolate": [
+      "dispatch_queue"
     ]
   },
   "identity": {

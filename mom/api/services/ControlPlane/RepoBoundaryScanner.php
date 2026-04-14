@@ -59,6 +59,16 @@ final class RepoBoundaryScanner
     ];
 
     /**
+     * @var list<string>
+     */
+    private const ALLOWED_CONTROLLED_GENERATED_PATTERNS = [
+        '#^mom/data/registry/[^/]+\.(json|yaml)$#i',
+        '#^mom/data/schema-studio/(?:designs/workspace\.json|snapshots/workspace\.baseline\.json|policies/control-plane-defaults\.json)$#i',
+        '#^mom/docs/system/agent-reports/tranche[0-9]+/(?:pass2-)?agent[0-9]-[^/]+\.md$#i',
+        '#^mom/docs/system/(?:branch-strategy|unresolved-backlog-ledger|world-benchmark-dossier|world-class-swarm-closure)-tranche[0-9]+\.md$#i',
+    ];
+
+    /**
      * @param list<string> $paths Repository-relative paths.
      * @return list<array{path: string, violation_type: string, severity: string}>
      */
@@ -70,7 +80,7 @@ final class RepoBoundaryScanner
             if ($normalized === '' || str_starts_with($normalized, '.git/')) {
                 continue;
             }
-            if ($this->isAllowedControlledArtifact($normalized)) {
+            if ($this->isAllowedControlledArtifact($normalized) || $this->isAllowedControlledGeneratedArtifact($normalized)) {
                 continue;
             }
 
@@ -154,6 +164,16 @@ final class RepoBoundaryScanner
     private function isAllowedControlledArtifact(string $path): bool
     {
         foreach (self::ALLOWED_CONTROLLED_BINARY_PATTERNS as $pattern) {
+            if (preg_match($pattern, $path) === 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isAllowedControlledGeneratedArtifact(string $path): bool
+    {
+        foreach (self::ALLOWED_CONTROLLED_GENERATED_PATTERNS as $pattern) {
             if (preg_match($pattern, $path) === 1) {
                 return true;
             }

@@ -17,21 +17,41 @@ final class FinanceControlServicePeriodPolicyTest extends TestCase
     {
         $this->dataDir = sys_get_temp_dir() . '/hesem-finance-period-policy-' . bin2hex(random_bytes(4));
         mkdir($this->dataDir, 0775, true);
+        $_SESSION = ['org_id' => 'ORG-TEST'];
     }
 
     protected function tearDown(): void
     {
         $this->removeDir($this->dataDir);
+        $_SESSION = [];
+    }
+
+    public function testCallerSuppliedOrgCannotCreatePeriodCloseWithoutSessionScope(): void
+    {
+        $_SESSION = [];
+        $service = new FinanceControlService($this->dataDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('authenticated org_id required');
+
+        $service->createPeriodClose([
+            'org_id' => 'ORG-CALLER',
+            'period_code' => '2026-04',
+            'ledger_scope' => 'AP',
+            'reason' => 'Caller org must not define finance authority.',
+        ], 'finance-user');
     }
 
     public function testMemoPostingIntoClosedPeriodRequiresBackdateException(): void
     {
         $service = new FinanceControlService($this->dataDir);
         $service->createPeriodClose([
+            'org_id' => 'ORG-TEST',
             'period_code' => '2026-04',
             'ledger_scope' => 'AP',
             'reason' => 'AP closed.',
         ], 'finance-user');
+        $this->assertSame('ORG-TEST', $service->listPeriodCloses()[0]['org_id'] ?? null);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Posting period 2026-04 for AP is closed');
@@ -49,6 +69,7 @@ final class FinanceControlServicePeriodPolicyTest extends TestCase
     {
         $service = new FinanceControlService($this->dataDir);
         $service->createPeriodClose([
+            'org_id' => 'ORG-TEST',
             'period_code' => '2026-04',
             'ledger_scope' => 'AP',
             'reason' => 'AP closed.',
@@ -64,6 +85,7 @@ final class FinanceControlServicePeriodPolicyTest extends TestCase
             'requested_posting_date' => '2026-04-15',
             'expires_at' => (new DateTimeImmutable('+2 days'))->format(DATE_ATOM),
         ], 'finance-user');
+        $this->assertSame('ORG-TEST', $exception['org_id'] ?? null);
 
         $memo = $service->createDebitMemo([
             'invoice_scope' => 'AP',
@@ -74,7 +96,8 @@ final class FinanceControlServicePeriodPolicyTest extends TestCase
             'backdate_exception_id' => $exception['backdate_exception_id'],
         ], 'finance-user');
 
-        $this->assertSame('draft', $memo['memo_status']);
+        $this->assertSame('approved', $memo['memo_status']);
+        $this->assertSame('ORG-TEST', $memo['org_id'] ?? null);
         $this->assertSame('closed_period_backdate_exception_consumed', $memo['posting_control']['policy'] ?? null);
 
         $consumed = $service->getBackdateException((string)$exception['backdate_exception_id']);

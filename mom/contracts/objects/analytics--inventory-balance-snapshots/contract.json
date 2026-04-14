@@ -22,6 +22,9 @@
       "inventory_balance_snapshot_id"
     ]
   },
+  "projection": {
+    "releaseSnapshotOf": "inventory_balance"
+  },
   "governance": {
     "usageZone": "governed_support",
     "gateType": "analytics_gate",

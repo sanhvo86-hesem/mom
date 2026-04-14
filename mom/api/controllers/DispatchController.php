@@ -913,7 +913,7 @@ class DispatchController extends BaseController
             $this->releaseExecutionStateLock($lockHandle);
             $lockHandle = null;
 
-            $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
+            $manufacturingEventProjection = $this->shopfloor()->appendProductionReportEvent($log, $target, $uid);
 
             $this->auditLog('dispatch_report_production', [
                 'target_id' => $target['target_id'],
@@ -929,6 +929,7 @@ class DispatchController extends BaseController
                 'dispatch_execution_event' => $dispatchEvent,
                 'storage_bridge' => $bridge,
                 'execution_event_bridge' => $eventBridge,
+                'manufacturing_event_projection' => $manufacturingEventProjection,
             ]);
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage(), 400);

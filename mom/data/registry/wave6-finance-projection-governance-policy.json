@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:23.545Z",
+    "description": "Wave 6 finance posting, valuation, and plant-performance projection governance policy."
+  },
+  "objective": {
+    "wave": 6,
+    "name": "Finance Posting, Valuation, And Plant Performance Truth",
+    "statement": "Every period close, backdate exception, correction memo, valuation snapshot, and plant-performance snapshot must exist for a concrete financial or operational control purpose, preserve auditable source lineage, and never be published as an editable second truth when it is only a projection or derived read model.",
+    "operating_mode": "backend_first_finance_projection_governance"
+  },
+  "build_questions": [
+    {
+      "id": "wave6_birth_purpose",
+      "question": "Which close control, posting decision, valuation checkpoint, or plant KPI review is this object born to serve, and what false financial or operational truth appears if it does not exist?"
+    },
+    {
+      "id": "wave6_gate_owner",
+      "question": "Is this object a first-class finance gate owner such as period close, backdate exception, or governed memo, or is it only a projection that must remain read-only?"
+    },
+    {
+      "id": "wave6_projection_boundary",
+      "question": "If this record is a valuation or snapshot projection, why would manual create, update, delete, or transition ever be allowed, and what downstream KPI distortion would that permit?"
+    },
+    {
+      "id": "wave6_lineage_truth",
+      "question": "Does the record preserve snapshot time, source system, source record, and organization scope so an auditor can trace the value or KPI back to a real source event?"
+    },
+    {
+      "id": "wave6_relationship_truth",
+      "question": "Do the canonical relationships cover the real subject types used in runtime, or is a dynamic control still pretending that only one invoice or one source path exists?"
+    },
+    {
+      "id": "wave6_signature_and_reason",
+      "question": "For posting-period and correction controls, are reason, approval, signature meaning, and expiry enforced at the backend rather than left as optional notes?"
+    },
+    {
+      "id": "wave6_plant_kpi_integrity",
+      "question": "Can plant OEE, quality, delivery, and valuation metrics be regenerated from governed projections without allowing a user to rewrite history directly in the KPI table?"
+    },
+    {
+      "id": "wave6_auto_audit",
+      "question": "Can the backend prove from one chain of records why a period was closed, reopened, adjusted, valued, and reported, with enough evidence for auto-audit and management review?"
+    },
+    {
+      "id": "wave6_unused_isolation",
+      "question": "If a finance or analytics element adds no unique control purpose, has it been isolated as archive or unused instead of left live as a second reporting truth?"
+    }
+  ],
+  "acceptance_criteria": {
+    "required_for_service_finance_gate": [
+      "service_backed_finance_gate_has_canonical_list_and_detail_surface",
+      "reason_signature_and_expiry_controls_exist_where_required",
+      "transition_or_command_path_is_auditable",
+      "no_generic_placeholder_workflow_is_used_for_close_or_exception_control"
+    ],
+    "required_for_projection_read_model": [
+      "projection_published_with_list_and_detail_only",
+      "generic_runtime_mutation_denied_by_runtime_access_policy",
+      "frontend_foundation_form_state_is_not_applicable",
+      "projection_keeps_lineage_fields_for_traceability"
+    ],
+    "required_for_relationship_truth": [
+      "canonical_key_relationships_cover_live_subject_types",
+      "valuation_and_plant_kpi_resources_reference_real_org_and_source_fields",
+      "release_snapshot_semantics_declared_where_snapshot_truth_must_be_preserved"
+    ]
+  },
+  "rejection_criteria": [
+    "projection_or_snapshot_published_with_generic_create_update_delete_surface",
+    "finance_control_missing_reason_signature_or_temporal_guard",
+    "backdate_exception_relationship_truth_only_covers_one_subject_type",
+    "valuation_or_plant_kpi_projection_lacks_source_lineage_fields",
+    "projection_read_model_promoted_as_manual_workflow_owner",
+    "wave6_control_or_projection_exists_without_a_concrete_gate_or_kpi_purpose"
+  ]
+}

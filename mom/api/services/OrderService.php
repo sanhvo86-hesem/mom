@@ -475,10 +475,14 @@ final class OrderService
             throw new RuntimeException('Sales Order number is required.');
         }
 
-        // MISSING-001 FIX: Validate order amount is not zero
-        $orderAmount = (float)($so['total_value'] ?? 0);
+        // MISSING-001 FIX: Validate order amount is not zero.
+        $hasExplicitTotal = array_key_exists('total_value', $so) && $so['total_value'] !== null && $so['total_value'] !== '';
+        $orderAmount = $hasExplicitTotal ? (float)$so['total_value'] : $this->deriveSalesOrderTotalValue($so);
         if ($orderAmount <= 0) {
             throw new \InvalidArgumentException('Order amount must be greater than zero');
+        }
+        if (!$hasExplicitTotal) {
+            $so['total_value'] = round($orderAmount, 2);
         }
 
         $store = $this->readStore();
@@ -516,6 +520,49 @@ final class OrderService
         $store['sales_orders'][] = $so;
         $this->writeStore($store);
         return $so;
+    }
+
+    /**
+     * @param array<string, mixed> $so
+     */
+    private function deriveSalesOrderTotalValue(array $so): float
+    {
+        $total = 0.0;
+        foreach ((array)($so['lines'] ?? []) as $line) {
+            if (!is_array($line)) {
+                continue;
+            }
+
+            foreach (['line_total', 'line_value', 'amount', 'total_value'] as $totalField) {
+                if (array_key_exists($totalField, $line) && $line[$totalField] !== null && $line[$totalField] !== '') {
+                    $total += (float)$line[$totalField];
+                    continue 2;
+                }
+            }
+
+            $quantity = $this->firstNumericLineValue($line, ['qty', 'quantity', 'order_qty']);
+            $unitPrice = $this->firstNumericLineValue($line, ['unit_price', 'price', 'unit_value']);
+            if ($quantity !== null && $unitPrice !== null) {
+                $total += $quantity * $unitPrice;
+            }
+        }
+
+        return round($total, 2);
+    }
+
+    /**
+     * @param array<string, mixed> $line
+     * @param array<int, string>   $fields
+     */
+    private function firstNumericLineValue(array $line, array $fields): ?float
+    {
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $line) && $line[$field] !== null && $line[$field] !== '') {
+                return (float)$line[$field];
+            }
+        }
+
+        return null;
     }
 
     /**

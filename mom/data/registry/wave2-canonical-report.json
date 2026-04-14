@@ -1,0 +1,1302 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:22.470Z",
+    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "policyVersion": "1.0",
+    "description": "Wave 2 canonical governance verification report."
+  },
+  "summary": {
+    "canonical_resources": 67,
+    "canonical_catalog_meta_resource_count": 67,
+    "canonical_catalog_meta_mismatch": 0,
+    "catalog_alignment_targets": 12,
+    "catalog_alignment_failures": 2,
+    "service_backed_resources": 5,
+    "service_backed_resource_gaps": 0,
+    "planned_canonical_resources_not_yet_in_registry": 0,
+    "archive_isolation_targets": 5,
+    "archive_isolation_targets_failed": 0,
+    "direct_table_matches": 54,
+    "legacy_table_matches": 8,
+    "service_backed_slice_matches": 5,
+    "true_schema_gaps": 0,
+    "remaining_unused_candidate_entities": 0,
+    "archive_isolation_entities": 6
+  },
+  "policy_gates": {
+    "build_questions": [
+      "wave2_canonical_owner",
+      "wave2_business_purpose",
+      "wave2_endpoint_exposure",
+      "wave2_archive_boundary",
+      "wave2_false_gap_check",
+      "wave2_identity_traceability",
+      "wave2_mutation_safety",
+      "wave2_unused_isolation"
+    ],
+    "acceptance_criteria": {
+      "required_for_canonical_alignment": [
+        "canonical_catalog_resource_count_matches_actual",
+        "canonical_table_or_legacy_table_resolves_to_live_entity",
+        "service_backed_controls_have_canonical_rest_exposure",
+        "service_backed_mutations_publish_idempotency_contract",
+        "isolated_legacy_aliases_move_to_archive_isolation",
+        "remaining_true_gaps_are_explicitly_declared"
+      ],
+      "required_for_archive_isolation": [
+        "no_live_mutation_entrypoint",
+        "no_relation_load_as_active_composition",
+        "traceability_retained",
+        "canonical_successor_declared"
+      ]
+    },
+    "rejection_criteria": [
+      "canonical_catalog_meta_count_does_not_match_actual_resources",
+      "service_backed_governed_control_missing_canonical_list_or_detail_endpoint",
+      "service_backed_mutation_missing_idempotency_contract",
+      "legacy_alias_left_as_unused_candidate_when_archive_isolation_is_known",
+      "catalog_names_runtime_that_do_not_exist_while_a_real_owner_already_exists",
+      "resource_gap_reported_without_classifying_false_gap_vs_true_schema_gap"
+    ]
+  },
+  "catalog_alignment": [
+    {
+      "resource_key": "commercial_customer.quotations",
+      "expected_table": "quotes",
+      "actual_table": "quotes",
+      "expected_primary_key": "quote_id",
+      "actual_primary_key": "quote_id",
+      "expected_status_column": "status",
+      "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "sales.quotes"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "commercial_customer.quote-effectiveness-reviews",
+      "expected_table": "qual_effectiveness_reviews",
+      "actual_table": "qual_effectiveness_reviews",
+      "expected_primary_key": "qual_effectiveness_review_id",
+      "actual_primary_key": "qual_effectiveness_review_id",
+      "expected_status_column": null,
+      "actual_status_column": null,
+      "expected_pattern": "assessment_record",
+      "actual_pattern": "assessment_record",
+      "expected_result_column": "review_result",
+      "actual_result_column": null,
+      "matched_entities": [
+        "quality_lab.qual_effectiveness_reviews"
+      ],
+      "passed": false
+    },
+    {
+      "resource_key": "planning_production.production-plans",
+      "expected_table": "production_schedule",
+      "actual_table": "production_schedule",
+      "expected_primary_key": "schedule_id",
+      "actual_primary_key": "schedule_id",
+      "expected_status_column": "schedule_status",
+      "actual_status_column": "schedule_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "production.production_schedule"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "planning_production.dispatch-lists",
+      "expected_table": "mes_dispatch_queue",
+      "actual_table": "mes_dispatch_queue",
+      "expected_primary_key": "queue_id",
+      "actual_primary_key": "queue_id",
+      "expected_status_column": "queue_status",
+      "actual_status_column": "queue_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "mes_execution.mes_dispatch_queue"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "quality_improvement.nonconformances",
+      "expected_table": "ncr_records",
+      "actual_table": "ncr_records",
+      "expected_primary_key": "ncr_id",
+      "actual_primary_key": "ncr_id",
+      "expected_status_column": "ncr_status",
+      "actual_status_column": "ncr_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "quality_management.ncr_records"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "quality_improvement.corrective-actions",
+      "expected_table": "capa_records",
+      "actual_table": "capa_records",
+      "expected_primary_key": "capa_id",
+      "actual_primary_key": "capa_id",
+      "expected_status_column": "capa_status",
+      "actual_status_column": "capa_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "quality_management.capa_records"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "quality_improvement.msa-studies",
+      "expected_table": "calibration_grr_studies",
+      "actual_table": "calibration_grr_studies",
+      "expected_primary_key": "grr_id",
+      "actual_primary_key": "grr_id",
+      "expected_status_column": null,
+      "actual_status_column": null,
+      "expected_pattern": "assessment_record",
+      "actual_pattern": "assessment_record",
+      "expected_result_column": "grr_result",
+      "actual_result_column": null,
+      "matched_entities": [
+        "calibration_equipment.calibration_grr_studies"
+      ],
+      "passed": false
+    },
+    {
+      "resource_key": "quality_improvement.audit-programs",
+      "expected_table": "qual_audit_programs",
+      "actual_table": "qual_audit_programs",
+      "expected_primary_key": "qual_audit_program_id",
+      "actual_primary_key": "qual_audit_program_id",
+      "expected_status_column": "status",
+      "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "quality_lab.qual_audit_programs"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "quality_improvement.improvement-actions",
+      "expected_table": "improvement_projects",
+      "actual_table": "improvement_projects",
+      "expected_primary_key": "improvement_id",
+      "actual_primary_key": "improvement_id",
+      "expected_status_column": "improvement_status",
+      "actual_status_column": "improvement_status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "audit_risk.improvement_projects"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "maintenance_ehs.maintenance-plans",
+      "expected_table": "pm_maintenance_plans",
+      "actual_table": "pm_maintenance_plans",
+      "expected_primary_key": "maintenance_plan_id",
+      "actual_primary_key": "maintenance_plan_id",
+      "expected_status_column": "status",
+      "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "plant_maintenance.pm_maintenance_plans"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "maintenance_ehs.maintenance-work-orders",
+      "expected_table": "pm_work_orders",
+      "actual_table": "pm_work_orders",
+      "expected_primary_key": "pm_work_order_id",
+      "actual_primary_key": "pm_work_order_id",
+      "expected_status_column": "status",
+      "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "plant_maintenance.pm_work_orders"
+      ],
+      "passed": true
+    },
+    {
+      "resource_key": "maintenance_ehs.five-s-audits",
+      "expected_table": "lean_5s_audits",
+      "actual_table": "lean_5s_audits",
+      "expected_primary_key": "audit_5s_id",
+      "actual_primary_key": "audit_5s_id",
+      "expected_status_column": "status",
+      "actual_status_column": "status",
+      "expected_pattern": null,
+      "actual_pattern": "lifecycle_owner",
+      "expected_result_column": null,
+      "actual_result_column": null,
+      "matched_entities": [
+        "lean_manufacturing.lean_5s_audits"
+      ],
+      "passed": true
+    }
+  ],
+  "service_backed_resources": [
+    {
+      "resource_key": "quality_improvement.override-controls",
+      "entity_key": "governance.override_controls",
+      "entity_exists": true,
+      "required_endpoints": [
+        "governance.override_controls.list",
+        "governance.override_controls.detail",
+        "governance.override_controls.create",
+        "governance.override_controls.transition"
+      ],
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
+    },
+    {
+      "resource_key": "finance.period-closes",
+      "entity_key": "finance.period_close_controls",
+      "entity_exists": true,
+      "required_endpoints": [
+        "finance.period_close_controls.list",
+        "finance.period_close_controls.detail",
+        "finance.period_close_controls.create",
+        "finance.period_close_controls.transition"
+      ],
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
+    },
+    {
+      "resource_key": "finance.backdate-exceptions",
+      "entity_key": "finance.backdate_exceptions",
+      "entity_exists": true,
+      "required_endpoints": [
+        "finance.backdate_exceptions.list",
+        "finance.backdate_exceptions.detail",
+        "finance.backdate_exceptions.create",
+        "finance.backdate_exceptions.transition"
+      ],
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
+    },
+    {
+      "resource_key": "finance.credit-memos",
+      "entity_key": "finance.credit_memos",
+      "entity_exists": true,
+      "required_endpoints": [
+        "finance.credit_memos.list",
+        "finance.credit_memos.detail",
+        "finance.credit_memos.create"
+      ],
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
+    },
+    {
+      "resource_key": "finance.debit-memos",
+      "entity_key": "finance.debit_memos",
+      "entity_exists": true,
+      "required_endpoints": [
+        "finance.debit_memos.list",
+        "finance.debit_memos.detail",
+        "finance.debit_memos.create"
+      ],
+      "missing_endpoints": [],
+      "idempotency_failures": [],
+      "passed": true
+    }
+  ],
+  "archive_isolation": [
+    {
+      "entity_key": "audit_risk.audit_program",
+      "canonical_resource": "quality_improvement.audit-programs",
+      "successor_table": "qual_audit_programs",
+      "reason": "Legacy audit_program alias must stay in archive isolation; live audit governance runs on qual_audit_programs.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "mes_execution.dispatch_queue",
+      "canonical_resource": "planning_production.dispatch-lists",
+      "successor_table": "mes_dispatch_queue",
+      "reason": "Legacy dispatch_queue alias must be isolated so live dispatch orchestration uses mes_dispatch_queue only.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "quality_management.capa",
+      "canonical_resource": "quality_improvement.corrective-actions",
+      "successor_table": "capa_records",
+      "reason": "Legacy capa alias must be isolated to prevent duplicate CAPA publication alongside capa_records.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "quality_management.deviation",
+      "canonical_resource": "quality_improvement.deviations",
+      "successor_table": "deviations",
+      "reason": "Legacy singular alias retained only for traceability; active composition must use the canonical deviations object.",
+      "in_archive_isolation": true
+    },
+    {
+      "entity_key": "quality_management.nonconformance",
+      "canonical_resource": "quality_improvement.nonconformances",
+      "successor_table": "ncr_records",
+      "reason": "Legacy nonconformance alias must be isolated so governed NCR execution stays on ncr_records.",
+      "in_archive_isolation": true
+    }
+  ],
+  "resource_resolution": [
+    {
+      "resource_key": "analytics.inventory-balance-snapshots",
+      "table": "inventory_balance_snapshot",
+      "legacy_tables": [
+        "inventory_balance_snapshot"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "inventory.inventory_balance_snapshot"
+      ],
+      "matched_legacy_tables": [
+        "inventory_balance_snapshot"
+      ]
+    },
+    {
+      "resource_key": "analytics.mes-oee-snapshots",
+      "table": "mes_oee_snapshots",
+      "legacy_tables": [
+        "mes_oee_snapshots"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "mes_execution.mes_oee_snapshots"
+      ],
+      "matched_legacy_tables": [
+        "mes_oee_snapshots"
+      ]
+    },
+    {
+      "resource_key": "analytics.plant-performance-snapshots",
+      "table": "plant_performance_snapshots",
+      "legacy_tables": [
+        "factory_kpis",
+        "plant_performance"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "bi_datawarehouse.plant_performance_snapshots"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "analytics.production-bom-snapshots",
+      "table": "production_order_bom_snapshot",
+      "legacy_tables": [
+        "production_order_bom_snapshot"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "production.production_order_bom_snapshot"
+      ],
+      "matched_legacy_tables": [
+        "production_order_bom_snapshot"
+      ]
+    },
+    {
+      "resource_key": "analytics.production-route-snapshots",
+      "table": "production_order_route_snapshot",
+      "legacy_tables": [
+        "production_order_route_snapshot"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "production.production_order_route_snapshot"
+      ],
+      "matched_legacy_tables": [
+        "production_order_route_snapshot"
+      ]
+    },
+    {
+      "resource_key": "commercial_customer.customer-care-cases",
+      "table": "crm_customer_touchpoints",
+      "legacy_tables": [
+        "customer_complaints"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "crm.crm_customer_touchpoints"
+      ],
+      "matched_legacy_tables": [
+        "customer_complaints"
+      ]
+    },
+    {
+      "resource_key": "commercial_customer.customer-purchase-orders",
+      "table": "customer_purchase_orders",
+      "legacy_tables": [
+        "sales_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "commercial_customer.customer_purchase_orders"
+      ],
+      "matched_legacy_tables": [
+        "sales_orders"
+      ]
+    },
+    {
+      "resource_key": "commercial_customer.quotations",
+      "table": "quotes",
+      "legacy_tables": [
+        "crm_quotes_pipeline",
+        "quotations"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "sales.quotes"
+      ],
+      "matched_legacy_tables": [
+        "crm_quotes_pipeline"
+      ]
+    },
+    {
+      "resource_key": "commercial_customer.quote-effectiveness-reviews",
+      "table": "qual_effectiveness_reviews",
+      "legacy_tables": [
+        "quote_effectiveness_reviews"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_lab.qual_effectiveness_reviews"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "commercial_customer.sales-orders",
+      "table": "sales_orders",
+      "legacy_tables": [
+        "sales_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "sales.sales_orders"
+      ],
+      "matched_legacy_tables": [
+        "sales_orders"
+      ]
+    },
+    {
+      "resource_key": "finance.ap-invoices",
+      "table": "ap_invoices",
+      "legacy_tables": [
+        "ap_ar_invoices"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "finance.ap_invoices"
+      ],
+      "matched_legacy_tables": [
+        "ap_ar_invoices"
+      ]
+    },
+    {
+      "resource_key": "finance.ar-invoices",
+      "table": "ar_invoices",
+      "legacy_tables": [
+        "ap_ar_invoices"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "ap_ar_invoices"
+      ]
+    },
+    {
+      "resource_key": "finance.backdate-exceptions",
+      "table": "backdate_exceptions",
+      "legacy_tables": [
+        "period_close_controls"
+      ],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.backdate_exceptions"
+      ],
+      "matched_legacy_tables": [
+        "period_close_controls"
+      ]
+    },
+    {
+      "resource_key": "finance.credit-memos",
+      "table": "credit_memos",
+      "legacy_tables": [
+        "ap_ar_invoices"
+      ],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.credit_memos"
+      ],
+      "matched_legacy_tables": [
+        "ap_ar_invoices"
+      ]
+    },
+    {
+      "resource_key": "finance.debit-memos",
+      "table": "debit_memos",
+      "legacy_tables": [
+        "ap_ar_invoices"
+      ],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.debit_memos"
+      ],
+      "matched_legacy_tables": [
+        "ap_ar_invoices"
+      ]
+    },
+    {
+      "resource_key": "finance.fixed-asset-capitalizations",
+      "table": "fixed_asset_capitalizations",
+      "legacy_tables": [
+        "fin_fixed_assets"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "fin_fixed_assets"
+      ]
+    },
+    {
+      "resource_key": "finance.inventory-valuations",
+      "table": "inventory_valuations",
+      "legacy_tables": [
+        "inventory_valuations"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "finance.inventory_valuations"
+      ],
+      "matched_legacy_tables": [
+        "inventory_valuations"
+      ]
+    },
+    {
+      "resource_key": "finance.period-closes",
+      "table": "period_close_controls",
+      "legacy_tables": [
+        "gl_period_close"
+      ],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "finance.period_close_controls"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "integration_resilience.reconciliation-exceptions",
+      "table": "mes_erp_reconciliation_exceptions",
+      "legacy_tables": [
+        "mes_erp_reconciliation_exceptions"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "mes_execution.mes_erp_reconciliation_exceptions"
+      ],
+      "matched_legacy_tables": [
+        "mes_erp_reconciliation_exceptions"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.customer-returns",
+      "table": "rma_orders",
+      "legacy_tables": [
+        "customer_returns",
+        "returned_goods"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "service_warranty.rma_orders"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "inventory_logistics.cycle-count-plans",
+      "table": "wms_cycle_count_plans",
+      "legacy_tables": [
+        "wms_cycle_count_plans"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "warehouse_management.wms_cycle_count_plans"
+      ],
+      "matched_legacy_tables": [
+        "wms_cycle_count_plans"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.freight-orders",
+      "table": "freight_orders",
+      "legacy_tables": [
+        "freight_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "transportation.freight_orders"
+      ],
+      "matched_legacy_tables": [
+        "freight_orders"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.inventory-items",
+      "table": "inventory_items",
+      "legacy_tables": [
+        "items"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "items"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.inventory-movements",
+      "table": "inventory_movements",
+      "legacy_tables": [
+        "inventory_transactions",
+        "wms_transfer_orders"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "inventory_transactions",
+        "wms_transfer_orders"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.shipments",
+      "table": "shipments",
+      "legacy_tables": [
+        "shipping_records",
+        "tms_shipments"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "shipping_compliance.shipments"
+      ],
+      "matched_legacy_tables": [
+        "tms_shipments"
+      ]
+    },
+    {
+      "resource_key": "inventory_logistics.stock-balances",
+      "table": "stock_balances",
+      "legacy_tables": [
+        "inventory_balances",
+        "wms_stock"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "inventory.stock_balances"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "inventory_logistics.warehouses",
+      "table": "warehouses",
+      "legacy_tables": [
+        "warehouses"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "inventory.warehouses"
+      ],
+      "matched_legacy_tables": [
+        "warehouses"
+      ]
+    },
+    {
+      "resource_key": "maintenance_ehs.five-s-audits",
+      "table": "lean_5s_audits",
+      "legacy_tables": [
+        "five_s_audits",
+        "workplace_audits"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "lean_manufacturing.lean_5s_audits"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "maintenance_ehs.incidents",
+      "table": "ehs_incidents",
+      "legacy_tables": [
+        "incidents"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.ehs_incidents"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "maintenance_ehs.maintenance-plans",
+      "table": "pm_maintenance_plans",
+      "legacy_tables": [
+        "maintenance_plans",
+        "pm_plans"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "plant_maintenance.pm_maintenance_plans"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "maintenance_ehs.maintenance-work-orders",
+      "table": "pm_work_orders",
+      "legacy_tables": [
+        "maintenance_work_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "plant_maintenance.pm_work_orders"
+      ],
+      "matched_legacy_tables": [
+        "maintenance_work_orders"
+      ]
+    },
+    {
+      "resource_key": "maintenance_ehs.permits",
+      "table": "ehs_permit_register",
+      "legacy_tables": [
+        "permits"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.ehs_permit_register"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "maintenance_ehs.safety-observations",
+      "table": "safety_observations",
+      "legacy_tables": [
+        "safety_observations"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "ehs_sustainability.safety_observations"
+      ],
+      "matched_legacy_tables": [
+        "safety_observations"
+      ]
+    },
+    {
+      "resource_key": "master_data.assets",
+      "table": "assets",
+      "legacy_tables": [
+        "fin_fixed_assets",
+        "pm_equipment_master",
+        "svc_customer_assets"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "fin_fixed_assets",
+        "pm_equipment_master",
+        "svc_customer_assets"
+      ]
+    },
+    {
+      "resource_key": "master_data.compliance-obligations",
+      "table": "qual_compliance_obligations",
+      "legacy_tables": [
+        "compliance_obligations"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_lab.qual_compliance_obligations"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "master_data.customers",
+      "table": "customers",
+      "legacy_tables": [
+        "customers"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "sales.customers"
+      ],
+      "matched_legacy_tables": [
+        "customers"
+      ]
+    },
+    {
+      "resource_key": "master_data.employees",
+      "table": "employees",
+      "legacy_tables": [
+        "hcm_employees"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "training_hr.employees"
+      ],
+      "matched_legacy_tables": [
+        "hcm_employees"
+      ]
+    },
+    {
+      "resource_key": "master_data.equipment",
+      "table": "equipment",
+      "legacy_tables": [
+        "equipment",
+        "pm_equipment_master"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "calibration_equipment.equipment"
+      ],
+      "matched_legacy_tables": [
+        "equipment",
+        "pm_equipment_master"
+      ]
+    },
+    {
+      "resource_key": "master_data.measuring-devices",
+      "table": "tools",
+      "legacy_tables": [
+        "gauges",
+        "tools"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "calibration_equipment.tools"
+      ],
+      "matched_legacy_tables": [
+        "tools"
+      ]
+    },
+    {
+      "resource_key": "master_data.suppliers",
+      "table": "suppliers",
+      "legacy_tables": [
+        "vendors"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "vendors"
+      ]
+    },
+    {
+      "resource_key": "master_data.tools",
+      "table": "tools",
+      "legacy_tables": [
+        "tools"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "calibration_equipment.tools"
+      ],
+      "matched_legacy_tables": [
+        "tools"
+      ]
+    },
+    {
+      "resource_key": "mes_execution.machine-alarms",
+      "table": "mes_machine_alarms",
+      "legacy_tables": [
+        "machine_alarm_events"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "mes_execution.mes_machine_alarms"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "planning_production.dispatch-lists",
+      "table": "mes_dispatch_queue",
+      "legacy_tables": [
+        "dispatch_lists",
+        "dispatch_queue"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "mes_execution.mes_dispatch_queue"
+      ],
+      "matched_legacy_tables": [
+        "dispatch_queue"
+      ]
+    },
+    {
+      "resource_key": "planning_production.ipqc-inspections",
+      "table": "ipqc_inspections",
+      "legacy_tables": [],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.ipqc_inspections"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "planning_production.job-orders",
+      "table": "job_orders",
+      "legacy_tables": [
+        "job_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "production.job_orders"
+      ],
+      "matched_legacy_tables": [
+        "job_orders"
+      ]
+    },
+    {
+      "resource_key": "planning_production.production-operations",
+      "table": "production_operations",
+      "legacy_tables": [
+        "job_operations",
+        "job_order_operations",
+        "routing_steps",
+        "work_order_operations"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "job_operations"
+      ]
+    },
+    {
+      "resource_key": "planning_production.production-plans",
+      "table": "production_schedule",
+      "legacy_tables": [
+        "production_plans"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "production.production_schedule"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "planning_production.work-orders",
+      "table": "work_orders",
+      "legacy_tables": [
+        "work_orders"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "production.work_orders"
+      ],
+      "matched_legacy_tables": [
+        "work_orders"
+      ]
+    },
+    {
+      "resource_key": "procurement_supplier_quality.iqc-inspections",
+      "table": "incoming_inspections",
+      "legacy_tables": [
+        "iqc_inspections"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.incoming_inspections"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "procurement_supplier_quality.purchase-receipt-corrections",
+      "table": "purchase_receipt_corrections",
+      "legacy_tables": [
+        "purchase_receipt_corrections"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "purchasing.purchase_receipt_corrections"
+      ],
+      "matched_legacy_tables": [
+        "purchase_receipt_corrections"
+      ]
+    },
+    {
+      "resource_key": "procurement_supplier_quality.purchase-receipts",
+      "table": "purchase_receipts",
+      "legacy_tables": [
+        "goods_receipts",
+        "incoming_inspections"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "purchasing.purchase_receipts"
+      ],
+      "matched_legacy_tables": [
+        "incoming_inspections"
+      ]
+    },
+    {
+      "resource_key": "procurement_supplier_quality.purchase-requisitions",
+      "table": "purchase_requisitions",
+      "legacy_tables": [
+        "purchase_requisitions"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "purchasing.purchase_requisitions"
+      ],
+      "matched_legacy_tables": [
+        "purchase_requisitions"
+      ]
+    },
+    {
+      "resource_key": "procurement_supplier_quality.supplier-asns",
+      "table": "supplier_asns",
+      "legacy_tables": [
+        "supplier_asns"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "purchasing.supplier_asns"
+      ],
+      "matched_legacy_tables": [
+        "supplier_asns"
+      ]
+    },
+    {
+      "resource_key": "procurement_supplier_quality.supplier-purchase-orders",
+      "table": "supplier_purchase_orders",
+      "legacy_tables": [
+        "purchase_order",
+        "purchase_orders"
+      ],
+      "resolution_mode": "legacy_table_match",
+      "matched_entities": [],
+      "matched_legacy_tables": [
+        "purchase_order",
+        "purchase_orders"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.audit-programs",
+      "table": "qual_audit_programs",
+      "legacy_tables": [
+        "audit_program",
+        "audit_programs",
+        "internal_audits"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_lab.qual_audit_programs"
+      ],
+      "matched_legacy_tables": [
+        "audit_program"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.concessions",
+      "table": "concessions",
+      "legacy_tables": [
+        "concessions"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.concessions"
+      ],
+      "matched_legacy_tables": [
+        "concessions"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.control-plans",
+      "table": "control_plans",
+      "legacy_tables": [
+        "fmea_control_plans"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "fmea_apqp.control_plans"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "quality_improvement.corrective-actions",
+      "table": "capa_records",
+      "legacy_tables": [
+        "capa",
+        "capa_actions",
+        "corrective_actions"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.capa_records"
+      ],
+      "matched_legacy_tables": [
+        "capa"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.deviations",
+      "table": "deviations",
+      "legacy_tables": [
+        "deviation",
+        "deviations",
+        "plm_deviation_permits"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.deviations"
+      ],
+      "matched_legacy_tables": [
+        "deviation",
+        "deviations",
+        "plm_deviation_permits"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.fqc-inspections",
+      "table": "oqc_inspections",
+      "legacy_tables": [
+        "fqc_inspections"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.oqc_inspections"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "quality_improvement.improvement-actions",
+      "table": "improvement_projects",
+      "legacy_tables": [
+        "continuous_improvements",
+        "improvement_actions",
+        "kaizen_actions"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "audit_risk.improvement_projects"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "quality_improvement.msa-studies",
+      "table": "calibration_grr_studies",
+      "legacy_tables": [
+        "msa_studies"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "calibration_equipment.calibration_grr_studies"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "quality_improvement.nonconformances",
+      "table": "ncr_records",
+      "legacy_tables": [
+        "ncr_cases",
+        "nonconformance",
+        "nonconformances"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.ncr_records"
+      ],
+      "matched_legacy_tables": [
+        "nonconformance"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.oqc-inspections",
+      "table": "oqc_inspections",
+      "legacy_tables": [
+        "oqc_inspections"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.oqc_inspections"
+      ],
+      "matched_legacy_tables": [
+        "oqc_inspections"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.override-controls",
+      "table": "operational_override_controls",
+      "legacy_tables": [
+        "shipment_gate_overrides"
+      ],
+      "resolution_mode": "service_backed_slice",
+      "matched_entities": [
+        "governance.override_controls"
+      ],
+      "matched_legacy_tables": []
+    },
+    {
+      "resource_key": "quality_improvement.spc-observations",
+      "table": "spc_data",
+      "legacy_tables": [
+        "spc_data"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "quality_management.spc_data"
+      ],
+      "matched_legacy_tables": [
+        "spc_data"
+      ]
+    },
+    {
+      "resource_key": "traceability_serialization.lot-genealogy",
+      "table": "genealogy_link",
+      "legacy_tables": [
+        "lot_genealogy",
+        "mes_part_genealogy"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "traceability_serialization.genealogy_link"
+      ],
+      "matched_legacy_tables": [
+        "mes_part_genealogy"
+      ]
+    }
+  ],
+  "recommendations": [
+    "Keep canonical catalog aligned to real runtime owners; do not publish theoretical table names when governed runtime already exists elsewhere.",
+    "Promote service-backed controls into canonical REST slices with list/detail/create exposure before frontend expansion depends on them.",
+    "Move legacy aliases into archive isolation once a canonical successor exists; do not leave them as ambiguous unused candidates.",
+    "Treat remaining true_schema_gaps as explicit backend build backlog rather than frontend configuration work."
+  ]
+}

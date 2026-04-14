@@ -34,6 +34,8 @@ Run the maximum safe subset for every change:
 
 - Never perform remediation directly on the user's original branch. Create a `codex/...` remediation branch from the current local HEAD before code or documentation changes.
 - Inspect `git status`, current branch, diff stat, changed filenames, and merge-base before remediation.
+- If the worktree is dirty at handoff, create the remediation branch from that exact state and make a safety checkpoint commit before further remediation.
+- Create a lightweight safety tag before major remediation when requested by the task.
 - Do not revert user or prior-agent changes unless explicitly instructed. Work with existing dirty files and keep unrelated changes intact.
 - When using audit agents or child worktrees, isolate their output and integrate only reviewed, intentional changes.
 - Agent branches must never merge directly to `main`; integrate reviewed changes into the root remediation branch first.
@@ -41,7 +43,7 @@ Run the maximum safe subset for every change:
 ## Merge To Main Cleanup
 
 - Merge to `main` only after remediation is integrated, validation is run or blocked with evidence, and the worktree is clean.
-- Prefer a fast-forward merge from the root remediation branch into local `main`; if it cannot be reconciled safely, stop and keep the remediation branch intact.
+- Prefer a fast-forward merge from the root remediation branch into local `main`; when `main` has moved, rebase the root branch onto `main`, rerun critical validation, and retry the fast-forward. If conflicts or validation failures cannot be resolved safely, stop and keep the remediation branch intact.
 - After a successful merge, delete the root remediation branch and temporary agent branches/worktrees created for that remediation.
 - Never delete `main` or the user's original branch.
 

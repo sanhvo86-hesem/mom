@@ -26,6 +26,7 @@ FRONTEND_PATH = REGISTRY_DIR / "frontend-foundation-catalog.json"
 QUALITY_REPORT_PATH = REGISTRY_DIR / "registry-quality-report.json"
 ENDPOINT_PATH = REGISTRY_DIR / "endpoint-catalog.json"
 MANIFEST_PATH = REGISTRY_DIR / "registry-manifest.json"
+GRAPHICS_GOVERNANCE_PATH = REGISTRY_DIR / "graphics-governance-registry.json"
 DATA_FIELDS_INDEX_PATH = REGISTRY_DIR / "data-fields.json"
 PUBLICATION_ACCOUNTING_PATH = REGISTRY_DIR / "publication-entity-accounting.json"
 PUBLICATION_TRUTH_PATH = REGISTRY_DIR / "publication-truth-summary.json"
@@ -43,6 +44,30 @@ def load_json(path: Path) -> dict:
 
 def dump_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def load_optional_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    return load_json(path)
+
+
+def graphics_release_blocked(graphics_governance: dict) -> bool:
+    release_blockers = graphics_governance.get("releaseBlockers")
+    if not isinstance(release_blockers, dict):
+        return False
+    summary = release_blockers.get("summary")
+    if isinstance(summary, dict) and summary.get("releaseBlocked") is True:
+        return True
+    blockers = release_blockers.get("blockers")
+    if not isinstance(blockers, list):
+        return False
+    closed_statuses = {"closed", "resolved", "waived", "accepted_risk"}
+    return any(
+        isinstance(blocker, dict)
+        and str(blocker.get("status") or "").strip().lower() not in closed_statuses
+        for blocker in blockers
+    )
 
 
 def openapi_path_count(path: Path) -> int:
@@ -90,6 +115,7 @@ def main() -> int:
     frontend_catalog = load_json(FRONTEND_PATH)
     quality_report = load_json(QUALITY_REPORT_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
+    graphics_governance = load_optional_json(GRAPHICS_GOVERNANCE_PATH)
     manifest = load_json(MANIFEST_PATH)
 
     tables = table_registry.get("tables", {}) if isinstance(table_registry.get("tables"), dict) else {}
@@ -183,6 +209,9 @@ def main() -> int:
         or 0
     )
     publishability_failed_checks = quality_report.get("publishability", {}).get("failed_checks") or []
+    publishability_blocked_by = []
+    if not publishability_ready and graphics_release_blocked(graphics_governance):
+        publishability_blocked_by.append("graphics_release_blockers_active")
     truth_summary = {
         "publication_truth": {
             "scope": "platform_global",
@@ -232,6 +261,7 @@ def main() -> int:
             "publishability": {
                 "ready": publishability_ready,
                 "verdict": "PASS" if publishability_ready else "REVIEW_REQUIRED",
+                "blockedBy": publishability_blocked_by,
                 "review_required_entities": review_required,
                 "enhancement_backlog_entities": partial_count,
                 "blockers": (

@@ -70,6 +70,8 @@ def load_frontend_entities(frontend_catalog: dict) -> dict[str, dict]:
 
 
 def canonical_resource_spec(canonical_catalog: dict, resource_key: str) -> dict:
+    if "." not in resource_key:
+        return {}
     domain_name, resource_name = resource_key.split(".", 1)
     domain_payload = (canonical_catalog.get("domains") or {}).get(domain_name) or {}
     resources = domain_payload.get("resources") or {}
@@ -289,8 +291,8 @@ def main() -> int:
     relationship_rows: list[dict] = []
     for resource_key, spec in (normalization.get("relationship_truth_targets") or {}).items():
         canonical_spec = canonical_resource_spec(canonical_catalog, resource_key)
-        actual_relationships = list(canonical_spec.get("key_relationships") or [])
-        expected_relationships = list(spec.get("expected_key_relationships") or [])
+        actual_relationships = sorted(canonical_spec.get("key_relationships") or [])
+        expected_relationships = sorted(spec.get("expected_key_relationships") or [])
         passed = actual_relationships == expected_relationships
         relationship_rows.append({
             "resource_key": resource_key,

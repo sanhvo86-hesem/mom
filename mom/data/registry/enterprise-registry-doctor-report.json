@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-13T16:59:08.508698+00:00",
+    "standardVersion": "1.0.0",
+    "inputs": [
+      "mom/contracts/registry-authority-standard.json",
+      "mom/data/registry/table-registry.json",
+      "mom/data/registry/table-governance-overlay.json",
+      "mom/data/registry/endpoint-catalog-index.json",
+      "mom/data/registry/endpoint-governance-classification.json",
+      "mom/data/registry/destructive-endpoint-quarantine.json",
+      "mom/data/registry/command-runtime-bindings.json",
+      "mom/data/registry/registry-manifest.json",
+      "mom/contracts/object-index.json",
+      "mom/contracts/state-model-index.json",
+      "mom/contracts/command-index.json",
+      "mom/contracts/event-index.json",
+      "mom/contracts/deprecation-ledger.json"
+    ]
+  },
+  "status": "watch",
+  "scorecard": {
+    "tables": {
+      "count": 750,
+      "domains": 49,
+      "missingOwnerRole": 0,
+      "missingSystemOfRecord": 0,
+      "governanceOverlayApplied": true,
+      "governanceOverlayCount": 750
+    },
+    "endpoints": {
+      "count": 4132,
+      "classified": 4132,
+      "hardDelete": 0,
+      "hardDeleteForbiddenDomain": 0,
+      "quarantinedDelete": 0,
+      "runtimeUnsafeExposed": 0,
+      "runtimeUnsafeBlocked": 927,
+      "missingWriteRequestSchemaRef": 0
+    },
+    "businessContracts": {
+      "objects": 67,
+      "stateModels": 65,
+      "commands": 276,
+      "boundRuntimeCommandRoutes": 276,
+      "unboundRuntimeCommandRoutes": 0,
+      "missingExecutableCommandRoutes": 0
+    },
+    "events": {
+      "eventIndexCount": 229,
+      "eventContractMapGenerated": true
+    },
+    "governance": {
+      "manifestDeletionModes": {
+        "hard_delete": 0,
+        "soft_delete": 0,
+        "archive_only": 750
+      },
+      "openapiVersion": "3.1.2",
+      "aiAuthorityChainGenerated": true,
+      "destructiveEndpointQuarantineGenerated": true
+    }
+  },
+  "findings": [
+    {
+      "id": "REG-ENDPOINT-001",
+      "severity": "P2",
+      "title": "Endpoint catalog needs governance classification as release input",
+      "evidence": {
+        "gapCounts": {
+          "generic_runtime_classification": 555,
+          "runtime_safe_false": 927
+        },
+        "classificationSummary": {
+          "authorityClass": {
+            "admin_governance_contract": 279,
+            "canonical_process_contract": 2375,
+            "generic_runtime_contract": 555,
+            "machine_runtime_contract": 500,
+            "master_data_contract": 90,
+            "support_or_read_model_contract": 333
+          },
+          "exposure": {
+            "admin_governance": 264,
+            "admin_or_internal": 333,
+            "blocked_runtime_internal": 927,
+            "frontend_process": 1637,
+            "machine_or_operator_ui": 416,
+            "needs_owner_review": 555
+          },
+          "sideEffectLevel": {
+            "destructive": 743,
+            "none": 1520,
+            "transactional_write": 714,
+            "workflow_transition": 1155
+          },
+          "gapCounts": {
+            "generic_runtime_classification": 555,
+            "runtime_safe_false": 927
+          }
+        }
+      },
+      "recommendation": "Use endpoint-governance-classification.json as the frontend/AI filter. Do not expose generic runtime CRUD until authorityClass, exposure, sideEffectLevel and deletion risk are reviewed."
+    },
+    {
+      "id": "REG-API-001",
+      "severity": "P3",
+      "title": "OpenAPI policy is behind latest approved profile",
+      "evidence": {
+        "current": "3.1.2",
+        "approvedProfile": {
+          "standard": "OpenAPI",
+          "approvedVersions": [
+            "3.1.x",
+            "3.2.x"
+          ],
+          "purpose": "Every frontend-callable HTTP contract must be explicit and versioned.",
+          "url": "https://spec.openapis.org/oas/latest.html"
+        }
+      },
+      "recommendation": "Keep 3.1.x as approved compatibility or plan a controlled upgrade path to 3.2.x. Do not mix generated contract versions silently."
+    }
+  ],
+  "roadmap": [
+    {
+      "wave": "A",
+      "objective": "Lock registry schema and authority chain",
+      "tasks": [
+        "Keep registry-authority-standard.json under review control.",
+        "Validate generated reports against JSON Schema 2020-12 profile.",
+        "Require AI tools to read ai-authority-chain.json before schema or endpoint edits."
+      ]
+    },
+    {
+      "wave": "B",
+      "objective": "Upgrade table governance metadata",
+      "tasks": [
+        "Generate governance blocks for all 658 tables from business contracts, domain map, and migration source.",
+        "Assign ownerRole, stewardRole, systemOfRecord, retentionClass and deletionMode.",
+        "Block frontend exposure for tables without governance metadata."
+      ]
+    },
+    {
+      "wave": "C",
+      "objective": "Harden endpoint release contract",
+      "tasks": [
+        "Use endpoint-governance-classification.json as the release filter.",
+        "Replace hard delete routes for core domains with archive or correction commands.",
+        "Add explicit request/response schema references for frontend-callable endpoints."
+      ]
+    },
+    {
+      "wave": "D",
+      "objective": "Publish event-driven machine and workflow contracts",
+      "tasks": [
+        "Convert enterprise-event-contract-map.json into AsyncAPI document.",
+        "Bind machine events to OPC UA / machine information model terms.",
+        "Require correlation id and event time for every machine/workflow event."
+      ]
+    }
+  ]
+}

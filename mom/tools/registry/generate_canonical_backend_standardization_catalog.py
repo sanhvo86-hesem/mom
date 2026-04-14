@@ -45,6 +45,8 @@ def build_resource(contract: dict[str, Any]) -> dict[str, Any]:
     integration = contract.get("integration") if isinstance(contract.get("integration"), dict) else {}
     runtime = contract.get("runtimeExposure") if isinstance(contract.get("runtimeExposure"), dict) else {}
     compatibility = contract.get("compatibility") if isinstance(contract.get("compatibility"), dict) else {}
+    controls = contract.get("controls") if isinstance(contract.get("controls"), dict) else {}
+    projection = contract.get("projection") if isinstance(contract.get("projection"), dict) else {}
 
     canonical_resource = str(contract.get("canonicalResource") or "").strip()
     if canonical_resource == "":
@@ -53,6 +55,8 @@ def build_resource(contract: dict[str, Any]) -> dict[str, Any]:
     primary_table = str(storage.get("primaryTable") or "").strip()
     object_role = str(contract.get("objectRole") or "").strip()
     pattern = "projection" if object_role == "projection" else object_role
+
+    legacy_tables_to_isolate = string_list(storage.get("legacyTablesToIsolate")) + string_list(compatibility.get("legacyTablesToIsolate"))
 
     return {
         "canonical_resource": canonical_resource,
@@ -65,7 +69,13 @@ def build_resource(contract: dict[str, Any]) -> dict[str, Any]:
         "result_column": str(storage.get("resultField") or "").strip() or None,
         "child_tables": string_list(storage.get("childTables")),
         "legacy_tables": string_list(storage.get("legacyTables")),
-        "legacy_tables_to_isolate": string_list(compatibility.get("legacyTablesToIsolate")),
+        "legacy_tables_to_isolate": sorted(set(legacy_tables_to_isolate)),
+        "alias_only": compatibility.get("aliasOnly") if isinstance(compatibility.get("aliasOnly"), bool) else None,
+        "canonical_successor_resource": str(compatibility.get("canonicalSuccessorResource") or "").strip() or None,
+        "e_signature_required": controls.get("eSignatureRequired") if isinstance(controls.get("eSignatureRequired"), bool) else None,
+        "reason_code_field": str(controls.get("reasonCodeField") or "").strip() or None,
+        "timeboxed_expiry_required": controls.get("timeboxedExpiryRequired") if isinstance(controls.get("timeboxedExpiryRequired"), bool) else None,
+        "release_snapshot_of": str(projection.get("releaseSnapshotOf") or "").strip() or None,
         "usage_zone": str(governance.get("usageZone") or "").strip(),
         "gate_type": str(governance.get("gateType") or "").strip(),
         "audit_class": str(governance.get("auditClass") or "").strip(),

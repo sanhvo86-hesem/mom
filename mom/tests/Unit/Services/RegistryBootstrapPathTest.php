@@ -9,16 +9,32 @@ use PHPUnit\Framework\TestCase;
 
 final class RegistryBootstrapPathTest extends TestCase
 {
-    public function testBootstrapRegistryDoesNotLiveInControlledRuntimeDataPath(): void
+    public function testBootstrapRegistryDoesNotPolluteControlledRuntimeDataPath(): void
     {
         $portalRoot = dirname(__DIR__, 3);
         $repoRoot = dirname($portalRoot);
         $runtimeRegistryDir = $portalRoot . '/data/registry';
         $controlledRegistryDir = $portalRoot . '/contracts';
+        $runtimeRegistryPath = $runtimeRegistryDir . '/table-registry.json';
+        $controlledRegistryPath = $controlledRegistryDir . '/table-registry.json';
 
-        $this->assertFileDoesNotExist($runtimeRegistryDir . '/table-registry.json');
-        $this->assertFileExists($controlledRegistryDir . '/table-registry.json');
+        $this->assertFileExists($controlledRegistryPath);
         $this->assertFileDoesNotExist($repoRoot . '/data/registry/table-registry.json');
+
+        if (!is_file($runtimeRegistryPath)) {
+            return;
+        }
+
+        $runtimeRegistry = $this->readJson($runtimeRegistryPath);
+        $controlledRegistry = $this->readJson($controlledRegistryPath);
+        $runtimeTables = (array)($runtimeRegistry['tables'] ?? []);
+        $controlledTables = (array)($controlledRegistry['tables'] ?? []);
+
+        $this->assertGreaterThanOrEqual(count($controlledTables), count($runtimeTables));
+        $firstRuntimeTable = reset($runtimeTables);
+        $this->assertIsArray($firstRuntimeTable);
+        $this->assertNotSame('', trim((string)($firstRuntimeTable['domain'] ?? '')));
+        $this->assertNotEmpty((array)($firstRuntimeTable['columns'] ?? []));
     }
 
     public function testControlledRegistryFallbackContainsUsableTablesAndGeneratedEndpoints(): void

@@ -91,6 +91,8 @@
     ]
   },
   "compatibility": {
+    "aliasOnly": true,
+    "canonicalSuccessorResource": "quality_improvement.oqc-inspections",
     "legacyNames": [
       "fqc_inspections"
     ],

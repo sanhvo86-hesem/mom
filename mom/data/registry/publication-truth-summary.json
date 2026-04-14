@@ -1,0 +1,67 @@
+{
+  "publication_truth": {
+    "scope": "platform_global",
+    "truth_model": "global_canonical_plus_slice_summary",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86",
+    "generated_at": "2026-04-14T09:52:20.789Z",
+    "schema_authority": "table-registry.json backed by database/migrations and publication generators",
+    "table_count": 758,
+    "entity_counts": {
+      "total": 769,
+      "ready": 764,
+      "partial": 5,
+      "blocked": 0,
+      "explanation": "769 frontend entities are published from 758 registered tables, with 8 non-table entities and 3 additional view aliases."
+    },
+    "field_coverage": {
+      "tables_with_fields": 758,
+      "tables_without_fields": 0,
+      "explanation": "All registered tables currently have field coverage."
+    },
+    "workflow_engine_bridge": {
+      "ready": 342,
+      "blocked": 5,
+      "unneeded": 422,
+      "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
+    },
+    "openapi": {
+      "version": "3.1.2",
+      "path_count": 130,
+      "foundation_governance_paths": 10
+    },
+    "publishability": {
+      "ready": false,
+      "verdict": "REVIEW_REQUIRED",
+      "blockedBy": [
+        "graphics_release_blockers_active"
+      ],
+      "review_required_entities": 4,
+      "enhancement_backlog_entities": 5,
+      "blockers": [
+        "2 publishability checks still fail, so platform-global publication cannot be claimed yet."
+      ],
+      "anti_false_green": "Publishability follows the quality gate's unpublishable-entity and contract checks. Partial-but-publishable entities remain visible as enhancement backlog, not as a false release blocker."
+    },
+    "benchmark": {
+      "mode": "stability_probe",
+      "honesty": "Smoke-level proof, not a production load benchmark."
+    },
+    "observability": {
+      "mode": "file_export_only",
+      "honesty": "Structured artifacts and logs exist, but no live collector proof is claimed here."
+    },
+    "verification_commands": [
+      "python3 mom/tools/registry/canonical_publication_orchestrator.py",
+      "python3 mom/tools/registry/verify_publication_truth.py",
+      "php mom/tests/backend_smoke.php"
+    ],
+    "standards": {
+      "openapi": "3.1.2",
+      "rfc_9457": true,
+      "fda_part_11": true,
+      "eu_annex_11": true,
+      "isa_95": true,
+      "otel": "partial (file_export_only)"
+    }
+  }
+}

@@ -67,6 +67,8 @@ def load_frontend_entities(frontend_catalog: dict) -> dict[str, dict]:
 
 
 def canonical_resource_spec(canonical_catalog: dict, resource_key: str) -> dict:
+    if "." not in resource_key:
+        return {}
     domain_name, resource_name = resource_key.split(".", 1)
     domain_payload = (canonical_catalog.get("domains") or {}).get(domain_name) or {}
     resources = domain_payload.get("resources") or {}

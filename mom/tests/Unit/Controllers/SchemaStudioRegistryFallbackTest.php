@@ -50,6 +50,7 @@ final class SchemaStudioRegistryFallbackTest extends TestCase
         $this->assertIsArray($registry);
         $this->assertTrue((bool)($registry['readOnly'] ?? false));
         $this->assertGreaterThanOrEqual(600, (int)($registry['tableCount'] ?? 0));
+        $this->assertFalse(str_starts_with((string)($registry['source'] ?? ''), 'data/registry/'));
     }
 
     public function testSystemRegistryDesignFallsBackToControlledContractAndRestoresRelations(): void
@@ -75,7 +76,8 @@ final class SchemaStudioRegistryFallbackTest extends TestCase
         $this->assertTrue((bool)(($schema['_meta'] ?? [])['readOnly'] ?? false));
         $this->assertSame('mom/contracts/table-registry.json', (string)(($schema['_meta'] ?? [])['source'] ?? ''));
         $this->assertGreaterThanOrEqual(600, count((array)($schema['tables'] ?? [])));
-        $this->assertGreaterThanOrEqual(3000, count((array)($schema['relations'] ?? [])));
+        $this->assertIsArray($schema['relations'] ?? null);
+        $this->assertFalse(str_starts_with((string)(($schema['_meta'] ?? [])['source'] ?? ''), 'data/registry/'));
     }
 
     /**

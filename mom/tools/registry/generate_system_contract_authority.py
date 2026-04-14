@@ -427,7 +427,14 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
     table_missing_in_relation, relation_missing_in_registry = relation_entity_mismatches(tables, relation_entities)
     endpoint_entities = {entity for entity in endpoints_by_entity if entity}
     endpoint_entities_missing_registry = sorted(endpoint_entities - set(tables))
-    schema_authority_count = int(schema_authority.get("schema_authority", {}).get("table_count") or 0)
+    schema_authority_payload = schema_authority.get("schema_authority", {})
+    if not isinstance(schema_authority_payload, dict):
+        schema_authority_payload = {}
+    schema_authority_count = int(
+        schema_authority_payload.get("registry_table_count")
+        or schema_authority_payload.get("table_count")
+        or 0
+    )
     global_summary = global_audit.get("summary", {}) if isinstance(global_audit.get("summary"), dict) else {}
     capability_blocking_gap_count = int(global_summary.get("blocking_gap_count") or 0)
     graphics_summary = graphics_release_summary(graphics_governance)

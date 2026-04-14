@@ -143,9 +143,13 @@ def main() -> int:
     policy["_meta"]["generatedAt"] = generated_at
     catalog.setdefault("_meta", {})
     catalog["_meta"]["generatedAt"] = generated_at
+    endpoint_catalog = load_json(ENDPOINT_PATH)
+    publication_run_id = str((endpoint_catalog.get("_meta") or {}).get("publication_run_id") or "")
+    if publication_run_id:
+        policy["_meta"]["publication_run_id"] = publication_run_id
+        catalog["_meta"]["publication_run_id"] = publication_run_id
     save_json(POLICY_PATH, policy)
     save_json(CATALOG_PATH, catalog)
-    endpoint_catalog = load_json(ENDPOINT_PATH)
     canonical = load_json(CANONICAL_PATH)
     blind_report = load_json(BLIND_PATH)
     wave1_report = load_json(WAVE1_PATH)

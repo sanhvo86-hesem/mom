@@ -118,6 +118,9 @@ def main() -> int:
     canonical = load_json(CANONICAL_PATH)
     endpoint_catalog = load_json(ENDPOINT_PATH)
     manifest = load_json(MANIFEST_PATH)
+    publication_run_id = str((endpoint_catalog.get("_meta") or {}).get("publication_run_id") or "")
+    if publication_run_id:
+        catalog.setdefault("_meta", {})["publication_run_id"] = publication_run_id
 
     missing_resources = {
         item["resource_key"] for item in wave0.get("violations", {}).get("missing_canonical_resources", [])
