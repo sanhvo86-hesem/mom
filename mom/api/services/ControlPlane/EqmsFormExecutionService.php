@@ -204,12 +204,15 @@ final class EqmsFormExecutionService
     /**
      * @param array<string, mixed> $data
      */
-    private function ksortRecursive(array &$data): void
+    private function ksortRecursive(array &$data, int $depth = 0): void
     {
+        if ($depth > 10) {
+            return; // CTRL-020: Stop recursion at depth 10 to prevent DoS
+        }
         ksort($data);
         foreach ($data as &$value) {
             if (is_array($value)) {
-                $this->ksortRecursive($value);
+                $this->ksortRecursive($value, $depth + 1);
             }
         }
     }

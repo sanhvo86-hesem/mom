@@ -95,8 +95,18 @@ class AuditMiddleware
      */
     public function summarizeRequest(): array
     {
-        // INFRA-012 FIX: Mask all sensitive query parameters
-        $sensitiveParams = ['password', 'pw', 'token', 'code', 'otp', 'secret', 'key', 'api_key', 'csrf'];
+        // INFRA-012 FIX + NEW-R6-004: Expanded sensitive params list (financial/PII/auth fields)
+        $sensitiveParams = [
+            'password', 'pw', 'pass', 'passwd',
+            'token', 'access_token', 'refresh_token', 'id_token',
+            'code', 'otp', 'pin', 'mfa_code',
+            'secret', 'client_secret',
+            'key', 'api_key', 'private_key',
+            'csrf', 'xsrf',
+            'card_number', 'cvv', 'cvc', 'ccv',
+            'ssn', 'sin', 'tax_id',
+            'passphrase', 'authorization',
+        ];
         $query = array_diff_key($_GET, array_flip($sensitiveParams));
 
         // Body keys only (not values, to avoid logging sensitive data)

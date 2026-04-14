@@ -729,7 +729,16 @@ class DataLayer
     {
         $code = strtoupper(trim($formCode));
         // DB-013: Use cryptographically secure random bytes instead of microtime
-        $entryId = $data['entry_id'] ?? ($code . '-' . bin2hex(random_bytes(16)));
+        // NEW-R6-003: Validate user-supplied entry_id format to prevent injection via controlled IDs
+        if (isset($data['entry_id'])) {
+            $suppliedId = (string)$data['entry_id'];
+            if (!preg_match('/^[A-Z0-9_\-]{1,64}$/', $suppliedId)) {
+                throw new \InvalidArgumentException('Invalid entry_id format');
+            }
+            $entryId = $suppliedId;
+        } else {
+            $entryId = $code . '-' . bin2hex(random_bytes(16));
+        }
 
         $this->write(
             jsonWriter: function () use ($code, $data): bool {

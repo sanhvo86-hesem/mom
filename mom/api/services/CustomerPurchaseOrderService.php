@@ -148,6 +148,8 @@ final class CustomerPurchaseOrderService
             'created_by' => $userId,
             'updated_at' => $now,
             'updated_by' => $userId,
+            // NEW-R6-001: Always store org_id so listPurchaseOrders() filter works correctly
+            'org_id' => (string)($_SESSION['org_id'] ?? ''),
         ];
         if (!in_array((string)$record['po_status'], self::STATUSES, true)) {
             throw new RuntimeException('Invalid customer purchase order status.');
