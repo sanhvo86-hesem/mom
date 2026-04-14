@@ -109,7 +109,9 @@ done
 # PHP-owned runtime state must stay owned by the PHP-FPM pool user. Session
 # files fail hard when created by another UID, and login rate-limit counters
 # are written during authentication.
-for runtime_dir in sessions ratelimit; do
+# File cache is also PHP-owned runtime state. Redis is optional in the current
+# deployment, so file fallback must be writable after every release reset.
+for runtime_dir in sessions ratelimit cache; do
     runtime_path="$SITE_DIR/mom/data/$runtime_dir"
     mkdir -p "$runtime_path"
     chown -R "$WEB_USER:$WEB_GROUP" "$runtime_path"
@@ -124,6 +126,14 @@ for logfile in php_error.log audit.log db_queries.log; do
     chown "$WEB_USER:$WEB_GROUP" "$target"
     chmod 664 "$target"
 done
+
+# Portal scan cache is rewritten by authenticated admin reads. Keep it as a
+# pre-created PHP-writable runtime file so the repository root stays locked
+# down without breaking the admin file explorer.
+scan_cache="$SITE_DIR/mom/data/scan_cache.json"
+touch "$scan_cache"
+chown "$WEB_USER:$WEB_GROUP" "$scan_cache"
+chmod 664 "$scan_cache"
 restore_git_executable_bits
 
 # ── Run governed database migrations before PHP-FPM serves the new release ──

@@ -19009,7 +19009,13 @@ if ($username === '') {
     // Cache result
     ensure_dir($DATA_DIR);
     $cacheData = ['docs' => $docs, 'tree' => $tree, 'extension_filter' => $allowedExtensions];
-    @file_put_contents($cacheFile, json_encode($cacheData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+    $cacheJson = json_encode($cacheData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (
+      is_string($cacheJson)
+      && ((is_file($cacheFile) && is_writable($cacheFile)) || (!is_file($cacheFile) && is_writable($DATA_DIR)))
+    ) {
+      @file_put_contents($cacheFile, $cacheJson, LOCK_EX);
+    }
 
     $hidden = load_doc_visibility($DOC_VIS_FILE);
     $visibleDocs = portal_filter_docs_for_user($docs, $me, $PORTAL_CONFIG_JS_FILE, $hidden, $displayConfig);

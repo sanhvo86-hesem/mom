@@ -1663,6 +1663,7 @@ if ($op === 'delete') {
     $parentRel = $parentRel === '/' ? '' : norm_rel($parentRel);
     $count = 0;
     rrmdir_guarded($source, $rootReal, $count);
+    clearstatcache(true, $source);
     out([
         'ok' => true,
         'mode' => 'delete',
