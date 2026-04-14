@@ -138,6 +138,7 @@ function resolve_paths(): array
         'users_file' => $dataDir . '/config/users.json',
         'sessions_dir' => $dataDir . '/sessions',
         'ratelimit_dir' => $dataDir . '/ratelimit',
+        'cache_dir' => $dataDir . '/cache',
         'portal_htaccess' => $baseDir . '/.htaccess',
         'docs_htaccess' => $baseDir . '/docs/.htaccess',
         'qmsdata_htaccess' => $baseDir . '/data/.htaccess',
@@ -201,8 +202,14 @@ if (!is_writable($p['data_dir'])) $critical[] = "DATA_DIR not writable: {$p['dat
 if (!is_dir($p['conf_dir'])) $critical[] = "Config dir missing: {$p['conf_dir']}";
 if (!is_file($p['users_file'])) $critical[] = "users.json missing: {$p['users_file']}";
 
-foreach (['sessions_dir', 'ratelimit_dir'] as $k) {
-    if (!is_dir($p[$k])) $warnings[] = "Directory missing (will be auto-created at runtime): {$p[$k]}";
+foreach (['sessions_dir', 'ratelimit_dir', 'cache_dir'] as $k) {
+    if (!is_dir($p[$k])) {
+        $critical[] = "Runtime directory missing: {$p[$k]}";
+        continue;
+    }
+    if (!is_writable($p[$k])) {
+        $critical[] = "Runtime directory not writable: {$p[$k]}";
+    }
 }
 
 if (!contains_rule($p['root_htaccess'], 'Options -Indexes')) {

@@ -354,7 +354,7 @@ final class GenealogyGraphService
                 )
                " . $this->scopeSql('e', $scope) . "
              ORDER BY e.event_time ASC NULLS LAST, e.created_at ASC
-	             LIMIT :limit",
+             LIMIT :limit",
             [
                 ':subject_type' => $subjectType,
                 ':subject_id' => $subjectId,

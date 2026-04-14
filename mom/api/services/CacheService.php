@@ -396,6 +396,9 @@ final class CacheService
             'redis_available' => $this->redisAvailable,
             'l1_entries'      => count($this->l1),
             'fallback_mode'   => !$this->redisAvailable ? 'file' : 'none',
+            'file_cache_dir' => $this->fileDir,
+            'file_cache_dir_exists' => is_dir($this->fileDir),
+            'file_cache_writable' => is_dir($this->fileDir) && is_writable($this->fileDir),
         ];
 
         if ($this->redisAvailable) {
@@ -469,11 +472,20 @@ final class CacheService
             'expires_at' => $ttl > 0 ? time() + $ttl : 0,
         ];
         $encoded = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($encoded)) {
+            @error_log("[CacheService] File cache encode failed for key {$key}");
+            return;
+        }
 
         // Atomic write
         $tmp = $path . '.tmp';
-        if (@file_put_contents($tmp, $encoded, LOCK_EX) !== false) {
-            @rename($tmp, $path);
+        if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
+            @error_log("[CacheService] File cache write failed for {$tmp}");
+            return;
+        }
+        if (!@rename($tmp, $path)) {
+            @unlink($tmp);
+            @error_log("[CacheService] File cache rename failed for {$tmp} -> {$path}");
         }
     }
 

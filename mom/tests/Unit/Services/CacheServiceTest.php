@@ -120,6 +120,9 @@ class CacheServiceTest extends TestCase
         $health = $this->cache->getHealth();
         $this->assertFalse($health['redis_available']);
         $this->assertSame('file', $health['fallback_mode']);
+        $this->assertSame($this->tmpDir . '/cache', $health['file_cache_dir']);
+        $this->assertTrue($health['file_cache_dir_exists']);
+        $this->assertTrue($health['file_cache_writable']);
     }
 
     private function removeDir(string $dir): void

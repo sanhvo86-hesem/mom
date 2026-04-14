@@ -181,24 +181,27 @@ class RateLimitMiddleware
     private function checkWithFileStore(string $bucketKey, int $maxRequests, int $windowSeconds): void
     {
         $stateFile = $this->stateDir . '/' . $bucketKey . '.json';
+        $now = time();
 
         if (!is_dir($this->stateDir)) {
             @mkdir($this->stateDir, 0775, true);
         }
-
-        $now = time();
+        if (!is_dir($this->stateDir) || !is_writable($this->stateDir)) {
+            @error_log('[RateLimitMiddleware] Rate-limit state directory unavailable: ' . $this->stateDir);
+            $this->throwRateLimitUnavailable($maxRequests, $windowSeconds, $now);
+        }
 
         // Atomic read-check-write with exclusive file lock
         $fp = @fopen($stateFile, 'c+');
         if ($fp === false) {
-            // Cannot open state file, allow request through
-            return;
+            @error_log('[RateLimitMiddleware] Cannot open rate-limit state file: ' . $stateFile);
+            $this->throwRateLimitUnavailable($maxRequests, $windowSeconds, $now);
         }
 
         if (!flock($fp, LOCK_EX)) {
             fclose($fp);
-            error_log('RateLimit: flock failed for ' . $stateFile);
-            return;
+            @error_log('[RateLimitMiddleware] Cannot lock rate-limit state file: ' . $stateFile);
+            $this->throwRateLimitUnavailable($maxRequests, $windowSeconds, $now);
         }
 
         try {
@@ -300,6 +303,21 @@ class RateLimitMiddleware
             'X-RateLimit-Limit' => (string)$maxRequests,
             'X-RateLimit-Remaining' => '0',
             'X-RateLimit-Reset' => (string)($windowStart + $windowSeconds),
+        ]);
+    }
+
+    private function throwRateLimitUnavailable(int $maxRequests, int $windowSeconds, int $now): never
+    {
+        throw ExitException::json([
+            'ok'          => false,
+            'error'       => 'rate_limit_unavailable',
+            'retry_after' => max(1, $windowSeconds),
+            'server_time' => gmdate('c'),
+        ], 503, [
+            'Retry-After' => (string)max(1, $windowSeconds),
+            'X-RateLimit-Limit' => (string)$maxRequests,
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string)($now + $windowSeconds),
         ]);
     }
 

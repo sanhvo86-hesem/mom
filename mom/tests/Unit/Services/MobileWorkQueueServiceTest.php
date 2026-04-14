@@ -176,6 +176,33 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertCount(2, $index['by_operator_date'] ?? []);
     }
 
+    public function testOperatorQueueUsesPlantLocalDateForAssignedAt(): void
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+        try {
+            $mobileDir = $this->tmpDir . '/mobile';
+            mkdir($mobileDir, 0775, true);
+            file_put_contents($mobileDir . '/work_queue.json', json_encode([[
+                'queue_id' => 'Q-TZ-1',
+                'operator_id' => 'operator-1',
+                'wo_number' => 'WO-TZ',
+                'task_type' => 'operation_complete',
+                'task_status' => 'pending',
+                'priority' => 10,
+                'assigned_at' => '2026-04-14T17:30:00Z',
+            ]], JSON_THROW_ON_ERROR));
+
+            $service = new MobileWorkQueueService($this->tmpDir);
+
+            $this->assertSame(['WO-TZ'], array_column($service->getOperatorQueue('operator-1', '2026-04-15'), 'wo_number'));
+            $this->assertSame([], $service->getOperatorQueue('operator-1', '2026-04-14'));
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
     public function testCompleteTaskAllowsExactOnlineIdempotentReplay(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);

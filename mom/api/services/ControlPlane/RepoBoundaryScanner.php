@@ -66,7 +66,7 @@ final class RepoBoundaryScanner
         '#^mom/data/registry/system-contract-runtime-projections\.segments/[^/]+\.json$#i',
         '#^mom/data/schema-studio/(?:designs/workspace\.json|snapshots/workspace\.baseline\.json|policies/control-plane-defaults\.json)$#i',
         '#^mom/docs/system/agent-reports/tranche[0-9]+/(?:pass2-)?agent[0-9]-[^/]+\.md$#i',
-        '#^mom/docs/system/(?:branch-strategy|unresolved-backlog-ledger|world-benchmark-dossier|world-class-swarm-closure)-tranche[0-9]+\.md$#i',
+        '#^mom/docs/system/(?:branch-strategy|unresolved-backlog-ledger|world-benchmark-dossier|world-class-swarm-closure|world-class-swarm-reaudit-closure)-tranche[0-9]+\.md$#i',
     ];
 
     /**

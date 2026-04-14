@@ -111,7 +111,7 @@ final class MobileWorkQueueService
             }
 
             // Match tasks assigned on target date
-            $assignedDate = substr($task['assigned_at'] ?? $task['created_at'] ?? '', 0, 10);
+            $assignedDate = $this->queueAssignedDate($task);
             if ($assignedDate !== $targetDate) {
                 continue;
             }
@@ -1280,7 +1280,7 @@ final class MobileWorkQueueService
             if ($operatorId === '') {
                 continue;
             }
-            $assignedDate = substr($this->stringValue($task['assigned_at'] ?? $task['created_at'] ?? ''), 0, 10);
+            $assignedDate = $this->queueAssignedDate($task);
             if ($assignedDate === '') {
                 continue;
             }
@@ -1331,6 +1331,25 @@ final class MobileWorkQueueService
     private function queueIndexKey(string $operatorId, string $date): string
     {
         return hash('sha256', $operatorId . '|' . $date);
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     */
+    private function queueAssignedDate(array $task): string
+    {
+        $raw = $this->stringValue($task['assigned_at'] ?? $task['created_at'] ?? '');
+        if ($raw === '') {
+            return '';
+        }
+
+        try {
+            return (new \DateTimeImmutable($raw))
+                ->setTimezone(new \DateTimeZone(date_default_timezone_get()))
+                ->format('Y-m-d');
+        } catch (Throwable) {
+            return substr($raw, 0, 10);
+        }
     }
 
     /**

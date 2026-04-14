@@ -63,6 +63,22 @@ final class RateLimitMiddlewareTest extends TestCase
         }
     }
 
+    public function testFileStoreUnavailableFailsClosed(): void
+    {
+        $statePath = $this->tmpDir . '/ratelimit-file';
+        file_put_contents($statePath, 'not a directory');
+        $middleware = new RateLimitMiddleware($statePath, 1, 60);
+
+        try {
+            $middleware->check('unit_file_unavailable');
+            $this->fail('Unavailable rate-limit state must not allow the request.');
+        } catch (ExitException $e) {
+            $this->assertSame(503, $e->getStatusCode());
+            $this->assertSame('rate_limit_unavailable', $e->getPayload()['error'] ?? null);
+            $this->assertSame('0', $e->getHeaders()['X-RateLimit-Remaining'] ?? null);
+        }
+    }
+
     public function testInternalVpsAuthActionsBypassLimiter(): void
     {
         $middleware = new RateLimitMiddleware($this->tmpDir . '/ratelimit', 1, 60);
