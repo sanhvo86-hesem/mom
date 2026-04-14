@@ -214,6 +214,19 @@ Validation:
 Accepted governance waiver:
 - Tracked manifest self-binding limitation: a manifest committed in the same Git tree cannot contain its own final commit SHA. External CI/deployment packaging must generate the post-merge promotion manifest and deploy receipt bound to the merge commit.
 
+## 2026-04-14 22:48 Agent 2 Retention Schema Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Audit-pack retention attachment was a false closure because `AuditPackExportService` queried `retention_locks.aggregate_type/aggregate_id`, while migration `106_eqms_world_class_control_plane.sql`, `RetentionLockService`, and `CanonicalEvidenceReadService` use canonical `object_type/object_id`. | `AuditPackExportService` now queries `object_type = 'evidence_record'`, `object_id = ANY(...)`, and migration-valid `lock_state = 'active'`; retention grouping uses `object_id`; `AuditPackExporter` no longer accepts impossible lock states; `WorldClassControlPlaneExecutionTest` adds a focused schema-parity test that rejects `aggregate_type/aggregate_id` retention SQL. |
+
+Validation:
+- `composer test -- --filter AuditPackExportService`: 3 tests, 18 assertions, passed.
+- `composer test -- --filter WorldClassControlPlaneExecutionTest`: 79 tests, 490 assertions, passed.
+- `php tools/release/check_repo_boundary.php`: `repo boundary clean`.
+- `php tools/release/check_workflow_status_authority.php`: `workflow status authority clean`.
+- `composer check`: PHPStan clean; 462 tests, 2688 assertions, 1 skipped, passed.
+
 ## Non-Authority Legacy Surfaces
 
 The following paths may remain for read/import compatibility only and must not be used as governed write authority:

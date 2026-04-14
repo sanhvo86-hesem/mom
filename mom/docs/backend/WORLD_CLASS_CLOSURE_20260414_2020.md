@@ -212,7 +212,7 @@ External sources refreshed without sending repository content:
 Closed P0: stale branch.
 
 Closed non-waived P1:
-- Evidence acceptance state, retention, audit event, and audit pack proof.
+- Evidence acceptance state, retention, audit event, and audit pack proof, including canonical `retention_locks.object_type/object_id` audit-pack lookup.
 - Evidence finalization audit event hash-chain proof and audit-pack chain-proof readiness.
 - Direct released document signature/import evidence.
 - Read acknowledgement audience semantics.
@@ -226,11 +226,11 @@ Closed non-waived P1:
 Final validation evidence after latest `origin/main` sync and final authority remediation:
 - `php tools/release/check_repo_boundary.php`: passed, `repo boundary clean`.
 - `php tools/release/check_workflow_status_authority.php`: passed, `workflow status authority clean`.
-- Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed, 78 tests / 483 assertions.
+- Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed, 79 tests / 490 assertions.
 - Focused PHPUnit: `ShopfloorExecutionServiceTest` passed, 48 tests / 179 assertions.
 - `composer analyse -- --memory-limit=1G`: passed via `composer check`, PHPStan clean over 228 files.
-- `composer test`: passed as part of `composer check`, 461 tests, 2681 assertions, 1 skipped.
-- `composer check`: passed, PHPStan clean plus 461 tests, 2681 assertions, 1 skipped.
+- `composer test`: passed as part of `composer check`, 462 tests, 2688 assertions, 1 skipped.
+- `composer check`: passed, PHPStan clean plus 462 tests, 2688 assertions, 1 skipped.
 
 ## N. Second Six-Agent Re-Audit
 
@@ -243,6 +243,7 @@ Second and closure-loop audits found additional P0/P1 issues that were remediate
 - submission acceptance path gap: closed by `FormSubmissionAcceptanceService` and route/OpenAPI/test coverage;
 - audit-pack export lifecycle gap: closed by `audit_pack_exports` lifecycle persistence;
 - deploy manifest binding gap: closed by `ReleaseManifestBindingVerifier` and workflow gate.
+- Agent 2 audit-pack retention schema false-closure: closed by changing `AuditPackExportService` from non-existent `aggregate_type/aggregate_id` retention lock columns to canonical `object_type/object_id`, restricting export retention proof to the migration-valid `active` state, and adding a focused schema-parity unit test.
 
 Required second-audit checks:
 - No unresolved P0.
@@ -259,7 +260,7 @@ Current closure state after remediation and validation:
 |---|---:|---|
 | P0 | 0 | Closed. |
 | Non-waived P1 | 0 | Closed in this branch by code/migration/API/test/runbook evidence, with dependency-scoped waivers below. |
-| Waived P1 dependencies | 5 | Recorded in accepted waiver register. |
+| Waived P1 dependencies | 6 | Recorded in accepted waiver register. |
 | P2 roadmap | 5 | Recorded in deferred roadmap register. |
 
 ## P. Unresolved Backlog Register
@@ -275,6 +276,7 @@ No unresolved P0 or non-waived P1 is accepted in this register. If any subsequen
 | Daily integrity digest worker | P1 | QA/QMS owner + platform owner | Digest scope, scheduler, and retention policy need owner approval. | 2026-05-14 | Worker writes daily digest and exception rows with high-watermark proof. |
 | Full training task lifecycle | P1 | QMS owner + training owner | Current branch enforces authoritative training proof at release but does not build the full assignment/completion product workflow. | 2026-05-14 | Training assignments, read-and-understand completion, waiver approval, and release gating are implemented end to end with signer/audience proof. |
 | Full deterministic as-built closure builder | P1 | MES owner + platform owner | Current branch hardens fact replay and current snapshot uniqueness; full closure is larger Wave 5 product work. | 2026-05-14 | Builder hashes full upstream/downstream closure and proves deterministic replay. |
+| Tracked manifest self-commit binding | P1 | Platform owner | A manifest committed in the same Git tree cannot contain its own final commit SHA because the commit hash depends on the manifest blob. | 2026-05-14 | CI or deployment packaging generates an external promotion manifest bound to the post-merge commit and stores it as deploy receipt authority. |
 
 No P0 waiver is accepted.
 
@@ -300,7 +302,7 @@ Summary:
 - Hardened document release signature/import evidence and read acknowledgement semantics.
 - Added change release governance: role/reason/SoD/signature checks, effectivity conflict persistence, release side effects, and resulting-object integrity migration.
 - Hardened manufacturing/genealogy scope authority, content-bound genealogy replay, scoped genealogy identity, current snapshot uniqueness, and shopfloor 5M production gate enforcement.
-- Added EQMS OpenAPI contracts, deploy manifest binding, and branch-specific release manifest, promotion receipt, and reverse-sync intake.
+- Added EQMS OpenAPI contracts, audit-pack canonical retention lock proof, deploy manifest binding, and branch-specific release manifest, promotion receipt, and reverse-sync intake.
 
 Validation:
 - `php tools/release/check_repo_boundary.php`
@@ -329,13 +331,14 @@ Rollback:
 | Training gate, WIP impact, and emergency waiver checks were self-certified or presence-based. | Migration `131` adds training proof columns; `EffectivityGateService` requires signature/evidence/authoritative decision proof; WIP dispositions block release until approved/executed/signed-waived; emergency risk waivers require signature evidence. |
 | Shopfloor 5M waiver path remained caller-shaped and PostgreSQL mirror omitted new 5M columns. | `ShopfloorExecutionService` accepts waivers only when backed by a `signature_events` row and consumed challenge bound to the blocked gate payload hash; `ShopfloorExecutionPersistenceService` writes `traceability_5m_gate` and `traceability_5m_waiver_signature_event_id` when migrated columns exist. |
 | EQMS OpenAPI route parity was curated instead of complete. | `api/openapi.yaml` now contains every route from `eqms-control-plane-routes.php`; `WorldClassControlPlaneExecutionTest::testEqmsControlPlaneOpenApiTracksGovernedRoutes` automatically checks every registered EQMS path and method. |
+| Agent 2 found a false closure in audit-pack retention proof: `AuditPackExportService` queried non-existent `retention_locks.aggregate_type/aggregate_id` columns while the migration and writer use `object_type/object_id`. | `AuditPackExportService` now queries `object_type = 'evidence_record'`, `object_id = ANY(...)`, and `lock_state = 'active'`; grouping uses `object_id`; `AuditPackExporter` only accepts the migration-valid active lock state; `WorldClassControlPlaneExecutionTest::testAuditPackExportServiceUsesCanonicalRetentionLockColumns` fails if the old columns return. |
 
 Validation after this addendum and latest `origin/main` sync:
 - `php tools/release/check_repo_boundary.php`: `repo boundary clean`.
 - `php tools/release/check_workflow_status_authority.php`: `workflow status authority clean`.
-- `vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php`: 78 tests, 483 assertions, passed.
+- `vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php`: 79 tests, 490 assertions, passed.
 - `vendor/bin/phpunit tests/Unit/Services/ShopfloorExecutionServiceTest.php`: 48 tests, 179 assertions, passed.
-- `composer check`: PHPStan clean; 461 tests, 2681 assertions, 1 skipped, passed.
+- `composer check`: PHPStan clean; 462 tests, 2688 assertions, 1 skipped, passed.
 
 Tracked manifest self-binding waiver:
 - Severity: P1 governance limitation, accepted.
@@ -352,7 +355,7 @@ Tracked manifest self-binding waiver:
 | Unresolved non-waived P1 = 0 | Closed by code/migration/API/test evidence; dependency waivers are explicit below. |
 | Required migrations present | Present: migrations 128, 129, 130, and 131. |
 | Required backend changes present | Present. |
-| Required tests green | Passed after latest `origin/main` sync plus final authority remediation: 461 tests, 2681 assertions, 1 skipped; PHPStan clean. |
+| Required tests green | Passed after latest `origin/main` sync plus final Agent 2 retention schema remediation: 462 tests, 2688 assertions, 1 skipped; PHPStan clean. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |
 | Waivers documented | Present. |
 | PR summary updated | Draft body prepared above. |

@@ -5,8 +5,8 @@
   "base_branch": "main",
   "original_base_head": "c7c3cdaa0c83",
   "synced_base_head": "88b79955b5654dd9a936e698a923326e6bce411c",
-  "validated_head": "5aab122518e44b6cfceeff2a7e238cf842bee0a0",
-  "validated_head_role": "post_remediation_runtime_head_before_governed_manifest_receipt_update",
+  "validated_head": "f4b752327f34b484be6efeb060bbda648b948017",
+  "validated_head_role": "post_agent2_retention_schema_remediation_head_before_governed_manifest_receipt_update",
   "record_state": "pre_merge_validated_controlled_source_manifest",
   "created_at": "2026-04-14T13:46:31Z",
   "change_authority": {
@@ -67,7 +67,8 @@
     "P1 CO release signature validates a consumed auth challenge and a full canonical release package hash",
     "P1 training gates require signature/evidence/authoritative training proof before release",
     "P1 WIP/on-order/finished impact dispositions block release until approved, executed, or signed-waived",
-    "P1 shopfloor 5M waiver path requires server-authoritative signature proof and DB production-log 5M columns are populated"
+    "P1 shopfloor 5M waiver path requires server-authoritative signature proof and DB production-log 5M columns are populated",
+    "P1 audit pack retention proof uses canonical retention_locks.object_type/object_id columns and migration-valid active lock state"
   ],
   "required_validation": [
     "php tools/release/check_repo_boundary.php",
