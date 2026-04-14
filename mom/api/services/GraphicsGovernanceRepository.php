@@ -77,7 +77,7 @@ class GraphicsGovernanceRepository
      */
     public function writeDesignConfig(array $config): void
     {
-        $this->writeJson($this->designConfigPath(), $config);
+        $this->writeVersionedJson($this->designConfigPath(), $config);
     }
 
     /**
@@ -93,7 +93,7 @@ class GraphicsGovernanceRepository
      */
     public function writeTemplateRegistry(array $registry): void
     {
-        $this->writeJson($this->canonicalTemplateRegistryPath(), $registry);
+        $this->writeVersionedJson($this->canonicalTemplateRegistryPath(), $registry);
     }
 
     /**
@@ -172,7 +172,7 @@ class GraphicsGovernanceRepository
      */
     public function writeState(array $state): void
     {
-        $this->writeJson($this->governanceStatePath(), $state);
+        $this->writeVersionedJson($this->governanceStatePath(), $state);
     }
 
     /**
@@ -196,7 +196,7 @@ class GraphicsGovernanceRepository
      */
     public function writeWaiversDocument(array $doc): void
     {
-        $this->writeJson($this->waiversPath(), $doc);
+        $this->writeVersionedJson($this->waiversPath(), $doc);
     }
 
     /**
@@ -220,7 +220,7 @@ class GraphicsGovernanceRepository
      */
     public function writeRolloutsDocument(array $doc): void
     {
-        $this->writeJson($this->rolloutsPath(), $doc);
+        $this->writeVersionedJson($this->rolloutsPath(), $doc);
     }
 
     /**
@@ -404,14 +404,98 @@ class GraphicsGovernanceRepository
         if (!is_string($json)) {
             throw new RuntimeException('Cannot encode JSON for: ' . $path);
         }
-        $tmp = $path . '.tmp';
-        if (@file_put_contents($tmp, $json . "\n", LOCK_EX) === false) {
-            throw new RuntimeException('Cannot write temporary file: ' . $tmp);
+        $this->writeJsonLocked($path, $json);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function writeVersionedJson(string $path, array $data): void
+    {
+        $dir = dirname($path);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Cannot create directory: ' . $dir);
         }
-        if (!@rename($tmp, $path)) {
-            @unlink($tmp);
-            throw new RuntimeException('Cannot replace file: ' . $path);
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        if (!is_string($json)) {
+            throw new RuntimeException('Cannot encode JSON for: ' . $path);
         }
+        $expectedPreviousVersion = $this->previousDocumentVersion($data);
+        $this->writeJsonLocked($path, $json, $expectedPreviousVersion);
+    }
+
+    private function writeJsonLocked(string $path, string $json, ?string $expectedPreviousVersion = null): void
+    {
+        $lockPath = $path . '.lock';
+        $lock = @fopen($lockPath, 'c');
+        if (!is_resource($lock)) {
+            throw new RuntimeException('Cannot open lock file: ' . $lockPath);
+        }
+        try {
+            if (!@flock($lock, LOCK_EX)) {
+                throw new RuntimeException('Cannot lock file: ' . $lockPath);
+            }
+            if ($expectedPreviousVersion !== null && is_file($path)) {
+                $current = $this->readJson($path);
+                $currentVersion = $this->documentVersion($current);
+                if ($currentVersion !== $expectedPreviousVersion) {
+                    throw new RuntimeException('Concurrent graphics authority write rejected for: ' . $path);
+                }
+            }
+            $tmp = $path . '.' . getmypid() . '.' . bin2hex(random_bytes(4)) . '.tmp';
+            if (@file_put_contents($tmp, $json . "\n", LOCK_EX) === false) {
+                throw new RuntimeException('Cannot write temporary file: ' . $tmp);
+            }
+            if (!@rename($tmp, $path)) {
+                @unlink($tmp);
+                throw new RuntimeException('Cannot replace file: ' . $path);
+            }
+        } finally {
+            @flock($lock, LOCK_UN);
+            @fclose($lock);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     */
+    private function previousDocumentVersion(array $document): ?string
+    {
+        $meta = is_array($document['_meta'] ?? null) ? (array)$document['_meta'] : [];
+        if (isset($meta['governanceRevision']) && is_numeric($meta['governanceRevision'])) {
+            $previous = (int)$meta['governanceRevision'] - 1;
+            return $previous >= 1 ? 'rev-' . $previous : null;
+        }
+        $version = isset($meta['version']) ? (string)$meta['version'] : '';
+        if (preg_match('/^(\d+)\.(\d+)\.(\d+)$/', $version, $m) && (int)$m[3] > 0) {
+            return $m[1] . '.' . $m[2] . '.' . ((int)$m[3] - 1);
+        }
+        if (preg_match('/^(\d+)\.(\d+)$/', $version, $m) && (int)$m[2] > 0) {
+            return $m[1] . '.' . ((int)$m[2] - 1);
+        }
+        if (preg_match('/^\d+$/', $version)) {
+            $previous = (int)$version - 1;
+            return $previous >= 1 ? (string)$previous : null;
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     */
+    private function documentVersion(array $document): string
+    {
+        $meta = is_array($document['_meta'] ?? null) ? (array)$document['_meta'] : [];
+        if (isset($meta['governanceRevision'])) {
+            return 'rev-' . (string)$meta['governanceRevision'];
+        }
+        if (isset($meta['version'])) {
+            return (string)$meta['version'];
+        }
+        if (isset($document['version'])) {
+            return (string)$document['version'];
+        }
+        return sha1(json_encode($document, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
     }
 
     /**

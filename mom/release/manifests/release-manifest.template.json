@@ -9,8 +9,67 @@
     "repo_boundary_scan_clean",
     "migration_lint_passed",
     "targeted_tests_passed",
-    "authority_map_reviewed"
+    "authority_map_reviewed",
+    "graphics_compliance_matrix_attested",
+    "graphics_release_blockers_clear"
   ],
+  "graphicsReleaseLink": {
+    "graphicsAuthorityRefs": [
+      "mom/design/template-registry.json",
+      "mom/data/registry/graphics-governance-registry.json",
+      "mom/docs/module-layout-template-design-system-v4.html",
+      "standards/36-frontend-module-layout-template-standard.md"
+    ],
+    "templateRegistryVersion": "",
+    "templateRegistryChecksum": "",
+    "complianceMatrixRef": "",
+    "impactAnalysisRef": "",
+    "waiversRef": "",
+    "runtimeBeaconRef": "",
+    "debtObservatoryRef": "",
+    "multiSitePlantBrandingGovernanceRef": "",
+    "controlledEmergencyOverridePathRef": "",
+    "rolloutDecisionRef": "",
+    "rollbackPlanRef": "",
+    "releaseBlocked": true,
+    "blockerCount": 0,
+    "runtimeBeaconSummary": {},
+    "debtSummary": {},
+    "driftReportGeneratedAt": "",
+    "evidenceBundleRequirements": [
+      "affectedModulesSnapshot",
+      "complianceMatrixSnapshot",
+      "debtDriftSnapshot",
+      "runtimeBeaconSnapshot",
+      "rolloutDecision",
+      "rollbackPlan",
+      "waiverRegisterSnapshot"
+    ],
+    "generatedAt": ""
+  },
+  "graphicsEvidenceBundle": {
+    "evidenceBundleRequirements": [
+      "affectedModulesSnapshot",
+      "complianceMatrixSnapshot",
+      "debtDriftSnapshot",
+      "runtimeBeaconSnapshot",
+      "rolloutDecision",
+      "rollbackPlan",
+      "waiverRegisterSnapshot"
+    ],
+    "graphicsAuthorityRefs": [],
+    "templateRegistryVersion": "",
+    "templateRegistryChecksum": "",
+    "complianceMatrixRef": "",
+    "impactAnalysisRef": "",
+    "waiversRef": "",
+    "runtimeBeaconRef": "",
+    "debtObservatoryRef": "",
+    "multiSitePlantBrandingGovernanceRef": "",
+    "controlledEmergencyOverridePathRef": "",
+    "rolloutDecisionRef": "",
+    "rollbackPlanRef": ""
+  },
   "signature_event_id": null,
   "approver": null,
   "notes": ""
