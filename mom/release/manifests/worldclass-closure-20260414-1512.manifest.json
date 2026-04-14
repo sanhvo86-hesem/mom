@@ -1,0 +1,70 @@
+{
+  "artifact_type": "source_promotion_manifest",
+  "manifest_id": "worldclass-closure-20260414-1512",
+  "branch": "codex/worldclass-closure-20260414-1512",
+  "base_branch": "main",
+  "base_head": "946880c6",
+  "record_state": "pre_merge_controlled_source_manifest",
+  "created_at": "2026-04-14T08:11:19Z",
+  "change_authority": {
+    "authority_type": "codex_remediation_request",
+    "authority_ref": "WORLDCLASS-CLOSURE-20260414-1512",
+    "scope": "repo_boundary_evidence_finalization_document_change_authority_genealogy_vps_deploy_governance"
+  },
+  "branch_activity_note": {
+    "note": "A prior closure branch was created from an older main head, then the worktree was moved back to main by concurrent activity. This manifest governs the remediation branch recreated from current main head 946880c6 before staging or commit.",
+    "supersedes_working_branches": [
+      "codex/worldclass-closure-20260414-1453",
+      "codex/worldclass-closure-20260414-1501"
+    ]
+  },
+  "source_boundaries": {
+    "controlled_source": [
+      "mom/api/controllers",
+      "mom/api/services",
+      "mom/database/migrations",
+      "mom/tests",
+      "mom/contracts",
+      "mom/docs/backend",
+      "mom/release"
+    ],
+    "runtime_or_generated_excluded": [
+      "mom/data/registry/*.json",
+      "mom/docs/system/agent-reports/tranche13/*.md",
+      "mom/docs/system/*tranche13*.md"
+    ],
+    "runtime_rebuild_path": [
+      "RegistryService runtime overlay may consume mom/data/registry when generated locally",
+      "Controlled fallback is mom/contracts/table-registry.json"
+    ]
+  },
+  "closed_findings": [
+    "P0 evidence finalization now fails closed without canonical DB persistence",
+    "P0 released document lifecycle changes require exact released change authority",
+    "P1 final evidence finalization requires signature event",
+    "P1 source submission attempt is checked before evidence finalization when supplied",
+    "P1 periodic evaluation, genealogy fact, and 5M gate writes require role and CSRF",
+    "P1 5M gate ignores caller-provided booleans without governed policy source",
+    "P1 shopfloor manual report events promote first-class 5M context",
+    "P1 deployment actions require governed promotion context",
+    "P1 CI/deploy checks are blocking",
+    "P1 generated registry/tranche13 artifacts removed from controlled source",
+    "P1 SharePoint template corrected to publication/read-only/discovery only"
+  ],
+  "required_validation": [
+    "php -l touched PHP files",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit focused closure suites --testdox",
+    "php tools/release/check_repo_boundary.php",
+    "php tools/release/check_workflow_status_authority.php",
+    "./composer analyse -- --memory-limit=1G",
+    "./composer test",
+    "./composer check"
+  ],
+  "merge_gate": {
+    "unresolved_p0": 0,
+    "unresolved_non_waived_p1": 0,
+    "accepted_waivers_documented": true,
+    "runbook_present": true,
+    "merge_strategy": "fast_forward_preferred_else_stop"
+  }
+}

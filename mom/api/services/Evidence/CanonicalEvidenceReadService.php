@@ -24,7 +24,7 @@ final class CanonicalEvidenceReadService
     /**
      * @return array<string, mixed>
      */
-    public function package(string $evidenceRef): array
+    public function package(string $evidenceRef, string $orgId = ''): array
     {
         $id = trim($evidenceRef);
         if ($id === '') {
@@ -37,9 +37,14 @@ final class CanonicalEvidenceReadService
         $record = $this->db->queryOne(
             "SELECT *
              FROM evidence_records
-             WHERE evidence_record_id::text = :id OR evidence_key = :id
+             WHERE (evidence_record_id::text = :id OR evidence_key = :id)
+               AND (
+                   :org_id = ''
+                   OR metadata->>'org_id' = :org_id
+                   OR metadata->'scope'->>'org_id' = :org_id
+               )
              LIMIT 1",
-            [':id' => $id],
+            [':id' => $id, ':org_id' => trim($orgId)],
         );
         if (!is_array($record)) {
             throw new RuntimeException('canonical_evidence_record_not_found');

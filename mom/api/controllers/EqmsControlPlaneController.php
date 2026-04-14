@@ -45,6 +45,37 @@ final class EqmsControlPlaneController extends BaseController
         )));
     }
 
+    /**
+     * @return list<string>
+     */
+    private function evidenceReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'document_control',
+                'document_controller',
+                'qms_manager',
+                'compliance_manager',
+                'production_director',
+                'auditor',
+            ],
+        )));
+    }
+
+    private function requireOrgContext(array $user): string
+    {
+        $orgId = trim((string)($_SESSION['org_id'] ?? $user['org_id'] ?? ''));
+        if ($orgId === '') {
+            $this->error('org_context_required', 403);
+        }
+
+        return $orgId;
+    }
+
     public function contract(): never
     {
         $this->requireAuth();
@@ -594,6 +625,12 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['subject_type', 'subject_id', 'canonical_payload']);
+        $orgId = $this->requireOrgContext($user);
+        $bodyOrgId = trim((string)($body['org_id'] ?? ''));
+        if ($bodyOrgId !== '' && $bodyOrgId !== $orgId) {
+            $this->error('evidence_scope_violation', 403);
+        }
+        $body['org_id'] = $orgId;
         if (!isset($body['actor_id'])) {
             $body['actor_id'] = (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user');
         }
@@ -629,7 +666,9 @@ final class EqmsControlPlaneController extends BaseController
 
     public function canonicalEvidencePackage(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->evidenceReadRoles());
+        $orgId = $this->requireOrgContext($user);
         $evidenceRef = trim((string)($this->query('evidence_ref', '') ?: $this->query('evidence_id', '')));
         if ($evidenceRef === '') {
             $this->error('evidence_ref_required', 400);
@@ -637,7 +676,7 @@ final class EqmsControlPlaneController extends BaseController
 
         try {
             $this->success([
-                'evidence_package' => (new CanonicalEvidenceReadService($this->data))->package($evidenceRef),
+                'evidence_package' => (new CanonicalEvidenceReadService($this->data))->package($evidenceRef, $orgId),
             ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 404);
@@ -646,15 +685,24 @@ final class EqmsControlPlaneController extends BaseController
 
     public function evidenceGraphPreview(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->evidenceReadRoles());
+        $orgId = $this->requireOrgContext($user);
         $body = $this->jsonBody();
         $this->requireFields($body, ['evidence_record_id']);
+        $scope = is_array($body['scope'] ?? null) ? $body['scope'] : [];
+        $bodyOrgId = trim((string)($body['org_id'] ?? $scope['org_id'] ?? ''));
+        if ($bodyOrgId !== '' && $bodyOrgId !== $orgId) {
+            $this->error('evidence_scope_violation', 403);
+        }
+        $body['org_id'] = $orgId;
         $this->success(['graph' => (new UnifiedEvidenceGraphService())->buildEvidenceContextGraph($body)]);
     }
 
     public function recordGenealogyFact(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'change_coordinator', 'production_manager']);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['edge_fact_type', 'from_object_type', 'from_object_id', 'to_object_type', 'to_object_id']);
@@ -672,7 +720,9 @@ final class EqmsControlPlaneController extends BaseController
 
     public function evaluate5MGate(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'change_coordinator', 'production_manager']);
+        $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['operation_class', 'object_type', 'object_id']);
 
@@ -737,7 +787,9 @@ final class EqmsControlPlaneController extends BaseController
 
     public function schedulePeriodicEvaluation(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer']);
+        $this->requireCsrf();
         $body = $this->jsonBody();
         try {
             $this->success([

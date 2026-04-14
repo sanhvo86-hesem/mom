@@ -29,8 +29,8 @@ final class CanonicalManufacturingSpineServiceTest extends TestCase
         mkdir($tmpBase . '/contracts', 0775, true);
 
         try {
-            copy(QMS_TEST_BASE_DIR . '/data/registry/table-registry.json', $tmpBase . '/data/registry/table-registry.json');
             copy(QMS_TEST_BASE_DIR . '/contracts/table-registry.json', $tmpBase . '/contracts/table-registry.json');
+            copy(QMS_TEST_BASE_DIR . '/contracts/table-registry.json', $tmpBase . '/data/registry/table-registry.json');
 
             $runtimeRegistry = json_decode(
                 (string)file_get_contents($tmpBase . '/data/registry/table-registry.json'),

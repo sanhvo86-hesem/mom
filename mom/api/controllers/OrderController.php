@@ -1209,6 +1209,26 @@ class OrderController extends BaseController
     // â”€â”€ Holds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
+     * @param array<string, mixed> $event
+     */
+    private function appendOrderHoldEvent(array $event): void
+    {
+        $eventsFile = $this->dataDir . '/orders/hold_events.json';
+        $events = $this->readJsonFile($eventsFile) ?? [];
+        if (!is_array($events)) {
+            $events = [];
+        }
+
+        $events[] = [
+            'event_id' => 'OH-EVT-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
+            'event_at' => $this->nowIso(),
+            'authority' => 'order_hold_event_journal',
+        ] + $event;
+
+        $this->writeJsonFile($eventsFile, $events);
+    }
+
+    /**
      * POST setHold â€” Set a hold on an order.
      * Action: `order_hold_set`
      * @return never
@@ -1235,7 +1255,7 @@ class OrderController extends BaseController
             $holdsFile = $this->dataDir . '/orders/holds.json';
             $holds = $this->readJsonFile($holdsFile) ?? [];
 
-            $holds[] = [
+            $hold = [
                 'hold_id'    => bin2hex(random_bytes(8)),
                 'order_type' => $orderType,
                 'order_id'   => $orderId,
@@ -1245,10 +1265,20 @@ class OrderController extends BaseController
                 'set_at'     => $now,
                 'released'   => false,
             ];
+            $holds[] = $hold;
 
             $this->writeJsonFile($holdsFile, $holds);
+            $this->appendOrderHoldEvent([
+                'event_type' => 'order.hold_set',
+                'hold_id' => $hold['hold_id'],
+                'order_type' => $orderType,
+                'order_id' => $orderId,
+                'hold_type' => $holdType,
+                'reason' => $reason,
+                'actor_id' => $uid,
+            ]);
             $this->auditLog('order_hold_set', ['order_id' => $orderId, 'hold_type' => $holdType], $uid);
-            $this->success(['hold_set' => true]);
+            $this->success(['hold_set' => true, 'hold_id' => $hold['hold_id']]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('hold_set_failed', 500, $e->getMessage());
@@ -1312,6 +1342,14 @@ class OrderController extends BaseController
             }
 
             $this->writeJsonFile($holdsFile, $holds);
+            $this->appendOrderHoldEvent([
+                'event_type' => 'order.hold_released',
+                'hold_id' => $holdId,
+                'order_type' => $releasedHold['order_type'] ?? null,
+                'order_id' => $releasedHold['order_id'] ?? null,
+                'release_reason' => $reason,
+                'actor_id' => $uid,
+            ]);
             $this->auditLog('order_hold_release', [
                 'hold_id' => $holdId,
                 'order_type' => $releasedHold['order_type'] ?? null,

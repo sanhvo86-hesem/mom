@@ -540,6 +540,24 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringNotContainsString('docs_custom.json', $sql);
     }
 
+    public function testReleasedDocumentRevisionRequiresExactReleasedChangeAuthority(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('released_document_change_authority_required');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb(changeAuthorityVerified: false)))->createRevision([
+            'doc_code' => 'SOP-100',
+            'doc_type' => 'SOP',
+            'title' => 'Machine setup control',
+            'revision_label' => 'A',
+            'revision_sequence' => 1,
+            'lifecycle_state' => 'released',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000701',
+            'canonical_payload' => ['purpose' => 'controlled setup'],
+            'manifest_hash_sha256' => str_repeat('a', 64),
+        ], 'qa-1');
+    }
+
     public function testDocumentReadAcknowledgementAndSupersessionUseCanonicalLedgers(): void
     {
         $db = new DocumentFormControlFakeDb();
@@ -819,6 +837,56 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                     'signature_meaning' => 'final evidence package approval',
                     'idempotency_key' => 'sig-key-1',
                 ]],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationFailsClosedWithoutAuthoritativeStore(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-no-db-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('authoritative_evidence_store_required');
+
+            (new EvidenceFinalizationService($dir))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [[
+                    'signer_ref' => 'qa-1',
+                    'signature_meaning' => 'final evidence package approval',
+                ]],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRequiresSignatureEvent(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-no-signature-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_signature_event_required');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
             ]);
         } finally {
             $this->removeTree($dir);
@@ -1143,6 +1211,29 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertContains('manpower', $gate['missing_context']);
     }
 
+    public function test5MGateIgnoresCallerSuppliedRequiredBooleansWithoutPolicy(): void
+    {
+        $gate = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->evaluateAndPersist5M([
+            'operation_class' => 'cnc_milling',
+            'object_type' => 'work_order',
+            'object_id' => 'WO-1',
+            'material_required' => false,
+            'machine_required' => false,
+            'method_required' => false,
+            'measurement_required' => false,
+            'manpower_required' => false,
+            'context' => [
+                'equipment_id' => 'MILL-1',
+            ],
+        ]);
+
+        $this->assertFalse($gate['allowed']);
+        $this->assertContains('material', $gate['missing_context']);
+        $this->assertContains('method', $gate['missing_context']);
+        $this->assertContains('measurement', $gate['missing_context']);
+        $this->assertContains('manpower', $gate['missing_context']);
+    }
+
     public function testGenealogyGraphWriteRequiresReleasedChangeAuthority(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -1405,6 +1496,43 @@ final class DocumentFormControlFakeDb
 
     public string $lastIssuanceManifestHash = '';
 
+    public function __construct(private readonly bool $changeAuthorityVerified = true)
+    {
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (!$this->changeAuthorityVerified || !str_contains($sql, 'FROM plm_change_orders co')) {
+            return [];
+        }
+
+        return [[
+            'plm_change_order_id' => (string)$params[':change_order_id'],
+            'change_order_number' => 'CO-DOC',
+            'status' => 'released',
+            'object_type' => 'document_family',
+            'object_id' => 'DOCFAM-1',
+            'affected_fields' => '{"lifecycle_state"}',
+            'requested_effect' => 'release',
+            'effectivity_rule' => '{}',
+            'disposition' => 'accepted',
+        ], [
+            'plm_change_order_id' => (string)$params[':change_order_id'],
+            'change_order_number' => 'CO-DOC',
+            'status' => 'released',
+            'object_type' => 'document_revision',
+            'object_id' => '00000000-0000-0000-0000-000000000901',
+            'affected_fields' => '{"lifecycle_state"}',
+            'requested_effect' => 'supersede',
+            'effectivity_rule' => '{}',
+            'disposition' => 'accepted',
+        ]];
+    }
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>
@@ -1447,10 +1575,10 @@ final class DocumentFormControlFakeDb
                 'schema_version' => '1.0.0',
             ];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO doc_families')) {
+        if (str_contains($trimmed, 'INSERT INTO doc_families')) {
             return ['doc_family_id' => 'DOCFAM-1', 'doc_code' => (string)$params[':doc_code']];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO doc_revisions')) {
+        if (str_contains($trimmed, 'INSERT INTO doc_revisions')) {
             return [
                 'doc_revision_id' => 'DOCREV-1',
                 'doc_family_id' => (string)$params[':doc_family_id'],
@@ -1485,7 +1613,7 @@ final class DocumentFormControlFakeDb
                 'source_change_order_id' => (string)$params[':source_change_order_id'],
             ];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO frm_issuances')) {
+        if (str_contains($trimmed, 'INSERT INTO frm_issuances')) {
             $this->lastIssuanceManifestHash = (string)$params[':issuance_manifest_hash_sha256'];
             return [
                 'frm_issuance_id' => 'FRMISS-1',
@@ -1494,14 +1622,14 @@ final class DocumentFormControlFakeDb
                 'frm_schema_version_id' => (string)$params[':frm_schema_version_id'],
             ];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO frm_submission_attempts')) {
+        if (str_contains($trimmed, 'INSERT INTO frm_submission_attempts')) {
             return [
                 'frm_submission_attempt_id' => 'FRMATT-1',
                 'frm_issuance_id' => (string)$params[':frm_issuance_id'],
                 'attempt_state' => (string)$params[':attempt_state'],
             ];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO submission_validation_results')) {
+        if (str_contains($trimmed, 'INSERT INTO submission_validation_results')) {
             $this->lastValidationState = (string)$params[':validation_state'];
             return [
                 'submission_validation_result_id' => 'VAL-1',

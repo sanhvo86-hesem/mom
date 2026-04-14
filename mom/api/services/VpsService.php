@@ -22,6 +22,8 @@ final class VpsService
         'git_pull', 'db_migrate', 'reload_php',
     ];
 
+    private const DEPLOYMENT_VPS_ACTIONS = ['git_pull', 'db_migrate', 'reload_php'];
+
     /** @var list<string> */
     private array $configCandidates;
 
@@ -293,7 +295,10 @@ final class VpsService
         }
     }
 
-    public function runAction(string $hostId, string $actionId, bool $allowWrite = false): array
+    /**
+     * @param array<string, mixed> $governanceContext
+     */
+    public function runAction(string $hostId, string $actionId, bool $allowWrite = false, array $governanceContext = []): array
     {
         // INT-013 FIX: Validate action is in the whitelist before execution
         if (!in_array($actionId, self::ALLOWED_VPS_ACTIONS, true)) {
@@ -307,6 +312,10 @@ final class VpsService
             throw new RuntimeException('write_access_required:' . $actionId);
         }
 
+        if (in_array($actionId, self::DEPLOYMENT_VPS_ACTIONS, true)) {
+            $this->assertDeploymentActionGovernance($actionId, $governanceContext);
+        }
+
         $run = $this->executeOnHost($host, (string)($action['command'] ?? ''));
 
         $result = [
@@ -317,6 +326,9 @@ final class VpsService
             'exit_code' => (int)($run['exit_code'] ?? 1),
             'output' => (string)($run['output'] ?? ''),
             'executed_at' => gmdate('c'),
+            'deployment_governance' => in_array($actionId, self::DEPLOYMENT_VPS_ACTIONS, true)
+                ? $this->summarizeDeploymentGovernance($governanceContext)
+                : null,
             'host_after' => $this->buildHostSnapshot($host),
         ];
 
@@ -325,6 +337,45 @@ final class VpsService
         }
 
         return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function assertDeploymentActionGovernance(string $actionId, array $context): void
+    {
+        if (strtolower(trim((string)getenv('VPS_DEPLOY_ACTIONS_ENABLED'))) !== '1') {
+            throw new RuntimeException('deployment_actions_disabled');
+        }
+
+        $manifestRef = trim((string)($context['release_manifest_ref'] ?? ''));
+        $changeAuthorityRef = trim((string)($context['change_authority_ref'] ?? $context['source_change_order_id'] ?? ''));
+        $intent = strtolower(trim((string)($context['promotion_intent'] ?? '')));
+        $confirmation = trim((string)($context['confirmation_phrase'] ?? ''));
+        $expectedConfirmation = 'DEPLOY ' . strtoupper($actionId);
+
+        if ($manifestRef === '' || $changeAuthorityRef === '') {
+            throw new RuntimeException('deployment_change_authority_required');
+        }
+        if (!in_array($intent, ['deploy_controlled_source', 'run_controlled_migration', 'reload_controlled_runtime'], true)) {
+            throw new RuntimeException('deployment_promotion_intent_required');
+        }
+        if ($confirmation !== $expectedConfirmation) {
+            throw new RuntimeException('deployment_confirmation_required');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, string>
+     */
+    private function summarizeDeploymentGovernance(array $context): array
+    {
+        return [
+            'release_manifest_ref' => trim((string)($context['release_manifest_ref'] ?? '')),
+            'change_authority_ref' => trim((string)($context['change_authority_ref'] ?? $context['source_change_order_id'] ?? '')),
+            'promotion_intent' => trim((string)($context['promotion_intent'] ?? '')),
+        ];
     }
 
     /**
@@ -1876,7 +1927,7 @@ BASH;
             }
 
             $loop = implode(' ', array_map('escapeshellarg', $units));
-            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\n'; fi";
+            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\\n'; fi";
         }
 
         if ($parts === []) {
@@ -1986,7 +2037,7 @@ BASH;
                 'response_ms' => null,
                 'detail' => 'Site probe failed',
             ];
-            $parts[] = "if command -v curl >/dev/null 2>&1; then out=\"\$(curl -k -L --max-time 8 -o /dev/null -s -w " . escapeshellarg('%{http_code}|%{url_effective}|%{content_type}|%{remote_ip}|%{time_total}') . ' ' . escapeshellarg($url) . " 2>/dev/null || true)\"; [ -n \"\$out\" ] || out='000||||'; printf '__SITE__|{$index}|%s\n' \"\$out\"; else printf '__SITE__|{$index}|000||||\n'; fi";
+            $parts[] = "if command -v curl >/dev/null 2>&1; then out=\"\$(curl -k -L --max-time 8 -o /dev/null -s -w " . escapeshellarg('%{http_code}|%{url_effective}|%{content_type}|%{remote_ip}|%{time_total}') . ' ' . escapeshellarg($url) . " 2>/dev/null || true)\"; [ -n \"\$out\" ] || out='000||||'; printf '__SITE__|{$index}|%s\\n' \"\$out\"; else printf '__SITE__|{$index}|000||||\\n'; fi";
         }
 
         if ($parts === []) {
@@ -2136,9 +2187,9 @@ BASH;
                 'reachable' => false,
             ];
             if ($captureBody) {
-                $parts[] = "if command -v curl >/dev/null 2>&1; then tmp_file=\"\$(mktemp)\"; meta=\"\$(curl -sS --max-time 6 -o \"\$tmp_file\" -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; body=\"\$(head -c 180 \"\$tmp_file\" 2>/dev/null | tr '\n' ' ' | tr '\r' ' ' | tr '|' ' ')\"; rm -f \"\$tmp_file\"; printf '__CTRL__|{$index}|%s|%s\n' \"\$meta\" \"\$body\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+                $parts[] = "if command -v curl >/dev/null 2>&1; then tmp_file=\"\$(mktemp)\"; meta=\"\$(curl -sS --max-time 6 -o \"\$tmp_file\" -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; body=\"\$(head -c 180 \"\$tmp_file\" 2>/dev/null | tr '\\n' ' ' | tr '\\r' ' ' | tr '|' ' ')\"; rm -f \"\$tmp_file\"; printf '__CTRL__|{$index}|%s|%s\\n' \"\$meta\" \"\$body\"; else printf '__CTRL__|{$index}|000||curl_missing\\n'; fi";
             } else {
-                $parts[] = "if command -v curl >/dev/null 2>&1; then meta=\"\$(curl -sSI --max-time 5 -o /dev/null -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; printf '__CTRL__|{$index}|%s|\n' \"\$meta\"; else printf '__CTRL__|{$index}|000||curl_missing\n'; fi";
+                $parts[] = "if command -v curl >/dev/null 2>&1; then meta=\"\$(curl -sSI --max-time 5 -o /dev/null -w " . escapeshellarg('%{http_code}|%{content_type}') . ' ' . escapeshellarg($internalUrl) . " 2>/dev/null || true)\"; [ -n \"\$meta\" ] || meta='000|'; printf '__CTRL__|{$index}|%s|\\n' \"\$meta\"; else printf '__CTRL__|{$index}|000||curl_missing\\n'; fi";
             }
         }
 

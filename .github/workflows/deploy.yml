@@ -24,6 +24,29 @@ jobs:
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
 
+      - name: Install validation dependencies
+        working-directory: mom
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Validate controlled source before deploy
+        working-directory: mom
+        env:
+          APP_ENV: test
+          DB_PASSWORD: test_password
+        run: |
+          ./composer analyse -- --memory-limit=1G
+          ./composer test
+          ./composer check
+          php tools/release/check_workflow_status_authority.php
+
+      - name: Require governed promotion inputs
+        env:
+          RELEASE_MANIFEST_REF: ${{ vars.RELEASE_MANIFEST_REF }}
+          CHANGE_AUTHORITY_REF: ${{ vars.CHANGE_AUTHORITY_REF }}
+        run: |
+          test -n "$RELEASE_MANIFEST_REF"
+          test -n "$CHANGE_AUTHORITY_REF"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:

@@ -61,6 +61,18 @@ final class EvidenceFinalizationService
         if (!is_array($package['manifest']['publication_state'] ?? null)) {
             throw new RuntimeException('evidence_package_missing_publication_state');
         }
+
+        $signatureEvents = is_array($package['manifest']['signature_events'] ?? null)
+            ? $package['manifest']['signature_events']
+            : [];
+        if ($signatureEvents === []) {
+            throw new RuntimeException('evidence_signature_event_required');
+        }
+        foreach ($signatureEvents as $event) {
+            if (!is_array($event)) {
+                throw new RuntimeException('signature_event_invalid');
+            }
+        }
     }
 
     /**
@@ -72,7 +84,7 @@ final class EvidenceFinalizationService
     {
         $db = $this->normalizeDb($this->db);
         if ($db === null || !method_exists($db, 'queryOne')) {
-            return [];
+            throw new RuntimeException('authoritative_evidence_store_required');
         }
 
         if (method_exists($db, 'transactional')) {
@@ -94,9 +106,16 @@ final class EvidenceFinalizationService
         if ($subjectType === '' || $subjectId === '') {
             throw new RuntimeException('evidence_subject_required_for_persistence');
         }
+        $this->assertSourceSubmissionAttemptAccepted($db, $input);
         $evidenceKey = $this->text($input['evidence_key'] ?? '');
         if ($evidenceKey === '') {
             $evidenceKey = 'EV-' . substr(hash('sha256', $subjectType . '|' . $subjectId . '|' . ($package['package_hash_sha256'] ?? '')), 0, 24);
+        }
+        $recordMetadata = ['source' => 'EvidenceFinalizationService'];
+        $scope = is_array($input['scope'] ?? null) ? $input['scope'] : [];
+        $orgId = $this->nullableText($input['org_id'] ?? $scope['org_id'] ?? null);
+        if ($orgId !== null) {
+            $recordMetadata['org_id'] = $orgId;
         }
 
         $record = $db->queryOne(
@@ -124,7 +143,7 @@ final class EvidenceFinalizationService
                 ':source_attempt_id' => $this->nullableUuid($input['source_attempt_id'] ?? null),
                 ':source_change_order_id' => $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null),
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
-                ':metadata' => $this->json(['source' => 'EvidenceFinalizationService']),
+                ':metadata' => $this->json($recordMetadata),
             ],
         );
         if (!is_array($record) || $this->text($record['evidence_record_id'] ?? '') === '') {
@@ -292,13 +311,13 @@ final class EvidenceFinalizationService
             ? $manifest['signature_events']
             : (is_array($input['signature_events'] ?? null) ? $input['signature_events'] : []);
         if ($events === []) {
-            return [];
+            throw new RuntimeException('evidence_signature_event_required');
         }
 
         $persisted = [];
         foreach ($events as $index => $event) {
             if (!is_array($event)) {
-                continue;
+                throw new RuntimeException('signature_event_invalid');
             }
 
             $signerUserId = $this->nullableUuid($event['signer_user_id'] ?? $event['user_id'] ?? null);
@@ -369,7 +388,57 @@ final class EvidenceFinalizationService
             }
         }
 
+        if ($persisted === []) {
+            throw new RuntimeException('evidence_signature_event_required');
+        }
+
         return $persisted;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function assertSourceSubmissionAttemptAccepted(object $db, array $input): void
+    {
+        $attemptId = $this->nullableUuid($input['source_attempt_id'] ?? $input['frm_submission_attempt_id'] ?? null);
+        if ($attemptId === null) {
+            return;
+        }
+
+        $issuanceId = $this->nullableUuid($input['source_issuance_id'] ?? $input['frm_issuance_id'] ?? null);
+        $schemaVersionId = $this->nullableUuid($input['source_schema_version_id'] ?? $input['frm_schema_version_id'] ?? null);
+        $row = $db->queryOne(
+            "SELECT
+                a.frm_submission_attempt_id,
+                a.frm_issuance_id,
+                vr.schema_version_id,
+                a.attempt_state,
+                vr.validation_state
+             FROM frm_submission_attempts a
+             LEFT JOIN submission_validation_results vr
+               ON vr.frm_submission_attempt_id = a.frm_submission_attempt_id
+             WHERE a.frm_submission_attempt_id = CAST(:attempt_id AS uuid)
+             ORDER BY vr.created_at DESC NULLS LAST
+             LIMIT 1",
+            [':attempt_id' => $attemptId],
+        );
+
+        if (!is_array($row) || $this->text($row['frm_submission_attempt_id'] ?? '') === '') {
+            throw new RuntimeException('source_submission_attempt_not_found');
+        }
+        if (!in_array($this->text($row['attempt_state'] ?? ''), ['accepted', 'valid'], true)) {
+            throw new RuntimeException('source_submission_attempt_not_accepted');
+        }
+        $validationState = $this->text($row['validation_state'] ?? '');
+        if ($validationState !== '' && !in_array($validationState, ['passed', 'accepted'], true)) {
+            throw new RuntimeException('source_submission_attempt_validation_not_passed');
+        }
+        if ($issuanceId !== null && $this->nullableUuid($row['frm_issuance_id'] ?? null) !== $issuanceId) {
+            throw new RuntimeException('source_submission_attempt_issuance_mismatch');
+        }
+        if ($schemaVersionId !== null && $this->nullableUuid($row['schema_version_id'] ?? null) !== $schemaVersionId) {
+            throw new RuntimeException('source_submission_attempt_schema_mismatch');
+        }
     }
 
     /**

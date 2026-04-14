@@ -1,6 +1,6 @@
 # World-Class Target Architecture
 
-Audited branch: `codex/worldclass-reaudit-20260414-145442`
+Audited branch: `codex/worldclass-closure-20260414-1512`
 
 Date: 2026-04-14
 
@@ -23,11 +23,13 @@ This target keeps the custom PHP MVC framework, router, middleware, DataLayer, E
 - Keep `ShopfloorExecutionPersistenceService` as the DB bridge for `shift_targets`, `shift_production_log`, `shift_production_report_events`, and `shift_dispatch_execution_events`.
 - Keep scheduling/capacity endpoints owned by the existing scheduling controller. Order-prefixed aliases are compatibility routes only and must not drift into missing `OrderController` methods.
 - Hold release is a controlled planning/governance mutation and must require source-order write authority before the hold row/file is changed.
+- Hold set/release keeps the legacy hold snapshot but also appends hold lifecycle events so planning governance has a replayable audit trail.
 
 ## Quality and evidence backbone
 
 - Keep mobile first-piece/in-process/final capture through `MobileWorkQueueService`.
 - Canonical evidence finalization must remain role-gated to quality/document/compliance authority roles, not merely authenticated users.
+- Canonical evidence package reads must be role-gated and scoped by organization. Finalization must fail closed unless at least one structured signature event is present.
 - Keep evidence custody through `EvidenceVaultService`.
 - Evidence uploads must validate server-side size and actual MIME bytes. Extension fallback is allowed only for ambiguous/generic byte detection.
 - FMEA and operational override access must use canonical role normalization, not generic or unmigrated role strings.
@@ -40,7 +42,7 @@ Target continuity:
 
 `item -> item revision -> job order -> work order -> operation -> work center -> machine/equipment -> setup sheet revision -> CNC program version -> inspection plan -> production report event -> quality/evidence/genealogy`
 
-Current execution payloads already preserve most links. New setup sheets start as `draft` and strict dispatch reference enforcement does not treat missing status as released. The remaining high-value target is a DB-backed CNC program/version/setup-sheet repository or bridge behind `CncProgramController`, with JSON retained as compatibility fallback during cutover.
+Current execution payloads already preserve most links. CNC program and version JSON records now persist plant/site/work-center/operation/part-revision/routing/inspection context, matching setup-sheet context. New setup sheets start as `draft` and strict dispatch reference enforcement does not treat missing status as released. The remaining high-value target is a DB-backed CNC program/version/setup-sheet repository or bridge behind `CncProgramController`, with JSON retained as compatibility fallback during cutover.
 Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database genealogy constraints aligned with the runtime expanded ontology while automatic edge emission from every production report remains staged.
 
 ## AI and copilot boundary
@@ -48,6 +50,7 @@ Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database geneal
 - AI prediction rows and recommendation actions are advisory projections.
 - `ai_recommendation_actions` may track pending human review but does not create NCRs, maintenance work, schedule moves, tool orders, dispatch changes, completion events, or machine commands.
 - Natural-language query writes conversation history and may expose broad manufacturing data, so it requires authentication, scoped roles, CSRF, read-only SQL validation, row limits, audit logging, and PostgreSQL read-only transactions.
+- Conversation history/detail reads also require AI read roles; JSON fallback detail reads validate safe IDs and require owner metadata before returning content.
 - AI prediction, SPC anomaly, tool-wear, legacy dashboard, model, and combined dashboard surfaces are advisory read APIs and require the same AI read role boundary; model internals are admin-only.
 - AI feedback that can alter advisory confidence requires feedback/write roles and remains idempotent.
 - RCA analysis is a write-like advisory surface because it can call an external LLM and cache/store outputs; it requires CSRF and quality/admin role scope.

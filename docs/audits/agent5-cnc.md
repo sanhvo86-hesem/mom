@@ -1,10 +1,11 @@
 # Agent 5 - CNC / Digital Thread / Traceability / Connectivity
 
-Branch audited: `codex/worldclass-reaudit-20260414-145442`
+Branch audited: `codex/worldclass-closure-20260414-1512`
 
 ## 2026-04-14 Current-Pass Addendum
 
 - Confirmed P1 setup-sheet release defect: missing setup-sheet status was treated as released. Remediation sets new setup sheets to `draft` and makes missing setup status fail strict dispatch enforcement.
+- Confirmed P1 CNC program context drift: setup sheets carried plant/work-center/revision context, but program and version rows did not. Remediation persists plant/site/work-center/machine/operation/part-revision/routing/inspection context on program create/update/version upload and scopes reads by `plant_id`/`org_plant_id`.
 - Confirmed P1 MTConnect parser defect: XML parsing used entity expansion. Remediation rejects `DOCTYPE`/`ENTITY` payloads and removes `LIBXML_NOENT`.
 - Deferred: DB-primary CNC program/setup authority and automatic genealogy edge emission remain blocked by reconciliation and trace-policy design.
 

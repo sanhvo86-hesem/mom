@@ -28,7 +28,7 @@ jobs:
         with:
           php-version: '8.3'
       - name: Check PHP syntax
-        run: find mom/api mom/database -name "*.php" -exec php -l {} \; 2>&1 | grep -v "No syntax errors" | head -50 || true
+        run: find mom/api mom/database -name "*.php" -print0 | xargs -0 -n1 php -l
 
   analyse:
     name: Static Analysis (PHPStan)
@@ -45,7 +45,6 @@ jobs:
         run: composer install --no-interaction --prefer-dist
       - name: Run PHPStan
         working-directory: mom
-        continue-on-error: true
         run: vendor/bin/phpstan analyse --error-format=github
 
   test:
@@ -109,4 +108,4 @@ jobs:
       - name: Install spectral
         run: npm install -g @stoplight/spectral-cli
       - name: Validate OpenAPI spec
-        run: spectral lint mom/api/openapi.yaml --fail-severity warn || true
+        run: spectral lint mom/api/openapi.yaml --fail-severity warn

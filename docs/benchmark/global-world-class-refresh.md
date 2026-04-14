@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-reaudit-20260414-145442`
+Audited branch: `codex/worldclass-closure-20260414-1512`
 
 Date: 2026-04-14
 
@@ -16,7 +16,7 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 | [AVEVA MES](https://www.aveva.com/en/products/manufacturing-execution-system/) | Manufacturing execution, performance visibility, OEE/loss insight, hybrid integration with enterprise systems. | Analytics must consume integrated canonical execution facts; AI projections must not become execution authority. |
 | [Tulip Composable MES](https://tulip.co/solutions/composable-mes/) | Human-centric composable execution apps with open API and validation-ready thinking. | Preserve the custom MVC and extend contracts/services incrementally; do not rewrite into a monolith. |
 | [Google Manufacturing Data Engine](https://docs.cloud.google.com/manufacturing-data-engine/docs/overview) | Factory data contextualization, standardized schemas, ISA-95 hierarchy support, analytics/ML use cases. | Keep a contextualization boundary between execution truth and derived AI/analytics features. |
-| [Microsoft Factory Operations Agent](https://learn.microsoft.com/en-us/industry/release-plan/2025wave1/cloud-manufacturing/factory-operations-agent-copilot-studio) | Natural-language access and agentic assistance over manufacturing data. | Copilot/NLQ must be CSRF/role guarded and grounded in governed read models. |
+| [Microsoft Factory Operations Agent](https://learn.microsoft.com/en-us/industry/manufacturing/whats-new) | Microsoft lists Factory Operations Agent and Manufacturing Data Solutions previews as deprecated on May 30, 2025. | Treat agent patterns as reference-only; NLQ/copilot must be grounded in governed read models and cannot become execution authority. |
 | [ISA-95 / IEC 62264](https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard) | Enterprise-control integration layers and explicit manufacturing interfaces. | Planning, execution, quality, analytics, and AI boundaries must remain explicit. |
 | [MTConnect 2.5](https://docs.mtconnect.org/MBSD_MTConnect_Part_1_2-5-0.pdf) | Open machine information model and HTTP agent semantics for machine data. | Preserve stable machine/equipment IDs, timestamps, and event-style records now. |
 | [OPC UA for Machinery](https://opcfoundation.org/markets-collaboration/opc-ua-for-machinery/) | Machinery companion specs for status, KPIs, and job/machine context. | Keep machine, work center, job, and operating context in execution payloads without commanding machines. |
@@ -30,4 +30,4 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - EQMS cannot be a side module. First-piece/in-process/final inspection, evidence, nonconformance, and release packets must be linked to work order/operation/machine/operator context.
 - CNC digital thread is the main remaining structural gap. Execution already preserves CNC references, but CNC program/setup-sheet authority is still file-backed while DB schema exists.
 - Security gaps in AI/NLQ are high-leverage because natural-language query surfaces can expose broad manufacturing data and write conversation history.
-- This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped and no longer leak blank-plant JSON fallback rows to scoped users, mobile task assignment/start/completion now has an event journal with explicit start-before-complete enforcement, canonical evidence finalization is role-gated, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.
+- This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped, AI prediction JSON fallback no longer leaks blank-plant rows to scoped users, AI conversation fallback IDs are validated and owner-scoped, mobile task assignment/start/completion now has an event journal, canonical evidence finalization is role/org scoped and requires signature events, order holds append lifecycle events, CNC program/version records persist plant/site/work-center/operation/revision/inspection context, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.

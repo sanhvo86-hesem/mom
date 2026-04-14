@@ -55,21 +55,25 @@ final class FormIssuanceCommandService
         }
 
         $row = $db->queryOne(
-            "INSERT INTO frm_issuances
-                (allocation_id, issued_record_id, frm_template_revision_id, frm_schema_version_id,
-                 issuance_no, delivery_mode, issuance_state, issued_to_user_id, issued_to_ref,
-                 issued_for_context, issued_artifact_uri, issuance_manifest_hash_sha256, expires_at,
-                 idempotency_key, metadata)
-             VALUES
-                (:allocation_id, :issued_record_id, CAST(:frm_template_revision_id AS uuid),
-                 CAST(:frm_schema_version_id AS uuid), :issuance_no, :delivery_mode, 'issued',
-                 CAST(:issued_to_user_id AS uuid), :issued_to_ref, CAST(:issued_for_context AS jsonb),
-                 :issued_artifact_uri, :issuance_manifest_hash_sha256, CAST(:expires_at AS timestamptz),
-                 :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (allocation_id) DO UPDATE SET
-                 updated_at = now(),
-                 metadata = frm_issuances.metadata || EXCLUDED.metadata
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO frm_issuances
+                    (allocation_id, issued_record_id, frm_template_revision_id, frm_schema_version_id,
+                     issuance_no, delivery_mode, issuance_state, issued_to_user_id, issued_to_ref,
+                     issued_for_context, issued_artifact_uri, issuance_manifest_hash_sha256, expires_at,
+                     idempotency_key, metadata)
+                VALUES
+                    (:allocation_id, :issued_record_id, CAST(:frm_template_revision_id AS uuid),
+                     CAST(:frm_schema_version_id AS uuid), :issuance_no, :delivery_mode, 'issued',
+                     CAST(:issued_to_user_id AS uuid), :issued_to_ref, CAST(:issued_for_context AS jsonb),
+                     :issued_artifact_uri, :issuance_manifest_hash_sha256, CAST(:expires_at AS timestamptz),
+                     :idempotency_key, CAST(:metadata AS jsonb))
+                ON CONFLICT (allocation_id) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM frm_issuances WHERE allocation_id = :allocation_id
+             LIMIT 1",
             [
                 ':allocation_id' => $this->requiredText($input, 'allocation_id'),
                 ':issued_record_id' => $this->requiredText($input, 'issued_record_id'),
@@ -139,20 +143,25 @@ final class FormIssuanceCommandService
         $duplicate = is_array($serverValidation['duplicate'] ?? null) ? $serverValidation['duplicate'] : null;
 
         $row = $db->queryOne(
-            "INSERT INTO frm_submission_attempts
-                (frm_issuance_id, attempt_no, attempt_state, submitted_by_user_id, submitted_by_ref,
-                 original_artifact_uri, original_hash_sha256, parsed_payload, validation_errors,
-                 duplicate_of_attempt_id, idempotency_key, metadata)
-             VALUES
-                (CAST(:frm_issuance_id AS uuid), :attempt_no, :attempt_state, CAST(:submitted_by_user_id AS uuid),
-                 :submitted_by_ref, :original_artifact_uri, :original_hash_sha256, CAST(:parsed_payload AS jsonb),
-                 CAST(:validation_errors AS jsonb), CAST(:duplicate_of_attempt_id AS uuid), :idempotency_key,
-                 CAST(:metadata AS jsonb))
-             ON CONFLICT (frm_issuance_id, attempt_no) DO UPDATE SET
-                 attempt_state = EXCLUDED.attempt_state,
-                 validation_errors = EXCLUDED.validation_errors,
-                 updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO frm_submission_attempts
+                    (frm_issuance_id, attempt_no, attempt_state, submitted_by_user_id, submitted_by_ref,
+                     original_artifact_uri, original_hash_sha256, parsed_payload, validation_errors,
+                     duplicate_of_attempt_id, idempotency_key, metadata)
+                VALUES
+                    (CAST(:frm_issuance_id AS uuid), :attempt_no, :attempt_state, CAST(:submitted_by_user_id AS uuid),
+                     :submitted_by_ref, :original_artifact_uri, :original_hash_sha256, CAST(:parsed_payload AS jsonb),
+                     CAST(:validation_errors AS jsonb), CAST(:duplicate_of_attempt_id AS uuid), :idempotency_key,
+                     CAST(:metadata AS jsonb))
+                ON CONFLICT (frm_issuance_id, attempt_no) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM frm_submission_attempts
+              WHERE frm_issuance_id = CAST(:frm_issuance_id AS uuid)
+                AND attempt_no = :attempt_no
+             LIMIT 1",
             [
                 ':frm_issuance_id' => $issuanceId,
                 ':attempt_no' => max(1, (int)($input['attempt_no'] ?? 1)),
@@ -207,19 +216,23 @@ final class FormIssuanceCommandService
     {
         $validationState = $this->validationState($input['validation_state'] ?? $this->validationStateForAttempt($attemptState));
         $result = $db->queryOne(
-            "INSERT INTO submission_validation_results
-                (frm_submission_attempt_id, validation_state, schema_version_id, validator_version,
-                 canonical_payload_hash_sha256, original_artifact_hash_sha256, validation_summary)
-             VALUES
-                (CAST(:frm_submission_attempt_id AS uuid), :validation_state, CAST(:schema_version_id AS uuid),
-                 :validator_version, :canonical_payload_hash_sha256, :original_artifact_hash_sha256,
-                 CAST(:validation_summary AS jsonb))
-             ON CONFLICT (frm_submission_attempt_id, validator_version) DO UPDATE SET
-                 validation_state = EXCLUDED.validation_state,
-                 canonical_payload_hash_sha256 = EXCLUDED.canonical_payload_hash_sha256,
-                 original_artifact_hash_sha256 = EXCLUDED.original_artifact_hash_sha256,
-                 validation_summary = EXCLUDED.validation_summary
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO submission_validation_results
+                    (frm_submission_attempt_id, validation_state, schema_version_id, validator_version,
+                     canonical_payload_hash_sha256, original_artifact_hash_sha256, validation_summary)
+                VALUES
+                    (CAST(:frm_submission_attempt_id AS uuid), :validation_state, CAST(:schema_version_id AS uuid),
+                     :validator_version, :canonical_payload_hash_sha256, :original_artifact_hash_sha256,
+                     CAST(:validation_summary AS jsonb))
+                ON CONFLICT (frm_submission_attempt_id, validator_version) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM submission_validation_results
+              WHERE frm_submission_attempt_id = CAST(:frm_submission_attempt_id AS uuid)
+                AND validator_version = :validator_version
+             LIMIT 1",
             [
                 ':frm_submission_attempt_id' => $attemptId,
                 ':validation_state' => $validationState,

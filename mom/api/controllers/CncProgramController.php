@@ -234,6 +234,83 @@ class CncProgramController extends BaseController
         return $current . '-1';
     }
 
+    private function activePlantId(): string
+    {
+        return trim((string)($_SESSION['plant_id'] ?? $_SESSION['org_plant_id'] ?? ''));
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     */
+    private function inPlantScope(array $record, string $plantId): bool
+    {
+        if ($plantId === '') {
+            return true;
+        }
+
+        $recordPlant = trim((string)($record['plant_id'] ?? $record['org_plant_id'] ?? ''));
+        return $recordPlant === $plantId;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $fallback
+     * @return array<string, string>
+     */
+    private function programScopeFields(array $body, array $fallback = []): array
+    {
+        $plantId = trim((string)(
+            $body['plant_id']
+            ?? $body['org_plant_id']
+            ?? $fallback['plant_id']
+            ?? $fallback['org_plant_id']
+            ?? $_SESSION['plant_id']
+            ?? $_SESSION['org_plant_id']
+            ?? ''
+        ));
+        $orgPlantId = trim((string)(
+            $body['org_plant_id']
+            ?? $body['plant_id']
+            ?? $fallback['org_plant_id']
+            ?? $fallback['plant_id']
+            ?? $_SESSION['org_plant_id']
+            ?? $_SESSION['plant_id']
+            ?? ''
+        ));
+        $machineId = trim((string)(
+            $body['machine_id']
+            ?? $body['equipment_id']
+            ?? $fallback['machine_id']
+            ?? $fallback['equipment_id']
+            ?? $body['machine']
+            ?? $fallback['machine']
+            ?? ''
+        ));
+        $equipmentId = trim((string)(
+            $body['equipment_id']
+            ?? $body['machine_id']
+            ?? $fallback['equipment_id']
+            ?? $fallback['machine_id']
+            ?? $body['machine']
+            ?? $fallback['machine']
+            ?? ''
+        ));
+
+        return [
+            'plant_id' => $plantId,
+            'org_plant_id' => $orgPlantId,
+            'org_site_id' => trim((string)($body['org_site_id'] ?? $body['site_id'] ?? $fallback['org_site_id'] ?? $fallback['site_id'] ?? $_SESSION['org_site_id'] ?? '')),
+            'machine_id' => $machineId,
+            'equipment_id' => $equipmentId,
+            'work_center_id' => trim((string)($body['work_center_id'] ?? $fallback['work_center_id'] ?? '')),
+            'operation_id' => trim((string)($body['operation_id'] ?? $fallback['operation_id'] ?? '')),
+            'operation_seq' => trim((string)($body['operation_seq'] ?? $fallback['operation_seq'] ?? '')),
+            'part_revision' => trim((string)($body['part_revision'] ?? $body['item_revision'] ?? $fallback['part_revision'] ?? $fallback['item_revision'] ?? $fallback['revision'] ?? '')),
+            'routing_id' => trim((string)($body['routing_id'] ?? $fallback['routing_id'] ?? '')),
+            'inspection_plan_id' => trim((string)($body['inspection_plan_id'] ?? $fallback['inspection_plan_id'] ?? '')),
+        ];
+    }
+
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -261,10 +338,10 @@ class CncProgramController extends BaseController
             $setupSheets = $this->readJsonFile($this->cncDir() . '/setup-sheets.json') ?? [];
 
             // SECURITY: Filter by plant_id from session
-            $plantId = $_SESSION['plant_id'] ?? null;
-            if ($plantId !== null) {
-                $all = array_filter($all, fn(array $p) => ($p['plant_id'] ?? '') === $plantId);
-                $setupSheets = array_filter($setupSheets, fn(array $s) => ($s['plant_id'] ?? '') === $plantId);
+            $plantId = $this->activePlantId();
+            if ($plantId !== '') {
+                $all = array_filter($all, fn(array $p) => $this->inPlantScope($p, $plantId));
+                $setupSheets = array_filter($setupSheets, fn(array $s) => $this->inPlantScope($s, $plantId));
             }
 
             $machine = $this->input('machine');
@@ -377,8 +454,8 @@ class CncProgramController extends BaseController
             }
 
             // SECURITY: Verify plant_id matches session
-            $plantId = $_SESSION['plant_id'] ?? null;
-            if ($plantId !== null && ($program['plant_id'] ?? '') !== $plantId) {
+            $plantId = $this->activePlantId();
+            if ($plantId !== '' && !$this->inPlantScope($program, $plantId)) {
                 $this->error('forbidden', 403, "Access to CNC program in different plant is not allowed.");
             }
 
@@ -503,6 +580,7 @@ class CncProgramController extends BaseController
                 'created_at'  => $this->nowIso(),
                 'updated_at'  => $this->nowIso(),
             ];
+            $program = array_merge($program, $this->programScopeFields($body, $program));
 
             $all[] = $program;
             $this->writeJsonFile($file, $all);
@@ -562,6 +640,11 @@ class CncProgramController extends BaseController
                     if (isset($body['part_number'])) $entry['part_number'] = trim((string)$body['part_number']);
                     if (isset($body['notes'])) $entry['notes'] = trim((string)$body['notes']);
                     if (isset($body['cycle_time'])) $entry['cycle_time'] = round((float)$body['cycle_time'], 2);
+                    foreach ($this->programScopeFields($body, $entry) as $field => $value) {
+                        if ($value !== '' || isset($entry[$field]) || isset($body[$field])) {
+                            $entry[$field] = $value;
+                        }
+                    }
                     $entry['updated_at'] = $this->nowIso();
                     $entry['updated_by'] = $userId;
                     $entry['author'] = $entry['author'] ?? (string)($entry['created_by'] ?? '');
@@ -646,6 +729,7 @@ class CncProgramController extends BaseController
                 'author'      => $userId,
                 'date'        => $this->nowIso(),
             ];
+            $version = array_merge($version, $this->programScopeFields($body, $program));
 
             $allVersions[] = $version;
             $this->writeJsonFile($versionsFile, $allVersions);
@@ -656,6 +740,11 @@ class CncProgramController extends BaseController
                     $p['pending_rev'] = $version['revision'];
                     $p['pending_version'] = (string)$version['version'];
                     $p['pending_version_id'] = $version['id'];
+                    foreach ($this->programScopeFields([], $p) as $field => $value) {
+                        if ($value !== '' || isset($p[$field])) {
+                            $p[$field] = $value;
+                        }
+                    }
                     $p['updated_at']  = $this->nowIso();
                     $p['status']      = 'in_review';
                     break;
@@ -697,6 +786,10 @@ class CncProgramController extends BaseController
             $all  = $this->readJsonFile($file) ?? [];
             $versions = $this->readJsonFile($this->cncDir() . '/versions.json') ?? [];
             $programs = $this->readJsonFile($this->cncDir() . '/programs.json') ?? [];
+            $plantId = $this->activePlantId();
+            if ($plantId !== '') {
+                $programs = array_filter($programs, fn(array $program) => $this->inPlantScope($program, $plantId));
+            }
 
             $status = $this->input('status');
             if ($status !== null && $status !== '' && strtolower($status) !== 'all') {
@@ -890,6 +983,10 @@ class CncProgramController extends BaseController
         try {
             $file = $this->cncDir() . '/setup-sheets.json';
             $all  = $this->readJsonFile($file) ?? [];
+            $plantId = $this->activePlantId();
+            if ($plantId !== '') {
+                $all = array_filter($all, fn(array $sheet) => $this->inPlantScope($sheet, $plantId));
+            }
 
             $programId = $this->input('program_id');
             if ($programId !== null && $programId !== '') {

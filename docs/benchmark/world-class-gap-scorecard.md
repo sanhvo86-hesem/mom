@@ -1,6 +1,6 @@
 # World-Class Gap Scorecard
 
-Audited branch: `codex/worldclass-reaudit-20260414-145442`
+Audited branch: `codex/worldclass-closure-20260414-1512`
 
 Date: 2026-04-14
 
@@ -9,18 +9,18 @@ Scale: 0 means absent or unsafe. 5 means benchmark-class, governed, tested, and 
 | category | before | after | target next | what changed in this pass |
 |---|---:|---:|---:|---|
 | Execution truth integrity | 3.2 | 3.4 | 4.2 | JSON compatibility authority remains staged, but generic JO/WO and EQMS updates now reject uncontrolled fields. |
-| Transaction model / event history | 3.5 | 3.9 | 4.4 | Dispatch events remain append-only and mobile task assignment/start/completion now has a task event journal; completion cannot skip the start event. |
+| Transaction model / event history | 3.5 | 3.8 | 4.4 | Dispatch events remain append-only and mobile task assignment/start/completion now has a task event journal. |
 | Planning-to-execution consistency | 3.2 | 3.7 | 4.2 | JO/WO updates use allowlists, WO creation rejects terminal parent JOs, and order schedule aliases remain routed to scheduling owner. |
-| Quality / EQMS integration | 3.1 | 3.7 | 4.3 | Exception updates cannot bypass lifecycle fields; canonical evidence finalization is role-gated; replay identity reaches inspection capture. |
+| Quality / EQMS integration | 3.1 | 3.9 | 4.3 | Exception updates cannot bypass lifecycle fields; canonical evidence finalization is role/org scoped and requires signature events; replay identity reaches inspection capture. |
 | Inspection/SPC rigor | 3.2 | 3.5 | 4.2 | First-piece/mobile inspection remains governed; replay identity is preserved; ad hoc SPC remains non-authoritative analysis. |
 | Workforce qualification / authorization | 3.0 | 3.3 | 4.2 | Conflict override scope is narrowed; dispatch-report skill matching remains staged. |
 | Reason-code governance | 3.6 | 3.7 | 4.3 | Mobile task completion now requires a structured reason code for fail/partial/scrap outcomes. |
-| Digital thread continuity | 3.2 | 3.6 | 4.4 | WO contracts carry plant/site/setup/CNC hooks; setup sheets now default draft and strict dispatch rejects unreleased setup context. |
+| Digital thread continuity | 3.2 | 3.8 | 4.4 | WO contracts carry plant/site/setup/CNC hooks; CNC program/version records now persist plant/site/work-center/operation/revision/inspection context; setup sheets default draft and strict dispatch rejects unreleased setup context. |
 | Traceability / genealogy | 3.1 | 3.4 | 4.3 | Migration 121 aligns `genealogy_nodes` and `as_manufactured_snapshots` constraints with runtime ontology. |
 | Multi-site / plant / site / work-center semantics | 3.0 | 3.2 | 4.0 | WO creation/update and dispatch/mobile payloads preserve plant/site context more consistently. |
 | Interoperability readiness | 3.1 | 3.3 | 4.2 | MTConnect XML parsing no longer expands entities and rejects DOCTYPE/ENTITY payloads. |
-| AI / copilot architecture quality | 3.3 | 4.3 | 4.5 | Legacy AI reads now require AI read roles, feedback requires feedback/write roles, schedule metrics are plant-scoped, and blank-plant fallback rows are excluded for scoped users. |
-| OT/IT security and governance | 3.2 | 4.1 | 4.5 | AI read/write surfaces, evidence finalization, XML parsing, exception lifecycle updates, and mobile conflict overrides are hardened. |
+| AI / copilot architecture quality | 3.3 | 4.4 | 4.5 | Legacy AI reads now require AI read roles, feedback requires feedback/write roles, schedule metrics and JSON prediction fallback are plant-scoped, and conversation fallback reads validate ID/owner. |
+| OT/IT security and governance | 3.2 | 4.2 | 4.5 | AI read/write surfaces, evidence finalization/read scoping, XML parsing, exception lifecycle updates, order hold event audit, and mobile conflict overrides are hardened. |
 | Reliability / idempotency / offline resilience | 3.4 | 3.8 | 4.3 | Evidence replay key contract is aligned; mobile task events and inspection replay identity are preserved. |
 | Performance / scalability | 3.0 | 3.0 | 4.1 | No broad performance refactor; mobile JSON full-scan path remains a staged risk for 50+ machines. |
 | Developer architecture / maintainability | 3.3 | 3.9 | 4.3 | Added root branch/cleanup rules, six audit artifacts, targeted regression tests, current-branch provenance, and focused service tests. |

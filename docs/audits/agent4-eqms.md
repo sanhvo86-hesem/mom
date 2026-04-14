@@ -1,11 +1,12 @@
 # Agent 4 - EQMS / Quality / SPC / Compliance
 
-Branch audited: `codex/worldclass-reaudit-20260414-145442`
+Branch audited: `codex/worldclass-closure-20260414-1512`
 
 ## 2026-04-14 Current-Pass Addendum
 
 - Confirmed P1 offline inspection replay gap: mobile inspection controller dropped replay identity fields. Remediation forwards `capture_id`, `client_capture_id`, `client_record_id`, `idempotency_key`, and `captured_at` into the service.
 - Confirmed P1 evidence finalization governance gap: finalization was auth/CSRF protected but not role-gated. Remediation requires controlled quality/document/compliance roles.
+- Confirmed P1 canonical evidence disclosure/completeness gap: canonical package reads were auth-only and finalization could complete without signature events. Remediation requires EQMS read roles plus org scope for package reads and rejects finalization without at least one structured signature event.
 - Deferred: full NCR/CAPA/SPC transactional closure remains blocked by DB-backed workflow bridge design and policy decisions for signature-required evidence classes.
 
 ## Findings
