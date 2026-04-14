@@ -67,4 +67,3 @@ The false part is the claim that all of that is already reflected in checked-in 
 - The checked-in `mom/data/registry` runtime mirror.
 - Any claim that a slice is fully native-authoritative when its probe still reports `compatibility_only` or `authority_partial`.
 - Any doc or smoke-test number that is only backed by a prior generated report, not by the current files in this worktree.
-

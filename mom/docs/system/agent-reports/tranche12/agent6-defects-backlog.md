@@ -132,4 +132,3 @@ The biggest code-fixable backlog remains the publication registry surface itself
 - Admin-tab persistence is still not fully authoritative.
 - Some blocker families still require domain-owner decision rather than mechanical regeneration.
 - Some regeneration paths cannot run in this environment without database credentials.
-
