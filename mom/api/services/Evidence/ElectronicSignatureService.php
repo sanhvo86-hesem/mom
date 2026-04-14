@@ -40,11 +40,11 @@ final class ElectronicSignatureService
         $manifestation = $this->requiredText($event['signature_manifestation'] ?? null, 'signature_manifestation');
         $challenge = (new ElectronicSignatureChallengeService($this->db))->consumeChallenge([
             'auth_challenge_id' => $authChallengeId,
-            'signer_user_id' => $event['signer_user_id'] ?? $event['user_id'] ?? null,
-            'signer_ref' => $event['signer_ref'] ?? $event['actor_ref'] ?? null,
-            'session_id' => $event['session_id'] ?? $context['session_id'] ?? null,
-            'org_id' => $event['org_id'] ?? $context['org_id'] ?? null,
-            'signature_action' => $event['signature_action'] ?? $context['signature_action'] ?? 'evidence_finalize',
+            'signer_user_id' => $context['signer_user_id'] ?? $event['signer_user_id'] ?? $event['user_id'] ?? null,
+            'signer_ref' => $context['signer_ref'] ?? $event['signer_ref'] ?? $event['actor_ref'] ?? null,
+            'session_id' => $context['session_id'] ?? null,
+            'org_id' => $context['org_id'] ?? null,
+            'signature_action' => $context['signature_action'] ?? $event['signature_action'] ?? 'evidence_finalize',
             'signed_payload_hash_sha256' => $payloadHash,
             'displayed_record_hash_sha256' => $displayedHash,
         ]);

@@ -339,14 +339,27 @@ final class EvidenceFinalizationService
             throw new RuntimeException('evidence_signature_event_required');
         }
 
+        $trustedSignerUserId = $this->nullableUuid($input['authenticated_user_id'] ?? $input['signer_user_id'] ?? null);
+        $trustedSignerRef = $this->nullableText($input['authenticated_signer_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null);
+        $trustedSessionId = $this->nullableText($input['session_id'] ?? null);
+        $trustedOrgId = $this->nullableText($input['org_id'] ?? null);
+        $trustedSignatureAction = $this->nullableText($input['signature_action'] ?? null) ?? 'evidence_finalize';
         $persisted = [];
         foreach ($events as $index => $event) {
             if (!is_array($event)) {
                 throw new RuntimeException('signature_event_invalid');
             }
 
-            $signerUserId = $this->nullableUuid($event['signer_user_id'] ?? $event['user_id'] ?? null);
-            $signerRef = $this->nullableText($event['signer_ref'] ?? $event['actor_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null);
+            $eventSignerUserId = $this->nullableUuid($event['signer_user_id'] ?? $event['user_id'] ?? null);
+            $eventSignerRef = $this->nullableText($event['signer_ref'] ?? $event['actor_ref'] ?? null);
+            if ($trustedSignerUserId !== null && $eventSignerUserId !== null && !hash_equals($trustedSignerUserId, $eventSignerUserId)) {
+                throw new RuntimeException('signature_authenticated_user_mismatch');
+            }
+            if ($trustedSignerRef !== null && $eventSignerRef !== null && !hash_equals($trustedSignerRef, $eventSignerRef)) {
+                throw new RuntimeException('signature_authenticated_signer_mismatch');
+            }
+            $signerUserId = $trustedSignerUserId ?? $eventSignerUserId;
+            $signerRef = $trustedSignerRef ?? $eventSignerRef;
             if ($signerUserId === null && $signerRef === null) {
                 throw new RuntimeException('signature_event_signer_required');
             }
@@ -361,9 +374,11 @@ final class EvidenceFinalizationService
             $this->assertSignedPayloadBelongsToPackage($payloadHash, $package);
             $ceremony = (new ElectronicSignatureService($db))->validateEvidenceSignature($event, [
                 'signed_payload_hash_sha256' => $payloadHash,
-                'org_id' => $input['org_id'] ?? null,
-                'session_id' => $input['session_id'] ?? null,
-                'signature_action' => 'evidence_finalize',
+                'signer_user_id' => $signerUserId,
+                'signer_ref' => $signerRef,
+                'org_id' => $trustedOrgId,
+                'session_id' => $trustedSessionId,
+                'signature_action' => $trustedSignatureAction,
             ]);
             $signatureHash = $this->nullableHash($event['signature_hash_sha256'] ?? null)
                 ?? hash('sha256', $payloadHash . '|' . ($signerUserId ?? $signerRef) . '|' . $meaning . '|' . $ceremony['auth_result_hash_sha256']);

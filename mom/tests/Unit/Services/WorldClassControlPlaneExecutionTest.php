@@ -1036,6 +1036,103 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         }
     }
 
+    public function testEvidenceFinalizationConsumesSignatureChallengeWithTrustedPrincipalSessionAndOrg(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-bound-challenge-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $db = new EvidenceFinalizationFakeDb(
+                expectedAuthSignerRef: 'qa-1',
+                expectedAuthSessionId: 'sess-1',
+                expectedAuthOrgId: 'org-1',
+            );
+            $result = (new EvidenceFinalizationService($dir, $db))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'actor_ref' => 'qa-1',
+                'authenticated_signer_ref' => 'qa-1',
+                'session_id' => 'sess-1',
+                'org_id' => 'org-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'retention_class' => 'quality_record',
+                'signature_events' => [$this->evidenceSignatureEvent([
+                    'signer_ref' => 'qa-1',
+                    'signer_role' => 'qa_qms',
+                    'signature_meaning' => 'final evidence package approval',
+                ])],
+            ]);
+
+            $this->assertSame('finalized', $result['finalization_state']);
+            $this->assertTrue($db->sawAuthChallengeConsume);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRejectsSessionBoundSignatureChallengeWithoutTrustedSession(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-missing-session-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('signature_auth_challenge_not_valid');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(expectedAuthSessionId: 'sess-1')))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'retention_class' => 'quality_record',
+                'signature_events' => [$this->evidenceSignatureEvent([
+                    'signer_ref' => 'qa-1',
+                    'signer_role' => 'qa_qms',
+                    'signature_meaning' => 'final evidence package approval',
+                ])],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRejectsSignerMismatchAgainstAuthenticatedPrincipal(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-signer-mismatch-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('signature_authenticated_signer_mismatch');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-2',
+                'authenticated_signer_ref' => 'qa-2',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'retention_class' => 'quality_record',
+                'signature_events' => [$this->evidenceSignatureEvent([
+                    'signer_ref' => 'qa-1',
+                    'signer_role' => 'qa_qms',
+                    'signature_meaning' => 'final evidence package approval',
+                ])],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
     public function testEvidenceFinalizationDetectsSignatureIdempotencyCollision(): void
     {
         $dir = sys_get_temp_dir() . '/mom-finalize-collision-' . bin2hex(random_bytes(4));
@@ -2460,6 +2557,9 @@ final class EvidenceFinalizationFakeDb
         private readonly bool $recordConflict = false,
         private readonly bool $versionConflict = false,
         private readonly bool $authChallengeValid = true,
+        private readonly ?string $expectedAuthSignerRef = null,
+        private readonly ?string $expectedAuthSessionId = null,
+        private readonly ?string $expectedAuthOrgId = null,
     )
     {
     }
@@ -2519,6 +2619,15 @@ final class EvidenceFinalizationFakeDb
         }
         if (str_starts_with(ltrim($sql), 'UPDATE e_signature_auth_challenges')) {
             if (!$this->authChallengeValid) {
+                return [];
+            }
+            if ($this->expectedAuthSignerRef !== null && ($params[':signer_ref'] ?? null) !== $this->expectedAuthSignerRef) {
+                return [];
+            }
+            if ($this->expectedAuthSessionId !== null && ($params[':session_id'] ?? null) !== $this->expectedAuthSessionId) {
+                return [];
+            }
+            if ($this->expectedAuthOrgId !== null && ($params[':org_id'] ?? null) !== $this->expectedAuthOrgId) {
                 return [];
             }
             $this->sawAuthChallengeConsume = true;

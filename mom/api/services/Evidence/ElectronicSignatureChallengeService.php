@@ -100,14 +100,14 @@ final class ElectronicSignatureChallengeService
                AND challenge_state = 'issued'
                AND consumed_at IS NULL
                AND expires_at > now()
-               AND signed_payload_hash_sha256 = :signed_payload_hash_sha256
-               AND displayed_record_hash_sha256 = :displayed_record_hash_sha256
-               AND signature_action = :signature_action
-               AND (:signer_user_id IS NULL OR signer_user_id = CAST(:signer_user_id AS uuid))
-               AND (:signer_ref IS NULL OR signer_ref = :signer_ref)
-               AND (:session_id IS NULL OR session_id = :session_id)
-               AND (:org_id IS NULL OR org_id = :org_id)
-             RETURNING *",
+	               AND signed_payload_hash_sha256 = :signed_payload_hash_sha256
+	               AND displayed_record_hash_sha256 = :displayed_record_hash_sha256
+	               AND signature_action = :signature_action
+	               AND (signer_user_id IS NULL OR (:signer_user_id IS NOT NULL AND signer_user_id = CAST(:signer_user_id AS uuid)))
+	               AND (signer_ref IS NULL OR (:signer_ref IS NOT NULL AND signer_ref = :signer_ref))
+	               AND (session_id IS NULL OR (:session_id IS NOT NULL AND session_id = :session_id))
+	               AND (org_id IS NULL OR (:org_id IS NOT NULL AND org_id = :org_id))
+	             RETURNING *",
             [
                 ':auth_challenge_id' => $challengeId,
                 ':signer_user_id' => $signerUserId,

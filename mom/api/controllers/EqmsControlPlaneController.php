@@ -585,9 +585,17 @@ final class EqmsControlPlaneController extends BaseController
             $this->error('evidence_scope_violation', 403);
         }
         $body['org_id'] = $orgId;
-        if (!isset($body['actor_id'])) {
-            $body['actor_id'] = (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user');
+        $authenticatedUserId = trim((string)($user['user_id'] ?? $user['id'] ?? ''));
+        $authenticatedSignerRef = trim((string)($user['username'] ?? $user['email'] ?? $user['user_id'] ?? $user['id'] ?? ''));
+        if ($authenticatedSignerRef === '') {
+            $authenticatedSignerRef = 'authenticated_user';
         }
+        $body['actor_id'] = $authenticatedSignerRef;
+        $body['actor_ref'] = $authenticatedSignerRef;
+        $body['authenticated_user_id'] = $authenticatedUserId !== '' ? $authenticatedUserId : null;
+        $body['authenticated_signer_ref'] = $authenticatedSignerRef;
+        $body['session_id'] = session_status() === PHP_SESSION_ACTIVE && session_id() !== '' ? session_id() : null;
+        $body['signature_action'] = 'evidence_finalize';
 
         try {
             $this->success([
