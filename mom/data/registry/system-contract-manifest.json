@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T14:23:43.721Z",
+    "generatedAt": "2026-04-14T14:44:26.298Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -55,10 +55,31 @@
   },
   "artifacts": {
     "runtimeProjections": "data/registry/system-contract-runtime-projections.json",
+    "runtimeProjectionSegments": "data/registry/system-contract-runtime-projections-segments.json",
     "registryContracts": "data/registry/system-contract-registry-contracts.json",
     "diagnostics": "data/registry/system-contract-diagnostics.json",
     "manifest": "data/registry/system-contract-manifest.json",
     "graphicsGovernance": "data/registry/graphics-governance-registry.json"
+  },
+  "runtimeProjectionSegmentation": {
+    "status": "managed_by_sidecar_manifest",
+    "manifest": "data/registry/system-contract-runtime-projections-segments.json",
+    "segmentDirectory": "data/registry/system-contract-runtime-projections.segments",
+    "readPolicy": "Use segment manifest for section-level reads; reserve the full projection file for rebuild/proof.",
+    "revisionGuard": "sourceSha256",
+    "targetedRebuildPolicy": "Rebuild changed authority sections and refresh checksums before release.",
+    "summary": {
+      "segmentCount": 7,
+      "sourceSizeBytes": 11155147,
+      "totalSegmentSizeBytes": 11163644,
+      "largestSegmentId": "tables",
+      "largestSegmentSizeBytes": 6678105,
+      "allSegmentsChecksummed": true,
+      "segmentedReadReady": true,
+      "revisionGuard": "sourceSha256",
+      "staleWritePolicy": "reject_if_source_sha256_changed",
+      "targetedRebuildPolicy": "rebuild_changed_sections_then_refresh_manifest"
+    }
   },
   "graphicsReleaseLink": {
     "graphicsAuthorityRefs": [

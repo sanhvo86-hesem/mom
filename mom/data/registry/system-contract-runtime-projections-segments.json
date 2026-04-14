@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "generatedAt": "2026-04-14T14:44:26.298Z",
+    "source": "system_contract_authority_generator",
+    "authorityLayer": "system_contract_registry",
+    "authorityViewKind": "db_derived_contract",
+    "designId": "system_contract_registry",
+    "designEditable": false,
+    "physicalDbSchema": "public",
+    "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
+    "sourceFiles": [
+      "data/registry/table-registry.json",
+      "data/registry/relation-map.json",
+      "data/registry/endpoint-catalog.json",
+      "data/registry/workflow-library.json",
+      "data/registry/schema-authority-summary.json",
+      "data/registry/global-erp-mom-capability-audit.json",
+      "data/registry/registry-manifest.json",
+      "data/registry/graphics-governance-registry.json"
+    ],
+    "workspaceDraftUsed": false,
+    "artifact": "system-contract-runtime-projections-segments",
+    "purpose": "Sidecar manifest for segmented runtime-projection reads, checksum proof, and revision-guarded regeneration.",
+    "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
+    "sourceSha256": "90121d8b82dd998b7a6b07529b56fed9ba9b002a2cb57145f372612d70e67d72",
+    "sourceSizeBytes": 11155147,
+    "worldClassPattern": "partial response/read-model segmentation plus optimistic concurrency guard"
+  },
+  "summary": {
+    "segmentCount": 7,
+    "sourceSizeBytes": 11155147,
+    "totalSegmentSizeBytes": 11163644,
+    "largestSegmentId": "tables",
+    "largestSegmentSizeBytes": 6678105,
+    "allSegmentsChecksummed": true,
+    "segmentedReadReady": true,
+    "revisionGuard": "sourceSha256",
+    "staleWritePolicy": "reject_if_source_sha256_changed",
+    "targetedRebuildPolicy": "rebuild_changed_sections_then_refresh_manifest"
+  },
+  "segments": [
+    {
+      "id": "tables",
+      "section": "tables",
+      "path": "data/registry/system-contract-runtime-projections.segments/tables.json",
+      "sizeBytes": 6678105,
+      "sha256": "11ed8f601f77c2c66009ffd16b48dbca9c7bb9a7b2880042bc298e2eb4d25bb6",
+      "recordCount": 760,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "relations",
+      "section": "relations",
+      "path": "data/registry/system-contract-runtime-projections.segments/relations.json",
+      "sizeBytes": 3408631,
+      "sha256": "7e765b6cdc7f08b699286def38f4ace7bb63f249717785b576788e0f87ec9436",
+      "recordCount": 3453,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "workflowBindings",
+      "section": "workflowBindings",
+      "path": "data/registry/system-contract-runtime-projections.segments/workflow-bindings.json",
+      "sizeBytes": 160748,
+      "sha256": "8e92a165cad445134c5c2e7a641c6ac59366bf362ca44f97663531045177b2ba",
+      "recordCount": 355,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "endpointBindings",
+      "section": "endpointBindings",
+      "path": "data/registry/system-contract-runtime-projections.segments/endpoint-bindings.json",
+      "sizeBytes": 667197,
+      "sha256": "c09d15f010b548da34b3e697079bf3eb998b1b6150f57ca4d4544fb782cc5ae9",
+      "recordCount": 760,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "domains",
+      "section": "domains",
+      "path": "data/registry/system-contract-runtime-projections.segments/domains.json",
+      "sizeBytes": 4979,
+      "sha256": "a050f1c0e006299f065fde020621553204af3e21c813188c33ca9bbb7bce07a9",
+      "recordCount": 49,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "graphicsGovernance",
+      "section": "graphicsGovernance",
+      "path": "data/registry/system-contract-runtime-projections.segments/graphics-governance.json",
+      "sizeBytes": 240285,
+      "sha256": "82d027a28cc6da17a1ee9d18ac33c37e7f17501dd9c3b27643b580b7e75a7f73",
+      "recordCount": 19,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    },
+    {
+      "id": "graphicsReleaseLink",
+      "section": "graphicsReleaseLink",
+      "path": "data/registry/system-contract-runtime-projections.segments/graphics-release-link.json",
+      "sizeBytes": 3699,
+      "sha256": "672022ed53637274701b7a38e440175fc8447ca6859542e1f213a087901b5abb",
+      "recordCount": 24,
+      "readPolicy": "load_segment_by_section",
+      "writePolicy": "generated_segment_do_not_edit",
+      "rebuildScope": "targeted_section_from_authority_inputs"
+    }
+  ],
+  "readProfiles": {
+    "summary": [
+      "_meta",
+      "summary"
+    ],
+    "tableDetail": [
+      "tables"
+    ],
+    "relationGraph": [
+      "relations"
+    ],
+    "workflowBridge": [
+      "workflowBindings"
+    ],
+    "endpointBridge": [
+      "endpointBindings"
+    ],
+    "graphicsGate": [
+      "graphicsGovernance",
+      "graphicsReleaseLink"
+    ]
+  },
+  "sourceGovernance": {
+    "authority": "system_contract_registry",
+    "fullArtifact": "data/registry/system-contract-runtime-projections.json",
+    "segmentDirectory": "data/registry/system-contract-runtime-projections.segments",
+    "guard": "Consumers must compare sourceSha256 before applying segment edits or generated rebuild outputs."
+  }
+}
