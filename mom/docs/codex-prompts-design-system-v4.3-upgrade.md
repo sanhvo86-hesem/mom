@@ -895,13 +895,13 @@ interface AppState {
   };
 }
 ```
-localStorage keys (AUTHORITATIVE — code phải follow):
+Historical localStorage sketch (NOT authority — current code must follow graphics governance split):
 ```
-hesem_user_appearance — Layer 5 user token overrides
-hesem_admin_appearance_cache — Layer 2 admin config cache (TTL: 1 hour)
-hesem_layout_templates — Template configs (future: server-persisted)
-hesem_active_template_{moduleId} — Active template per module
-hesem_density_mode — Global density setting
+hesem_user_appearance — user preference cache only
+hesem_graphics_template_preview_cache — preview cache only
+hesem_graphics_template_draft_cache — unsaved draft cache only
+hesem_layout_templates — forbidden legacy authority key; purge or read-only migration evidence only
+hesem_module_template_binding — forbidden legacy binding key; backend registry owns production binding
 ```
 
 #### 6.6 API Contract

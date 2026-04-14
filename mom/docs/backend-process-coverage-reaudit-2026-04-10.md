@@ -36,7 +36,7 @@ Therefore the historical `publishability_ready=true`, "no blocking gaps remain",
 - Wave 3 process governance: `remaining_wave3_gaps=0`
 - Operational blind spots: `critical=0`, `high=0`, `medium=0`
 - Operational stress: `critical=0`, `high=0`, `medium=0`
-- Registry quality: historical generated claim only; current Tranche 12 verification is `UNPROVEN/BLOCKED` because the checked-in `mom/data/registry` publication artifacts are absent.
+- Registry quality: generated publication artifacts are checked in under `mom/data/registry`; current verification must be established by running `mom/tools/registry/verify_publication_truth.py`, which also distinguishes release-blocked graphics governance from publishability-ready state.
 
 ## Findings Closed In This Round
 
