@@ -4,17 +4,19 @@
   "manifest_id": "worldclass-closure-20260414-1512",
   "branch": "codex/worldclass-closure-20260414-1512",
   "target_branch": "main",
+  "base_head": "6e82963a",
+  "validated_head": "55a09426",
   "promotion_state": "premerge_validation_passed",
   "created_at": "2026-04-14T08:11:19Z",
   "merge_strategy": "fast_forward_preferred_else_stop",
   "validation_evidence": {
     "focused_lint": "passed: php -l touched PHP files",
-    "focused_phpunit": "passed: 78 tests, 594 assertions",
+    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest 50 tests, 283 assertions",
     "repo_boundary": "passed: P0/P1 clean, 7 P2 prompt-file warnings",
     "workflow_status_authority": "passed",
     "composer_analyse": "passed",
-    "composer_test": "passed: 407 tests, 2356 assertions, 1 skipped",
-    "full_composer_check": "passed: PHPStan clean; PHPUnit 407 tests, 2356 assertions, 1 skipped"
+    "composer_test": "passed: 414 tests, 2378 assertions, 1 skipped",
+    "full_composer_check": "passed: PHPStan clean; PHPUnit 414 tests, 2378 assertions, 1 skipped"
   },
   "closure_counts": {
     "unresolved_p0": 0,
@@ -23,13 +25,14 @@
       "Graph publication worker dependency-blocked on production Microsoft Graph configuration",
       "WORM adapter dependency-blocked on storage provider retention mode",
       "Daily integrity digest worker dependency-blocked on approved scheduler scope",
-      "Authoritative audit-pack export bundle dependency-blocked on approved export destination"
+      "Audit-pack background bundle/export destination dependency-blocked on approved immutable storage",
+      "Deterministic full as-built graph closure dependency-blocked on Wave 5 product rollout",
+      "MES evidence bridge conversion dependency-blocked on MES package-flow rollout"
     ],
     "p2_roadmap": [
       "Prompt-file hygiene",
-      "Partition-safe aggregate audit sequence column",
       "Productized effectivity manager UI/API",
-      "Deterministic full as-built graph closure"
+      "Training task lifecycle automation"
     ]
   },
   "branch_cleanup_gate": {
