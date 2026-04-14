@@ -216,7 +216,7 @@ Validation rules:
 - `capture_type` must be one of `first_piece`, `in_process`, `final`, or `receiving`.
 - First-piece capture requires at least one structured measurement.
 - Measurement values must be numeric when supplied.
-- `pass_fail` must be `pass`, `fail`, or `na`.
+- `pass_fail` must be `pass`, `fail`, or `conditional`.
 - `overall_result` must be `pass`, `fail`, or `conditional`; it is derived from measurements when possible.
 - Offline capture requires a replay key: `client_capture_id` or `idempotency_key`.
 - Exact replay returns the existing fact; conflicting replay under the same client/idempotency key is rejected.

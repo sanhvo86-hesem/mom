@@ -866,6 +866,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
 
         $this->assertSame('blocked', $blocked['reference_validation']['status']);
         $this->assertContains('cnc_program_not_released', $blocked['reference_validation']['blockers']);
+        $this->assertContains('missing_setup_sheet_reference', $blocked['reference_validation']['blockers']);
         $this->assertContains('missing_inspection_plan_reference', $blocked['reference_validation']['blockers']);
 
         try {
@@ -899,6 +900,25 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertSame('ok', $ready['reference_validation']['status']);
         $this->service()->assertTargetDispatchable($ready);
         $this->addToAssertionCount(1);
+    }
+
+    public function testStrictReferencePolicyDoesNotTreatMissingCncRegistryAsReleased(): void
+    {
+        $target = $this->service()->normalizeTargetForCreate([
+            'wo_number' => 'WO-STRICT-MISSING-CNC',
+            'machine_id' => 'MC-5AX-01',
+            'shift_date' => '2026-04-13',
+            'cycle_time_minutes' => 5,
+            'target_quantity' => 20,
+            'cnc_program_id' => 'NC-NO-REGISTRY',
+            'setup_sheet_id' => 'SETUP-NO-REGISTRY',
+            'inspection_plan_id' => 'IP-714-OP20',
+            'reference_policy' => 'enforce_dispatch',
+        ], 'planner-1', '2026-04-13T00:00:00Z');
+
+        $this->assertSame('blocked', $target['reference_validation']['status']);
+        $this->assertContains('unverified_cnc_program_reference', $target['reference_validation']['blockers']);
+        $this->assertContains('unverified_setup_sheet_reference', $target['reference_validation']['blockers']);
     }
 
     public function testExecutionStateTracksPauseResumeAndCompletionWithoutNewStatusModel(): void

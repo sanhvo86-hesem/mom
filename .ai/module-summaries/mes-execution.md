@@ -47,17 +47,17 @@ Captures machine execution events, operator work queues, time tracking, in-proce
 - **Poll MTConnect:** `MtconnectPollingService::pollAll()` → queries adapters with `adapter_type='mtconnect'` and `status='active'`
 
 ## Business Rules
-- **Employee identification**: lookup `user['employee_id']` in `users.json` by username; fallback to username if `employee_id` not set
+- **Employee identification**: require explicit `employee_id` from session/user mapping; missing employee provisioning fails with `employee_id_not_provisioned_for_user`
 - **Clock-in requires**: `wo_number`, `operation_seq`, `machine_id`, `labor_type` (setup/run/rework/inspection)
 - **Clock-out requires**: `qty_completed`; `qty_scrap` is optional
 - **First-piece inspection required** before production run when a dispatch target sets `first_piece_required` or `quality_gate_policy = enforce_first_piece`; dispatch reporting checks the existing mobile inspection capture store and permits only audited supervisor override with `quality_override_reason`
-- **Offline batch conflict types**: depend on entry type (time_entry, inspection, queue_task); `merge` strategy requires `merge_data` payload; must specify `resolution`: keep_local | keep_server | merge
+- **Offline batch conflict types**: depend on entry type (time_entry, inspection, queue_task); current conflict resolution accepts `keep_local`/`keep_server` aliases for `accept_client`/`accept_server`; records are operator-scoped unless a supervisor-style override role is used
 - **Machine alarms must have source**: source must be machine/adapter/edge — manual alarm creation is blocked
 - **Inspection photos as base64**: stored directly in JSON; no separate file storage abstraction
 - **MTConnect filter**: `adapter_type='mtconnect'` AND `status='active'` — only matching adapters are polled
 
 ## Notes / Gotchas
-- **Employee resolution can fail silently**: `user['employee_id']` may not exist; system falls back to username as employee identifier — ensure users have `employee_id` set in `users.json`
-- **Offline sync conflicts require explicit resolution payload**: the `merge` strategy needs `merge_data`; sending empty merge_data silently drops the update
-- **Inspection photos are base64 blobs in the JSON records** — no file storage; large photos significantly increase record size; no size cap currently enforced
+- **Employee resolution is strict**: users without `employee_id` cannot use mobile execution endpoints; provision operators in `users.json` or the authenticated user shadow before go-live
+- **Offline sync conflict resolution is owner-scoped**: non-owner resolution is rejected unless the API caller has an elevated mobile overview role
+- **Inspection photos are base64 blobs in the JSON records** — no file storage; large photos significantly increase record size; controller caps mobile inspection photo payloads at 50MB total
 - **MES runtime is file-backed**: `mes_runtime.json` is not in PostgreSQL; changes by concurrent processes can cause write conflicts

@@ -43,9 +43,11 @@ final class SecurityHardeningRegressionTest extends TestCase
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
 
+        $this->assertMatchesRegularExpression('/public function aiFeedbackSubmit\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertMatchesRegularExpression('/public function aiFeedbackSubmit\(\): never\s*\{.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertStringContainsString('aiFeedbackIdempotency', $source);
         $this->assertStringContainsString('$this->idempotency()->execute', $source);
+        $this->assertStringContainsString("strlen(\$text) < 16 || strlen(\$text) > 128", $source);
     }
 
     public function testAiNaturalLanguageAndRcaWritesRequireCsrfAndScopedRoles(): void
@@ -56,6 +58,16 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertMatchesRegularExpression('/public function aiNlQuery\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertMatchesRegularExpression('/public function aiRcaAnalyze\(\): never\s*\{.*?\$this->requireAnyRole\(\$user,.*?\$this->requireCsrf\(\);/s', $source);
         $this->assertStringContainsString('question_hash', $source);
+    }
+
+    public function testAiDocumentSummarizeRequiresScopedRoleCsrfAndContentHashAudit(): void
+    {
+        $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/controllers/AiSchedulingController.php');
+
+        $this->assertMatchesRegularExpression('/public function aiDocumentSummarize\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);.*?\$this->requireCsrf\(\);/s', $source);
+        $this->assertStringContainsString('$this->jsonBody(256 * 1024)', $source);
+        $this->assertStringContainsString('content_too_large', $source);
+        $this->assertStringContainsString('content_sha256', $source);
     }
 
     public function testOrderScheduleCompatibilityAliasesUseExistingSchedulingController(): void
