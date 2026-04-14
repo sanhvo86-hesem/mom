@@ -50,6 +50,17 @@ restore_git_executable_bits() {
         done
 }
 
+sanitize_php_fpm_pool_runtime_settings() {
+    local conf
+    for conf in /etc/php/*/fpm/pool.d/mom.conf; do
+        [ -f "$conf" ] || continue
+        if grep -Eq '^[[:space:]]*php_(admin_)?value\[opcache\.enable\][[:space:]]*=' "$conf"; then
+            sed -i.bak -E '/^[[:space:]]*php_(admin_)?value\[opcache\.enable\][[:space:]]*=/d' "$conf"
+            log "INFO" "Removed pool-level opcache.enable from $conf"
+        fi
+    done
+}
+
 log "INFO" "═══ Deploy started ═══"
 
 # ── Pre-flight checks ────────────────────────────────────────────────────
@@ -95,13 +106,16 @@ for dir in uploads online-forms allocations form-workflow/state; do
     fi
 done
 
-# PHP refuses to open session files created by a different UID. Keep the
-# whole session tree owned by the PHP-FPM pool user, not the deploy user.
-session_dir="$SITE_DIR/mom/data/sessions"
-mkdir -p "$session_dir"
-chown -R "$WEB_USER:$WEB_GROUP" "$session_dir"
-find "$session_dir" -type d -exec chmod 2770 {} +
-find "$session_dir" -type f -exec chmod 660 {} +
+# PHP-owned runtime state must stay owned by the PHP-FPM pool user. Session
+# files fail hard when created by another UID, and login rate-limit counters
+# are written during authentication.
+for runtime_dir in sessions ratelimit; do
+    runtime_path="$SITE_DIR/mom/data/$runtime_dir"
+    mkdir -p "$runtime_path"
+    chown -R "$WEB_USER:$WEB_GROUP" "$runtime_path"
+    find "$runtime_path" -type d -exec chmod 2770 {} +
+    find "$runtime_path" -type f -exec chmod 660 {} +
+done
 
 # Ensure log files are writable
 for logfile in php_error.log audit.log db_queries.log; do
@@ -124,6 +138,7 @@ fi
 
 # ── Clear OPcache ────────────────────────────────────────────────────────
 log "INFO" "Clearing OPcache..."
+sanitize_php_fpm_pool_runtime_settings
 # Method 1: via PHP-FPM reload (recommended)
 systemctl reload php8.2-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
 

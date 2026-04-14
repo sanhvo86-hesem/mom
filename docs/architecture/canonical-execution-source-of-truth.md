@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-closure-20260414-1512`
+Audited branch: `codex/worldclass-reaudit-20260414-203827`
 
 Date: 2026-04-14
 
@@ -26,7 +26,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | Work center | Existing work center references | Dispatch/report copies | Dispatch/report preserve work-center context for later capacity/OEE analytics. |
 | Machine alarm/downtime | Manual downtime/blocking facts in production reports for Phase 1 | Connectivity alarm tables, machine state projections | Manual downtime is execution truth only for operator-reported losses. Telemetry remains separate until connectivity cutover. |
 | Reason codes | Master-data catalogs: downtime, defect, rework, blocking | Free text notes | Governed codes are required for structured loss/defect/blocker semantics. Notes are supporting context only. |
-| Schedule/capacity slot | Planning/scheduling modules | Dispatch shift target date/shift fields | Dispatch captures execution intent, not APS authority. |
+| Schedule/capacity slot | Planning/scheduling modules through `AiSchedulingController` schedule handlers | Dispatch shift target date/shift fields, advisory AI suggestions | Dispatch captures execution intent, not APS authority. Schedule create/update rejects machine/date/time overlaps in DB and JSON fallback stores. |
 | CNC program version | CNC program management module | Dispatch target copied program revision | Execution freezes references; CNC program store owns release/version truth. Program and version rows now persist plant/site/work-center/operation/part-revision/inspection context for CNC traceability. |
 | Setup sheet revision | CNC setup sheet store | Dispatch target copied setup revision | Execution freezes references; setup sheet store owns release/version truth. New setup sheets start as `draft`; missing setup status is not treated as released. |
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
@@ -34,6 +34,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
 | AI model/dashboard/read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard reads require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |
+| AI schedule apply / PM proposal | Advisory review/proposal responses from `AiSchedulingController` | Schedule slot and maintenance work-order stores | AI-named apply/PM endpoints do not mutate schedules or create maintenance execution. They return `applied=false`/`scheduled=false`, `execution_authority=false`, and human action requirements. |
 | Evidence artifact | `EvidenceVaultService` custody/hash chain and canonical evidence DB tables where available | Uploaded file metadata, attachment rows | Evidence is controlled quality context. Uploads validate size and byte-detected MIME; extension fallback cannot override dangerous content. Canonical package reads require EQMS read roles and org scope; finalization requires at least one signature event. |
 | Genealogy ontology | `GenealogyGraphService` runtime ontology plus migration 121 DB constraints | Older migration 108 constraints | Runtime and DB now agree on expanded MOM/MES/EQMS/PLM node and snapshot subject types. |
 
@@ -84,6 +85,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - AI feedback that can affect advisory confidence requires feedback/write roles, not read-only AI access.
 - AI natural-language query and RCA POST surfaces require CSRF because they write conversation/advisory history or trigger advisory processing.
 - AI may suggest risk, priority, or quality insights, but may not dispatch work, complete targets, approve inspections, create quality disposition, or command machines.
+- AI schedule apply and preventive-maintenance proposal routes are advisory review capture only. A human planner or governed maintenance/EQMS path must perform any real schedule or maintenance mutation.
 - Execution truth remains in MOM/MES service paths, not in AI JSON files.
 - AI ETL may extract `shopfloor_execution` features from accepted execution facts for training/projection snapshots; those datasets are downstream analytics artifacts and never overwrite dispatch, quality, maintenance, tooling, or machine state.
 

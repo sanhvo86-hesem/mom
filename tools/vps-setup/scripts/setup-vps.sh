@@ -224,11 +224,14 @@ for dir in uploads online-forms allocations form-workflow/state; do
     chown -R "$DEPLOY_USER:www-data" "$target"
 done
 
-# PHP refuses to open session files created by a different UID.
-mkdir -p "$SITE_DIR/mom/data/sessions"
-chown -R www-data:www-data "$SITE_DIR/mom/data/sessions"
-find "$SITE_DIR/mom/data/sessions" -type d -exec chmod 2770 {} +
-find "$SITE_DIR/mom/data/sessions" -type f -exec chmod 660 {} +
+# PHP-owned runtime state must stay owned by PHP-FPM, not the deploy user.
+for runtime_dir in sessions ratelimit; do
+    runtime_path="$SITE_DIR/mom/data/$runtime_dir"
+    mkdir -p "$runtime_path"
+    chown -R www-data:www-data "$runtime_path"
+    find "$runtime_path" -type d -exec chmod 2770 {} +
+    find "$runtime_path" -type f -exec chmod 660 {} +
+done
 
 # Log files
 for logfile in php_error.log audit.log db_queries.log; do
