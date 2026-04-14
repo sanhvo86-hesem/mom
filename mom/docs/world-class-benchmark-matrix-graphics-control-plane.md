@@ -12,7 +12,7 @@ Scope: graphics control plane, frontend SSOT, regulated UI, accessibility, relea
 - `node mom/tools/design/validate-frontend-contracts.mjs` passes with `0` errors and `14` warnings.
 - The graphics authority registry exists in `mom/data/registry/graphics-governance-registry.json`.
 - Graphics release blockers are cleared: `graphics-governance-registry.json` reports `releaseBlocked: false`, `blockerCount: 0`, and `releaseReadinessState: ready`.
-- Platform-global publishability is `ready` in `registry-quality-report.json` after the schema authority refresh. The current count model separates 773 physical storage tables, including 13 partition children, from 760 logical runtime-contract tables published through the frontend/runtime registry.
+- Platform-global publishability is `ready` in `registry-quality-report.json` after the schema authority refresh. The current count model separates 774 physical storage tables, including 13 partition children, from 761 logical runtime-contract tables published through the frontend/runtime registry.
 - Graphics debt remains material: `privateCssDebtScore = 14777`, `privateCssFileCount = 75`, `tokenCoveragePercent = 29`.
 
 ## Benchmark Matrix

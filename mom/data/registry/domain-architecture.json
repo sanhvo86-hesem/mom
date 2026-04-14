@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:11:54.935Z",
+    "generatedAt": "2026-04-14T16:18:24.554Z",
     "domainCount": 49,
-    "tableCount": 760,
+    "tableCount": 761,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-14T16:12:00.119Z"
+    "workflowCoverageGeneratedAt": "2026-04-14T16:18:30.445Z"
   },
   "domains": {
     "core_system": {
@@ -2805,6 +2805,7 @@
         "audit_pack_exports",
         "control_plane_command_handlers",
         "control_plane_object_registry",
+        "controlled_import_receipts",
         "electronic_signatures",
         "eqms_command_ledger",
         "eqms_retention_lock",
@@ -2826,6 +2827,7 @@
         "wf_audit_pack_export",
         "wf_control_plane_command_handler",
         "wf_control_plane_object_registry",
+        "wf_controlled_import_receipt",
         "wf_eqms_command_ledger",
         "wf_governed_route_registry",
         "wf_legacy_authority_sunset",
@@ -2862,6 +2864,7 @@
         "wf_audit_pack_export",
         "wf_control_plane_command_handler",
         "wf_control_plane_object_registry",
+        "wf_controlled_import_receipt",
         "wf_eqms_command_ledger",
         "wf_governed_route_registry",
         "wf_legacy_authority_sunset",

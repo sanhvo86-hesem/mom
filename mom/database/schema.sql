@@ -31249,3 +31249,353 @@ UPDATE schema_migrations
  WHERE migration_id = '113_audit_columns'
    AND checksum <> 'af7c0260a71f0d8c8223067e8e2fb7349901caf401d9380e8326ecddf2b49f11';
 -- <<< END MIGRATION: 127_reconcile_historical_migration_checksums.sql
+
+-- >>> BEGIN MIGRATION: 128_change_resulting_object_scope_and_snapshot_current.sql
+-- ============================================================================
+-- Migration 127: Change resulting-object scope and as-manufactured current guard
+-- ============================================================================
+-- Purpose:
+--   Close two data-integrity gaps left after the initial control-plane cutover:
+--   1) resulting objects must always be tied to a canonical affected object;
+--   2) an as-manufactured subject must have at most one current snapshot.
+-- ============================================================================
+
+BEGIN;
+
+UPDATE plm_change_resulting_objects ro
+SET affected_object_id = ao.plm_change_affected_object_id
+FROM plm_change_affected_objects ao
+WHERE ro.affected_object_id IS NULL
+  AND ao.plm_change_order_id = ro.plm_change_order_id
+  AND lower(ao.object_type) = lower(ro.object_type)
+  AND ao.object_id = ro.object_id;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM plm_change_resulting_objects
+        WHERE affected_object_id IS NULL
+    ) THEN
+        RAISE EXCEPTION 'plm_change_resulting_objects contains orphan rows; backfill affected_object_id before applying migration 127';
+    END IF;
+END $$;
+
+ALTER TABLE plm_change_resulting_objects
+    ALTER COLUMN affected_object_id SET NOT NULL;
+
+ALTER TABLE effectivity_conflicts
+    ADD COLUMN IF NOT EXISTS idempotency_key TEXT,
+    ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_effectivity_conflicts_idempotency_key
+    ON effectivity_conflicts (idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+
+WITH ranked AS (
+    SELECT
+        as_manufactured_snapshot_id,
+        row_number() OVER (
+            PARTITION BY subject_type, subject_ref
+            ORDER BY built_at DESC, as_manufactured_snapshot_id DESC
+        ) AS rn
+    FROM as_manufactured_snapshots
+    WHERE snapshot_state = 'current'
+)
+UPDATE as_manufactured_snapshots s
+SET snapshot_state = 'superseded',
+    built_at = now(),
+    row_version = row_version + 1
+FROM ranked r
+WHERE s.as_manufactured_snapshot_id = r.as_manufactured_snapshot_id
+  AND r.rn > 1;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_as_manufactured_snapshots_one_current
+    ON as_manufactured_snapshots (subject_type, subject_ref)
+    WHERE snapshot_state = 'current';
+
+COMMIT;
+-- <<< END MIGRATION: 128_change_resulting_object_scope_and_snapshot_current.sql
+
+-- >>> BEGIN MIGRATION: 129_change_release_authorization_integrity.sql
+-- ============================================================================
+-- Migration 129: Change release authorization integrity
+-- ============================================================================
+-- Purpose:
+--   Make released change orders and resulting-object links fail closed at the
+--   database contract layer, not only in service code.
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE plm_change_orders
+    ADD COLUMN IF NOT EXISTS release_signature_event_id UUID REFERENCES signature_events(signature_event_id),
+    ADD COLUMN IF NOT EXISTS release_package_hash_sha256 CHAR(64);
+
+ALTER TABLE genealogy_edge_facts
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40);
+
+ALTER TABLE frm_submission_attempts
+    ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS accepted_by_ref TEXT,
+    ADD COLUMN IF NOT EXISTS acceptance_signature_event_id UUID REFERENCES signature_events(signature_event_id);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'chk_plm_change_orders_release_signature'
+    ) THEN
+        ALTER TABLE plm_change_orders
+            ADD CONSTRAINT chk_plm_change_orders_release_signature
+            CHECK (
+                status <> 'released'
+                OR (
+                    release_signature_event_id IS NOT NULL
+                    AND release_package_hash_sha256 IS NOT NULL
+                )
+            ) NOT VALID;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'uq_plm_change_affected_objects_order_id_pair'
+    ) THEN
+        ALTER TABLE plm_change_affected_objects
+            ADD CONSTRAINT uq_plm_change_affected_objects_order_id_pair
+            UNIQUE (plm_change_order_id, plm_change_affected_object_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_plm_change_resulting_objects_same_order_affected'
+    ) THEN
+        ALTER TABLE plm_change_resulting_objects
+            ADD CONSTRAINT fk_plm_change_resulting_objects_same_order_affected
+            FOREIGN KEY (plm_change_order_id, affected_object_id)
+            REFERENCES plm_change_affected_objects (plm_change_order_id, plm_change_affected_object_id)
+            DEFERRABLE INITIALLY DEFERRED;
+    END IF;
+END $$;
+
+DROP INDEX IF EXISTS ux_as_manufactured_snapshots_one_current;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_as_manufactured_snapshots_one_current_scoped
+    ON as_manufactured_snapshots (
+        subject_type,
+        subject_ref,
+        COALESCE(org_company_code, ''),
+        COALESCE(org_legal_entity_code, ''),
+        COALESCE(org_plant_id, ''),
+        COALESCE(org_site_id, '')
+    )
+    WHERE snapshot_state = 'current';
+
+COMMIT;
+-- <<< END MIGRATION: 129_change_release_authorization_integrity.sql
+
+-- >>> BEGIN MIGRATION: 130_genealogy_scope_identity_and_5m_gate.sql
+-- ============================================================================
+-- Migration 130: Genealogy scope identity and production 5M gate closure
+-- ============================================================================
+-- Purpose:
+--   Close the remaining MES/genealogy P1 gaps from the final closure audit:
+--   1) node, edge-fact, replay, and cycle identity must be scoped;
+--   2) as-manufactured snapshot hash identity must be scoped;
+--   3) shopfloor acceptance must have a database contract for 5M gate evidence.
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE genealogy_edge_facts
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40);
+
+ALTER TABLE genealogy_nodes
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40);
+
+ALTER TABLE as_manufactured_snapshots
+    ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(40);
+
+ALTER TABLE shift_production_log
+    ADD COLUMN IF NOT EXISTS traceability_5m_gate JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ADD COLUMN IF NOT EXISTS traceability_5m_gate_state TEXT GENERATED ALWAYS AS (traceability_5m_gate ->> 'gate_state') STORED,
+    ADD COLUMN IF NOT EXISTS traceability_5m_waiver_signature_event_id UUID REFERENCES signature_events(signature_event_id);
+
+DO $$
+DECLARE
+    constraint_name TEXT;
+BEGIN
+    FOR constraint_name IN
+        SELECT c.conname
+        FROM pg_constraint c
+        WHERE c.conrelid = 'genealogy_edge_facts'::regclass
+          AND c.contype = 'u'
+          AND pg_get_constraintdef(c.oid) LIKE '%edge_fact_type%'
+          AND pg_get_constraintdef(c.oid) LIKE '%source_event_id%'
+    LOOP
+        EXECUTE format('ALTER TABLE genealogy_edge_facts DROP CONSTRAINT IF EXISTS %I', constraint_name);
+    END LOOP;
+END $$;
+
+ALTER TABLE genealogy_nodes
+    DROP CONSTRAINT IF EXISTS genealogy_nodes_node_type_node_ref_key;
+
+ALTER TABLE as_manufactured_snapshots
+    DROP CONSTRAINT IF EXISTS as_manufactured_snapshots_subject_type_subject_ref_snapshot_hash_sha256_key;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_genealogy_edge_facts_scope_source
+    ON genealogy_edge_facts (
+        edge_fact_type,
+        from_object_type,
+        from_object_id,
+        to_object_type,
+        to_object_id,
+        source_event_id,
+        (COALESCE(org_company_code, '')),
+        (COALESCE(org_legal_entity_code, '')),
+        (COALESCE(org_plant_id, '')),
+        (COALESCE(org_site_id, ''))
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_genealogy_nodes_scope_identity
+    ON genealogy_nodes (
+        node_type,
+        node_ref,
+        (COALESCE(org_company_code, '')),
+        (COALESCE(org_legal_entity_code, '')),
+        (COALESCE(org_plant_id, '')),
+        (COALESCE(org_site_id, ''))
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_as_manufactured_snapshots_scope_hash
+    ON as_manufactured_snapshots (
+        subject_type,
+        subject_ref,
+        snapshot_hash_sha256,
+        (COALESCE(org_company_code, '')),
+        (COALESCE(org_legal_entity_code, '')),
+        (COALESCE(org_plant_id, '')),
+        (COALESCE(org_site_id, ''))
+    );
+
+DROP INDEX IF EXISTS ux_as_manufactured_snapshots_one_current;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_as_manufactured_snapshots_one_current_scoped
+    ON as_manufactured_snapshots (
+        subject_type,
+        subject_ref,
+        (COALESCE(org_company_code, '')),
+        (COALESCE(org_legal_entity_code, '')),
+        (COALESCE(org_plant_id, '')),
+        (COALESCE(org_site_id, ''))
+    )
+    WHERE snapshot_state = 'current';
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'chk_shift_production_log_traceability_5m_gate'
+    ) THEN
+        ALTER TABLE shift_production_log
+            ADD CONSTRAINT chk_shift_production_log_traceability_5m_gate
+            CHECK (
+                traceability_5m_gate_state IN ('complete', 'waived', 'not_applicable')
+                OR traceability_5m_waiver_signature_event_id IS NOT NULL
+            ) NOT VALID;
+    END IF;
+END $$;
+
+COMMENT ON INDEX ux_genealogy_edge_facts_scope_source IS
+    'Scope-keyed genealogy fact replay identity; prevents cross-plant/site false conflicts.';
+
+COMMENT ON INDEX ux_genealogy_nodes_scope_identity IS
+    'Scope-keyed genealogy node identity for reused lot/order/material refs across plants/sites.';
+
+COMMENT ON INDEX ux_as_manufactured_snapshots_scope_hash IS
+    'Scope-keyed as-manufactured snapshot hash identity.';
+
+COMMIT;
+-- <<< END MIGRATION: 130_genealogy_scope_identity_and_5m_gate.sql
+
+-- >>> BEGIN MIGRATION: 131_world_class_closure_authority_proof.sql
+-- World-class closure: authoritative release ceremonies and gate proof.
+--
+-- Adds narrowly scoped proof columns/tables required by the closure audit:
+-- document controlled-import receipts, training gate signature/evidence proof,
+-- and indexes used by audit-pack export retrieval.
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS controlled_import_receipts (
+    controlled_import_receipt_id TEXT PRIMARY KEY,
+    imported_object_type TEXT NOT NULL,
+    imported_object_id TEXT,
+    receipt_state TEXT NOT NULL DEFAULT 'accepted'
+        CHECK (receipt_state IN ('draft', 'accepted', 'rejected', 'voided')),
+    source_system TEXT NOT NULL DEFAULT 'controlled_import',
+    manifest_hash_sha256 CHAR(64) NOT NULL,
+    imported_by_ref TEXT NOT NULL,
+    accepted_at TIMESTAMPTZ,
+    source_change_order_id UUID REFERENCES plm_change_orders(plm_change_order_id),
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    row_version BIGINT NOT NULL DEFAULT 1,
+    CHECK (receipt_state <> 'accepted' OR accepted_at IS NOT NULL)
+);
+
+CREATE INDEX IF NOT EXISTS idx_controlled_import_receipts_object
+    ON controlled_import_receipts (imported_object_type, imported_object_id, receipt_state);
+
+ALTER TABLE plm_change_training_requirements
+    ADD COLUMN IF NOT EXISTS satisfaction_signature_event_id UUID REFERENCES signature_events(signature_event_id),
+    ADD COLUMN IF NOT EXISTS waiver_signature_event_id UUID REFERENCES signature_events(signature_event_id),
+    ADD COLUMN IF NOT EXISTS training_evidence_record_id UUID REFERENCES evidence_records(evidence_record_id),
+    ADD COLUMN IF NOT EXISTS source_training_record_id TEXT;
+
+ALTER TABLE plm_change_training_requirements
+    DROP CONSTRAINT IF EXISTS ck_plm_change_training_authoritative_completion;
+
+ALTER TABLE plm_change_training_requirements
+    ADD CONSTRAINT ck_plm_change_training_authoritative_completion
+    CHECK (
+        requirement_state NOT IN ('satisfied', 'waived')
+        OR satisfaction_signature_event_id IS NOT NULL
+        OR waiver_signature_event_id IS NOT NULL
+        OR training_evidence_record_id IS NOT NULL
+        OR NULLIF(trim(source_training_record_id), '') IS NOT NULL
+        OR NULLIF(trim(COALESCE(metadata ->> 'authoritative_training_decision_id', '')), '') IS NOT NULL
+    );
+
+CREATE INDEX IF NOT EXISTS idx_audit_pack_exports_scope_lookup
+    ON audit_pack_exports (export_scope, scope_ref, completed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_audit_pack_exports_package_hash
+    ON audit_pack_exports (package_hash_sha256)
+    WHERE package_hash_sha256 IS NOT NULL;
+
+COMMIT;
+-- <<< END MIGRATION: 131_world_class_closure_authority_proof.sql

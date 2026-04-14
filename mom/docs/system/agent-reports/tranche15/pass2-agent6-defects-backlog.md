@@ -14,7 +14,8 @@ No code-fixable tranche15 backlog remains.
 | AI scheduling blank scope | ALREADY_FIXED | Closed; fail-closed code remains. |
 | Stale graphics benchmark doc | ALREADY_FIXED | Updated to current publishability and logical-contract model. |
 | Stale `schema-field-audit-full.json` authority wording | ALREADY_FIXED | Marked legacy orphan-field input, not release authority. |
-| Migration README drift | ALREADY_FIXED | Updated to 001-127 / 129 migration files. |
+| Migration README drift | ALREADY_FIXED | Updated to 001-131 / 133 migration files after latest `main` merge. |
+| Post-main-merge `controlled_import_receipts` registry gap | FIXED_IN_THIS_RUN | Added authority-domain mapping and regenerated publication to 761/761 schema/registry alignment. |
 | Pre-existing old helper worktree | PRODUCT_DECISION_REQUIRED | Preserved because it has unique unmerged commits and was not created by tranche15. |
 | Live OT/OTel/immutable-storage proof | BLOCKED_EXTERNAL | Requires target infrastructure evidence. |
 | Part 11 validation scope | PRODUCT_DECISION_REQUIRED | Requires owner/compliance decision. |
@@ -29,4 +30,3 @@ No code-fixable tranche15 backlog remains.
 ## FIX_NOW
 
 None.
-

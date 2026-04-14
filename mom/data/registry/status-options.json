@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-14T16:12:00.119Z",
-    "enumCount": 876
+    "generatedAt": "2026-04-14T16:18:30.445Z",
+    "enumCount": 877
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -5398,8 +5398,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "traceability_5m_policy_rules",
-    "statusColumn": "policy_state",
+    "sourceTable": "controlled_import_receipts",
+    "statusColumn": "receipt_state",
     "options": [
       {
         "value": "complete",
@@ -42390,6 +42390,49 @@
           "planned",
           "released"
         ]
+      }
+    ]
+  },
+  "controlled_import_receipts_receipt_state": {
+    "label": "Controlled Import phiếu nhận - Receipt State",
+    "labelEn": "Controlled Import Receipts Receipt State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "controlled_import_receipts",
+    "statusColumn": "receipt_state",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
       }
     ]
   }

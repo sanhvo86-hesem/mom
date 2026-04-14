@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T16:12:17.492Z",
+    "generatedAt": "2026-04-14T16:18:46.250Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "3b73ad15-ff7a-46ed-a691-bdc9f0a63fb2",
+    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "endpointBindings",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "182da255d962588e8168cd5a4254c148283fa5eae603d5dc24304189b271e2fe",
-    "sourceGeneratedAt": "2026-04-14T16:12:17.492Z",
+    "sourceSha256": "4bb84215c020823126dd9705c90be84fb0a3f05bb9b1a14fa0fdba8ff06967d5",
+    "sourceGeneratedAt": "2026-04-14T16:18:46.250Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -2565,6 +2565,38 @@
         "/api/runtime/fmea_apqp/control_plans",
         "/api/runtime/fmea_apqp/control_plans/{id}",
         "/api/runtime/fmea_apqp/control_plans/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.controlled_import_receipts",
+      "table": "controlled_import_receipts",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "record_system.controlled_import_receipts.create",
+        "record_system.controlled_import_receipts.delete",
+        "record_system.controlled_import_receipts.detail",
+        "record_system.controlled_import_receipts.list",
+        "record_system.controlled_import_receipts.transition",
+        "record_system.controlled_import_receipts.update"
+      ],
+      "paths": [
+        "/api/runtime/record_system/controlled_import_receipts",
+        "/api/runtime/record_system/controlled_import_receipts/{id}",
+        "/api/runtime/record_system/controlled_import_receipts/{id}/transition"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T16:12:17.492Z",
+    "generatedAt": "2026-04-14T16:18:46.250Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "3b73ad15-ff7a-46ed-a691-bdc9f0a63fb2",
+    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "relations",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "182da255d962588e8168cd5a4254c148283fa5eae603d5dc24304189b271e2fe",
-    "sourceGeneratedAt": "2026-04-14T16:12:17.492Z",
+    "sourceSha256": "4bb84215c020823126dd9705c90be84fb0a3f05bb9b1a14fa0fdba8ff06967d5",
+    "sourceGeneratedAt": "2026-04-14T16:18:46.250Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -11468,6 +11468,34 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_controlled_import_receipts_source_change_order_id_plm_change_orders_plm_change_order_id",
+      "from": {
+        "entity": "controlled_import_receipts",
+        "field": "source_change_order_id"
+      },
+      "to": {
+        "entity": "plm_change_orders",
+        "field": "plm_change_order_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_controlled_import_receipts_source_change_order_id",
+      "nullable": true,
+      "label": "Controlled Import phiếu nhận → PLM thay đổi đơn hàng",
+      "labelEn": "Controlled Import Receipts → PLM Change Orders",
+      "domain": "record_system -> plm_change_control",
+      "fromDomain": "record_system",
+      "toDomain": "plm_change_control",
+      "sourceColumn": "source_change_order_id",
+      "targetColumn": "plm_change_order_id",
+      "lookupEntity": "plm_change_orders",
+      "lookupEndpoint": "plm_change_control.plm_change_orders.list",
+      "displayField": "title",
+      "valueField": "plm_change_order_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_copq_ledger_recorded_by_users_user_id",
       "from": {
         "entity": "copq_ledger",
@@ -16558,7 +16586,7 @@
       "targetColumn": "frm_submission_attempt_id",
       "lookupEntity": "frm_submission_attempts",
       "lookupEndpoint": "forms_system.frm_submission_attempts.list",
-      "displayField": "attempt_no",
+      "displayField": "acceptance_signature_event_id",
       "valueField": "frm_submission_attempt_id",
       "digitalThread": true,
       "cascadeActions": []
@@ -24342,7 +24370,7 @@
       "targetColumn": "frm_submission_attempt_id",
       "lookupEntity": "frm_submission_attempts",
       "lookupEndpoint": "forms_system.frm_submission_attempts.list",
-      "displayField": "attempt_no",
+      "displayField": "acceptance_signature_event_id",
       "valueField": "frm_submission_attempt_id",
       "digitalThread": true,
       "cascadeActions": []
@@ -31264,8 +31292,36 @@
       "targetColumn": "frm_submission_attempt_id",
       "lookupEntity": "frm_submission_attempts",
       "lookupEndpoint": "forms_system.frm_submission_attempts.list",
-      "displayField": "attempt_no",
+      "displayField": "acceptance_signature_event_id",
       "valueField": "frm_submission_attempt_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_frm_submission_attempts_acceptance_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "frm_submission_attempts",
+        "field": "acceptance_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_frm_submission_attempts_acceptance_signature_event_id",
+      "nullable": true,
+      "label": "Frm bản nộp Attempt → Chữ ký sự kiện",
+      "labelEn": "Frm Submission Attempts → Signature Events",
+      "domain": "forms_system -> foundation_governance",
+      "fromDomain": "forms_system",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "acceptance_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -58122,6 +58178,34 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_plm_change_orders_release_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "plm_change_orders",
+        "field": "release_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_plm_change_orders_release_signature_event_id",
+      "nullable": true,
+      "label": "PLM thay đổi đơn hàng → Chữ ký sự kiện",
+      "labelEn": "PLM Change Orders → Signature Events",
+      "domain": "plm_change_control -> foundation_governance",
+      "fromDomain": "plm_change_control",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "release_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_plm_change_requests_item_id_items_item_id",
       "from": {
         "entity": "plm_change_requests",
@@ -58346,6 +58430,40 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_plm_change_resulting_objects_plm_change_order_id_affected_object_id_plm_change_affected_objects_plm_change_order_id,plm_change_affected_object_id",
+      "from": {
+        "entity": "plm_change_resulting_objects",
+        "field": [
+          "plm_change_order_id",
+          "affected_object_id"
+        ]
+      },
+      "to": {
+        "entity": "plm_change_affected_objects",
+        "field": "plm_change_order_id,plm_change_affected_object_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_plm_change_resulting_objects_plm_change_order_id,affected_object_id",
+      "nullable": true,
+      "label": "PLM thay đổi Resulting Object → PLM thay đổi bị ảnh hưởng Object",
+      "labelEn": "PLM Change Resulting Objects → PLM Change Affected Objects",
+      "domain": "plm_change_control -> plm_change_control",
+      "fromDomain": "plm_change_control",
+      "toDomain": "plm_change_control",
+      "sourceColumn": [
+        "plm_change_order_id",
+        "affected_object_id"
+      ],
+      "targetColumn": "plm_change_order_id,plm_change_affected_object_id",
+      "lookupEntity": "plm_change_affected_objects",
+      "lookupEndpoint": "plm_change_control.plm_change_affected_objects.list",
+      "displayField": "affected_fields",
+      "valueField": "plm_change_order_id,plm_change_affected_object_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_plm_change_review_board_plm_change_order_id_plm_change_orders_plm_change_order_id",
       "from": {
         "entity": "plm_change_review_board",
@@ -58538,6 +58656,90 @@
       "lookupEndpoint": "plm_change_control.plm_change_orders.list",
       "displayField": "title",
       "valueField": "plm_change_order_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_plm_change_training_requirements_satisfaction_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "plm_change_training_requirements",
+        "field": "satisfaction_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_plm_change_training_requirements_satisfaction_signature_event_id",
+      "nullable": true,
+      "label": "PLM thay đổi Đào tạo yêu cầu → Chữ ký sự kiện",
+      "labelEn": "PLM Change Training Requirements → Signature Events",
+      "domain": "plm_change_control -> foundation_governance",
+      "fromDomain": "plm_change_control",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "satisfaction_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_plm_change_training_requirements_waiver_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "plm_change_training_requirements",
+        "field": "waiver_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_plm_change_training_requirements_waiver_signature_event_id",
+      "nullable": true,
+      "label": "PLM thay đổi Đào tạo yêu cầu → Chữ ký sự kiện",
+      "labelEn": "PLM Change Training Requirements → Signature Events",
+      "domain": "plm_change_control -> foundation_governance",
+      "fromDomain": "plm_change_control",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "waiver_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_plm_change_training_requirements_training_evidence_record_id_evidence_records_evidence_record_id",
+      "from": {
+        "entity": "plm_change_training_requirements",
+        "field": "training_evidence_record_id"
+      },
+      "to": {
+        "entity": "evidence_records",
+        "field": "evidence_record_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_plm_change_training_requirements_training_evidence_record_id",
+      "nullable": true,
+      "label": "PLM thay đổi Đào tạo yêu cầu → Bằng chứng hồ sơ",
+      "labelEn": "PLM Change Training Requirements → Evidence Records",
+      "domain": "plm_change_control -> evidence_vault",
+      "fromDomain": "plm_change_control",
+      "toDomain": "evidence_vault",
+      "sourceColumn": "training_evidence_record_id",
+      "targetColumn": "evidence_record_id",
+      "lookupEntity": "evidence_records",
+      "lookupEndpoint": "evidence_vault.evidence_records.list",
+      "displayField": "created_at",
+      "valueField": "evidence_record_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -76440,6 +76642,34 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_shift_production_log_traceability_5m_waiver_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "shift_production_log",
+        "field": "traceability_5m_waiver_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_shift_production_log_traceability_5m_waiver_signature_event_id",
+      "nullable": true,
+      "label": "Ca Sản xuất Nhật ký → Chữ ký sự kiện",
+      "labelEn": "Shift Production Log → Signature Events",
+      "domain": "production -> foundation_governance",
+      "fromDomain": "production",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "traceability_5m_waiver_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_shift_targets_org_company_code_org_companies_company_code",
       "from": {
         "entity": "shift_targets",
@@ -81698,7 +81928,7 @@
       "targetColumn": "frm_submission_attempt_id",
       "lookupEntity": "frm_submission_attempts",
       "lookupEndpoint": "forms_system.frm_submission_attempts.list",
-      "displayField": "attempt_no",
+      "displayField": "acceptance_signature_event_id",
       "valueField": "frm_submission_attempt_id",
       "digitalThread": true,
       "cascadeActions": []

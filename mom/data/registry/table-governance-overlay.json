@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:12:12.921115+00:00",
+    "generatedAt": "2026-04-14T16:18:41.951839+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 760
+    "tableCount": 761
   },
   "summary": {
     "domains": {
@@ -51,7 +51,7 @@
       "purchasing": 14,
       "quality_lab": 16,
       "quality_management": 37,
-      "record_system": 20,
+      "record_system": 21,
       "sales": 17,
       "service_warranty": 13,
       "shipping_compliance": 7,
@@ -71,10 +71,10 @@
       "governed_support": 24,
       "machine_runtime": 91,
       "platform_governance": 18,
-      "process_runtime": 474
+      "process_runtime": 475
     },
     "targetDeletionMode": {
-      "archive_only": 760
+      "archive_only": 761
     },
     "hardDeleteWaiverRequired": 0
   },
@@ -4016,6 +4016,56 @@
       "businessObjectRefs": [
         "quality_improvement.control-plans"
       ],
+      "uiSurfaces": [
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "controlled_import_receipts": {
+      "systemOfRecord": "postgres_migration:131_world_class_closure_authority_proof.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.controlled_import_receipts.create",
+        "record_system.controlled_import_receipts.delete",
+        "record_system.controlled_import_receipts.detail",
+        "record_system.controlled_import_receipts.list",
+        "record_system.controlled_import_receipts.transition",
+        "record_system.controlled_import_receipts.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:digital_thread_status",
+        "wf_controlled_import_receipt"
+      ],
+      "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
         "system_contract_registry"

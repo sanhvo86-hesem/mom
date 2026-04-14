@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:12:12.921115+00:00",
+    "generatedAt": "2026-04-14T16:18:41.951839+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -22,16 +22,16 @@
   "status": "watch",
   "scorecard": {
     "tables": {
-      "count": 760,
+      "count": 761,
       "domains": 49,
       "missingOwnerRole": 0,
       "missingSystemOfRecord": 0,
       "governanceOverlayApplied": true,
-      "governanceOverlayCount": 760
+      "governanceOverlayCount": 761
     },
     "endpoints": {
-      "count": 4192,
-      "classified": 4192,
+      "count": 4198,
+      "classified": 4198,
       "hardDelete": 0,
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
@@ -55,7 +55,7 @@
       "manifestDeletionModes": {
         "hard_delete": 12,
         "soft_delete": 63,
-        "archive_only": 697
+        "archive_only": 698
       },
       "openapiVersion": "3.1.2",
       "aiAuthorityChainGenerated": true,
@@ -75,7 +75,7 @@
         "classificationSummary": {
           "authorityClass": {
             "admin_governance_contract": 279,
-            "canonical_process_contract": 2435,
+            "canonical_process_contract": 2441,
             "generic_runtime_contract": 555,
             "machine_runtime_contract": 500,
             "master_data_contract": 90,
@@ -85,15 +85,15 @@
             "admin_governance": 258,
             "admin_or_internal": 333,
             "blocked_runtime_internal": 1032,
-            "frontend_process": 1610,
+            "frontend_process": 1616,
             "machine_or_operator_ui": 404,
             "needs_owner_review": 555
           },
           "sideEffectLevel": {
-            "destructive": 753,
-            "none": 1540,
+            "destructive": 754,
+            "none": 1542,
             "transactional_write": 714,
-            "workflow_transition": 1185
+            "workflow_transition": 1188
           },
           "gapCounts": {
             "generic_runtime_classification": 555,

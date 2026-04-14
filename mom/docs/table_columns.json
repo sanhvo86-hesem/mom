@@ -1764,6 +1764,21 @@
     "title_vi",
     "updated_at"
   ],
+  "controlled_import_receipts": [
+    "accepted_at",
+    "controlled_import_receipt_id",
+    "created_at",
+    "imported_by_ref",
+    "imported_object_id",
+    "imported_object_type",
+    "manifest_hash_sha256",
+    "metadata",
+    "receipt_state",
+    "row_version",
+    "source_change_order_id",
+    "source_system",
+    "updated_at"
+  ],
   "copq_ledger": [
     "amount",
     "copq_category",
@@ -2793,6 +2808,8 @@
     "conflict_type",
     "created_at",
     "effectivity_conflict_id",
+    "idempotency_key",
+    "metadata",
     "object_id",
     "object_type",
     "plm_change_order_id",
@@ -5231,6 +5248,9 @@
     "validation_rules"
   ],
   "frm_submission_attempts": [
+    "acceptance_signature_event_id",
+    "accepted_at",
+    "accepted_by_ref",
     "attempt_no",
     "attempt_state",
     "created_at",
@@ -5281,6 +5301,10 @@
     "from_object_type",
     "genealogy_edge_fact_id",
     "metadata",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
     "quantity",
     "source_event_id",
     "superseded_at",
@@ -10368,6 +10392,8 @@
     "payload_schema_version",
     "plm_change_order_id",
     "plm_change_request_id",
+    "release_package_hash_sha256",
+    "release_signature_event_id",
     "row_version",
     "serial_effective_from",
     "serial_effective_to",
@@ -10452,9 +10478,13 @@
     "plm_change_training_requirement_id",
     "requirement_state",
     "row_version",
+    "satisfaction_signature_event_id",
     "satisfied_at",
+    "source_training_record_id",
+    "training_evidence_record_id",
     "training_requirement_type",
-    "updated_at"
+    "updated_at",
+    "waiver_signature_event_id"
   ],
   "plm_change_verifications": [
     "created_at",
@@ -13187,6 +13217,9 @@
     "sync_status",
     "target_id",
     "target_quantity",
+    "traceability_5m_gate",
+    "traceability_5m_gate_state",
+    "traceability_5m_waiver_signature_event_id",
     "updated_at",
     "wo_number"
   ],

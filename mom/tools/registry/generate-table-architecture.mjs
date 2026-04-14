@@ -960,6 +960,7 @@ const tableDomainOverrides = {
   field_governance_rules: 'plm_change_control',
   release_manifests: 'record_system',
   promotion_receipts: 'record_system',
+  controlled_import_receipts: 'record_system',
   reverse_sync_intakes: 'system_infrastructure',
   source_boundary_violations: 'system_infrastructure',
   eqms_command_ledger: 'record_system',

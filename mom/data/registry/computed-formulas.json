@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-14T16:12:00.119Z",
-    "formulaCount": 1351
+    "generatedAt": "2026-04-14T16:18:30.445Z",
+    "formulaCount": 1353
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -29673,6 +29673,48 @@
       {
         "type": "endpoint",
         "id": "traceability_serialization.traceability_5m_policy_rules.transition"
+      }
+    ]
+  },
+  "f_controlled_import_receipts_record_count": {
+    "formulaId": "f_controlled_import_receipts_record_count",
+    "name": "Controlled Import phiếu nhận - Số bản ghi",
+    "nameEn": "Controlled Import Receipts Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM controlled_import_receipts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "controlled_import_receipts_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.controlled_import_receipts.list"
+      }
+    ]
+  },
+  "f_controlled_import_receipts_closed_count": {
+    "formulaId": "f_controlled_import_receipts_closed_count",
+    "name": "Controlled Import phiếu nhận - Số hồ sơ đã đóng",
+    "nameEn": "Controlled Import Receipts Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE receipt_state IN ('closed','completed','archived','paid','delivered')) FROM controlled_import_receipts",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "controlled_import_receipts_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.controlled_import_receipts.transition"
       }
     ]
   }

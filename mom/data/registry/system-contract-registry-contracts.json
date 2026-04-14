@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T16:12:17.492Z",
+    "generatedAt": "2026-04-14T16:18:46.250Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "3b73ad15-ff7a-46ed-a691-bdc9f0a63fb2",
+    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,23 +24,23 @@
     "purpose": "Full DB-derived table contract index. Read-only; regenerate from registry authority."
   },
   "summary": {
-    "tableCount": 760,
-    "authoritativeLogicalTableCount": 760,
-    "authoritativePhysicalTableCount": 773,
+    "tableCount": 761,
+    "authoritativeLogicalTableCount": 761,
+    "authoritativePhysicalTableCount": 774,
     "authoritativePartitionTableCount": 13,
-    "schemaAuthorityRegistryTableCount": 760,
-    "relationCount": 3453,
-    "relationEntityCount": 760,
-    "endpointCount": 4192,
-    "endpointBoundTableCount": 760,
-    "workflowCount": 335,
-    "workflowEligibleTableCount": 400,
-    "workflowBoundTableCount": 355,
+    "schemaAuthorityRegistryTableCount": 761,
+    "relationCount": 3461,
+    "relationEntityCount": 761,
+    "endpointCount": 4198,
+    "endpointBoundTableCount": 761,
+    "workflowCount": 336,
+    "workflowEligibleTableCount": 401,
+    "workflowBoundTableCount": 356,
     "workflowBindingCoveragePercent": 89,
-    "statusManagedTableCount": 381,
+    "statusManagedTableCount": 382,
     "supportTableCount": 127,
     "domainCount": 49,
-    "contractCount": 760,
+    "contractCount": 761,
     "criticalGapCount": 0,
     "warningCount": 2,
     "capabilityCount": 15,
@@ -2843,6 +2843,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.controlled_import_receipts",
+      "table": "controlled_import_receipts",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Controlled Import phiếu nhận",
+      "labelEn": "Controlled Import Receipts",
+      "primaryKey": "controlled_import_receipt_id",
+      "statusColumn": "receipt_state",
+      "statusSet": "digital_thread_status",
+      "workflowId": "wf_controlled_import_receipt",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 13,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 6
+    },
+    {
       "tableKey": "public.copq_ledger",
       "table": "copq_ledger",
       "schema": "public",
@@ -4564,7 +4598,7 @@
       "workflowId": "wf_effectivity_conflict",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 12,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8781,7 +8815,7 @@
       "workflowId": "wf_frm_submission_attempt",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 17,
+      "columnCount": 20,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8849,7 +8883,7 @@
       "workflowId": "wf_genealogy_edge_fact",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 17,
+      "columnCount": 21,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8868,7 +8902,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 4
     },
     {
       "tableKey": "public.genealogy_edges",
@@ -16187,7 +16221,7 @@
       "workflowId": "wf_plm_change_order",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 26,
+      "columnCount": 28,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -16322,7 +16356,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 16,
+      "columnCount": 20,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -20553,7 +20587,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 42,
+      "columnCount": 45,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,

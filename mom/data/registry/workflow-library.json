@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-14T16:12:00.119Z",
-    "workflowCount": 335
+    "generatedAt": "2026-04-14T16:18:30.445Z",
+    "workflowCount": 336
   },
   "workflows": {
     "wf_ai_recommendation_action": {
@@ -6937,6 +6937,31 @@
           "fmea_records",
           "ncr_records"
         ]
+      }
+    },
+    "wf_controlled_import_receipt": {
+      "workflowId": "wf_controlled_import_receipt",
+      "name": "Controlled Import phiếu nhận - Luong xu ly",
+      "nameEn": "Controlled Import Receipts Workflow",
+      "entity": "controlled_import_receipts",
+      "domain": "record_system",
+      "standard": "internal",
+      "primaryTable": "controlled_import_receipts",
+      "relatedTables": [
+        "controlled_import_receipts",
+        "plm_change_orders"
+      ],
+      "stateField": "receipt_state",
+      "statusSet": "digital_thread_status",
+      "lifecycleMode": "generic_status_only",
+      "states": [],
+      "transitions": [],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "plm_change_orders"
+        ],
+        "downstreamEffects": []
       }
     },
     "wf_crm_account": {
@@ -15029,6 +15054,7 @@
         "duplicate_detection_fingerprints",
         "genealogy_edge_facts",
         "genealogy_edges",
+        "plm_change_training_requirements",
         "plm_change_verifications",
         "rollback_requirements",
         "wip_dispositions"
@@ -18136,6 +18162,7 @@
         "frm_submission_attempts",
         "frm_issuances",
         "users",
+        "signature_events",
         "duplicate_detection_fingerprints",
         "evidence_records",
         "submission_validation_results"
@@ -38121,7 +38148,9 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "signature_events",
         "control_plane_object_registry",
+        "controlled_import_receipts",
         "doc_effectivities",
         "doc_revisions",
         "effectivity_conflicts",
