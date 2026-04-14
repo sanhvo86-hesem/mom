@@ -46,6 +46,7 @@ Pass-2 fixes after red-team:
 
 - `LogTransport` now reports a configured but unverified Loki endpoint as `loki_available=null` with `loki_probe_state=unverified`, avoiding both the old false green and the pass-2 readiness overcorrection before an actual push failure.
 - Standards/vendor wording was tightened so local proof-layer changes are not presented as full ISA-95, OT, OpenTelemetry, SAP DM, Siemens, ETQ, Critical Manufacturing, or MasterControl parity.
+- After merging the current local `main` into the integration branch, PHPStan caught a redundant null coalesce in `GenericCrudService`; the integrated tree now uses the registry status option value directly.
 
 ## Verification run on integration branch
 
@@ -55,8 +56,8 @@ Pass-2 fixes after red-team:
 - `composer test -- --filter SliceObservabilityTest`: pass.
 - `composer test -- --filter HealthControllerRuntimeAuthorityTest`: pass.
 - `composer analyse -- --memory-limit=1G`: pass.
-- `composer test`: pass, 368 tests, 2149 assertions, 1 skipped.
-- `composer check`: pass, 368 tests, 2149 assertions, 1 skipped after PHPStan success.
+- `composer test`: pass before merging local `main`, 368 tests, 2149 assertions, 1 skipped.
+- `composer check`: pass after merging local `main`, 370 tests, 2154 assertions, 1 skipped after PHPStan success.
 - Baseline focused tests before implementation:
   - `MobileWorkQueueServiceTest`: pass.
   - `SecurityHardeningRegressionTest`: pass.
