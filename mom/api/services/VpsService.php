@@ -2574,7 +2574,88 @@ BASH;
         }
 
         // Dynamic service probe commands are validated separately.
-        return $this->isAllowedServiceProbeCommand($command);
+        // Dynamic site / control-endpoint probe commands are validated separately.
+        if ($this->isAllowedSiteProbeCommand($command)) {
+            return true;
+        }
+        return $this->isAllowedControlEndpointProbeCommand($command);
+    }
+
+    /**
+     * SVC-011: Validate dynamically-built site probe commands (probeSites).
+     *
+     * Each segment follows a fixed curl template with __SITE__ marker.
+     * We verify: (a) structural match, (b) embedded URL is a safe http/https address.
+     */
+    private function isAllowedSiteProbeCommand(string $command): bool
+    {
+        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        if ($segments === []) {
+            return false;
+        }
+
+        foreach ($segments as $segment) {
+            // Must follow the curl site probe template.
+            if (!str_starts_with($segment, 'if command -v curl >/dev/null 2>&1;')) {
+                return false;
+            }
+            if (!str_contains($segment, '__SITE__|')) {
+                return false;
+            }
+
+            // Extract the URL argument (single-quoted by escapeshellarg).
+            // Pattern: ... -w '...' '<URL>' ...
+            if (!preg_match("/ '(https?:\/\/[^']+)' /", $segment, $m)) {
+                return false;
+            }
+
+            // Validate URL is a well-formed http/https address with no shell metacharacters.
+            $url = $m[1];
+            if (!filter_var($url, FILTER_VALIDATE_URL) || !in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * SVC-011: Validate dynamically-built control-endpoint probe commands
+     * (probeControlEndpoints — used by probeTerminals and probeObservabilityPanels).
+     *
+     * Internal URLs must be loopback (127.0.0.1 or localhost) so the probe
+     * cannot be redirected to an arbitrary external target.
+     */
+    private function isAllowedControlEndpointProbeCommand(string $command): bool
+    {
+        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        if ($segments === []) {
+            return false;
+        }
+
+        foreach ($segments as $segment) {
+            if (!str_starts_with($segment, 'if command -v curl >/dev/null 2>&1;')) {
+                return false;
+            }
+            if (!str_contains($segment, '__CTRL__|')) {
+                return false;
+            }
+
+            // Extract the URL argument.
+            if (!preg_match("/ '(https?:\/\/[^']+)' /", $segment, $m)) {
+                return false;
+            }
+
+            $url = $m[1];
+            $host = parse_url($url, PHP_URL_HOST);
+
+            // Internal probe URLs must be loopback only (never external hosts).
+            if (!in_array($host, ['127.0.0.1', 'localhost'], true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
