@@ -893,6 +893,36 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ], 'operator-1');
     }
 
+    public function testGenealogyGraphPersistsExpandedProcessRoutingOntologyTypes(): void
+    {
+        $db = new GenealogyGraphFakeDb();
+        $fact = (new GenealogyGraphService($db))->recordEdgeFact([
+            'edge_fact_type' => 'measure',
+            'from_object_type' => 'process',
+            'from_object_id' => 'PROC-OP10',
+            'to_object_type' => 'routing',
+            'to_object_id' => 'ROUTE-714-OP10',
+            'change_order_id' => '00000000-0000-0000-0000-000000000201',
+            'field_path' => 'genealogy.measure',
+        ], 'planner-1');
+
+        $this->assertSame('measure', $fact['edge_fact_type']);
+        $this->assertSame('process', $fact['from_object_type']);
+        $this->assertSame('routing', $fact['to_object_type']);
+        $this->assertTrue($db->sawProjectionWrite);
+    }
+
+    public function testGenealogyOntologyMigrationMatchesRuntimeNodeTypes(): void
+    {
+        $migration = (string)file_get_contents(QMS_TEST_BASE_DIR . '/database/migrations/121_genealogy_runtime_ontology_constraints.sql');
+
+        foreach (['job_order', 'work_center', 'batch', 'process', 'routing', 'setup_sheet', 'inspection_plan', 'inspection_result', 'nc_program', 'cnc_program', 'form_template', 'form_schema', 'change_request', 'deviation', 'capa', 'supplier_lot', 'customer_order'] as $nodeType) {
+            $this->assertStringContainsString("'" . $nodeType . "'", $migration);
+        }
+        $this->assertStringContainsString('chk_genealogy_nodes_node_type_world_class', $migration);
+        $this->assertStringContainsString('chk_as_manufactured_snapshots_subject_type_world_class', $migration);
+    }
+
     public function testAsManufacturedThreadReadsProjectedGraphAndSnapshot(): void
     {
         $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('work_order', 'WO-1');
