@@ -1,6 +1,6 @@
 # World-Class Target Architecture
 
-Audited branch: `codex/worldclass-closure-20260414-1512`
+Audited branch: `codex/worldclass-reaudit-20260414-203827`
 
 Date: 2026-04-14
 
@@ -49,6 +49,7 @@ Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database geneal
 
 - AI prediction rows and recommendation actions are advisory projections.
 - `ai_recommendation_actions` may track pending human review but does not create NCRs, maintenance work, schedule moves, tool orders, dispatch changes, completion events, or machine commands.
+- AI schedule apply and preventive-maintenance proposal routes may record review intent or propose a planner action, but they must return no execution authority and must not create schedule moves or maintenance work.
 - Natural-language query writes conversation history and may expose broad manufacturing data, so it requires authentication, scoped roles, CSRF, read-only SQL validation, row limits, audit logging, and PostgreSQL read-only transactions.
 - Conversation history/detail reads also require AI read roles; JSON fallback detail reads validate safe IDs and require owner metadata before returning content.
 - AI prediction, SPC anomaly, tool-wear, legacy dashboard, model, and combined dashboard surfaces are advisory read APIs and require the same AI read role boundary; model internals are admin-only.
@@ -61,3 +62,4 @@ Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database geneal
 - No AI, analytics, dashboard, or ETL projection may overwrite operational records during or after cutover.
 - Connectivity parsers must not expand XML entities or accept machine-source XML with `DOCTYPE`/`ENTITY` declarations.
 - Any compatibility bridge must state which side is authoritative, which side is a cache/projection, and how divergence is detected.
+- Schedule write paths must enforce the same conflict rules in DB-primary and JSON fallback modes before a DB-primary scheduling cutover is allowed.

@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-closure-20260414-1512`
+Audited branch: `codex/worldclass-reaudit-20260414-203827`
 
 Date: 2026-04-14
 
@@ -52,6 +52,8 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | MTConnect XML entity expansion | Fixed now | `EdgeConnectorService` rejects `DOCTYPE`/`ENTITY` payloads and parses MTConnect XML without `LIBXML_NOENT`. |
 | Legacy AI read surface gating | Fixed now | Prediction list, SPC anomalies, tool-wear, and legacy AI dashboard now require AI read roles. |
 | AI feedback role split | Fixed now | Feedback submission now requires AI feedback/write roles instead of broad read-only advisory roles. |
+| AI scheduling advisory boundary | Fixed now | `aiScheduleApply()` records human review intent with `applied=false`; `aiSchedulePm()` returns a maintenance proposal with `scheduled=false`; both responses include `advisory_only`, `execution_authority=false`, and human-action fields. |
+| Schedule slot conflict symmetry | Fixed now | `createSlot()` and `updateSlot()` call shared DB and JSON overlap guards so DB-backed scheduling no longer bypasses the fallback conflict rule. |
 | Parent JO lifecycle for WO creation | Fixed now | `OrderService::createWorkOrder()` rejects terminal parent job orders. |
 | Genealogy runtime/DB ontology drift | Fixed now | Migration `121_genealogy_runtime_ontology_constraints.sql` aligns DB checks with `GenealogyGraphService::nodeType()`. |
 
@@ -86,6 +88,8 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | FMEA authorization | Role gates used a single unmigrated `role` string. | Added migrated multi-role checks and role buckets. |
 | COPQ configuration | A TODO documented hardcoded cost rates without remediation. | Added config-driven rates with defaults and tests. |
 | AI conversation JSON fallback | Conversation detail built a file path from the query string and did not enforce fallback-file ownership. | Conversation IDs are now constrained to safe tokens, fallback paths are resolved under the conversations directory, and fallback records must belong to the caller. |
+| AI schedule apply / PM naming | AI-named routes could imply that recommendations were applied or maintenance was scheduled even though no governed planning/MOM write occurred. | Routes now return advisory review/proposal records only and explicitly state no execution authority. |
+| DB schedule slot overlap validation | JSON fallback slot creation had a conflict guard, but DB create/update paths could persist overlapping machine slots. | DB and JSON slot writes now use dedicated overlap guard helpers before persistence. |
 | Canonical evidence package reads | Canonical evidence read endpoints were auth-only and not org-scoped. | Reads now require evidence read roles and session org context, and DB package lookup filters by metadata org scope. |
 | Evidence finalization completeness | Signature manifest artifacts existed, but finalization could persist with no signature events. | Finalization now rejects packages without at least one structured signature event. |
 | CNC program execution context | CNC setup sheets carried plant/work-center/revision fields, but programs and versions did not. | Program and version records now carry the same scope/digital-thread fields used by setup and dispatch. |

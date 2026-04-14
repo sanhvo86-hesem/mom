@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-closure-20260414-1512`
+Audited branch: `codex/worldclass-reaudit-20260414-203827`
 
 Date: 2026-04-14
 
@@ -31,3 +31,4 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - CNC digital thread is the main remaining structural gap. Execution already preserves CNC references, but CNC program/setup-sheet authority is still file-backed while DB schema exists.
 - Security gaps in AI/NLQ are high-leverage because natural-language query surfaces can expose broad manufacturing data and write conversation history.
 - This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped, AI prediction JSON fallback no longer leaks blank-plant rows to scoped users, AI conversation fallback IDs are validated and owner-scoped, mobile task assignment/start/completion now has an event journal, canonical evidence finalization is role/org scoped and requires signature events, order holds append lifecycle events, CNC program/version records persist plant/site/work-center/operation/revision/inspection context, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.
+- Current re-audit fix: schedule slot create/update now uses the same overlap guard in DB and JSON fallback paths, and AI-named `ai_schedule_apply` / `ai_schedule_pm` routes now return advisory review/proposal responses instead of implying schedule or maintenance execution authority.
