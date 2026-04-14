@@ -20,6 +20,18 @@ RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
 die() { log "ERROR" "$1"; exit 1; }
 
+restore_git_executable_bits() {
+    if [ ! -d "$SITE_DIR/.git" ]; then
+        return
+    fi
+
+    git -C "$SITE_DIR" ls-files -s \
+        | awk '$1 == "100755" {print $4}' \
+        | while IFS= read -r tracked; do
+            [ -f "$SITE_DIR/$tracked" ] && chmod 755 "$SITE_DIR/$tracked"
+        done
+}
+
 log "INFO" "═══ Deploy started ═══"
 
 # ── Pre-flight checks ────────────────────────────────────────────────────
@@ -52,12 +64,14 @@ log "INFO" "Setting permissions..."
 chown -R "$DEPLOY_USER:$WEB_GROUP" "$SITE_DIR"
 find "$SITE_DIR" -type d -exec chmod 755 {} +
 find "$SITE_DIR" -type f -exec chmod 644 {} +
+restore_git_executable_bits
 
 # Writable directories (PHP-FPM writes here as www-data)
 for dir in sessions uploads online-forms allocations form-workflow/state; do
     target="$SITE_DIR/mom/data/$dir"
     if [ -d "$target" ]; then
-        chmod -R 775 "$target"
+        find "$target" -type d -exec chmod 775 {} +
+        find "$target" -type f -exec chmod 664 {} +
         chown -R "$DEPLOY_USER:$WEB_GROUP" "$target"
     fi
 done
@@ -73,6 +87,7 @@ for logfile in php_error.log audit.log db_queries.log; do
     chown "$WEB_GROUP:$WEB_GROUP" "$target"
     chmod 664 "$target"
 done
+restore_git_executable_bits
 
 # ── Run governed database migrations before PHP-FPM serves the new release ──
 if [ "$RUN_DB_MIGRATIONS" = "1" ]; then
