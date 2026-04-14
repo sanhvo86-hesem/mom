@@ -483,12 +483,13 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $manifest,
             [
                 'original_artifact_hash_sha256' => str_repeat('b', 64),
-                'canonical_payload_hash_sha256' => str_repeat('c', 64),
+                'canonical_payload_hash_sha256' => hash('sha256', '{"result":"pass"}'),
+                'parsed_payload' => ['result' => 'pass'],
             ],
             [
                 [
                     'fingerprint_type' => 'canonical_payload_hash',
-                    'fingerprint_value_sha256' => str_repeat('c', 64),
+                    'fingerprint_value_sha256' => hash('sha256', '{"result":"pass"}'),
                     'frm_submission_attempt_id' => 'ATTEMPT-OLD',
                 ],
             ],
@@ -701,6 +702,33 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('failed', $result['validation_state']);
         $this->assertContains('canonical_payload_hash_mismatch', array_column($result['errors'], 'error_code'));
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $result['canonical_payload_hash_sha256']);
+    }
+
+    public function testFormValidationRequiresParsedPayloadEvenWhenSchemaRulesAreEmpty(): void
+    {
+        $result = (new EqmsFormExecutionService())->validateSubmissionAttempt(
+            [
+                'issuance_state' => 'issued',
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+            ],
+            [
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+            ],
+            [
+                'original_artifact_hash_sha256' => str_repeat('a', 64),
+                'canonical_payload_hash_sha256' => str_repeat('b', 64),
+            ],
+        );
+
+        $this->assertSame('failed', $result['validation_state']);
+        $this->assertContains('canonical_payload_required', array_column($result['errors'], 'error_code'));
+        $this->assertSame('', $result['canonical_payload_hash_sha256']);
     }
 
     public function testDocumentChangeAuthorityRequiresCanonicalEffectivityMatch(): void
@@ -1228,6 +1256,60 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'source_issuance_id' => '00000000-0000-0000-0000-000000000803',
                 'actor_id' => 'qa-1',
                 'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRejectsSourceAttemptCanonicalPayloadMismatch(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-source-canonical-mismatch-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('source_submission_attempt_canonical_payload_mismatch');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'form_submission',
+                'subject_id' => 'FRM-1',
+                'source_issuance_id' => '00000000-0000-0000-0000-000000000803',
+                'source_attempt_id' => '00000000-0000-0000-0000-000000000804',
+                'source_schema_version_id' => '00000000-0000-0000-0000-000000000802',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'fail'],
+                'readable_snapshot_html' => '<html><body>fail</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRejectsSourceAttemptOriginalArtifactMismatch(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-source-original-mismatch-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('source_submission_attempt_original_artifact_mismatch');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'form_submission',
+                'subject_id' => 'FRM-1',
+                'source_issuance_id' => '00000000-0000-0000-0000-000000000803',
+                'source_attempt_id' => '00000000-0000-0000-0000-000000000804',
+                'source_schema_version_id' => '00000000-0000-0000-0000-000000000802',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'tampered original',
                 'canonical_payload' => ['result' => 'pass'],
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
@@ -2587,6 +2669,9 @@ final class EvidenceFinalizationFakeDb
                 'schema_version_id' => '00000000-0000-0000-0000-000000000802',
                 'attempt_state' => 'accepted',
                 'validation_state' => 'passed',
+                'original_hash_sha256' => hash('sha256', 'raw original'),
+                'canonical_payload_hash_sha256' => hash('sha256', '{"result":"pass"}'),
+                'original_artifact_hash_sha256' => hash('sha256', 'raw original'),
             ];
         }
         if (str_contains($sql, 'INSERT INTO evidence_records')) {

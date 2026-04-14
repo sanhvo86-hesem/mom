@@ -109,7 +109,8 @@ final class EqmsFormExecutionService
                 );
             }
             $payloadHash = $serverPayloadHash;
-        } elseif ($schema !== [] || $validationRules !== []) {
+        } else {
+            $payloadHash = '';
             $errors[] = $this->error('canonical_payload_required', 'Parsed canonical payload is required for server-authoritative validation.');
         }
 

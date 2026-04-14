@@ -106,7 +106,7 @@ final class EvidenceFinalizationService
         if ($subjectType === '' || $subjectId === '') {
             throw new RuntimeException('evidence_subject_required_for_persistence');
         }
-        $this->assertSourceSubmissionAttemptAccepted($db, $input);
+        $this->assertSourceSubmissionAttemptAccepted($db, $input, $package);
         $evidenceKey = $this->text($input['evidence_key'] ?? '');
         if ($evidenceKey === '') {
             $evidenceKey = 'EV-' . substr(hash('sha256', $subjectType . '|' . $subjectId . '|' . ($package['package_hash_sha256'] ?? '')), 0, 24);
@@ -459,7 +459,7 @@ final class EvidenceFinalizationService
     /**
      * @param array<string, mixed> $input
      */
-    private function assertSourceSubmissionAttemptAccepted(object $db, array $input): void
+    private function assertSourceSubmissionAttemptAccepted(object $db, array $input, array $package): void
     {
         $attemptId = $this->nullableUuid($input['source_attempt_id'] ?? $input['frm_submission_attempt_id'] ?? null);
         if ($attemptId === null) {
@@ -475,11 +475,14 @@ final class EvidenceFinalizationService
             "SELECT
                 a.frm_submission_attempt_id,
                 a.frm_issuance_id,
-                vr.schema_version_id,
-                a.attempt_state,
-                vr.validation_state
-             FROM frm_submission_attempts a
-             LEFT JOIN submission_validation_results vr
+	                vr.schema_version_id,
+	                a.attempt_state,
+	                vr.validation_state,
+	                a.original_hash_sha256,
+	                vr.canonical_payload_hash_sha256,
+	                vr.original_artifact_hash_sha256
+	             FROM frm_submission_attempts a
+	             LEFT JOIN submission_validation_results vr
                ON vr.frm_submission_attempt_id = a.frm_submission_attempt_id
              WHERE a.frm_submission_attempt_id = CAST(:attempt_id AS uuid)
              ORDER BY vr.created_at DESC NULLS LAST
@@ -502,6 +505,28 @@ final class EvidenceFinalizationService
         }
         if ($schemaVersionId !== null && $this->nullableUuid($row['schema_version_id'] ?? null) !== $schemaVersionId) {
             throw new RuntimeException('source_submission_attempt_schema_mismatch');
+        }
+        $this->assertSourceAttemptHashMatches(
+            $this->nullableHash($row['canonical_payload_hash_sha256'] ?? null),
+            $this->nullableHash($package['canonical_payload_hash_sha256'] ?? null),
+            'source_submission_attempt_canonical_payload_hash_missing',
+            'source_submission_attempt_canonical_payload_mismatch',
+        );
+        $this->assertSourceAttemptHashMatches(
+            $this->nullableHash($row['original_artifact_hash_sha256'] ?? null) ?? $this->nullableHash($row['original_hash_sha256'] ?? null),
+            $this->nullableHash($package['artifacts']['original']['sha256'] ?? null),
+            'source_submission_attempt_original_artifact_hash_missing',
+            'source_submission_attempt_original_artifact_mismatch',
+        );
+    }
+
+    private function assertSourceAttemptHashMatches(?string $sourceHash, ?string $packageHash, string $missingCode, string $mismatchCode): void
+    {
+        if ($sourceHash === null || $packageHash === null) {
+            throw new RuntimeException($missingCode);
+        }
+        if (!hash_equals($sourceHash, $packageHash)) {
+            throw new RuntimeException($mismatchCode);
         }
     }
 

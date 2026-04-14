@@ -12,8 +12,8 @@ Validated remediation state: Agent 2 P1 closure pass on `codex/worldclass-closur
 | Controlled source contains generated registry and tranche13 agent reports | P1 | Closed | `mom/data/registry/*` and tranche13 generated reports removed from Git; `.gitignore` no longer unignores runtime registry projections; boundary scanner is required before merge. |
 | Evidence finalization can report finalized without canonical persistence | P0 | Closed | `EvidenceFinalizationService` now throws `authoritative_evidence_store_required` when no DB-backed canonical store is available. |
 | Final evidence package can be finalized without signature events | P1 | Closed | `EvidenceFinalizationService` now throws `evidence_signature_event_required` unless the package manifest carries at least one signature event. |
-| Form upload validation is hash/metadata-oriented rather than server-authoritative | P1 | Closed | `EqmsFormExecutionService` now computes canonical payload hash from parsed payload, validates required/type rules from issued schema, and rejects caller hash mismatch. |
-| Finalization does not verify source submission attempt if provided | P1 | Closed | `EvidenceFinalizationService` checks `frm_submission_attempts` and latest validation result before persistence when a source attempt is supplied, and requires a source attempt for form/offline-derived evidence. |
+| Form upload validation is hash/metadata-oriented rather than server-authoritative | P1 | Closed | `EqmsFormExecutionService` now requires parsed payload for every validation attempt, computes canonical payload hash from parsed payload, validates required/type rules from issued schema, and rejects caller hash mismatch. |
+| Finalization does not verify source submission attempt if provided | P1 | Closed | `EvidenceFinalizationService` checks `frm_submission_attempts` plus latest validation result before persistence, requires source attempts for form/offline-derived evidence, and binds final package original/canonical hashes to the accepted source attempt. |
 | Document release/supersede/withdraw authority was not DB-exact | P1 | Closed | Migration `125_change_effect_exact_release_semantics.sql` and the base control-plane migration allow exact `release`, `supersede`, and `withdraw` effects; `DocumentRevisionCommandService` no longer treats generic `revise` as sufficient authority. |
 | Final document revision idempotency lacked a mandatory manifest anchor | P1 | Closed | Released/superseded/obsolete/withdrawn document revisions now require `manifest_hash_sha256`, and replay equivalence checks include that manifest hash. |
 | Evidence signature ceremony auto-filled displayed hash | P1 | Closed | `EvidenceFinalizationService` no longer auto-populates `displayed_record_hash_sha256`; `ElectronicSignatureService` requires the signer-visible hash and finalization verifies signed payload hash belongs to the immutable evidence package. |
@@ -46,7 +46,7 @@ Validated remediation state: Agent 2 P1 closure pass on `codex/worldclass-closur
 | Agent | Highest severity | Hard finding merged into work |
 |---|---:|---|
 | Platform governance and repo hygiene | P1 | Generated runtime registry/report artifacts were tracked; CI/deploy release gates were advisory. |
-| Document/form/evidence control | P1/P0 via change agent | Server schema/canonical validation, exact release/supersede/withdraw authority, manifest-anchored final document revisions, source attempt requirement, finalized-record amendment guard, authenticated principal/session-bound re-auth challenge, org-safe audit pack manifest, and non-auto-filled e-signature ceremony were added. |
+| Document/form/evidence control | P1/P0 via change agent | Server schema/canonical validation, source-attempt content hash binding, exact release/supersede/withdraw authority, manifest-anchored final document revisions, source attempt requirement, finalized-record amendment guard, authenticated principal/session-bound re-auth challenge, org-safe audit pack manifest, and non-auto-filled e-signature ceremony were added. |
 | Change authority/configuration control | P0/P1 | Released document changes, strict shared post-release field authority, exact deployment actions, emergency risk acceptance, idempotency scope, and change package rollback proof were hardened. |
 | MES/MOM/genealogy | P1 | 5M policy is server-loaded and genealogy fact/projection writes are transaction-wrapped. |
 | Regulated electronic records/data integrity | P0/P1 | Finalization fail-closed, signature ceremony, deterministic audit sequence, and scope-only audit pack export were added. |
@@ -86,7 +86,7 @@ Primary benchmark URLs used during audit refresh:
 |---|---|---|---|
 | 0 | Repo hygiene and release discipline | Generated P1 artifacts removed; CI/deploy hardened; release artifacts added. | P2 prompt-file hygiene. |
 | 1 | Control-plane foundation | Evidence/document/change/genealogy gates hardened; deterministic audit sequence migration added. | Partition-scale DB validation under production volume. |
-| 2 | Offline issuance and online finalization | Finalization fail-closed, signature ceremony requires authenticated principal/session-bound server challenge without server auto-fill, source attempt mandatory for form/offline evidence, server schema/canonical validation added and proven through command service. | Broader schema-rule library and user-facing validation UX. |
+| 2 | Offline issuance and online finalization | Finalization fail-closed, signature ceremony requires authenticated principal/session-bound server challenge without server auto-fill, source attempt is mandatory and content-hash-bound for form/offline evidence, server schema/canonical validation added and proven through command service. | Broader schema-rule library and user-facing validation UX. |
 | 3 | Change authority, effectivity, training gate | Exact document release/supersede/withdraw, strict shared post-release field authority, exact deploy authority checks, emergency signature/waiver, idempotency scope, and rollback proof added. | Productized effectivity manager and training task lifecycle. |
 | 4 | Publication, immutable package, audit pack | SharePoint boundary corrected; publication action guarded; audit pack is scope-only DB-loaded. | Graph worker, WORM adapter, daily digest worker. |
 | 5 | Genealogy, digital thread, impact explorer | Shopfloor event 5M promotion added; genealogy write endpoints gated and transaction-wrapped; persisted 5M policy lookup added. | Deterministic full as-built graph closure, MES bridge conversion, and impact explorer product API. |
@@ -96,7 +96,7 @@ Primary benchmark URLs used during audit refresh:
 | API area | Required contract behavior |
 |---|---|
 | Document release/supersede | Request must include `source_change_order_id`; response must include authoritative doc revision/effectivity/distribution rows; errors include `released_document_change_authority_required`. |
-| Evidence finalization | Request must include original, canonical payload, readable snapshot, publication state, and Part 11-style signature ceremony backed by a server-issued one-time challenge bound to the authenticated principal/session/org; form/offline evidence requires accepted source submission attempt; finalized records require amendment/change authority. |
+| Evidence finalization | Request must include original, canonical payload, readable snapshot, publication state, and Part 11-style signature ceremony backed by a server-issued one-time challenge bound to the authenticated principal/session/org; form/offline evidence requires accepted source submission attempt with matching original and canonical payload hashes; finalized records require amendment/change authority. |
 | Canonical evidence retrieve | Request is evidence ref plus org context; response is assembled from canonical DB rows, not caller payload. |
 | Genealogy fact write | Requires CSRF and controlled role; request must include edge fact endpoints and released change authority where service requires it. |
 | 5M gate | Caller context is evaluated against persisted policy-authoritative required dimensions; caller cannot set required dimensions false or spoof policy source. |
@@ -117,13 +117,13 @@ Primary benchmark URLs used during audit refresh:
 ## Validation Evidence
 
 - `php -l` on touched PHP files: passed.
-- Focused PHPUnit for world-class control-plane execution: passed, `66 tests`, `327 assertions`.
+- Focused PHPUnit for world-class control-plane execution: passed, `69 tests`, `334 assertions`.
 - Focused PHPUnit for strict change authority: passed, `8 tests`, `28 assertions`.
 - `php tools/release/check_repo_boundary.php`: P0/P1 clean, 7 P2 prompt-file warnings remain.
 - `php tools/release/check_workflow_status_authority.php`: clean.
 - `./composer analyse -- --memory-limit=1G`: passed.
-- `./composer test`: passed, `433 tests`, `2435 assertions`, `1 skipped`.
-- `./composer check`: passed, `433 tests`, `2435 assertions`, `1 skipped`.
+- `./composer test`: passed, `436 tests`, `2442 assertions`, `1 skipped`.
+- `./composer check`: passed, `436 tests`, `2442 assertions`, `1 skipped`.
 
 ## Dependency-Blocked Register
 

@@ -17,6 +17,8 @@
     "Corrected SharePoint template to read-only publication/discovery boundary"
     ,"Added server-authoritative form schema/canonical payload validation"
     ,"Required accepted source submission attempts for form/offline evidence finalization"
+    ,"Bound accepted source submission attempt hashes to final evidence package original and canonical payload hashes"
+    ,"Required parsed payload before server form validation can accept a submission attempt"
     ,"Blocked new final evidence packages over finalized records without amendment/change authority"
     ,"Added DB-backed deployment change authority verification"
     ,"Added electronic signature ceremony fields and deterministic audit aggregate sequence"
