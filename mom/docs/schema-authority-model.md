@@ -51,6 +51,8 @@ Any registry, builder or release tool that reads `hesem_layout_templates` or a b
 
 The graphics authority projection must also include `changeSetModel`, `moduleGraphicsLineageGraph`, `runtimeGraphicsComplianceBeacon`, `visualDebtObservatory`, `environmentPolicyPacks`, `graphicsReleaseDashboard`, `multiSitePlantBrandingGovernance`, `controlledEmergencyOverridePath` and `graphicsReleaseLink`. These artifacts are generated from backend authority and registry/build-packet evidence; they are not editable workspace drafts and are not browser-cache state.
 
+Multi-agent governance routes through the same authority family: `cat-admin` is the coordinating namespace for identity, graphics, endpoint, waiver, release and observability actions, and multi-agent outputs must resolve to backend-attested artifacts rather than browser-only state or agent-local memory.
+
 ## Workspace Deletion Impact
 
 Deleting or blanking `workspace.json` does not delete database rows and does not remove the generated system registry. It only changes the editable Schema Studio design surface.

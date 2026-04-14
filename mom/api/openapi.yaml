@@ -4236,8 +4236,8 @@ paths:
       summary: Read release-grade graphics authority linkage
       description: |
         Returns the graphics authority refs, registry checksum, compliance snapshot refs,
-        impact-analysis refs, waiver refs, runtime beacon refs, rollout decision refs and
-        evidence bundle obligations required by release engineering.
+        impact-analysis refs, waiver refs, runtime beacon refs, rollout decision refs,
+        release evidence pack refs and evidence bundle obligations required by release engineering.
 
         **Action aliases:** `graphics_release_link_get`, `admin_graphics_release_link_get`
       responses:
@@ -4249,6 +4249,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GraphicsReleaseLinkResponse'
+
+  /api/graphics/release-evidence-pack:
+    get:
+      operationId: graphicsReleaseEvidencePackGet
+      tags: [Graphics Governance]
+      summary: Read the canonical graphics release evidence pack
+      description: |
+        Returns the immutable evidence pack assembled from release linkage, blockers,
+        compliance snapshots, drift proof, rollback evidence and required artifacts.
+
+        **Action aliases:** `graphics_release_evidence_pack_get`, `admin_graphics_release_evidence_pack_get`
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultProblem'
+        '200':
+          description: Graphics release evidence pack returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphicsReleaseEvidencePackResponse'
 
   /api/graphics/impact/token:
     post:
@@ -6652,6 +6672,8 @@ components:
           type: string
         releaseDashboardRef:
           type: string
+        releaseEvidencePackRef:
+          type: string
         multiSitePlantBrandingGovernanceRef:
           type: string
         controlledEmergencyOverridePathRef:
@@ -6662,10 +6684,15 @@ components:
           type: string
         releaseBlocked:
           type: boolean
+        releaseReadinessState:
+          type: string
+          enum: [ready, blocked-by-graphics-governance]
         blockerCount:
           type: integer
         releaseBlockerCount:
           type: integer
+        complianceMatrixVersion:
+          type: string
         runtimeBeaconSummary:
           type: object
           additionalProperties: true
@@ -6691,6 +6718,58 @@ components:
           properties:
             releaseLink:
               $ref: '#/components/schemas/GraphicsReleaseLink'
+
+    GraphicsReleaseEvidencePack:
+      type: object
+      required: [evidencePackId, authority, status, changeSetRef, impactReportRef, complianceMatrixSnapshotRef, driftReportRef, runtimeLinkageProofRef, debtObservatoryRef, rolloutDecisionRef, rollbackPackageRef, waiverRefs, releaseBlockersStatus, releaseBlockers, requiredArtifacts, generatedAt]
+      additionalProperties: true
+      properties:
+        evidencePackId:
+          type: string
+        authority:
+          type: string
+        status:
+          type: string
+          enum: [ready, blocked]
+        changeSetRef:
+          type: string
+        impactReportRef:
+          type: string
+        complianceMatrixSnapshotRef:
+          type: string
+        driftReportRef:
+          type: string
+        runtimeLinkageProofRef:
+          type: string
+        debtObservatoryRef:
+          type: string
+        rolloutDecisionRef:
+          type: string
+        rollbackPackageRef:
+          type: string
+        waiverRefs:
+          type: string
+        releaseBlockersStatus:
+          type: string
+        releaseBlockers:
+          type: object
+          additionalProperties: true
+        requiredArtifacts:
+          type: array
+          items:
+            type: string
+        generatedAt:
+          type: string
+          format: date-time
+
+    GraphicsReleaseEvidencePackResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          required: [evidencePack]
+          properties:
+            evidencePack:
+              $ref: '#/components/schemas/GraphicsReleaseEvidencePack'
 
     GraphicsPublishRequest:
       type: object

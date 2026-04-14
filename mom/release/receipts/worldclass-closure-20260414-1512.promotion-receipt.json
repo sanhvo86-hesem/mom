@@ -7,6 +7,9 @@
   "base_head": "6e82963a",
   "validated_head": "recorded_in_branch_merge_summary_after_register_commit",
   "promotion_state": "premerge_validation_passed",
+  "artifact_state": "historical_superseded",
+  "not_current_release_evidence": true,
+  "superseded_by": "codex/integration-graphics-control-plane-v8",
   "created_at": "2026-04-14T08:11:19Z",
   "merge_strategy": "fast_forward_preferred_else_stop",
   "validation_evidence": {

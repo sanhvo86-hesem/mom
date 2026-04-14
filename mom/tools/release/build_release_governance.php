@@ -33,8 +33,17 @@ $context = [
     'repository' => $args['repository'] ?? 'sanhvo86-hesem/mom',
     'branch' => $args['branch'] ?? $branch,
     'commit_sha' => $args['commit-sha'] ?? $commit,
+    'release_ref' => $args['release-ref'] ?? '',
+    'promotion_scope' => $args['promotion-scope'] ?? 'controlled_source',
     'change_authority_ref' => $args['change-authority'] ?? '',
     'change_authority_state' => $args['change-authority-state'] ?? 'released',
+    'manifest_state' => $args['manifest-state'] ?? 'draft',
+    'required_checks' => isset($args['required-checks']) && $args['required-checks'] !== ''
+        ? array_values(array_filter(array_map('trim', explode(',', $args['required-checks']))))
+        : null,
+    'approver' => $args['approver'] ?? '',
+    'signature_event_id' => $args['signature-event-id'] ?? '',
+    'notes' => $args['notes'] ?? '',
     'target_environment' => $args['target-environment'] ?? 'production',
     'promotion_state' => $args['promotion-state'] ?? 'promoted',
     'promoted_by' => $args['promoted-by'] ?? 'automation',

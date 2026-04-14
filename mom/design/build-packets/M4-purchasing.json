@@ -121,8 +121,14 @@
   },
   "qa": {
     "gateSet": "mom/design/qa-gates.json",
-    "requiredNow": ["G01", "G02", "G03", "G06", "G13", "G17"],
-    "knownOpen": ["G04", "G05", "G07", "G08", "G09", "G10", "G14", "G18", "G19"]
+    "requiredNow": ["G01", "G02", "G03", "G06", "G07", "G08", "G13", "G14", "G17", "G19"],
+    "knownOpen": ["G04", "G05", "G09", "G10", "G18"],
+    "evidenceRefs": {
+      "G07": "mom/data/graphics-governance/evidence/M4-purchasing-graphics-release-evidence-2026-04-14.json#/evidence/gates/G07",
+      "G08": "mom/data/graphics-governance/evidence/M4-purchasing-graphics-release-evidence-2026-04-14.json#/evidence/gates/G08",
+      "G14": "mom/data/graphics-governance/evidence/M4-purchasing-graphics-release-evidence-2026-04-14.json#/evidence/gates/G14",
+      "G19": "mom/data/graphics-governance/evidence/M4-purchasing-graphics-release-evidence-2026-04-14.json#/evidence/gates/G19"
+    }
   },
   "traceability": {
     "sourceEntities": ["sales.sales_order", "production.job_orders", "production.work_orders", "direct_purchase_demand"],
