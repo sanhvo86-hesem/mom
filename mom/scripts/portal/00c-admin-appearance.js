@@ -1236,7 +1236,10 @@ var VISUAL_THEMES = [
   { id:'soft-pastel', name:{vi:'Pastel mềm',en:'Soft Pastel'}, colors:{brand:'#6366f1',brand2:'#a5b4fc',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#f9a8d4'}, desc:{vi:'Dịu, phù hợp HR và onboarding.',en:'Soft pastel for onboarding and HR flows.'} },
   { id:'earth-tone', name:{vi:'Đất',en:'Earth Tone'}, colors:{brand:'#78350f',brand2:'#92400e',bgPage:'#fefce8',bgSurface:'#fff7ed',accent:'#ca8a04'}, desc:{vi:'Nâu ấm, organic.',en:'Warm organic brown palette.'} },
   { id:'neon-pulse', name:{vi:'Neon',en:'Neon Pulse'}, colors:{brand:'#09090b',brand2:'#22c55e',bgPage:'#09090b',bgSurface:'#18181b',accent:'#06b6d4'}, desc:{vi:'Dark tech với accent neon.',en:'Dark tech preset with neon accents.'} },
-  { id:'zen-minimal', name:{vi:'Thiền',en:'Zen Minimal'}, colors:{brand:'#737373',brand2:'#a3a3a3',bgPage:'#fafafa',bgSurface:'#ffffff',accent:'#d4d4d4'}, desc:{vi:'Whitespace tối đa, trang nhã.',en:'Maximum whitespace, minimal chrome.'} }
+  { id:'zen-minimal', name:{vi:'Thiền',en:'Zen Minimal'}, colors:{brand:'#737373',brand2:'#a3a3a3',bgPage:'#fafafa',bgSurface:'#ffffff',accent:'#d4d4d4'}, desc:{vi:'Whitespace tối đa, trang nhã.',en:'Maximum whitespace, minimal chrome.'} },
+  { id:'ember-industrial', name:{vi:'Than công nghiệp',en:'Ember Industrial'}, colors:{brand:'#9a3412',brand2:'#f97316',bgPage:'#fff7ed',bgSurface:'#ffffff',accent:'#facc15'}, desc:{vi:'Màu cảnh báo ấm cho khu công nghiệp, phải qua impact analysis trước rollout.',en:'Warm industrial warning palette; impact analysis required before rollout.'} },
+  { id:'graphite-amber', name:{vi:'Graphite hổ phách',en:'Graphite Amber'}, colors:{brand:'#334155',brand2:'#f59e0b',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#fbbf24'}, desc:{vi:'Tối trung tính với hổ phách cho dashboard và review.',en:'Neutral dark graphite with amber for dashboards and reviews.'} },
+  { id:'slate-ice', name:{vi:'Đá phiến lạnh',en:'Slate Ice'}, colors:{brand:'#1e293b',brand2:'#38bdf8',bgPage:'#f8fafc',bgSurface:'#ffffff',accent:'#14b8a6'}, desc:{vi:'Tông lạnh cho control room, vẫn phải giữ tương phản và focus token.',en:'Cool control-room palette while preserving contrast and focus tokens.'} }
 ];
 
 function normalizeSubTab(subTab){
@@ -1735,16 +1738,14 @@ window._admGraphicsRequestWaiver = function(){
     expiresAt: expiresAt,
     requestedBy: 'Admin Appearance',
     scope: waiverScope,
-    releaseManifestRefs: [{
-      refType:'release_manifest',
-      refId:'graphics-waiver-request',
-      uri:'mom/data/registry/graphics-governance-registry.json'
-    }],
-    documentControlRefs: [{
-      refType:'document',
-      refId:'document-graphics-governance-2026-04-05',
-      uri:'mom/docs/document-graphics-governance-2026-04-05.md'
-    }]
+    releaseManifestRefs: [
+      { refType:'release_manifest', refId:'mom/release/manifests/release-manifest.template.json', uri:'mom/release/manifests/release-manifest.template.json' },
+      { refType:'graphics_evidence_pack', refId:'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseEvidencePack', uri:'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseEvidencePack' }
+    ],
+    documentControlRefs: [
+      'mom/data/registry/graphics-governance-registry.json#/controlledEmergencyOverridePath',
+      'mom/data/registry/graphics-governance-registry.json#/graphicsReleaseLink'
+    ]
   }).then(function(result){
     announceGraphics((result && result.message) ? result.message : L('Waiver request đã gửi vào backend governance.', 'Waiver request submitted to backend governance.'));
     if(typeof showToast === 'function'){
@@ -2711,7 +2712,7 @@ function renderTemplateEditor(id){
   h += '<div style="display:grid;gap:14px">';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">Live Preview</div>'+renderZoneMiniDiagram(tpl)+'<div style="margin-top:10px;padding:10px;border:1px dashed var(--border);border-radius:10px;background:var(--bg-surface-alt,#f8fafc)">'+renderTemplateSvg(tpl)+'</div></div>';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('themeLibrary'))+'</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">';
-  VISUAL_THEMES.slice(0,8).forEach(function(theme){
+  VISUAL_THEMES.forEach(function(theme){
     h += '<button type="button" onclick="_admTplApplyTheme(\''+theme.id+'\')" style="text-align:left;padding:10px;border:1px solid '+(_templateThemePreview === theme.id ? 'var(--brand-2)' : 'var(--border)')+';border-radius:10px;background:var(--bg-surface);cursor:pointer"><div class="theme-swatch-bar"><div style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></div><div style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></div><div style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></div><div style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></div></div><div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div><div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div></button>';
   });
   h += '</div></div>';
