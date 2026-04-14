@@ -1882,7 +1882,7 @@ BASH;
             return ['statuses' => [], 'systemctl' => false];
         }
 
-        $run = $this->executeOnHost($host, implode('; ', $parts));
+        $run = $this->executeOnHost($host, implode("\n", $parts));
         if (($run['ok'] ?? false) !== true && trim((string)($run['output'] ?? '')) === '') {
             return ['statuses' => [], 'systemctl' => false];
         }
@@ -1992,7 +1992,7 @@ BASH;
             return $probes;
         }
 
-        $run = $this->executeOnHost($host, implode('; ', $parts));
+        $run = $this->executeOnHost($host, implode("\n", $parts));
         foreach (preg_split("/\r\n|\n|\r/", trim((string)($run['output'] ?? ''))) ?: [] as $line) {
             if (!is_string($line) || !str_starts_with($line, '__SITE__|')) {
                 continue;
@@ -2145,7 +2145,7 @@ BASH;
             return $probes;
         }
 
-        $run = $this->executeOnHost($host, implode('; ', $parts));
+        $run = $this->executeOnHost($host, implode("\n", $parts));
         foreach (preg_split("/\r\n|\n|\r/", trim((string)($run['output'] ?? ''))) ?: [] as $line) {
             if (!is_string($line) || !str_starts_with($line, '__CTRL__|')) {
                 continue;
@@ -2595,7 +2595,9 @@ BASH;
      */
     private function isAllowedSiteProbeCommand(string $command): bool
     {
-        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        // Segments are joined by "\n" in probeSites(); splitting on "; " is wrong
+        // because "; " also appears inside each segment (e.g., "out='000||||'; printf").
+        $segments = array_filter(array_map('trim', explode("\n", $command)), fn(string $s): bool => $s !== '');
         if ($segments === []) {
             return false;
         }
@@ -2634,7 +2636,9 @@ BASH;
      */
     private function isAllowedControlEndpointProbeCommand(string $command): bool
     {
-        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        // Segments are joined by "\n" in probeControlEndpoints(); splitting on "; " is wrong
+        // because "; " also appears inside each segment.
+        $segments = array_filter(array_map('trim', explode("\n", $command)), fn(string $s): bool => $s !== '');
         if ($segments === []) {
             return false;
         }
@@ -2746,8 +2750,9 @@ BASH;
         // We reconstruct and compare structurally rather than by string match.
         $safeUnitPattern = '/^[a-zA-Z0-9._@-]+$/';
 
-        // Split on "; " — the separator used by probeServices() implode.
-        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        // Segments are joined by "\n" in probeServices(); splitting on "; " was wrong
+        // because "; " also appears inside each segment (e.g., "resolved=''; state='';").
+        $segments = array_filter(array_map('trim', explode("\n", $command)), fn(string $s): bool => $s !== '');
         if ($segments === []) {
             return false;
         }
