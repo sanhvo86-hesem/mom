@@ -289,13 +289,6 @@ final class MobileWorkQueueService
                     if ($currentStatus === self::TASK_STATUSES[2]) {
                         throw new RuntimeException('task_already_completed');
                     }
-                    // Auto-start pending tasks for backward compatibility with
-                    // clients that call completeTask without an explicit startTask.
-                    if ($currentStatus === self::TASK_STATUSES[0]) {
-                        $task['task_status'] = self::TASK_STATUSES[1];
-                        $task['started_at'] = $now;
-                        $currentStatus = self::TASK_STATUSES[1];
-                    }
                     if ($currentStatus !== self::TASK_STATUSES[1]) {
                         throw new RuntimeException('task_not_started');
                     }

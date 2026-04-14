@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-reaudit-20260414-122702`
+Audited branch: `codex/worldclass-reaudit-20260414-145442`
 
 Date: 2026-04-14
 
@@ -30,4 +30,4 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - EQMS cannot be a side module. First-piece/in-process/final inspection, evidence, nonconformance, and release packets must be linked to work order/operation/machine/operator context.
 - CNC digital thread is the main remaining structural gap. Execution already preserves CNC references, but CNC program/setup-sheet authority is still file-backed while DB schema exists.
 - Security gaps in AI/NLQ are high-leverage because natural-language query surfaces can expose broad manufacturing data and write conversation history.
-- This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped, mobile task assignment/start/completion now has an event journal, canonical evidence finalization is role-gated, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.
+- This remediation pass closed additional safe gaps: legacy AI read surfaces are role-scoped, feedback uses feedback/write roles, combined AI schedule metrics are plant-scoped and no longer leak blank-plant JSON fallback rows to scoped users, mobile task assignment/start/completion now has an event journal with explicit start-before-complete enforcement, canonical evidence finalization is role-gated, setup sheets default to draft, MTConnect XML parsing no longer expands entities, and WO creation rejects terminal parent JOs.

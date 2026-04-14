@@ -121,12 +121,26 @@ final class MobileWorkQueueServiceTest extends TestCase
         ]);
     }
 
-    public function testCompleteTaskAutoStartsPendingAndRejectsDoubleCompletion(): void
+    public function testCompleteTaskRequiresExplicitStartAndRejectsDoubleCompletion(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);
         $task = $service->assignTask('operator-1', 'WO-1005', 'operation_complete', []);
 
-        // Pending tasks are auto-started for backward compatibility
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('task_not_started');
+        $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 1,
+            'qty_scrap' => 0,
+        ]);
+    }
+
+    public function testCompleteTaskRejectsDoubleCompletion(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1005', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
+
         $completed = $service->completeTask((string)$task['queue_id'], 'operator-1', [
             'result' => 'pass',
             'qty_completed' => 1,

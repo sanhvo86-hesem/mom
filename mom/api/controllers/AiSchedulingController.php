@@ -198,7 +198,7 @@ class AiSchedulingController extends BaseController
                 return false;
             }
             $rowPlant = trim((string)($row['plant_id'] ?? $row['org_plant_id'] ?? ''));
-            return $rowPlant === '' || $rowPlant === $plantId;
+            return $rowPlant === $plantId;
         }));
     }
 

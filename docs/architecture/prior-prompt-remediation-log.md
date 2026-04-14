@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-reaudit-20260414-122702`
+Audited branch: `codex/worldclass-reaudit-20260414-145442`
 
 Date: 2026-04-14
 
@@ -35,12 +35,13 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Local storage first-write reliability | Fixed now | `LocalStorageDriver` creates directories before realpath validation and rejects absolute/traversal paths. |
 | Required docs under requested names | Fixed now | Added `canonical-execution-source-of-truth.md`, `prior-prompt-remediation-log.md`, and `shopfloor-execution-contracts.md`; updated benchmark doc. |
 | Six-agent global reaudit artifacts | Fixed now | Added `docs/audits/agent1-benchmark.md` through `agent6-ai-security.md` with current finding dispositions. |
-| AI model/dashboard read governance | Fixed now | `aiModelList()` and `aiDashboard()` require AI read access; non-admin model list output redacts config, metadata, and training source. |
+| AI model/dashboard read governance | Fixed now | `aiModelList()` and `aiDashboard()` require AI read access; non-admin model list output redacts config, metadata, and training source; scoped JSON fallback reads no longer include blank-plant advisory rows. |
 | EQMS generic update lifecycle bypass | Fixed now | Exception update routes now use field allowlists and reject lifecycle/status fields through generic update. |
 | JO/WO generic update field drift | Fixed now | `OrderController` now rejects unknown JO/WO update fields before workflow validation and validates WO schedule window order. |
 | Evidence replay-key contract drift | Fixed now | `EvidenceController` idempotency keys now follow the 16-128 character platform token contract without colon separators. |
 | Mobile task completion data quality | Fixed now | Mobile completion rejects scrap greater than completed quantity and requires a reason code for fail/partial/scrap outcomes. |
 | Mobile task lifecycle event history | Fixed now | Mobile assignment/start/completion now writes `mobile/task_events.json`; completion requires `in_progress` and cannot overwrite completed tasks. |
+| Mobile completion start-state enforcement regression | Fixed now | Current branch code still auto-started pending tasks during completion despite the documented contract. This pass removed auto-start and added a pending-completion rejection test. |
 | Mobile clock-out scrap contradiction | Fixed now | Clock-out rejects `qty_scrap > qty_completed` even when completed quantity is zero. |
 | Mobile inspection replay identity through controller | Fixed now | `MobileController::captureInspection()` forwards capture/client/idempotency/captured timestamp fields into the service. |
 | Canonical evidence finalization role gate | Fixed now | `EqmsControlPlaneController::finalizeEvidencePackage()` now requires controlled evidence finalization roles. |
@@ -81,6 +82,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Operational override elevated roles | Generic `manager/director/admin` gate could block real repository roles. | Replaced with canonical elevated role list plus `admin_roles()` and role migration. |
 | FMEA authorization | Role gates used a single unmigrated `role` string. | Added migrated multi-role checks and role buckets. |
 | COPQ configuration | A TODO documented hardcoded cost rates without remediation. | Added config-driven rates with defaults and tests. |
+| Mobile task completion lifecycle | Current branch still auto-started pending tasks during completion, creating a completion event without a matching start event. | Completion now requires `in_progress`; clients must call `startTask` first so assignment/start/completion history is complete. |
 | Required documentation names | Previous docs existed under related names but not all requested names. | Added exact required documents and updated the benchmark doc. |
 
 ## Still blocked by evidence

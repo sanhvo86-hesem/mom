@@ -83,6 +83,8 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertMatchesRegularExpression('/public function getDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertMatchesRegularExpression('/public function aiDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertStringContainsString('SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}', $controller);
+        $this->assertStringContainsString('return $rowPlant === $plantId;', $controller);
+        $this->assertStringNotContainsString("return \$rowPlant === '' || \$rowPlant === \$plantId;", $controller);
         $this->assertStringContainsString('$canViewModelInternals = $this->userHasAnyRole($user, admin_roles())', $controller);
         $this->assertStringContainsString('unset($row[\'training_data_source\'], $row[\'config\'], $row[\'metadata\']);', $controller);
         $this->assertStringContainsString('p.plant_id = :mtta_plant_id', $pipeline);
