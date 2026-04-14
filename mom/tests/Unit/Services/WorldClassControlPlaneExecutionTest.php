@@ -1121,6 +1121,31 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'released'], 'qa-1');
     }
 
+    public function testChangeOrderCreationUsesTransactionForPackageRollback(): void
+    {
+        $db = new FailingTransactionalChangeLifecycleFakeDb();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('simulated_child_insert_failure');
+
+        try {
+            (new ChangeLifecycleCommandService($db))->createChangeOrder([
+                'change_order_number' => 'CO-TX-FAIL',
+                'title' => 'Transaction failure proof',
+                'affected_objects' => [[
+                    'object_type' => 'document_revision',
+                    'object_id' => 'SOP-100-A',
+                    'affected_fields' => ['lifecycle_state'],
+                    'requested_effect' => 'revise',
+                ]],
+            ], 'qa-1');
+        } finally {
+            $this->assertSame(1, $db->transactionCount);
+            $this->assertTrue($db->rolledBack);
+            $this->assertSame([], $db->affectedObjects);
+        }
+    }
+
     public function testEmergencyChangeReleaseRequiresRollbackAndPostImplementationControls(): void
     {
         $db = new ChangeLifecycleFakeDb();
@@ -2271,7 +2296,7 @@ final class CanonicalEvidenceReadFakeDb
     }
 }
 
-final class ChangeLifecycleFakeDb
+class ChangeLifecycleFakeDb
 {
     /**
      * @var list<array{sql: string, params: array<string, mixed>}>
@@ -2541,5 +2566,38 @@ final class ChangeLifecycleFakeDb
             return [];
         }
         return [];
+    }
+}
+
+final class FailingTransactionalChangeLifecycleFakeDb extends ChangeLifecycleFakeDb
+{
+    public int $transactionCount = 0;
+
+    public bool $rolledBack = false;
+
+    public function transactional(callable $callback): mixed
+    {
+        $this->transactionCount++;
+        try {
+            return $callback();
+        } catch (\Throwable $e) {
+            $this->rolledBack = true;
+            $this->affectedObjects = [];
+            $this->resultingObjects = [];
+            throw $e;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        if (str_starts_with(ltrim($sql), 'INSERT INTO plm_change_affected_objects')) {
+            throw new \RuntimeException('simulated_child_insert_failure');
+        }
+
+        return parent::queryOne($sql, $params);
     }
 }
