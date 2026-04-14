@@ -1038,6 +1038,16 @@ class GenericCrudService
             }
         }
 
+        // Include FK reference columns (columns with a 'references' definition).
+        // These are domain-level foreign keys (e.g. hcm_org_unit_id) that are needed
+        // by the frontend for grouping, filtering, and relationship display.
+        // Org-scope FK columns (org_company_code etc.) are already added above.
+        foreach ($columns as $colName => $colDef) {
+            if (is_array($colDef) && ($colDef['references'] ?? null) !== null) {
+                $add((string)$colName);
+            }
+        }
+
         return $selected !== [] ? $selected : array_keys($columns);
     }
 

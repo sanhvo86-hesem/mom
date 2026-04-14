@@ -1684,13 +1684,11 @@ function _body(){
     return _empty(overview.error);
   }
   var hosts = Array.isArray(overview.hosts) ? overview.hosts : [];
-  if(state.tab === 'files'){
-    return _filesTab(state.host);
-  }
   var body = _header(overview, state.host || {}) + _summaryCards(overview.metrics || {});
   body += _tabs();
   body += _hostPicker(hosts);
   body += '<div style="height:16px"></div>';
+  if(state.tab === 'files') return body + _filesTab(state.host);
   if(state.tab === 'overview') body += _overviewTab(state.host);
   if(state.tab === 'services') body += _servicesTab(state.host);
   if(state.tab === 'network') body += _networkTab(state.host);
