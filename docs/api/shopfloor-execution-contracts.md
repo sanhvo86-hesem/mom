@@ -104,6 +104,8 @@ Behavior:
 - Operators receive only their assigned work for the selected shift/day unless the actor has planner/write authority.
 - Blank assignment does not create an open-to-all report path.
 - Response may include legacy task fields and compact task cards. The compact shape should preserve `target_id`, `wo_number`, `operation_seq`, `machine_id`, `equipment_id`, `work_center_id`, `shift_date`, `shift_code`, `target_quantity`, `reported_quantity`, `remaining_quantity`, and quality-gate status when available.
+- Mobile task completion persists `result`, `qty_completed`, `qty_scrap`, `quantity_completed`, `quantity_scrap`, and `completion_reason_code` on the existing mobile work queue snapshot. Non-`pass` outcomes and any scrap require a structured reason code; `qty_scrap` may not exceed `qty_completed`.
+- Mobile offline conflict resolution is owner-scoped. Supervisor/admin-style override requires explicit override reason and is audited.
 
 ## Production report
 
@@ -271,6 +273,8 @@ Rules:
 - Feedback write is idempotent.
 - Feedback is advisory analytics data only and cannot mutate dispatch or execution state.
 - Critical prediction recommendation records remain `pending` and carry `advisory_only: true`, `execution_authority: false`, and `requires_human_approval: true`. They may point a human to quality, maintenance, tooling, or planning review, but they do not create NCRs, maintenance work, tool orders, schedule moves, or machine commands.
+- AI model list and dashboard endpoints require AI read roles. Model config, metadata, and training source fields are only returned to admin roles.
+- Dashboard prediction metrics are plant-scoped where plant context is available, including mean time to action.
 
 ## AI natural-language query
 
@@ -319,6 +323,15 @@ Evidence upload and governance attachment paths validate:
 - file size is greater than zero and no more than 50 MB
 - MIME type is detected from file bytes
 - extension fallback is allowed only for generic/ambiguous byte detection, not for concrete disallowed content
+- explicit idempotency keys must be 16 to 128 characters and use only letters, numbers, `.`, `_`, or `-`
+
+## Planning and EQMS controlled update surfaces
+
+- JO and WO generic update routes use explicit field allowlists before workflow validation. Unknown top-level fields are rejected instead of being silently added to the JSON authority store.
+- WO schedule edits reject `scheduled_end <= scheduled_start` when both timestamps are supplied.
+- WO creation and update contracts preserve optional CNC/digital-thread fields: `routing_operation_id`, `job_operation_id`, `cnc_program_version_id`, `setup_sheet_id`, `setup_sheet_revision`, `org_plant_id`, and `org_site_id`.
+- EQMS complaint/MRB/deviation/concession generic updates cannot mutate lifecycle fields such as `status`, `status_history`, closure, approval, or rejection metadata. Those changes must use transition or change-control paths.
+- Genealogy DB constraint migration `121_genealogy_runtime_ontology_constraints.sql` aligns `genealogy_nodes` and `as_manufactured_snapshots` with the runtime graph ontology; it does not make AI or analytics execution authority.
 
 ## Backward compatibility
 

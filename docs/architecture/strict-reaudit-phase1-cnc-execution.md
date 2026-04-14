@@ -2,7 +2,7 @@
 
 ## Branch And Scope Inspected
 
-- Branch: `main`.
+- Branch: `codex/worldclass-closure-20260414-1022`.
 - Merge base checked against `origin/main`: `685d51d7a9a37996f505e2f9e054903cacfeff59`.
 - Workspace state: dirty before this upgrade, with many unrelated registry/governance changes. This remediation is intentionally scoped to dispatch/shopfloor execution files and architecture docs.
 

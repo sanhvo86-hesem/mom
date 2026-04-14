@@ -1,6 +1,6 @@
 # World-Class Target Architecture
 
-Audited branch: `codex/worldclass-closure-20260414-0807`
+Audited branch: `codex/worldclass-closure-20260414-1022`
 
 Date: 2026-04-14
 
@@ -29,6 +29,7 @@ This target keeps the custom PHP MVC framework, router, middleware, DataLayer, E
 - Keep evidence custody through `EvidenceVaultService`.
 - Evidence uploads must validate server-side size and actual MIME bytes. Extension fallback is allowed only for ambiguous/generic byte detection.
 - FMEA and operational override access must use canonical role normalization, not generic or unmigrated role strings.
+- Generic exception updates must not mutate lifecycle fields; status, closure, approval, and rejection movement stays in transition/change-control paths.
 - Next staged work: route NCR/deviation/concession/MRB updates through service-owned transitions and make shipment OQC consume canonical inspection facts instead of sidecar JSON.
 
 ## CNC digital thread target
@@ -38,12 +39,14 @@ Target continuity:
 `item -> item revision -> job order -> work order -> operation -> work center -> machine/equipment -> setup sheet revision -> CNC program version -> inspection plan -> production report event -> quality/evidence/genealogy`
 
 Current execution payloads already preserve most links. The remaining high-value target is a DB-backed CNC program/version/setup-sheet repository or bridge behind `CncProgramController`, with JSON retained as compatibility fallback during cutover.
+Migration `121_genealogy_runtime_ontology_constraints.sql` keeps database genealogy constraints aligned with the runtime expanded ontology while automatic edge emission from every production report remains staged.
 
 ## AI and copilot boundary
 
 - AI prediction rows and recommendation actions are advisory projections.
 - `ai_recommendation_actions` may track pending human review but does not create NCRs, maintenance work, schedule moves, tool orders, dispatch changes, completion events, or machine commands.
 - Natural-language query writes conversation history and may expose broad manufacturing data, so it requires authentication, scoped roles, CSRF, read-only SQL validation, row limits, audit logging, and PostgreSQL read-only transactions.
+- AI model/dashboard surfaces are advisory read APIs and require the same AI read role boundary; model internals are admin-only.
 - RCA analysis is a write-like advisory surface because it can call an external LLM and cache/store outputs; it requires CSRF and quality/admin role scope.
 
 ## Staged cutover rules

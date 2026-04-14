@@ -600,7 +600,7 @@ final class MobileWorkQueueService
     /**
      * Resolve a sync conflict.
      */
-    public function resolveConflict(string $entryId, string $resolution, string $operatorId, bool $allowOverride = false): array
+    public function resolveConflict(string $entryId, string $resolution, string $operatorId, bool $allowOverride = false, string $overrideReason = ''): array
     {
         $resolution = match ($resolution) {
             'keep_server' => 'accept_server',
@@ -609,7 +609,7 @@ final class MobileWorkQueueService
         };
 
         foreach (['work_queue', 'time_entries', 'inspections'] as $store) {
-            $resolved = $this->withStoreLock($store, function () use ($store, $entryId, $resolution, $operatorId, $allowOverride): ?array {
+            $resolved = $this->withStoreLock($store, function () use ($store, $entryId, $resolution, $operatorId, $allowOverride, $overrideReason): ?array {
                 $records = $this->loadFile($store);
                 $idKey   = $store === 'work_queue' ? 'queue_id'
                          : ($store === 'time_entries' ? 'entry_id' : 'capture_id');
@@ -624,6 +624,9 @@ final class MobileWorkQueueService
                     if (!$allowOverride && $this->stringValue($rec['operator_id'] ?? '') !== $operatorId) {
                         throw new RuntimeException('forbidden_conflict_operator');
                     }
+                    if ($allowOverride && $this->stringValue($rec['operator_id'] ?? '') !== $operatorId && trim($overrideReason) === '') {
+                        throw new RuntimeException('conflict_override_reason_required');
+                    }
 
                     $now = $this->nowIso();
 
@@ -634,6 +637,7 @@ final class MobileWorkQueueService
                             $records[$idx]['conflict_override'] = [
                                 'resolved_by' => $operatorId,
                                 'resolved_at' => $now,
+                                'reason' => $overrideReason,
                             ];
                         }
                     } else {
