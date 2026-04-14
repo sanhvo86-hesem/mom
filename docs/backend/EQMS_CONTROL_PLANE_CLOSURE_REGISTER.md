@@ -56,8 +56,8 @@ Verification evidence:
 - `php mom/tools/release/build_release_governance.php --artifact=manifest --change-authority=CO-WORLDCLASS-CLOSURE`: emitted a valid release manifest hash.
 - `php mom/tools/release/check_workflow_status_authority.php`: workflow status authority clean.
 - `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors.
-- `./composer test`: 424 tests, 2404 assertions, 1 skipped, passed on the current `codex/worldclass-closure-20260414-1512` closure branch after Agent 2 P1 remediation.
-- `./composer check`: PHPStan plus PHPUnit completed with no errors; 424 tests, 2404 assertions, 1 skipped on the current closure branch.
+- `./composer test`: 428 tests, 2426 assertions, 1 skipped, passed on the current `codex/worldclass-closure-20260414-1512` closure branch after Agent 2/3/5 P1 remediation.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 428 tests, 2426 assertions, 1 skipped on the current closure branch.
 
 ## 2026-04-14 15:12 Agent 2 P1 Closure Addendum
 
@@ -68,6 +68,23 @@ Verification evidence:
 | Evidence signature ceremony auto-filled the signer-visible hash | `EvidenceFinalizationService` no longer fills `displayed_record_hash_sha256`; `ElectronicSignatureService` requires it from the ceremony payload and finalization rejects signed payload hashes that are not part of the evidence package. |
 | Idempotency proof was incomplete | `WorldClassControlPlaneExecutionTest` now covers replay conflicts for document revision, form issuance, form submission attempt, validation result, evidence record, and evidence version. |
 | Schema validation proof did not go through the form command path | Tests now cover missing required fields and type mismatch through `EqmsFormExecutionService` and `FormIssuanceCommandService::recordSubmissionAttempt()`. |
+
+## 2026-04-14 15:12 Agent 3 / Agent 5 Blocking P1 Closure Addendum
+
+| Finding closed | Closure evidence |
+|---|---|
+| E-signature ceremony still accepted caller-supplied re-auth fields without server challenge consumption | `ElectronicSignatureChallengeService` and migration `126_e_signature_auth_challenges.sql` add server-issued, expiring, one-time challenges bound to signer/action/payload/displayed hash; `EvidenceFinalizationService` consumes the challenge before persisting `signature_events`; focused tests cover invalid challenge rejection. |
+| Audit pack org-scope assertion could false-fail because summarization dropped `org_id` | `AuditPackExporter` preserves `org_id` in evidence package and audit timeline summaries; `AuditPackExportService` test proves org-scoped package/event rows remain visible after manifest assembly. |
+| VPS deployment authority accepted wildcard objects, empty fields, missing effectivity, and broad effects | `VpsService` requires release manifest hash, exact manifest object, exact target environment, exact release manifest ref/hash in effectivity scope, exact action plus promotion intent fields, and exact deployment requested effect; focused regression tests cover wildcard/empty/wrong/missing cases. |
+| Shared post-release change authority allowed wildcard object/field/effectivity and substitute effects | `ChangeAuthorityService` strict controlled-lifecycle mode uses canonical `plm_change_affected_objects` plus `plm_change_effectivities`, skips legacy broad authorization, requires exact object/effect/field, and rejects empty effectivity; focused tests cover wildcard object, empty fields, broad effect, missing effectivity row, and empty effectivity scope. |
+
+Verification evidence for this addendum:
+
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php --testdox`: 63 tests, 321 assertions, passed.
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/ChangeAuthorityServiceTest.php --testdox`: 8 tests, 28 assertions, passed.
+- `./composer analyse -- --memory-limit=1G`: PHPStan completed with no errors over 223 files.
+- `./composer test`: 428 tests, 2426 assertions, 1 skipped, passed.
+- `./composer check`: PHPStan plus PHPUnit completed with no errors; 428 tests, 2426 assertions, 1 skipped.
 
 ## 2026-04-14 10:02 Closure Re-Audit Cycle
 

@@ -83,7 +83,7 @@ final class OrderWorkflowRepositoryBoundaryTest extends TestCase
             'part_revision',
             'B',
             'qa_manager',
-            ['change_order_number' => 'ECO-001'],
+            ['change_order_number' => 'ECO-001', 'requested_effect' => 'amend'],
         );
 
         $this->assertTrue($result->ok, $result->message);
@@ -221,14 +221,18 @@ final class ReleasedChangeAuthorityFakeDb
             ]];
         }
 
-        if (str_contains($sql, 'eqms_change_affected_object')) {
+        if (str_contains($sql, 'plm_change_affected_objects')) {
             return [[
                 'plm_change_order_id' => '00000000-0000-4000-8000-000000000001',
                 'change_order_number' => 'ECO-001',
                 'status' => 'released',
-                'allowed_effect' => 'revise',
-                'effectivity_rule' => '{}',
+                'object_id' => 'JO-AUTH-001',
+                'allowed_effect' => 'amend',
                 'affected_fields' => '{part_revision}',
+                'plm_change_effectivity_id' => '00000000-0000-4000-8000-000000000002',
+                'effectivity_scope' => ['order_id' => 'JO-AUTH-001'],
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'effective_to' => null,
                 'authority_source' => 'affected_object',
             ]];
         }

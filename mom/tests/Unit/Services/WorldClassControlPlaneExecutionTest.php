@@ -17,6 +17,7 @@ use MOM\Services\ControlPlane\ReleaseGovernanceBuilder;
 use MOM\Services\ControlPlane\WorkflowStatusAuthorityService;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
+use MOM\Services\Evidence\AuditPackExportService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
@@ -26,6 +27,7 @@ use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Traceability\GenealogyGraphService;
 use MOM\Services\Traceability\UnifiedEvidenceGraphService;
+use MOM\Services\VpsService;
 use PHPUnit\Framework\TestCase;
 
 final class WorldClassControlPlaneExecutionTest extends TestCase
@@ -940,6 +942,48 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('evidence_package_incomplete', $manifest['exceptions'][0]['exception_code']);
     }
 
+    public function testAuditPackExportServicePreservesOrgScopeAfterSummarization(): void
+    {
+        $manifest = (new AuditPackExportService(new AuditPackExportFakeDb()))->buildForScope([
+            'scope_type' => 'evidence_record',
+            'scope_ref' => 'EV-1',
+        ], 'org-1');
+
+        $this->assertSame('ready', $manifest['export_state']);
+        $this->assertSame('org-1', $manifest['evidence_packages'][0]['org_id']);
+        $this->assertSame('org-1', $manifest['audit_timeline'][0]['org_id']);
+    }
+
+    public function testVpsDeploymentAuthorityRequiresExactManifestEnvironmentActionAndEffect(): void
+    {
+        $manifestHash = str_repeat('a', 64);
+        $context = [
+            'target_environment' => 'production',
+            'release_manifest_hash_sha256' => $manifestHash,
+        ];
+        $this->assertVpsDeploymentAuthorityPasses(new VpsDeploymentAuthorityFakeDb(), 'git_pull', $context, 'manifest-1', 'CO-DEPLOY', 'deploy_controlled_source');
+
+        foreach ([
+            'wildcard object' => new VpsDeploymentAuthorityFakeDb(objectId: '*'),
+            'empty fields' => new VpsDeploymentAuthorityFakeDb(fields: []),
+            'wrong action' => new VpsDeploymentAuthorityFakeDb(fields: ['deploy_controlled_source']),
+            'wrong effect' => new VpsDeploymentAuthorityFakeDb(effect: 'metadata_update'),
+            'missing scope' => new VpsDeploymentAuthorityFakeDb(scope: []),
+            'wrong manifest hash' => new VpsDeploymentAuthorityFakeDb(scope: [
+                'target_environment' => 'production',
+                'release_manifest_ref' => 'manifest-1',
+                'release_manifest_hash_sha256' => str_repeat('b', 64),
+            ]),
+        ] as $label => $db) {
+            try {
+                $this->assertVpsDeploymentAuthorityPasses($db, 'git_pull', $context, 'manifest-1', 'CO-DEPLOY', 'deploy_controlled_source');
+                $this->fail('Deployment authority unexpectedly passed for ' . $label);
+            } catch (\RuntimeException $e) {
+                $this->assertSame('deployment_change_authority_not_verified', $e->getMessage(), $label);
+            }
+        }
+    }
+
     public function testEvidenceFinalizationServiceBuildsCompleteImmutablePackage(): void
     {
         $dir = sys_get_temp_dir() . '/mom-finalize-' . bin2hex(random_bytes(4));
@@ -976,6 +1020,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertSame(1, $db->transactionCount);
             $this->assertTrue($db->sawSignatureEventInsert);
             $this->assertTrue($db->sawRetentionLockInsert);
+            $this->assertTrue($db->sawAuthChallengeConsume);
             $this->assertGreaterThanOrEqual(9, count($db->queryOneCalls));
             $sql = $db->combinedSql();
             $this->assertStringContainsString('ON CONFLICT (package_hash_sha256) DO NOTHING', $sql);
@@ -1142,6 +1187,30 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
                 'signature_events' => [$event],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRequiresServerConsumedSignatureChallenge(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-invalid-auth-challenge-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('signature_auth_challenge_not_valid');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(authChallengeValid: false)))->finalize([
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
             ]);
         } finally {
             $this->removeTree($dir);
@@ -1786,6 +1855,95 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         }
         @rmdir($dir);
     }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function assertVpsDeploymentAuthorityPasses(object $db, string $actionId, array $context, string $manifestRef, string $changeRef, string $intent): void
+    {
+        $service = new VpsService(sys_get_temp_dir(), dirname(__DIR__, 3), $db);
+        $method = new \ReflectionMethod(VpsService::class, 'assertReleasedDeploymentChangeAuthority');
+        $method->invoke($service, $actionId, $context, $manifestRef, $changeRef, $intent);
+    }
+}
+
+final class AuditPackExportFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (str_contains($sql, 'FROM evidence_records er')) {
+            return [[
+                'org_id' => 'org-1',
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'evidence_record_id' => '00000000-0000-0000-0000-000000000901',
+                'evidence_version_id' => '00000000-0000-0000-0000-000000000902',
+                'package_hash_sha256' => str_repeat('a', 64),
+                'manifest_hash_sha256' => str_repeat('b', 64),
+                'artifacts' => [
+                    'original' => ['sha256' => str_repeat('c', 64)],
+                    'canonical_payload' => ['sha256' => str_repeat('d', 64)],
+                    'readable_snapshot' => ['sha256' => str_repeat('e', 64)],
+                    'hash_signature_manifest' => ['sha256' => str_repeat('f', 64)],
+                ],
+            ]];
+        }
+        if (str_contains($sql, 'FROM audit_events')) {
+            return [[
+                'org_id' => 'org-1',
+                'recorded_at' => '2026-04-14T00:00:00Z',
+                'event_type' => 'evidence.finalized',
+                'aggregate_type' => 'evidence_record',
+                'aggregate_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'event_hash_sha256' => str_repeat('1', 64),
+            ]];
+        }
+        return [];
+    }
+}
+
+final class VpsDeploymentAuthorityFakeDb
+{
+    /**
+     * @param list<string> $fields
+     * @param array<string, mixed> $scope
+     */
+    public function __construct(
+        private readonly string $objectId = 'manifest-1',
+        private readonly array $fields = ['git_pull', 'deploy_controlled_source'],
+        private readonly string $effect = 'deploy_controlled_source',
+        private readonly array $scope = [
+            'target_environment' => 'production',
+            'release_manifest_ref' => 'manifest-1',
+            'release_manifest_hash_sha256' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        ],
+    ) {
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        return [[
+            'plm_change_order_id' => '00000000-0000-0000-0000-000000000991',
+            'change_order_number' => 'CO-DEPLOY',
+            'status' => 'released',
+            'object_type' => 'release_manifest',
+            'object_id' => $this->objectId,
+            'affected_fields' => $this->fields,
+            'requested_effect' => $this->effect,
+            'effectivity_rule' => '{}',
+            'plm_change_effectivity_id' => '00000000-0000-0000-0000-000000000992',
+            'effectivity_scope' => $this->scope,
+        ]];
+    }
 }
 
 final class CanonicalOutboxFakeDb
@@ -2290,6 +2448,8 @@ final class EvidenceFinalizationFakeDb
 
     public bool $sawRetentionLockInsert = false;
 
+    public bool $sawAuthChallengeConsume = false;
+
     public int $transactionCount = 0;
 
     public function __construct(
@@ -2299,6 +2459,7 @@ final class EvidenceFinalizationFakeDb
         private readonly bool $changeAuthorityVerified = true,
         private readonly bool $recordConflict = false,
         private readonly bool $versionConflict = false,
+        private readonly bool $authChallengeValid = true,
     )
     {
     }
@@ -2355,6 +2516,19 @@ final class EvidenceFinalizationFakeDb
         }
         if (str_contains($sql, 'INSERT INTO evidence_artifacts')) {
             return ['evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'], 'artifact_role' => (string)$params[':artifact_role']];
+        }
+        if (str_starts_with(ltrim($sql), 'UPDATE e_signature_auth_challenges')) {
+            if (!$this->authChallengeValid) {
+                return [];
+            }
+            $this->sawAuthChallengeConsume = true;
+            return [
+                'auth_challenge_id' => (string)$params[':auth_challenge_id'],
+                'challenge_state' => 'consumed',
+                'consumed_at' => '2026-04-14T00:00:00Z',
+                'signed_payload_hash_sha256' => (string)$params[':signed_payload_hash_sha256'],
+                'displayed_record_hash_sha256' => (string)$params[':displayed_record_hash_sha256'],
+            ];
         }
         if (str_contains($sql, 'INSERT INTO evidence_publications')) {
             return ['evidence_publication_id' => 'PUB-1', 'publication_state' => (string)$params[':publication_state']];

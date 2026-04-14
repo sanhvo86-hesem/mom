@@ -20,7 +20,10 @@ ALTER TABLE plm_change_affected_objects
         'deviation',
         'metadata_update',
         'training_update',
-        'publication_update'
+        'publication_update',
+        'deploy_controlled_source',
+        'run_controlled_migration',
+        'reload_controlled_runtime'
     ));
 
 COMMIT;

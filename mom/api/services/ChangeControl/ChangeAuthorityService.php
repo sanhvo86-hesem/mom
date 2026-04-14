@@ -214,7 +214,14 @@ final class ChangeAuthorityService
             );
         }
 
-        $match = $this->findMatchingAuthority($changeOrderRef, $objectType, $objectId, $fieldPath, $context);
+        $match = $this->findMatchingAuthority(
+            $changeOrderRef,
+            $objectType,
+            $objectId,
+            $fieldPath,
+            $context,
+            $this->isControlledLifecycle($lifecycleState),
+        );
         if ($match === null) {
             return new ChangeAuthorityDecision(
                 false,
@@ -403,16 +410,22 @@ final class ChangeAuthorityService
         string $objectId,
         string $fieldPath,
         array $context,
+        bool $strictPostRelease = false,
     ): ?array {
         $requestedEffect = $this->requestedEffect($context);
-        $explicit = $this->findExplicitFieldAuthorization($changeOrderRef, $objectType, $objectId, $fieldPath, $requestedEffect, $context);
-        if ($explicit !== null) {
-            return $explicit;
+        if (!$strictPostRelease) {
+            $explicit = $this->findExplicitFieldAuthorization($changeOrderRef, $objectType, $objectId, $fieldPath, $requestedEffect, $context);
+            if ($explicit !== null) {
+                return $explicit;
+            }
         }
 
-        $canonical = $this->findCanonicalAffectedObjectAuthority($changeOrderRef, $objectType, $objectId, $fieldPath, $requestedEffect, $context);
+        $canonical = $this->findCanonicalAffectedObjectAuthority($changeOrderRef, $objectType, $objectId, $fieldPath, $requestedEffect, $context, $strictPostRelease);
         if ($canonical !== null) {
             return $canonical;
+        }
+        if ($strictPostRelease) {
+            return null;
         }
 
         try {
@@ -478,6 +491,7 @@ final class ChangeAuthorityService
         string $fieldPath,
         string $requestedEffect,
         array $context,
+        bool $strictPostRelease,
     ): ?array {
         if ($this->db === null || !method_exists($this->db, 'query')) {
             return null;
@@ -491,18 +505,27 @@ final class ChangeAuthorityService
                     co.plm_change_order_id::text AS plm_change_order_id,
                     co.change_order_number,
                     co.status,
+                    cao.object_id,
                     cao.requested_effect AS allowed_effect,
                     cao.effectivity_rule,
                     cao.affected_fields,
+                    eff.plm_change_effectivity_id::text AS plm_change_effectivity_id,
+                    eff.effectivity_scope,
+                    eff.effective_from,
+                    eff.effective_to,
                     'affected_object' AS authority_source
                  FROM plm_change_orders co
                  INNER JOIN plm_change_affected_objects cao
                     ON cao.plm_change_order_id = co.plm_change_order_id
+                 LEFT JOIN plm_change_effectivities eff
+                    ON eff.plm_change_order_id = co.plm_change_order_id
+                   AND lower(eff.object_type) = lower(cao.object_type)
+                   AND eff.object_id = cao.object_id
                  WHERE (co.plm_change_order_id::text = :co_ref_id OR co.change_order_number = :co_ref_number)
                    AND co.status = 'released'
                    AND lower(cao.object_type) IN (:object_type, :object_type_alias)
-                   AND (cao.object_id = :object_id OR cao.object_id = '*')
-                   AND cao.requested_effect IN (:requested_effect, 'revise', 'amend', 'metadata_update', 'deviation')
+                   AND cao.object_id = :object_id
+                   AND cao.requested_effect = :requested_effect
                    AND cao.disposition = 'accepted'
                  ORDER BY cao.created_at DESC",
                 [
@@ -522,10 +545,16 @@ final class ChangeAuthorityService
             if (!is_array($row)) {
                 continue;
             }
-            if (!$this->fieldScopeMatches($row['affected_fields'] ?? null, $fieldPath)) {
+            if ($strictPostRelease && $this->text($row['object_id'] ?? '') !== $objectId) {
                 continue;
             }
-            if ($this->effectivityMatches($row['effectivity_rule'] ?? null, $context)) {
+            if ($strictPostRelease && $this->text($row['allowed_effect'] ?? '') !== $requestedEffect) {
+                continue;
+            }
+            if ($strictPostRelease ? !$this->fieldScopeMatchesStrict($row['affected_fields'] ?? null, $fieldPath) : !$this->fieldScopeMatches($row['affected_fields'] ?? null, $fieldPath)) {
+                continue;
+            }
+            if ($strictPostRelease ? $this->canonicalEffectivityMatchesStrict($row, $context) : $this->effectivityMatches($row['effectivity_rule'] ?? null, $context)) {
                 return $row;
             }
         }
@@ -698,6 +727,93 @@ final class ChangeAuthorityService
         return false;
     }
 
+    private function fieldScopeMatchesStrict(mixed $scopeRaw, string $fieldPath): bool
+    {
+        $scope = $scopeRaw;
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scope = is_array($decoded) ? $decoded : $this->textList($scopeRaw);
+        }
+        if (!is_array($scope) || $scope === []) {
+            return false;
+        }
+        if (array_is_list($scope)) {
+            return !in_array('*', $scope, true) && in_array($fieldPath, $scope, true);
+        }
+        foreach (['fields', 'field_paths', 'affected_fields'] as $key) {
+            $fields = $scope[$key] ?? null;
+            if (is_string($fields)) {
+                $fields = [$fields];
+            }
+            if (is_array($fields)) {
+                return !in_array('*', $fields, true) && in_array($fieldPath, $fields, true);
+            }
+        }
+
+        $field = $scope['field_path'] ?? null;
+        return is_scalar($field) && (string)$field !== '*' && (string)$field === $fieldPath;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $context
+     */
+    private function canonicalEffectivityMatchesStrict(array $row, array $context): bool
+    {
+        if ($this->text($row['plm_change_effectivity_id'] ?? '') === '') {
+            return false;
+        }
+        $scopeRaw = $row['effectivity_scope'] ?? null;
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scopeRaw = is_array($decoded) ? $decoded : [];
+        }
+        $scope = is_array($scopeRaw) ? $scopeRaw : [];
+        if ($scope === []) {
+            return false;
+        }
+
+        $effectivity = is_array($context['effectivity'] ?? null) ? $context['effectivity'] : $context;
+        $matchedScopeKey = false;
+        foreach (['site', 'plant', 'lot', 'serial', 'order_id', 'product', 'target_environment', 'environment'] as $key) {
+            if (!array_key_exists($key, $scope)) {
+                continue;
+            }
+            $matchedScopeKey = true;
+            $expected = $scope[$key];
+            $actual = $effectivity[$key] ?? $effectivity['effectivity_' . $key] ?? null;
+            if ($actual === null) {
+                return false;
+            }
+            if (is_array($expected)) {
+                if (!in_array($actual, $expected, true)) {
+                    return false;
+                }
+            } elseif ((string)$expected !== (string)$actual) {
+                return false;
+            }
+        }
+        if (!$matchedScopeKey) {
+            return false;
+        }
+
+        $effectiveAt = new \DateTimeImmutable((string)($effectivity['effective_at'] ?? 'now'));
+        foreach (['effective_from', 'from'] as $key) {
+            $raw = $row[$key] ?? $scope[$key] ?? null;
+            if ($raw !== null && trim((string)$raw) !== '' && $effectiveAt < new \DateTimeImmutable((string)$raw)) {
+                return false;
+            }
+        }
+        foreach (['effective_to', 'to'] as $key) {
+            $raw = $row[$key] ?? $scope[$key] ?? null;
+            if ($raw !== null && trim((string)$raw) !== '' && $effectiveAt >= new \DateTimeImmutable((string)$raw)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function sameValue(mixed $oldValue, mixed $newValue): bool
     {
         return json_encode($oldValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
@@ -753,7 +869,7 @@ final class ChangeAuthorityService
 
         return array_values(array_unique(array_filter(array_map(
             fn(string $item): string => $this->normalizeToken($item),
-            str_getcsv($text),
+            str_getcsv($text, ',', '"', '\\'),
         ))));
     }
 
@@ -785,6 +901,11 @@ final class ChangeAuthorityService
     private function normalizeToken(string $value): string
     {
         return strtolower(trim($value));
+    }
+
+    private function text(mixed $value): string
+    {
+        return is_scalar($value) ? trim((string)$value) : '';
     }
 
     private function legacyObjectAlias(string $objectType): string

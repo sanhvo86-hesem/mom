@@ -359,6 +359,9 @@ final class VpsService
         if ($manifestRef === '' || $changeAuthorityRef === '') {
             throw new RuntimeException('deployment_change_authority_required');
         }
+        if (trim((string)($context['release_manifest_hash_sha256'] ?? $context['manifest_hash_sha256'] ?? '')) === '') {
+            throw new RuntimeException('deployment_release_manifest_hash_required');
+        }
         if (!in_array($intent, ['deploy_controlled_source', 'run_controlled_migration', 'reload_controlled_runtime'], true)) {
             throw new RuntimeException('deployment_promotion_intent_required');
         }
@@ -415,11 +418,14 @@ final class VpsService
                 continue;
             }
             $objectId = trim((string)($row['object_id'] ?? ''));
-            if (!in_array($objectId, [$manifestRef, $manifestHash, $targetEnvironment, $actionId, '*'], true)) {
+            if (!in_array($objectId, [$manifestRef, $manifestHash], true)) {
+                continue;
+            }
+            if (strtolower(trim((string)($row['requested_effect'] ?? ''))) !== $intent) {
                 continue;
             }
             $fields = $this->textList($row['affected_fields'] ?? null);
-            if ($fields !== [] && !in_array($actionId, $fields, true) && !in_array($intent, $fields, true) && !in_array('deployment', $fields, true)) {
+            if ($fields === [] || !in_array($actionId, $fields, true) || !in_array($intent, $fields, true)) {
                 continue;
             }
             if (!$this->deploymentEffectivityMatches($row['effectivity_scope'] ?? null, $targetEnvironment, $manifestRef, $manifestHash)) {
@@ -462,15 +468,21 @@ final class VpsService
             $scopeRaw = is_array($decoded) ? $decoded : [];
         }
         $scope = is_array($scopeRaw) ? $scopeRaw : [];
+        if ($scope === []) {
+            return false;
+        }
+        if (!isset($scope['target_environment']) && !isset($scope['environment'])) {
+            return false;
+        }
         foreach (['target_environment', 'environment'] as $key) {
             if (isset($scope[$key]) && strtolower((string)$scope[$key]) !== $targetEnvironment) {
                 return false;
             }
         }
-        if (isset($scope['release_manifest_ref']) && (string)$scope['release_manifest_ref'] !== $manifestRef) {
+        if (!isset($scope['release_manifest_ref']) || (string)$scope['release_manifest_ref'] !== $manifestRef) {
             return false;
         }
-        if ($manifestHash !== '' && isset($scope['release_manifest_hash_sha256']) && strtolower((string)$scope['release_manifest_hash_sha256']) !== $manifestHash) {
+        if ($manifestHash === '' || !isset($scope['release_manifest_hash_sha256']) || strtolower((string)$scope['release_manifest_hash_sha256']) !== $manifestHash) {
             return false;
         }
         return true;

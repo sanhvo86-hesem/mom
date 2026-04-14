@@ -49,7 +49,7 @@
     "P1 periodic evaluation schedule/close, publication actions, genealogy fact, and 5M gate writes require role and CSRF",
     "P1 5M gate ignores caller-provided booleans and spoofed policy source without persisted policy row",
     "P1 shopfloor manual report events promote first-class 5M context",
-    "P1 deployment actions require DB-backed released change authority and governed promotion context",
+    "P1 deployment actions require exact DB-backed released change authority and governed promotion context",
     "P1 audit aggregate sequence and e-signature ceremony controls added",
     "P1 audit pack endpoint is scope-only and DB-assembled",
     "P1 emergency change risk acceptance requires signature or approved waiver",
@@ -61,11 +61,16 @@
     "P1 final document revisions require manifest hash anchors",
     "P1 evidence signature ceremony no longer auto-fills signer-visible displayed hash",
     "P1 replay conflict proof covers document revision, form issuance, submission attempt, validation result, evidence record, and evidence version",
-    "P1 schema validation proof covers missing required and type mismatch through validator and command service"
+    "P1 schema validation proof covers missing required and type mismatch through validator and command service",
+    "P1 e-signature ceremony requires server-issued one-time challenge consumption",
+    "P1 audit-pack evidence and audit summaries preserve org scope after canonical DB assembly",
+    "P1 deployment authority requires exact manifest object, hash, environment, action, intent, effectivity, and effect",
+    "P1 shared post-release field authority rejects wildcard object, empty fields, broad effects, and missing canonical effectivity"
   ],
   "required_validation": [
     "php -l touched PHP files",
     "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php --testdox",
+    "APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/ChangeAuthorityServiceTest.php --testdox",
     "php tools/release/check_repo_boundary.php",
     "php tools/release/check_workflow_status_authority.php",
     "./composer analyse -- --memory-limit=1G",

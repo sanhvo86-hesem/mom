@@ -71,9 +71,13 @@ final class ChangeAuthorityServiceTest extends TestCase
                 'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
                 'change_order_number' => 'ECO-2026-001',
                 'status' => 'released',
+                'object_id' => 'FRM-001',
                 'allowed_effect' => 'amend',
-                'effectivity_rule' => '{}',
                 'affected_fields' => ['temperature'],
+                'plm_change_effectivity_id' => '22222222-2222-4222-8222-222222222222',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'effective_to' => null,
                 'authority_source' => 'affected_object',
             ]],
         ]);
@@ -82,6 +86,7 @@ final class ChangeAuthorityServiceTest extends TestCase
         $decision = $service->assertFieldEditAllowed('form_record', 'FRM-001', 'temperature', '10', '11', 'submitted', [
             'change_authority_id' => 'ECO-2026-001',
             'requested_effect' => 'amend',
+            'effectivity' => ['site' => 'VN-HCMC', 'effective_at' => '2026-04-14T01:00:00Z'],
         ]);
 
         $this->assertTrue($decision->allowed, $decision->message);
@@ -107,18 +112,26 @@ final class ChangeAuthorityServiceTest extends TestCase
                     'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
                     'change_order_number' => 'ECO-2026-001',
                     'status' => 'released',
+                    'object_id' => 'EV-001',
                     'allowed_effect' => 'amend',
-                    'effectivity_rule' => '{}',
                     'affected_fields' => ['wrong_field'],
+                    'plm_change_effectivity_id' => '22222222-2222-4222-8222-222222222222',
+                    'effectivity_scope' => ['site' => 'VN-HCMC'],
+                    'effective_from' => '2026-04-14T00:00:00Z',
+                    'effective_to' => null,
                     'authority_source' => 'affected_object',
                 ],
                 [
                     'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
                     'change_order_number' => 'ECO-2026-001',
                     'status' => 'released',
+                    'object_id' => 'EV-001',
                     'allowed_effect' => 'amend',
-                    'effectivity_rule' => '{}',
                     'affected_fields' => ['package_metadata'],
+                    'plm_change_effectivity_id' => '33333333-3333-4333-8333-333333333333',
+                    'effectivity_scope' => ['site' => 'VN-HCMC'],
+                    'effective_from' => '2026-04-14T00:00:00Z',
+                    'effective_to' => null,
                     'authority_source' => 'affected_object',
                 ],
             ],
@@ -127,10 +140,83 @@ final class ChangeAuthorityServiceTest extends TestCase
 
         $decision = $service->assertFieldEditAllowed('evidence_record', 'EV-001', 'package_metadata', 'a', 'b', 'locked', [
             'change_authority_id' => 'ECO-2026-001',
+            'requested_effect' => 'amend',
+            'effectivity' => ['site' => 'VN-HCMC', 'effective_at' => '2026-04-14T01:00:00Z'],
         ]);
 
         $this->assertTrue($decision->allowed, $decision->message);
         $this->assertSame('ECO-2026-001', $db->lastAffectedParams[':co_ref_number'] ?? null);
+    }
+
+    public function testStrictPostReleaseAuthorityRejectsWildcardEmptyFieldsBroadEffectAndMissingEffectivity(): void
+    {
+        $baseRows = [
+            'governance' => [[
+                'object_type' => 'evidence_record',
+                'field_path' => '*',
+                'lifecycle_state' => 'locked',
+                'governance_class' => 'post_release_locked',
+                'change_required' => true,
+                'signature_required' => true,
+                'warn_only' => false,
+            ]],
+        ];
+
+        $cases = [
+            'wildcard object' => [
+                'object_id' => '*',
+                'allowed_effect' => 'amend',
+                'affected_fields' => ['package_metadata'],
+                'plm_change_effectivity_id' => '33333333-3333-4333-8333-333333333333',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+            ],
+            'empty field scope' => [
+                'object_id' => 'EV-001',
+                'allowed_effect' => 'amend',
+                'affected_fields' => [],
+                'plm_change_effectivity_id' => '33333333-3333-4333-8333-333333333333',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+            ],
+            'broad effect' => [
+                'object_id' => 'EV-001',
+                'allowed_effect' => 'revise',
+                'affected_fields' => ['package_metadata'],
+                'plm_change_effectivity_id' => '33333333-3333-4333-8333-333333333333',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+            ],
+            'missing effectivity row' => [
+                'object_id' => 'EV-001',
+                'allowed_effect' => 'amend',
+                'affected_fields' => ['package_metadata'],
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+            ],
+            'empty effectivity scope' => [
+                'object_id' => 'EV-001',
+                'allowed_effect' => 'amend',
+                'affected_fields' => ['package_metadata'],
+                'plm_change_effectivity_id' => '33333333-3333-4333-8333-333333333333',
+                'effectivity_scope' => [],
+            ],
+        ];
+
+        foreach ($cases as $label => $row) {
+            $db = new FakeChangeAuthorityDb($baseRows + [
+                'affected' => [[
+                    'plm_change_order_id' => '11111111-1111-4111-8111-111111111111',
+                    'change_order_number' => 'ECO-2026-001',
+                    'status' => 'released',
+                    'authority_source' => 'affected_object',
+                ] + $row],
+            ]);
+            $decision = (new ChangeAuthorityService($db))->assertFieldEditAllowed('evidence_record', 'EV-001', 'package_metadata', 'a', 'b', 'locked', [
+                'change_authority_id' => 'ECO-2026-001',
+                'requested_effect' => 'amend',
+                'effectivity' => ['site' => 'VN-HCMC', 'effective_at' => '2026-04-14T01:00:00Z'],
+            ]);
+
+            $this->assertFalse($decision->allowed, $label);
+            $this->assertSame('change_authority_required', $decision->errorCode, $label);
+        }
     }
 
     public function testCanonicalGovernanceAllowedEffectsAreEnforced(): void

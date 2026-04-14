@@ -359,8 +359,11 @@ final class EvidenceFinalizationService
             $payloadHash = $this->nullableHash($event['signed_payload_hash_sha256'] ?? null)
                 ?? (string)$package['manifest_hash_sha256'];
             $this->assertSignedPayloadBelongsToPackage($payloadHash, $package);
-            $ceremony = (new ElectronicSignatureService())->validateEvidenceSignature($event, [
+            $ceremony = (new ElectronicSignatureService($db))->validateEvidenceSignature($event, [
                 'signed_payload_hash_sha256' => $payloadHash,
+                'org_id' => $input['org_id'] ?? null,
+                'session_id' => $input['session_id'] ?? null,
+                'signature_action' => 'evidence_finalize',
             ]);
             $signatureHash = $this->nullableHash($event['signature_hash_sha256'] ?? null)
                 ?? hash('sha256', $payloadHash . '|' . ($signerUserId ?? $signerRef) . '|' . $meaning . '|' . $ceremony['auth_result_hash_sha256']);

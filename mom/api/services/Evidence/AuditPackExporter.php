@@ -119,6 +119,7 @@ final class AuditPackExporter
         $out = [];
         foreach ($packages as $package) {
             $out[] = [
+                'org_id' => $this->text($package['org_id'] ?? ''),
                 'subject_type' => $this->text($package['subject_type'] ?? ''),
                 'subject_id' => $this->text($package['subject_id'] ?? ''),
                 'package_hash_sha256' => $this->text($package['package_hash_sha256'] ?? ''),
@@ -139,6 +140,7 @@ final class AuditPackExporter
         $out = [];
         foreach ($events as $event) {
             $out[] = [
+                'org_id' => $this->text($event['org_id'] ?? ''),
                 'recorded_at' => $this->text($event['recorded_at'] ?? $event['occurred_at'] ?? ''),
                 'event_type' => $this->text($event['event_type'] ?? ''),
                 'aggregate_type' => $this->text($event['aggregate_type'] ?? ''),

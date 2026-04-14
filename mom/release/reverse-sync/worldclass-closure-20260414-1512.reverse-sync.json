@@ -26,6 +26,10 @@
     ,"Required manifest hashes for final document revisions"
     ,"Removed evidence signature displayed-hash auto-fill and required signer-visible hash proof"
     ,"Expanded replay conflict and form schema validation proof tests"
+    ,"Added server-authoritative e-signature challenge issuance and consumption schema/service"
+    ,"Preserved audit-pack org scope through evidence/audit summarization"
+    ,"Hardened VPS deployment authority to exact manifest/hash/environment/action/effect"
+    ,"Hardened shared post-release change authority to exact object/field/effect/canonical effectivity"
   ],
   "runtime_or_generated_artifacts_not_reimported": [
     "mom/data/registry/*.json",
