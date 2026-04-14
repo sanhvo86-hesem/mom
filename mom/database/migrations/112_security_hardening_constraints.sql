@@ -14,8 +14,7 @@ ALTER TABLE users ALTER COLUMN employee_id SET NOT NULL;
 ALTER TABLE users ALTER COLUMN created_at SET NOT NULL;
 ALTER TABLE users ALTER COLUMN updated_at SET NOT NULL;
 
-ALTER TABLE roles ALTER COLUMN role_name SET NOT NULL;
-ALTER TABLE roles ALTER COLUMN created_at SET NOT NULL;
+-- roles table uses role_code/role_label (not role_name); created_at not present — skip
 
 -- Session management constraints
 ALTER TABLE sessions ALTER COLUMN user_id SET NOT NULL;
@@ -53,7 +52,7 @@ ALTER TABLE items ALTER COLUMN created_at SET NOT NULL;
 ALTER TABLE items ALTER COLUMN updated_at SET NOT NULL;
 
 ALTER TABLE item_revisions ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE item_revisions ALTER COLUMN revision_level SET NOT NULL;
+-- revision_level does not exist; actual column is "rev" — skip
 ALTER TABLE item_revisions ALTER COLUMN created_at SET NOT NULL;
 
 -- BOM constraints
@@ -123,8 +122,7 @@ ALTER TABLE warehouses ALTER COLUMN created_at SET NOT NULL;
 
 ALTER TABLE inventory_locations ALTER COLUMN location_id SET NOT NULL;
 ALTER TABLE inventory_locations ALTER COLUMN warehouse_id SET NOT NULL;
-ALTER TABLE inventory_locations ALTER COLUMN item_id SET NOT NULL;
-ALTER TABLE inventory_locations ALTER COLUMN created_at SET NOT NULL;
+-- item_id and created_at do not exist in inventory_locations schema — skip
 
 ALTER TABLE lot_master ALTER COLUMN lot_number SET NOT NULL;
 ALTER TABLE lot_master ALTER COLUMN item_id SET NOT NULL;
@@ -159,7 +157,8 @@ ALTER TABLE production_schedule ALTER COLUMN created_at SET NOT NULL;
 ALTER TABLE inspection_plans ALTER COLUMN inspection_plan_id SET NOT NULL;
 ALTER TABLE inspection_plans ALTER COLUMN created_at SET NOT NULL;
 
-ALTER TABLE inspection_results ALTER COLUMN created_at SET NOT NULL;
+-- inspection_results uses recorded_at (not created_at)
+ALTER TABLE inspection_results ALTER COLUMN recorded_at SET NOT NULL;
 
 -- SPC data constraints
 ALTER TABLE spc_data ALTER COLUMN item_id SET NOT NULL;
@@ -265,12 +264,20 @@ ALTER TABLE cost_elements ALTER COLUMN created_at SET NOT NULL;
 -- Shipment constraints
 ALTER TABLE shipments ALTER COLUMN created_at SET NOT NULL;
 
--- Package constraints
-ALTER TABLE packages ALTER COLUMN shipment_id SET NOT NULL;
-ALTER TABLE packages ALTER COLUMN created_at SET NOT NULL;
+-- Package constraints (packages table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
+        EXECUTE 'ALTER TABLE packages ALTER COLUMN shipment_id SET NOT NULL';
+        EXECUTE 'ALTER TABLE packages ALTER COLUMN created_at SET NOT NULL';
+    END IF;
+END $$;
 
--- Compliance constraints
-ALTER TABLE compliance ALTER COLUMN created_at SET NOT NULL;
+-- Compliance constraints (compliance table may not exist in all deployments)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
+        EXECUTE 'ALTER TABLE compliance ALTER COLUMN created_at SET NOT NULL';
+    END IF;
+END $$;
 
 -- ============================================================================
 -- Note on future ENUM columns:
