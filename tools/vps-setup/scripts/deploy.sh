@@ -50,6 +50,17 @@ restore_git_executable_bits() {
         done
 }
 
+sanitize_php_fpm_pool_runtime_settings() {
+    local conf
+    for conf in /etc/php/*/fpm/pool.d/mom.conf; do
+        [ -f "$conf" ] || continue
+        if grep -Eq '^[[:space:]]*php_(admin_)?value\[opcache\.enable\][[:space:]]*=' "$conf"; then
+            sed -i.bak -E '/^[[:space:]]*php_(admin_)?value\[opcache\.enable\][[:space:]]*=/d' "$conf"
+            log "INFO" "Removed pool-level opcache.enable from $conf"
+        fi
+    done
+}
+
 log "INFO" "═══ Deploy started ═══"
 
 # ── Pre-flight checks ────────────────────────────────────────────────────
@@ -127,6 +138,7 @@ fi
 
 # ── Clear OPcache ────────────────────────────────────────────────────────
 log "INFO" "Clearing OPcache..."
+sanitize_php_fpm_pool_runtime_settings
 # Method 1: via PHP-FPM reload (recommended)
 systemctl reload php8.2-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
 

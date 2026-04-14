@@ -66,7 +66,6 @@ php_admin_value[memory_limit] = 256M
 php_admin_value[upload_max_filesize] = 50M
 php_admin_value[post_max_size] = 55M
 php_admin_value[max_execution_time] = 120
-php_admin_value[opcache.enable] = 1
 php_admin_value[opcache.memory_consumption] = 128
 php_admin_value[opcache.max_accelerated_files] = 10000
 php_admin_value[opcache.validate_timestamps] = 0
