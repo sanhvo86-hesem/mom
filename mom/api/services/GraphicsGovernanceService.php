@@ -1370,7 +1370,7 @@ class GraphicsGovernanceService
         $doc['_meta']['updatedAt'] = gmdate('c');
         $this->repo->writeRolloutsDocument($doc);
         $this->publishRuntimeRegistry();
-        return ['rollout' => $rollout];
+        return ['rollout' => $rollout, 'registryVersion' => $this->documentVersion($registry), 'registryEtag' => $this->etag($registry)];
     }
 
     /**
@@ -2872,7 +2872,7 @@ class GraphicsGovernanceService
         if ($moduleOwnerSignoffRef === '') {
             $missing[] = 'moduleOwnerSignoffRef';
         }
-        $manifestRefs = $this->normalizeReleaseManifestRefs((array)($verification['releaseManifestRefs'] ?? $rollout['releaseManifestRefs'] ?? []));
+        $manifestRefs = $this->normalizeReleaseManifestRefs((array)($verification['releaseManifestRefs'] ?? []));
         if ($manifestRefs === []) {
             $missing[] = 'releaseManifestRefs';
         }

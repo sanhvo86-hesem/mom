@@ -6306,6 +6306,7 @@ components:
     GraphicsRolloutApplyRequest:
       type: object
       required: [expectedVersion, rolloutId]
+      additionalProperties: false
       properties:
         expectedVersion:
           type: string
@@ -6314,7 +6315,7 @@ components:
         postCanaryVerification:
           type: object
           required: [runtimeBeaconRef, driftReportRef, moduleOwnerSignoffRef, releaseManifestRefs]
-          additionalProperties: true
+          additionalProperties: false
           properties:
             runtimeBeaconRef:
               type: string
@@ -6351,7 +6352,7 @@ components:
 
     GraphicsRolloutResult:
       type: object
-      required: [rollout]
+      required: [rollout, registryVersion, registryEtag]
       additionalProperties: true
       properties:
         rollout:
