@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T14:17:22.108182+00:00",
+    "generatedAt": "2026-04-14T14:56:56.827719+00:00",
     "description": "Explicit lifecycle and state-contract index for canonical business objects.",
     "stateModelCount": 65
   },
@@ -1408,7 +1408,7 @@
         "engineering_change_requests"
       ],
       "statusSetKey": "engineering_change_requests_ecr_status",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "guarded_transition_runtime",
       "purpose": "Controls engineering change request progression under guarded runtime so release governance exists before any separate PLM workflow engine is introduced.",
       "usageZone": "governed_support",
       "gateType": "change_gate",

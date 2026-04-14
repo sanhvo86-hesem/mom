@@ -2,18 +2,18 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-14T14:48:25.628Z",
+    "generatedAt": "2026-04-14T14:56:51.112Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
-    "enterpriseAuthorityGeneratedAt": "2026-04-14T14:17:22.586947+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T14:17:22.742360+00:00"
+    "publication_run_id": "6b44c138-a80f-4197-9680-48de7c9392ca",
+    "enterpriseAuthorityGeneratedAt": "2026-04-14T14:56:57.305745+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T14:56:57.502297+00:00"
   },
   "coverage": {
     "router_actions": 4192,
-    "field_registry_actions": 4920,
-    "field_definitions": 75075,
-    "unique_field_keys": 4716,
+    "field_registry_actions": 4185,
+    "field_definitions": 56087,
+    "unique_field_keys": 5192,
     "status_sets": 876,
     "workflow_count": 335,
     "relation_edges": 3453,
@@ -73,8 +73,8 @@
       "medium": 0,
       "watch": 15,
       "idempotency_mentions": 22064,
-      "idempotency_contract_coverage_ratio": 1,
-      "default_retry_safe_ratio": 1,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
       "generic_status_only_core_entities": 0,
       "missing_transition_contracts_for_core_entities": 0,
@@ -166,8 +166,8 @@
       "medium": 0,
       "watch": 12,
       "idempotency_mentions": 22085,
-      "idempotency_contract_coverage_ratio": 1,
-      "default_retry_safe_ratio": 1,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
       "compensation_markers": 5,
       "correction_markers": 2259,
@@ -188,7 +188,7 @@
       "hard_delete_endpoint_count": 0,
       "quarantined_delete_endpoint_count": 0,
       "runtime_unsafe_exposed_endpoint_count": 0,
-      "runtime_unsafe_blocked_endpoint_count": 1047,
+      "runtime_unsafe_blocked_endpoint_count": 1032,
       "generic_runtime_classification_count": 555,
       "bound_command_runtime_binding_count": 276,
       "unbound_command_runtime_binding_count": 0
@@ -220,7 +220,7 @@
   "assets": {
     "data-fields-index.json": {
       "kind": "field-registry-index",
-      "records": 4920
+      "records": 4185
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
