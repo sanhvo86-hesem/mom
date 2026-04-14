@@ -4,9 +4,9 @@
   "branch": "codex/worldclass-closure-20260414-2020",
   "base_branch": "main",
   "original_base_head": "c7c3cdaa0c83",
-  "synced_base_head": "7d3500918270",
-  "validated_head": "recorded_in_branch_merge_summary_after_register_commit",
-  "record_state": "pre_merge_controlled_source_manifest",
+  "synced_base_head": "a5171d020e3e353df6f6e96a54551b1f94f2a280",
+  "validated_head": "0b0de6b68e462fff97f46274662652041516af8e",
+  "record_state": "pre_merge_validated_controlled_source_manifest",
   "created_at": "2026-04-14T13:46:31Z",
   "change_authority": {
     "authority_type": "codex_remediation_request",
@@ -14,8 +14,8 @@
     "scope": "branch_sync_evidence_finalization_document_release_change_authority_effectivity_genealogy_audit_pack_openapi_release_governance"
   },
   "branch_activity_note": {
-    "sync_strategy": "git fetch origin main then git merge --ff-only origin/main",
-    "note": "This branch was created from local main and then fast-forwarded to origin/main 7d3500918270 after the first platform governance audit identified branch drift. No force push was used and no default-branch edits were made directly."
+    "sync_strategy": "git fetch origin main, initial fast-forward, then auditable no-ff merges when origin/main moved during remediation",
+    "note": "This branch was created from local main, fast-forwarded to origin/main 7d3500918270 after the first platform governance audit, and later merged origin/main through a5171d020e3e after main moved during remediation. No force push was used and no default-branch edits were made directly."
   },
   "source_boundaries": {
     "controlled_source": [
@@ -52,7 +52,10 @@
     "P1 as-manufactured query requires traceability role and authenticated session scope",
     "P1 genealogy facts use content-bound source ids and replay-equivalence checks",
     "P1 current as-manufactured snapshots are unique by subject",
-    "P1 EQMS control-plane OpenAPI contracts are documented"
+    "P1 EQMS control-plane OpenAPI contracts are documented and route parity is tested",
+    "P1 form submission acceptance has a portal-first e-signature transition",
+    "P1 CO release signature is validated against authoritative signature_events and release package hash",
+    "P1 deploy workflow verifies release manifest commit, change authority, tracking, and manifest hash before SSH deployment"
   ],
   "required_validation": [
     "php tools/release/check_repo_boundary.php",
@@ -60,7 +63,7 @@
     "composer analyse -- --memory-limit=1G",
     "composer test",
     "composer check",
-    "second six-agent closure audit"
+    "closure-loop six-agent audit"
   ],
   "merge_gate": {
     "unresolved_p0": 0,

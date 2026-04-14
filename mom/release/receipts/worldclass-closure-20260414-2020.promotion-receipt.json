@@ -5,18 +5,18 @@
   "branch": "codex/worldclass-closure-20260414-2020",
   "target_branch": "main",
   "original_base_head": "c7c3cdaa0c83",
-  "synced_base_head": "7d3500918270",
-  "validated_head": "recorded_in_branch_merge_summary_after_register_commit",
-  "promotion_state": "premerge_validation_passed_before_second_audit",
+  "synced_base_head": "a5171d020e3e353df6f6e96a54551b1f94f2a280",
+  "validated_head": "0b0de6b68e462fff97f46274662652041516af8e",
+  "promotion_state": "premerge_validation_passed_after_closure_loop",
   "created_at": "2026-04-14T13:46:31Z",
   "merge_strategy": "fast_forward_preferred_else_stop",
   "validation_evidence": {
     "repo_boundary": "passed: repo boundary clean",
     "workflow_status_authority": "passed: workflow status authority clean",
-    "focused_phpunit": "passed: 98 tests, 428 assertions",
+    "focused_phpunit": "passed: WorldClassControlPlaneExecutionTest and release manifest binding focused checks",
     "composer_analyse": "passed",
-    "composer_test": "passed: 448 tests, 2504 assertions, 1 skipped",
-    "composer_check": "passed: PHPStan clean; PHPUnit 448 tests, 2504 assertions, 1 skipped"
+    "composer_test": "passed: 451 tests, 2543 assertions, 1 skipped",
+    "composer_check": "passed: PHPStan clean; PHPUnit 451 tests, 2543 assertions, 1 skipped"
   },
   "closure_counts": {
     "unresolved_p0": 0,

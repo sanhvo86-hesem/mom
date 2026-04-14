@@ -3,9 +3,10 @@
 Branch: `codex/worldclass-closure-20260414-2020`
 Base branch: `main`
 Original base head: `c7c3cdaa0c83`
-Synced base head: `7d3500918270`
-Sync strategy: `git fetch origin main` then `git merge --ff-only origin/main`
-Record state: pre-merge controlled closure register for the branch-level remediation pass.
+Synced base heads: `7d3500918270`, then `13ef99b2f1bb`, then `a5171d020e3e`
+Current validated code head before this evidence-only register update: `0b0de6b6`
+Sync strategy: initial `git fetch origin main` + `git merge --ff-only origin/main`; later `git merge --no-ff origin/main` when `main` moved during remediation.
+Record state: post-remediation controlled closure register for the branch-level remediation pass.
 
 This register is the governed delivery package for the 20:20 closure branch. It is intentionally source-controlled because it records audit findings, remediations, waivers, validation evidence, and merge gates. It is not a prompt dump or generated scratch report.
 
@@ -14,9 +15,11 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Debt item | Severity | Disposition | Closure evidence in this branch |
 |---|---:|---|---|
 | Branch was created from an older `main` while `origin/main` moved | P0 | Closed | Branch was fast-forwarded to `origin/main` head `7d3500918270` before code changes; repo boundary and workflow authority gates passed after sync. |
+| `origin/main` moved again during remediation | P0 | Closed | Committed remediation slices, merged `origin/main` head `a5171d020e3e`, and reran boundary, workflow authority, PHPStan, full PHPUnit, and `composer check`. |
 | Previous closure artifacts did not govern this exact branch | P1 | Closed | Added branch-specific closure register plus manifest, promotion receipt, and reverse-sync intake for `worldclass-closure-20260414-2020`. |
 | Evidence finalization could accept a merely `valid` submission attempt | P1 | Closed | `EvidenceFinalizationService` now requires the source submission attempt state to be exactly `accepted`; focused test proves `valid` is rejected. |
 | Evidence finalization had no mandatory authoritative audit event | P1 | Closed | Finalization now persists or replays an `audit_events` row of type `evidence.finalized`, fails closed if the authoritative audit store cannot confirm it, and binds it to evidence record/version/package hashes. |
+| Evidence finalization could continue without canonical publication/artifact persistence | P1 | Closed | `EvidenceFinalizationService` now requires persisted artifact rows, a persisted `evidence_publication_id`, matching `publication_state`, and an audit event carrying publication id. |
 | Retention lock path could silently continue without persisted lock evidence | P1 | Closed | Final evidence finalization now throws `retention_lock_required_for_final_evidence` when no lock row or lock id is persisted. |
 | Audit pack export could report ready without finalization audit timeline | P1 | Closed | `AuditPackExporter` now rejects packages with persisted evidence packages but no finalization audit event. |
 | Audit pack event query over-included same-type aggregate events | P1 | Closed | `AuditPackExportService` now scopes audit events to the requested aggregate id plus exact evidence package ids/hashes. |
@@ -25,6 +28,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Read acknowledgement could close a group distribution with one actor | P1 | Closed | Group/role/department/site/plant distributions no longer become complete from a single actor acknowledgement; only individual/user rows complete directly. |
 | Change endpoints were auth-only | P1 | Closed for API path | `EqmsControlPlaneController` now gates CR/CO create/transition and as-manufactured query with explicit role policies and passes actor roles to the lifecycle service. |
 | Change lifecycle lacked transition governance, reason, SoD, and released signature checks | P1 | Closed for service/API path | `ChangeLifecycleCommandService` enforces reason, role, segregation-of-duties when roles are supplied, and signature evidence on released transitions. |
+| Released CO signature accepted UUID-shaped text instead of authoritative e-signature | P0 | Closed | Added `ChangeReleaseSignatureValidator`, `release_signature_event_id`, `release_package_hash_sha256`, release package hash binding, and tests around signature-backed release. |
 | Effectivity conflict detection was passive | P1 | Closed | New `EffectivityConflictService` evaluates overlaps and persists open conflicts with idempotency hash before CO release. |
 | Change release side effects were declared but not DB-visible | P1 | Closed to minimum executable standard | New `ChangeReleaseSideEffectService` freezes affected objects, marks resulting objects released, marks effectivities active, and enqueues training gate events. |
 | Resulting objects could orphan from affected objects | P1 | Closed | Migration `128_change_resulting_object_scope_and_snapshot_current.sql` backfills and enforces `plm_change_resulting_objects.affected_object_id NOT NULL`. |
@@ -34,6 +38,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Genealogy fact conflict handling could mutate semantic content | P1 | Closed | Fact insert now uses `ON CONFLICT DO NOTHING` plus replay-equivalence assertion instead of semantic update. |
 | Multiple current as-manufactured snapshots could exist | P1 | Closed | Migration supersedes duplicates and adds unique partial current-snapshot index; service supersedes previous current snapshots before insert. |
 | EQMS control-plane routes lacked OpenAPI coverage | P1 | Closed | `api/openapi.yaml` now documents issuance, submission attempt, finalization, change order, audit pack, and as-manufactured query contracts and error states. |
+| Deploy workflow only checked promotion refs were non-empty | P1 | Closed | Added `ReleaseManifestBindingVerifier`, `verify_release_manifest_binding.php`, workflow deploy step, and focused test proving commit/authority/hash mismatch blocks deployment. |
 | Graph publication worker, WORM adapter, daily digest worker, full training task lifecycle, and full as-built closure | P1 | Dependency-waived | External/provider/product rollout dependencies are documented in the accepted waiver register with owner, review date, and exit criteria. |
 
 ## B. Branch Creation Details
@@ -44,7 +49,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Working branch | `codex/worldclass-closure-20260414-2020` |
 | Worktree | `/Users/a10/Documents/mom-worktrees/worldclass-closure-20260414-2020` |
 | Creation | `git worktree add -b codex/worldclass-closure-20260414-2020 /Users/a10/Documents/mom-worktrees/worldclass-closure-20260414-2020 main` |
-| Required sync | `git fetch origin main`; `git merge --ff-only origin/main` |
+| Required sync | `git fetch origin main`; `git merge --ff-only origin/main`; later `git merge --no-ff origin/main` after `main` advanced |
 | Force push used | No |
 | Direct changes on default branch | No |
 
@@ -63,14 +68,15 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 
 | Issue | Severity | Root cause | Subsystems affected | Benchmark reference | Exact remediation path | Closure evidence required |
 |---|---:|---|---|---|---|---|
-| Branch drift before remediation | P0 | Feature branch was not based on current `origin/main`. | Repo governance, merge safety. | NIST SP 800-128 controlled baseline discipline. | Fast-forward branch to `origin/main` before edits. | `merge-base --is-ancestor origin/main HEAD`, repo gates clean. |
+| Branch drift before remediation and during remediation | P0 | Feature branch was not always based on current `origin/main`. | Repo governance, merge safety. | NIST SP 800-128 controlled baseline discipline. | Sync branch to `origin/main` with auditable merges before merge. | `merge-base --is-ancestor origin/main HEAD`, repo gates clean. |
 | Evidence source attempt not acceptance-strict | P1 | Validation state and business acceptance state were conflated. | Form execution, evidence finalization. | Connected QMS evidence acceptance. | Require `frm_submission_attempts.submission_state = accepted`. | Unit test proving `valid` fails. |
 | Finalization no audit-event proof | P1 | Evidence persistence and audit trail were not transactionally evidenced. | Evidence, audit, audit pack. | Part 11 and ALCOA+ event attribution. | Persist/replay `evidence.finalized` event or fail closed. | Audit insert/replay test and audit-pack finalization-event guard. |
 | Retention not fail-closed | P1 | Local retention row could be absent while finalization succeeded. | Evidence, retention. | Annex 11 record retention and availability. | Require persisted lock id for final evidence. | Unit test proving failure when lock is not persisted. |
 | Change authority too close to workflow | P1 | Lifecycle states did not execute release implementation controls. | Change, document, training, effectivity. | PLM affected/resulting/effectivity patterns. | Add transition governance, effectivity conflict persistence, side-effect service. | Focused lifecycle tests and migration 128. |
 | Group document ack over-completion | P1 | Distribution audience semantics were not separated from user acknowledgement rows. | Document control, training/read-understand. | Connected QMS training linkage. | Only individual/user audience rows complete on one actor ack. | SQL assertion in document control test. |
 | Genealogy replay not deterministic | P1 | Default source id was not fact-content-bound and conflict update mutated facts. | MES, genealogy, audit. | Siemens/SAP genealogy and as-manufactured trail. | Canonical fact fingerprint, conflict as replay conflict, current snapshot uniqueness. | Focused genealogy tests and migration 128. |
-| API contracts incomplete | P1 | EQMS control-plane operations were implemented but not externally contract-governed. | API, integrations, test strategy. | Best-in-class platform API clarity. | Add OpenAPI paths, responses, and error codes. | `api/openapi.yaml` updated. |
+| API contracts incomplete | P1 | EQMS control-plane operations were implemented but not externally contract-governed. | API, integrations, test strategy. | Best-in-class platform API clarity. | Add OpenAPI paths, responses, and route parity test. | `api/openapi.yaml` updated; route parity test added. |
+| Deploy manifest not bound to HEAD | P1 | Deployment only required env vars to be non-empty. | Release governance, deploy. | NIST SP 800-128 controlled promotion. | Verify manifest tracked, hash-valid, authority-bound, and commit-bound to `github.sha`. | `ReleaseManifestBindingVerifier` and deploy workflow step. |
 
 ## E. Benchmark Matrix Vs World-Class Systems
 
@@ -129,13 +135,18 @@ External sources refreshed without sending repository content:
 | `mom/api/services/DocumentControl/DocumentRevisionCommandService.php` | Refactor | Release signature/import receipt required; group ack no longer completes distribution. | Document release/read ack tests. |
 | `mom/api/services/ChangeControl/ChangeLifecycleCommandService.php` | Refactor | Transition governance, release signature, conflict evaluation, release side effects, request hash metadata. | Change lifecycle tests. |
 | `mom/api/services/ChangeControl/EffectivityConflictService.php` | Create | Persists effectivity overlap conflicts with idempotency hash. | Change order release path tests. |
+| `mom/api/services/ChangeControl/ChangeReleaseSignatureValidator.php` | Create | Validates release e-signature rows by object, actor, meaning, auth challenge, and release package hash. | Change lifecycle release tests. |
 | `mom/api/services/ChangeControl/ChangeReleaseSideEffectService.php` | Create | Executes DB-visible affected/resulting/effectivity/training side effects on CO release. | Change order release path tests. |
+| `mom/api/services/FormControl/FormSubmissionAcceptanceService.php` | Create | Provides portal-first valid-to-accepted submission attempt transition with e-signature evidence. | Evidence/form acceptance tests. |
+| `mom/api/services/ControlPlane/ReleaseManifestBindingVerifier.php` | Create | Fails deploy promotion when release manifest is not tracked, commit-bound, authority-bound, and hash-valid. | Release manifest binding test. |
 | `mom/api/services/OrderWorkflowService.php` | Keep | No change; strict post-release authority from earlier branch remains the boundary. | Existing order workflow authority tests. |
 | `mom/api/services/Traceability/GenealogyGraphService.php` | Refactor | Session scope support, content-bound source id, replay equivalence, current snapshot uniqueness. | Genealogy focused tests. |
 | `mom/api/controllers/EqmsControlPlaneController.php` | Refactor | Role gates for CR/CO and traceability read; session scope injection; OpenAPI alignment. | Controller-level integration tests are next P2. |
 | `mom/api/controllers/ManufacturingEventController.php` | Refactor | Rejects caller-supplied scope and injects session scope filters. | Existing controller smoke tests plus future scoped API tests. |
 | `mom/api/openapi.yaml` | Refactor | Adds EQMS control-plane contracts and state-aware error codes. | `composer check` and future OpenAPI contract lint. |
+| `.github/workflows/deploy.yml` | Refactor | Replaces non-empty ref check with release-manifest binding verification before deploy. | Release manifest binding test and workflow review. |
 | `mom/database/migrations/*` | Create/update | Adds migration 128 and README range update. | Migration review and DB dry-run in deployment. |
+| `mom/tools/release/verify_release_manifest_binding.php` | Create | CLI gate for deployment manifest/source commit/change authority verification. | Release manifest binding test and `php -l`. |
 | `mom/docs/backend/*` | Create | Adds this closure register. | Boundary scanner. |
 | `mom/release/*` | Create | Adds manifest, promotion receipt, reverse-sync intake. | Boundary scanner and branch review. |
 
@@ -146,6 +157,7 @@ External sources refreshed without sending repository content:
 | `128_change_resulting_object_scope_and_snapshot_current.sql` | Backfill `affected_object_id` on resulting objects from matching CO affected objects. | Abort if unmapped resulting rows remain before `NOT NULL`. | Do not roll back after enforcing traceability unless downstream data is restored from backup. |
 | `128_change_resulting_object_scope_and_snapshot_current.sql` | Add `effectivity_conflicts.idempotency_key`, `metadata`, and unique index. | Existing rows receive stable hash over conflict object/scope. | Dropping idempotency loses duplicate detection evidence. |
 | `128_change_resulting_object_scope_and_snapshot_current.sql` | Supersede duplicate current snapshots and add unique partial index. | Keeps newest current row by timestamp/id. | Rollback can reintroduce multiple current snapshots and is not recommended after production writes. |
+| `129_change_release_authorization_integrity.sql` | Add CO release signature/package hash columns, same-order affected/resulting FK, submission acceptance columns, scoped snapshot uniqueness. | Constraint is `NOT VALID` where needed to avoid unsafe historical lock; production validation is a governed follow-up. | Do not roll back after release signatures are written unless restoring associated signature/change state. |
 
 ## J. API Contract List
 
@@ -156,7 +168,9 @@ External sources refreshed without sending repository content:
 | `POST /api/v1/eqms/evidence/finalize` | Source attempt, original artifact, canonical payload, readable snapshot, signatures, publication state | Evidence record/version, package hashes, retention lock, audit event | `source_submission_attempt_not_accepted`, `retention_lock_required_for_final_evidence`, `finalization_audit_event_required` |
 | `POST /api/v1/eqms/change-orders` | CR ref, affected objects, resulting objects, effectivity, training, verification | CO id, lifecycle state, idempotency metadata | `duplicate_change_order`, `affected_object_required` |
 | `POST /api/v1/eqms/change-orders/transition` | CO id, target state, reason, release signature, actor roles | Updated state, readiness, release side effects | `change_order_transition_role_not_authorized`, `effectivity_conflict_open`, `change_order_release_signature_required` |
-| `POST /api/v1/eqms/audit-packs` | Scope type/id only | Audit pack manifest and completeness state | `audit_timeline_missing_finalization_event`, `audit_pack_scope_required` |
+| `POST /api/v1/eqms/forms/submission-attempts/{attempt_id}/accept` | Attempt id, reason, signature event | Accepted submission attempt row | `submission_attempt_validation_not_passed`, `submission_acceptance_signature_not_authoritative` |
+| `POST /api/v1/eqms/audit-packs/manifest` | Scope type/id only | Audit pack manifest and completeness state | `audit_timeline_missing_finalization_event`, `audit_pack_scope_required` |
+| `GET /api/v1/eqms/audit-packs/export` | Export hash/scope query | Durable audit pack bundle/readback | `audit_pack_export_not_found`, `audit_pack_hash_mismatch` |
 | `GET /api/v1/eqms/genealogy/as-manufactured` | Subject type/id; session supplies scope | Scoped nodes, edges, current snapshot | `traceability_read_not_authorized`, `caller_scope_not_authoritative` |
 
 ## K. Worker/Job List
@@ -201,17 +215,24 @@ Closed non-waived P1:
 - Genealogy replay determinism and current snapshot uniqueness.
 - OpenAPI EQMS coverage.
 
-Validation evidence before this register:
+Final validation evidence after latest `origin/main` sync and deploy-binding remediation:
 - `php tools/release/check_repo_boundary.php`: passed, `repo boundary clean`.
 - `php tools/release/check_workflow_status_authority.php`: passed, `workflow status authority clean`.
-- Focused PHPUnit: 98 tests, 428 assertions.
+- Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed; release manifest binding focused test passed.
 - `composer analyse -- --memory-limit=1G`: passed.
-- `composer test`: passed, 448 tests, 2504 assertions, 1 skipped.
-- `composer check`: passed, PHPStan clean plus 448 tests, 2504 assertions, 1 skipped.
+- `composer test`: passed, 451 tests, 2543 assertions, 1 skipped.
+- `composer check`: passed, PHPStan clean plus 451 tests, 2543 assertions, 1 skipped.
 
 ## N. Second Six-Agent Re-Audit
 
-Status before second audit: pending at the time this register was introduced. The second audit must review this exact branch state after code, migration, OpenAPI, release artifacts, and validation evidence are present.
+Second and closure-loop audits found additional P0/P1 issues that were remediated in this branch:
+- stale branch after `origin/main` moved again: closed by `git merge --no-ff origin/main`;
+- release e-signature UUID-only validation: closed by `ChangeReleaseSignatureValidator` and migration 129;
+- role/idempotency/effectivity-conflict gaps: closed by mandatory actor roles, request hash replay checks, baseline conflict detection, and idempotent conflict replay;
+- publication/artifact persistence gaps: closed by fail-closed artifact/publication row checks;
+- submission acceptance path gap: closed by `FormSubmissionAcceptanceService` and route/OpenAPI/test coverage;
+- audit-pack export lifecycle gap: closed by `audit_pack_exports` lifecycle persistence;
+- deploy manifest binding gap: closed by `ReleaseManifestBindingVerifier` and workflow gate.
 
 Required second-audit checks:
 - No unresolved P0.
@@ -222,18 +243,18 @@ Required second-audit checks:
 
 ## O. Closure Loop Results
 
-Current closure state before second audit:
+Current closure state after remediation and validation:
 
 | Severity | Count | Disposition |
 |---|---:|---|
 | P0 | 0 | Closed. |
-| Non-waived P1 | 0 | Closed in this branch subject to second audit verification. |
+| Non-waived P1 | 0 | Closed in this branch by code/migration/API/test/runbook evidence, with dependency-scoped waivers below. |
 | Waived P1 dependencies | 5 | Recorded in accepted waiver register. |
 | P2 roadmap | 5 | Recorded in deferred roadmap register. |
 
 ## P. Unresolved Backlog Register
 
-No unresolved P0 or non-waived P1 is accepted in this register. Any second-audit P0/P1 finding must be remediated before merge.
+No unresolved P0 or non-waived P1 is accepted in this register. If any subsequent audit finds a P0/P1 against the final committed state, merge remains blocked until remediated or explicitly dependency-waived with owner, review date, and exit condition.
 
 ## Q. Accepted Waiver Register
 
@@ -269,7 +290,7 @@ Summary:
 - Hardened document release signature/import evidence and read acknowledgement semantics.
 - Added change release governance: role/reason/SoD/signature checks, effectivity conflict persistence, release side effects, and resulting-object integrity migration.
 - Hardened manufacturing/genealogy scope authority, content-bound genealogy replay, and current snapshot uniqueness.
-- Added EQMS OpenAPI contracts and branch-specific release manifest, promotion receipt, and reverse-sync intake.
+- Added EQMS OpenAPI contracts, deploy manifest binding, and branch-specific release manifest, promotion receipt, and reverse-sync intake.
 
 Validation:
 - `php tools/release/check_repo_boundary.php`
@@ -279,22 +300,22 @@ Validation:
 - `composer check`
 
 Risk:
-- Migration 128 enforces resulting-object affected-object integrity and current snapshot uniqueness; production dry-run is required before deployment.
+- Migrations 128 and 129 enforce resulting-object affected-object integrity, current snapshot uniqueness, release authorization integrity, and submission acceptance metadata; production dry-run is required before deployment.
 - Graph/WORM/daily digest/full training lifecycle/full as-built closure remain explicit P1 dependency waivers, not closure claims.
 
 Rollback:
-- Do not roll back migration 128 after production writes unless restoring from backup, because it protects traceability integrity.
+- Do not roll back migrations 128/129 after production writes unless restoring from backup, because they protect traceability and release-authorization integrity.
 - Service changes are backward-compatible at API path level but intentionally reject previously permissive invalid finalization/release/replay states.
 
 ## U. Final Merge Checklist
 
 | Gate | Status |
 |---|---|
-| Unresolved P0 = 0 | Pending second audit verification. |
-| Unresolved non-waived P1 = 0 | Pending second audit verification. |
-| Required migrations present | Present: migration 128. |
+| Unresolved P0 = 0 | Closed by current remediation register; final merge remains blocked if a later audit finds a new P0. |
+| Unresolved non-waived P1 = 0 | Closed by code/migration/API/test evidence; dependency waivers are explicit below. |
+| Required migrations present | Present: migrations 128 and 129. |
 | Required backend changes present | Present. |
-| Required tests green | Passed before register; rerun after register and second audit. |
+| Required tests green | Passed after latest `origin/main` sync and deploy-binding remediation: 451 tests, 2543 assertions, 1 skipped; PHPStan clean. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |
 | Waivers documented | Present. |
 | PR summary updated | Draft body prepared above. |
@@ -302,7 +323,7 @@ Rollback:
 
 ## V. Merge Result Summary
 
-Pending. Merge to `main` is prohibited until second audit and post-register validation pass.
+Pending. Merge to `main` is prohibited until this evidence update is committed, validation is rerun if required, final agent closure is reviewed, and `origin/main` is still an ancestor of the branch.
 
 ## W. Branch Deletion Evidence
 
