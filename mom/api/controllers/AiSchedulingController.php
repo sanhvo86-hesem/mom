@@ -1865,21 +1865,33 @@ class AiSchedulingController extends BaseController
     public function aiModelList(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         try {
             $db = $this->getDb();
             if ($db !== null) {
-                $rows = $db->query(
-                    "SELECT model_id, model_name, model_type, version, algorithm,
+                $modelColumns = "model_id, model_name, model_type, version, algorithm,
+                            training_samples,
+                            accuracy_score, precision_score, recall_score,
+                            is_active, promoted_at, created_at";
+                $canViewModelInternals = $this->userHasAnyRole($user, admin_roles());
+                if ($canViewModelInternals) {
+                    $modelColumns = "model_id, model_name, model_type, version, algorithm,
                             training_data_source, training_samples,
                             accuracy_score, precision_score, recall_score,
-                            is_active, promoted_at, config, metadata, created_at
+                            is_active, promoted_at, config, metadata, created_at";
+                }
+                $rows = $db->query(
+                    "SELECT {$modelColumns}
                      FROM prediction_models
                      ORDER BY created_at DESC"
                 );
 
                 // Parse JSONB fields
                 foreach ($rows as &$row) {
+                    if (!$canViewModelInternals) {
+                        unset($row['training_data_source'], $row['config'], $row['metadata']);
+                    }
                     if (isset($row['config']) && is_string($row['config'])) {
                         $row['config'] = json_decode($row['config'], true) ?? [];
                     }
@@ -2011,6 +2023,7 @@ class AiSchedulingController extends BaseController
     public function aiDashboard(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiReadAccess($user);
 
         try {
             // Get prediction pipeline metrics

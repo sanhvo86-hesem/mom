@@ -246,12 +246,13 @@ final class MobileWorkQueueService
                 $completionResult = $this->normalizeTaskResult($result['result'] ?? null);
                 $qtyCompleted = $this->nonNegativeInt($result['qty_completed'] ?? 0, 'qty_completed');
                 $qtyScrap = $this->nonNegativeInt($result['qty_scrap'] ?? 0, 'qty_scrap');
-                if ($qtyScrap > $qtyCompleted && $qtyCompleted > 0) {
+                if ($qtyScrap > $qtyCompleted) {
                     throw new RuntimeException('qty_scrap_exceeds_completed');
                 }
                 if ($completionResult === 'pass' && $qtyScrap > 0) {
                     throw new RuntimeException('pass_result_cannot_have_scrap');
                 }
+                $completionReasonCode = $this->normalizeCompletionReasonCode($result['reason_code'] ?? null, $completionResult, $qtyScrap);
 
                 foreach ($queue as $idx => $task) {
                     if (!is_array($task)) {
@@ -282,6 +283,7 @@ final class MobileWorkQueueService
                         'qty_scrap'       => $qtyScrap,
                         'quantity_completed' => $qtyCompleted,
                         'quantity_scrap'  => $qtyScrap,
+                        'completion_reason_code' => $completionReasonCode,
                         'notes'          => $result['notes'] ?? $task['notes'],
                         'updated_at'     => $now,
                     ]);
@@ -1347,6 +1349,41 @@ final class MobileWorkQueueService
         }
 
         return $result;
+    }
+
+    private function normalizeCompletionReasonCode(mixed $value, string $result, int $qtyScrap): string
+    {
+        $reasonCode = strtoupper($this->stringValue($value));
+        $reasonRequired = $result !== 'pass' || $qtyScrap > 0;
+        if ($reasonRequired && $reasonCode === '') {
+            throw new RuntimeException('completion_reason_code_required');
+        }
+        if ($reasonCode === '') {
+            return '';
+        }
+        if (preg_match('/^[A-Z0-9][A-Z0-9._-]{1,63}$/', $reasonCode) !== 1) {
+            throw new RuntimeException('invalid_completion_reason_code');
+        }
+
+        $catalog = (new ShopfloorExecutionService($this->dataDir))->activeReasonCatalog();
+        $knownCodes = [];
+        foreach (['ng' => 'defect_code', 'rework' => 'defect_code', 'blocking' => 'reason_code'] as $domain => $field) {
+            foreach ((array)($catalog[$domain] ?? []) as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $code = strtoupper($this->stringValue($row[$field] ?? ''));
+                if ($code !== '') {
+                    $knownCodes[$code] = true;
+                }
+            }
+        }
+
+        if ($knownCodes !== [] && !isset($knownCodes[$reasonCode])) {
+            throw new RuntimeException('unknown_completion_reason_code');
+        }
+
+        return $reasonCode;
     }
 
     private function nullableFloat(mixed $value, string $field): ?float
