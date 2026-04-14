@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T16:18:46.250Z",
+    "generatedAt": "2026-04-14T17:51:43.620Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
+    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -29,7 +29,7 @@
     "authoritativePhysicalTableCount": 774,
     "authoritativePartitionTableCount": 13,
     "schemaAuthorityRegistryTableCount": 761,
-    "relationCount": 3461,
+    "relationCount": 3462,
     "relationEntityCount": 761,
     "endpointCount": 4198,
     "endpointBoundTableCount": 761,
@@ -74,10 +74,10 @@
     "targetedRebuildPolicy": "Rebuild changed authority sections and refresh checksums before release.",
     "summary": {
       "segmentCount": 7,
-      "sourceSizeBytes": 11180820,
-      "totalSegmentSizeBytes": 11189140,
+      "sourceSizeBytes": 11181977,
+      "totalSegmentSizeBytes": 11190297,
       "largestSegmentId": "tables",
-      "largestSegmentSizeBytes": 6692367,
+      "largestSegmentSizeBytes": 6692386,
       "allSegmentsChecksummed": true,
       "segmentedReadReady": true,
       "revisionGuard": "sourceSha256",
@@ -135,7 +135,7 @@
     "endpointSource": "data/registry/endpoint-catalog.json",
     "workflowSource": "data/registry/workflow-library.json",
     "relationSource": "data/registry/relation-map.json",
-    "registryManifestRunId": "177a8d7c-455d-4977-b166-a466ef06bd55",
+    "registryManifestRunId": "51dffd80-0733-463d-af48-891fbdd0701f",
     "graphicsGovernanceSource": "data/registry/graphics-governance-registry.json"
   },
   "deletePolicy": {

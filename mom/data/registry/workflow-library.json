@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-14T16:18:30.445Z",
+    "generatedAt": "2026-04-14T17:51:26.990Z",
     "workflowCount": 336
   },
   "workflows": {
@@ -6952,10 +6952,93 @@
         "plm_change_orders"
       ],
       "stateField": "receipt_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "controlled_import_receipts_receipt_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [
@@ -10169,7 +10252,8 @@
       "primaryTable": "e_signature_auth_challenges",
       "relatedTables": [
         "e_signature_auth_challenges",
-        "users"
+        "users",
+        "signature_events"
       ],
       "stateField": "challenge_state",
       "statusSet": "e_signature_auth_challenges_challenge_state",

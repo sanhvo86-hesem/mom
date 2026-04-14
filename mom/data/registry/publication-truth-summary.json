@@ -2,8 +2,8 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
-    "generated_at": "2026-04-14T16:18:46.865Z",
+    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
+    "generated_at": "2026-04-14T17:51:44.381Z",
     "schema_authority": "database/migrations -> schema.sql own storage truth; table-registry publishes logical runtime-contract tables, excluding physical partition children.",
     "schema_authority_counts": {
       "logical_contract_table_count": 761,
@@ -26,9 +26,9 @@
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
-      "ready": 344,
+      "ready": 345,
       "blocked": 0,
-      "unneeded": 428,
+      "unneeded": 427,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
     "openapi": {
