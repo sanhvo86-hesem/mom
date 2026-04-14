@@ -18,6 +18,9 @@
     "legacyTables": [
       "quotations",
       "crm_quotes_pipeline"
+    ],
+    "legacyTablesToIsolate": [
+      "crm_quotes_pipeline"
     ]
   },
   "identity": {

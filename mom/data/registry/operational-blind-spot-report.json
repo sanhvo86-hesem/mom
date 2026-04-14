@@ -1,18 +1,385 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
-    "publication_scope": "platform_global",
-    "slice_publication_pass": "foundation_governance_contract_slice"
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:28.354Z",
+    "registryDir": "/Users/a10/Documents/mom-tranche14-integration/mom/data/registry",
+    "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
   "summary": {
-    "scenario_count": 10,
-    "idempotency_contract_coverage_ratio": 1.0
+    "scenario_count": 15,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "watch": 15,
+    "idempotency_mentions": 21977,
+    "idempotency_contract_coverage_ratio": 1.0,
+    "default_retry_safe_ratio": 1.0,
+    "create_endpoints_requiring_client_key": 0,
+    "generic_status_only_core_entities": 0,
+    "missing_transition_contracts_for_core_entities": 0,
+    "missing_canonical_resources": 0,
+    "unused_candidate_entities": 0
+  },
+  "current_local_signals": {
+    "generic_status_only_core_entities": [],
+    "missing_transition_contracts_for_core_entities": [],
+    "not_applicable_core_entities": [
+      {
+        "entity_key": "bi_datawarehouse.plant_performance_snapshots",
+        "entity": "plant_performance_snapshots",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.plant-performance-snapshots"
+        ]
+      },
+      {
+        "entity_key": "calibration_equipment.calibration_grr_studies",
+        "entity": "calibration_grr_studies",
+        "profile": "assessment_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.msa-studies"
+        ]
+      },
+      {
+        "entity_key": "finance.inventory_valuations",
+        "entity": "inventory_valuations",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "finance.inventory-valuations"
+        ]
+      },
+      {
+        "entity_key": "inventory.inventory_balance_snapshot",
+        "entity": "inventory_balance_snapshot",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.inventory-balance-snapshots"
+        ]
+      },
+      {
+        "entity_key": "inventory.stock_balances",
+        "entity": "stock_balances",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "inventory_logistics.stock-balances"
+        ]
+      },
+      {
+        "entity_key": "mes_execution.mes_oee_snapshots",
+        "entity": "mes_oee_snapshots",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.mes-oee-snapshots"
+        ]
+      },
+      {
+        "entity_key": "mes_execution.mes_part_genealogy",
+        "entity": "mes_part_genealogy",
+        "profile": "business_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "traceability_serialization.lot-genealogy"
+        ]
+      },
+      {
+        "entity_key": "production.production_order_bom_snapshot",
+        "entity": "production_order_bom_snapshot",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.production-bom-snapshots"
+        ]
+      },
+      {
+        "entity_key": "production.production_order_route_snapshot",
+        "entity": "production_order_route_snapshot",
+        "profile": "projection_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "analytics.production-route-snapshots"
+        ]
+      },
+      {
+        "entity_key": "quality_lab.qual_effectiveness_reviews",
+        "entity": "qual_effectiveness_reviews",
+        "profile": "assessment_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "commercial_customer.quote-effectiveness-reviews"
+        ]
+      },
+      {
+        "entity_key": "quality_management.spc_data",
+        "entity": "spc_data",
+        "profile": "transactional_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.spc-observations"
+        ]
+      },
+      {
+        "entity_key": "traceability_serialization.genealogy_link",
+        "entity": "genealogy_link",
+        "profile": "business_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": [
+          "traceability_serialization.lot-genealogy"
+        ]
+      }
+    ],
+    "unused_candidate_entities": [],
+    "idempotency_runtime_contract": {
+      "mutating_endpoint_count": 2644,
+      "idempotent_endpoint_count": 2644,
+      "idempotency_contract_coverage_ratio": 1.0,
+      "default_retry_safe_endpoint_count": 2644,
+      "default_retry_safe_ratio": 1.0,
+      "create_endpoints_requiring_client_key": 0
+    }
   },
   "assessments": [
     {
       "scenario_id": "OPS-001",
-      "current_severity": "watch"
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "idempotency_mentions": 21977,
+        "optimistic_concurrency_mentions": 8296,
+        "mutating_endpoint_count": 2644,
+        "idempotent_endpoint_count": 2644,
+        "idempotency_contract_coverage_ratio": 1.0,
+        "default_retry_safe_endpoint_count": 2644,
+        "default_retry_safe_ratio": 1.0,
+        "create_endpoints_requiring_client_key": 0
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-002",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
+      ],
+      "evidence": {
+        "optimistic_concurrency_mentions": 8296,
+        "if_match_mentions": 3373,
+        "row_version_mentions": 26845
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-003",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_resources": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-004",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_resources": [],
+        "missing_transition_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-005",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_resources": [],
+        "generic_core_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-006",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_design_terms": [],
+        "missing_resources": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-007",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "not_applicable_core_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-008",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "not_applicable_core_entities": [],
+        "missing_design_terms": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-009",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_resources": [],
+        "missing_transition_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-010",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_resources": [],
+        "missing_transition_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-011",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_design_terms": [],
+        "generic_core_entities": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-012",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "idempotency_mentions": 21977
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-013",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "missing_design_terms": []
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-014",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [
+        "Heartbeat and escalation controls are now modeled in both policy and runtime contracts, so the gap has moved out of the active remediation tier."
+      ],
+      "evidence": {
+        "policy_has_job_heartbeat_requirement": true,
+        "heartbeat_mentions": 33,
+        "escalation_mentions": 587
+      },
+      "required_controls": []
+    },
+    {
+      "scenario_id": "OPS-015",
+      "title": null,
+      "priority": null,
+      "current_severity": "watch",
+      "rationale": [],
+      "evidence": {
+        "unused_candidate_entities": 0,
+        "isolated_legacy_aliases": []
+      },
+      "required_controls": []
     }
-  ]
+  ],
+  "decision_rule": "Anything critical or high must enter the next remediation wave before broad frontend rollout in that process family."
 }

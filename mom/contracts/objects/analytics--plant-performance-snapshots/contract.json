@@ -23,6 +23,9 @@
       "plant_performance_snapshot_id"
     ]
   },
+  "projection": {
+    "releaseSnapshotOf": "plant_performance"
+  },
   "governance": {
     "usageZone": "governed_support",
     "gateType": "analytics_gate",

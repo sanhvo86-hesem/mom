@@ -636,10 +636,13 @@ def main() -> int:
     catalog.setdefault("_meta", {})
     catalog["_meta"]["generatedAt"] = generated_at
     catalog["sourceRefs"] = {**SOURCE_REFS, **(catalog.get("sourceRefs") or {})}
-    save_json(CATALOG_PATH, catalog)
 
     table_registry = load_json(REGISTRY_DIR / "table-registry.json")
     endpoint_catalog = load_json(REGISTRY_DIR / "endpoint-catalog.json")
+    publication_run_id = str((endpoint_catalog.get("_meta") or {}).get("publication_run_id") or "")
+    if publication_run_id:
+        catalog["_meta"]["publication_run_id"] = publication_run_id
+    save_json(CATALOG_PATH, catalog)
     workflow_library = load_json(REGISTRY_DIR / "workflow-library.json")
     manifest = load_json(MANIFEST_PATH)
     openapi_blob = OPENAPI_PATH.read_text(encoding="utf-8", errors="ignore").lower() if OPENAPI_PATH.is_file() else ""

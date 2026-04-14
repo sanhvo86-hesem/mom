@@ -1,24 +1,74 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
-    "publication_scope": "platform_global",
-    "slice_publication_pass": "foundation_governance_contract_slice"
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:23.190Z",
+    "description": "Wave 5 maintenance, EHS, compliance, and lean-governance policy for practical lifecycle closure."
+  },
+  "objective": {
+    "wave": 5,
+    "name": "Maintenance, EHS, And Compliance Closure",
+    "statement": "Every maintenance, permit, incident, safety, and 5S object must exist for a concrete plant-control purpose, run on a practical lifecycle instead of placeholder status aliases, and close through one auditable backend owner with lean follow-up and gate control.",
+    "operating_mode": "backend_first_maintenance_ehs_governance"
   },
   "build_questions": [
-    "Q01",
-    "Q02",
-    "Q03",
-    "Q04",
-    "Q05",
-    "Q06",
-    "Q07",
-    "Q08"
+    {
+      "id": "wave5_birth_purpose",
+      "question": "What factory gate, uptime risk, permit-to-work constraint, safety exposure, or lean-discipline loop is this object born to control, and what real plant failure appears if it does not exist?"
+    },
+    {
+      "id": "wave5_practical_states",
+      "question": "Do the lifecycle states describe real operating decisions such as approve, activate, contain, suspend, verify, retire, or archive, instead of placeholder digital-thread statuses?"
+    },
+    {
+      "id": "wave5_canonical_owner",
+      "question": "Does the canonical resource point to the live table that production actually uses, or is it still hiding behind a legacy alias or non-existent placeholder table?"
+    },
+    {
+      "id": "wave5_alias_boundary",
+      "question": "If a maintenance console or register is only a contextual alias, can it trace back to the canonical master identity without creating a second state truth?"
+    },
+    {
+      "id": "wave5_role_guards",
+      "question": "Which server-side roles may approve, activate, suspend, close, retire, or archive the object, and are those guards enforced on the backend transitions?"
+    },
+    {
+      "id": "wave5_gate_audit",
+      "question": "Can an auditor trace from equipment, PM plan, PM work order, permit, incident, observation, or 5S audit through one canonical chain with timeline, status, and closure evidence?"
+    },
+    {
+      "id": "wave5_continuous_improvement",
+      "question": "Does the object feed maintenance review, permit review, incident review, safety review, or gemba follow-up so the backend supports continuous improvement instead of dead records?"
+    },
+    {
+      "id": "wave5_unused_isolation",
+      "question": "If the element has no unique operational purpose, has it been isolated as alias, archive, or unused instead of left live by habit?"
+    }
   ],
+  "acceptance_criteria": {
+    "required_for_wave5_execution_owner": [
+      "canonical_resource_maps_to_live_table",
+      "persisted_or_practical_guarded_lifecycle_matches_real_operation",
+      "placeholder_digital_thread_status_alias_removed",
+      "transition_endpoint_has_server_side_guard",
+      "workflow_engine_bridge_ready_when_persisted"
+    ],
+    "required_for_wave5_alias_boundary": [
+      "maintenance_alias_links_back_to_canonical_equipment_identity",
+      "alias_does_not_introduce_a_second_status_truth",
+      "frontend_and_canonical_contracts_use_the_same_traceability_anchor"
+    ],
+    "required_for_wave5_relationship_truth": [
+      "canonical_key_relationships_only_reference_real_fields",
+      "nonexistent_asset_or_permit_links_removed",
+      "incident_safety_and_compliance_links_match_live_schema"
+    ]
+  },
   "rejection_criteria": [
-    "live_maintenance_or_ehs_owner_left_on_placeholder_digital_thread_status"
-  ],
-  "lifecycle_modes": {
-    "guarded_transition_runtime": "required"
-  }
+    "live_maintenance_or_ehs_owner_left_on_placeholder_digital_thread_status",
+    "canonical_maintenance_or_compliance_resource_points_to_non_live_placeholder_table",
+    "persisted_workflow_keeps_generic_complete_partial_broken_pending_states_for_live_factory_control",
+    "maintenance_alias_published_without_link_back_to_canonical_equipment_identity",
+    "permit_incident_observation_or_5s_close_path_missing_server_side_role_guard",
+    "false_canonical_relationship_published_for_missing_asset_permit_or_corrective_action_field"
+  ]
 }

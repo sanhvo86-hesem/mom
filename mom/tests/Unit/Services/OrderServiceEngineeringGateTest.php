@@ -104,6 +104,42 @@ final class OrderServiceEngineeringGateTest extends TestCase
         $this->assertCount(1, $service->listSalesOrders());
     }
 
+    public function testCreateSalesOrderDerivesMissingTotalValueFromLines(): void
+    {
+        $service = new OrderService($this->dataDir);
+
+        $salesOrder = $service->createSalesOrder([
+            'so_number' => 'SO-2026-0005',
+            'status' => 'draft',
+            'customer_name' => 'ACME',
+            'lines' => [
+                ['qty' => 2, 'unit_price' => 125.50],
+                ['quantity' => 1, 'price' => 49.00],
+            ],
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+
+        $this->assertSame(300.0, $salesOrder['total_value']);
+    }
+
+    public function testCreateSalesOrderRejectsZeroAmountWithoutLineValue(): void
+    {
+        $service = new OrderService($this->dataDir);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Order amount must be greater than zero');
+
+        $service->createSalesOrder([
+            'so_number' => 'SO-2026-0006',
+            'status' => 'draft',
+            'customer_name' => 'ACME',
+            'lines' => [
+                ['qty' => 2, 'unit_price' => 0],
+            ],
+            'created_at' => '2026-04-13T10:00:00+07:00',
+        ]);
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {

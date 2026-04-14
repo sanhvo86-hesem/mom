@@ -1,22 +1,296 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
-    "publication_scope": "platform_global",
-    "slice_publication_pass": "foundation_governance_contract_slice"
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:23.545Z",
+    "description": "Wave 6 normalization decisions for finance posting controls, valuation projections, and plant-performance snapshots."
   },
   "service_finance_gate_targets": {
-    "s0": {},
-    "s1": {},
-    "s2": {},
-    "s3": {}
+    "finance.period_close_controls": {
+      "canonical_resource": "finance.period-closes",
+      "entity_key": "finance.period_close_controls",
+      "expected_profile": "governed_case",
+      "required_actions": [
+        "list",
+        "detail",
+        "create",
+        "transition"
+      ],
+      "expected_canonical_pattern": "lifecycle_owner",
+      "require_signature_child": true,
+      "purpose": "Period close is the governed accounting gate that blocks false late posting and enables auditable reopen and reclose."
+    },
+    "finance.backdate_exceptions": {
+      "canonical_resource": "finance.backdate-exceptions",
+      "entity_key": "finance.backdate_exceptions",
+      "expected_profile": "governed_case",
+      "required_actions": [
+        "list",
+        "detail",
+        "create",
+        "transition"
+      ],
+      "expected_canonical_pattern": "lifecycle_owner",
+      "require_signature": true,
+      "require_reason_code": true,
+      "require_timeboxed_expiry": true,
+      "purpose": "Backdate exception is the timeboxed override gate for closed-period adjustments and must stay signed, reason-coded, and expiring."
+    },
+    "finance.credit_memos": {
+      "canonical_resource": "finance.credit-memos",
+      "entity_key": "finance.credit_memos",
+      "expected_profile": "transactional_record",
+      "required_actions": [
+        "list",
+        "detail",
+        "create"
+      ],
+      "expected_canonical_pattern": "ledger_document",
+      "purpose": "Credit memo is a first-class financial correction document and must not be hidden inside a generic invoice row."
+    },
+    "finance.debit_memos": {
+      "canonical_resource": "finance.debit-memos",
+      "entity_key": "finance.debit_memos",
+      "expected_profile": "transactional_record",
+      "required_actions": [
+        "list",
+        "detail",
+        "create"
+      ],
+      "expected_canonical_pattern": "ledger_document",
+      "purpose": "Debit memo is a first-class financial correction document and must not be hidden inside a generic invoice row."
+    }
   },
   "projection_read_model_targets": {
-    "pr0": {},
-    "pr1": {},
-    "pr2": {},
-    "pr3": {},
-    "pr4": {},
-    "pr5": {}
+    "finance.inventory_valuations": {
+      "canonical_resource": "finance.inventory-valuations",
+      "table": "inventory_valuations",
+      "entity_key": "finance.inventory_valuations",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "Inventory valuation is a derived valuation truth at a time boundary and must not be manually rewritten through generic CRUD."
+    },
+    "inventory.inventory_balance_snapshot": {
+      "canonical_resource": "analytics.inventory-balance-snapshots",
+      "table": "inventory_balance_snapshot",
+      "entity_key": "inventory.inventory_balance_snapshot",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "Inventory balance snapshots preserve released inventory truth against later stock drift and therefore must remain read-only."
+    },
+    "production.production_order_bom_snapshot": {
+      "canonical_resource": "analytics.production-bom-snapshots",
+      "table": "production_order_bom_snapshot",
+      "entity_key": "production.production_order_bom_snapshot",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "Released BOM snapshots must freeze the manufacturing structure used at execution time instead of letting users rewrite history."
+    },
+    "production.production_order_route_snapshot": {
+      "canonical_resource": "analytics.production-route-snapshots",
+      "table": "production_order_route_snapshot",
+      "entity_key": "production.production_order_route_snapshot",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "Released route snapshots must preserve the executable routing truth used when the order was released."
+    },
+    "mes_execution.mes_oee_snapshots": {
+      "canonical_resource": "analytics.mes-oee-snapshots",
+      "table": "mes_oee_snapshots",
+      "entity_key": "mes_execution.mes_oee_snapshots",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "MES OEE snapshots must stay a derived execution read model so equipment performance cannot be manually restated."
+    },
+    "bi_datawarehouse.plant_performance_snapshots": {
+      "canonical_resource": "analytics.plant-performance-snapshots",
+      "table": "plant_performance_snapshots",
+      "entity_key": "bi_datawarehouse.plant_performance_snapshots",
+      "expected_profile": "projection_record",
+      "required_actions": [
+        "list",
+        "detail"
+      ],
+      "forbidden_actions": [
+        "create",
+        "update",
+        "delete",
+        "transition"
+      ],
+      "purpose": "Plant performance snapshots aggregate OEE, quality, delivery, energy, and safety signals and must remain read-only KPI truth."
+    }
+  },
+  "projection_lineage_targets": {
+    "inventory_valuations": {
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    },
+    "inventory_balance_snapshot": {
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    },
+    "production_order_bom_snapshot": {
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    },
+    "production_order_route_snapshot": {
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    },
+    "mes_oee_snapshots": {
+      "required_columns": [
+        "snapshot_at",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    },
+    "plant_performance_snapshots": {
+      "required_columns": [
+        "snapshot_at",
+        "snapshot_grain",
+        "source_record_id",
+        "source_system",
+        "org_site_id",
+        "org_plant_id",
+        "row_version",
+        "payload_schema_version"
+      ]
+    }
+  },
+  "relationship_truth_targets": {
+    "finance.backdate-exceptions": {
+      "expected_relationships": [
+        "approved_period_code -> period_close_controls.period_code",
+        "subject_ref -> ap_invoices.ap_invoice_id",
+        "subject_ref -> ar_invoices.ar_invoice_id",
+        "subject_ref -> inventory_transactions.inventory_transaction_id",
+        "subject_ref -> tms_shipments.shipment_id"
+      ]
+    },
+    "finance.inventory-valuations": {
+      "expected_relationships": [
+        "inventory_item_id -> inventory_items.inventory_item_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ]
+    },
+    "analytics.inventory-balance-snapshots": {
+      "expected_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id",
+        "warehouse_id -> org_warehouses.warehouse_id",
+        "lot_id -> lot.lot_id",
+        "source_record_id -> inventory_transactions.inventory_transaction_id"
+      ],
+      "expected_release_snapshot_of": "inventory_balance"
+    },
+    "analytics.production-bom-snapshots": {
+      "expected_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "expected_release_snapshot_of": "production_order_bom"
+    },
+    "analytics.production-route-snapshots": {
+      "expected_relationships": [
+        "production_order_id -> production_orders.production_order_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "expected_release_snapshot_of": "production_order_route"
+    },
+    "analytics.mes-oee-snapshots": {
+      "expected_relationships": [
+        "equipment_id -> equipment.equipment_id",
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "expected_release_snapshot_of": "mes_execution_oee"
+    },
+    "analytics.plant-performance-snapshots": {
+      "expected_relationships": [
+        "org_plant_id -> org_plants.plant_id",
+        "org_site_id -> org_sites.site_id"
+      ],
+      "expected_release_snapshot_of": "plant_performance"
+    }
   }
 }

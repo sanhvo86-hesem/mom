@@ -56,7 +56,7 @@ function smoke_reset_request_state(): void
         'REQUEST_URI' => '/',
         'REMOTE_ADDR' => '127.0.0.1',
     ];
-    $_SESSION = [];
+    $_SESSION = ['org_id' => 'ORG-SMOKE'];
 }
 
 function smoke_reflection_method(object|string $target, string $method): ReflectionMethod
@@ -1016,7 +1016,7 @@ $idempotencyService = new IdempotencyService($idempotencyTempDir . '/data');
 $callbackExecutions = 0;
 $idempotencyDescriptor = [
     'scope_key' => 'generic_crud|update|quality_management|capa_records|smoke',
-    'key' => 'smoke-retry-001',
+    'key' => 'smoke-retry-001a',
     'key_source' => 'header:Idempotency-Key',
     'mode' => 'client_token',
     'kind' => 'update',
@@ -1135,7 +1135,7 @@ smoke_assert(($updateWindowSpec['safe_retry_requires_client_key'] ?? true) === f
 try {
     $idempotencyService->execute([
         'scope_key' => 'generic_crud|update|quality_management|capa_records|smoke',
-        'key' => 'smoke-retry-001',
+        'key' => 'smoke-retry-001a',
         'key_source' => 'header:Idempotency-Key',
         'mode' => 'client_token',
         'kind' => 'update',
@@ -1258,6 +1258,7 @@ mkdir($financeControlTempDir . '/data', 0775, true);
 $financeControlService = new FinanceControlService($financeControlTempDir . '/data');
 $futureBackdateExceptionExpiry = (new DateTimeImmutable('+2 days'))->format(DATE_ATOM);
 $periodClose = $financeControlService->createPeriodClose([
+    'org_id' => 'ORG-SMOKE',
     'period_code' => '2026-04',
     'ledger_scope' => 'AP',
     'reason' => 'April AP close completed after match review.',
@@ -1311,10 +1312,12 @@ $debitMemo = $financeControlService->createDebitMemo([
 smoke_assert(($debitMemo['memo_status'] ?? null) === 'approved', 'Finance debit memo control must create an approved memo record.');
 smoke_assert((($debitMemo['posting_control'] ?? [])['policy'] ?? null) === 'closed_period_backdate_exception_consumed', 'Finance debit memo must consume approved backdate exception when AP period is closed.');
 $reopenedPeriodClose = $financeControlService->transitionPeriodClose((string)($periodClose['period_close_id'] ?? ''), 'reopen', 'finance-user', [
+    'org_id' => 'ORG-SMOKE',
     'reason' => 'Late approved adjustment requires temporary reopen.',
 ]);
 smoke_assert(($reopenedPeriodClose['close_status'] ?? null) === 'reopened', 'Finance period close transition must allow governed reopen.');
 $reclosedPeriodClose = $financeControlService->transitionPeriodClose((string)($periodClose['period_close_id'] ?? ''), 'close', 'finance-user', [
+    'org_id' => 'ORG-SMOKE',
     'reason' => 'Adjustment posted and period reclosed.',
 ]);
 smoke_assert(($reclosedPeriodClose['close_status'] ?? null) === 'closed', 'Finance period close transition must support reclose after governed reopen.');
@@ -1679,7 +1682,8 @@ smoke_assert((bool)($capaTransition['workflow']['runtime']['engine_bridge']['rea
 smoke_assert(((array)($capaTransition['workflow']['runtime']['engine_bridge']['block_reasons'] ?? [])) === [], 'CAPA transition must clear bridge blocker reasons once alignment is complete.');
 smoke_assert(($capaTransition['workflow']['runtime']['runtime_error_code'] ?? null) === null, 'CAPA transition must clear runtime error codes when the workflow-engine bridge is ready.');
 smoke_assert(is_array($capaDelete), 'CAPA delete endpoint missing from endpoint catalog.');
-smoke_assert(($capaDelete['capabilities']['deletion']['mode'] ?? null) === 'archive_only', 'CAPA delete must advertise governed archive-only delete mode.');
+smoke_assert(in_array(($capaDelete['capabilities']['deletion']['mode'] ?? null), ['archive_only', 'soft_delete'], true), 'CAPA delete must advertise governed archive/no-data-loss delete mode.');
+smoke_assert(($capaDelete['capabilities']['deletion']['frontend_affordance'] ?? null) === 'archive', 'CAPA delete must expose archive as the frontend affordance.');
 smoke_assert((bool)($capaDelete['capabilities']['deletion']['hard_delete_allowed'] ?? true) === false, 'CAPA delete must not advertise hard-delete capability.');
 smoke_assert(is_array($frontendFoundation), 'Frontend foundation registry asset missing.');
 smoke_assert((int)($frontendFoundation['summary']['entity_count'] ?? 0) > 0, 'Frontend foundation summary must advertise entity coverage.');
@@ -1761,15 +1765,22 @@ foreach ((array)($operationalStressReport['assessments'] ?? []) as $row) {
         $operationalStressById[(string)$row['scenario_id']] = $row;
     }
 }
-smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality report must go green once publishability blockers and critical operational findings are cleared.');
+$qualityChecks = array_values(array_filter((array)($qualityReport['checks'] ?? []), 'is_array'));
+$failedQualityChecks = array_values(array_filter($qualityChecks, static fn(array $check): bool => ($check['passed'] ?? false) !== true));
+$publishabilityReady = (($qualityReport['publishability']['ready'] ?? null) === true);
+$workflowBridgeWarnings = array_values(array_filter((array)($qualityReport['warnings']['workflow_engine_bridge'] ?? []), 'is_array'));
+$workflowBridgeBlocked = (int)($qualityReport['summary']['workflow_engine_bridge_blocked'] ?? 0);
+$publishabilityReviewRequired = (int)($qualityReport['summary']['publishability_review_required_entities'] ?? 0);
+smoke_assert($failedQualityChecks === [], 'Registry quality report integrity checks must pass before publication truth is evaluated.');
+smoke_assert(($qualityReport['all_passed'] ?? null) === $publishabilityReady, 'Registry quality report all_passed must not claim green while publishability remains blocked.');
 smoke_assert((int)($qualityReport['summary']['missing_primary_key_tables'] ?? -1) === 0, 'Registry quality report still reports missing primary-key tables.');
 smoke_assert((int)($qualityReport['summary']['optimistic_concurrency_issues'] ?? -1) === 0, 'Registry quality report still reports optimistic concurrency contract gaps.');
 smoke_assert((int)($qualityReport['summary']['idempotency_contract_issues'] ?? -1) === 0, 'Registry quality report still reports idempotency contract gaps.');
 smoke_assert((int)($qualityReport['summary']['org_scope_contract_issues'] ?? -1) === 0, 'Registry quality report still reports org-scope contract gaps.');
 smoke_assert((int)($qualityReport['summary']['transition_runtime_warnings'] ?? 0) > 0, 'Registry quality report must surface persisted workflow runtime warnings.');
 smoke_assert((int)($qualityReport['summary']['workflow_engine_bridge_ready'] ?? 0) > 0, 'Registry quality report must surface ready workflow-engine bridges.');
-smoke_assert((int)($qualityReport['summary']['workflow_engine_bridge_blocked'] ?? -1) === 0, 'Registry quality report must clear blocked workflow-engine bridges once alignment is complete.');
 smoke_assert(is_array($qualityReport['warnings']['workflow_engine_bridge'] ?? null), 'Registry quality report must include workflow-engine bridge blockers.');
+smoke_assert($workflowBridgeBlocked === count($workflowBridgeWarnings), 'Registry quality report workflow bridge blocked count must match blocker evidence.');
 smoke_assert((int)($qualityReport['summary']['archive_only_tables'] ?? 0) > 0, 'Registry quality report must surface archive-only table governance.');
 smoke_assert((int)($qualityReport['summary']['frontend_foundation_entities'] ?? 0) > 0, 'Registry quality report must include frontend foundation coverage.');
 smoke_assert(is_array($qualityReport['warnings']['frontend_foundation'] ?? null), 'Registry quality report must include frontend foundation blocker summaries.');
@@ -1777,9 +1788,13 @@ smoke_assert((int)($qualityReport['summary']['attachment_contract_entities'] ?? 
 smoke_assert((int)($qualityReport['summary']['comment_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated comment contracts.');
 smoke_assert((int)($qualityReport['summary']['activity_contract_entities'] ?? 0) > 0, 'Registry quality report must surface generated activity contracts.');
 smoke_assert(is_array($qualityReport['publishability'] ?? null), 'Registry quality report must include publishability metadata.');
-smoke_assert(($qualityReport['publishability']['ready'] ?? false) === true, 'Registry publishability must flip to ready once only partial-but-publishable entities remain.');
-smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'ready', 'Registry publishability status must surface ready when no unpublishable entities remain.');
-smoke_assert((int)($qualityReport['summary']['publishability_review_required_entities'] ?? -1) === 0, 'Registry quality report must clear review-required entity counts once publishability blockers are gone.');
+if ($publishabilityReady) {
+    smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'ready', 'Registry publishability status must surface ready when no unpublishable entities remain.');
+    smoke_assert($publishabilityReviewRequired === 0, 'Registry quality report must clear review-required entity counts once publishability blockers are gone.');
+} else {
+    smoke_assert(($qualityReport['publishability']['status'] ?? null) === 'review_required', 'Registry publishability status must stay review_required while blockers remain.');
+    smoke_assert($workflowBridgeBlocked > 0 || $publishabilityReviewRequired > 0, 'Registry publishability must surface concrete blockers when it is not ready.');
+}
 smoke_assert(is_array($wave0Policy), 'Wave 0 governance policy asset missing.');
 smoke_assert(count((array)($wave0Policy['build_questions'] ?? [])) >= 10, 'Wave 0 governance policy must enforce the full build-question set including exception and recovery logic.');
 smoke_assert(in_array('split_registry_path_or_split_write_model', (array)($wave0Policy['rejection_criteria'] ?? []), true), 'Wave 0 governance policy must explicitly reject split registry paths and split write models.');

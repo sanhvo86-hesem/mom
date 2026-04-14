@@ -35,9 +35,16 @@ Closed in this run:
 - self-hash readback verification;
 - route-level retrieval surface;
 - regression test for bundle/receipt/readback.
+- finance org-scope hardening for period-close, backdate exception, and memo controls;
+- AI scheduling read-scope fail-closed behavior;
+- generated object contract action guidance from authored workflow commands;
+- generated artifact freshness correction for downstream manifest-patching reports.
 
 Still not closed:
 
 - production immutable storage / WORM target;
 - formal Part 11 validation scope;
+- live OT/OpenTelemetry deployment proof;
+- graphics publication release blocker disposition;
+- registry/schema publication delta closure;
 - full MasterControl/ETQ suite parity.

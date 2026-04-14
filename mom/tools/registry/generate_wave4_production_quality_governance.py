@@ -53,6 +53,18 @@ def dump_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def question_ids(items: list) -> list[str]:
+    output: list[str] = []
+    for item in items:
+        if isinstance(item, dict):
+            value = str(item.get("id") or "").strip()
+        else:
+            value = str(item or "").strip()
+        if value:
+            output.append(value)
+    return output
+
+
 def load_frontend_entities(frontend_catalog: dict) -> dict[str, dict]:
     entities = frontend_catalog.get("entities", {})
     if isinstance(entities, dict):
@@ -69,6 +81,8 @@ def load_frontend_entities(frontend_catalog: dict) -> dict[str, dict]:
 
 
 def canonical_resource_spec(canonical_catalog: dict, resource_key: str) -> dict:
+    if "." not in resource_key:
+        return {}
     domain_name, resource_name = resource_key.split(".", 1)
     domain_payload = (canonical_catalog.get("domains") or {}).get(domain_name) or {}
     resources = domain_payload.get("resources") or {}
@@ -308,7 +322,7 @@ def main() -> int:
         },
         "summary": summary,
         "policy_gates": {
-            "build_questions": [item["id"] for item in policy.get("build_questions") or []],
+            "build_questions": question_ids(policy.get("build_questions") or []),
             "acceptance_criteria": policy.get("acceptance_criteria") or {},
             "rejection_criteria": policy.get("rejection_criteria") or [],
         },

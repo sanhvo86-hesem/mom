@@ -1,19 +1,277 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
-    "publication_scope": "platform_global",
-    "slice_publication_pass": "foundation_governance_contract_slice"
+    "version": "1.0",
+    "generatedAt": "2026-04-14T09:37:22.834Z",
+    "description": "Wave 4 normalization decisions for production-quality execution, QA/QC role split, and reaction-loop closure."
   },
   "quality_execution_targets": {
-    "q0": {},
-    "q1": {},
-    "q2": {}
+    "procurement_supplier_quality.iqc-inspections": {
+      "entity_key": "quality_management.incoming_inspections",
+      "workflow_id": "wf_receiving_inspection",
+      "required_endpoints": [
+        "quality_management.incoming_inspections.list",
+        "quality_management.incoming_inspections.detail",
+        "quality_management.incoming_inspections.create",
+        "quality_management.incoming_inspections.transition"
+      ],
+      "expected_table": "incoming_inspections",
+      "expected_primary_key": "inspection_id",
+      "expected_status_column": "status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "purpose": "Incoming quality gate must be a real governed owner before material is released to stock or production."
+    },
+    "planning_production.ipqc-inspections": {
+      "entity_key": "quality_management.ipqc_inspections",
+      "workflow_id": "wf_ipqc_inspection",
+      "required_endpoints": [
+        "quality_management.ipqc_inspections.list",
+        "quality_management.ipqc_inspections.detail",
+        "quality_management.ipqc_inspections.create",
+        "quality_management.ipqc_inspections.transition"
+      ],
+      "expected_table": "ipqc_inspections",
+      "expected_primary_key": "ipqc_inspection_id",
+      "expected_status_column": "inspection_status",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "purpose": "IPQC owns in-process containment, reinspection, and route-to-NCR before bad output reaches downstream operations."
+    },
+    "quality_improvement.oqc-inspections": {
+      "entity_key": "quality_management.oqc_inspections",
+      "workflow_id": "wf_oqc_inspection",
+      "required_endpoints": [
+        "quality_management.oqc_inspections.list",
+        "quality_management.oqc_inspections.detail",
+        "quality_management.oqc_inspections.create",
+        "quality_management.oqc_inspections.transition"
+      ],
+      "expected_table": "oqc_inspections",
+      "expected_primary_key": "oqc_id",
+      "expected_status_column": "result",
+      "expected_lifecycle_mode": "persisted",
+      "expected_transition_execution_guard": "workflow_engine",
+      "expected_engine_bridge_ready": true,
+      "purpose": "OQC must remain the canonical final or outbound release gate until a separate finished-goods gate is justified."
+    }
+  },
+  "inspection_backbone_targets": {
+    "quality_management.inspection_plan": {
+      "table": "inspection_plan",
+      "expected_profile": "governed_case",
+      "expected_workflow_state": "ready",
+      "required_endpoints": [
+        "quality_management.inspection_plan.list",
+        "quality_management.inspection_plan.detail",
+        "quality_management.inspection_plan.create",
+        "quality_management.inspection_plan.transition"
+      ]
+    },
+    "quality_management.inspection_lot": {
+      "table": "inspection_lot",
+      "expected_profile": "governed_case",
+      "expected_workflow_state": "ready",
+      "required_endpoints": [
+        "quality_management.inspection_lot.list",
+        "quality_management.inspection_lot.detail",
+        "quality_management.inspection_lot.create",
+        "quality_management.inspection_lot.transition"
+      ]
+    },
+    "quality_management.incoming_inspection_results": {
+      "table": "incoming_inspection_results",
+      "expected_profile": "transactional_record",
+      "expected_workflow_state": "not_applicable",
+      "forbid_workflow_owner": true
+    },
+    "quality_management.inspection_result": {
+      "table": "inspection_result",
+      "expected_profile": "transactional_record",
+      "expected_workflow_state": "not_applicable",
+      "forbid_workflow_owner": true
+    },
+    "quality_management.inspection_results": {
+      "table": "inspection_results",
+      "expected_profile": "transactional_record",
+      "expected_workflow_state": "not_applicable",
+      "forbid_workflow_owner": true
+    },
+    "quality_management.ipqc_inspection_results": {
+      "table": "ipqc_inspection_results",
+      "expected_profile": "transactional_record",
+      "expected_workflow_state": "not_applicable",
+      "forbid_workflow_owner": true
+    }
   },
   "reaction_loop_targets": {
-    "r0": {},
-    "r1": {},
-    "r2": {},
-    "r3": {}
+    "quality_management.ncr_records": {
+      "canonical_resource": "quality_improvement.nonconformances",
+      "required_endpoints": [
+        "quality_management.ncr_records.list",
+        "quality_management.ncr_records.detail",
+        "quality_management.ncr_records.create",
+        "quality_management.ncr_records.transition"
+      ],
+      "expected_profile": "governed_case",
+      "expected_workflow_state": "ready",
+      "expected_table": "ncr_records",
+      "expected_primary_key": "ncr_id"
+    },
+    "quality_management.capa_records": {
+      "canonical_resource": "quality_improvement.corrective-actions",
+      "required_endpoints": [
+        "quality_management.capa_records.list",
+        "quality_management.capa_records.detail",
+        "quality_management.capa_records.create",
+        "quality_management.capa_records.transition"
+      ],
+      "expected_profile": "governed_case",
+      "expected_workflow_state": "ready",
+      "expected_table": "capa_records",
+      "expected_primary_key": "capa_id"
+    },
+    "quality_management.spc_data": {
+      "canonical_resource": "quality_improvement.spc-observations",
+      "required_endpoints": [
+        "quality_management.spc_data.list",
+        "quality_management.spc_data.detail",
+        "quality_management.spc_data.create",
+        "quality_management.spc_data.update"
+      ],
+      "expected_profile": "transactional_record",
+      "expected_workflow_state": "not_applicable",
+      "expected_table": "spc_data",
+      "expected_primary_key": "spc_id"
+    },
+    "calibration_equipment.calibration_grr_studies": {
+      "canonical_resource": "quality_improvement.msa-studies",
+      "required_endpoints": [
+        "calibration_equipment.calibration_grr_studies.list",
+        "calibration_equipment.calibration_grr_studies.detail",
+        "calibration_equipment.calibration_grr_studies.create",
+        "calibration_equipment.calibration_grr_studies.update"
+      ],
+      "expected_profile": "assessment_record",
+      "expected_workflow_state": "not_applicable",
+      "expected_table": "calibration_grr_studies",
+      "expected_primary_key": "grr_id"
+    }
+  },
+  "qa_qc_role_split_workflows": {
+    "wf_receiving_inspection": {
+      "required_transition_roles": {
+        "queued->in_progress": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner"
+        ],
+        "in_progress->accepted": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner"
+        ],
+        "in_progress->rejected": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner"
+        ],
+        "queued->waived": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner"
+        ]
+      }
+    },
+    "wf_ipqc_inspection": {
+      "required_transition_roles": {
+        "queued->in_progress": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner",
+          "system_admin"
+        ],
+        "reinspect->in_progress": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner",
+          "system_admin"
+        ],
+        "in_progress->accepted": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "in_progress->rejected": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "rejected->reinspect": [
+          "quality_engineer",
+          "quality_manager",
+          "production_planner",
+          "system_admin"
+        ],
+        "accepted->closed": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "rejected->closed": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ]
+      }
+    },
+    "wf_oqc_inspection": {
+      "required_transition_roles": {
+        "pending->accepted": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "pending->rejected": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "pending->waived": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ],
+        "rejected->waived": [
+          "quality_engineer",
+          "quality_manager",
+          "system_admin"
+        ]
+      }
+    }
+  },
+  "conditional_alias_retention": {
+    "quality_improvement.fqc-inspections": {
+      "successor_resource": "quality_improvement.oqc-inspections",
+      "successor_entity_key": "quality_management.oqc_inspections",
+      "required_successor_endpoints": [
+        "quality_management.oqc_inspections.list",
+        "quality_management.oqc_inspections.detail",
+        "quality_management.oqc_inspections.create",
+        "quality_management.oqc_inspections.transition"
+      ],
+      "alias_entity_candidates": [
+        "quality_management.fqc_inspections",
+        "quality_improvement.fqc_inspections"
+      ],
+      "expected_alias_only": true,
+      "split_criteria": [
+        "A distinct finished-goods release gate exists before outbound OQC or shipping.",
+        "FQC owns a different sampling plan, defect taxonomy, or approval chain from OQC.",
+        "FQC carries a KPI or governance owner that cannot be represented by OQC."
+      ],
+      "reason": "Do not create a duplicate FQC object until the backend proves a real finished-goods gate beyond the existing OQC release."
+    }
   }
 }

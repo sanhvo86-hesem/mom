@@ -46,6 +46,7 @@ final class FinanceControlService
      */
     public function createPeriodClose(array $payload, string $userId): array
     {
+        $orgId = $this->resolveOrgId((string)($payload['org_id'] ?? ''));
         $periodCode = trim((string)($payload['period_code'] ?? ''));
         $ledgerScope = strtoupper(trim((string)($payload['ledger_scope'] ?? '')));
         $reasonText = trim((string)($payload['reason'] ?? ''));
@@ -61,7 +62,11 @@ final class FinanceControlService
 
         $rows = $this->readCollection('period_closes');
         foreach ($rows as $row) {
-            if (($row['period_code'] ?? '') === $periodCode && ($row['ledger_scope'] ?? '') === $ledgerScope) {
+            if (
+                ($row['org_id'] ?? '') === $orgId
+                && ($row['period_code'] ?? '') === $periodCode
+                && ($row['ledger_scope'] ?? '') === $ledgerScope
+            ) {
                 throw new RuntimeException('A governed period close control already exists for this ledger scope and period.');
             }
         }
@@ -69,6 +74,7 @@ final class FinanceControlService
         $now = $this->nowIso();
         $row = [
             'period_close_id' => $this->uuid('PC'),
+            'org_id' => $orgId,
             'period_code' => $periodCode,
             'ledger_scope' => $ledgerScope,
             'close_status' => 'closed',
@@ -108,10 +114,7 @@ final class FinanceControlService
     public function transitionPeriodClose(string $periodCloseId, string $transition, string $userId, array $context = [], ?string $orgId = null): array
     {
         // FIN-001: Mandatory org_id scoping from session
-        $sessionOrgId = (string)($_SESSION['org_id'] ?? '');
-        if ($sessionOrgId === '') {
-            throw new RuntimeException('org_id required');
-        }
+        $sessionOrgId = $this->resolveOrgId($orgId, $context);
 
         $transition = strtolower(trim($transition));
         if ($transition === '') {
@@ -206,6 +209,7 @@ final class FinanceControlService
      */
     public function createBackdateException(array $payload, string $userId): array
     {
+        $orgId = $this->resolveOrgId();
         $ledgerScope = strtoupper(trim((string)($payload['ledger_scope'] ?? '')));
         $subjectType = trim((string)($payload['subject_type'] ?? ''));
         $subjectRef = trim((string)($payload['subject_ref'] ?? ''));
@@ -235,6 +239,8 @@ final class FinanceControlService
         $rows = $this->readCollection('backdate_exceptions');
         foreach ($rows as $row) {
             if (
+                ($row['org_id'] ?? '') === $orgId
+                &&
                 ($row['ledger_scope'] ?? '') === $ledgerScope
                 && ($row['subject_type'] ?? '') === $subjectType
                 && ($row['subject_ref'] ?? '') === $subjectRef
@@ -260,6 +266,7 @@ final class FinanceControlService
         $nowIso = $this->nowIso();
         $row = [
             'backdate_exception_id' => $this->uuid('BDX'),
+            'org_id' => $orgId,
             'exception_status' => 'approved',
             'ledger_scope' => $ledgerScope,
             'subject_type' => $subjectType,
@@ -485,7 +492,7 @@ final class FinanceControlService
             $row = [
                 $idField => $this->uuid(strtoupper(substr($kind, 0, 1)) . 'M'),
                 'memo_type' => $kind,
-                'memo_status' => 'draft',
+                'memo_status' => 'approved',
                 'invoice_scope' => $invoiceScope,
                 'original_invoice_ref' => $originalInvoiceRef,
                 'reason_code' => $reasonCode,
@@ -494,6 +501,7 @@ final class FinanceControlService
                 'currency_code' => $currencyCode,
                 'posting_date' => $postingDate,
                 'period_code' => $periodCode,
+                'org_id' => (string)($backdateEvidence['org_id'] ?? ''),
                 'backdate_exception_id' => $backdateEvidence['backdate_exception_id'] ?? '',
                 'posting_control' => $backdateEvidence,
                 'approved_by' => $userId,
@@ -528,9 +536,13 @@ final class FinanceControlService
         string $userId,
         string $backdateExceptionId = ''
     ): array {
+        $orgId = $this->resolveOrgId();
         $periodCode = substr($postingDate, 0, 7);
         $closedControl = null;
         foreach ($this->readCollection('period_closes') as $periodClose) {
+            if (($periodClose['org_id'] ?? '') !== $orgId) {
+                continue;
+            }
             if (($periodClose['ledger_scope'] ?? '') !== $ledgerScope || ($periodClose['period_code'] ?? '') !== $periodCode) {
                 continue;
             }
@@ -546,6 +558,7 @@ final class FinanceControlService
                 'ledger_scope' => $ledgerScope,
                 'period_code' => $periodCode,
                 'posting_date' => $postingDate,
+                'org_id' => $orgId,
             ];
         }
 
@@ -560,6 +573,9 @@ final class FinanceControlService
         }
 
         $exception = (array)$exceptions[$index];
+        if (($exception['org_id'] ?? '') !== $orgId) {
+            throw new RuntimeException('Backdate exception access denied.');
+        }
         if ($this->effectiveBackdateStatus($exception) !== 'approved') {
             throw new RuntimeException('Backdate exception is not approved or is no longer active.');
         }
@@ -603,6 +619,7 @@ final class FinanceControlService
             'ledger_scope' => $ledgerScope,
             'period_code' => $periodCode,
             'posting_date' => $postingDate,
+            'org_id' => $orgId,
             'period_close_id' => $closedControl['period_close_id'] ?? '',
             'backdate_exception_id' => $backdateExceptionId,
         ];
@@ -677,6 +694,25 @@ final class FinanceControlService
             @flock($handle, LOCK_UN);
             @fclose($handle);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function resolveOrgId(?string $explicitOrgId = null, array $context = []): string
+    {
+        $sessionOrgId = trim((string)($_SESSION['org_id'] ?? ''));
+        if ($sessionOrgId !== '') {
+            return $sessionOrgId;
+        }
+
+        $contextOrgId = trim((string)($context['org_id'] ?? ''));
+        $explicit = trim((string)($explicitOrgId ?? ''));
+        if ($contextOrgId !== '' || $explicit !== '') {
+            throw new RuntimeException('authenticated org_id required');
+        }
+
+        throw new RuntimeException('org_id required');
     }
 
     /**

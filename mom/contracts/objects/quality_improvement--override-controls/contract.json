@@ -100,6 +100,11 @@
       "Shipment-gate override files remain compatibility history only; the governed business meaning is now explicit as override-controls."
     ]
   },
+  "controls": {
+    "eSignatureRequired": true,
+    "reasonCodeField": "reason_code",
+    "timeboxedExpiryRequired": true
+  },
   "invariants": [
     "Only one active override may exist for the same governed gate subject and control code.",
     "Revocation, expiry, and closure must retain reason trace.",

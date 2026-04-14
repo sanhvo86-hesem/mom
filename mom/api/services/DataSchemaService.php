@@ -1297,7 +1297,6 @@ final class DataSchemaService
                     $this->registryPath('wave0-governance-report'),
                     $this->registryPath('canonical-backend-standardization-catalog'),
                     $this->registryPath('endpoint-catalog'),
-                    $this->registryPath('registry-manifest'),
                 ],
             ],
             'stress_report' => [
@@ -1314,7 +1313,6 @@ final class DataSchemaService
                     $this->registryPath('wave-gap-ledger'),
                     $this->registryPath('endpoint-catalog'),
                     $this->registryPath('canonical-backend-standardization-catalog'),
-                    $this->registryPath('registry-manifest'),
                 ],
             ],
             'global_capability_audit' => [
@@ -1328,7 +1326,6 @@ final class DataSchemaService
                     $this->registryPath('table-registry'),
                     $this->registryPath('endpoint-catalog'),
                     $this->registryPath('workflow-library'),
-                    $this->registryPath('registry-manifest'),
                     $this->rootDir . '/mom/api/openapi.yaml',
                     $this->rootDir . '/mom/contracts/object-index.json',
                     $this->rootDir . '/mom/contracts/package-index.json',

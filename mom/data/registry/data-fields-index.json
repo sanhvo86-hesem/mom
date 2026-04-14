@@ -1,16 +1,16 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T06:08:56.109Z",
+    "generatedAt": "2026-04-14T09:37:27.000Z",
     "source": "table-registry.json",
-    "tableCount": 750,
-    "fieldCount": 14134,
+    "tableCount": 758,
+    "fieldCount": 14528,
     "parts": [
       {
         "file": "data-fields-part1.json",
-        "endpointCount": 750,
-        "tableCount": 750,
-        "fieldCount": 14134,
+        "endpointCount": 758,
+        "tableCount": 758,
+        "fieldCount": 14528,
         "domains": [
           "advanced_planning",
           "ai_predictive",
@@ -68,9 +68,9 @@
   "parts": [
     {
       "file": "data-fields-part1.json",
-      "endpointCount": 750,
-      "tableCount": 750,
-      "fieldCount": 14134,
+      "endpointCount": 758,
+      "tableCount": 758,
+      "fieldCount": 14528,
       "domains": [
         "advanced_planning",
         "ai_predictive",

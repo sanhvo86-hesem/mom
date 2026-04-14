@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-13T23:08:39.549544+00:00",
+    "generatedAt": "2026-04-14T09:52:19.297561+00:00",
     "description": "Canonical ERP+MOM object inventory for the business contract authority layer.",
     "objectCount": 67,
     "authoredPackageCount": 67
@@ -472,10 +472,12 @@
         "customer_care_case_events"
       ],
       "recommendedActions": [
-        "acknowledge",
+        "start_work",
+        "wait_for_customer",
         "escalate",
         "resolve",
-        "close"
+        "close",
+        "archive"
       ],
       "keyRelationships": [
         "customer_id -> customers.customer_id",
@@ -593,7 +595,7 @@
         "customer_purchase_order_lines"
       ],
       "recommendedActions": [
-        "submit",
+        "acknowledge",
         "confirm",
         "cancel",
         "close"
@@ -699,17 +701,21 @@
         "crm_quotes_pipeline",
         "quotations"
       ],
-      "legacyTablesToIsolate": [],
+      "legacyTablesToIsolate": [
+        "crm_quotes_pipeline"
+      ],
       "childTables": [
         "quotation_lines",
         "quote_lines"
       ],
       "recommendedActions": [
-        "submit",
-        "approve",
+        "submit_for_review",
         "send",
-        "convert_to_customer_po",
-        "close_lost"
+        "accept",
+        "reject",
+        "expire",
+        "revise",
+        "convert_to_sales_order"
       ],
       "keyRelationships": [
         "customer_id -> customers.customer_id",
@@ -810,7 +816,7 @@
       "storageTable": "qual_effectiveness_reviews",
       "primaryKey": "qual_effectiveness_review_id",
       "statusColumn": null,
-      "resultColumn": "review_result",
+      "resultColumn": null,
       "purpose": "Capture structured quote win-loss and effectiveness analysis so commercial learning, margin review, and continuous improvement are preserved as governed assessment records instead of ad hoc notes.",
       "usageZone": "governed_support",
       "gateType": "learning_gate",
@@ -826,11 +832,7 @@
       "childTables": [
         "quote_effectiveness_metrics"
       ],
-      "recommendedActions": [
-        "start_review",
-        "complete_review",
-        "approve_improvement"
-      ],
+      "recommendedActions": [],
       "keyRelationships": [
         "related_record_id -> quotes.quote_id"
       ],
@@ -938,9 +940,10 @@
         "sales_order_lines"
       ],
       "recommendedActions": [
+        "quote",
         "confirm",
-        "release",
-        "ship",
+        "release_to_production",
+        "release_shipment",
         "close",
         "cancel"
       ],
@@ -1063,9 +1066,11 @@
       ],
       "recommendedActions": [
         "match",
+        "hold",
         "post",
         "settle",
-        "void"
+        "void",
+        "close"
       ],
       "keyRelationships": [
         "supplier_purchase_order_id -> supplier_purchase_orders.supplier_purchase_order_id",
@@ -1185,7 +1190,9 @@
       "recommendedActions": [
         "post",
         "settle",
-        "void"
+        "raise_dispute",
+        "void",
+        "close"
       ],
       "keyRelationships": [
         "sales_order_id -> sales_orders.sales_order_id",
@@ -1266,8 +1273,7 @@
         "electronic_signature"
       ],
       "recommendedActions": [
-        "submit",
-        "approve",
+        "revoke",
         "expire",
         "close"
       ],
@@ -1275,6 +1281,7 @@
         "approved_period_code -> period_close_controls.period_code",
         "subject_ref -> ap_invoices.ap_invoice_id",
         "subject_ref -> ar_invoices.ar_invoice_id",
+        "subject_ref -> inventory_transactions.inventory_transaction_id",
         "subject_ref -> tms_shipments.shipment_id"
       ],
       "currentRuntimeEndpoints": [
@@ -1378,10 +1385,7 @@
         "credit_memo_lines"
       ],
       "recommendedActions": [
-        "approve",
-        "post",
-        "settle",
-        "void"
+        "create"
       ],
       "keyRelationships": [
         "ap_invoice_id -> ap_invoices.ap_invoice_id",
@@ -1480,10 +1484,7 @@
         "debit_memo_lines"
       ],
       "recommendedActions": [
-        "approve",
-        "post",
-        "settle",
-        "void"
+        "create"
       ],
       "keyRelationships": [
         "ap_invoice_id -> ap_invoices.ap_invoice_id",
@@ -1584,8 +1585,8 @@
       "recommendedActions": [
         "capitalize",
         "post",
-        "retire",
-        "void"
+        "void",
+        "retire"
       ],
       "keyRelationships": [
         "asset_id -> assets.asset_id",
@@ -1752,7 +1753,6 @@
         "period_close_steps"
       ],
       "recommendedActions": [
-        "prepare",
         "close",
         "reopen"
       ],
@@ -1859,7 +1859,8 @@
         "acknowledge",
         "retry",
         "compensate",
-        "close"
+        "close",
+        "reject"
       ],
       "keyRelationships": [
         "org_site_id -> org_sites.org_site_id"
@@ -1976,7 +1977,10 @@
       "recommendedActions": [
         "authorize",
         "receive",
-        "disposition",
+        "evaluate",
+        "repair",
+        "replace",
+        "credit",
         "close"
       ],
       "keyRelationships": [
@@ -2098,7 +2102,7 @@
       ],
       "recommendedActions": [
         "publish",
-        "start",
+        "pause",
         "complete",
         "close"
       ],
@@ -2217,7 +2221,10 @@
       "recommendedActions": [
         "tender",
         "book",
-        "close"
+        "dispatch",
+        "confirm_delivery",
+        "close",
+        "cancel"
       ],
       "keyRelationships": [
         "shipment_id -> shipments.shipment_id"
@@ -2335,9 +2342,10 @@
         "inventory_item_uoms"
       ],
       "recommendedActions": [
-        "release",
-        "obsolesce",
-        "block"
+        "promote_to_engineering",
+        "activate",
+        "inactivate",
+        "obsolesce"
       ],
       "keyRelationships": [
         "inventory_item_id -> stock_balances.inventory_item_id",
@@ -2419,11 +2427,11 @@
         "inventory_movement_lines"
       ],
       "recommendedActions": [
-        "reserve",
-        "issue",
-        "receive",
-        "transfer",
-        "reverse"
+        "submit_for_review",
+        "post",
+        "hold",
+        "reverse",
+        "cancel"
       ],
       "keyRelationships": [
         "warehouse_id -> warehouses.warehouse_id",
@@ -2509,11 +2517,12 @@
         "shipment_packages"
       ],
       "recommendedActions": [
-        "plan",
-        "pick",
-        "pack",
+        "prepare",
+        "release",
         "dispatch",
-        "deliver"
+        "deliver",
+        "close",
+        "cancel"
       ],
       "keyRelationships": [
         "sales_order_id -> sales_orders.sales_order_id",
@@ -2722,7 +2731,8 @@
       ],
       "recommendedActions": [
         "activate",
-        "freeze",
+        "hold",
+        "inactivate",
         "archive"
       ],
       "keyRelationships": [
@@ -2839,9 +2849,11 @@
         "five_s_audit_findings"
       ],
       "recommendedActions": [
-        "schedule",
-        "complete",
-        "close"
+        "start_audit",
+        "launch_follow_up",
+        "verify",
+        "close",
+        "archive"
       ],
       "keyRelationships": [
         "auditor_id -> employees.employee_id"
@@ -2957,10 +2969,12 @@
         "incident_investigations"
       ],
       "recommendedActions": [
-        "report",
-        "investigate",
+        "triage",
         "contain",
-        "close"
+        "investigate",
+        "launch_corrective_action",
+        "close",
+        "archive"
       ],
       "keyRelationships": [
         "reported_by_employee_id -> employees.employee_id",
@@ -3080,10 +3094,11 @@
         "maintenance_plan_tasks"
       ],
       "recommendedActions": [
+        "approve",
         "activate",
-        "schedule",
-        "suspend",
-        "retire"
+        "hold",
+        "retire",
+        "archive"
       ],
       "keyRelationships": [
         "equipment_id -> equipment.equipment_id"
@@ -3198,10 +3213,11 @@
         "pm_work_order_parts"
       ],
       "recommendedActions": [
+        "plan",
         "release",
         "start",
         "complete",
-        "close"
+        "cancel"
       ],
       "keyRelationships": [
         "maintenance_plan_id -> pm_maintenance_plans.maintenance_plan_id",
@@ -3319,7 +3335,8 @@
         "approve",
         "activate",
         "suspend",
-        "close"
+        "close",
+        "archive"
       ],
       "keyRelationships": [],
       "currentRuntimeEndpoints": [
@@ -3432,9 +3449,10 @@
         "safety_observation_actions"
       ],
       "recommendedActions": [
-        "log",
         "assign",
-        "close"
+        "start_action",
+        "close",
+        "archive"
       ],
       "keyRelationships": [
         "employee_id -> employees.employee_id",
@@ -3554,9 +3572,10 @@
         "asset_locations"
       ],
       "recommendedActions": [
-        "capitalize",
-        "transfer",
-        "retire"
+        "hold",
+        "retire",
+        "dispose",
+        "archive"
       ],
       "keyRelationships": [
         "asset_id -> fixed_asset_capitalizations.asset_id",
@@ -3635,9 +3654,11 @@
         "obligation_tasks"
       ],
       "recommendedActions": [
-        "activate",
-        "acknowledge",
-        "close"
+        "mark_due",
+        "mark_overdue",
+        "waive",
+        "close",
+        "archive"
       ],
       "keyRelationships": [
         "qual_compliance_obligation_id -> ehs_incidents.qual_compliance_obligation_id",
@@ -3755,7 +3776,8 @@
       ],
       "recommendedActions": [
         "activate",
-        "suspend",
+        "hold",
+        "inactivate",
         "archive"
       ],
       "keyRelationships": [
@@ -3875,9 +3897,11 @@
         "employee_qualifications"
       ],
       "recommendedActions": [
-        "hire",
-        "transfer",
-        "terminate"
+        "activate",
+        "suspend",
+        "inactivate",
+        "terminate",
+        "archive"
       ],
       "keyRelationships": [
         "employee_id -> quotations.owner_id",
@@ -3995,9 +4019,12 @@
         "equipment_components"
       ],
       "recommendedActions": [
-        "commission",
-        "decommission",
-        "lockout"
+        "qualify",
+        "activate",
+        "hold",
+        "lockout",
+        "retire",
+        "archive"
       ],
       "keyRelationships": [
         "equipment_id -> pm_maintenance_plans.equipment_id",
@@ -4115,11 +4142,7 @@
         "calibration_oot_investigations",
         "calibration_records"
       ],
-      "recommendedActions": [
-        "calibrate",
-        "quarantine",
-        "release"
-      ],
+      "recommendedActions": [],
       "keyRelationships": [],
       "currentRuntimeEndpoints": [
         {
@@ -4232,9 +4255,11 @@
         "supplier_qualifications"
       ],
       "recommendedActions": [
-        "approve",
-        "suspend",
-        "block_for_procurement"
+        "qualify",
+        "authorize_spend",
+        "hold",
+        "block",
+        "archive"
       ],
       "keyRelationships": [
         "supplier_id -> supplier_purchase_orders.supplier_id",
@@ -4313,9 +4338,12 @@
         "tool_transactions"
       ],
       "recommendedActions": [
+        "qualify",
         "issue",
-        "return",
-        "retire"
+        "mark_worn",
+        "mark_broken",
+        "retire",
+        "archive"
       ],
       "keyRelationships": [
         "tool_id -> work_orders.tool_id",
@@ -4564,9 +4592,13 @@
         "dispatch_list_entries"
       ],
       "recommendedActions": [
-        "publish",
-        "acknowledge",
-        "close"
+        "release",
+        "start_execution",
+        "hold",
+        "complete",
+        "close",
+        "cancel",
+        "archive"
       ],
       "keyRelationships": [
         "source_schedule_id -> production_schedule.schedule_id"
@@ -4680,11 +4712,11 @@
         "ipqc_inspection_results"
       ],
       "recommendedActions": [
-        "queue",
         "start",
         "accept",
         "reject",
-        "reinspect"
+        "reinspect",
+        "close"
       ],
       "keyRelationships": [
         "work_order_id -> work_orders.work_order_id",
@@ -4804,6 +4836,7 @@
       ],
       "recommendedActions": [
         "release",
+        "start_execution",
         "hold",
         "complete",
         "close",
@@ -4927,10 +4960,12 @@
       "legacyTablesToIsolate": [],
       "childTables": [],
       "recommendedActions": [
-        "dispatch",
+        "ready",
         "start",
+        "hold_for_quality",
         "complete",
-        "scrap"
+        "scrap",
+        "cancel"
       ],
       "keyRelationships": [
         "work_order_id -> work_orders.work_order_id",
@@ -5016,10 +5051,13 @@
         "production_schedule_slots"
       ],
       "recommendedActions": [
+        "submit_for_review",
+        "approve",
         "publish",
         "freeze",
-        "replan",
-        "close"
+        "hold",
+        "complete",
+        "archive"
       ],
       "keyRelationships": [
         "schedule_id -> mes_dispatch_queue.source_schedule_id",
@@ -5140,9 +5178,10 @@
       "recommendedActions": [
         "dispatch",
         "start",
-        "pause",
-        "complete",
-        "close"
+        "pause_for_quality",
+        "resume",
+        "close",
+        "cancel"
       ],
       "keyRelationships": [
         "job_order_id -> job_orders.job_order_id",
@@ -5505,7 +5544,9 @@
         "purchase_receipt_lines"
       ],
       "recommendedActions": [
-        "receive",
+        "start_iqc",
+        "accept",
+        "quarantine",
         "putaway",
         "close",
         "reverse"
@@ -5748,8 +5789,11 @@
       ],
       "recommendedActions": [
         "confirm",
-        "receive",
-        "close"
+        "start_receiving",
+        "mark_received",
+        "mark_discrepant",
+        "close",
+        "cancel"
       ],
       "keyRelationships": [
         "po_id -> supplier_purchase_orders.supplier_purchase_order_id",
@@ -5869,10 +5913,12 @@
         "supplier_purchase_order_lines"
       ],
       "recommendedActions": [
+        "submit_for_approval",
         "approve",
-        "dispatch",
-        "close",
-        "cancel"
+        "release",
+        "receive_partial",
+        "receive_full",
+        "close"
       ],
       "keyRelationships": [
         "supplier_id -> suppliers.supplier_id",
@@ -5962,8 +6008,11 @@
       "recommendedActions": [
         "schedule",
         "start",
+        "approve_plan",
         "issue_findings",
-        "close"
+        "verify",
+        "close",
+        "reject"
       ],
       "keyRelationships": [
         "qual_audit_program_id -> improvement_projects.source_record_id"
@@ -6078,10 +6127,10 @@
         "electronic_signature"
       ],
       "recommendedActions": [
-        "submit",
+        "start_review",
+        "submit_for_review",
         "approve",
-        "expire",
-        "close"
+        "reject"
       ],
       "keyRelationships": [
         "customer_id -> customers.customer_id",
@@ -6328,9 +6377,10 @@
         "corrective_action_verifications"
       ],
       "recommendedActions": [
-        "open",
-        "assign",
-        "verify",
+        "initiate",
+        "plan_actions",
+        "implement",
+        "verify_effectiveness",
         "close"
       ],
       "keyRelationships": [
@@ -6453,10 +6503,10 @@
         "electronic_signature"
       ],
       "recommendedActions": [
-        "submit",
-        "approve",
-        "expire",
-        "close"
+        "start_work",
+        "submit_for_review",
+        "close",
+        "reject"
       ],
       "keyRelationships": [
         "linked_so_number -> sales_orders.sales_order_number",
@@ -6571,12 +6621,7 @@
       "childTables": [
         "oqc_inspection_results"
       ],
-      "recommendedActions": [
-        "queue",
-        "accept",
-        "reject",
-        "waive"
-      ],
+      "recommendedActions": [],
       "keyRelationships": [
         "wo_number -> work_orders.work_order_number",
         "so_number -> sales_orders.sales_order_number"
@@ -6695,10 +6740,15 @@
         "improvement_action_tasks"
       ],
       "recommendedActions": [
+        "submit",
+        "review",
         "approve",
         "implement",
+        "hold",
         "verify",
-        "close"
+        "close",
+        "reject",
+        "archive"
       ],
       "keyRelationships": [
         "source_record_id -> qual_audit_programs.qual_audit_program_id",
@@ -6799,7 +6849,7 @@
       "storageTable": "calibration_grr_studies",
       "primaryKey": "grr_id",
       "statusColumn": null,
-      "resultColumn": "grr_result",
+      "resultColumn": null,
       "purpose": "Capture measurement-system-analysis and GRR evidence so acceptance of measurement capability is explicit before relying on data for release, SPC, or capability decisions.",
       "usageZone": "governed_support",
       "gateType": "measurement_system_gate",
@@ -6816,9 +6866,9 @@
         "msa_trials"
       ],
       "recommendedActions": [
-        "approve_protocol",
-        "complete_study",
-        "approve_result"
+        "record",
+        "update_evidence",
+        "escalate_follow_up"
       ],
       "keyRelationships": [
         "equipment_id -> equipment.equipment_id"
@@ -6932,8 +6982,11 @@
         "nonconformance_evidence"
       ],
       "recommendedActions": [
-        "contain",
-        "disposition",
+        "submit",
+        "review",
+        "set_disposition",
+        "activate_containment",
+        "request_close",
         "close"
       ],
       "keyRelationships": [
@@ -7055,11 +7108,10 @@
         "oqc_inspection_results"
       ],
       "recommendedActions": [
-        "queue",
         "start",
         "accept",
         "reject",
-        "release_to_shipping"
+        "waive"
       ],
       "keyRelationships": [
         "wo_number -> work_orders.work_order_number",
@@ -7175,10 +7227,9 @@
       "legacyTablesToIsolate": [],
       "childTables": [],
       "recommendedActions": [
-        "approve",
-        "expire",
         "revoke",
-        "close_follow_up"
+        "expire",
+        "close"
       ],
       "keyRelationships": [
         "subject_id -> sales_orders.sales_order_id",
@@ -7269,7 +7320,7 @@
       "storageTable": "spc_data",
       "primaryKey": "spc_id",
       "statusColumn": null,
-      "resultColumn": "out_of_control",
+      "resultColumn": null,
       "purpose": "Preserve structured statistical-process-control observations so process capability, rule violations, and escalation triggers are governed assessment evidence instead of spreadsheet-only history.",
       "usageZone": "core_value_stream",
       "gateType": "process_gate",

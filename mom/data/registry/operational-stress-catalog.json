@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T05:25:47.940Z",
-    "publication_run_id": "7eefae3e-f02f-4e4b-b8cb-6effc0f95401",
+    "generatedAt": "2026-04-14T09:37:28.410Z",
+    "publication_run_id": "0b8cc2da-de63-440a-9b93-b5779cb86c86",
     "publication_scope": "platform_global",
     "slice_publication_pass": "foundation_governance_contract_slice"
   },
@@ -35,6 +35,12 @@
     },
     {
       "scenario_id": "STR-010"
+    },
+    {
+      "scenario_id": "STR-011"
+    },
+    {
+      "scenario_id": "STR-012"
     }
   ]
 }

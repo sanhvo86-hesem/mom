@@ -83,6 +83,11 @@ final class SecurityHardeningRegressionTest extends TestCase
         $this->assertMatchesRegularExpression('/public function getDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertMatchesRegularExpression('/public function aiDashboard\(\): never\s*\{.*?\$this->requireAiReadAccess\(\$user\);/s', $controller);
         $this->assertStringContainsString('SELECT COUNT(*) FROM production_schedule_slots {$scheduleWhere}', $controller);
+        $this->assertStringNotContainsString('WHERE 1=1', $controller);
+        $this->assertStringContainsString("private const MISSING_PLANT_SCOPE_SENTINEL = '__missing_plant_scope__';", $controller);
+        $this->assertStringContainsString("return ['where' => 'WHERE ' . \$field . ' = :plant_id', 'params' => [':plant_id' => self::MISSING_PLANT_SCOPE_SENTINEL]];", $controller);
+        $this->assertStringContainsString('return [];', $controller);
+        $this->assertStringContainsString("\$scheduleWhere = 'WHERE org_plant_id = :schedule_plant_id';", $controller);
         $this->assertStringContainsString('return $rowPlant === $plantId;', $controller);
         $this->assertStringNotContainsString("return \$rowPlant === '' || \$rowPlant === \$plantId;", $controller);
         $this->assertStringContainsString('$all = $this->filterAiRowsByPlant($all, $plantId);', $controller);

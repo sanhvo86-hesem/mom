@@ -22,6 +22,9 @@
       "production_order_route_snapshot_id"
     ]
   },
+  "projection": {
+    "releaseSnapshotOf": "production_order_route"
+  },
   "governance": {
     "usageZone": "governed_support",
     "gateType": "analytics_gate",

@@ -89,8 +89,6 @@ SLICE_ENTITY_OVERRIDES = {
 }
 
 # Number of workflow-engine bridges newly ready in this slice (added to global count)
-SLICE_BRIDGE_READY_INCREMENT = 1
-
 # Publication scope: elevated to platform_global when all entities are ready
 PUBLICATION_SCOPE = "platform_global"
 
@@ -253,11 +251,10 @@ def regenerate_all() -> dict:
     s["frontend_partial_entities"] = partial_count
     s["frontend_blocked_entities"] = blocked_count
 
-    # Align workflow_engine_bridge counts with slice truth
     current_ready = s.get("workflow_engine_bridge_ready", 0)
-    current_blocked = s.get("workflow_engine_bridge_blocked", 115)
-    s["workflow_engine_bridge_ready"] = current_ready + SLICE_BRIDGE_READY_INCREMENT
-    s["workflow_engine_bridge_blocked"] = max(0, current_blocked - SLICE_BRIDGE_READY_INCREMENT)
+    current_blocked = s.get("workflow_engine_bridge_blocked", 0)
+    s["workflow_engine_bridge_ready"] = current_ready
+    s["workflow_engine_bridge_blocked"] = current_blocked
 
     with open(QUALITY_REPORT, "w", encoding="utf-8") as f:
         json.dump(qr, f, ensure_ascii=False, indent=2)

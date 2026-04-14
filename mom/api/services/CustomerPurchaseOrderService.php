@@ -279,6 +279,11 @@ final class CustomerPurchaseOrderService
             ? (array)$store['customer_purchase_orders'][$existingIdx]
             : $this->seedRecordFromSalesOrder($store, $salesOrder, $userId);
 
+        $orgId = trim((string)($_SESSION['org_id'] ?? ($salesOrder['org_id'] ?? '')));
+        if ($orgId !== '') {
+            $record['org_id'] = $orgId;
+        }
+
         $record['customer_name'] = trim((string)($salesOrder['customer_name'] ?? $record['customer_name'] ?? ''));
         $record['customer_site_id'] = trim((string)($salesOrder['customer_site_id'] ?? $record['customer_site_id'] ?? ''));
         $record['ship_to_site_id'] = trim((string)($salesOrder['ship_to_site_id'] ?? $record['ship_to_site_id'] ?? ''));
@@ -366,6 +371,7 @@ final class CustomerPurchaseOrderService
             'created_by' => $userId,
             'updated_at' => $now,
             'updated_by' => $userId,
+            'org_id' => trim((string)($_SESSION['org_id'] ?? ($salesOrder['org_id'] ?? ''))),
         ];
 
         return $this->withTotals($record);

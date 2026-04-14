@@ -69,12 +69,14 @@ mom/data/*
 !mom/data/registry/
 mom/data/registry/*
 !mom/data/registry/endpoint-catalog-index.json
+!mom/data/registry/api-params.json
 !mom/data/registry/canonical-backend-standardization-catalog.json
 !mom/data/registry/data-fields.json
 !mom/data/registry/data-fields-index.json
 !mom/data/registry/data-fields-part1.json
 !mom/data/registry/relation-map.json
 !mom/data/registry/schema-authority-summary.json
+!mom/data/registry/schema-library.json
 !mom/data/registry/table-registry.json
 !mom/data/schema-studio/
 mom/data/schema-studio/*

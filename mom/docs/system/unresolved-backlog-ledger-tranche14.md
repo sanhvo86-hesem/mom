@@ -2,53 +2,47 @@
 
 Date: 2026-04-14
 
-This ledger is synthesized from the six pass-1 agent reports, current code, tests, generated registry artifacts, and prior tranche documents. `FIX_NOW` items are code/process-fixable in this run. External deployment proof and explicit product-scope decisions are kept separate from code backlog.
+This ledger is synthesized from pass-1/pass-2 agent reports, current code, tests, generated artifacts, and tranche documents. Code-fixable findings identified in pass 1 and pass 2 are closed on the integration branch unless explicitly listed as final-phase git cleanup.
 
-## Ledger
+## Closure Ledger
 
 | Source prompt / tranche / doc | Original expected outcome | Current verified status | Evidence | Why still open | Code-fixable now | Action required in this run |
 |---|---|---|---|---|---|---|
-| Tranche 13 registry/publication closure docs; Agent 1 | Generated registry/system-contract tests match current artifacts, not stale historical counts. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `verify_publication_truth.py` passes 244/244; current endpoint count is 22, relation count is 0, workflow count is 0. Tests still asserted `>=3000` endpoints/relations and `>=250` workflows. | Test drift created false failures and false expectations. | Yes | Update tests/smokes to assert consistency with current generated artifacts instead of obsolete size floors. |
-| Agent 4 architecture authority | Schema Studio source labels match actual runtime/controlled contract paths. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `SchemaStudioController` labeled source metadata as `data/registry/table-registry.json`, while runtime consumes `mom/data/registry` and fallback contracts under `mom/contracts`. | Generated-artifact path drift erodes proof-layer trust. | Yes | Update source labels and add regression assertions that root `data/registry` is not reported. |
-| Agent 5 reliability/security | Dispatch production reports leave durable projection evidence if manufacturing-event projection fails. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `DispatchController::recordProductionReport()` called `appendProductionReportEvent()` after state mutation; `ShopfloorExecutionService` caught `Throwable` and only logged. | A successful report could lack event projection proof. | Yes | Return projection status, write durable manufacturing-event projection dead-letter JSONL, and include the status in the response. |
-| Agent 5 reliability/security | Mobile work queue task state is not completed without the append-only task-event journal. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `MobileWorkQueueService::completeTask()` saved `work_queue.json` before appending `mobile.task_completed`. | Snapshot and event truth could diverge on journal failure. | Yes | Persist queue mutation and event journal as one guarded operation; rollback snapshot and write dead-letter if the journal fails. |
-| Agent 6 defects backlog; `WORLD_CLASS_CLOSURE_20260414.md` | Audit-pack export creates a retrievable bundle and receipt, not only a manifest. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `AuditPackExporter` only built a manifest; route was `POST /api/v1/eqms/audit-packs/manifest` with no durable readback. | Release/eQMS evidence remained manifest-grade. | Yes | Add durable bundle write, receipt write, hash readback, retrieval route, and regression test. |
-| Agent 6 repo hygiene | Prompt/source artifacts do not remain tracked in root operational lanes. | `FIX_NOW -> CLOSED_BY_IMPLEMENTATION` | `git ls-files prompts standards/prompts tools/prompts` showed tracked prompt files. | Controlled source tree carried prompt artifacts outside a governed docs lane. | Yes | Move tracked prompt files into `mom/docs/ai-prompts/legacy-source-prompts/` and ignore root prompt lanes. |
-| Agent 6 cleanup | Helper branches/worktrees are removed after final merge. | `FIX_NOW -> FINAL_PHASE_PENDING` | `git worktree list` and branch listing showed tranche 14 helper worktrees plus older helper surfaces. | Cleanup must happen only after merge gate passes. | Yes | Delete tranche 14 helper worktrees/branches and safe stale helper surfaces in final phase. |
-| Agent 1/4 runtime authority | Strict runtime authority across all governed slices. | `PRODUCT_DECISION_REQUIRED` / `MIGRATION_ROLLOUT_REQUIRED` | `RuntimeAuthorityService` reports `mixed_authority=true` and `strict_authority_ready=false`; trusted release and connected governance still expose file fallback modes. | Full authority consolidation needs migration/rollout decisions beyond a local patch. | No | Keep claims partial; do not call this world-class complete. |
-| Agent 1/4 traceability/digital thread | End-to-end event-to-edge coverage across all operational event families. | `PRODUCT_DECISION_REQUIRED` | Genealogy graph service is strong, but runtime posture still classifies some traceability modes as partial/read-model. | Event taxonomy and coverage breadth are not a narrow code defect. | No | Define product taxonomy and rollout scope before claiming full digital-thread parity. |
-| Agent 5 observability | Live OpenTelemetry / Loki exporter proof. | `BLOCKED_EXTERNAL` | Local trace/log envelopes exist, but live collector/exporter proof was not exercised. | Requires target infrastructure and endpoint evidence. | No | Collect live observability proof outside local repo. |
-| Agent 5 / generated publication truth | Release readiness blocked by graphics governance. | `BLOCKED_EXTERNAL` / `PRODUCT_DECISION_REQUIRED` | Generated registry quality/readiness artifacts report blocked graphics governance posture. | Requires graphics governance release evidence or owner decision. | No | Preserve blocker wording; do not hide it in green docs. |
-| Agent 2 standards | FDA Part 11 applicability and validation scope. | `PRODUCT_DECISION_REQUIRED` | Repo has structural controls, but no formal regulated-scope decision or validation package. | Part 11 scope is predicate-rule/compliance ownership, not a code-only patch. | No | Document scope decision before claiming Part 11 readiness. |
-| Agent 2/5 standards | Live OT segmentation, incident response, recovery evidence. | `BLOCKED_EXTERNAL` | NIST SP 800-82 requires OT operational proof; local app code cannot prove target network segmentation or recovery drills. | Requires deployed environment evidence. | No | Gather deployment/runbook evidence. |
-| Agent 3 vendor benchmark | SAP/Siemens/Critical/ETQ/MasterControl suite parity. | `PRODUCT_DECISION_REQUIRED` | Agent 3 found foundations but not vendor-suite parity. | Requires roadmap and breadth decisions. | No | Keep benchmark gaps explicit and choose future slices through the matrix. |
+| Agent 1 / tranche13 generated tests | Generated tests match current artifacts. | `CLOSED_BY_IMPLEMENTATION` | `verify_publication_truth.py` passes 241/241; `composer check` passes 414 tests. | Not open. | No | None. |
+| Agent 4 / Schema Studio source labels | Source labels match consumed paths. | `CLOSED_BY_IMPLEMENTATION` | Schema Studio/Data Schema tests pass; fallback test expects controlled contract source where appropriate. | Not open. | No | None. |
+| Agent 5 / dispatch projection | Projection failure is observable and durable. | `CLOSED_BY_IMPLEMENTATION` | Shopfloor tests assert `projection_status=dead_letter`; dispatch response includes `manufacturing_event_projection`. | Not open. | No | None. |
+| Agent 5 / mobile task journal | Snapshot and append-only event do not diverge silently. | `CLOSED_BY_IMPLEMENTATION` | Mobile queue test covers rollback/dead-letter on journal failure. | Not open. | No | None. |
+| Agent 6 / audit-pack export | Export writes retrievable bundle and receipt. | `CLOSED_BY_IMPLEMENTATION` | World-class control-plane test covers bundle, receipt, and hash readback. | Not open. | No | None. |
+| Agent 6 / prompt hygiene | Prompt sources are governed under docs, not root lanes. | `CLOSED_BY_IMPLEMENTATION` | `.gitignore`; `mom/docs/ai-prompts/legacy-source-prompts/`. | Not open. | No | None. |
+| Pass-2 Agent 6 / registry bootstrap test | Test proves actual bootstrap invariant. | `CLOSED_BY_IMPLEMENTATION` | `RegistryBootstrapPathTest` now allows full overlay and rejects root pollution; `composer check` passes. | Not open. | No | None. |
+| Pass-2 Agent 6 / untracked generated inputs | Allowlisted generator inputs are tracked or resolved. | `CLOSED_BY_IMPLEMENTATION` | `api-params.json` and `schema-library.json` are restored and will be staged. | Not open after staging. | No | Stage/commit in integration branch. |
+| Pass-2 Agent 6 / AI blank-scope SQL | Blank plant scope fails closed. | `CLOSED_BY_IMPLEMENTATION` | `SecurityHardeningRegressionTest` asserts no `WHERE 1=1`, sentinel scope, and empty JSON fallback. | Not open. | No | None. |
+| Pass-2 Agent 4 / finance org authority | Governed org-scoped finance actions use authenticated org scope. | `CLOSED_BY_IMPLEMENTATION` | Finance tests cover rejection of caller-supplied org without session plus org propagation into backdate exception and memo. | Not open. | No | None. |
+| Pass-2 Agent 4 / object-index action guidance | Authored command guidance survives publication. | `CLOSED_BY_IMPLEMENTATION` | `generate_business_contract_bundle.py` derives `recommendedActions` from workflow commands; object index has non-empty actions for authored command resources. | Not open. | No | None. |
+| Pass-2 smoke / Data Schema freshness | Derived artifact drift does not flag downstream manifest patches as upstream drift. | `CLOSED_BY_IMPLEMENTATION` | `data_schema_admin_smoke.php` passes after removing circular manifest dependencies for reports that patch the manifest. | Not open. | No | None. |
+| Final git cleanup | Helper and integration worktrees/branches are removed after merge. | `FINAL_PHASE_PENDING` | `git worktree list` still contains tranche14 helper worktrees before final phase. | Cleanup must happen after merge gate and integration commit. | Yes | Remove helper worktrees/branches and integration branch after merge to `main`. |
+| Strict runtime authority across all slices | Uniform production authority. | `PRODUCT_DECISION_REQUIRED` / `MIGRATION_ROLLOUT_REQUIRED` | Runtime authority still reports mixed-authority modes where compatibility paths remain. | Requires rollout/migration decisions. | No | Keep claims partial. |
+| Full publication equals schema authority | Registry publication covers every schema table. | `PRODUCT_DECISION_REQUIRED` / `MIGRATION_ROLLOUT_REQUIRED` | Schema authority reports 772 schema tables and 758 registry tables. | Requires migration/publication scope decision. | No | Keep explicit delta. |
+| Graphics publication blocker | Generated publishability can be true. | `PRODUCT_DECISION_REQUIRED` | Publication truth remains `ready=false` because graphics release blockers are active. | Owner disposition needed. | No | Do not claim publishable. |
+| Live OTel/OT/WORM/validation proof | Deployment evidence exists. | `BLOCKED_EXTERNAL` | Local tests cannot prove target collectors, network segmentation, immutable storage, or validation package. | Needs external environment proof. | No | Gather deployment evidence outside local repo. |
+| FDA Part 11 scope | Predicate-rule scope and validation status are decided. | `PRODUCT_DECISION_REQUIRED` | Code has record/signature controls but no compliance-owner scope decision. | Compliance ownership required. | No | Decide and validate before claiming readiness. |
 
 ## Code-Fixable Closure Summary
 
-Closed in implementation before pass-2:
-
-- stale generated-count test expectations;
-- Schema Studio source-label drift;
-- silent dispatch projection failure;
-- non-atomic mobile task completion journal;
-- manifest-only audit-pack export;
-- tracked root prompt-source hygiene.
-
-Pending until final phase:
-
-- branch/worktree cleanup after merge to `main`.
+Closed in this tranche: generated-count drift, source-label drift, missing generator inputs, fake publication bridge truth, dispatch/mobile dead-letter gaps, audit-pack manifest-only export, prompt hygiene, AI blank-scope broad SQL, finance org authority, object-index action guidance, registry bootstrap test drift, and Data Schema circular freshness drift.
 
 ## Remaining Non-Code Blockers
 
 - Live OT segmentation/recovery proof.
-- Live OpenTelemetry/Loki collector/exporter proof.
-- Production WORM/Object Lock or equivalent immutable-storage evidence.
-- Formal Part 11 applicability/validation scope.
-- Graphics governance release proof.
+- Live OpenTelemetry collector/exporter proof.
+- Production WORM/immutable storage evidence.
+- Formal validation package and Part 11 scope.
+- Graphics publication release blocker evidence.
 
 ## Remaining Product Decisions
 
-- Multisite rollout thresholds.
-- Full authority consolidation rollout scope.
-- Full digital-thread event taxonomy coverage.
-- Vendor-suite parity roadmap and priority order.
+- Multisite rollout and system-job claim model.
+- Full authority consolidation scope.
+- Full digital-thread taxonomy coverage.
+- Registry/schema publication delta plan.
+- Vendor-suite parity roadmap.
