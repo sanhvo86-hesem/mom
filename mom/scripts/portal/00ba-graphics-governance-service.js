@@ -309,7 +309,7 @@ function archetypeForTemplate(tpl){
   return 'admin-studio';
 }
 
-function mergeDraftAndPreviewTemplates(seedTemplates){
+function mergeAuthorityTemplates(seedTemplates){
   var map = {};
   (seedTemplates || []).forEach(function(tpl){
     var normalized = normalizeTemplate(tpl);
@@ -331,12 +331,18 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
     if(normalized.templateId) map[normalized.templateId] = Object.assign({}, map[normalized.templateId] || {}, normalized);
   });
 
+  return Object.keys(map).sort(function(a, b){ return a.localeCompare(b); }).map(function(id){ return map[id]; });
+}
+
+function collectLocalCacheTemplates(){
+  var out = [];
   var preview = safeRead(PREVIEW_CACHE_KEY);
   Object.keys(preview || {}).forEach(function(id){
     var tpl = normalizeTemplate(preview[id]);
     tpl.status = tpl.status === 'draft-only' ? 'draft-only' : canonicalState(tpl.status || 'legacy-bridged');
     tpl.sourceAuthority = 'preview-cache';
-    map[id] = Object.assign({}, map[id] || {}, tpl);
+    tpl.controlMode = tpl.controlMode || 'preview-cache';
+    out.push(tpl);
   });
 
   var drafts = safeRead(DRAFT_CACHE_KEY);
@@ -345,10 +351,12 @@ function mergeDraftAndPreviewTemplates(seedTemplates){
     tpl.status = 'draft-only';
     tpl.controlMode = 'draft-cache';
     tpl.sourceAuthority = 'unsaved-draft-cache';
-    map[id] = Object.assign({}, map[id] || {}, tpl);
+    out.push(tpl);
   });
 
-  return Object.keys(map).sort(function(a, b){ return a.localeCompare(b); }).map(function(id){ return map[id]; });
+  return out.sort(function(a, b){
+    return String(a.templateId || a.id || '').localeCompare(String(b.templateId || b.id || ''));
+  });
 }
 
 function fallbackModules(){
@@ -825,7 +833,8 @@ function getSnapshot(seedTemplates){
   if(!_state.modules || !_state.modules.length) _state.modules = mergeModules([]);
   if(!_state.compliance || !_state.compliance.length) _state.compliance = fallbackCompliance(_state.modules);
   if(!_state.audit || !_state.audit.length) _state.audit = defaultAudit();
-  var templates = mergeDraftAndPreviewTemplates(seedTemplates || []);
+  var templates = mergeAuthorityTemplates(seedTemplates || []);
+  var localCacheTemplates = collectLocalCacheTemplates();
   var runtimeDiagnostics = collectRuntimeDiagnostics();
   return {
     version: VERSION,
@@ -840,6 +849,9 @@ function getSnapshot(seedTemplates){
     backendAvailable: _state.backendAvailable,
     lastLoadedAt: _state.lastLoadedAt,
     templates: templates,
+    localCacheTemplates: clone(localCacheTemplates),
+    draftTemplates: clone(localCacheTemplates.filter(function(tpl){ return String(tpl.sourceAuthority || '') === 'unsaved-draft-cache'; })),
+    previewTemplates: clone(localCacheTemplates.filter(function(tpl){ return String(tpl.sourceAuthority || '') === 'preview-cache'; })),
     modules: clone(_state.modules),
     compliance: clone(_state.compliance),
     debt: clone(_state.debt),
@@ -996,7 +1008,7 @@ function buildChangeSet(impact){
 }
 
 function buildLineageGraph(seedTemplates){
-  var templates = mergeDraftAndPreviewTemplates(seedTemplates || []);
+  var templates = mergeAuthorityTemplates(seedTemplates || []);
   var nodes = [
     { id:'admin-appearance', type:'admin-control-plane', label:'Admin Appearance / Template Studio' },
     { id:'backend-graphics-authority', type:'backend-authority', label:'Canonical backend graphics authority' },
@@ -1246,6 +1258,51 @@ function hasGateEvidence(body){
   return evidence && typeof evidence === 'object' && Object.keys(evidence).length > 0;
 }
 
+function controlledReleaseRefs(){
+  var link = _state.releaseLink || buildReleaseLink();
+  var pack = _state.releaseEvidencePack || buildReleaseEvidencePack();
+  var refs = [
+    link.releaseEvidencePackRef,
+    link.complianceMatrixRef,
+    link.impactAnalysisRef,
+    link.rolloutDecisionRef,
+    link.runtimeBeaconRef,
+    link.debtObservatoryRef,
+    pack && pack.complianceMatrixSnapshotRef,
+    pack && pack.driftReportRef,
+    pack && pack.runtimeLinkageProofRef,
+    pack && pack.rollbackPackageRef
+  ].filter(Boolean);
+  return refs.filter(function(ref, idx){ return refs.indexOf(ref) === idx; }).map(function(ref){
+    return { refType:'graphics_release_evidence', refId:ref, uri:ref };
+  });
+}
+
+function gateEvidenceFromImpact(){
+  var impact = _state.lastImpact || {};
+  var gates = (impact.gatesToRerun && impact.gatesToRerun.length) ? impact.gatesToRerun : ['G01','G02','G03','G18','G19'];
+  var ref = 'mom/data/registry/graphics-governance-registry.json';
+  return gates.reduce(function(out, gate){
+    out[gate] = {
+      gateId: gate,
+      source:'backend-impact-analysis',
+      impactAnalysisId: impact.impactId || '',
+      ref: ref
+    };
+    return out;
+  }, {});
+}
+
+function attachControlledReleaseEvidence(body){
+  if(!body.releaseManifestRefs || !hasReleaseManifestRefs(body)){
+    body.releaseManifestRefs = controlledReleaseRefs();
+  }
+  if(!hasGateEvidence(body)){
+    body.gateEvidence = gateEvidenceFromImpact();
+  }
+  return body;
+}
+
 function effectiveReleaseBlockers(){
   var blockers = clone(_state.releaseBlockers || []) || [];
   if(!_state.backendAvailable){
@@ -1291,7 +1348,7 @@ function modulesForTemplate(templateId, templates){
 }
 
 function computeImpact(change, seedTemplates){
-  var snapshotTemplates = mergeDraftAndPreviewTemplates(seedTemplates || []);
+  var snapshotTemplates = mergeAuthorityTemplates(seedTemplates || []);
   var modules = (_state.modules && _state.modules.length ? _state.modules : mergeModules([]));
   var kind = String(change && change.kind || 'template-registry');
   var target = String(change && change.target || '');
@@ -1551,8 +1608,12 @@ function templateAction(action, templateId, payload){
   if(action === 'stage'){
     body.impactType = body.impactType || 'template';
     body.scope = Object.assign({ mode:'preview-only', templates:[id] }, body.scope || {});
+    if(!body.releaseManifestRefs || !hasReleaseManifestRefs(body)){
+      body.releaseManifestRefs = controlledReleaseRefs();
+    }
   }
   if(action === 'publish'){
+    body = attachControlledReleaseEvidence(body);
     body.impactAnalysisId = body.impactAnalysisId || (_state.lastImpact && _state.lastImpact.backendAttested && _state.lastImpact.impactId) || '';
     if(!body.impactAnalysisId){
       recordAudit('template-publish', id, 'blocked-impact-analysis-required');
@@ -1804,7 +1865,7 @@ window.HmGraphicsGovernance = {
   getSnapshot: getSnapshot,
   getTemplateRegistry: function(seedTemplates){ return getSnapshot(seedTemplates).templates; },
   getTemplate: getTemplate,
-  getModulesForTemplate: function(templateId, seedTemplates){ return modulesForTemplate(templateId, mergeDraftAndPreviewTemplates(seedTemplates || [])); },
+  getModulesForTemplate: function(templateId, seedTemplates){ return modulesForTemplate(templateId, mergeAuthorityTemplates(seedTemplates || [])); },
   getComplianceMatrix: function(){ return clone(_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(mergeModules([]))); },
   getGraphicsComplianceMatrix: function(){ return clone(_state.compliance && _state.compliance.length ? _state.compliance : fallbackCompliance(mergeModules([]))); },
   getNonCompliantModules: getNonCompliantModules,

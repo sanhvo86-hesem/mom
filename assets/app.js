@@ -138,11 +138,18 @@
     }
   }
 
-  function postCurrentContent() {
+  var _qmsTrustedParentOrigin = window.location.origin;
+
+  function isTrustedMessageOrigin(evt) {
+    var origin = String(evt && evt.origin || '');
+    return !!origin && origin === window.location.origin;
+  }
+
+  function postCurrentContent(targetOrigin) {
     var dc = document.getElementById('docContent');
     var html = dc ? dc.innerHTML : (document.body ? document.body.innerHTML : '');
     try {
-      window.parent && window.parent.postMessage({ type: 'docContent', html: html }, '*');
+      window.parent && window.parent.postMessage({ type: 'docContent', html: html }, targetOrigin || _qmsTrustedParentOrigin);
     } catch (_e) {}
   }
 
@@ -188,10 +195,12 @@
 
   function initMessageBridge() {
     window.addEventListener('message', function (evt) {
+      if (!isTrustedMessageOrigin(evt)) return;
+      _qmsTrustedParentOrigin = String(evt.origin || window.location.origin);
       var data = evt && evt.data;
       if (!data) return;
       if (data === 'getContent') {
-        postCurrentContent();
+        postCurrentContent(_qmsTrustedParentOrigin);
         return;
       }
       if (typeof data === 'object' && data.type === 'setLang') {

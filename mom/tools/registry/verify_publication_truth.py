@@ -442,6 +442,73 @@ def main() -> int:
         ]:
             check(f"graphics_contract_has:{key}", isinstance(graphics.get(key), dict),
                   f"{key} missing or not object")
+        lineage = graphics.get("moduleGraphicsLineageGraph", {})
+        lineage_nodes = lineage.get("nodes", []) if isinstance(lineage, dict) else []
+        lineage_edges = lineage.get("edges", []) if isinstance(lineage, dict) else []
+        lineage_node_ids = {
+            str(node.get("id", ""))
+            for node in lineage_nodes
+            if isinstance(node, dict)
+        }
+        check("graphics_lineage_required_nodes",
+              {"admin-appearance", "backend-graphics-authority", "shared-tokens", "shared-components"}.issubset(lineage_node_ids),
+              f"nodes={sorted(lineage_node_ids)}")
+        dangling_edges = [
+            f"{edge.get('from', '?')}->{edge.get('to', '?')}"
+            for edge in lineage_edges
+            if isinstance(edge, dict)
+            and (str(edge.get("from", "")) not in lineage_node_ids or str(edge.get("to", "")) not in lineage_node_ids)
+        ]
+        check("graphics_lineage_edges_resolve", not dangling_edges,
+              f"dangling_edges={dangling_edges[:10]}")
+        check("graphics_lineage_admin_to_backend_edge",
+              any(isinstance(edge, dict) and edge.get("from") == "admin-appearance" and edge.get("to") == "backend-graphics-authority" for edge in lineage_edges),
+              "Admin -> backend graphics authority edge missing")
+        check("graphics_lineage_tokens_to_components_edge",
+              any(isinstance(edge, dict) and edge.get("from") == "shared-tokens" and edge.get("to") == "shared-components" for edge in lineage_edges),
+              "shared-tokens -> shared-components edge missing")
+        beacons = graphics.get("runtimeGraphicsComplianceBeacon", {}).get("beacons", [])
+        beacon_fields = {
+            "moduleId",
+            "route",
+            "linkageStatus",
+            "sharedTokenProbe",
+            "hmComponentProbe",
+            "privateCssProbe",
+            "driftHash",
+            "complianceState",
+            "beaconStatus",
+            "reportedAt",
+        }
+        missing_beacons = [
+            row.get("moduleId", "unknown")
+            for row in beacons
+            if isinstance(row, dict) and not beacon_fields.issubset(row.keys())
+        ]
+        check("graphics_runtime_beacons_present", isinstance(beacons, list) and len(beacons) > 0,
+              f"count={len(beacons) if isinstance(beacons, list) else 'n/a'}")
+        check("graphics_runtime_beacons_have_required_fields", len(missing_beacons) == 0,
+              f"missing_beacons={missing_beacons[:10]}")
+        debt_rows = graphics.get("visualDebtObservatory", {}).get("byModule", [])
+        debt_fields = {
+            "moduleId",
+            "route",
+            "linkageStatus",
+            "bridgeAliasDebt",
+            "privateCssDebt",
+            "hardcodedStyleDebt",
+            "uncontrolledLegacyShellDebt",
+            "debtScore",
+        }
+        missing_debt_rows = [
+            row.get("moduleId", "unknown")
+            for row in debt_rows
+            if isinstance(row, dict) and not debt_fields.issubset(row.keys())
+        ]
+        check("graphics_visual_debt_rows_present", isinstance(debt_rows, list) and len(debt_rows) > 0,
+              f"count={len(debt_rows) if isinstance(debt_rows, list) else 'n/a'}")
+        check("graphics_visual_debt_rows_have_required_fields", len(missing_debt_rows) == 0,
+              f"missing_debt_rows={missing_debt_rows[:10]}")
         rows = graphics.get("moduleGraphicsCompliance", {}).get("matrix", [])
         row_fields = {
             "moduleId",

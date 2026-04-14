@@ -2409,6 +2409,18 @@ function catLabel(cat){
   return (typeof out === 'string') ? fixMojibakeText(out) : out;
 }
 
+function postDocLanguageMessage(frame, payload){
+  try{
+    if(!frame || !frame.contentWindow) return false;
+    const src = frame.getAttribute && frame.getAttribute('src');
+    const origin = new URL(src || window.location.href, window.location.href).origin;
+    frame.contentWindow.postMessage(payload, origin);
+    return true;
+  }catch(_e){
+    return false;
+  }
+}
+
 function setLang(l){
   lang = l;
   try{ localStorage.setItem('hesem_lang', l); }catch(e){}
@@ -2426,7 +2438,7 @@ function setLang(l){
       try{
         if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(f, l);
         else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
-        else if(f && f.contentWindow) f.contentWindow.postMessage({type:'setLang',lang:l},'*');
+        else postDocLanguageMessage(f, {type:'setLang',lang:l});
       }catch(_e){}
     });
   }catch(e){}

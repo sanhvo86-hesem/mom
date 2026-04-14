@@ -8068,10 +8068,10 @@ Không copy pattern này vào runtime.</pre>
 </section>
 <section class="section" id="zone-system">
 <h2 class="section-title"><span class="section-number">38</span>Zone System <span class="chip chip-amber" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">PARTIAL</span></h2>
-<p class="section-lead">Zone là contract cứng giữa template và block engine. Mỗi zone quyết định vị trí, độ cao, hành vi scroll, loại block được phép và cách responsive co giãn theo breakpoint. Status là PARTIAL cho tới khi runtime và Module Builder enforce whitelist thật.</p>
+<p class="section-lead">Zone là contract cứng giữa template và block engine. Mỗi zone quyết định vị trí, độ cao, hành vi scroll, loại block được phép và cách responsive co giãn theo breakpoint. Build packet, Module Builder publish path và release validation PHẢI enforce whitelist trước khi module được phát hành.</p>
 <div class="info-box info-box-amber">
 <strong>IMPLEMENTATION STATUS: ALLOWED BLOCKS</strong>
-  Zone <code>allowedBlocks</code> là SPEC ONLY trong runtime hiện tại. Runtime layer hiện có thể vẫn render block theo schema/tab mà chưa enforce whitelist zone ở mọi mount path. Vì vậy bất kỳ block nào vẫn có thể bị đặt sai zone nếu schema/UI cho phép. Runtime validation PHẢI được implement trước khi mount/render block, đối chiếu <a href="#block-engine">Section 37</a>, <a href="#block-schema">Section 29</a> và <a href="#runtime-api-spec">Section 35</a>.
+  Zone <code>allowedBlocks</code> hiện được kiểm bằng <code>node mom/tools/design/validate-frontend-contracts.mjs</code>: template phải tồn tại, version phải khớp, block zone phải nằm trong template, block type phải được <code>allowedBlocksByZone</code> cho phép và block contract phải khai báo zone đó. Runtime editor hoặc preview path nào không đi qua backend schema/build-packet authority chỉ được xem là preview-only/release-ineligible; không được dùng làm publish evidence. Runtime mount path vẫn PHẢI giữ diagnostics/fail-closed cho schema có <code>_graphicsAuthority.releaseBlocking</code>, đối chiếu <a href="#block-engine">Section 37</a>, <a href="#block-schema">Section 29</a> và <a href="#runtime-api-spec">Section 35</a>.
 </div>
 <div class="card" style="margin-top:18px;margin-bottom:18px">
 <div class="card-header"><span class="chip chip-red">P0</span>Zone Enforcement Truth Table</div>

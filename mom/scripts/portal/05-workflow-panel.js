@@ -777,7 +777,7 @@ function openVersionPreview(code, idx){
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
                 if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
                 else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},new URL(fr.getAttribute('src') || window.location.href, window.location.href).origin);
         }catch(_e){}
       });
       setTimeout(()=>{
@@ -785,7 +785,7 @@ function openVersionPreview(code, idx){
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
                 if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
                 else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},new URL(fr.getAttribute('src') || window.location.href, window.location.href).origin);
         }catch(_e){}
       }, 200);
     }

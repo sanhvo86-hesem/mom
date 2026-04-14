@@ -1910,6 +1910,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,.1));
 }
+.tpl-gallery-card:focus-visible {
+  outline: 3px solid var(--focus-ring, var(--brand-2));
+  outline-offset: 3px;
+  border-color: var(--brand-2);
+}
 .tpl-gallery-thumb {
   aspect-ratio: 16/10;
   background: var(--bg-surface-alt, #f1f5f9);

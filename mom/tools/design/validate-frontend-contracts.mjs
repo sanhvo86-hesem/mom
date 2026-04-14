@@ -341,6 +341,55 @@ function validateGraphicsGovernance(graphicsGovernance, packets) {
     }
   }
 
+  const lineage = graphicsGovernance.moduleGraphicsLineageGraph || {};
+  const lineageNodes = Array.isArray(lineage.nodes) ? lineage.nodes : [];
+  const lineageEdges = Array.isArray(lineage.edges) ? lineage.edges : [];
+  const lineageNodeIds = new Set(lineageNodes.map((node) => String(node.id || '')));
+  for (const nodeId of ['admin-appearance', 'backend-graphics-authority', 'shared-tokens', 'shared-components']) {
+    if (!lineageNodeIds.has(nodeId)) {
+      errors.push(`graphics-governance: moduleGraphicsLineageGraph missing required node ${nodeId}`);
+    }
+  }
+  for (const edge of lineageEdges) {
+    if (!lineageNodeIds.has(String(edge.from || '')) || !lineageNodeIds.has(String(edge.to || ''))) {
+      errors.push(`graphics-governance: lineage edge references unknown node ${edge.from || '?'} -> ${edge.to || '?'}`);
+    }
+  }
+  if (!lineageEdges.some((edge) => edge.from === 'admin-appearance' && edge.to === 'backend-graphics-authority')) {
+    errors.push('graphics-governance: lineage graph missing Admin -> backend authority edge');
+  }
+  if (!lineageEdges.some((edge) => edge.from === 'shared-tokens' && edge.to === 'shared-components')) {
+    errors.push('graphics-governance: lineage graph missing shared tokens -> shared components edge');
+  }
+
+  const beacons = Array.isArray(graphicsGovernance.runtimeGraphicsComplianceBeacon?.beacons)
+    ? graphicsGovernance.runtimeGraphicsComplianceBeacon.beacons
+    : [];
+  if (!beacons.length) {
+    errors.push('graphics-governance: runtimeGraphicsComplianceBeacon.beacons is empty or missing');
+  }
+  for (const beacon of beacons) {
+    for (const field of ['moduleId', 'route', 'linkageStatus', 'sharedTokenProbe', 'hmComponentProbe', 'privateCssProbe', 'driftHash', 'complianceState', 'beaconStatus', 'reportedAt']) {
+      if (!(field in beacon)) {
+        errors.push(`graphics-governance: runtime beacon "${beacon.moduleId || 'unknown'}" missing ${field}`);
+      }
+    }
+  }
+
+  const debtRows = Array.isArray(graphicsGovernance.visualDebtObservatory?.byModule)
+    ? graphicsGovernance.visualDebtObservatory.byModule
+    : [];
+  if (!debtRows.length) {
+    errors.push('graphics-governance: visualDebtObservatory.byModule is empty or missing');
+  }
+  for (const debt of debtRows) {
+    for (const field of ['moduleId', 'route', 'linkageStatus', 'bridgeAliasDebt', 'privateCssDebt', 'hardcodedStyleDebt', 'uncontrolledLegacyShellDebt', 'debtScore']) {
+      if (!(field in debt)) {
+        errors.push(`graphics-governance: visual debt row "${debt.moduleId || 'unknown'}" missing ${field}`);
+      }
+    }
+  }
+
   const requiredComplianceFields = [
     'moduleId',
     'route',

@@ -1663,7 +1663,12 @@ window._admGraphicsTemplateAction = function(action, id){
     if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng', 'Graphics governance service is not ready'), 'error');
     return;
   }
-  svc.templateAction(action, tpl.templateId || tpl.id, { template:tpl }).then(function(result){
+  var payload = { template:tpl };
+  var snap = graphicsSnapshot();
+  if(action === 'publish' && snap.releaseEvidencePack){
+    payload.releaseEvidence = snap.releaseEvidencePack;
+  }
+  svc.templateAction(action, tpl.templateId || tpl.id, payload).then(function(result){
     announceGraphics((result && result.message) ? result.message : (L('Workflow template đã ghi nhận: ', 'Template workflow recorded: ') + action));
     if(typeof showToast === 'function'){
       showToast(result && result.message ? result.message : (L('Đã ghi nhận workflow', 'Workflow recorded') + ': ' + action), result && result.ok === false ? 'warning' : 'success');
@@ -1672,6 +1677,26 @@ window._admGraphicsTemplateAction = function(action, id){
   }).catch(function(err){
     announceGraphics(L('Workflow template thất bại; authority không đổi.', 'Template workflow failed; authority unchanged.'));
     if(typeof showToast === 'function') showToast(String(err && err.message || err || 'workflow_failed'), 'error');
+    renderAdminAppearance();
+  });
+};
+
+window._admGraphicsWaiverAction = function(action, waiverId){
+  var svc = graphicsSvc();
+  if(!svc || !waiverId) return;
+  var fn = action === 'approve' ? svc.approveWaiver : (action === 'expire' ? svc.expireWaiver : null);
+  if(typeof fn !== 'function'){
+    announceGraphics(L('Waiver lifecycle endpoint chưa sẵn sàng.', 'Waiver lifecycle endpoint is not ready.'));
+    if(typeof showToast === 'function') showToast(L('Waiver endpoint chưa sẵn sàng', 'Waiver endpoint is not ready'), 'warning');
+    return;
+  }
+  fn.call(svc, { waiverId:waiverId }).then(function(result){
+    announceGraphics((result && result.message) || (action + ' waiver ' + waiverId));
+    if(typeof showToast === 'function') showToast((result && result.message) || (action + ' waiver'), result && result.ok === false ? 'warning' : 'success');
+    renderAdminAppearance();
+  }).catch(function(err){
+    announceGraphics(L('Waiver action bị backend chặn.', 'Waiver action was blocked by backend authority.'));
+    if(typeof showToast === 'function') showToast(String(err && err.message || err || 'waiver_action_failed'), 'error');
     renderAdminAppearance();
   });
 };
@@ -1806,9 +1831,7 @@ function renderControlledRegistrySummary(){
     return /backend-graphics-authority|backend|controlled/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''))
       && !/preview-cache|unsaved-draft-cache|draft-cache|preview-seed/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''));
   });
-  var overlayTemplates = templates.filter(function(tpl){
-    return /preview-cache|unsaved-draft-cache|draft-cache|preview-seed/i.test(String(tpl.sourceAuthority || tpl.controlMode || ''));
-  });
+  var overlayTemplates = snap.localCacheTemplates || [];
   var counts = {};
   templates.forEach(function(tpl){ counts[tpl.status] = (counts[tpl.status] || 0) + 1; });
   return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px">'
@@ -1820,6 +1843,32 @@ function renderControlledRegistrySummary(){
     + infoCard('Legacy bridged', String(counts['legacy-bridged'] || 0), 'admin')
     + infoCard('Publish blocked', String(counts['publish-blocked'] || 0), counts['publish-blocked'] ? 'partial' : 'neutral')
     + '</div>';
+}
+
+function renderLocalTemplateCachePanel(){
+  var snap = graphicsSnapshot();
+  var rows = (snap.localCacheTemplates || []).slice(0, 8).map(function(tpl){
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(tpl.templateId || tpl.id || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip('preview', tpl.sourceAuthority || tpl.controlMode || 'cache')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">'+esc(L('Không được dùng làm registry authority hoặc publish state.', 'Not used as registry authority or publish state.'))+'</td>'
+      + '</tr>';
+  }).join('');
+  return sect(
+    L('Draft / preview cache inventory', 'Draft / preview cache inventory'),
+    '<div style="font-size:11px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px">'
+      + esc(L('Các bản này chỉ là cache trình duyệt để xem trước hoặc khôi phục draft chưa lưu; registry controlled bên trên không bị shadow bởi localStorage.', 'These records are browser cache only for preview or unsaved draft recovery; the controlled registry above is not shadowed by localStorage.'))
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">templateId</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">cache state</th>'
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">authority rule</th>'
+      + '</tr></thead><tbody>'
+      + (rows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No local draft or preview cache records</td></tr>')
+      + '</tbody></table>',
+    false,
+    statusChip('preview', L('cache-only', 'cache-only'))
+  );
 }
 
 function renderImpactAnalysisPanel(wrap){
@@ -2229,10 +2278,21 @@ function renderReleaseLinkagePanel(){
   );
 }
 
-	function renderWaiverGovernancePanel(){
+function renderWaiverGovernancePanel(){
   var snap = graphicsSnapshot();
   var waiverRows = (snap.waivers || []).slice(0, 5).map(function(row){
-    return '<tr><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.waiverId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || row.targetId || '-')+'</td><td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td></tr>';
+    var waiverId = String(row.waiverId || row.id || '');
+    var canApprove = waiverId && String(row.status || '') !== 'approved' && String(row.status || '') !== 'expired';
+    var canExpire = waiverId && String(row.status || '') !== 'expired';
+    return '<tr>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(waiverId || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.subjectId || row.targetId || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(row.status || '-')+'</td>'
+      + '<td style="padding:8px;border-bottom:1px solid var(--border);white-space:nowrap">'
+      + '<button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" onclick="_admGraphicsWaiverAction(\'approve\',\''+esc(waiverId)+'\')"'+(canApprove?'':' disabled')+'>'+esc(L('Approve', 'Approve'))+'</button> '
+      + '<button type="button" class="hm-btn hm-btn-sm hm-btn-secondary" onclick="_admGraphicsWaiverAction(\'expire\',\''+esc(waiverId)+'\')"'+(canExpire?'':' disabled')+'>'+esc(L('Expire', 'Expire'))+'</button>'
+      + '</td>'
+      + '</tr>';
   }).join('');
   return sect(
     L('Waiver / exception governance', 'Waiver / exception governance'),
@@ -2249,7 +2309,8 @@ function renderReleaseLinkagePanel(){
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Waiver</th>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Subject</th>'
       + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Status</th>'
-      + '</tr></thead><tbody>'+(waiverRows || '<tr><td colspan="3" style="padding:12px;color:var(--text-secondary)">No waiver requests in current snapshot</td></tr>')+'</tbody></table>',
+      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Lifecycle</th>'
+      + '</tr></thead><tbody>'+(waiverRows || '<tr><td colspan="4" style="padding:12px;color:var(--text-secondary)">No waiver requests in current snapshot</td></tr>')+'</tbody></table>',
     false,
     statusChip('preview', L('Exception path', 'Exception path'))
   );
@@ -2563,6 +2624,7 @@ function renderTemplateGallery(){
   h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
   h += renderRolloutControls(_selectedTemplate ? getTemplateById(_selectedTemplate) : null);
   h += renderControlledRegistrySummary();
+  h += renderLocalTemplateCachePanel();
   h += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;position:sticky;top:0;z-index:10;background:var(--bg-surface);padding:8px 0">';
   h += '<input type="text" placeholder="'+esc(T('templateSearchHint'))+'" value="'+esc(_templateSearch)+'" oninput="_admTplSetState(\'search\',this.value)" style="flex:1;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg-surface)">';
   h += '<select onchange="_admTplSetState(\'category\',this.value)" style="height:36px;padding:0 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg-surface)">';

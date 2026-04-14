@@ -1233,10 +1233,17 @@ function bindFields(container){
   var saveBtn = document.getElementById('eqms-save-draft');
   if(saveBtn) saveBtn.onclick = function(){
     saveBtn.disabled = true;
-    saveDraft().then(function(){
-      toast(t('Đã lưu nháp.', 'Draft saved.'), 'success');
-    }).catch(function(){
-      toast(t('Không thể lưu nháp.', 'Could not save draft.'), 'error');
+    saveDraft().then(function(result){
+      if(result && result.source === 'local_only'){
+        toast(t('Đã lưu bản nháp cục bộ. Chưa có xác nhận từ server.', 'Draft saved locally only. No server confirmation yet.'), 'warn');
+        return;
+      }
+      toast(t('Đã lưu nháp lên server.', 'Draft saved on server.'), 'success');
+    }).catch(function(err){
+      var localBackup = err && err.localBackup;
+      toast(localBackup
+        ? t('Server không nhận nháp; bản sao cục bộ chỉ dùng để khôi phục, không phải hồ sơ authority.', 'Server did not accept the draft; the local copy is only recovery cache, not authority.')
+        : t('Không thể lưu nháp.', 'Could not save draft.'), 'error');
     }).finally(function(){ saveBtn.disabled = false; });
   };
 
@@ -1459,8 +1466,9 @@ function saveDraft(){
       if(currentEntryIsLocked() || isAmendmentEdit()){
         return Promise.reject(err || new Error('server_draft_rejected'));
       }
-      /* Server save failed — localStorage draft is the backup for pre-release drafts. */
-      return { ok: true, source: 'local_only' };
+      /* Server save failed; the local copy is only a recovery cache, not authority. */
+      if(err && typeof err === 'object') err.localBackup = true;
+      return Promise.reject(err || Object.assign(new Error('server_draft_unavailable'), { localBackup:true }));
     });
   }
   return Promise.resolve({ ok: true, source: 'local_only' });

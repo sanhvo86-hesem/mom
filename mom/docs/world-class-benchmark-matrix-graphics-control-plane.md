@@ -8,7 +8,7 @@ Scope: graphics control plane, frontend SSOT, regulated UI, accessibility, relea
 
 ## Evidence Summary
 
-- `python3 mom/tools/registry/verify_publication_truth.py` passes `241/241`.
+- `python3 mom/tools/registry/verify_publication_truth.py` passes `256/256`.
 - `node mom/tools/design/validate-frontend-contracts.mjs` passes with `0` errors and `14` warnings.
 - The graphics authority registry exists in `mom/data/registry/graphics-governance-registry.json`.
 - Graphics release blockers are cleared: `graphics-governance-registry.json` reports `releaseBlocked: false`, `blockerCount: 0`, and `releaseReadinessState: ready`.
@@ -88,7 +88,7 @@ Validation details:
 | Closed P0 | Shopfloor / regulated accessibility evidence not yet complete for blocked pilot modules | Frontend validator passes and the graphics registry now marks the graphics release link ready. | Keep G09/G10 route-level automation as non-blocking P1 maturity work. |
 | P1 | Legacy API alias mappings still generate warnings in the frontend contract validator | `validate-frontend-contracts.mjs` emits 14 warnings, all legacy API map warnings. | Decide which aliases remain compatibility only and retire the rest on a published migration path. |
 | P1 | Private CSS debt remains substantial | `privateCssFileCount = 75`, `privateCssDebtScore = 14777`, `tokenCoveragePercent = 29`. | Keep pushing modules onto shared tokens/components and shrink private styling surface. |
-| Closed P1 | Release evidence still has to prove the graphics control plane, not just the data registry | Truth verification passes 241/241 and graphics readiness is now ready. | Maintain release evidence refs through the release manifest and evidence pack. |
+| Closed P1 | Release evidence still has to prove the graphics control plane, not just the data registry | Truth verification passes 256/256 and graphics readiness is now ready. | Maintain release evidence refs through the release manifest and evidence pack. |
 | P2 | Legacy module styling and bridge alias cleanup | Docs already classify private CSS and bridge aliases as debt classes. | Burn down low-risk legacy CSS and alias debt after the blocked pilot evidence is closed. |
 | P2 | Accessibility and regulated evidence need to become routine rather than special-case | Current blocker reasons show this is still concentrated in the pilot modules. | Make the accessibility and audit evidence checks default for regulated and shopfloor modules. |
 

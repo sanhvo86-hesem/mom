@@ -6,6 +6,34 @@ function edClearInjectedDocShellStyles(){
   }catch(e){}
 }
 
+function edIframeOrigin(iframe){
+  try{
+    var src = iframe && iframe.getAttribute && iframe.getAttribute('src');
+    return new URL(src || window.location.href, window.location.href).origin;
+  }catch(_e){
+    return window.location.origin;
+  }
+}
+
+function edPostToDocIframe(iframe, message){
+  try{
+    if(iframe && iframe.contentWindow){
+      iframe.contentWindow.postMessage(message, edIframeOrigin(iframe));
+      return true;
+    }
+  }catch(_e){}
+  return false;
+}
+
+function edIsTrustedDocMessage(evt, iframe){
+  try{
+    if(!evt || !iframe || evt.source !== iframe.contentWindow) return false;
+    return String(evt.origin || '') === edIframeOrigin(iframe);
+  }catch(_e){
+    return false;
+  }
+}
+
 function edSyncDocShellStyles(iframeDoc){
   try{
     edClearInjectedDocShellStyles();
@@ -321,6 +349,7 @@ function startEdit(code){
     // Fallback: use postMessage to request content from iframe
     var _pmTimeout;
     function _onMessage(evt){
+      if(!edIsTrustedDocMessage(evt, iframe)) return;
       if(evt.data && evt.data.type==='docContent'){
         window.removeEventListener('message', _onMessage);
         clearTimeout(_pmTimeout);
@@ -328,9 +357,7 @@ function startEdit(code){
       }
     }
     window.addEventListener('message', _onMessage);
-    try{
-      iframe.contentWindow.postMessage('getContent','*');
-    }catch(e){}
+    edPostToDocIframe(iframe, 'getContent');
     
     // Timeout fallback after 1.5s
     _pmTimeout=setTimeout(function(){
@@ -996,21 +1023,17 @@ function syncIframeDocumentLanguage(iframe, targetLang){
         return Promise.resolve(iwin.HesemApp.applyDocumentLanguage(targetLang)).then(function(){
           return true;
         }).catch(function(){
-          try{ iwin.postMessage({type:'setLang',lang:targetLang},'*'); }catch(_e){}
+          edPostToDocIframe(iframe, {type:'setLang',lang:targetLang});
           return false;
         });
       }
       if(iwin){
-        try{ iwin.postMessage({type:'setLang',lang:targetLang},'*'); }catch(_e){}
+        edPostToDocIframe(iframe, {type:'setLang',lang:targetLang});
       }
     }catch(e){}
     return false;
   }).catch(function(){
-    try{
-      if(iframe && iframe.contentWindow){
-        iframe.contentWindow.postMessage({type:'setLang',lang:targetLang},'*');
-      }
-    }catch(_e){}
+    edPostToDocIframe(iframe, {type:'setLang',lang:targetLang});
     return false;
   });
 }
