@@ -1,10 +1,10 @@
 # World-Class Gap Analysis for CNC Shopfloor Execution
 
-Audited branch: `main`
+Audited branch: `codex/worldclass-closure-20260414-0807`
 
-Audit date: 2026-04-13
+Audit date: 2026-04-14
 
-Merge-base inspected: `9bf1f16258e45410d36f932933779edab077302c`
+Merge-base inspected: `88529e684fd5bb52ea674643094c05b32a347914`
 
 Scope: current local branch state for planning/order control, dispatch, mobile execution, production reporting, quality inspection capture, CNC program management, connectivity, analytics/AI projections, migrations, and prior prompt artifacts.
 
@@ -48,7 +48,7 @@ Scores are 0-5. "Before" is the current branch posture before this pass. "After"
 |---|---:|---:|---:|---|---|
 | Execution truth integrity | 3.4 | 3.8 | 4.6 | `DispatchController` plus `ShopfloorExecutionService` remain one dispatch/report truth path; JSON compatibility still primary. | Hardened mobile inspection bridge, blocking catalog, replay handling, AI feedback write controls. |
 | Transaction model / event history | 3.7 | 4.0 | 4.7 | Production report events and dispatch lifecycle events exist; snapshots remain compatibility read models. | Mobile inspection replay now dedupes and rejects conflicts; DB bridge adds inspection replay columns. |
-| Planning-to-execution consistency | 3.3 | 3.4 | 4.6 | Order/planning truth still has JSON stores and DB mirrors; dispatch carries work order/job/order references. | Documented staged source-of-truth decision; no duplicate dispatch model added. |
+| Planning-to-execution consistency | 3.3 | 3.6 | 4.6 | Order/planning truth still has JSON stores and DB mirrors; dispatch carries work order/job/order references. | Documented staged source-of-truth decision, fixed order schedule aliases to the existing scheduling controller, and required source-order write permission for hold release. |
 | Quality / EQMS integration | 3.1 | 3.8 | 4.7 | First-piece gate exists in execution, but mobile capture was weak and file-only. | Added structured first-piece measurement validation and DB mirror into `mobile_inspection_captures`. |
 | Digital thread continuity for CNC | 3.6 | 3.9 | 4.7 | Dispatch/report payloads carry WO/JO/operation/work center/machine/program/setup/inspection fields. | Inspection captures now preserve machine/equipment/work center/client/replay context. |
 | Traceability / genealogy | 2.6 | 2.8 | 4.6 | Genealogy services and migrations exist, but dispatch/report do not emit complete genealogy edges. | Preserved trace-ready fields; deferred full genealogy edge emission. |
@@ -57,7 +57,7 @@ Scores are 0-5. "Before" is the current branch posture before this pass. "After"
 | Multisite / plant / site semantics | 3.0 | 3.1 | 4.6 | Org/site fields exist in enterprise migrations and dispatch contracts; not fully DB-primary. | Documentation now marks org/site as required digital-thread context when available. |
 | Interoperability readiness | 3.2 | 3.3 | 4.6 | MTConnect/connectivity tables and machine IDs exist; no machine ingestion required in Phase 1. | Manual inspection/execution contracts use stable machine/equipment and timestamps. |
 | AI / copilot architecture quality | 3.0 | 3.6 | 4.5 | AI scheduling is advisory, DB-first with JSON fallback, and execution facts remain MOM/MES authority. | AI feedback write is CSRF/idempotency guarded; recommendation actions are explicitly pending/advisory; AI ETL now extracts `shopfloor_execution` features from canonical execution facts. |
-| OT / IT security and governance | 3.4 | 3.9 | 4.8 | Existing auth/role/CSRF/audit middleware; some write paths were inconsistent. | Added CSRF to API key writes and AI feedback; hardened local storage traversal/first-write behavior. |
+| OT / IT security and governance | 3.4 | 4.0 | 4.8 | Existing auth/role/CSRF/audit middleware; some write paths were inconsistent. | Added CSRF to API key writes and AI feedback; hardened local storage traversal/first-write behavior; hold release now checks order write authority before mutation. |
 | Performance / scalability | 3.5 | 3.7 | 4.5 | Operator dispatch retrieval is single-pass; mobile offline replay was append-only without dedupe. | Offline replay now dedupes inspection facts and rejects divergent replays. |
 | Developer architecture quality | 3.7 | 4.0 | 4.6 | Custom MVC/service pattern preserved; focused service/migration/test changes. | Added tests and docs without introducing a second MES or framework rewrite. |
 
@@ -67,8 +67,8 @@ Scores are 0-5. "Before" is the current branch posture before this pass. "After"
 |---|---|---:|---|---|
 | H1 dispatch truth weakly file-backed | Confirmed | P1 | Dispatch targets/logs/events still use JSON compatibility stores with DB bridges. | Documented staged JSON-live/DB-bridge model; no new conflicting store. Full DB-primary cutover deferred. |
 | H2 production reporting last-write-wins | Partially refuted | P1 | Report and lifecycle event journals exist; snapshots remain derived read models. | Mobile inspection capture now also has replay-safe event-like append behavior. |
-| H3 lifecycle/edit constraints naive | Partially confirmed | P1 | Target lifecycle locks were previously improved; full ERP release/hold governance is not DB-primary. | Deferred full order-release governance; source decision documented. |
-| H4 validation weak | Confirmed | P1 | Mobile first-piece allowed empty measurements and weak result semantics. | First-piece now requires structured measurements and valid result; numeric/spec validation added. |
+| H3 lifecycle/edit constraints naive | Partially confirmed | P1 | Target lifecycle locks were previously improved; full ERP release/hold governance is not DB-primary. | Hold release authority and schedule alias drift fixed; broad order-release governance remains staged. |
+| H4 validation weak | Confirmed | P1 | Mobile first-piece allowed empty measurements and weak result semantics; planner schedule slot writes accepted weak date/time/priority context. | First-piece now requires structured measurements and valid result; schedule slot create/update validates date, time range, and priority. |
 | H5 operator dispatch retrieval inefficient | Refuted | P3 | `getOperatorDispatch()` reads target/log stores once and maps logs by target. | No change needed. |
 | H6 assignment/authorization unsafe | Refuted for dispatch reports, partially confirmed for mobile capture | P2 | Dispatch rejects blank assignment reports without override; mobile capture needed stronger operator/WO guards. | Mobile inspection now requires nonblank operator and work order. |
 | H7 governed blocker reasons missing/superficial | Confirmed | P1 | Blocking reasons could fall back to downtime catalog. | Added blocker catalog and removed fallback. |
@@ -82,7 +82,7 @@ Scores are 0-5. "Before" is the current branch posture before this pass. "After"
 
 ## Six-agent findings
 
-- Agent 1 - ERP / Planning / Lifecycle Governance: order/planning data remains split between JSON stores and richer DB schema; release/hold and full state-based planning governance are deferred. The safe fix here is explicit source-of-truth documentation, not a rushed DB cutover.
+- Agent 1 - ERP / Planning / Lifecycle Governance: order/planning data remains split between JSON stores and richer DB schema. Hold release authorization and stale schedule aliases were safe to fix now; full DB-primary planning governance is deferred.
 - Agent 2 - MOM / MES Shopfloor Execution: dispatch/reporting are the correct Phase 1 extension points; operator retrieval is not the bottleneck; mobile/offline inspection replay was the confirmed weak area and was fixed.
 - Agent 3 - EQMS / Quality / SPC / Compliance: quality capture needed first-piece measurement structure and a DB bridge. This pass validates first-piece measurements and shadows captures to `mobile_inspection_captures`.
 - Agent 4 - CNC / Digital Thread / Connectivity: digital-thread fields exist but are not fully indexed in every canonical projection. This pass keeps stable machine/equipment/work-center semantics and preserves replay/inspection context for later MTConnect/OPC UA correlation.

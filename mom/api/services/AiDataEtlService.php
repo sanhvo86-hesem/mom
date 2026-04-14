@@ -103,6 +103,11 @@ final class AiDataEtlService
             );
         }
 
+        // MES-R6-010 FIX: Verify org_id matches session
+        if (isset($_SESSION['org_id']) && (string)$_SESSION['org_id'] !== (string)$orgId) {
+            throw new \RuntimeException('unauthorized_org_access');
+        }
+
         // ── Resolve date range / Xác định khoảng thời gian ──
         $dateTo   = $this->normalizeDate($options['date_to'] ?? date('Y-m-d'), 'date_to');
         $dateFrom = $this->normalizeDate(

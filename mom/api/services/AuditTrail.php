@@ -605,9 +605,27 @@ final class AuditTrail
      */
     private function persistToJson(array $record): void
     {
-        $dir = $this->eventDir . '/' . strtolower($record['aggregate_type']);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
+        // OPS-R6-006: Validate aggregate_type to prevent path traversal
+        $aggregateType = strtolower($record['aggregate_type'] ?? '');
+        if (!preg_match('/^[a-z_][a-z0-9_]*$/', $aggregateType)) {
+            throw new RuntimeException('invalid_aggregate_type_format');
+        }
+
+        $dir = $this->eventDir . '/' . $aggregateType;
+
+        // OPS-R6-006: Verify constructed path is within eventDir
+        $dirReal = @realpath($dir);
+        if ($dirReal === false) {
+            // Directory doesn't exist yet, try to create it
+            if (!@mkdir($dir, 0775, true)) {
+                throw new RuntimeException('failed_to_create_audit_directory');
+            }
+            $dirReal = @realpath($dir);
+        }
+
+        $eventDirReal = @realpath($this->eventDir);
+        if (!is_string($dirReal) || !is_string($eventDirReal) || strpos($dirReal, $eventDirReal) !== 0) {
+            throw new RuntimeException('path_traversal_detected');
         }
 
         $file = $dir . '/' . $this->safeFilename($record['aggregate_id']) . '.jsonl';
@@ -710,19 +728,46 @@ final class AuditTrail
             throw new RuntimeException('Authoritative audit store is required for controlled event.');
         }
 
-        // JSON fallback: read last line of JSONL file
+        // REAUDIT-R6-016: JSON fallback: read last line of JSONL file without loading entire file
         $file = $this->eventDir . '/' . strtolower($aggType) . '/' . $this->safeFilename($aggId) . '.jsonl';
         if (!is_file($file)) {
             return '';
         }
 
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false || count($lines) === 0) {
+        // Read only the last 8192 bytes to avoid memory exhaustion on large files
+        $fileSize = filesize($file);
+        if ($fileSize === false || $fileSize === 0) {
             return '';
         }
 
-        $last = json_decode(end($lines), true);
-        return is_array($last) ? (string) ($last['event_hash'] ?? '') : '';
+        $readSize = min(8192, $fileSize);
+        $handle = @fopen($file, 'rb');
+        if ($handle === false) {
+            return '';
+        }
+
+        if (!@fseek($handle, -$readSize, SEEK_END)) {
+            $content = @fread($handle, $readSize);
+            @fclose($handle);
+
+            if ($content !== false) {
+                $lines = explode("\n", trim($content));
+                // Iterate in reverse through lines, skip empty lines, find first valid JSON with event_hash
+                for ($i = count($lines) - 1; $i >= 0; $i--) {
+                    $line = trim($lines[$i]);
+                    if ($line === '') continue;
+
+                    $decoded = json_decode($line, true);
+                    if (is_array($decoded) && isset($decoded['event_hash'])) {
+                        return (string)$decoded['event_hash'];
+                    }
+                }
+            }
+        } else {
+            @fclose($handle);
+        }
+
+        return '';
     }
 
     private function requiresAuthoritativeStore(AuditEvent $event): bool

@@ -32,6 +32,12 @@ final class RepoBoundaryScanner
         ['pattern' => '#^[^/]+\.(docx|pptx|xlsx)$#i', 'type' => 'runtime_artifact', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/docs/tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P2'],
         ['pattern' => '#(^|/)mom/data/php_error\.log$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/(audit|ratelimit|dispatch|erp|mes|orders|passports|uploads|apqp|cnc-programs|exceptions|fmea|improvement|knowledge|master-data|quotes|shifts)($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/online-forms/(entries|drafts)($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/schema-studio/(compiler|snapshots)($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/schema-studio/designs/workspace\.json$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/config/[^/]+\.bak_[0-9_]+$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
+        ['pattern' => '#(^|/)mom/data/scan_cache\.json$#', 'type' => 'runtime_artifact', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/\.phpunit\.cache($|/)#', 'type' => 'generated_report', 'severity' => 'P2'],
     ];
 

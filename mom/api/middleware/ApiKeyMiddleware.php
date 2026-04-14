@@ -121,18 +121,22 @@ class ApiKeyMiddleware
         $_SESSION['mfa_ok'] = true; // API keys bypass MFA
         $_SESSION['auth_method'] = 'api_key';
         $_SESSION['api_key_id'] = $key['key_id'] ?? null;
-        $_SESSION['api_key_scopes'] = $key['scopes'] ?? ['*'];
+        // SEC-002 FIX: Set admin flag based on key metadata
+        $_SESSION['api_key_is_admin'] = (bool)($key['is_admin'] ?? false);
+        $_SESSION['api_key_scopes'] = $key['scopes'] ?? [];
         $_SESSION['last_active'] = time();
     }
 
     /**
      * Authenticate via JWT.
+     * SECURITY FIX PIPE-JWT-001: Validate JWT_SECRET is strong enough (minimum 32 chars)
      */
     private function authenticateJwt(string $token): void
     {
         $jwtSecret = getenv('JWT_SECRET') ?: '';
-        if ($jwtSecret === '') {
-            $this->deny('jwt_not_configured', 500);
+        if ($jwtSecret === '' || strlen($jwtSecret) < 32) {
+            // Don't reveal whether JWT is configured or the secret is too short
+            $this->deny('invalid_token_format', 401);
         }
 
         try {
@@ -169,6 +173,12 @@ class ApiKeyMiddleware
 
             // Extract claims
             $claims = $parsedToken->claims();
+
+            // SECURITY FIX PIPE-AUTH-002: JWT must have an 'exp' claim
+            if (!$claims->has('exp')) {
+                $this->deny('jwt_missing_exp_claim', 401);
+            }
+
             $userId = $claims->get('sub', 'jwt-service');
             $scopes = $claims->get('scopes', ['*']);
 
@@ -226,13 +236,29 @@ class ApiKeyMiddleware
 
     /**
      * Check if the current request has a specific scope.
+     * SEC-002 FIX: Wildcard '*' scope only allowed for admin API keys.
+     * Regular API keys must have explicit scope list.
      */
     public static function hasScope(string $scope): bool
     {
-        $scopes = $_SESSION['api_key_scopes'] ?? $_SESSION['jwt_scopes'] ?? ['*'];
-        if (in_array('*', $scopes, true) || in_array('admin:*', $scopes, true)) {
+        $scopes = $_SESSION['api_key_scopes'] ?? $_SESSION['jwt_scopes'] ?? [];
+
+        // SEC-002: Wildcard '*' only allowed if auth method is NOT api_key OR is explicitly admin key
+        $authMethod = $_SESSION['auth_method'] ?? 'session';
+        $isAdminKey = ($authMethod === 'api_key') && (bool)($_SESSION['api_key_is_admin'] ?? false);
+
+        if (in_array('*', $scopes, true)) {
+            // Wildcard only for admin API keys; reject for regular API keys
+            if ($authMethod === 'api_key' && !$isAdminKey) {
+                return false;
+            }
             return true;
         }
+
+        if (in_array('admin:*', $scopes, true)) {
+            return $isAdminKey;
+        }
+
         return in_array($scope, $scopes, true);
     }
 

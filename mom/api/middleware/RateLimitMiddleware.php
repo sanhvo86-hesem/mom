@@ -197,6 +197,7 @@ class RateLimitMiddleware
 
         if (!flock($fp, LOCK_EX)) {
             fclose($fp);
+            error_log('RateLimit: flock failed for ' . $stateFile);
             return;
         }
 
@@ -303,6 +304,8 @@ class RateLimitMiddleware
 
     /**
      * Get the client IP address.
+     * SEC-004 FIX (VERIFIED): Only trust X-Forwarded-For from validated trusted proxies.
+     * SECURITY FIX PIPE-RATELIMIT-002: Validate ALL IPs in the X-Forwarded-For chain.
      *
      * @return string
      */
@@ -310,8 +313,17 @@ class RateLimitMiddleware
     {
         $remoteAddr = (string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
 
-        // Only trust X-Forwarded-For when behind a configured trusted proxy
-        $trustedProxies = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: '127.0.0.1,::1'))));
+        // SEC-004: Only trust X-Forwarded-For when behind a configured trusted proxy
+        // Validate each IP in the trusted proxies list with filter_var
+        $trustedProxiesRaw = array_filter(array_map('trim', explode(',', (string)(getenv('TRUSTED_PROXIES') ?: '127.0.0.1,::1'))));
+        $trustedProxies = [];
+        foreach ($trustedProxiesRaw as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                $trustedProxies[] = $ip;
+            }
+        }
+
+        // Only accept X-Forwarded-For if REMOTE_ADDR is in the trusted proxies list
         if ($trustedProxies === [] || !in_array($remoteAddr, $trustedProxies, true)) {
             return $remoteAddr;
         }
@@ -319,10 +331,22 @@ class RateLimitMiddleware
         $forwarded = (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
         if ($forwarded !== '') {
             $ips = array_map('trim', explode(',', $forwarded));
-            $clientIp = $ips[0] ?? '';
-            if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
-                return $clientIp;
+
+            // SECURITY FIX PIPE-RATELIMIT-002: Validate ALL IPs in the chain, not just the first
+            // If any IP in the chain is invalid, fall back to REMOTE_ADDR
+            $validIps = [];
+            foreach ($ips as $ip) {
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    $validIps[] = $ip;
+                } else {
+                    // Invalid IP in chain; reject the entire header
+                    return $remoteAddr;
+                }
             }
+
+            // All IPs are valid; explode() on a non-empty header yields at
+            // least one element, so the first validated IP is the client IP.
+            return $validIps[0];
         }
 
         return $remoteAddr;

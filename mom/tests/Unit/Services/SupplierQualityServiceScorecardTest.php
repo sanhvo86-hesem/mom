@@ -27,6 +27,7 @@ final class SupplierQualityServiceScorecardTest extends TestCase
         $this->writeSupplierQuality('incoming', [
             [
                 'vendor_id' => 'V-100',
+                'org_id' => 'ORG-1',
                 'inspection_date' => '2026-04-10',
                 'result' => 'accepted',
                 'qty_received' => 1000,
@@ -36,6 +37,7 @@ final class SupplierQualityServiceScorecardTest extends TestCase
             ],
             [
                 'vendor_id' => 'V-100',
+                'org_id' => 'ORG-1',
                 'inspection_date' => '2026-04-13',
                 'result' => 'rejected',
                 'qty_received' => 500,
@@ -69,7 +71,7 @@ final class SupplierQualityServiceScorecardTest extends TestCase
             'expiry_date' => '2026-04-30',
         ]]);
 
-        $scorecard = (new SupplierQualityService($this->dataDir))->calculateScorecard('V-100', '2026-04', 'qa-user');
+        $scorecard = (new SupplierQualityService($this->dataDir))->calculateScorecard('V-100', '2026-04', 'qa-user', 'ORG-1');
 
         $this->assertSame(1500.0, $scorecard['qty_received']);
         $this->assertSame(5.0, $scorecard['qty_rejected']);

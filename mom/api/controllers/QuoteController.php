@@ -99,7 +99,8 @@ class QuoteController extends BaseController
         }
         $config = $this->loadQuoteConfig();
         $roles  = $config['roles'] ?? [];
-        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
+        // Fail-closed: if role is not in config, default to viewer (least privilege)
+        $perms  = $roles[$role] ?? ($roles['viewer'] ?? []);
         return in_array($permission, $perms, true);
     }
 

@@ -322,25 +322,36 @@ final class EventBus
 
     private function notifyListeners(DomainEvent $event): void
     {
+        // WRK-003 FIX: Each listener is independently wrapped in try/catch.
+        // If one listener fails, it does NOT block other listeners from executing.
+
         // Exact match listeners
         foreach ($this->listeners[$event->eventType] ?? [] as $handler) {
             try {
                 $handler($event);
             } catch (\Throwable $e) {
-                error_log("[EventBus] Listener error for {$event->eventType}: {$e->getMessage()}");
+                error_log("[EventBus] Listener error for {$event->eventType}: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
                 $this->log?->error("EventBus listener error: {$e->getMessage()}", [
                     'event_type' => $event->eventType,
                     'event_id'   => $event->eventId,
+                    'listener'   => get_class($handler),
                 ]);
+                // Continue to next listener instead of propagating exception
             }
         }
 
-        // Wildcard listeners
+        // Wildcard listeners (also independently wrapped)
         foreach ($this->listeners['*'] ?? [] as $handler) {
             try {
                 $handler($event);
             } catch (\Throwable $e) {
-                error_log("[EventBus] Wildcard listener error: {$e->getMessage()}");
+                error_log("[EventBus] Wildcard listener error: {$e->getMessage()} in {$e->getFile()}:{$e->getLine()}");
+                $this->log?->error("EventBus wildcard listener error: {$e->getMessage()}", [
+                    'event_type' => $event->eventType,
+                    'event_id'   => $event->eventId,
+                    'listener'   => get_class($handler),
+                ]);
+                // Continue to next listener instead of propagating exception
             }
         }
     }

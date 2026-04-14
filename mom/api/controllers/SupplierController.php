@@ -304,6 +304,13 @@ class SupplierController extends BaseController
             $filters['date_to'] = $dateTo;
         }
 
+        // REAUDIT-R6-012: Add org_id filtering from session (fail-closed)
+        $sessionOrgId = $_SESSION['org_id'] ?? null;
+        if (empty($sessionOrgId)) {
+            $this->error('org_id_required', 403, 'Organization context is required to access supplier data.');
+        }
+        $filters['org_id'] = $sessionOrgId;
+
         $offset = max(0, (int)($this->query('offset', '0')));
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
@@ -311,34 +318,33 @@ class SupplierController extends BaseController
             $sqDir    = $this->dataDir . '/supplier-quality';
             $allItems = $this->readJsonFile($sqDir . '/incoming.json') ?? [];
 
-            // Apply filters
-            if (!empty($filters)) {
-                $allItems = array_filter($allItems, function (array $insp) use ($filters) {
-                    if (isset($filters['vendor_id']) && ($insp['vendor_id'] ?? '') !== $filters['vendor_id']) {
+            // Apply filters. org_id is mandatory above, so this always applies
+            // the tenant boundary in addition to optional query filters.
+            $allItems = array_filter($allItems, function (array $insp) use ($filters) {
+                if (isset($filters['vendor_id']) && ($insp['vendor_id'] ?? '') !== $filters['vendor_id']) {
+                    return false;
+                }
+                if (isset($filters['status']) && ($insp['status'] ?? '') !== $filters['status']) {
+                    return false;
+                }
+                if (isset($filters['part_id']) && ($insp['part_id'] ?? '') !== $filters['part_id']) {
+                    return false;
+                }
+                if (isset($filters['date_from'])) {
+                    $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
+                    if ($date < $filters['date_from']) {
                         return false;
                     }
-                    if (isset($filters['status']) && ($insp['status'] ?? '') !== $filters['status']) {
+                }
+                if (isset($filters['date_to'])) {
+                    $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
+                    if ($date > $filters['date_to']) {
                         return false;
                     }
-                    if (isset($filters['part_id']) && ($insp['part_id'] ?? '') !== $filters['part_id']) {
-                        return false;
-                    }
-                    if (isset($filters['date_from'])) {
-                        $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
-                        if ($date < $filters['date_from']) {
-                            return false;
-                        }
-                    }
-                    if (isset($filters['date_to'])) {
-                        $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
-                        if ($date > $filters['date_to']) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-                $allItems = array_values($allItems);
-            }
+                }
+                return ($insp['org_id'] ?? '') === $filters['org_id'];
+            });
+            $allItems = array_values($allItems);
 
             $total = count($allItems);
             $items = array_slice($allItems, $offset, $limit);
@@ -375,11 +381,17 @@ class SupplierController extends BaseController
         $userId = $this->userId($user);
 
         try {
+            // INV-R6-004: Validate qty_received must be > 0
+            $qtyReceived = (int)($body['qty_received'] ?? 0);
+            if ($qtyReceived <= 0) {
+                $this->error('qty_received_must_be_positive', 400, 'qty_received must be > 0');
+            }
+
             $inspection = $this->supplierService()->createIncoming([
                 'vendor_id'       => trim((string)($body['vendor_id'] ?? '')),
                 'part_id'         => trim((string)($body['part_id'] ?? '')),
                 'po_number'       => trim((string)($body['po_number'] ?? '')),
-                'qty_received'    => (int)($body['qty_received'] ?? 0),
+                'qty_received'    => $qtyReceived,
                 'lot_number'      => trim((string)($body['lot_number'] ?? '')),
                 'inspection_plan' => trim((string)($body['inspection_plan'] ?? '')),
             ], $userId);

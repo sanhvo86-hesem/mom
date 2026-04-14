@@ -28,8 +28,8 @@ final class ChangeLifecycleCommandService
     public function createChangeRequest(array $input, string $actorRef): array
     {
         $this->requireDb();
-        $status = $this->enum($input['status'] ?? 'draft', ['draft', 'submitted', 'in_review', 'approved', 'rejected', 'implemented']);
-        if (in_array($status, ['approved', 'implemented'], true)) {
+        $status = $this->enum($input['status'] ?? 'draft', ['draft', 'submitted', 'triage', 'approved_for_order', 'rejected', 'cancelled']);
+        if ($status === 'approved_for_order') {
             throw new RuntimeException('change_request_terminal_status_requires_transition');
         }
 
@@ -75,7 +75,7 @@ final class ChangeLifecycleCommandService
     public function transitionChangeRequest(array $input, string $actorRef): array
     {
         $this->requireDb();
-        $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'submitted', 'in_review', 'approved', 'rejected', 'implemented']);
+        $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'submitted', 'triage', 'approved_for_order', 'rejected', 'cancelled']);
         $id = $this->requiredText($input, 'change_request_id');
         $current = $this->loadChangeRequestRow($id);
         $this->assertAllowedRequestTransition(strtolower($this->text($current['status'] ?? '')), $target);
@@ -107,8 +107,8 @@ final class ChangeLifecycleCommandService
     public function createChangeOrder(array $input, string $actorRef): array
     {
         $this->requireDb();
-        $status = $this->enum($input['status'] ?? 'draft', ['draft', 'in_review', 'approved', 'released', 'closed', 'cancelled']);
-        if (in_array($status, ['released', 'closed'], true)) {
+        $status = $this->enum($input['status'] ?? 'draft', ['draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled']);
+        if (in_array($status, ['released', 'implemented', 'closed'], true)) {
             throw new RuntimeException('change_order_release_requires_transition');
         }
 
@@ -148,12 +148,15 @@ final class ChangeLifecycleCommandService
             throw new RuntimeException('change_order_create_failed');
         }
         $orderId = $row['plm_change_order_id'] ?? null;
-        $this->persistAffectedObjects(null, $orderId, $input['affected_objects'] ?? []);
-        $this->persistResultingObjects($orderId, $input['resulting_objects'] ?? []);
+        $affectedObjects = $this->persistAffectedObjects(null, $orderId, $input['affected_objects'] ?? []);
+        $this->persistResultingObjects($orderId, $input['resulting_objects'] ?? [], $affectedObjects);
         $this->persistEffectivities($orderId, $input['effectivities'] ?? [], $actorRef);
         $this->persistTrainingRequirements($orderId, $input['training_requirements'] ?? [], $actorRef);
         $this->persistVerifications($orderId, $input['verifications'] ?? [], $actorRef);
         $this->persistEffectivenessReviews($orderId, $input['effectiveness_reviews'] ?? [], $actorRef);
+        $this->persistWipDispositions($orderId, $input['wip_dispositions'] ?? [], $actorRef);
+        $this->persistRollbackRequirements($orderId, $input['rollback_requirements'] ?? $input['affected_objects'] ?? [], $input['rollback_plan'] ?? null, $actorRef);
+        $this->persistEmergencyControl($orderId, $input, $actorRef);
         return $this->normalizeRow($row);
     }
 
@@ -164,7 +167,7 @@ final class ChangeLifecycleCommandService
     public function transitionChangeOrder(array $input, string $actorRef): array
     {
         $this->requireDb();
-        $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'in_review', 'approved', 'released', 'closed', 'cancelled']);
+        $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled']);
         $id = $this->requiredText($input, 'change_order_id');
         $current = $this->loadChangeOrderRow($id);
         $this->assertAllowedOrderTransition(strtolower($this->text($current['status'] ?? '')), $target);
@@ -182,6 +185,10 @@ final class ChangeLifecycleCommandService
 
         if ($target === 'closed') {
             $this->assertEffectivenessClosure($id);
+        }
+
+        if ($target === 'implemented') {
+            $this->assertImplementationEvidence($id, $input);
         }
 
         $row = $this->db->queryOne(
@@ -240,14 +247,19 @@ final class ChangeLifecycleCommandService
         $rollbackRequired = $this->releaseRequiresRollback($package['effectivities']);
         $emergency = $this->isEmergencyChange($package['change_order'], $overrides);
         if ($rollbackRequired || $emergency) {
-            $rollback = $this->rollbackPlan($package['change_order'], $overrides);
+            $rollback = $this->rollbackPlan($package['change_order'], $overrides, $package['rollback_requirements']);
             if ($rollback === []) {
                 $blockers[] = $this->blocker('rollback_plan_required', 'Retroactive, WIP-impacting, ship-hold, or emergency change release requires a rollback plan.');
             }
         }
 
         if ($emergency) {
-            $emergencyBlockers = $this->emergencyControlBlockers($package['change_order'], $overrides);
+            $emergencyBlockers = $this->emergencyControlBlockers(
+                $package['change_order'],
+                $overrides,
+                $package['emergency_change_controls'],
+                $package['rollback_requirements'],
+            );
             $blockers = array_merge($blockers, $emergencyBlockers);
         }
 
@@ -263,6 +275,9 @@ final class ChangeLifecycleCommandService
                 'plm_change_training_requirements',
                 'plm_change_verifications',
                 'plm_change_effectiveness_reviews',
+                'wip_dispositions',
+                'rollback_requirements',
+                'emergency_change_controls',
                 'effectivity_conflicts',
             ],
         ];
@@ -294,16 +309,20 @@ final class ChangeLifecycleCommandService
         }
     }
 
-    private function persistAffectedObjects(mixed $requestId, mixed $orderId, mixed $objects): void
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function persistAffectedObjects(mixed $requestId, mixed $orderId, mixed $objects): array
     {
         if (!is_array($objects) || $objects === []) {
-            return;
+            return [];
         }
+        $rows = [];
         foreach ($objects as $object) {
             if (!is_array($object)) {
                 continue;
             }
-            $this->db->queryOne(
+            $row = $this->db->queryOne(
                 "INSERT INTO plm_change_affected_objects
                     (plm_change_request_id, plm_change_order_id, object_type, object_id, object_revision,
                      affected_fields, requested_effect, disposition, effectivity_rule, wip_disposition,
@@ -329,10 +348,17 @@ final class ChangeLifecycleCommandService
                     ':metadata' => $this->json(['authority' => 'change_lifecycle_command']),
                 ],
             );
+            if (is_array($row)) {
+                $rows[] = $this->normalizeRow($row);
+            }
         }
+        return $rows;
     }
 
-    private function persistResultingObjects(mixed $orderId, mixed $objects): void
+    /**
+     * @param list<array<string, mixed>> $affectedObjects
+     */
+    private function persistResultingObjects(mixed $orderId, mixed $objects, array $affectedObjects): void
     {
         if (!is_array($objects) || $objects === []) {
             return;
@@ -341,17 +367,19 @@ final class ChangeLifecycleCommandService
             if (!is_array($object)) {
                 continue;
             }
+            $affectedObjectId = $this->resolveAffectedObjectId($object, $affectedObjects);
             $this->db->queryOne(
                 "INSERT INTO plm_change_resulting_objects
-                    (plm_change_order_id, object_type, object_id, resulting_revision, result_role, release_state,
+                    (plm_change_order_id, affected_object_id, object_type, object_id, resulting_revision, result_role, release_state,
                      idempotency_key, metadata)
                  VALUES
-                    (CAST(:order_id AS uuid), :object_type, :object_id, :resulting_revision, :result_role, :release_state,
+                    (CAST(:order_id AS uuid), CAST(:affected_object_id AS uuid), :object_type, :object_id, :resulting_revision, :result_role, :release_state,
                      :idempotency_key, CAST(:metadata AS jsonb))
                  ON CONFLICT (idempotency_key) DO UPDATE SET updated_at = now()
                  RETURNING *",
                 [
                     ':order_id' => $this->nullableUuid($orderId),
+                    ':affected_object_id' => $affectedObjectId,
                     ':object_type' => $this->requiredText($object, 'object_type'),
                     ':object_id' => $this->requiredText($object, 'object_id'),
                     ':resulting_revision' => $this->nullableText($object['resulting_revision'] ?? null),
@@ -362,6 +390,167 @@ final class ChangeLifecycleCommandService
                 ],
             );
         }
+    }
+
+    /**
+     * @param array<string, mixed> $resultingObject
+     * @param list<array<string, mixed>> $affectedObjects
+     */
+    private function resolveAffectedObjectId(array $resultingObject, array $affectedObjects): string
+    {
+        $explicit = $this->nullableUuid($resultingObject['affected_object_id'] ?? null);
+        if ($explicit !== null) {
+            return $explicit;
+        }
+
+        $affectedRef = $this->text($resultingObject['affected_object_ref'] ?? '');
+        if ($affectedRef !== '') {
+            foreach ($affectedObjects as $affected) {
+                if ($this->text($affected['plm_change_affected_object_id'] ?? '') === $affectedRef) {
+                    return $affectedRef;
+                }
+                if ($this->text($affected['object_id'] ?? '') === $affectedRef) {
+                    $id = $this->nullableUuid($affected['plm_change_affected_object_id'] ?? null);
+                    if ($id !== null) {
+                        return $id;
+                    }
+                }
+            }
+            throw new RuntimeException('resulting_object_affected_ref_not_found');
+        }
+
+        $sourceType = $this->text($resultingObject['source_object_type'] ?? $resultingObject['affected_object_type'] ?? '');
+        $sourceId = $this->text($resultingObject['source_object_id'] ?? $resultingObject['affected_object_source_id'] ?? '');
+        if ($sourceType !== '' && $sourceId !== '') {
+            foreach ($affectedObjects as $affected) {
+                if ($this->text($affected['object_type'] ?? '') === $sourceType && $this->text($affected['object_id'] ?? '') === $sourceId) {
+                    $id = $this->nullableUuid($affected['plm_change_affected_object_id'] ?? null);
+                    if ($id !== null) {
+                        return $id;
+                    }
+                }
+            }
+            throw new RuntimeException('resulting_object_source_not_affected');
+        }
+
+        if (count($affectedObjects) === 1) {
+            $id = $this->nullableUuid($affectedObjects[0]['plm_change_affected_object_id'] ?? null);
+            if ($id !== null) {
+                return $id;
+            }
+        }
+
+        throw new RuntimeException('resulting_object_affected_object_required');
+    }
+
+    private function persistWipDispositions(mixed $orderId, mixed $objects, string $actorRef): void
+    {
+        if (!is_array($objects) || $objects === []) {
+            return;
+        }
+
+        foreach ($objects as $object) {
+            if (!is_array($object)) {
+                continue;
+            }
+            $wip = is_array($object['wip_disposition'] ?? null) ? $object['wip_disposition'] : $object;
+            $disposition = $this->text($wip['disposition'] ?? '');
+            if ($disposition === '') {
+                continue;
+            }
+
+            $this->db->queryOne(
+                "INSERT INTO wip_dispositions
+                    (plm_change_order_id, wip_object_type, wip_object_id, disposition, disposition_state,
+                     evidence_record_id, metadata)
+                 VALUES
+                    (CAST(:order_id AS uuid), :wip_object_type, :wip_object_id, :disposition, :disposition_state,
+                     CAST(:evidence_record_id AS uuid), CAST(:metadata AS jsonb))
+                 ON CONFLICT (plm_change_order_id, wip_object_type, wip_object_id) DO UPDATE SET
+                     disposition = EXCLUDED.disposition,
+                     disposition_state = EXCLUDED.disposition_state,
+                     updated_at = now()
+                 RETURNING *",
+                [
+                    ':order_id' => $this->nullableUuid($orderId),
+                    ':wip_object_type' => $this->enum($object['wip_object_type'] ?? $object['object_type'] ?? '', ['work_order', 'job_order', 'lot', 'serial', 'purchase_order', 'inventory_lot']),
+                    ':wip_object_id' => $this->requiredText($object, 'wip_object_id'),
+                    ':disposition' => $this->enum($disposition, ['use_as_is', 'rework', 'scrap', 'hold', 'convert_to_new_revision', 'ship_under_deviation']),
+                    ':disposition_state' => $this->enum($wip['disposition_state'] ?? 'planned', ['planned', 'approved', 'executed', 'waived', 'cancelled']),
+                    ':evidence_record_id' => $this->nullableUuid($wip['evidence_record_id'] ?? null),
+                    ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command']),
+                ],
+            );
+        }
+    }
+
+    private function persistRollbackRequirements(mixed $orderId, mixed $objects, mixed $rollbackPlan, string $actorRef): void
+    {
+        if (!is_array($rollbackPlan) || $rollbackPlan === [] || !is_array($objects) || $objects === []) {
+            return;
+        }
+
+        foreach ($objects as $object) {
+            if (!is_array($object)) {
+                continue;
+            }
+            $this->db->queryOne(
+                "INSERT INTO rollback_requirements
+                    (plm_change_order_id, object_type, object_id, rollback_state, rollback_plan)
+                 VALUES
+                    (CAST(:order_id AS uuid), :object_type, :object_id, :rollback_state, CAST(:rollback_plan AS jsonb))
+                 ON CONFLICT (plm_change_order_id, object_type, object_id) DO UPDATE SET
+                     rollback_plan = EXCLUDED.rollback_plan,
+                     updated_at = now()
+                 RETURNING *",
+                [
+                    ':order_id' => $this->nullableUuid($orderId),
+                    ':object_type' => $this->requiredText($object, 'object_type'),
+                    ':object_id' => $this->requiredText($object, 'object_id'),
+                    ':rollback_state' => $this->enum($object['rollback_state'] ?? 'required', ['required', 'planned', 'approved', 'executed', 'waived', 'not_required']),
+                    ':rollback_plan' => $this->json($rollbackPlan),
+                ],
+            );
+        }
+    }
+
+    private function persistEmergencyControl(mixed $orderId, array $input, string $actorRef): void
+    {
+        $emergency = $this->bool($input['emergency_change'] ?? false)
+            || strtolower($this->text($input['order_type'] ?? '')) === 'temporary_deviation';
+        if (!$emergency) {
+            return;
+        }
+
+        $this->db->queryOne(
+            "INSERT INTO emergency_change_controls
+                (plm_change_order_id, emergency_state, declared_reason, risk_payload, required_followup_payload,
+                 declared_by, signature_event_id)
+             VALUES
+                (CAST(:order_id AS uuid), :emergency_state, :declared_reason, CAST(:risk_payload AS jsonb),
+                 CAST(:required_followup_payload AS jsonb), CAST(:declared_by AS uuid), CAST(:signature_event_id AS uuid))
+             ON CONFLICT (plm_change_order_id) DO UPDATE SET
+                 emergency_state = EXCLUDED.emergency_state,
+                 risk_payload = EXCLUDED.risk_payload,
+                 required_followup_payload = EXCLUDED.required_followup_payload
+             RETURNING *",
+            [
+                ':order_id' => $this->nullableUuid($orderId),
+                ':emergency_state' => $this->enum($input['emergency_state'] ?? 'declared', ['declared', 'approved_for_use', 'contained', 'normalized', 'rejected', 'rolled_back']),
+                ':declared_reason' => $this->requiredText($input, 'emergency_justification'),
+                ':risk_payload' => $this->json([
+                    'risk_accepted' => $this->bool($input['risk_accepted'] ?? false),
+                    'risk_acceptance_signature_event_id' => $this->text($input['risk_acceptance_signature_event_id'] ?? ''),
+                    'actor_ref' => $actorRef,
+                ]),
+                ':required_followup_payload' => $this->json([
+                    'post_implementation_review_due_at' => $this->text($input['post_implementation_review_due_at'] ?? ''),
+                    'rollback_plan' => is_array($input['rollback_plan'] ?? null) ? $input['rollback_plan'] : [],
+                ]),
+                ':declared_by' => $this->nullableUuid($input['declared_by'] ?? null),
+                ':signature_event_id' => $this->nullableUuid($input['risk_acceptance_signature_event_id'] ?? null),
+            ],
+        );
     }
 
     private function persistEffectivities(mixed $orderId, mixed $effectivities, string $actorRef): void
@@ -544,6 +733,9 @@ final class ChangeLifecycleCommandService
      *   training_requirements: list<array<string, mixed>>,
      *   verifications: list<array<string, mixed>>,
      *   effectiveness_reviews: list<array<string, mixed>>,
+     *   wip_dispositions: list<array<string, mixed>>,
+     *   rollback_requirements: list<array<string, mixed>>,
+     *   emergency_change_controls: list<array<string, mixed>>,
      *   conflicts: list<array<string, mixed>>
      * }
      */
@@ -559,6 +751,9 @@ final class ChangeLifecycleCommandService
             'training_requirements' => $this->queryRows("SELECT * FROM plm_change_training_requirements WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
             'verifications' => $this->queryRows("SELECT * FROM plm_change_verifications WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
             'effectiveness_reviews' => $this->queryRows("SELECT * FROM plm_change_effectiveness_reviews WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
+            'wip_dispositions' => $this->queryRows("SELECT * FROM wip_dispositions WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
+            'rollback_requirements' => $this->queryRows("SELECT * FROM rollback_requirements WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
+            'emergency_change_controls' => $this->queryRows("SELECT * FROM emergency_change_controls WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
             'conflicts' => $this->queryRows("SELECT * FROM effectivity_conflicts WHERE plm_change_order_id::text = :id", [':id' => $orderId]),
         ];
     }
@@ -593,12 +788,12 @@ final class ChangeLifecycleCommandService
     private function assertAllowedRequestTransition(string $current, string $target): void
     {
         $allowed = [
-            'draft' => ['submitted', 'rejected'],
-            'submitted' => ['in_review', 'rejected'],
-            'in_review' => ['approved', 'rejected', 'draft'],
-            'approved' => ['implemented', 'rejected'],
+            'draft' => ['submitted', 'cancelled'],
+            'submitted' => ['triage', 'rejected', 'cancelled'],
+            'triage' => ['approved_for_order', 'rejected'],
+            'approved_for_order' => [],
             'rejected' => [],
-            'implemented' => [],
+            'cancelled' => [],
         ];
         $current = $current === '' ? 'draft' : $current;
         if (!in_array($target, $allowed[$current] ?? [], true)) {
@@ -609,10 +804,12 @@ final class ChangeLifecycleCommandService
     private function assertAllowedOrderTransition(string $current, string $target): void
     {
         $allowed = [
-            'draft' => ['in_review', 'cancelled'],
-            'in_review' => ['approved', 'cancelled', 'draft'],
-            'approved' => ['released', 'cancelled'],
-            'released' => ['closed'],
+            'draft' => ['impact_assessment', 'cancelled'],
+            'impact_assessment' => ['in_review', 'cancelled'],
+            'in_review' => ['approved', 'cancelled'],
+            'approved' => ['released'],
+            'released' => ['implemented'],
+            'implemented' => ['closed'],
             'closed' => [],
             'cancelled' => [],
         ];
@@ -631,6 +828,24 @@ final class ChangeLifecycleCommandService
             }
         }
         throw new RuntimeException('effective_review_required_before_change_order_close');
+    }
+
+    private function assertImplementationEvidence(string $id, array $input): void
+    {
+        if ($this->text($input['implementation_evidence_record_id'] ?? $input['evidence_record_id'] ?? '') !== '') {
+            return;
+        }
+
+        $package = $this->loadChangeLifecyclePackage($id);
+        foreach ($package['verifications'] as $verification) {
+            $type = strtolower($this->text($verification['verification_type'] ?? ''));
+            $state = strtolower($this->text($verification['verification_state'] ?? ''));
+            if ($type === 'implementation' && in_array($state, ['passed', 'waived'], true)) {
+                return;
+            }
+        }
+
+        throw new RuntimeException('implementation_evidence_required');
     }
 
     /**
@@ -695,10 +910,21 @@ final class ChangeLifecycleCommandService
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
      */
-    private function rollbackPlan(array $order, array $overrides): array
+    private function rollbackPlan(array $order, array $overrides, array $rollbackRequirements = []): array
     {
         if (is_array($overrides['rollback_plan'] ?? null)) {
             return $overrides['rollback_plan'];
+        }
+        foreach ($rollbackRequirements as $requirement) {
+            if (is_array($requirement['rollback_plan'] ?? null) && $requirement['rollback_plan'] !== []) {
+                return $requirement['rollback_plan'];
+            }
+            if (is_string($requirement['rollback_plan'] ?? null)) {
+                $decoded = json_decode((string)$requirement['rollback_plan'], true);
+                if (is_array($decoded) && $decoded !== []) {
+                    return $decoded;
+                }
+            }
         }
         $metadata = is_array($order['metadata'] ?? null) ? $order['metadata'] : [];
         return is_array($metadata['rollback_plan'] ?? null) ? $metadata['rollback_plan'] : [];
@@ -709,17 +935,20 @@ final class ChangeLifecycleCommandService
      * @param array<string, mixed> $overrides
      * @return list<array<string, mixed>>
      */
-    private function emergencyControlBlockers(array $order, array $overrides): array
+    private function emergencyControlBlockers(array $order, array $overrides, array $emergencyControls = [], array $rollbackRequirements = []): array
     {
         $metadata = is_array($order['metadata'] ?? null) ? $order['metadata'] : [];
-        $rollback = $this->rollbackPlan($order, $overrides);
+        $control = $this->firstEmergencyControl($emergencyControls);
+        $riskPayload = is_array($control['risk_payload'] ?? null) ? $control['risk_payload'] : [];
+        $followupPayload = is_array($control['required_followup_payload'] ?? null) ? $control['required_followup_payload'] : [];
+        $rollback = $this->rollbackPlan($order, $overrides, $rollbackRequirements);
         $blockers = [];
 
-        if ($this->text($overrides['emergency_justification'] ?? $metadata['emergency_justification'] ?? '') === '') {
+        if ($this->text($overrides['emergency_justification'] ?? $metadata['emergency_justification'] ?? $control['declared_reason'] ?? '') === '') {
             $blockers[] = $this->blocker('emergency_justification_required', 'Emergency change requires justification.');
         }
-        if (!$this->bool($overrides['risk_accepted'] ?? $metadata['risk_accepted'] ?? false)
-            && $this->text($overrides['risk_acceptance_signature_event_id'] ?? $metadata['risk_acceptance_signature_event_id'] ?? '') === '') {
+        if (!$this->bool($overrides['risk_accepted'] ?? $metadata['risk_accepted'] ?? $riskPayload['risk_accepted'] ?? false)
+            && $this->text($overrides['risk_acceptance_signature_event_id'] ?? $metadata['risk_acceptance_signature_event_id'] ?? $riskPayload['risk_acceptance_signature_event_id'] ?? $control['signature_event_id'] ?? '') === '') {
             $blockers[] = $this->blocker('emergency_risk_acceptance_required', 'Emergency change requires risk acceptance or e-signature.');
         }
         foreach (['rollback_strategy', 'rollback_trigger'] as $field) {
@@ -727,10 +956,33 @@ final class ChangeLifecycleCommandService
                 $blockers[] = $this->blocker('rollback_' . $field . '_required', 'Emergency rollback plan is incomplete.');
             }
         }
-        if ($this->text($overrides['post_implementation_review_due_at'] ?? $metadata['post_implementation_review_due_at'] ?? '') === '') {
+        if ($this->text($overrides['post_implementation_review_due_at'] ?? $metadata['post_implementation_review_due_at'] ?? $followupPayload['post_implementation_review_due_at'] ?? '') === '') {
             $blockers[] = $this->blocker('post_implementation_review_required', 'Emergency change requires post-implementation review due date.');
         }
         return $blockers;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $controls
+     * @return array<string, mixed>
+     */
+    private function firstEmergencyControl(array $controls): array
+    {
+        foreach ($controls as $control) {
+            if (!is_array($control)) {
+                continue;
+            }
+            foreach (['risk_payload', 'required_followup_payload'] as $field) {
+                if (is_string($control[$field] ?? null)) {
+                    $decoded = json_decode((string)$control[$field], true);
+                    if (is_array($decoded)) {
+                        $control[$field] = $decoded;
+                    }
+                }
+            }
+            return $control;
+        }
+        return [];
     }
 
     /**

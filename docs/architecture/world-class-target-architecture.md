@@ -1,6 +1,6 @@
 # World-Class Target Architecture
 
-Audited branch: `main`
+Audited branch: `codex/worldclass-closure-20260414-0807`
 
 Date: 2026-04-14
 
@@ -20,6 +20,8 @@ This target keeps the custom PHP MVC framework, router, middleware, DataLayer, E
 - Keep production report events and dispatch lifecycle events as audit/replay truth.
 - Treat target and production-log JSON snapshots as compatibility/read models until a DB-primary cutover is proven.
 - Keep `ShopfloorExecutionPersistenceService` as the DB bridge for `shift_targets`, `shift_production_log`, `shift_production_report_events`, and `shift_dispatch_execution_events`.
+- Keep scheduling/capacity endpoints owned by the existing scheduling controller. Order-prefixed aliases are compatibility routes only and must not drift into missing `OrderController` methods.
+- Hold release is a controlled planning/governance mutation and must require source-order write authority before the hold row/file is changed.
 
 ## Quality and evidence backbone
 

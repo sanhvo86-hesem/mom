@@ -124,6 +124,12 @@ final class EventBroadcaster
      */
     public function broadcast(string $channel, array $data): void
     {
-        $this->cache->publish($channel, $data);
+        // OPS-R6-019: Graceful degradation when Redis fails
+        try {
+            $this->cache->publish($channel, $data);
+        } catch (\Throwable $e) {
+            // Log the error but don't throw - Redis failures should not break non-critical broadcasts
+            @error_log('[EventBroadcaster] Failed to publish to channel ' . $channel . ': ' . $e->getMessage());
+        }
     }
 }

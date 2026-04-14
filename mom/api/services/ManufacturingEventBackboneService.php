@@ -383,7 +383,8 @@ final class ManufacturingEventBackboneService
         if ($string !== null) {
             return $string;
         }
-        return $prefix . '-' . gmdate('YmdHis') . '-' . bin2hex(random_bytes(6));
+        // MES-R6-020 FIX: Use 8 bytes instead of 6 for stronger entropy
+        return $prefix . '-' . gmdate('YmdHis') . '-' . bin2hex(random_bytes(8));
     }
 
     private function normalizeTimestamp(mixed $value): string
@@ -396,6 +397,20 @@ final class ManufacturingEventBackboneService
         if ($ts === false) {
             throw new InvalidArgumentException('invalid_event_timestamp');
         }
+
+        // MES-R6-006 FIX: Reject timestamps in the future (allow 5-minute clock skew)
+        $now = time();
+        $maxFutureWindow = $now + (5 * 60); // 5 minutes
+        if ($ts > $maxFutureWindow) {
+            throw new InvalidArgumentException('event_timestamp_in_future');
+        }
+
+        // MES-R6-006 FIX: Reject timestamps older than 30 days
+        $minPastWindow = $now - (86400 * 30); // 30 days
+        if ($ts < $minPastWindow) {
+            throw new InvalidArgumentException('event_timestamp_too_old_cannot_create_historical_events');
+        }
+
         return gmdate(DATE_ATOM, $ts);
     }
 

@@ -146,11 +146,20 @@ class MasterDataController extends BaseController
                 $all = array_filter($all, fn($r) => ($r['status'] ?? '') === $status);
             }
 
-            // Search
+            // INT-R6-018: Search validation and DoS prevention
             if ($search && trim($search) !== '') {
                 $q = strtolower(trim($search));
+
+                // Check minimum search length (min 2 chars)
+                if (strlen($q) < 2) {
+                    $this->error('search_too_short', 400, 'Search term must be at least 2 characters');
+                }
+
                 $all = array_filter($all, function ($r) use ($q) {
-                    $haystack = strtolower(json_encode($r) ?: '');
+                    // Limit JSON encoding to first 5000 chars to prevent DoS on large records
+                    $json = json_encode($r) ?: '';
+                    $limited = substr($json, 0, 5000);
+                    $haystack = strtolower($limited);
                     return strpos($haystack, $q) !== false;
                 });
             }
@@ -428,6 +437,12 @@ class MasterDataController extends BaseController
             $shifts = $this->readJsonFile($file) ?? [];
 
             $code      = trim((string)($body['shift_code'] ?? ''));
+
+            // INT-R6-014: Validate shift_code format - must match /^[A-Z0-9\-]{2,50}$/
+            if (!preg_match('/^[A-Z0-9\-]{2,50}$/', $code)) {
+                $this->error('invalid_shift_code', 400, 'Shift code must be 2-50 characters, containing only uppercase letters, numbers, and hyphens');
+            }
+
             $existing  = -1;
             foreach ($shifts as $idx => $s) {
                 if (($s['shift_code'] ?? '') === $code) { $existing = $idx; break; }

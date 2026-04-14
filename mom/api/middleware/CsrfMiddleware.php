@@ -34,7 +34,8 @@ class CsrfMiddleware
             $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 
             // GET, HEAD, OPTIONS are safe - no CSRF needed
-            if (in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true)) {
+            // TRACE is NOT exempt as it can be exploited for Cross-Site Tracing (XST) attacks
+            if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
                 $next();
                 return;
             }

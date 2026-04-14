@@ -364,6 +364,11 @@ final class SpcEngine
 
         $specRange = $usl - $lsl;
 
+        // QUAL-003 FIX: Validate sigma and spec range before division
+        if ($specRange <= 0) {
+            throw new RuntimeException('Invalid spec limits: USL must be greater than LSL.');
+        }
+
         // Cp = (USL - LSL) / 6*sigma_within
         $cp = $sigmaWithin > 0 ? $specRange / (6 * $sigmaWithin) : 0;
 

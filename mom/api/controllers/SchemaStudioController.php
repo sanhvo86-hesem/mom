@@ -89,11 +89,15 @@ class SchemaStudioController extends BaseController
 
     private function normalizeDesignId(string $designId): string
     {
-        // SECURITY FIX (INF-002): Return the actual sanitized ID, not a constant
-        // This ensures each unique design ID maps to a unique storage key
-        $id = $this->safeId($designId, self::SYSTEM_DESIGN_ID);
-        // Allow system_contract_registry as a special read-only design, but return the actual ID
-        return $id;
+        $clean = preg_replace('/[^A-Za-z0-9_-]+/', '_', trim($designId));
+        $clean = trim($clean, '_');
+        if ($clean === '') {
+            throw new RuntimeException('Design ID cannot be empty or contain only invalid characters');
+        }
+        if (strlen($clean) > 255) {
+            throw new RuntimeException('Design ID is too long (max 255 characters)');
+        }
+        return $clean;
     }
 
     private function isReadOnlyDesignId(string $designId): bool

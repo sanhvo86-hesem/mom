@@ -13,8 +13,11 @@ use MOM\Services\ControlPlane\EqmsFormExecutionService;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
+use MOM\Services\ControlPlane\ReleaseGovernanceBuilder;
+use MOM\Services\ControlPlane\WorkflowStatusAuthorityService;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
@@ -45,13 +48,90 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'HESEM_Security_Audit_Final.docx',
             'standards/templates/frm-000-master-template.xlsx',
             'mom/data/registry/registry-manifest.json',
+            'mom/data/audit/audit_2026-04.jsonl',
+            'mom/data/online-forms/entries/FRM-208.json',
+            'mom/data/ratelimit/login_127.0.0.1.json',
             'mom/release/module-builder-ultra-round10-manifest-2026-04-08.json',
         ]);
 
-        $this->assertCount(3, $findings);
+        $this->assertCount(6, $findings);
         $this->assertSame('HESEM_Security_Audit_Final.docx', $findings[0]['path']);
-        $this->assertSame('mom/data/registry/registry-manifest.json', $findings[1]['path']);
-        $this->assertSame('mom/release/module-builder-ultra-round10-manifest-2026-04-08.json', $findings[2]['path']);
+        $this->assertSame('mom/data/audit/audit_2026-04.jsonl', $findings[1]['path']);
+        $this->assertSame('mom/data/online-forms/entries/FRM-208.json', $findings[2]['path']);
+        $this->assertSame('mom/data/ratelimit/login_127.0.0.1.json', $findings[3]['path']);
+        $this->assertSame('mom/data/registry/registry-manifest.json', $findings[4]['path']);
+        $this->assertSame('mom/release/module-builder-ultra-round10-manifest-2026-04-08.json', $findings[5]['path']);
+    }
+
+    public function testReleaseGovernanceBuilderCreatesDeterministicManifestAndReceipts(): void
+    {
+        $builder = new ReleaseGovernanceBuilder();
+        $manifest = $builder->buildManifest(['mom/api/index.php', 'mom/api/services/WorkflowEngine.php'], [
+            'branch' => 'codex/worldclass-closure-20260414-0807',
+            'commit_sha' => str_repeat('a', 40),
+            'change_authority_ref' => 'CO-2026-0001',
+            'generated_at' => '2026-04-14T00:00:00+00:00',
+        ]);
+
+        $this->assertSame('release_manifest', $manifest['artifact_type']);
+        $this->assertSame('CO-2026-0001', $manifest['change_authority']['authority_ref']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $manifest['manifest_hash_sha256']);
+
+        $receipt = $builder->buildPromotionReceipt($manifest, [
+            'target_environment' => 'production',
+            'promotion_state' => 'promoted',
+            'generated_at' => '2026-04-14T00:10:00+00:00',
+        ]);
+        $this->assertSame($manifest['manifest_hash_sha256'], $receipt['manifest_hash_sha256']);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $receipt['receipt_hash_sha256']);
+    }
+
+    public function testWorkflowStatusAuthorityRejectsStaleOrderStatusSetReferences(): void
+    {
+        $config = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/config/so_jo_wo_config.json'), true);
+        $registry = json_decode((string)file_get_contents(QMS_TEST_BASE_DIR . '/contracts/table-registry.json'), true);
+        $this->assertIsArray($config);
+        $this->assertIsArray($registry);
+
+        $result = (new WorkflowStatusAuthorityService())->validate($config, $registry);
+
+        $this->assertTrue($result['valid'], json_encode($result['findings'], JSON_UNESCAPED_SLASHES) ?: 'workflow status findings');
+        $this->assertSame(
+            ['draft', 'quoted', 'confirmed', 'engineering_ready', 'in_production', 'shipped', 'closed', 'cancelled'],
+            $result['canonical']['sales_order_status_runtime']['states'],
+        );
+        $this->assertSame(
+            ['planned', 'released', 'active', 'on_hold', 'completed', 'closed', 'cancelled'],
+            $result['canonical']['job_order_status_runtime']['states'],
+        );
+        $this->assertSame(
+            ['scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold', 'cancelled'],
+            $result['canonical']['work_order_status_runtime']['states'],
+        );
+
+        $mutated = $registry;
+        $mutated['tables']['sales_order']['statusSet'] = 'sales_order_status_code';
+        $invalid = (new WorkflowStatusAuthorityService())->validate($config, $mutated);
+        $this->assertFalse($invalid['valid']);
+        $this->assertSame('stale_status_set_reference', $invalid['findings'][0]['code']);
+
+        $mutated = $registry;
+        $mutated['tables']['job_orders']['statusSet'] = 'job_order_status';
+        $invalid = (new WorkflowStatusAuthorityService())->validate($config, $mutated);
+        $this->assertFalse($invalid['valid']);
+        $this->assertSame('stale_status_set_reference', $invalid['findings'][0]['code']);
+
+        $mutated = $registry;
+        $mutated['tables']['work_orders']['statusSet'] = 'work_order_status';
+        $invalid = (new WorkflowStatusAuthorityService())->validate($config, $mutated);
+        $this->assertFalse($invalid['valid']);
+        $this->assertSame('stale_status_set_reference', $invalid['findings'][0]['code']);
+
+        $mutated = $registry;
+        $mutated['tables']['work_order']['statusSet'] = 'work_order_status_code';
+        $invalid = (new WorkflowStatusAuthorityService())->validate($config, $mutated);
+        $this->assertFalse($invalid['valid']);
+        $this->assertSame('stale_status_set_reference', $invalid['findings'][0]['code']);
     }
 
     public function testCommandGuardBlocksGenericCrudSharePointUploadAndFinalEditWithoutReleasedChange(): void
@@ -205,6 +285,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
     public function testPeriodicEvaluationServiceSchedulesAuthoritativeReviewRows(): void
     {
         $db = new CanonicalOutboxFakeDb();
+        $dueAt = gmdate('Y-m-d\TH:i:s\Z', strtotime('+1 day'));
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
             'evaluation_scope' => 'system_integrity',
@@ -216,7 +297,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $row = (new PeriodicEvaluationService($db))->schedule([
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
-            'due_at' => '2026-04-14T00:00:00Z',
+            'due_at' => $dueAt,
         ]);
 
         $this->assertSame('system_integrity', $row['evaluation_scope']);
@@ -394,6 +475,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'canonical_payload' => ['result' => 'pass'],
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [[
+                    'signer_ref' => 'qa-1',
+                    'signer_role' => 'qa_qms',
+                    'signature_meaning' => 'final evidence package approval',
+                ]],
             ]);
 
             $this->assertSame('finalized', $result['finalization_state']);
@@ -404,10 +490,25 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertArrayHasKey('canonical_payload', $result['package']['artifacts']);
             $this->assertArrayHasKey('readable_snapshot', $result['package']['artifacts']);
             $this->assertArrayHasKey('hash_signature_manifest', $result['package']['artifacts']);
-            $this->assertGreaterThanOrEqual(7, count($db->queryOneCalls));
+            $this->assertCount(1, $result['canonical']['signature_events']);
+            $this->assertTrue($db->sawSignatureEventInsert);
+            $this->assertGreaterThanOrEqual(8, count($db->queryOneCalls));
         } finally {
             $this->removeTree($dir);
         }
+    }
+
+    public function testCanonicalEvidenceReadServiceReturnsRecordVersionArtifactSignatureAndPublicationPackage(): void
+    {
+        $package = (new CanonicalEvidenceReadService(new CanonicalEvidenceReadFakeDb()))->package('EV-1');
+
+        $this->assertSame('canonical_evidence_control_plane', $package['authority']);
+        $this->assertSame('compatibility_read_only_not_source_of_truth', $package['legacy_vault_role']);
+        $this->assertSame('EVREC-1', $package['evidence_record']['evidence_record_id']);
+        $this->assertSame('EVVER-1', $package['evidence_version']['evidence_version_id']);
+        $this->assertNotEmpty($package['evidence_artifacts']);
+        $this->assertNotEmpty($package['signature_events']);
+        $this->assertNotEmpty($package['publication_records']);
     }
 
     public function testChangeLifecycleCommandServicePersistsRequestOrderAndImpactObjects(): void
@@ -472,6 +573,14 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             ]],
         ], 'qa-1');
         $this->assertSame('CO-1', $order['change_order_number']);
+        $this->assertSame('00000000-0000-0000-0000-000000000301', $db->resultingObjects[0]['affected_object_id']);
+
+        $impactAssessment = $service->transitionChangeOrder([
+            'change_order_id' => 'CO-1',
+            'target_status' => 'impact_assessment',
+            'reason' => 'scope is ready for impact assessment',
+        ], 'qa-1');
+        $this->assertSame('impact_assessment', $impactAssessment['status']);
 
         $inReview = $service->transitionChangeOrder([
             'change_order_id' => 'CO-1',
@@ -493,6 +602,13 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'reason' => 'approved implementation',
         ], 'qa-1');
         $this->assertSame('released', $released['status']);
+
+        $implemented = $service->transitionChangeOrder([
+            'change_order_id' => 'CO-1',
+            'target_status' => 'implemented',
+            'reason' => 'implementation evidence complete',
+        ], 'qa-1');
+        $this->assertSame('implemented', $implemented['status']);
         $this->assertNotEmpty($db->queryOneCalls);
     }
 
@@ -510,6 +626,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'affected_fields' => ['release_state'],
             ]],
         ], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'impact_assessment'], 'qa-1');
         $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'in_review'], 'qa-1');
         $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'approved'], 'qa-1');
 
@@ -535,6 +652,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'rollback_strategy' => 'restore prior SOP revision and quarantine WIP',
                 'rollback_trigger' => 'verification failure or elevated defect signal',
             ],
+            'wip_dispositions' => [[
+                'wip_object_type' => 'work_order',
+                'wip_object_id' => 'WO-10',
+                'disposition' => 'hold',
+                'disposition_state' => 'approved',
+            ]],
             'affected_objects' => [[
                 'object_type' => 'process_route',
                 'object_id' => 'ROUTE-10',
@@ -574,6 +697,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             ]],
         ], 'qa-1');
 
+        $this->assertNotEmpty($db->wipDispositions);
+        $this->assertNotEmpty($db->rollbackRequirements);
+        $this->assertNotEmpty($db->emergencyChangeControls);
+
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'impact_assessment'], 'qa-1');
         $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'in_review'], 'qa-1');
         $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'approved'], 'qa-1');
         $released = $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'released'], 'qa-1');
@@ -628,7 +756,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('consume', $fact['edge_fact_type']);
         $this->assertArrayHasKey('projected_graph', $fact);
         $this->assertNotEmpty($db->queryOneCalls);
-        $this->assertStringContainsString('INSERT INTO genealogy_edge_facts', $db->queryOneCalls[0]['sql']);
+        $sawEdgeInsert = false;
+        foreach ($db->queryOneCalls as $call) {
+            $sawEdgeInsert = $sawEdgeInsert || str_contains($call['sql'], 'INSERT INTO genealogy_edge_facts');
+        }
+        $this->assertTrue($sawEdgeInsert, 'expected an authoritative genealogy edge fact insert after cycle check');
         $this->assertTrue($db->sawProjectionWrite);
 
         $gate = $service->evaluateAndPersist5M([
@@ -658,6 +790,22 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'from_object_id' => 'MAT-LOT-1',
             'to_object_type' => 'work_order',
             'to_object_id' => 'WO-1',
+        ], 'operator-1');
+    }
+
+    public function testGenealogyGraphRejectsUnsupportedNodeTypesInsteadOfCoercingToEvidence(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('unsupported_genealogy_node_type');
+
+        (new GenealogyGraphService(new GenealogyGraphFakeDb()))->recordEdgeFact([
+            'edge_fact_type' => 'consume',
+            'from_object_type' => 'unknown_payload',
+            'from_object_id' => 'MYSTERY-1',
+            'to_object_type' => 'work_order',
+            'to_object_id' => 'WO-1',
+            'change_order_id' => '00000000-0000-0000-0000-000000000201',
+            'field_path' => 'genealogy.consume',
         ], 'operator-1');
     }
 
@@ -773,12 +921,15 @@ final class GenealogyGraphFakeDb
 
     /**
      * @param array<string, mixed> $params
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
-    public function queryOne(string $sql, array $params = []): array
+    public function queryOne(string $sql, array $params = []): ?array
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
-        if (str_contains($sql, 'genealogy_edge_facts')) {
+        if (str_contains($sql, 'SELECT 1 FROM genealogy_edge_facts')) {
+            return null;
+        }
+        if (str_contains($sql, 'INSERT INTO genealogy_edge_facts')) {
             return [
                 'edge_fact_type' => (string)$params[':edge_fact_type'],
                 'from_object_type' => (string)$params[':from_object_type'],
@@ -882,6 +1033,8 @@ final class EvidenceFinalizationFakeDb
      */
     public array $queryOneCalls = [];
 
+    public bool $sawSignatureEventInsert = false;
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>
@@ -901,8 +1054,81 @@ final class EvidenceFinalizationFakeDb
         if (str_starts_with(ltrim($sql), 'INSERT INTO evidence_publications')) {
             return ['evidence_publication_id' => 'PUB-1', 'publication_state' => (string)$params[':publication_state']];
         }
+        if (str_starts_with(ltrim($sql), 'INSERT INTO signature_events')) {
+            $this->sawSignatureEventInsert = true;
+            return [
+                'signature_event_id' => 'SIG-1',
+                'signed_object_type' => 'evidence_version',
+                'signed_object_id' => (string)$params[':signed_object_id'],
+                'signature_meaning' => (string)$params[':signature_meaning'],
+                'signature_hash_sha256' => (string)$params[':signature_hash_sha256'],
+            ];
+        }
         if (str_starts_with(ltrim($sql), 'UPDATE evidence_records')) {
             return ['evidence_record_id' => 'EVREC-1', 'current_version_id' => (string)$params[':evidence_version_id'], 'record_state' => 'finalized'];
+        }
+        return [];
+    }
+}
+
+final class CanonicalEvidenceReadFakeDb
+{
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function queryOne(string $sql, array $params = []): ?array
+    {
+        if (str_contains($sql, 'FROM evidence_records')) {
+            return [
+                'evidence_record_id' => 'EVREC-1',
+                'evidence_key' => 'EV-1',
+                'record_state' => 'finalized',
+                'current_version_id' => 'EVVER-1',
+                'metadata' => '{}',
+            ];
+        }
+        if (str_contains($sql, 'FROM evidence_versions')) {
+            return [
+                'evidence_version_id' => 'EVVER-1',
+                'evidence_record_id' => 'EVREC-1',
+                'version_state' => 'locked',
+                'canonical_payload' => '{"result":"pass"}',
+                'metadata' => '{}',
+            ];
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (str_contains($sql, 'FROM evidence_artifacts')) {
+            return [[
+                'evidence_artifact_id' => 'ART-1',
+                'artifact_role' => 'original',
+                'sha256' => str_repeat('a', 64),
+                'metadata' => '{}',
+            ]];
+        }
+        if (str_contains($sql, 'FROM signature_events')) {
+            return [[
+                'signature_event_id' => 'SIG-1',
+                'signed_object_id' => 'EVVER-1',
+                'signature_meaning' => 'final evidence package approval',
+                'metadata' => '{}',
+            ]];
+        }
+        if (str_contains($sql, 'FROM evidence_publications')) {
+            return [[
+                'evidence_publication_id' => 'PUB-1',
+                'publication_state' => 'pending',
+                'publication_receipt' => '{}',
+                'metadata' => '{}',
+            ]];
         }
         return [];
     }
@@ -943,12 +1169,27 @@ final class ChangeLifecycleFakeDb
     /**
      * @var list<array<string, mixed>>
      */
-    private array $affectedObjects = [];
+    public array $affectedObjects = [];
 
     /**
      * @var list<array<string, mixed>>
      */
-    private array $resultingObjects = [];
+    public array $resultingObjects = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    public array $wipDispositions = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    public array $rollbackRequirements = [];
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    public array $emergencyChangeControls = [];
 
     /**
      * @param array<string, mixed> $params
@@ -1014,6 +1255,7 @@ final class ChangeLifecycleFakeDb
         }
         if (str_starts_with($trimmed, 'INSERT INTO plm_change_affected_objects')) {
             $row = [
+                'plm_change_affected_object_id' => '00000000-0000-0000-0000-000000000301',
                 'plm_change_request_id' => (string)($params[':request_id'] ?? ''),
                 'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
                 'object_type' => (string)($params[':object_type'] ?? ''),
@@ -1031,6 +1273,7 @@ final class ChangeLifecycleFakeDb
         if (str_starts_with($trimmed, 'INSERT INTO plm_change_resulting_objects')) {
             $row = [
                 'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'affected_object_id' => (string)($params[':affected_object_id'] ?? ''),
                 'object_type' => (string)($params[':object_type'] ?? ''),
                 'object_id' => (string)($params[':object_id'] ?? ''),
                 'resulting_revision' => (string)($params[':resulting_revision'] ?? ''),
@@ -1038,6 +1281,40 @@ final class ChangeLifecycleFakeDb
                 'release_state' => (string)($params[':release_state'] ?? ''),
             ];
             $this->resultingObjects[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO wip_dispositions')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'wip_object_type' => (string)($params[':wip_object_type'] ?? ''),
+                'wip_object_id' => (string)($params[':wip_object_id'] ?? ''),
+                'disposition' => (string)($params[':disposition'] ?? ''),
+                'disposition_state' => (string)($params[':disposition_state'] ?? ''),
+            ];
+            $this->wipDispositions[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO rollback_requirements')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'object_type' => (string)($params[':object_type'] ?? ''),
+                'object_id' => (string)($params[':object_id'] ?? ''),
+                'rollback_state' => (string)($params[':rollback_state'] ?? ''),
+                'rollback_plan' => $params[':rollback_plan'] ?? '{}',
+            ];
+            $this->rollbackRequirements[] = $row;
+            return $row;
+        }
+        if (str_starts_with($trimmed, 'INSERT INTO emergency_change_controls')) {
+            $row = [
+                'plm_change_order_id' => (string)($params[':order_id'] ?? ''),
+                'emergency_state' => (string)($params[':emergency_state'] ?? ''),
+                'declared_reason' => (string)($params[':declared_reason'] ?? ''),
+                'risk_payload' => $params[':risk_payload'] ?? '{}',
+                'required_followup_payload' => $params[':required_followup_payload'] ?? '{}',
+                'signature_event_id' => (string)($params[':signature_event_id'] ?? ''),
+            ];
+            $this->emergencyChangeControls[] = $row;
             return $row;
         }
         if (str_starts_with($trimmed, 'INSERT INTO plm_change_training_requirements')) {
@@ -1113,6 +1390,15 @@ final class ChangeLifecycleFakeDb
         }
         if (str_contains($trimmed, 'FROM plm_change_effectiveness_reviews')) {
             return $this->changeEffectivenessReviews;
+        }
+        if (str_contains($trimmed, 'FROM wip_dispositions')) {
+            return $this->wipDispositions;
+        }
+        if (str_contains($trimmed, 'FROM rollback_requirements')) {
+            return $this->rollbackRequirements;
+        }
+        if (str_contains($trimmed, 'FROM emergency_change_controls')) {
+            return $this->emergencyChangeControls;
         }
         if (str_contains($trimmed, 'FROM effectivity_conflicts')) {
             return [];

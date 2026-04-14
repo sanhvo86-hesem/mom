@@ -174,6 +174,15 @@ final class AiPredictionPipeline
 
         foreach ($optionalFields as $field) {
             if (isset($data[$field]) && $data[$field] !== '') {
+                // MES-R6-007 FIX: Validate confidence_score bounds
+                if ($field === 'confidence_score' && isset($data[$field])) {
+                    $score = is_numeric($data[$field]) ? (float)$data[$field] : null;
+                    if ($score !== null && ($score < 0 || $score > 100)) {
+                        throw new \InvalidArgumentException(
+                            "confidence_score must be between 0 and 100, got: {$score}"
+                        );
+                    }
+                }
                 $columns[$field] = $data[$field];
             }
         }

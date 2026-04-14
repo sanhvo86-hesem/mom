@@ -82,6 +82,16 @@ class UserController extends BaseController
                 'org_plant_id',
                 'org_site_id',
             ];
+
+            // Validate role if provided
+            $validRoles = ['user', 'viewer', 'qa_manager', 'doc_controller', 'admin'];
+            if (array_key_exists('role', $data)) {
+                $providedRole = (string)($data['role'] ?? '');
+                if ($providedRole !== '' && !in_array($providedRole, $validRoles, true)) {
+                    $this->error('invalid_role', 400, 'Role must be one of: ' . implode(', ', $validRoles));
+                }
+            }
+
             foreach ($allowed as $key) {
                 if (array_key_exists($key, $data)) {
                     $existing[$key] = $data[$key];
@@ -126,10 +136,17 @@ class UserController extends BaseController
             [$pwOk, $pwErr] = password_policy($newPw);
             if (!$pwOk) $this->error($pwErr, 400);
 
+            // Validate role if provided
+            $validRoles = ['user', 'viewer', 'qa_manager', 'doc_controller', 'admin'];
+            $providedRole = (string)($data['role'] ?? 'user');
+            if ($providedRole !== '' && !in_array($providedRole, $validRoles, true)) {
+                $this->error('invalid_role', 400, 'Role must be one of: ' . implode(', ', $validRoles));
+            }
+
             $newUser = [
                 'username'      => $username,
                 'name'          => (string)($data['name'] ?? ''),
-                'role'          => (string)($data['role'] ?? 'user'),
+                'role'          => $providedRole,
                 'dept'          => (string)($data['dept'] ?? ''),
                 'title'         => (string)($data['title'] ?? ''),
                 'phone'         => (string)($data['phone'] ?? ''),

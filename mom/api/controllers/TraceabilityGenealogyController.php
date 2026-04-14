@@ -146,15 +146,11 @@ final class TraceabilityGenealogyController extends BaseController
             $filters['org_site_id'] = $userSiteId;
         }
 
-        // MES-003 FIX: If user tries to pass conflicting scope parameters, reject with 403
+        // MES-R6-003 FIX: Reject any scope field in user input entirely
         foreach (['plant_id', 'org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $scopeField) {
             $userInput = $this->input($scopeField);
             if ($userInput !== null && trim($userInput) !== '') {
-                $userInputTrimmed = trim($userInput);
-                $currentValue = $filters[$scopeField] ?? '';
-                if ($currentValue !== '' && $currentValue !== $userInputTrimmed) {
-                    $this->error('unauthorized_scope_bypass_attempt', 403, "User attempted to access unauthorized genealogy scope.");
-                }
+                $this->error('unauthorized_scope_field_in_request', 403, "Scope fields cannot be provided in request. Scope is derived from user session.");
             }
         }
 

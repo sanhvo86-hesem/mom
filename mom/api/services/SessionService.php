@@ -50,18 +50,18 @@ final class SessionService
         }
 
         if ($headerlessSessionMode) {
-            @ini_set('session.use_cookies', '0');
+            ini_set('session.use_cookies', '0');
             if (PHP_VERSION_ID < 80500) {
-                @ini_set('session.use_only_cookies', '0');
+                ini_set('session.use_only_cookies', '0');
             }
-            @ini_set('session.cache_limiter', '');
+            ini_set('session.cache_limiter', '');
         } else {
-            @ini_set('session.use_only_cookies', '1');
-            @ini_set('session.use_strict_mode', '1');
-            @ini_set('session.cookie_httponly', '1');
-            @ini_set('session.cookie_samesite', 'Lax');
+            ini_set('session.use_only_cookies', '1');
+            ini_set('session.use_strict_mode', '1');
+            ini_set('session.cookie_httponly', '1');
+            ini_set('session.cookie_samesite', 'Strict');
             if ($https) {
-                @ini_set('session.cookie_secure', '1');
+                ini_set('session.cookie_secure', '1');
             }
         }
 
@@ -76,7 +76,7 @@ final class SessionService
                 'domain'   => $domain,
                 'secure'   => $https,
                 'httponly'  => true,
-                'samesite'  => 'Lax',
+                'samesite'  => 'Strict',
             ]);
         }
 
@@ -88,11 +88,11 @@ final class SessionService
             }
 
             if ($headersMutable) {
-                @session_save_path($sessDir);
+                session_save_path($sessDir);
             }
 
             if ($headerlessSessionMode && session_id() === '') {
-                @session_id(bin2hex(random_bytes(16)));
+                session_id(bin2hex(random_bytes(16)));
             }
 
             try {
@@ -100,7 +100,6 @@ final class SessionService
                 return;
             } catch (\Throwable $e) {
                 $lastError = $e;
-                @session_write_close();
                 if (self::exceptionAllowsFreshStart($e)) {
                     if (self::startWithFreshId()) {
                         return;
@@ -130,7 +129,7 @@ final class SessionService
         }
         $_SESSION = [];
         if (session_status() === PHP_SESSION_ACTIVE) {
-            @session_destroy();
+            session_destroy();
         }
     }
 
@@ -192,7 +191,8 @@ final class SessionService
     public static function setPreauth(string $username): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) self::init();
-        self::regenerateIdSafe(true);
+        // SECURITY FIX PIPE-SESSION-002: This is a critical auth path, require session regeneration to succeed
+        self::regenerateIdSafe(true, true);
         self::clearAuthState();
         $_SESSION['preauth_user'] = strtolower(trim($username));
         $_SESSION['preauth_started'] = time();
@@ -206,7 +206,8 @@ final class SessionService
     public static function setAuthenticated(string $username, array $user = []): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) self::init();
-        self::regenerateIdSafe(true);
+        // SECURITY FIX PIPE-SESSION-002: This is a critical auth path, require session regeneration to succeed
+        self::regenerateIdSafe(true, true);
         self::clearAuthState();
         $_SESSION['user'] = strtolower(trim($username));
         $_SESSION['mfa_ok'] = true;
@@ -252,33 +253,51 @@ final class SessionService
     /**
      * Safely regenerate session ID with fallback.
      * Equivalent to legacy: session_regenerate_id_safe($deleteOldSession)
+     *
+     * SECURITY FIX PIPE-SESSION-002: Add $required parameter. When called from critical auth
+     * paths (login), pass $required=true to throw RuntimeException instead of silently continuing.
+     *
+     * @param bool $deleteOldSession Whether to delete the old session file.
+     * @param bool $required If true and regeneration fails, throw RuntimeException instead of silently continuing.
+     * @return void
+     * @throws \RuntimeException When $required is true and regeneration fails.
      */
-    public static function regenerateIdSafe(bool $deleteOldSession = true): void
+    public static function regenerateIdSafe(bool $deleteOldSession = true, bool $required = false): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             return;
         }
 
         try {
-            if (@session_regenerate_id($deleteOldSession)) {
+            if (session_regenerate_id($deleteOldSession)) {
                 return;
             }
         } catch (\Throwable $e) {
-            @error_log('[API] session_regenerate_id failed: ' . $e->getMessage());
+            error_log('[API] session_regenerate_id failed: ' . $e->getMessage());
+            if ($required) {
+                throw new \RuntimeException('session_regenerate_id failed in critical auth path', 0, $e);
+            }
         }
 
         if ($deleteOldSession) {
             try {
-                if (@session_regenerate_id(false)) {
-                    @error_log('[API] session_regenerate_id fallback kept old session file');
+                if (session_regenerate_id(false)) {
+                    error_log('[API] session_regenerate_id fallback kept old session file');
                     return;
                 }
             } catch (\Throwable $e) {
-                @error_log('[API] session_regenerate_id fallback failed: ' . $e->getMessage());
+                error_log('[API] session_regenerate_id fallback failed: ' . $e->getMessage());
+                if ($required) {
+                    throw new \RuntimeException('session_regenerate_id fallback failed in critical auth path', 0, $e);
+                }
             }
         }
 
-        @error_log('[API] session_regenerate_id skipped; continuing with current session id');
+        if ($required) {
+            throw new \RuntimeException('session_regenerate_id could not complete in critical auth path');
+        }
+
+        error_log('[API] session_regenerate_id skipped; continuing with current session id');
     }
 
     /**
@@ -340,23 +359,23 @@ final class SessionService
         }
 
         if (session_status() === PHP_SESSION_ACTIVE) {
-            @session_write_close();
+            session_write_close();
         }
 
-        @ini_set('session.use_cookies', '0');
+        ini_set('session.use_cookies', '0');
         if (PHP_VERSION_ID < 80500) {
-            @ini_set('session.use_only_cookies', '0');
+            ini_set('session.use_only_cookies', '0');
         }
-        @ini_set('session.cache_limiter', '');
-        @session_id(bin2hex(random_bytes(16)));
+        ini_set('session.cache_limiter', '');
+        session_id(bin2hex(random_bytes(16)));
 
         try {
             self::sessionStartOrThrow();
             return true;
         } catch (\Throwable $retryError) {
-            @error_log('[API] Session recovery failed: ' . $retryError->getMessage() . ' in ' . $retryError->getFile() . ':' . $retryError->getLine());
+            error_log('[API] Session recovery failed: ' . $retryError->getMessage() . ' in ' . $retryError->getFile() . ':' . $retryError->getLine());
             if (session_status() === PHP_SESSION_ACTIVE) {
-                @session_write_close();
+                session_write_close();
             }
         }
 
@@ -373,7 +392,8 @@ final class SessionService
 
         $primary = ($DATA_DIR ?? '') . '/sessions';
         if ($primary !== '/sessions' && $primary !== '' && !is_dir($primary)) {
-            @mkdir($primary, 0775, true);
+            // SECURITY FIX PIPE-SESS-001: Use 0700 (owner only) instead of 0775 to prevent group/other read access
+            mkdir($primary, 0700, true);
         }
 
         $candidates = [

@@ -165,6 +165,9 @@ final class EpicorInboundWorker
      */
     private function resolveDomains(array $policy, array $requestedDomains): array
     {
+        // INT-R6-011: Whitelist of supported domain names
+        $whitelistedDomains = ['master_data', 'sales_orders', 'job_orders', 'work_orders', 'labor'];
+
         $available = [];
         foreach ((array)($policy['domains'] ?? []) as $domain => $config) {
             if (!is_array($config)) {
@@ -174,11 +177,17 @@ final class EpicorInboundWorker
             if (!in_array($direction, ['inbound', 'bidirectional'], true)) {
                 continue;
             }
-            $available[] = strtolower((string)$domain);
+            $domainLower = strtolower((string)$domain);
+            // Only include whitelisted domains
+            if (in_array($domainLower, $whitelistedDomains, true)) {
+                $available[] = $domainLower;
+            }
         }
         if ($requestedDomains === []) {
             return array_values(array_unique($available));
         }
+        // Explicitly requested unsupported domains must be processed as skipped
+        // results, not silently filtered into an all-green no-op.
         return array_values(array_unique($requestedDomains));
     }
 

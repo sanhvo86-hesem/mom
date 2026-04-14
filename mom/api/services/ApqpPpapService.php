@@ -140,6 +140,45 @@ final class ApqpPpapService
     // ── Validation ──────────────────────────────────────────────────────────
 
     /**
+     * QUAL-002 FIX: Validate PPAP file attachments (MIME type, size limits).
+     *
+     * @param array $file File upload array with 'tmp_name', 'name', 'size'
+     * @throws RuntimeException If validation fails
+     */
+    public function validatePpapAttachment(array $file): void
+    {
+        $tmpName = $file['tmp_name'] ?? '';
+        $fileName = $file['name'] ?? '';
+        $fileSize = (int)($file['size'] ?? 0);
+
+        if (!is_file($tmpName) || !is_readable($tmpName)) {
+            throw new RuntimeException('PPAP attachment file not found or unreadable');
+        }
+
+        // QUAL-002 FIX: Enforce size limits (20MB max for PPAP)
+        $maxSize = 20 * 1024 * 1024; // 20MB
+        if ($fileSize > $maxSize) {
+            throw new RuntimeException("PPAP attachment exceeds 20MB limit: {$fileSize} bytes");
+        }
+
+        // QUAL-002 FIX: Validate MIME types
+        $allowedMimes = [
+            'application/pdf',
+            'image/jpeg',
+            'image/png',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+            'application/msword', // .doc
+            'application/vnd.ms-excel', // .xls
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        ];
+
+        $actualMime = mime_content_type($tmpName);
+        if ($actualMime === false || !in_array($actualMime, $allowedMimes, true)) {
+            throw new RuntimeException("PPAP attachment MIME type not allowed: {$actualMime}");
+        }
+    }
+
+    /**
      * @param array<int, string> $allowed
      */
     private function enumValue(array $allowed, mixed $value, string $field, string $default): string
@@ -453,7 +492,18 @@ final class ApqpPpapService
     /**
      * Update a specific PPAP element status.
      */
-    public function updatePpapElement(string $submissionId, string $element, string $status, ?string $ref = null): array
+    /**
+     * Update a PPAP element with optimistic locking.
+     *
+     * @param string      $submissionId  PPAP submission ID
+     * @param string      $element       Element name
+     * @param string      $status        New status
+     * @param string|null $ref           Reference
+     * @param string|null $expectedVersion Expected updated_at for optimistic locking (optional)
+     * @return array Updated submission
+     * @throws RuntimeException If version mismatch (concurrent edit detected)
+     */
+    public function updatePpapElement(string $submissionId, string $element, string $status, ?string $ref = null, ?string $expectedVersion = null): array
     {
         if (!in_array($element, self::PPAP_ELEMENTS, true)) {
             throw new RuntimeException("Invalid PPAP element: {$element}.");
@@ -471,6 +521,11 @@ final class ApqpPpapService
             }
             if (($sub['submission_id'] ?? '') !== $submissionId) {
                 continue;
+            }
+
+            // QUAL-007 FIX: Implement optimistic locking to prevent concurrent edit conflicts
+            if ($expectedVersion !== null && ($sub['updated_at'] ?? '') !== $expectedVersion) {
+                throw new RuntimeException('submission_version_conflict_detected');
             }
 
             $elements = $sub['elements'] ?? [];

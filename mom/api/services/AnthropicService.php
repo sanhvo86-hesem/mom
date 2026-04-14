@@ -538,6 +538,10 @@ PROMPT;
             if ($httpStatus >= 400 || isset($parsed['error'])) {
                 $errorMsg = $parsed['error']['message'] ?? ('HTTP ' . $httpStatus);
                 $errorType = $parsed['error']['type'] ?? 'api_error';
+                // INT-R6-002: Sanitize error message to prevent API key exposure
+                if (stripos($errorMsg, 'api-key') !== false || stripos($errorMsg, 'api_key') !== false) {
+                    $errorMsg = 'Authentication failed';
+                }
                 return $this->errorResponse(
                     "Anthropic API error ({$errorType}): {$errorMsg}",
                     $httpStatus,

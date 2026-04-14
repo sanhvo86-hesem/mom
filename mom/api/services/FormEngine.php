@@ -308,6 +308,15 @@ final class FormEngine
 
         // Step 9: Log to audit trail
         if ($this->auditTrail !== null) {
+            // INT-R6-006: Sanitize REMOTE_ADDR and HTTP_USER_AGENT to prevent log injection
+            $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+            if (!filter_var($remoteAddr, FILTER_VALIDATE_IP)) {
+                $remoteAddr = 'unknown';
+            }
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+            $userAgent = str_replace(["\n", "\r", "\0"], ' ', $userAgent);
+            $userAgent = substr($userAgent, 0, 500); // Truncate to 500 chars
+
             $this->auditTrail->logEvent(new AuditEvent(
                 eventType: AuditEventType::SUBMITTED,
                 aggregateType: $recordType ?? 'FORM',
@@ -318,8 +327,8 @@ final class FormEngine
                     'entry_id'  => $entryId,
                 ],
                 metadata: [
-                    'ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
-                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+                    'ip'         => $remoteAddr,
+                    'user_agent' => $userAgent,
                 ],
             ));
         }
@@ -344,14 +353,23 @@ final class FormEngine
     {
         $now = gmdate('Y-m-d\TH:i:s\Z');
 
+        // INT-R6-006: Sanitize REMOTE_ADDR and HTTP_USER_AGENT
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        if (!filter_var($remoteAddr, FILTER_VALIDATE_IP)) {
+            $remoteAddr = 'unknown';
+        }
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $userAgent = str_replace(["\n", "\r", "\0"], ' ', $userAgent);
+        $userAgent = substr($userAgent, 0, 500); // Truncate to 500 chars
+
         $data['_form_code']    = strtoupper(trim($formCode));
         $data['_server_time']  = $now;
         $data['_submitted_at'] = $now;
         $data['_submitted_by'] = $userId;
         $data['_session_user'] = $userId;
         $data['_status']       = 'submitted';
-        $data['_ip']           = $_SERVER['REMOTE_ADDR'] ?? '';
-        $data['_user_agent']   = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $data['_ip']           = $remoteAddr;
+        $data['_user_agent']   = $userAgent;
 
         // Generate entry ID
         $data['_entry_id'] = $this->generateEntryId();
@@ -766,17 +784,18 @@ final class FormEngine
         $actualValue = $data[$targetField] ?? null;
 
         return match ($operator) {
-            'equals', '=='     => $actualValue == $targetValue,
-            'not_equals', '!=' => $actualValue != $targetValue,
-            'in'               => is_array($targetValue) && in_array($actualValue, $targetValue, false),
-            'not_in'           => is_array($targetValue) && !in_array($actualValue, $targetValue, false),
+            // RA-003 FIX: Use strict comparison (===) instead of loose (==) to prevent type juggling
+            'equals', '=='     => $actualValue === $targetValue || (is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
+            'not_equals', '!=' => $actualValue !== $targetValue && !(is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
+            'in'               => is_array($targetValue) && in_array($actualValue, $targetValue, true),
+            'not_in'           => is_array($targetValue) && !in_array($actualValue, $targetValue, true),
             'gt', '>'          => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue > (float) $targetValue,
             'gte', '>='        => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue >= (float) $targetValue,
             'lt', '<'          => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue < (float) $targetValue,
             'lte', '<='        => is_numeric($actualValue) && is_numeric($targetValue) && (float) $actualValue <= (float) $targetValue,
             'not_empty'        => $actualValue !== null && $actualValue !== '' && $actualValue !== [],
             'empty'            => $actualValue === null || $actualValue === '' || $actualValue === [],
-            default            => $actualValue == $targetValue,
+            default            => $actualValue === $targetValue || (is_string($actualValue) && is_string($targetValue) && (string)$actualValue === (string)$targetValue),
         };
     }
 

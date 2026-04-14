@@ -43,6 +43,14 @@ final class LocalImmutableStorageAdapter implements ImmutableStorageAdapter
                 }
             }
             @chmod($target, 0444);
+
+            // FILE-005 (MEDIUM): Artifact hash re-verification after write
+            // Verify the written file matches the expected hash
+            $writtenHash = hash_file('sha256', $target);
+            if ($writtenHash === false || $writtenHash !== $hash) {
+                @unlink($target);
+                throw new RuntimeException('Evidence integrity check failed after write: hash mismatch');
+            }
         }
 
         return [
@@ -79,6 +87,14 @@ final class LocalImmutableStorageAdapter implements ImmutableStorageAdapter
                 }
             }
             @chmod($target, 0444);
+
+            // FILE-005 (MEDIUM): Artifact hash re-verification after write
+            // Verify the written file matches the expected hash
+            $writtenHash = hash_file('sha256', $target);
+            if ($writtenHash === false || $writtenHash !== $hash) {
+                @unlink($target);
+                throw new RuntimeException('Evidence integrity check failed after write: hash mismatch');
+            }
         }
 
         return [

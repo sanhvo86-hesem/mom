@@ -7,9 +7,9 @@ This specification replaces fragmented status authority across PHP constants, JS
 | Entity | Runtime PHP/JSON | Registry/status-options | Workflow-library | Database/migration evidence | Finding |
 | --- | --- | --- | --- | --- | --- |
 | Quote | `draft, internal_review, sent, accepted, rejected, expired, revised, converted` | `draft, review, sent, won, lost, expired` | `draft, review, sent, won, lost, expired` | Quote migration enum includes runtime-like values | documentation-runtime mismatch |
-| SO | Runtime config/service now includes `draft, quoted, confirmed, engineering_ready, in_production, shipped, closed, cancelled`; JO creation rejects parent SO unless SO is `engineering_ready` or `in_production`; missing `engineering_release_status` fails readiness. | `sales_order_status`: `draft, confirmed, engineering_ready, in_production, shipped, closed`; `sales_order_status_code`: `draft, released, in_progress, completed, closed, cancelled` | `wf_sales_order` states `draft, confirmed, engineering_ready, in_production, shipped, closed` but statusSet `sales_order_status_code` | Multiple SO table variants | P0 mismatch; `engineering_ready` is partially runtime-enforced, but still not one generated authority across registry/DB/OpenAPI |
-| JO | Runtime config/service `planned, released, active, on_hold, completed, closed, cancelled` | `draft, planned, released, active, completed, closed` | `draft, planned, released, active, completed, closed` | `job_orders` schema exists | Runtime config now registers `cancelled`; registry/workflow still miss `cancelled/on_hold`; `draft` registry not runtime |
-| WO | `scheduled, setup, running, inspection, completed, on_hold, cancelled` | `draft, planned, released, in_production, quality_hold, closed, cancelled` | same as registry for `wf_work_order_execution` | `work_order` and `work_orders` both exist | Production WO lifecycle conflated with service/maintenance WO |
+| SO | Runtime config/service includes `draft, quoted, confirmed, engineering_ready, in_production, shipped, closed, cancelled`; JO creation rejects parent SO unless SO is `engineering_ready` or `in_production`; missing `engineering_release_status` fails readiness. | `sales_order_status_runtime` is the controlled SO registry set for `sales_order` and `sales_orders`; old `sales_order_status` and `sales_order_status_code` are legacy aliases only. | `wf_sales_order` is aligned to `sales_order_status_runtime`; support line tables do not inherit the header workflow. | `sales_order` and `sales_orders` are constrained by migrations `115` and `116`; singular/plural table consolidation remains a compatibility task. | P0 workflow/status drift closed for SO; broader generated authority across all domains remains target hardening. |
+| JO | Runtime config/service `planned, released, active, on_hold, completed, closed, cancelled` | `job_order_status_runtime` is the controlled status set for `wf_job_order`; old `job_order_status` aliases are legacy only. | `wf_job_order` aligned to runtime status flow. | `job_orders` is constrained by migrations `117` and `118`. | P0 workflow/status drift closed for JO; generated all-domain authority remains target hardening. |
+| WO | Runtime config/service `scheduled, setup, running, inspection, completed, on_hold, cancelled` | `work_order_status_runtime` is the controlled status set for production WO surfaces; service/maintenance WO status remains separate. | `wf_work_order_execution` aligned to runtime status flow; legacy `wf_work_order` must not point to `work_order_status_code`. | `work_orders` is constrained by migration `119`; singular MES `work_order` is aligned by migration `120`; service `svc_service_work_orders` remains a separate lifecycle. | P0 workflow/status drift closed for production WO; generated all-domain authority remains target hardening. |
 | NCR | Exception JSON + JSONL use `open` in automation | `draft, submitted, under_review, disposition_set, containment_active, close_requested, closed` | `wf_ncr` | `ncr_records` exists | unregistered runtime states |
 | CAPA | JSONL trend trigger uses `pending_review` | `draft, initiated, action_planning, implementation, effectiveness_review, closed` | `wf_capa` | `capa_records` exists | unregistered trigger state |
 | SCAR | Supplier JSON states are service-owned | `issued, acknowledged, root_cause_analysis, corrective_action, verification, closed, overdue` | `wf_scar_record` | `scar_records` exists | Multiple authorities |
@@ -63,7 +63,7 @@ Deprecated mappings:
 
 | Old state | Canonical state | Notes |
 | --- | --- | --- |
-| `released` from `sales_order_status_code` | `engineering_ready` or `in_production` by migration rule | Requires record-level evidence; cannot blind map without audit. |
+| `released` from `sales_order_status_code` | `engineering_ready` by migration `115`; future ambiguous imports must enter migration hold. | Existing alias is retired from the workflow contract; command writes must use `sales_order_status_runtime`. |
 | `in_progress` | `in_production` | Use only for legacy SO records. |
 | `completed` | `shipped` or `closed` by shipment/invoice evidence | Requires migration script decision. |
 
@@ -175,11 +175,14 @@ CI must fail if a generated artifact is edited manually or if any runtime state 
    - `lost -> rejected`
 6. Migrate SO statuses:
    - Keep `draft/quoted/confirmed/engineering_ready/in_production/shipped/closed/cancelled`.
-   - If registry/PG has `released/in_progress/completed`, map only with evidence. Otherwise set `migration_hold` and require manual remediation.
-   - Keep or insert `engineering_ready` only when release package evidence exists; otherwise keep `confirmed` and block JO/WO creation.
+   - Migrations `115` and `116` map legacy aliases on `sales_order` and `sales_orders` into the canonical runtime set and add DB checks.
+   - Future ambiguous imports must be placed in migration hold rather than silently mapped.
+   - Keep or insert `engineering_ready` only through command evidence; otherwise keep `confirmed` and block JO/WO creation.
 7. Migrate JO/WO statuses:
    - Keep current runtime config `cancelled` entries and add the same state to registry/workflow/DB generated artifacts.
-   - Map registry WO `in_production -> running`; `quality_hold -> on_hold`; `closed -> completed|closed` depending table semantics.
+   - Migrations `117` and `118` add/constrain JO runtime status authority and retire legacy `engineered`.
+   - Migration `119` maps production WO aliases: `draft/planned -> scheduled`, `released -> setup`, `in_production -> running`, `quality_hold -> on_hold`, `closed -> completed`.
+   - Migration `120` maps singular MES `work_order.status_code` aliases into the same runtime WO status set and constrains the column.
 8. Migrate NCR/CAPA/SCAR:
    - Convert JSONL triggers to canonical records or mark as `legacy_trigger_imported`.
 9. Add DB constraints but initially `NOT VALID`.

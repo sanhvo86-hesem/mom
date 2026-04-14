@@ -126,8 +126,17 @@ final class SupplierQualityService
      * @param string $period   Format "YYYY-MM".
      * @return array Calculated scorecard.
      */
-    public function calculateScorecard(string $vendorId, string $period, ?string $userId = null): array
+    public function calculateScorecard(string $vendorId, string $period, ?string $userId = null, ?string $orgId = null): array
     {
+        // INV-R6-011: Always filter by org_id - fail-closed pattern
+        if (empty($orgId) && isset($_SESSION['org_id']) && !empty($_SESSION['org_id'])) {
+            $orgId = $_SESSION['org_id'];
+        }
+        if (empty($orgId)) {
+            // No org_id available - return empty result (fail-closed)
+            return [];
+        }
+
         $incoming = $this->loadFile('incoming');
         $now      = $this->nowIso();
 
@@ -143,6 +152,10 @@ final class SupplierQualityService
                 continue;
             }
             if (($insp['vendor_id'] ?? '') !== $vendorId) {
+                continue;
+            }
+            // INV-R6-011: Always filter by org_id to prevent cross-organization data access
+            if (($insp['org_id'] ?? '') !== $orgId) {
                 continue;
             }
             $inspPeriod = substr($insp['inspection_date'] ?? $insp['created_at'] ?? '', 0, 7);

@@ -454,7 +454,13 @@ final class FinanceController extends BaseController
         $this->requireFinanceRead($user);
 
         try {
-            $this->success(['debit_memos' => $this->controls()->listDebitMemos()]);
+            $all = $this->controls()->listDebitMemos();
+            // BLF-009: Add pagination to prevent DoS from large result sets
+            $offset = max(0, (int)($this->query('offset') ?? 0));
+            $limit = min(200, max(1, (int)($this->query('limit') ?? 50)));
+            $total = count($all);
+            $page = array_slice($all, $offset, $limit);
+            $this->success(['debit_memos' => $page, 'total' => $total, 'offset' => $offset, 'limit' => $limit]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('finance_debit_memo_list_failed', 500, $e->getMessage());

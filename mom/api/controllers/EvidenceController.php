@@ -34,6 +34,19 @@ class EvidenceController extends BaseController
     private ?array $evidenceConfig = null;
     private ?IdempotencyService $idempotencyService = null;
 
+    /**
+     * @return array<string, string|bool>
+     */
+    private function legacyReadAuthorityNotice(): array
+    {
+        return [
+            'authority' => 'legacy_compatibility_read_only',
+            'source_of_truth' => false,
+            'canonical_read_path' => '/api/v1/eqms/evidence/package',
+            'canonical_write_path' => '/api/v1/eqms/evidence/finalize',
+        ];
+    }
+
     private function denyLegacyEvidenceWrite(string $operation): void
     {
         $decision = (new LegacyWriteSurfacePolicy())->assess('evidence_vault_json', $operation);
@@ -301,7 +314,14 @@ class EvidenceController extends BaseController
             $total    = count($allItems);
             $items    = array_slice($allItems, $offset, $limit);
 
-            $this->paginated('evidence', array_values($items), $total, $offset, $limit);
+            $this->success([
+                'evidence' => array_values($items),
+                'total' => $total,
+                'offset' => $offset,
+                'limit' => $limit,
+                'has_more' => ($offset + count($items)) < $total,
+                'read_authority' => $this->legacyReadAuthorityNotice(),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('evidence_list_failed', 500, $e->getMessage());
@@ -338,7 +358,7 @@ class EvidenceController extends BaseController
             $custody = $this->evidenceService()->getCustodyLog($id);
             $evidence['custody_timeline'] = $custody;
 
-            $this->success(['evidence' => $evidence]);
+            $this->success(['evidence' => $evidence, 'read_authority' => $this->legacyReadAuthorityNotice()]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('evidence_detail_failed', 500, $e->getMessage());
@@ -504,7 +524,7 @@ class EvidenceController extends BaseController
 
         try {
             $custody = $this->evidenceService()->getCustodyLog($id);
-            $this->success(['chain_of_custody' => $custody]);
+            $this->success(['chain_of_custody' => $custody, 'read_authority' => $this->legacyReadAuthorityNotice()]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('custody_failed', 500, $e->getMessage());
@@ -532,7 +552,7 @@ class EvidenceController extends BaseController
         try {
             $result = $this->evidenceService()->verifyChain($id ? trim($id) : null);
 
-            $this->success(['verification' => $result]);
+            $this->success(['verification' => $result, 'read_authority' => $this->legacyReadAuthorityNotice()]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('verify_chain_failed', 500, $e->getMessage());
@@ -781,7 +801,14 @@ class EvidenceController extends BaseController
             $total    = count($allItems);
             $items    = array_slice($allItems, $offset, $limit);
 
-            $this->paginated('results', array_values($items), $total, $offset, $limit);
+            $this->success([
+                'results' => array_values($items),
+                'total' => $total,
+                'offset' => $offset,
+                'limit' => $limit,
+                'has_more' => ($offset + count($items)) < $total,
+                'read_authority' => $this->legacyReadAuthorityNotice(),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('evidence_search_failed', 500, $e->getMessage());

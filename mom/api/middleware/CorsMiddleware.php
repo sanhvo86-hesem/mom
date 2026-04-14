@@ -124,6 +124,7 @@ class CorsMiddleware
      * Check whether a given origin is in the allowed list.
      *
      * Supports exact match and simple wildcard patterns (e.g. `https://*.hesem.com.vn`).
+     * SECURITY FIX: Wildcard patterns must match at domain boundary to prevent subdomain bypass attacks.
      *
      * @param string $origin The Origin header value.
      * @return bool
@@ -141,10 +142,18 @@ class CorsMiddleware
                 return true;
             }
             // Wildcard matching: https://*.example.com
+            // SECURITY: Ensure wildcard matches only at domain boundaries, not in the middle of domain names
             if (str_contains($allowed, '*')) {
-                $regex = '/^' . str_replace('\*', '[a-z0-9-]+', preg_quote($allowed, '/')) . '$/i';
-                if (preg_match($regex, $origin)) {
-                    return true;
+                // Only allow * at the beginning of the subdomain (e.g. https://*.example.com)
+                if (str_starts_with($allowed, 'https://*.') || str_starts_with($allowed, 'http://*.')) {
+                    // Extract the domain part after ://*. and anchor the regex to domain boundaries
+                    $pattern = preg_replace('/^\w+:\/\/\\\*\./', '', preg_quote($allowed, '/'));
+                    // Subdomain can be one or more segments of alphanumeric + hyphen, separated by dots
+                    // The regex ensures the wildcard part ends exactly at the quoted domain boundary
+                    $regex = '/^https?:\/\/[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?)*\.' . $pattern . '$/i';
+                    if (preg_match($regex, $origin)) {
+                        return true;
+                    }
                 }
             }
         }

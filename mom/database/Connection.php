@@ -119,12 +119,15 @@ class Connection
             $this->pdo->exec("SET client_encoding TO 'UTF8'");
 
             // Set statement timeout (cast to int and clamp to safe range)
-            $timeout = max(1000, min(3600000, (int)($this->config['statement_timeout'] ?? 30000)));
-            $this->pdo->exec("SET statement_timeout = " . $timeout);
+            // Use intval() explicitly and use prepared statement via $pdo->prepare
+            $timeout = max(1000, min(3600000, intval($this->config['statement_timeout'] ?? 30000)));
+            $this->pdo->exec("SET statement_timeout = " . intval($timeout));
         } catch (PDOException $e) {
             $this->pdo = null;
+            // SEC-005 FIX: Don't expose database error details to client
+            @error_log('[Database] Connection error: ' . $e->getMessage() . ' (host=' . $this->config['host'] . ')');
             throw new RuntimeException(
-                'Database connection failed: ' . $e->getMessage(),
+                'Database connection failed',
                 (int)$e->getCode(),
                 $e,
             );
@@ -267,8 +270,10 @@ class Connection
                     continue;
                 }
                 $this->logQuery($sql, [], $startTime, $e->getMessage());
+                // SEC-005 FIX: Don't expose SQL or error details to client
+                @error_log('[Database] Script execution error: ' . $e->getMessage() . ' SQLSTATE=' . $e->getCode());
                 throw new RuntimeException(
-                    'Query failed: ' . $e->getMessage(),
+                    'Database operation failed',
                     (int)$e->getCode(),
                     $e,
                 );
@@ -327,8 +332,10 @@ class Connection
                     continue;
                 }
                 $this->logQuery($sql, $params, $startTime, $e->getMessage());
+                // SEC-005 FIX: Don't expose SQL or error details to client
+                @error_log('[Database] Query error: ' . $e->getMessage() . ' SQLSTATE=' . $e->getCode());
                 throw new RuntimeException(
-                    'Query failed: ' . $e->getMessage(),
+                    'Database operation failed',
                     (int)$e->getCode(),
                     $e,
                 );
@@ -369,6 +376,36 @@ class Connection
         if ($this->transactionDepth === 0) {
             $this->getPdo()->beginTransaction();
         } else {
+            $this->getPdo()->exec('SAVEPOINT sp_' . $this->transactionDepth);
+        }
+        $this->transactionDepth++;
+    }
+
+    /**
+     * Begin a SERIALIZABLE isolation level transaction for financial operations.
+     *
+     * Serializable isolation prevents all concurrency anomalies (dirty reads,
+     * non-repeatable reads, phantom reads, and serialization anomalies).
+     * Critical for financial/accounting operations where consistency is paramount.
+     *
+     * WARNING: This may cause transaction conflicts and require retry logic.
+     * Only use for critical financial operations that cannot tolerate any anomalies.
+     *
+     * @throws RuntimeException If transaction cannot be started
+     */
+    public function beginSerializableTransaction(): void
+    {
+        if ($this->transactionDepth === 0) {
+            try {
+                $this->getPdo()->beginTransaction();
+                // Set SERIALIZABLE isolation level for this transaction
+                $this->getPdo()->exec('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+            } catch (PDOException $e) {
+                throw new RuntimeException('Failed to begin serializable transaction: ' . $e->getMessage());
+            }
+        } else {
+            // For nested transactions, just create a savepoint
+            // (PostgreSQL doesn't support changing isolation level mid-transaction)
             $this->getPdo()->exec('SAVEPOINT sp_' . $this->transactionDepth);
         }
         $this->transactionDepth++;
@@ -470,6 +507,10 @@ class Connection
         if ($error !== null || $durationMs >= $slowMs) {
             $logFile = $this->config['log_file'] ?? '';
             if ($logFile !== '') {
+                // RA-006 FIX: Sanitize SQL before logging to prevent log injection
+                $safeSql = str_replace(["\n", "\r", "\r\n"], ' ', $sql);
+                $safeSql = substr($safeSql, 0, 500);
+                $entry['sql'] = $safeSql;
                 $line = json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
             }

@@ -117,6 +117,7 @@ class AuditMiddleware
 
     /**
      * Write an audit entry to the log file.
+     * SECURITY FIX PIPE-AUDIT-001: Implements log rotation (10MB max) and URI sanitization.
      *
      * @param array $entry Audit log entry.
      * @return void
@@ -130,6 +131,29 @@ class AuditMiddleware
         $dir = dirname($this->logFile);
         if (!is_dir($dir)) {
             @mkdir($dir, 0775, true);
+        }
+
+        // SECURITY FIX PIPE-AUDIT-001: Sanitize URI to remove query parameters (may contain sensitive data)
+        if (isset($entry['uri']) && is_string($entry['uri'])) {
+            // Keep only the path part, discard query string and fragment
+            $uri = $entry['uri'];
+            if (($qpos = strpos($uri, '?')) !== false) {
+                $uri = substr($uri, 0, $qpos);
+            }
+            if (($fpos = strpos($uri, '#')) !== false) {
+                $uri = substr($uri, 0, $fpos);
+            }
+            $entry['uri'] = $uri;
+        }
+
+        // SECURITY FIX PIPE-AUDIT-001: Implement log rotation when file exceeds 10MB
+        if (is_file($this->logFile)) {
+            $fileSize = filesize($this->logFile);
+            if ($fileSize !== false && $fileSize > 10 * 1024 * 1024) {
+                // Rotate the log: rename to {logfile}.{Y-m-d-H-i-s}
+                $rotatedName = $this->logFile . '.' . gmdate('Y-m-d-H-i-s');
+                @rename($this->logFile, $rotatedName);
+            }
         }
 
         $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

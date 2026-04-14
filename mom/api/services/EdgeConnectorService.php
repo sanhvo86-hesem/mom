@@ -225,7 +225,12 @@ final class EdgeConnectorService
         }
 
         try {
-            $doc = @simplexml_load_string($xml);
+            // MES-R6-001 FIX: XXE protection for MTConnect XML parsing
+            libxml_disable_entity_loader(true);
+            libxml_use_internal_errors(true);
+            $options = LIBXML_NONET;
+
+            $doc = @simplexml_load_string($xml, null, $options);
             if ($doc === false) {
                 return [];
             }
@@ -291,11 +296,9 @@ final class EdgeConnectorService
             return null;
         }
         $number = (float)$value;
-        if ($number < 0) {
-            $number = 0;
-        }
-        if ($number > $max) {
-            $number = (float)$max;
+        // QUAL-006 FIX: Validate range instead of silently clamping
+        if ($number < 0 || $number > $max) {
+            throw new \RuntimeException("Percentage value out of range: {$number} (valid: 0-{$max})");
         }
         return $number;
     }
@@ -308,8 +311,12 @@ final class EdgeConnectorService
         if (!is_numeric((string)$value)) {
             return null;
         }
+        // MES-R6-013 FIX: Return null for out-of-range values instead of silently clamping
         $number = (float)$value;
-        return $number < 0 ? 0.0 : $number;
+        if ($number < 0) {
+            return null;
+        }
+        return $number;
     }
 
     private function normalizeInt(mixed $value): ?int

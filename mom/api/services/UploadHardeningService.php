@@ -103,6 +103,21 @@ class UploadHardeningService
         }
 
         $originalName = (string)($uploadedFile['name'] ?? 'unknown');
+
+        // FILE-007 (MEDIUM): Null byte in filename
+        if (str_contains($originalName, "\0")) {
+            $this->logException('null_byte_filename', 'Null byte detected in uploaded filename', $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
+            return new QuarantineResult(false, '', '', 'Invalid filename: null byte detected.');
+        }
+
+        // FILE-006 (MEDIUM): Windows reserved filenames
+        $reservedNames = ['CON','PRN','AUX','NUL','COM1','COM2','COM3','COM4','COM5','COM6','COM7','COM8','COM9','LPT1','LPT2','LPT3','LPT4','LPT5','LPT6','LPT7','LPT8','LPT9'];
+        $baseName = strtoupper(pathinfo($originalName, PATHINFO_FILENAME));
+        if (in_array($baseName, $reservedNames, true)) {
+            $this->logException('reserved_filename', "Reserved filename not allowed: {$baseName}", $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
+            return new QuarantineResult(false, '', '', "Reserved filename not allowed: {$baseName}");
+        }
+
         $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $size = (int)($uploadedFile['size'] ?? 0);
 
@@ -158,6 +173,14 @@ class UploadHardeningService
             return new QuarantineResult(false, '', '', (string)$encoding['detail']);
         }
 
+        // FILE-002 (HIGH): ZIP bomb validation at quarantine time
+        $zipBombCheck = $this->validateZipBomb($quarantinePath);
+        if (!$zipBombCheck['ok']) {
+            @unlink($quarantinePath);
+            $this->logException('zip_bomb_detected', $zipBombCheck['detail'], $uploadedBy, array_merge($extra, ['original_name' => $originalName]));
+            return new QuarantineResult(false, '', '', 'Upload rejected: ' . $zipBombCheck['detail']);
+        }
+
         $metadata = [
             'quarantine_id' => $quarantineId,
             'original_name' => $originalName,
@@ -178,6 +201,44 @@ class UploadHardeningService
     }
 
     /**
+     * FILE-002 (HIGH): ZIP bomb - Validate decompressed size for XLSX/DOCX/ZIP files.
+     * Prevents denial-of-service attacks from archives containing highly compressed data.
+     *
+     * @param string $filePath Path to the file to validate
+     * @return array{ok: bool, detail: string}
+     */
+    private function validateZipBomb(string $filePath): array
+    {
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        // XLSX, DOCX, OASIS formats are ZIP archives
+        if (!in_array($ext, ['xlsx', 'xlsm', 'xltx', 'xltm', 'docx', 'docm', 'zip'], true)) {
+            return ['ok' => true, 'detail' => 'File is not a ZIP-based archive.'];
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($filePath) !== true) {
+            return ['ok' => false, 'detail' => 'ZIP archive cannot be opened.'];
+        }
+
+        $totalUncompressed = 0;
+        $maxUncompressed = 100 * 1024 * 1024; // 100MB limit
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $stat = $zip->statIndex($i);
+            if ($stat === false) {
+                continue;
+            }
+            $totalUncompressed += (int)($stat['size'] ?? 0);
+            if ($totalUncompressed > $maxUncompressed) {
+                $zip->close();
+                return ['ok' => false, 'detail' => 'ZIP content exceeds 100MB decompressed size limit (potential ZIP bomb).'];
+            }
+        }
+        $zip->close();
+
+        return ['ok' => true, 'detail' => 'ZIP archive decompressed size is within limits.'];
+    }
+
+    /**
      * Run verification checks on a quarantined file.
      */
     public function verifyQuarantinedFile(string $quarantineId): VerificationResult
@@ -194,6 +255,16 @@ class UploadHardeningService
         }
 
         $checks = [];
+
+        // FILE-002 (HIGH): ZIP bomb validation
+        $zipBombCheck = $this->validateZipBomb($filePath);
+        if (!$zipBombCheck['ok']) {
+            $checks[] = [
+                'check' => 'zip_bomb',
+                'ok' => false,
+                'detail' => $zipBombCheck['detail'],
+            ];
+        }
 
         if (array_key_exists($ext, MimeValidator::MAGIC_SIGNATURES)) {
             $magic = MimeValidator::getFileMagicBytes($filePath);
@@ -237,6 +308,27 @@ class UploadHardeningService
             'ok' => (bool)$encoding['ok'],
             'detail' => (string)$encoding['detail'],
         ];
+
+        // FILE-007 (MEDIUM): Null byte in filename check
+        $originalName = (string)($meta['original_name'] ?? '');
+        if (str_contains($originalName, "\0")) {
+            $checks[] = [
+                'check' => 'null_byte_filename',
+                'ok' => false,
+                'detail' => 'Null byte detected in original filename.',
+            ];
+        }
+
+        // FILE-006 (MEDIUM): Windows reserved filenames check
+        $reservedNames = ['CON','PRN','AUX','NUL','COM1','COM2','COM3','COM4','COM5','COM6','COM7','COM8','COM9','LPT1','LPT2','LPT3','LPT4','LPT5','LPT6','LPT7','LPT8','LPT9'];
+        $baseName = strtoupper(pathinfo($originalName, PATHINFO_FILENAME));
+        if (in_array($baseName, $reservedNames, true)) {
+            $checks[] = [
+                'check' => 'reserved_filename',
+                'ok' => false,
+                'detail' => 'Windows reserved filename not allowed: ' . $baseName,
+            ];
+        }
 
         $allPassed = true;
         foreach ($checks as $check) {

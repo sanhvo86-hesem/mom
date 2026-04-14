@@ -302,6 +302,12 @@ final class NotificationService
      */
     private function persistNotificationToPg(array $notification): void
     {
+        // RA-004 FIX: Check DB is available before using
+        if ($this->db === null || !$this->db->isConnected()) {
+            error_log('NotificationService: DB not available for persistNotificationToPg');
+            return;
+        }
+
         $sql = <<<'SQL'
             INSERT INTO notifications (
                 id, user_id, type, priority, message, message_vi,
@@ -337,6 +343,12 @@ final class NotificationService
         int $offset,
         string $now,
     ): array {
+        // RA-004 FIX: Check DB is available before using
+        if ($this->db === null || !$this->db->isConnected()) {
+            error_log('NotificationService: DB not available for getNotificationsFromPg');
+            return [];
+        }
+
         $where = 'user_id = :uid AND expires_at > :now';
         $params = [':uid' => $userId, ':now' => $now];
 
@@ -466,20 +478,22 @@ final class NotificationService
                 continue;
             }
 
-            // Read with shared lock first to find if we need to update
-            $fp = @fopen($file, 'r');
+            // RA-007 FIX: Use exclusive lock from opening to closing to prevent race condition
+            $fp = @fopen($file, 'c+');
             if (!$fp) {
                 continue;
             }
 
-            if (!@flock($fp, LOCK_SH)) {
+            if (!@flock($fp, LOCK_EX)) {
                 @fclose($fp);
                 continue;
             }
 
-            $lines = [];
-            $found = false;
             try {
+                // Read file content while holding exclusive lock
+                $lines = [];
+                $found = false;
+                rewind($fp);
                 while (($line = fgets($fp)) !== false) {
                     $line = trim($line);
                     if ($line !== '') {
@@ -490,19 +504,9 @@ final class NotificationService
                         }
                     }
                 }
-            } finally {
-                @flock($fp, LOCK_UN);
-                @fclose($fp);
-            }
 
-            // If found, upgrade to exclusive lock and update
-            if ($found) {
-                $fp = @fopen($file, 'r+');
-                if (!$fp || !@flock($fp, LOCK_EX)) {
-                    continue;
-                }
-
-                try {
+                // If found, update while lock is still held
+                if ($found) {
                     $newLines = [];
                     $modified = false;
                     foreach ($lines as $line) {
@@ -515,13 +519,15 @@ final class NotificationService
                     }
 
                     if ($modified) {
-                        file_put_contents($file, implode("\n", $newLines) . "\n", LOCK_EX);
+                        ftruncate($fp, 0);
+                        rewind($fp);
+                        fwrite($fp, implode("\n", $newLines) . "\n");
                     }
                     return;
-                } finally {
-                    @flock($fp, LOCK_UN);
-                    @fclose($fp);
                 }
+            } finally {
+                @flock($fp, LOCK_UN);
+                @fclose($fp);
             }
         }
     }

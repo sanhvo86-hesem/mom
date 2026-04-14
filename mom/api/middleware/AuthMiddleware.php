@@ -58,7 +58,7 @@ class AuthMiddleware
             ])
         )));
         $this->enforce = (bool)($config['enforce_middleware'] ?? true);
-        $this->idleTimeoutSeconds = max(60, (int)($config['idle_timeout_seconds'] ?? (4 * 60 * 60)));
+        $this->idleTimeoutSeconds = max(60, (int)($config['idle_timeout_seconds'] ?? (30 * 60)));
     }
 
     /**
@@ -96,9 +96,10 @@ class AuthMiddleware
                 $self->deny('unauthorized', 401);
             }
 
-            // Validate idle session timeout (skip for API key auth)
+            // Validate idle session timeout for ALL authentication methods (not just session)
+            // SECURITY FIX PIPE-AUTH-001: This check must apply to API keys and JWT tokens too
             $now = time();
-            if (isset($_SESSION['last_active']) && (($_SESSION['auth_method'] ?? 'session') === 'session')) {
+            if (isset($_SESSION['last_active'])) {
                 $last = (int)$_SESSION['last_active'];
                 if ($last > 0 && ($now - $last) > $self->idleTimeoutSeconds) {
                     destroy_auth_session();

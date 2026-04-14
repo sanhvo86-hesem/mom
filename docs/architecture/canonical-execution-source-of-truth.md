@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `main`
+Audited branch: `codex/worldclass-closure-20260414-0807`
 
 Date: 2026-04-14
 
@@ -60,10 +60,12 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 - `completed`: normal edits are locked; corrections must use correction/override semantics.
 - `cancelled`: execution reporting is rejected; corrections require governed supervisor path.
 - `blocked`, `paused`, and `resumed` are execution sub-states/events, not new work-order abstractions.
+- Compatibility aliases with the `order_schedule_*` prefix route to the existing scheduling controller. They do not make `OrderController` the owner of scheduling truth.
 
 ## Override rules
 
 - Overrides must be explicit, role-guarded, CSRF-protected when invoked via web/API write route, and audited.
+- Order hold release must derive the held order type and require the matching source-order write permission before mutating the hold.
 - First-piece gate override requires a structured `quality_override_reason`.
 - Completed/cancelled target edits are not silently reopened by a free-text note.
 - Offline/mobile replay is not an override path. Conflicting replay keys are rejected as data-integrity defects.

@@ -86,6 +86,15 @@ abstract class BaseController
             $limitMb = round(max(1, $maxBytes) / 1048576, 1);
             $this->error('request_body_too_large', 413, 'Request body exceeds ' . $limitMb . 'MB limit');
         }
+
+        // Validate Content-Type header if body is non-empty
+        if (strlen($raw) > 0 && trim($raw) !== '') {
+            $contentType = $this->requestHeader('Content-Type');
+            if ($contentType !== null && !str_contains($contentType, 'application/json')) {
+                $this->error('unsupported_media_type', 415, 'Content-Type must be application/json');
+            }
+        }
+
         if ($raw === false || trim($raw) === '') {
             return $this->jsonBodyCache = [];
         }
@@ -554,12 +563,21 @@ abstract class BaseController
     protected function auditLog(string $action, array $context = [], ?string $user = null): void
     {
         $user = $user ?? (string)($_SESSION['user'] ?? 'anonymous');
+
+        // Sanitize context: only keep scalar values, convert to strings to prevent log injection
+        $sanitizedContext = [];
+        foreach ($context as $key => $value) {
+            if (is_scalar($value) || $value === null) {
+                $sanitizedContext[$key] = $value === null ? null : (string)$value;
+            }
+        }
+
         $entry = [
             'action'    => $action,
             'user'      => $user,
             'ip'        => $this->clientIp(),
             'timestamp' => $this->nowIso(),
-            'context'   => $context,
+            'context'   => $sanitizedContext,
         ];
         if (in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true)) {
             $logFile = $this->dataDir . '/audit.log';
@@ -570,10 +588,10 @@ abstract class BaseController
         try {
             $aggregateId = '';
             foreach (['aggregate_id', 'id', 'username', 'code', 'record_id'] as $key) {
-                if (!isset($context[$key]) || !is_scalar($context[$key])) {
+                if (!isset($sanitizedContext[$key]) || !is_scalar($sanitizedContext[$key])) {
                     continue;
                 }
-                $candidate = trim((string)$context[$key]);
+                $candidate = trim((string)$sanitizedContext[$key]);
                 if ($candidate === '') {
                     continue;
                 }
@@ -588,15 +606,15 @@ abstract class BaseController
                 'source' => 'api_controller',
                 'controller' => static::class,
             ];
-            if ($context !== []) {
-                $metadata['context_keys'] = array_values(array_map('strval', array_keys($context)));
+            if ($sanitizedContext !== []) {
+                $metadata['context_keys'] = array_values(array_map('strval', array_keys($sanitizedContext)));
             }
 
             $this->data->logEvent(
                 $action,
                 'api_action',
                 $aggregateId,
-                ['context' => $context],
+                ['context' => $sanitizedContext],
                 [
                     'actor_name' => $user,
                     'ip_address' => $this->clientIp(),

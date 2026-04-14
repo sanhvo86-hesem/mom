@@ -1150,7 +1150,10 @@ function rrmdir_guarded(string $path, string $rootReal, int &$count = 0): void {
     if (!@rmdir($path)) fail('file_delete_failed');
 }
 
-function copy_guarded(string $source, string $dest, string $rootReal, int &$count = 0): void {
+function copy_guarded(string $source, string $dest, string $rootReal, int &$count = 0, int $depth = 0): void {
+    // REAUDIT-R6-015: Add recursion depth limit to prevent stack exhaustion (max depth 19)
+    if ($depth >= 20) fail('file_recursion_depth_exceeded');
+
     $sourceReal = realpath($source);
     if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
     if (is_link($source)) fail('file_symlink_not_supported');
@@ -1169,11 +1172,14 @@ function copy_guarded(string $source, string $dest, string $rootReal, int &$coun
         if ($item === '.' || $item === '..') continue;
         $count += 1;
         if ($count > 6000) fail('file_operation_limit');
-        copy_guarded($source . '/' . $item, $dest . '/' . $item, $rootReal, $count);
+        copy_guarded($source . '/' . $item, $dest . '/' . $item, $rootReal, $count, $depth + 1);
     }
 }
 
-function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, string $rootReal, array $deny, int &$count = 0): void {
+function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, string $rootReal, array $deny, int &$count = 0, int $depth = 0): void {
+    // REAUDIT-R6-015: Add recursion depth limit to prevent stack exhaustion (max depth 19)
+    if ($depth >= 20) fail('file_recursion_depth_exceeded');
+
     $sourceReal = realpath($source);
     if (!is_string($sourceReal) || !inside_root($sourceReal, $rootReal)) fail('file_path_not_found');
     $baseRel = trim(str_replace('\\', '/', $baseRel), '/');
@@ -1196,7 +1202,7 @@ function add_to_zip_guarded(ZipArchive $zip, string $source, string $baseRel, st
         ensure_rel_not_denied($childRel, $deny);
         $count += 1;
         if ($count > 6000) fail('file_operation_limit');
-        add_to_zip_guarded($zip, $childAbs, $childRel, $rootReal, $deny, $count);
+        add_to_zip_guarded($zip, $childAbs, $childRel, $rootReal, $deny, $count, $depth + 1);
     }
 }
 
@@ -2295,6 +2301,8 @@ BASH;
         if ($target === '') {
             throw new RuntimeException('ssh_target_missing');
         }
+        // FOUND-002 FIX: Validate SSH target against SSRF
+        $this->validateSshTarget($target);
         if (!$this->shellAvailable()) {
             throw new RuntimeException('exec_unavailable');
         }
@@ -2403,6 +2411,8 @@ BASH;
             if ($target === '') {
                 return null;
             }
+            // FOUND-002 FIX: Validate SSH target against SSRF
+            $this->validateSshTarget($target);
 
             $remote = 'bash -lc ' . escapeshellarg($command);
             return implode(' ', [
@@ -2416,6 +2426,52 @@ BASH;
         }
 
         return null;
+    }
+
+    /**
+     * FOUND-002 FIX: Validate SSH target to prevent SSRF attacks
+     */
+    private function validateSshTarget(string $target): void
+    {
+        // Extract host from user@host or user@host:port format
+        $hostPart = preg_replace('/^[^@]*@/', '', $target);
+        if (!is_string($hostPart) || $hostPart === '') {
+            throw new RuntimeException('invalid_ssh_target_format');
+        }
+
+        // Remove port if present
+        $host = preg_replace('/:.*$/', '', $hostPart);
+        if (!is_string($host) || $host === '') {
+            throw new RuntimeException('invalid_ssh_target_host');
+        }
+
+        // Validate host format
+        if (!preg_match('/^[a-zA-Z0-9\.\-]{1,253}$/', $host)) {
+            throw new RuntimeException('invalid_ssh_host_format');
+        }
+
+        // Resolve IP and block private/loopback addresses
+        $resolvedIp = gethostbyname($host);
+        $privateRanges = ['10.', '192.168.', '127.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.', '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'];
+        foreach ($privateRanges as $range) {
+            if (str_starts_with($resolvedIp, $range)) {
+                // Only allow if it matches configured VPS hosts from env
+                $allowedHosts = explode(',', getenv('VPS_ALLOWED_HOSTS') ?: '');
+                if (!in_array(trim($host), $allowedHosts, true)) {
+                    throw new RuntimeException('ssh_host_resolves_to_private_address');
+                }
+            }
+        }
+
+        // OPS-R6-009: Check VPS_SSH_ALLOWLIST if configured
+        $allowlistEnv = getenv('VPS_SSH_ALLOWLIST');
+        if (!empty($allowlistEnv)) {
+            $allowlist = array_map('trim', explode(',', $allowlistEnv));
+            $allowlist = array_filter($allowlist, static fn($h) => $h !== '');
+            if (!empty($allowlist) && !in_array($host, $allowlist, true)) {
+                throw new RuntimeException('ssh_host_not_in_allowlist');
+            }
+        }
     }
 
     private function resolveExecutionMode(array $host): string

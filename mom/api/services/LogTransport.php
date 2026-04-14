@@ -222,7 +222,24 @@ final class LogTransport
 
         $lines = '';
         foreach ($entries as $entry) {
-            $lines .= json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+            // OPS-R6-004: Validate log entries for injection attacks
+            $source = (string)($entry['source'] ?? '');
+            if (str_contains($source, "\n") || str_contains($source, "\r")) {
+                @error_log('[LogTransport] Skipping entry with newline in source field');
+                continue;
+            }
+
+            $encoded = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (str_contains($encoded, "\r")) {
+                @error_log('[LogTransport] Skipping entry with \\r in encoded JSON');
+                continue;
+            }
+
+            $lines .= $encoded . "\n";
+        }
+
+        if ($lines === '') {
+            return;
         }
 
         $written = @file_put_contents($file, $lines, FILE_APPEND | LOCK_EX);

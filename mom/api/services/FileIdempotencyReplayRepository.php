@@ -45,8 +45,17 @@ final class FileIdempotencyReplayRepository implements IdempotencyReplayReposito
         }
 
         try {
-            if (!@flock($handle, LOCK_EX)) {
-                throw new RuntimeException('Unable to lock idempotency state.');
+            // Acquire lock with timeout: try every 100ms for max 30 seconds (300 attempts)
+            $lockAcquired = false;
+            for ($attempt = 0; $attempt < 300; $attempt++) {
+                if (@flock($handle, LOCK_EX | LOCK_NB)) {
+                    $lockAcquired = true;
+                    break;
+                }
+                usleep(100000); // 100ms
+            }
+            if (!$lockAcquired) {
+                throw new RuntimeException('Idempotency lock acquisition timeout');
             }
 
             $existing = $this->readState($path);

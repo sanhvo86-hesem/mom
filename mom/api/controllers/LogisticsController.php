@@ -21,7 +21,10 @@ class LogisticsController extends BaseController
     private function logisticsDir(): string
     {
         $dir = $this->dataDir . '/logistics';
-        if (!is_dir($dir)) @mkdir($dir, 0775, true);
+        // INV-R6-014: Fix TOCTOU race condition in mkdir
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('failed_to_create_logistics_directory');
+        }
         return $dir;
     }
 
@@ -210,8 +213,9 @@ class LogisticsController extends BaseController
         }
 
         $dir = $this->dataDir . '/quality/ncr';
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0775, true);
+        // REAUDIT-R6-017: Use TOCTOU-safe pattern for mkdir
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('Unable to initialize NCR directory.');
         }
         $path = $dir . '/ncr_log.jsonl';
 
@@ -268,7 +272,10 @@ class LogisticsController extends BaseController
     {
         $year       = date('Y');
         $counterDir = $this->dataDir . '/counters';
-        if (!is_dir($counterDir)) @mkdir($counterDir, 0775, true);
+        // REAUDIT-R6-017: Use TOCTOU-safe pattern for mkdir
+        if (!is_dir($counterDir) && !@mkdir($counterDir, 0775, true) && !is_dir($counterDir)) {
+            throw new RuntimeException('Unable to initialize counters directory.');
+        }
 
         $counterFile = $counterDir . '/logistics_' . $type . '_' . $year . '.json';
         $seq = $this->withFileLock($counterFile . '.lock', function () use ($counterFile): int {
@@ -494,6 +501,21 @@ class LogisticsController extends BaseController
         $now = $this->nowIso();
 
         try {
+            // INV-R6-001: Validate quantities
+            $qtyReceived = (int)($body['qty_received'] ?? 0);
+            $qtyAccepted = (int)($body['qty_accepted'] ?? 0);
+            $qtyRejected = (int)($body['qty_rejected'] ?? 0);
+
+            if ($qtyReceived < 0 || $qtyAccepted < 0 || $qtyRejected < 0) {
+                $this->error('negative_quantity_not_allowed', 400, 'All quantities must be >= 0');
+            }
+            if ($qtyReceived === 0) {
+                $this->error('qty_received_must_be_positive', 400, 'qty_received must be > 0 for incoming records');
+            }
+            if ($qtyAccepted + $qtyRejected > $qtyReceived) {
+                $this->error('accepted_rejected_exceed_received', 400, 'qty_accepted + qty_rejected must not exceed qty_received');
+            }
+
             $file  = $this->logisticsDir() . '/subcontracts.json';
             $items = $this->readJsonFile($file) ?? [];
             $updated = null;
@@ -502,9 +524,9 @@ class LogisticsController extends BaseController
                 if (($r['id'] ?? '') === $id || ($r['sc_number'] ?? '') === $id) {
                     $r['status']                = 'received';
                     $r['received_date']         = trim((string)($body['received_date'] ?? date('Y-m-d')));
-                    $r['qty_received']          = (int)($body['qty_received'] ?? 0);
-                    $r['qty_accepted']          = (int)($body['qty_accepted'] ?? 0);
-                    $r['qty_rejected']          = (int)($body['qty_rejected'] ?? 0);
+                    $r['qty_received']          = $qtyReceived;
+                    $r['qty_accepted']          = $qtyAccepted;
+                    $r['qty_rejected']          = $qtyRejected;
                     $r['coc_received']          = (bool)($body['coc_received'] ?? false);
                     $r['test_report_received']  = (bool)($body['test_report_received'] ?? false);
                     $r['inspection_result']     = trim((string)($body['inspection_result'] ?? 'accept'));

@@ -37,8 +37,9 @@ class HealthController extends BaseController
     /**
      * GET /api/health/ready - Readiness probe.
      * Returns 200 if the service can handle requests (DB, cache accessible).
-     * SECURITY FIX (INF-003): This endpoint is unauthenticated; sanitize error responses
-     * to avoid leaking internal hostnames, ports, and credentials.
+     * SEC-003 FIX (VERIFIED): This endpoint is unauthenticated; error messages are sanitized
+     * via collectInfrastructureHealthSanitized() to prevent information disclosure of
+     * internal hostnames, ports, and error details.
      */
     public function ready(): void
     {

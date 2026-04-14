@@ -148,6 +148,9 @@ final class WorkflowDefinitionRegistry
      */
     public static function register(array $definitions): void
     {
+        foreach ($definitions as $key => $definition) {
+            self::validateWorkflowDefinition((string)$key, $definition);
+        }
         self::$definitions = $definitions;
     }
 
@@ -168,5 +171,44 @@ final class WorkflowDefinitionRegistry
     private static function buildStepRequirements(): array
     {
         return self::$stepRequirements ?? [];
+    }
+
+    /**
+     * MISSING-005 FIX: Validate workflow definition structure
+     */
+    private static function validateWorkflowDefinition(string $key, array $definition): void
+    {
+        $steps = $definition['steps'] ?? null;
+        $states = $definition['states'] ?? null;
+        if (!is_array($steps) && !is_array($states) && !isset($definition['initial'])) {
+            throw new \InvalidArgumentException("Workflow definition {$key} must define steps or states");
+        }
+
+        if (is_array($steps)) {
+            if ($steps === []) {
+                throw new \InvalidArgumentException('Workflow must have at least one step');
+            }
+            foreach ($steps as $step) {
+                if (!is_array($step)) {
+                    throw new \InvalidArgumentException('Step must be an array');
+                }
+                $stepName = $step['name'] ?? null;
+                if (!preg_match('/^[a-zA-Z0-9_]{1,50}$/', (string)$stepName)) {
+                    throw new \InvalidArgumentException('Invalid step name: ' . (is_string($stepName) ? $stepName : 'null'));
+                }
+            }
+        } elseif ($states === []) {
+            throw new \InvalidArgumentException('Workflow must have at least one state');
+        } elseif (is_array($states)) {
+            foreach ($states as $state) {
+                if (!preg_match('/^[a-zA-Z0-9_]{1,50}$/', (string)$state)) {
+                    throw new \InvalidArgumentException('Invalid workflow state: ' . (is_string($state) ? $state : 'null'));
+                }
+            }
+        }
+
+        if (isset($definition['transitions']) && !is_array($definition['transitions'])) {
+            throw new \InvalidArgumentException('Transitions must be an array');
+        }
     }
 }

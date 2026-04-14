@@ -518,6 +518,10 @@ final class IdempotencyServiceTest extends TestCase
      */
     private function descriptor(string $key = 'retry-key-001'): array
     {
+        if (strlen($key) < 16) {
+            $key = str_pad($key, 16, 'x');
+        }
+
         return [
             'scope_key' => 'sales|convert_quote|QUOTE-001',
             'key' => $key,

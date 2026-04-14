@@ -113,6 +113,48 @@ final class CacheService
     }
 
     /**
+     * Get or set a value with cache lock protection against cache stampede.
+     * WRK-005 FIX: Uses atomic lock-based approach to prevent thundering herd
+     * when cache misses occur.
+     *
+     * @param string   $key       Cache key
+     * @param callable $generator Function that generates the value
+     * @param int      $ttl       Time-to-live in seconds
+     * @return mixed The cached value
+     */
+    public function getOrSet(string $key, callable $generator, int $ttl = 300): mixed
+    {
+        $value = $this->get($key);
+        if ($value !== null) {
+            return $value;
+        }
+
+        // WRK-005 FIX: Try to acquire a lock to prevent cache stampede
+        $lockKey = $key . ':lock';
+        if ($this->setNx($lockKey, 1, 30)) {
+            // Lock acquired - generate the value
+            try {
+                $value = $generator();
+                $this->set($key, $value, $ttl);
+                return $value;
+            } finally {
+                $this->delete($lockKey);
+            }
+        } else {
+            // Another request has the lock - wait briefly then retry
+            usleep(100000); // 100ms wait
+            $retried = $this->get($key);
+            if ($retried !== null) {
+                return $retried;
+            }
+            // Still no value after wait - generate it directly
+            $value = $generator();
+            $this->set($key, $value, $ttl);
+            return $value;
+        }
+    }
+
+    /**
      * Set a cached value with optional TTL.
      *
      * @param int $ttl Time-to-live in seconds (0 = no expiry)
@@ -177,9 +219,10 @@ final class CacheService
             }
         }
 
-        // Redis SCAN + DEL
+        // REAUDIT-R6-018: Redis SCAN + DEL with batched deletion
         if ($this->redisAvailable) {
             try {
+                $allKeys = [];
                 $cursor = '0';
                 do {
                     [$cursor, $keys] = $this->redis->scan($cursor, [
@@ -187,9 +230,16 @@ final class CacheService
                         'COUNT' => 100,
                     ]);
                     if (!empty($keys)) {
-                        $this->redis->del($keys);
+                        $allKeys = array_merge($allKeys, $keys);
                     }
                 } while ($cursor !== '0');
+
+                // Delete in batches to prevent timeout on large key sets
+                if (!empty($allKeys)) {
+                    foreach (array_chunk($allKeys, 100) as $batch) {
+                        $this->redis->del($batch);
+                    }
+                }
             } catch (\Throwable $e) {
                 @error_log("[CacheService] Redis invalidatePrefix error: {$e->getMessage()}");
             }

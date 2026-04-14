@@ -7,6 +7,7 @@ This repository is an integrated ERP + MOM + MES + EQMS platform for CNC/discret
 ## Architectural Rules
 
 - Preserve the existing PHP custom MVC structure, router, middleware, services, migrations, and legacy fallback patterns.
+- Preserve `mom/api/index.php` boot flow, middleware ordering, router semantics, and legacy fallback behavior unless a documented security blocker requires a narrow exception.
 - Prefer extending existing controllers, services, repositories, and controlled registries over creating parallel abstractions.
 - Do not rewrite the platform, replace the framework, or introduce broad infrastructure without a documented blocker.
 - Keep ERP, MOM, MES, EQMS, analytics, and integration boundaries explicit and ISA-95 aligned.
@@ -28,6 +29,13 @@ Run the maximum safe subset for every change:
 - `./composer test`
 - `./composer check -- --memory-limit=1G`
 - Focused `php -l`, PHPUnit, PHPStan, migration, and grep checks for touched files when full-suite analysis is blocked by existing debt.
+
+## Branch And Worktree Safety
+
+- Never perform remediation directly on the user's original branch. Create a `codex/...` remediation branch from the current local HEAD before code or documentation changes.
+- Inspect `git status`, current branch, diff stat, changed filenames, and merge-base before remediation.
+- Do not revert user or prior-agent changes unless explicitly instructed. Work with existing dirty files and keep unrelated changes intact.
+- When using audit agents or child worktrees, isolate their output and integrate only reviewed, intentional changes.
 
 ## Citations And Research
 

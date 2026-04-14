@@ -294,6 +294,12 @@ class OrderController extends BaseController
         try {
             $allItems = $this->orderService()->listSalesOrders($filters);
             $total    = count($allItems);
+
+            // Protect against large result sets that could cause memory exhaustion
+            if ($total > 10000) {
+                $this->error('result_set_too_large', 400, 'Result set contains too many items. Please add filters to narrow the results to fewer than 10,000 items.');
+            }
+
             $items    = array_slice($allItems, $offset, $limit);
 
             $this->paginated('sales_orders', array_values($items), $total, $offset, $limit);
@@ -380,6 +386,12 @@ class OrderController extends BaseController
         try {
             $allItems = $this->orderService()->listJobOrders($soNumber, $filters);
             $total    = count($allItems);
+
+            // Protect against large result sets that could cause memory exhaustion
+            if ($total > 10000) {
+                $this->error('result_set_too_large', 400, 'Result set contains too many items. Please add filters to narrow the results to fewer than 10,000 items.');
+            }
+
             $items    = array_slice($allItems, $offset, $limit);
 
             $this->paginated('job_orders', array_values($items), $total, $offset, $limit);
@@ -1088,13 +1100,30 @@ class OrderController extends BaseController
             $holdsFile = $this->dataDir . '/orders/holds.json';
             $holds = $this->readJsonFile($holdsFile) ?? [];
             $found = false;
+            $releasedHold = [];
 
             foreach ($holds as &$h) {
                 if (($h['hold_id'] ?? '') === $holdId && !($h['released'] ?? false)) {
+                    $orderType = strtolower(trim((string)($h['order_type'] ?? '')));
+                    $permission = match ($orderType) {
+                        'so' => 'so_write',
+                        'jo' => 'jo_write',
+                        'wo' => 'wo_write',
+                        default => null,
+                    };
+
+                    if ($permission === null) {
+                        $this->error('hold_order_type_invalid', 409, 'Hold cannot be released because its order_type is missing or invalid.');
+                    }
+
+                    assert(is_string($permission));
+                    $this->requireOrderPermission($user, $permission);
+
                     $h['released']       = true;
                     $h['released_by']    = $uid;
                     $h['released_at']    = $now;
                     $h['release_reason'] = $reason;
+                    $releasedHold = $h;
                     $found = true;
                     break;
                 }
@@ -1106,7 +1135,11 @@ class OrderController extends BaseController
             }
 
             $this->writeJsonFile($holdsFile, $holds);
-            $this->auditLog('order_hold_release', ['hold_id' => $holdId], $uid);
+            $this->auditLog('order_hold_release', [
+                'hold_id' => $holdId,
+                'order_type' => $releasedHold['order_type'] ?? null,
+                'order_id' => $releasedHold['order_id'] ?? null,
+            ], $uid);
             $this->success(['released' => true]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);

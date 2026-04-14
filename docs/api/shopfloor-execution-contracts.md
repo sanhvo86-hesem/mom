@@ -78,6 +78,23 @@ Lifecycle rules:
 - `completed` and `cancelled` targets are locked for normal edits.
 - Pause, resume, blocked, downtime, and completion are execution events, not a second work-order abstraction.
 
+## Schedule compatibility aliases
+
+Existing order-prefixed schedule action aliases remain available for backward compatibility:
+
+- `order_schedule_get`
+- `order_schedule_slot`
+- `order_schedule_update`
+- `order_capacity_heatmap`
+- `order_promise_suggest`
+
+Behavior:
+
+- The aliases route to the existing scheduling controller handlers, not to order ownership logic.
+- Schedule slot create/update requires authenticated scheduling write authority and CSRF.
+- Create/update validates `YYYY-MM-DD` dates, 24-hour `HH:MM` times, same-day `end_time > start_time`, and priority values `low`, `normal`, `high`, or `urgent`.
+- Scheduling remains planning/advisory capacity context. Dispatch target creation remains the execution-intent path for shopfloor work.
+
 ## Operator work retrieval
 
 Handler: existing operator dispatch route in `DispatchController`.

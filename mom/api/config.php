@@ -30,24 +30,39 @@ return [
         'legacy_action_fallback' => $envBool('QMS_API_LEGACY_ACTION_FALLBACK', false),
     ],
     'cors' => [
-        'allowed_origins' => $envList('QMS_API_ALLOWED_ORIGINS', [
+        'allowed_origins' => (function() use ($envList, $envBool) {
             // SECURITY FIX: Replace wildcard patterns with explicit domain list.
             // Wildcard subdomains (*.hesem.com.vn) are too permissive and allow potentially compromised subdomains.
             // Only list known trusted frontend domains.
-            'https://eqms.hesemeng.com',
-            'https://portal.hesemeng.com',
-            'https://qms.hesem.com.vn',
-            'https://portal.hesem.com.vn',
-            'https://app.hesem.com.vn',
-            'https://admin.hesem.com.vn',
-            // Development/local origins
-            'http://localhost:3000',
-            'http://127.0.0.1:3000',
-            'http://localhost:4173',
-            'http://127.0.0.1:4173',
-            'http://localhost:5173',
-            'http://127.0.0.1:5173',
-        ]),
+            $origins = [
+                'https://eqms.hesemeng.com',
+                'https://portal.hesemeng.com',
+                'https://qms.hesem.com.vn',
+                'https://portal.hesem.com.vn',
+                'https://app.hesem.com.vn',
+                'https://admin.hesem.com.vn',
+            ];
+
+            // SECURITY FIX PIPE-CORS-001: Only allow localhost origins in development mode
+            if ($envBool('QMS_DEV_MODE', false)) {
+                $origins = array_merge($origins, [
+                    'http://localhost:3000',
+                    'http://127.0.0.1:3000',
+                    'http://localhost:4173',
+                    'http://127.0.0.1:4173',
+                    'http://localhost:5173',
+                    'http://127.0.0.1:5173',
+                ]);
+            }
+
+            // Allow environment variable to override defaults
+            $envOrigins = getenv('QMS_API_ALLOWED_ORIGINS');
+            if ($envOrigins !== false && trim((string)$envOrigins) !== '') {
+                return $envList('QMS_API_ALLOWED_ORIGINS', $origins);
+            }
+
+            return $origins;
+        })(),
         'allowed_methods' => $envList('QMS_API_ALLOWED_METHODS', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
         'allowed_headers' => $envList('QMS_API_ALLOWED_HEADERS', ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization', 'If-Match', 'X-Row-Version', 'Idempotency-Key']),
         'max_age' => max(0, (int)(getenv('QMS_API_CORS_MAX_AGE') ?: 86400)),
@@ -55,7 +70,7 @@ return [
     ],
     'auth' => [
         'enforce_middleware' => $envBool('QMS_API_ENFORCE_AUTH_MIDDLEWARE', true),
-        'idle_timeout_seconds' => max(60, (int)(getenv('QMS_API_IDLE_TIMEOUT_SECONDS') ?: 14400)),
+        'idle_timeout_seconds' => max(60, (int)(getenv('QMS_API_IDLE_TIMEOUT_SECONDS') ?: 1800)), // SEC-001 FIX: Changed from 14400 (4h) to 1800 (30m)
         'public_actions' => $envList('QMS_API_PUBLIC_ACTIONS', [
             'status',
             'auth_login',

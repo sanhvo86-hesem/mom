@@ -30,6 +30,9 @@ final class CircuitBreaker
     private string $stateKey;
     private ?CacheService $cacheService;
 
+    // WRK-004 FIX: Track if a half-open test request is currently in progress
+    private bool $halfOpenTestInProgress = false;
+
     public function __construct(
         string $stateDir,
         string $serviceName = 'default',
@@ -56,7 +59,18 @@ final class CircuitBreaker
         $this->evaluateState();
 
         if ($this->state === self::STATE_CLOSED) return true;
-        if ($this->state === self::STATE_HALF_OPEN) return true; // allow test request
+
+        // REAUDIT-R6-021: In HALF_OPEN state, only allow ONE test request at a time.
+        // Other concurrent requests must wait or be rejected.
+        if ($this->state === self::STATE_HALF_OPEN) {
+            // Only allow if no other request is already testing
+            if ($this->isHalfOpenTestInProgress()) {
+                return false; // Another request is already testing, reject this one
+            }
+            $this->setHalfOpenTestInProgress(true); // Mark that a test is in progress
+            return true; // Allow this test request
+        }
+
         // STATE_OPEN: check if recovery timeout has elapsed
         return false;
     }
@@ -72,6 +86,8 @@ final class CircuitBreaker
                 $this->successCount = 0;
                 $this->openedAt = null;
             }
+            // REAUDIT-R6-021: Clear the half-open test flag after success
+            $this->setHalfOpenTestInProgress(false);
         } else {
             $this->failureCount = 0;
         }
@@ -88,6 +104,8 @@ final class CircuitBreaker
             $this->state = self::STATE_OPEN;
             $this->openedAt = microtime(true);
             $this->successCount = 0;
+            // REAUDIT-R6-021: Clear the half-open test flag after failure
+            $this->setHalfOpenTestInProgress(false);
         } elseif ($this->failureCount >= $this->failureThreshold) {
             $this->state = self::STATE_OPEN;
             $this->openedAt = microtime(true);
@@ -194,5 +212,51 @@ final class CircuitBreaker
         }
 
         @file_put_contents($this->stateFile, json_encode($state, JSON_PRETTY_PRINT), LOCK_EX);
+    }
+
+    /**
+     * REAUDIT-R6-021: Check if a half-open test is currently in progress.
+     * Uses Redis for distribution across PHP-FPM workers if cache is available.
+     */
+    private function isHalfOpenTestInProgress(): bool
+    {
+        if ($this->cacheService !== null) {
+            try {
+                $testKey = $this->stateKey . ':test_in_progress';
+                $value = $this->cacheService->get($testKey);
+                return $value === true;
+            } catch (\Throwable $e) {
+                @error_log('[CircuitBreaker] Cache check failed: ' . $e->getMessage());
+                // Fall back to instance variable
+            }
+        }
+
+        return $this->halfOpenTestInProgress;
+    }
+
+    /**
+     * REAUDIT-R6-021: Set or clear the half-open test in progress flag.
+     * Uses Redis for distribution across PHP-FPM workers if cache is available.
+     */
+    private function setHalfOpenTestInProgress(bool $value): void
+    {
+        if ($this->cacheService !== null) {
+            try {
+                $testKey = $this->stateKey . ':test_in_progress';
+                if ($value) {
+                    // Set with 5-second TTL to auto-expire if process dies
+                    $this->cacheService->set($testKey, true, 5);
+                } else {
+                    // Clear the flag immediately
+                    $this->cacheService->delete($testKey);
+                }
+                return;
+            } catch (\Throwable $e) {
+                @error_log('[CircuitBreaker] Cache set failed: ' . $e->getMessage());
+                // Fall back to instance variable
+            }
+        }
+
+        $this->halfOpenTestInProgress = $value;
     }
 }

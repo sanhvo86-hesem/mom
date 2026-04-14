@@ -61,7 +61,12 @@ class RegistryController extends BaseController
      */
     private function rawContractDocument(string $name): array
     {
-        $file = $this->rootDir . '/mom/contracts/' . ltrim($name, '/');
+        // INT-R6-001: Path traversal protection - use basename to strip directory components
+        $safeName = basename($name);
+        if ($safeName === '') {
+            return [];
+        }
+        $file = $this->rootDir . '/mom/contracts/' . $safeName;
         $data = $this->readJsonFile($file) ?? [];
         return is_array($data) ? $data : [];
     }

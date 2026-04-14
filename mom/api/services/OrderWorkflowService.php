@@ -133,6 +133,7 @@ final class OrderWorkflowService
 
     /**
      * Terminal statuses -- no field edits allowed (except system fields).
+     * BLF-008: These statuses should not allow any outgoing transitions except explicit reopen.
      */
     private const TERMINAL_STATUSES = ['closed', 'cancelled', 'completed', 'shipped'];
 
@@ -230,6 +231,7 @@ final class OrderWorkflowService
      * 1. The transition is defined in so_jo_wo_config.json status_flow.
      * 2. The user's role has edit permission for this order type.
      * 3. Cancel requires manager+ role. Reopen from closed requires director+.
+     * 4. BLF-003: Terminal states cannot transition to operational states without explicit reopening.
      *
      * @param string $orderType     "so", "jo", or "wo".
      * @param string $currentStatus Current status of the order.
@@ -260,6 +262,34 @@ final class OrderWorkflowService
             if (!$this->isRoleInList($role, self::CANCEL_ROLES)) {
                 return new OrderTransitionResult(false, 'Cancel requires manager or director role.', errorCode: 'cancel_forbidden');
             }
+        }
+
+        // BLF-008: Block all transitions FROM terminal states except explicit reopen
+        if (in_array($currentStatus, self::TERMINAL_STATUSES, true)) {
+            // Only allow 'reopen' action from terminal states (which would change status back to a working state)
+            // Any other transition is forbidden
+            $terminalStateExceptions = ['reopen', 'reinstate'];
+            $isReopenAction = false;
+
+            // Check if this looks like a reopen action
+            if ($targetStatus !== 'cancelled' && $targetStatus !== 'closed' && $targetStatus !== 'completed' && $targetStatus !== 'shipped') {
+                $isReopenAction = true;
+            }
+
+            if (!$isReopenAction) {
+                return new OrderTransitionResult(false, "Cannot transition from terminal state '{$currentStatus}' without explicit reopen approval.", errorCode: 'terminal_state_locked');
+            }
+
+            // Require director+ for reopening from terminal states
+            if (!$this->isRoleInList($role, self::REOPEN_ROLES)) {
+                return new OrderTransitionResult(false, 'Reopen from terminal state requires director approval.', errorCode: 'reopen_forbidden');
+            }
+        }
+
+        // BLF-003: Block transitions from cancelled status to operational states
+        $forbiddenFromCancelled = ['shipped', 'delivered', 'closed', 'in_production', 'active', 'running'];
+        if ($currentStatus === 'cancelled' && in_array($targetStatus, $forbiddenFromCancelled, true)) {
+            return new OrderTransitionResult(false, 'Cannot transition from cancelled status without explicit reopen approval.', errorCode: 'cancelled_terminal');
         }
 
         // Reopen guard (closed -> any active state)
@@ -425,20 +455,34 @@ final class OrderWorkflowService
             'status' => ['old' => $currentStatus, 'new' => $targetStatus],
         ], $userId, $reason ?? "Status transition: {$currentStatus} -> {$targetStatus}");
 
-        // ── Hash-chain audit trail integration ──────────────────────────
-        $this->appendImmutableAuditEvent($orderType, $orderId, [
-            'event_type'   => 'STATUS_CHANGED',
-            'from_state'   => $currentStatus,
-            'to_state'     => $targetStatus,
-            'user'         => $userId,
-            'role'         => $userRole,
-            'reason'       => $reason,
-            'timestamp'    => $now,
-            'ip'           => $_SERVER['REMOTE_ADDR'] ?? '',
-            'user_agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
-        ]);
+        // BLF-012: Transaction safety - audit trail must be appended atomically with state change
+        // If audit fails, rollback the state change before throwing
+        try {
+            // ── Hash-chain audit trail integration ──────────────────────────
+            $this->appendImmutableAuditEvent($orderType, $orderId, [
+                'event_type'   => 'STATUS_CHANGED',
+                'from_state'   => $currentStatus,
+                'to_state'     => $targetStatus,
+                'user'         => $userId,
+                'role'         => $userRole,
+                'reason'       => $reason,
+                'timestamp'    => $now,
+                'ip'           => $_SERVER['REMOTE_ADDR'] ?? '',
+                'user_agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
+            ]);
 
-        $this->saveOrders($orders);
+            $this->saveOrders($orders);
+        } catch (\Exception $e) {
+            // Rollback: restore original status if audit failed
+            $orders[$storeKey][$recordIdx]['status'] = $currentStatus;
+            $history = (array)($orders[$storeKey][$recordIdx]['status_history'] ?? []);
+            $lastHistory = $history[array_key_last($history)] ?? [];
+            $orders[$storeKey][$recordIdx]['updated_at'] = is_array($lastHistory) && isset($lastHistory['timestamp'])
+                ? (string)$lastHistory['timestamp']
+                : $now;
+            // Note: we don't re-save here since audit failed - let the exception propagate
+            throw new RuntimeException("Order status transition failed: audit trail could not be recorded. State has been reverted. Original error: " . $e->getMessage(), previous: $e);
+        }
 
         // Auto-actions on transition
         $this->runAutoActions($orderType, $orderId, $targetStatus, $orders);
