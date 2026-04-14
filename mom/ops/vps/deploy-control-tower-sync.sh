@@ -210,7 +210,7 @@ sync_repo() {
 
 fix_permissions() {
   echo "==> Fix remote permissions"
-  run_remote_cmd "owner_group='${APP_DATA_OWNER_GROUP}'; owner=\${owner_group%%:*}; group=\${owner_group##*:}; mkdir -p '${APP_DIR}/mom/data' '${APP_DIR}/mom/data/sessions' '${APP_DIR}/mom/data/ratelimit'; touch '${APP_DIR}/mom/data/php_error.log'; chown -R \"\${owner}:\${group}\" '${APP_DIR}/mom/data'; find '${APP_DIR}/mom/data' -type d -exec chmod 775 {} +; find '${APP_DIR}/mom/data' -type f -exec chmod 664 {} +; chown -R \"\${owner}:\${group}\" '${APP_DIR}/mom/data/sessions' '${APP_DIR}/mom/data/ratelimit' '${APP_DIR}/mom/data/php_error.log'; find '${APP_DIR}/mom/data/sessions' -type f -exec chmod 660 {} +; chmod 2770 '${APP_DIR}/mom/data/sessions'; chmod 2775 '${APP_DIR}/mom/data/ratelimit'; chmod 664 '${APP_DIR}/mom/data/php_error.log'"
+  run_remote_cmd "set -e; app='${APP_DIR}'; data_dir=\"\${app}/mom/data\"; owner_group='${APP_DATA_OWNER_GROUP}'; owner=\${owner_group%%:*}; group=\${owner_group##*:}; find \"\${app}\" -path \"\${data_dir}\" -prune -o -type d -exec chmod u+rwx,go+rx {} +; find \"\${app}\" -path \"\${data_dir}\" -prune -o -type f -exec chmod u+rw,go+r {} +; mkdir -p \"\${data_dir}\" \"\${data_dir}/sessions\" \"\${data_dir}/ratelimit\"; touch \"\${data_dir}/php_error.log\"; chown -R \"\${owner}:\${group}\" \"\${data_dir}\"; find \"\${data_dir}\" -type d -exec chmod 775 {} +; find \"\${data_dir}\" -type f -exec chmod 664 {} +; chown -R \"\${owner}:\${group}\" \"\${data_dir}/sessions\" \"\${data_dir}/ratelimit\" \"\${data_dir}/php_error.log\"; find \"\${data_dir}/sessions\" -type f -exec chmod 660 {} +; chmod 2770 \"\${data_dir}/sessions\"; chmod 2775 \"\${data_dir}/ratelimit\"; chmod 664 \"\${data_dir}/php_error.log\""
 }
 
 run_installers() {
