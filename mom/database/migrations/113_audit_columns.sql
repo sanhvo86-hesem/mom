@@ -394,6 +394,7 @@ ALTER TABLE shipments ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(
 ALTER TABLE shipments ADD COLUMN IF NOT EXISTS deleted_by UUID REFERENCES users(user_id);
 ALTER TABLE shipments ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
+-- packages table may not exist in all deployments
 DO $$ BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='packages') THEN
         EXECUTE 'ALTER TABLE packages ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id)';
@@ -407,6 +408,7 @@ END $$;
 -- Compliance & Traceability Tables
 -- ============================================================================
 
+-- compliance table may not exist in all deployments
 DO $$ BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='compliance') THEN
         EXECUTE 'ALTER TABLE compliance ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(user_id)';

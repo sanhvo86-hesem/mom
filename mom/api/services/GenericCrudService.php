@@ -1004,6 +1004,17 @@ class GenericCrudService
         $selected = [];
         $columns = (array)($table['columns'] ?? []);
         $fieldDefs = (array)($this->registry->fields($domain . '.' . $tableName . '.list') ?? []);
+
+        // When no registry field definitions exist for this table+view, return all
+        // columns so display-relevant fields (names, titles, types, counts) are
+        // available without requiring explicit registry configuration.
+        // The registry's purpose is to RESTRICT the projection; without it, the full
+        // row should be exposed (the table itself is already access-controlled via
+        // resolveTable + scope checks).
+        if ($fieldDefs === []) {
+            return array_keys($columns);
+        }
+
         $primaryKey = $this->primaryKeyMeta($table);
         $add = function (string $column) use (&$selected, $columns): void {
             if ($column === '' || !array_key_exists($column, $columns) || in_array($column, $selected, true)) {
@@ -1038,10 +1049,8 @@ class GenericCrudService
             }
         }
 
-        // Include FK reference columns (columns with a 'references' definition).
-        // These are domain-level foreign keys (e.g. hcm_org_unit_id) that are needed
-        // by the frontend for grouping, filtering, and relationship display.
-        // Org-scope FK columns (org_company_code etc.) are already added above.
+        // Always include FK reference columns (e.g. hcm_org_unit_id) for grouping
+        // and relationship display, even when registry field defs exist.
         foreach ($columns as $colName => $colDef) {
             if (is_array($colDef) && ($colDef['references'] ?? null) !== null) {
                 $add((string)$colName);
