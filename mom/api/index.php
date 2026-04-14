@@ -262,7 +262,7 @@ $router->use($corsMiddleware->handler());
 $router->use($apiKeyMiddleware->handler());  // API key/JWT checked before session auth
 $router->use($authMiddleware->handler());
 $router->use($rateLimitMiddleware->handler());
-$router->use(new CsrfMiddleware()->handler());  // CSRF validation after rate limiting
+$router->use((new CsrfMiddleware())->handler());  // CSRF validation after rate limiting
 $router->use($auditMiddleware->handler());
 
 // Route module order preserves legacy action alias precedence and REST matching.
