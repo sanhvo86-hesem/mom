@@ -23,6 +23,8 @@ final class ManufacturingEventController extends BaseController
                     $filters[$field] = trim($value);
                 }
             }
+            $this->rejectCallerScopeFields();
+            $filters += $this->sessionScopeFilters();
             $filters['limit'] = (int)($this->input('limit', '100') ?? '100');
 
             $timeline = $this->service()->productionTimeline($filters);
@@ -63,6 +65,8 @@ final class ManufacturingEventController extends BaseController
                     $filters[$field] = trim($value);
                 }
             }
+            $this->rejectCallerScopeFields();
+            $filters += $this->sessionScopeFilters();
             $filters['limit'] = (int)($this->input('limit', '100') ?? '100');
 
             $packet = (new ProductionHistoryReadModelService(
@@ -80,6 +84,30 @@ final class ManufacturingEventController extends BaseController
     private function service(): ManufacturingEventBackboneService
     {
         return new ManufacturingEventBackboneService($this->dataDir, $this->data);
+    }
+
+    private function rejectCallerScopeFields(): void
+    {
+        foreach (['plant_id', 'org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $scopeField) {
+            $value = $this->input($scopeField);
+            if ($value !== null && trim($value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be provided in request. Scope is derived from user session.');
+            }
+        }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function sessionScopeFilters(): array
+    {
+        return array_filter([
+            'plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_company_code' => (string)($_SESSION['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($_SESSION['org_legal_entity_code'] ?? ''),
+            'org_site_id' => (string)($_SESSION['org_site_id'] ?? ''),
+        ], static fn(string $value): bool => $value !== '');
     }
 
     /**

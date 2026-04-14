@@ -53,15 +53,26 @@ final class AuditPackExportService
             [':scope_ref' => $scopeRef, ':org_id' => $orgId],
         );
 
+        $aggregateIds = $this->scopeAggregateIds($scopeRef, $evidencePackages);
         $auditEvents = $this->queryRows(
             "SELECT event_id, event_type, aggregate_type, aggregate_id, actor_id, actor_name,
                     payload, metadata, recorded_at, source_event_hash,
                     COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') AS org_id
              FROM audit_events
-             WHERE (aggregate_id = :scope_ref OR aggregate_type = :scope_type)
+             WHERE (
+                    aggregate_id = ANY(CAST(:aggregate_ids AS text[]))
+                    OR payload ->> 'evidence_record_id' = ANY(CAST(:aggregate_ids AS text[]))
+                    OR payload ->> 'evidence_version_id' = ANY(CAST(:aggregate_ids AS text[]))
+                    OR metadata ->> 'evidence_record_id' = ANY(CAST(:aggregate_ids AS text[]))
+                    OR metadata ->> 'evidence_version_id' = ANY(CAST(:aggregate_ids AS text[]))
+                )
+               AND aggregate_type IN ('evidence_record', 'evidence_version', 'signature_event', 'evidence_publication', 'retention_lock', 'audit_pack')
                AND (:org_id = '' OR COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') = :org_id)
              ORDER BY COALESCE(aggregate_sequence, 0), recorded_at",
-            [':scope_type' => $scopeType, ':scope_ref' => $scopeRef, ':org_id' => $orgId],
+            [
+                ':aggregate_ids' => $this->postgresTextArray($aggregateIds),
+                ':org_id' => $orgId,
+            ],
         );
 
         $changeAuthorities = $this->queryRows(
@@ -128,5 +139,42 @@ final class AuditPackExportService
             }
         }
         return $db;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $evidencePackages
+     * @return list<string>
+     */
+    private function scopeAggregateIds(string $scopeRef, array $evidencePackages): array
+    {
+        $ids = [$scopeRef];
+        foreach ($evidencePackages as $package) {
+            foreach (['evidence_record_id', 'evidence_version_id', 'package_hash_sha256', 'manifest_hash_sha256'] as $field) {
+                $value = $this->requiredTextOrNull($package[$field] ?? null);
+                if ($value !== null) {
+                    $ids[] = $value;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($ids, static fn(string $id): bool => $id !== '')));
+    }
+
+    private function requiredTextOrNull(mixed $value): ?string
+    {
+        $text = is_scalar($value) ? trim((string)$value) : '';
+        return $text === '' ? null : $text;
+    }
+
+    /**
+     * @param list<string> $values
+     */
+    private function postgresTextArray(array $values): string
+    {
+        $escaped = array_map(
+            static fn(string $value): string => '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], $value) . '"',
+            $values,
+        );
+        return '{' . implode(',', $escaped) . '}';
     }
 }

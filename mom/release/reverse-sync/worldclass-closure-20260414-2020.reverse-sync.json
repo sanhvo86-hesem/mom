@@ -1,0 +1,38 @@
+{
+  "artifact_type": "reverse_sync_intake",
+  "intake_id": "worldclass-closure-20260414-2020",
+  "branch": "codex/worldclass-closure-20260414-2020",
+  "created_at": "2026-04-14T13:46:31Z",
+  "source_of_change": "codex_worldclass_closure_program",
+  "controlled_source_updates": [
+    "Fast-forwarded remediation branch to current origin/main before code changes",
+    "Hardened evidence finalization to require accepted source submission attempt",
+    "Required persisted retention lock and finalization audit event for final evidence",
+    "Added stable record content hash to evidence package builder",
+    "Changed audit-pack export to exact scope and finalization timeline requirement",
+    "Required release signature evidence or controlled import receipt for direct released document revisions",
+    "Blocked one-actor completion of group document distributions",
+    "Role-gated EQMS change and as-manufactured API paths",
+    "Added change release governance, effectivity conflict persistence, and release side-effect execution",
+    "Enforced resulting-object affected-object linkage and current snapshot uniqueness in migration 127",
+    "Rejected caller-supplied scope for manufacturing timeline/history and as-manufactured query",
+    "Made genealogy facts content-fingerprint-bound and replay-conflict aware",
+    "Added EQMS control-plane OpenAPI contracts",
+    "Added branch-specific closure register, promotion manifest, receipt, and reverse-sync intake"
+  ],
+  "runtime_or_generated_artifacts_not_reimported": [
+    "mom/vendor",
+    "mom/data/registry/*.json",
+    "browser-test artifacts",
+    "scratch prompt dumps",
+    "local runtime logs"
+  ],
+  "post_merge_actions": [
+    "Run governed migration 127 in target environments after dry-run",
+    "Capture environment deploy receipt with release manifest ref and change authority ref",
+    "Configure Graph publication worker credentials and target library IDs",
+    "Select WORM/Object Lock adapter and update retention policy waiver",
+    "Design and schedule daily integrity digest worker",
+    "Implement full training task lifecycle and deterministic as-built closure builder"
+  ]
+}

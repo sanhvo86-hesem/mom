@@ -54,15 +54,28 @@ final class EvidencePackageBuilder
             $snapshotBytes,
         );
 
+        $publicationState = $this->publicationState($input);
+        $recordContentHash = hash('sha256', $this->canonicalJson([
+            'subject_type' => $subjectType,
+            'subject_id' => $subjectId,
+            'publication_state' => $publicationState,
+            'artifacts' => [
+                'original' => $this->artifactManifest($artifacts['original']),
+                'canonical_payload' => $this->artifactManifest($artifacts['canonical_payload']),
+                'readable_snapshot' => $this->artifactManifest($artifacts['readable_snapshot']),
+            ],
+        ]));
+
         $manifest = [
             'manifest_version' => 1,
             'subject_type' => $subjectType,
             'subject_id' => $subjectId,
-            'created_at' => $this->nowIso(),
+            'created_at' => $this->manifestCreatedAt($input),
             'actor_id' => (string)($input['actor_id'] ?? ''),
             'source' => is_array($input['source'] ?? null) ? $input['source'] : [],
+            'record_content_hash_sha256' => $recordContentHash,
             'signature_events' => is_array($input['signature_events'] ?? null) ? $input['signature_events'] : [],
-            'publication_state' => $this->publicationState($input),
+            'publication_state' => $publicationState,
             'artifacts' => [
                 'original' => $this->artifactManifest($artifacts['original']),
                 'canonical_payload' => $this->artifactManifest($artifacts['canonical_payload']),
@@ -91,6 +104,7 @@ final class EvidencePackageBuilder
             'subject_id' => $subjectId,
             'package_hash_sha256' => $packageHash,
             'manifest_hash_sha256' => $manifestHash,
+            'record_content_hash_sha256' => $recordContentHash,
             'canonical_payload_hash_sha256' => $artifacts['canonical_payload']['sha256'],
             'readable_snapshot_hash_sha256' => $artifacts['readable_snapshot']['sha256'],
             // Backward-compatible alias for migration 103 callers.
@@ -245,5 +259,26 @@ final class EvidencePackageBuilder
     private function nowIso(): string
     {
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function manifestCreatedAt(array $input): string
+    {
+        foreach (['created_at', 'finalized_at', 'command_created_at', 'finalization_command_at'] as $key) {
+            if (is_scalar($input[$key] ?? null) && trim((string)$input[$key]) !== '') {
+                return trim((string)$input[$key]);
+            }
+        }
+
+        $signatureEvents = is_array($input['signature_events'] ?? null) ? $input['signature_events'] : [];
+        foreach ($signatureEvents as $event) {
+            if (is_array($event) && is_scalar($event['signed_at'] ?? null) && trim((string)$event['signed_at']) !== '') {
+                return trim((string)$event['signed_at']);
+            }
+        }
+
+        return $this->nowIso();
     }
 }

@@ -379,9 +379,11 @@ final class EqmsControlPlaneController extends BaseController
     public function createChangeRequest(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeRequesterRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['title']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -398,12 +400,14 @@ final class EqmsControlPlaneController extends BaseController
     public function transitionChangeRequest(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeCoordinatorRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         if (!isset($body['change_request_id'])) {
             $body['change_request_id'] = (string)$this->query('change_request_id', '');
         }
         $this->requireFields($body, ['change_request_id', 'target_status']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -420,9 +424,11 @@ final class EqmsControlPlaneController extends BaseController
     public function createChangeOrder(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeCoordinatorRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['title']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -439,12 +445,14 @@ final class EqmsControlPlaneController extends BaseController
     public function transitionChangeOrder(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->changeApproverRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
         if (!isset($body['change_order_id'])) {
             $body['change_order_id'] = (string)$this->query('change_order_id', '');
         }
         $this->requireFields($body, ['change_order_id', 'target_status']);
+        $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
             $this->success([
@@ -726,7 +734,14 @@ final class EqmsControlPlaneController extends BaseController
 
     public function asManufacturedThread(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->traceabilityReadRoles());
+        foreach (['plant_id', 'org_plant_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $scopeField) {
+            $value = $this->query($scopeField, '');
+            if ($value !== null && trim($value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be provided in request. Scope is derived from user session.');
+            }
+        }
         $subjectType = (string)$this->query('subject_type', '');
         $subjectId = (string)$this->query('subject_id', '');
         if ($subjectType === '' || $subjectId === '') {
@@ -739,6 +754,7 @@ final class EqmsControlPlaneController extends BaseController
                     $subjectType,
                     $subjectId,
                     (int)$this->query('limit', '200'),
+                    $this->sessionOrgScope(),
                 ),
             ]);
         } catch (\Throwable $e) {
@@ -800,5 +816,93 @@ final class EqmsControlPlaneController extends BaseController
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeRequesterRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'requester',
+            'author',
+            'engineering',
+            'qa',
+            'qms_engineer',
+            'change_coordinator',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeCoordinatorRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'change_coordinator',
+            'qa_manager',
+            'qms_manager',
+            'document_control',
+            'engineering_manager',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function changeApproverRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'qa_manager',
+            'qms_manager',
+            'production_director',
+            'engineering_manager',
+            'compliance_manager',
+            'change_coordinator',
+        ])));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function traceabilityReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'production_director',
+            'production_manager',
+            'cnc_workshop_manager',
+            'shift_leader',
+            'quality_manager',
+            'qa_manager',
+            'quality_engineer',
+            'qms_engineer',
+            'internal_auditor',
+            'auditor',
+        ])));
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return list<string>
+     */
+    private function rolesForUser(array $user): array
+    {
+        $roles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+        return array_values(array_filter(array_map(static fn(mixed $role): string => strtolower(trim((string)$role)), $roles)));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function sessionOrgScope(): array
+    {
+        return array_filter([
+            'plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_plant_id' => (string)($_SESSION['plant_id'] ?? ''),
+            'org_id' => (string)($_SESSION['org_id'] ?? ''),
+            'org_company_code' => (string)($_SESSION['org_company_code'] ?? ''),
+            'org_legal_entity_code' => (string)($_SESSION['org_legal_entity_code'] ?? ''),
+            'org_site_id' => (string)($_SESSION['org_site_id'] ?? ''),
+        ], static fn(string $value): bool => $value !== '');
     }
 }

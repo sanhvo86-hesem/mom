@@ -62,6 +62,12 @@ final class AuditPackExporter
                 ];
             }
         }
+        if ($evidencePackages !== [] && !$this->hasFinalizationAuditEvent($auditEvents)) {
+            $exceptions[] = [
+                'exception_code' => 'audit_timeline_missing_finalization_event',
+                'missing' => ['evidence.finalized audit event'],
+            ];
+        }
 
         $manifest = [
             'manifest_version' => 1,
@@ -304,6 +310,24 @@ final class AuditPackExporter
         }
 
         return $missing;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $auditEvents
+     */
+    private function hasFinalizationAuditEvent(array $auditEvents): bool
+    {
+        foreach ($auditEvents as $event) {
+            $eventType = strtolower($this->text($event['event_type'] ?? ''));
+            $aggregateType = strtolower($this->text($event['aggregate_type'] ?? ''));
+            if (in_array($eventType, ['evidence.finalized', 'evidence_finalized', 'finalized', 'approved'], true)
+                && in_array($aggregateType, ['evidence_record', 'evidence_version'], true)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

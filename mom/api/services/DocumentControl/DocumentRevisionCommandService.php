@@ -37,6 +37,12 @@ final class DocumentRevisionCommandService
         if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true) && $manifestHash === null) {
             throw new RuntimeException('document_revision_manifest_hash_required');
         }
+        if ($lifecycleState === 'released'
+            && $this->nullableUuid($input['release_signature_event_id'] ?? $input['signature_event_id'] ?? null) === null
+            && $this->nullableText($input['controlled_import_receipt_id'] ?? null) === null
+        ) {
+            throw new RuntimeException('document_release_signature_required');
+        }
 
         $family = $db->queryOne(
             "WITH inserted AS (
@@ -117,6 +123,8 @@ final class DocumentRevisionCommandService
                     'authority' => 'DocumentRevisionCommandService',
                     'actor_ref' => $actorRef,
                     'legacy_file_role' => 'carrier_not_authority',
+                    'release_signature_event_id' => $this->nullableUuid($input['release_signature_event_id'] ?? $input['signature_event_id'] ?? null),
+                    'controlled_import_receipt_id' => $this->nullableText($input['controlled_import_receipt_id'] ?? null),
                 ] + (is_array($input['revision_metadata'] ?? null) ? $input['revision_metadata'] : [])),
             ],
         );
@@ -192,9 +200,8 @@ final class DocumentRevisionCommandService
              WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
                AND read_ack_required = true
                AND (
-                   audience_ref = :actor_ref
-                   OR audience_ref = :audience_user_id
-                   OR audience_type IN ('role', 'department', 'site', 'plant')
+                   (audience_type = 'user' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
+                   OR (audience_type = 'individual' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
                )
              RETURNING *",
             [

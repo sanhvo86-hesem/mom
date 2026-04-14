@@ -32,6 +32,7 @@ final class ChangeLifecycleCommandService
         if ($status === 'approved_for_order') {
             throw new RuntimeException('change_request_terminal_status_requires_transition');
         }
+        $requestHash = $this->requestHash($input);
 
         $number = $this->text($input['change_request_number'] ?? '');
         if ($number === '') {
@@ -57,7 +58,12 @@ final class ChangeLifecycleCommandService
                 ':priority' => $this->enum($input['priority'] ?? 'medium', ['low', 'medium', 'high', 'critical']),
                 ':status' => $status,
                 ':target_effective_date' => $this->nullableText($input['target_effective_date'] ?? null),
-                ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command']),
+                ':metadata' => $this->json([
+                    'actor_ref' => $actorRef,
+                    'authority' => 'change_lifecycle_command',
+                    'idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
+                    'request_hash_sha256' => $requestHash,
+                ]),
             ],
         );
 
@@ -79,6 +85,7 @@ final class ChangeLifecycleCommandService
         $id = $this->requiredText($input, 'change_request_id');
         $current = $this->loadChangeRequestRow($id);
         $this->assertAllowedRequestTransition(strtolower($this->text($current['status'] ?? '')), $target);
+        $this->assertTransitionGovernance($input, $actorRef, 'change_request', strtolower($this->text($current['status'] ?? '')), $target, $current);
 
         $row = $this->db->queryOne(
             "UPDATE plm_change_requests
@@ -124,6 +131,7 @@ final class ChangeLifecycleCommandService
         if (in_array($status, ['released', 'implemented', 'closed'], true)) {
             throw new RuntimeException('change_order_release_requires_transition');
         }
+        $requestHash = $this->requestHash($input);
 
         $number = $this->text($input['change_order_number'] ?? '');
         if ($number === '') {
@@ -153,7 +161,10 @@ final class ChangeLifecycleCommandService
                 ':serial_effective_to' => $this->nullableText($input['serial_effective_to'] ?? null),
                 ':status' => $status,
                 ':implementation_due_date' => $this->nullableText($input['implementation_due_date'] ?? null),
-                ':metadata' => $this->json($this->changeOrderMetadata($input, $actorRef)),
+                ':metadata' => $this->json($this->changeOrderMetadata($input, $actorRef) + [
+                    'idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
+                    'request_hash_sha256' => $requestHash,
+                ]),
             ],
         );
 
@@ -184,8 +195,10 @@ final class ChangeLifecycleCommandService
         $id = $this->requiredText($input, 'change_order_id');
         $current = $this->loadChangeOrderRow($id);
         $this->assertAllowedOrderTransition(strtolower($this->text($current['status'] ?? '')), $target);
+        $this->assertTransitionGovernance($input, $actorRef, 'change_order', strtolower($this->text($current['status'] ?? '')), $target, $current);
 
         $releaseGate = null;
+        $releaseSideEffects = null;
         if ($target === 'released') {
             $releaseGate = $this->evaluateChangeOrderReleaseReadiness($id, $input);
             if (!$releaseGate['allowed']) {
@@ -194,6 +207,11 @@ final class ChangeLifecycleCommandService
                     $releaseGate['blockers'],
                 )));
             }
+            $releaseSideEffects = (new ChangeReleaseSideEffectService($this->db))->apply($current, [
+                'change_order_id' => $this->text($current['plm_change_order_id'] ?? $id),
+                'actor_ref' => $actorRef,
+                'signature_event_id' => $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null),
+            ]);
         }
 
         if ($target === 'closed') {
@@ -219,6 +237,7 @@ final class ChangeLifecycleCommandService
                     'transitioned_by' => $actorRef,
                     'reason' => $this->text($input['reason'] ?? ''),
                     'release_gate' => $releaseGate,
+                    'release_side_effects' => $releaseSideEffects,
                 ], static fn(mixed $value): bool => $value !== null && $value !== '')),
             ],
         );
@@ -236,6 +255,11 @@ final class ChangeLifecycleCommandService
     public function evaluateChangeOrderReleaseReadiness(string $changeOrderId, array $overrides = []): array
     {
         $package = $this->loadChangeLifecyclePackage($changeOrderId);
+        $detectedConflicts = (new EffectivityConflictService($this->db))->detectAndPersist(
+            $this->text($package['change_order']['plm_change_order_id'] ?? $changeOrderId),
+            $package['effectivities'],
+        );
+        $conflicts = array_merge($package['conflicts'], $detectedConflicts);
         $gate = (new EffectivityGateService())->evaluateChangeOrderRelease(
             $package['change_order'],
             $package['affected_objects'],
@@ -243,7 +267,7 @@ final class ChangeLifecycleCommandService
             $package['effectivities'],
             $package['training_requirements'],
             $package['verifications'],
-            $package['conflicts'],
+            $conflicts,
         );
 
         $blockers = $gate['blockers'];
@@ -814,6 +838,103 @@ final class ChangeLifecycleCommandService
         }
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $currentRow
+     */
+    private function assertTransitionGovernance(
+        array $input,
+        string $actorRef,
+        string $aggregateType,
+        string $current,
+        string $target,
+        array $currentRow,
+    ): void {
+        if ($this->text($input['reason'] ?? '') === '' && !in_array($target, ['cancelled', 'rejected'], true)) {
+            throw new RuntimeException($aggregateType . '_transition_reason_required');
+        }
+
+        $roles = $this->normalizedRoles($input['actor_roles'] ?? $input['_actor_roles'] ?? []);
+        if ($roles !== [] && !$this->transitionRoleAllowed($aggregateType, $target, $roles)) {
+            throw new RuntimeException($aggregateType . '_transition_role_not_authorized');
+        }
+
+        if ($roles !== [] && $aggregateType === 'change_order' && in_array($target, ['approved', 'released', 'closed'], true)) {
+            $creator = $this->creatorRef($currentRow);
+            if ($creator !== '' && hash_equals($creator, $actorRef)) {
+                throw new RuntimeException('change_order_transition_sod_violation');
+            }
+        }
+
+        if ($target === 'released' && $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null) === null) {
+            throw new RuntimeException('change_order_release_signature_required');
+        }
+    }
+
+    /**
+     * @param list<string>|mixed $roles
+     * @return list<string>
+     */
+    private function normalizedRoles(mixed $roles): array
+    {
+        if (!is_array($roles)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn(mixed $role): string => strtolower(trim((string)$role)),
+            $roles,
+        ))));
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    private function transitionRoleAllowed(string $aggregateType, string $target, array $roles): bool
+    {
+        $policy = $aggregateType === 'change_request'
+            ? [
+                'submitted' => ['requester', 'author', 'qa', 'qms_engineer', 'change_coordinator', 'admin'],
+                'triage' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'approved_for_order' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'rejected' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'cancelled' => ['requester', 'change_coordinator', 'admin'],
+            ]
+            : [
+                'impact_assessment' => ['change_coordinator', 'qa_manager', 'qms_manager', 'engineering_manager', 'admin'],
+                'in_review' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+                'approved' => ['qa_manager', 'qms_manager', 'engineering_manager', 'compliance_manager', 'admin'],
+                'released' => ['qa_manager', 'qms_manager', 'change_coordinator', 'compliance_manager', 'admin'],
+                'implemented' => ['implementation_owner', 'production_manager', 'change_coordinator', 'admin'],
+                'closed' => ['qa_manager', 'qms_manager', 'compliance_manager', 'admin'],
+                'cancelled' => ['change_coordinator', 'qa_manager', 'qms_manager', 'admin'],
+            ];
+
+        $allowed = $policy[$target] ?? [];
+        if ($allowed === []) {
+            return true;
+        }
+        foreach ($roles as $role) {
+            if (in_array($role, $allowed, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function creatorRef(array $row): string
+    {
+        $metadata = $row['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+        return is_array($metadata) ? $this->text($metadata['actor_ref'] ?? $metadata['created_by_actor_ref'] ?? '') : '';
+    }
+
     private function assertAllowedOrderTransition(string $current, string $target): void
     {
         $allowed = [
@@ -830,6 +951,16 @@ final class ChangeLifecycleCommandService
         if (!in_array($target, $allowed[$current] ?? [], true)) {
             throw new RuntimeException('invalid_change_order_transition');
         }
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     */
+    private function requestHash(array $input): string
+    {
+        $copy = $input;
+        unset($copy['idempotency_key']);
+        return hash('sha256', $this->json($copy));
     }
 
     private function assertEffectivenessClosure(string $id): void
