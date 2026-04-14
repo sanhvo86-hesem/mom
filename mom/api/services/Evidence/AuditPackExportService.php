@@ -236,9 +236,9 @@ final class AuditPackExportService
         $retentionLocks = $recordIds === [] ? [] : $this->queryRows(
             "SELECT *, COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') AS org_id
              FROM retention_locks
-             WHERE aggregate_type = 'evidence_record'
-               AND aggregate_id = ANY(CAST(:evidence_record_ids AS text[]))
-               AND lock_state IN ('active', 'retained', 'locked')
+             WHERE object_type = 'evidence_record'
+               AND object_id = ANY(CAST(:evidence_record_ids AS text[]))
+               AND lock_state = 'active'
                AND (:org_id = '' OR COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id', :org_id) = :org_id)
              ORDER BY created_at, retention_lock_id",
             [
@@ -248,7 +248,7 @@ final class AuditPackExportService
         );
 
         $publicationsByVersion = $this->groupRows($publications, 'evidence_version_id');
-        $retentionByRecord = $this->groupRows($retentionLocks, 'aggregate_id');
+        $retentionByRecord = $this->groupRows($retentionLocks, 'object_id');
 
         foreach ($packages as &$package) {
             $versionId = $this->requiredTextOrNull($package['evidence_version_id'] ?? null) ?? '';

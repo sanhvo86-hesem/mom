@@ -1039,6 +1039,34 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('org-1', $manifest['audit_timeline'][0]['org_id']);
     }
 
+    public function testAuditPackExportServiceUsesCanonicalRetentionLockColumns(): void
+    {
+        $db = new AuditPackExportFakeDb();
+        $manifest = (new AuditPackExportService($db))->buildForScope([
+            'scope_type' => 'evidence_record',
+            'scope_ref' => 'EV-1',
+        ], 'org-1');
+
+        $retentionSql = '';
+        foreach ($db->queryCalls as $call) {
+            if (str_contains($call['sql'], 'FROM retention_locks')) {
+                $retentionSql = $call['sql'];
+                break;
+            }
+        }
+
+        $this->assertNotSame('', $retentionSql);
+        $this->assertStringContainsString("object_type = 'evidence_record'", $retentionSql);
+        $this->assertStringContainsString('object_id = ANY', $retentionSql);
+        $this->assertStringContainsString("lock_state = 'active'", $retentionSql);
+        $this->assertStringNotContainsString('aggregate_type', $retentionSql);
+        $this->assertStringNotContainsString('aggregate_id', $retentionSql);
+        $this->assertSame(
+            '00000000-0000-0000-0000-000000000901',
+            $manifest['evidence_packages'][0]['retention_locks'][0]['object_id'] ?? null,
+        );
+    }
+
     public function testAuditPackExportServiceWritesDurableBundleFromCanonicalScope(): void
     {
         $dir = sys_get_temp_dir() . '/mom-audit-pack-service-' . bin2hex(random_bytes(4));
@@ -2437,6 +2465,11 @@ final class AuditPackExportFakeDb
     /**
      * @var list<array{sql: string, params: array<string, mixed>}>
      */
+    public array $queryCalls = [];
+
+    /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
     public array $queryOneCalls = [];
 
     /**
@@ -2445,6 +2478,8 @@ final class AuditPackExportFakeDb
      */
     public function query(string $sql, array $params = []): array
     {
+        $this->queryCalls[] = ['sql' => $sql, 'params' => $params];
+
         if (str_contains($sql, 'FROM evidence_records er')) {
             return [[
                 'org_id' => 'org-1',
@@ -2476,8 +2511,8 @@ final class AuditPackExportFakeDb
         if (str_contains($sql, 'FROM retention_locks')) {
             return [[
                 'retention_lock_id' => '00000000-0000-0000-0000-000000000905',
-                'aggregate_type' => 'evidence_record',
-                'aggregate_id' => '00000000-0000-0000-0000-000000000901',
+                'object_type' => 'evidence_record',
+                'object_id' => '00000000-0000-0000-0000-000000000901',
                 'lock_state' => 'active',
                 'org_id' => 'org-1',
             ]];

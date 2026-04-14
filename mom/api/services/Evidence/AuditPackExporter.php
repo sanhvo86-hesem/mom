@@ -427,7 +427,7 @@ final class AuditPackExporter
             }
             $state = strtolower($this->text($lock['lock_state'] ?? ''));
             if ($this->text($lock['retention_lock_id'] ?? '') !== ''
-                && in_array($state, ['active', 'retained', 'locked'], true)
+                && $state === 'active'
             ) {
                 return true;
             }
