@@ -90,6 +90,19 @@ final class TraceabilityGenealogyServiceTest extends TestCase
         $this->traceability->downstreamTrace(['lot_number' => 'SUP-SCOPE-REQ']);
     }
 
+    public function testGenealogyReadRejectsBroadEnterpriseOnlyScope(): void
+    {
+        $this->seedSupplierToShipmentChain('SUP-BROAD-SCOPE', 'REC-BROAD-SCOPE', 'PROD-BROAD-SCOPE', 'SHIP-BROAD-SCOPE', 'SITE-A');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('traceability_genealogy_partition_scope_required');
+
+        $this->traceability->downstreamTrace([
+            'lot_number' => 'SUP-BROAD-SCOPE',
+            'enterprise_id' => 'GLOBAL',
+        ]);
+    }
+
     public function testTraceReadModelHonorsSiteScope(): void
     {
         $this->seedSupplierToShipmentChain('SUP-SCOPE', 'REC-A', 'PROD-A', 'SHIP-A', 'SITE-A');

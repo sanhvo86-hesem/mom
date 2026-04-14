@@ -2152,6 +2152,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'field_path' => 'genealogy.consume',
             'quantity' => 1,
             'uom' => 'EA',
+            'scope' => ['org_site_id' => 'SITE-1'],
         ], 'operator-1');
 
         $this->assertSame('consume', $fact['edge_fact_type']);
@@ -2245,6 +2246,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'from_object_id' => 'MAT-LOT-1',
             'to_object_type' => 'work_order',
             'to_object_id' => 'WO-1',
+            'scope' => ['org_site_id' => 'SITE-1'],
         ], 'operator-1');
     }
 
@@ -2275,6 +2277,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'to_object_id' => 'ROUTE-714-OP10',
             'change_order_id' => '00000000-0000-0000-0000-000000000201',
             'field_path' => 'genealogy.measure',
+            'scope' => ['org_site_id' => 'SITE-1'],
         ], 'planner-1');
 
         $this->assertSame('measure', $fact['edge_fact_type']);
@@ -2318,6 +2321,23 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringContainsString("(COALESCE(org_site_id, ''))", $insert['sql']);
     }
 
+    public function testGenealogyGraphRejectsBroadScopeWithoutPlantOrSitePartition(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('genealogy_partition_scope_required');
+
+        (new GenealogyGraphService(new GenealogyGraphFakeDb()))->recordEdgeFact([
+            'edge_fact_type' => 'consume',
+            'from_object_type' => 'material',
+            'from_object_id' => 'MAT-LOT-1',
+            'to_object_type' => 'work_order',
+            'to_object_id' => 'WO-1',
+            'change_order_id' => '00000000-0000-0000-0000-000000000201',
+            'field_path' => 'genealogy.consume',
+            'scope' => ['org_company_code' => 'GLOBAL'],
+        ], 'operator-1');
+    }
+
     public function testGenealogyOntologyMigrationMatchesRuntimeNodeTypes(): void
     {
         $migration = (string)file_get_contents(QMS_TEST_BASE_DIR . '/database/migrations/121_genealogy_runtime_ontology_constraints.sql');
@@ -2336,20 +2356,30 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
     public function testAsManufacturedThreadReadsProjectedGraphAndSnapshot(): void
     {
-        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('work_order', 'WO-1');
+        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('work_order', 'WO-1', scope: ['org_site_id' => 'SITE-1']);
 
         $this->assertSame('genealogy_projected_graph', $thread['authority']);
         $this->assertSame(str_repeat('a', 64), $thread['graph_hash_sha256']);
+        $this->assertTrue($thread['complete']);
+        $this->assertFalse($thread['truncated']);
         $this->assertNotEmpty($thread['edges']);
         $this->assertSame('material', $thread['edges'][0]['from_node_type']);
     }
 
     public function testAsManufacturedThreadAcceptsExpandedDigitalThreadSubjectTypes(): void
     {
-        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('process', 'PROC-OP10');
+        $thread = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('process', 'PROC-OP10', scope: ['org_site_id' => 'SITE-1']);
 
         $this->assertSame('process', $thread['subject_type']);
         $this->assertSame('PROC-OP10', $thread['subject_id']);
+    }
+
+    public function testAsManufacturedThreadRequiresPlantOrSiteScope(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('genealogy_partition_scope_required');
+
+        (new GenealogyGraphService(new GenealogyGraphFakeDb()))->asManufacturedThread('work_order', 'WO-1', scope: ['org_company_code' => 'GLOBAL']);
     }
 
     /**

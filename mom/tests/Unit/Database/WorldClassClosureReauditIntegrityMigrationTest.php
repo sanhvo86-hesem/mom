@@ -23,7 +23,8 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $this->assertStringContainsString('fk_signature_events_auth_challenge', $this->sql);
         $this->assertStringContainsString('FOREIGN KEY (auth_challenge_id)', $this->sql);
         $this->assertStringContainsString('REFERENCES e_signature_auth_challenges (auth_challenge_id)', $this->sql);
-        $this->assertStringContainsString('NOT VALID', $this->sql);
+        $this->assertStringContainsString('signature_events_auth_challenge_orphans_block_fk', $this->sql);
+        $this->assertStringNotContainsString('NOT VALID', $this->sql);
     }
 
     public function testExplicitFieldAuthorizationTokensHaveUnconsumedLookupIndex(): void

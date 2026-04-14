@@ -15,6 +15,17 @@ CREATE INDEX IF NOT EXISTS idx_signature_events_auth_challenge_id
 
 DO $$
 BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM signature_events se
+        LEFT JOIN e_signature_auth_challenges ac
+          ON ac.auth_challenge_id = se.auth_challenge_id
+        WHERE se.auth_challenge_id IS NOT NULL
+          AND ac.auth_challenge_id IS NULL
+    ) THEN
+        RAISE EXCEPTION 'signature_events_auth_challenge_orphans_block_fk';
+    END IF;
+
     IF NOT EXISTS (
         SELECT 1
         FROM pg_constraint
@@ -24,8 +35,7 @@ BEGIN
             ADD CONSTRAINT fk_signature_events_auth_challenge
             FOREIGN KEY (auth_challenge_id)
             REFERENCES e_signature_auth_challenges (auth_challenge_id)
-            DEFERRABLE INITIALLY IMMEDIATE
-            NOT VALID;
+            DEFERRABLE INITIALLY IMMEDIATE;
     END IF;
 END $$;
 

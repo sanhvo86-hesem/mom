@@ -69,7 +69,7 @@ final class GenealogyGraphService
         $toId = $this->requiredText($fact, 'to_object_id');
         $this->nodeType($fromType);
         $this->nodeType($toType);
-        $scope = $this->trustedScope($fact);
+        $scope = $this->requireTrustedScope($fact);
 
         // MES-R6-004 FIX: Cycle detection
         if ($fromId === $toId) {
@@ -321,6 +321,8 @@ final class GenealogyGraphService
         }
         $subjectType = $this->nodeType($subjectType);
 
+        $scope = $this->requireReadScope($scope);
+        $limit = max(1, min(1000, $limit));
         $scopeSql = $this->scopeSql('s', $scope);
         $snapshotRows = $this->db->query(
             "SELECT *
@@ -352,25 +354,34 @@ final class GenealogyGraphService
                 )
                " . $this->scopeSql('e', $scope) . "
              ORDER BY e.event_time ASC NULLS LAST, e.created_at ASC
-             LIMIT :limit",
+	             LIMIT :limit",
             [
                 ':subject_type' => $subjectType,
                 ':subject_id' => $subjectId,
-                ':limit' => max(1, min(1000, $limit)),
+                ':limit' => $limit + 1,
             ] + $this->scopeParams($scope),
         );
+        $edgeRows = is_array($rows) ? array_values($rows) : [];
+        $truncated = count($edgeRows) > $limit;
+        if ($truncated) {
+            $edgeRows = array_slice($edgeRows, 0, $limit);
+        }
 
         return [
             'subject_type' => $subjectType,
             'subject_id' => $subjectId,
             'authority' => 'genealogy_projected_graph',
+            'limit' => $limit,
+            'complete' => !$truncated,
+            'truncated' => $truncated,
             'snapshot' => is_array($snapshotRows) && isset($snapshotRows[0]) && is_array($snapshotRows[0])
                 ? $this->normalizeRow($snapshotRows[0])
                 : null,
             'graph_hash_sha256' => is_array($snapshotRows) && isset($snapshotRows[0]['snapshot_hash_sha256'])
                 ? (string)$snapshotRows[0]['snapshot_hash_sha256']
                 : '',
-            'edges' => array_map(fn(array $row): array => $this->normalizeRow($row), is_array($rows) ? $rows : []),
+            'edge_count' => count($edgeRows),
+            'edges' => array_map(fn(array $row): array => $this->normalizeRow($row), $edgeRows),
         ];
     }
 
@@ -705,6 +716,37 @@ final class GenealogyGraphService
             }
         }
         return $normalized;
+    }
+
+    /**
+     * @param array<string, mixed> $fact
+     * @return array<string, string>
+     */
+    private function requireTrustedScope(array $fact): array
+    {
+        return $this->requireCanonicalPartitionScope($this->trustedScope($fact));
+    }
+
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, string>
+     */
+    private function requireReadScope(array $scope): array
+    {
+        return $this->requireCanonicalPartitionScope($scope);
+    }
+
+    /**
+     * @param array<string, string> $scope
+     * @return array<string, string>
+     */
+    private function requireCanonicalPartitionScope(array $scope): array
+    {
+        if (($scope['org_site_id'] ?? '') !== '' || ($scope['org_plant_id'] ?? '') !== '') {
+            return $scope;
+        }
+
+        throw new RuntimeException('genealogy_partition_scope_required');
     }
 
     /**

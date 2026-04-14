@@ -1148,8 +1148,13 @@ final class TraceabilityGenealogyService
         if ($scope === []) {
             throw new RuntimeException('traceability_genealogy_scope_required');
         }
+        foreach (['site_id', 'plant_id', 'org_site_id', 'org_plant_id'] as $field) {
+            if (($scope[$field] ?? '') !== '') {
+                return $scope;
+            }
+        }
 
-        return $scope;
+        throw new RuntimeException('traceability_genealogy_partition_scope_required');
     }
 
     /**
