@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-14T16:18:30.445Z",
+    "generatedAt": "2026-04-14T17:51:26.990Z",
     "enumCount": 877
   },
   "so_status": {
@@ -42400,7 +42400,6 @@
     "standard": "internal",
     "sourceTable": "controlled_import_receipts",
     "statusColumn": "receipt_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",

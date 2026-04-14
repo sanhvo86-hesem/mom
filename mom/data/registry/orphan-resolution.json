@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:18:24.554Z",
-    "description": "Resolution plan for 0 orphan registry fields and 474 orphan DB column names."
+    "generatedAt": "2026-04-14T17:51:20.496Z",
+    "description": "Resolution plan for 0 orphan registry fields and 462 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,7 +39,7 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 377,
+      "count": 372,
       "columns": [
         {
           "column": "item_class",
@@ -4177,19 +4177,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "release_package_hash_sha256",
-          "tables": [
-            "plm_change_orders"
-          ],
-          "suggestedLabel": "Phát hành Package Băm Sha256",
-          "suggestedLabelEn": "Release Package Hash Sha256",
-          "suggestedType": "string",
-          "dbTypes": [
-            "CHAR(64)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "root_cause_description",
           "tables": [
             "capa_8d_steps"
@@ -4906,58 +4893,6 @@
             "JSONB"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "accepted_by_ref",
-          "tables": [
-            "frm_submission_attempts"
-          ],
-          "suggestedLabel": "Accepted bởi tham chiếu",
-          "suggestedLabelEn": "Accepted By Ref",
-          "suggestedType": "string",
-          "dbTypes": [
-            "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "imported_object_type",
-          "tables": [
-            "controlled_import_receipts"
-          ],
-          "suggestedLabel": "Imported Object Loại",
-          "suggestedLabelEn": "Imported Object Type",
-          "suggestedType": "select",
-          "dbTypes": [
-            "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "receipt_state",
-          "tables": [
-            "controlled_import_receipts"
-          ],
-          "suggestedLabel": "Phiếu nhận Trạng thái",
-          "suggestedLabelEn": "Receipt State",
-          "suggestedType": "select",
-          "dbTypes": [
-            "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "imported_by_ref",
-          "tables": [
-            "controlled_import_receipts"
-          ],
-          "suggestedLabel": "Imported bởi tham chiếu",
-          "suggestedLabelEn": "Imported By Ref",
-          "suggestedType": "string",
-          "dbTypes": [
-            "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4968,7 +4903,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 97,
+      "count": 90,
       "columns": [
         {
           "column": "supervisor_id",
@@ -5505,16 +5440,6 @@
           "role": "primary_key"
         },
         {
-          "column": "release_signature_event_id",
-          "tables": [
-            "plm_change_orders"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "foreign_key"
-        },
-        {
           "column": "plm_design_review_id",
           "tables": [
             "plm_design_reviews"
@@ -5880,46 +5805,6 @@
           "role": "foreign_key"
         },
         {
-          "column": "acceptance_signature_event_id",
-          "tables": [
-            "frm_submission_attempts"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "foreign_key"
-        },
-        {
-          "column": "satisfaction_signature_event_id",
-          "tables": [
-            "plm_change_training_requirements"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "foreign_key"
-        },
-        {
-          "column": "training_evidence_record_id",
-          "tables": [
-            "plm_change_training_requirements"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "foreign_key"
-        },
-        {
-          "column": "source_training_record_id",
-          "tables": [
-            "plm_change_training_requirements"
-          ],
-          "dbTypes": [
-            "TEXT"
-          ],
-          "role": "foreign_key"
-        },
-        {
           "column": "submission_validation_error_id",
           "tables": [
             "submission_validation_errors"
@@ -5928,26 +5813,6 @@
             "UUID"
           ],
           "role": "primary_key"
-        },
-        {
-          "column": "controlled_import_receipt_id",
-          "tables": [
-            "controlled_import_receipts"
-          ],
-          "dbTypes": [
-            "TEXT"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "imported_object_id",
-          "tables": [
-            "controlled_import_receipts"
-          ],
-          "dbTypes": [
-            "TEXT"
-          ],
-          "role": "foreign_key"
         }
       ]
     },

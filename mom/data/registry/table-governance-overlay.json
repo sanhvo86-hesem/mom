@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:18:41.951839+00:00",
+    "generatedAt": "2026-04-14T17:51:38.803565+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -4062,7 +4062,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:controlled_import_receipts_receipt_state",
         "wf_controlled_import_receipt"
       ],
       "businessObjectRefs": [],

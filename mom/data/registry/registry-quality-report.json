@@ -2,23 +2,23 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-14T16:18:35.855Z",
+    "generatedAt": "2026-04-14T17:51:32.935Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55"
+    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f"
   },
   "summary": {
     "endpoint_count": 4198,
     "pack_count": 4613,
-    "relation_edge_count": 3461,
+    "relation_edge_count": 3462,
     "workflow_count": 336,
     "status_set_count": 877,
     "validation_rule_count": 48682,
     "formula_count": 1353,
     "formula_reference_count": 1353,
-    "field_context_count": 56207,
+    "field_context_count": 56209,
     "row_version_tables": 616,
     "org_scoped_tables": 576,
     "composite_pk_tables": 21,
@@ -29,17 +29,17 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 344,
-    "workflow_engine_bridge_ready": 344,
+    "transition_runtime_warnings": 345,
+    "workflow_engine_bridge_ready": 345,
     "workflow_engine_bridge_blocked": 0,
     "archive_only_tables": 698,
     "soft_delete_tables": 63,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
       "stateless": 366,
-      "generic_status_only": 46,
+      "generic_status_only": 45,
       "guarded_transition_runtime": 5,
-      "persisted": 344,
+      "persisted": 345,
       "unknown": 0
     },
     "frontend_foundation_entities": 772,
@@ -96,8 +96,8 @@
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3461,
-      "target": 3461
+      "actual": 3462,
+      "target": 3462
     },
     {
       "id": "workflow_coverage",

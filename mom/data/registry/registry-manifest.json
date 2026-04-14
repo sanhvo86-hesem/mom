@@ -2,30 +2,30 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-14T16:18:35.855Z",
+    "generatedAt": "2026-04-14T17:51:32.935Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "177a8d7c-455d-4977-b166-a466ef06bd55",
-    "enterpriseAuthorityGeneratedAt": "2026-04-14T16:18:41.951839+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T16:18:42.100840+00:00"
+    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
+    "enterpriseAuthorityGeneratedAt": "2026-04-14T17:51:38.803565+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T17:51:38.952467+00:00"
   },
   "coverage": {
     "router_actions": 4198,
     "field_registry_actions": 4191,
-    "field_definitions": 56207,
-    "unique_field_keys": 5214,
+    "field_definitions": 56209,
+    "unique_field_keys": 5215,
     "status_sets": 877,
     "workflow_count": 336,
-    "relation_edges": 3461,
+    "relation_edges": 3462,
     "validation_rules": 48682,
     "formula_count": 1353,
     "domain_pack_count": 4613,
     "scalar_record_endpoints": 4054,
     "workflow_runtime_modes": {
       "stateless": 366,
-      "generic_status_only": 46,
+      "generic_status_only": 45,
       "guarded_transition_runtime": 5,
-      "persisted": 344,
+      "persisted": 345,
       "unknown": 12
     },
     "deletion_modes": {
@@ -34,9 +34,9 @@
       "archive_only": 698
     },
     "workflow_engine_bridge": {
-      "ready": 344,
+      "ready": 345,
       "blocked": 0,
-      "unneeded": 429
+      "unneeded": 428
     },
     "frontend_foundation": {
       "entity_count": 772,
@@ -188,7 +188,7 @@
       "hard_delete_endpoint_count": 0,
       "quarantined_delete_endpoint_count": 0,
       "runtime_unsafe_exposed_endpoint_count": 0,
-      "runtime_unsafe_blocked_endpoint_count": 1032,
+      "runtime_unsafe_blocked_endpoint_count": 1035,
       "generic_runtime_classification_count": 555,
       "bound_command_runtime_binding_count": 276,
       "unbound_command_runtime_binding_count": 0
@@ -240,7 +240,7 @@
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3461
+      "records": 3462
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",

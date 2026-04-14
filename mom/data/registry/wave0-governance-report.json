@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T16:18:37.651Z",
+    "generatedAt": "2026-04-14T17:51:34.800Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
@@ -3674,7 +3674,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 7,
+        "relation_count": 8,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6567,7 +6567,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 4,
+        "relation_count": 5,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
