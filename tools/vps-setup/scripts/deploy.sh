@@ -13,6 +13,8 @@ BRANCH="main"
 LOG="/var/log/qms-deploy.log"
 DEPLOY_USER="deploy"
 WEB_GROUP="www-data"
+RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
+RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
@@ -71,6 +73,16 @@ for logfile in php_error.log audit.log db_queries.log; do
     chown "$WEB_GROUP:$WEB_GROUP" "$target"
     chmod 664 "$target"
 done
+
+# ── Run governed database migrations before PHP-FPM serves the new release ──
+if [ "$RUN_DB_MIGRATIONS" = "1" ]; then
+    log "INFO" "Running governed DB migrations and schema smoke..."
+    RUN_DB_MIGRATIONS="$RUN_DB_MIGRATIONS" \
+    RUN_DB_SCHEMA_SMOKE="$RUN_DB_SCHEMA_SMOKE" \
+        bash "$SITE_DIR/mom/ops/vps/run-db-migrations.sh"
+else
+    log "WARN" "Skipping DB migrations because RUN_DB_MIGRATIONS=$RUN_DB_MIGRATIONS"
+fi
 
 # ── Clear OPcache ────────────────────────────────────────────────────────
 log "INFO" "Clearing OPcache..."

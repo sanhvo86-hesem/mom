@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T10:13:51.868315+00:00",
+    "generatedAt": "2026-04-14T11:32:57.946687+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -6428,7 +6428,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:e_signature_auth_challenges_challenge_state",
         "wf_e_signature_auth_challenge"
       ],
       "businessObjectRefs": [],
@@ -7440,7 +7440,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:emergency_change_controls_emergency_state",
         "wf_emergency_change_control"
       ],
       "businessObjectRefs": [],
@@ -12493,7 +12493,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:genealogy_edge_facts_fact_state",
         "wf_genealogy_edge_fact"
       ],
       "businessObjectRefs": [],
@@ -12730,7 +12730,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:governed_route_registry_route_state",
         "wf_governed_route_registry"
       ],
       "businessObjectRefs": [],
@@ -15799,7 +15799,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:legacy_authority_sunset_sunset_state",
         "wf_legacy_authority_sunset"
       ],
       "businessObjectRefs": [],
@@ -22454,7 +22454,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:periodic_evaluations_evaluation_state",
         "wf_periodic_evaluation"
       ],
       "businessObjectRefs": [],
@@ -27869,7 +27869,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status"
+        "status-set:rollback_requirements_rollback_state"
       ],
       "businessObjectRefs": [],
       "uiSurfaces": [
@@ -33581,7 +33581,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:traceability_5m_obligations_gate_state",
         "wf_traceability_5m_obligation"
       ],
       "businessObjectRefs": [],
@@ -33629,7 +33629,7 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [
-        "status-set:digital_thread_status",
+        "status-set:traceability_5m_policy_rules_policy_state",
         "wf_traceability_5m_policy_rule"
       ],
       "businessObjectRefs": [],

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-14T10:13:41.320Z",
+    "generatedAt": "2026-04-14T11:32:46.153Z",
     "workflowCount": 335
   },
   "workflows": {
@@ -10147,10 +10147,93 @@
         "users"
       ],
       "stateField": "challenge_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "e_signature_auth_challenges_challenge_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "quality_engineer",
+              "template": "quality_management_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [
@@ -11549,10 +11632,93 @@
         "users"
       ],
       "stateField": "emergency_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "emergency_change_controls_emergency_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "plm_change_control_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [
@@ -18089,10 +18255,93 @@
         "plm_change_orders"
       ],
       "stateField": "fact_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "genealogy_edge_facts_fact_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [
@@ -18223,10 +18472,93 @@
         "eqms_command_ledger"
       ],
       "stateField": "route_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "governed_route_registry_route_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [],
@@ -25140,10 +25472,93 @@
         "legacy_authority_sunset"
       ],
       "stateField": "sunset_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "legacy_authority_sunset_sunset_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [],
@@ -37482,10 +37897,93 @@
         "audit_pack_exports"
       ],
       "stateField": "evaluation_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "periodic_evaluations_evaluation_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "record_system_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [
@@ -54471,10 +54969,93 @@
         "traceability_5m_obligations"
       ],
       "stateField": "gate_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "traceability_5m_obligations_gate_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [],
@@ -54494,10 +55075,93 @@
         "plm_change_orders"
       ],
       "stateField": "policy_state",
-      "statusSet": "digital_thread_status",
-      "lifecycleMode": "generic_status_only",
-      "states": [],
-      "transitions": [],
+      "statusSet": "traceability_5m_policy_rules_policy_state",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "traceability_serialization_pending"
+            }
+          ]
+        }
+      ],
       "sla": {},
       "digitalThread": {
         "upstreamTriggers": [

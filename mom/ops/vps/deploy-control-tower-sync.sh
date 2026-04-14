@@ -16,6 +16,8 @@ RSYNC_RSH="${RSYNC_RSH:-ssh${SSH_OPTS}}"
 RUN_TERMINAL_INSTALL="${RUN_TERMINAL_INSTALL:-1}"
 RUN_OBSERVABILITY_INSTALL="${RUN_OBSERVABILITY_INSTALL:-1}"
 RUN_ROUTING_COMPAT_INSTALL="${RUN_ROUTING_COMPAT_INSTALL:-1}"
+RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
+RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 RUN_REMOTE_SMOKE="${RUN_REMOTE_SMOKE:-1}"
 APP_OWNER_GROUP="${APP_OWNER_GROUP:-}"
 APP_DATA_OWNER_GROUP="${APP_DATA_OWNER_GROUP:-}"
@@ -230,6 +232,16 @@ run_installers() {
   fi
 }
 
+run_db_migrations() {
+  if [ "$RUN_DB_MIGRATIONS" != "1" ]; then
+    echo "==> DB migrations skipped"
+    return
+  fi
+
+  echo "==> Run DB migrations and Data Schema live-DB smoke"
+  run_remote_cmd "cd '${APP_DIR}' && RUN_DB_MIGRATIONS='${RUN_DB_MIGRATIONS}' RUN_DB_SCHEMA_SMOKE='${RUN_DB_SCHEMA_SMOKE}' bash 'mom/ops/vps/run-db-migrations.sh'"
+}
+
 reload_runtime() {
   echo "==> Reload runtime"
   run_remote_cmd "set -e; nginx -t >/dev/null; systemctl reload nginx; php_fpm_service=\$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print \$1}' | head -n 1 || true); if [ -n \"\$php_fpm_service\" ]; then systemctl reload \"\$php_fpm_service\"; fi"
@@ -253,6 +265,7 @@ print_summary() {
  Target:      ${TARGET}
  App Dir:     ${APP_DIR}
  Routing:     $( [ "$RUN_ROUTING_COMPAT_INSTALL" = "1" ] && echo installed || echo skipped )
+ DB Migrate:  $( [ "$RUN_DB_MIGRATIONS" = "1" ] && echo executed || echo skipped )
  Terminal:    $( [ "$RUN_TERMINAL_INSTALL" = "1" ] && echo installed || echo skipped )
  Observe:     $( [ "$RUN_OBSERVABILITY_INSTALL" = "1" ] && echo installed || echo skipped )
  Smoke:       $( [ "$RUN_REMOTE_SMOKE" = "1" ] && echo executed || echo skipped )
@@ -277,6 +290,7 @@ detect_remote_data_owner_group
 detect_remote_domain
 sync_repo
 fix_permissions
+run_db_migrations
 run_installers
 fix_permissions
 reload_runtime

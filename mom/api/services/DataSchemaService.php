@@ -1866,6 +1866,37 @@ final class DataSchemaService
             ];
         }
 
+        if ($migrationFileCount > 0 && $appliedMigrationCount > 0 && $pendingMigrationCount > 0) {
+            $pendingIds = array_values(array_filter((array)($dbProbe['pending_migration_ids'] ?? []), 'is_scalar'));
+            $pendingPreview = array_slice(array_map('strval', $pendingIds), 0, 5);
+            $reason = sprintf(
+                '%d/%d migrations are recorded as applied; %d migration(s) are still pending.',
+                $appliedMigrationCount,
+                $migrationFileCount,
+                $pendingMigrationCount
+            );
+            if ($missingTableCount > 0 || $structuralDriftCount > 0) {
+                $reason .= sprintf(
+                    ' The live DB currently has %d/%d authority tables, %d missing table(s), and %d table(s) with column or PK drift.',
+                    $presentTableCount,
+                    $authorityTableCount,
+                    $missingTableCount,
+                    $structuralDriftCount
+                );
+            }
+            if ($pendingPreview !== []) {
+                $reason .= ' Pending: ' . implode(', ', $pendingPreview) . ($pendingMigrationCount > count($pendingPreview) ? ', ...' : '') . '.';
+            }
+
+            return [
+                'status' => 'migration_backlog',
+                'healthy' => false,
+                'reason' => $reason,
+                'nextAction' => 'Apply pending migrations through mom/ops/vps/run-db-migrations.sh or mom/database/migrate.sh before trusting frontend/schema readiness.',
+                'coverageRatio' => $coverageRatio,
+            ];
+        }
+
         if ($missingTableCount > 0 || ($authorityTableCount > 0 && $coverageRatio < 0.95)) {
             return [
                 'status' => 'incomplete_runtime_database',
@@ -1891,16 +1922,6 @@ final class DataSchemaService
                     $structuralDriftCount
                 ),
                 'nextAction' => 'Reconcile live DB columns, keys and unmanaged tables against migrations before release.',
-                'coverageRatio' => $coverageRatio,
-            ];
-        }
-
-        if ($migrationFileCount > 0 && $appliedMigrationCount > 0 && $pendingMigrationCount > 0) {
-            return [
-                'status' => 'migration_backlog',
-                'healthy' => false,
-                'reason' => sprintf('%d/%d migrations are recorded as applied; %d migration(s) are still pending.', $appliedMigrationCount, $migrationFileCount, $pendingMigrationCount),
-                'nextAction' => 'Apply pending migrations through the governed migration runner.',
                 'coverageRatio' => $coverageRatio,
             ];
         }

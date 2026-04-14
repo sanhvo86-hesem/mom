@@ -112,6 +112,37 @@ data_schema_smoke_trace($traceWorkspaceStart);
 $workspace = $service->getWorkspace();
 data_schema_smoke_trace('workspace-loaded');
 
+$classifyDbTarget = new ReflectionMethod(DataSchemaService::class, 'classifyDbTarget');
+if (PHP_VERSION_ID < 80100) {
+    $classifyDbTarget->setAccessible(true);
+}
+$migrationBacklogTarget = $classifyDbTarget->invoke(
+    $service,
+    [
+        'db_probe_applicable' => true,
+        'db_probe_reachable' => true,
+        'db_probe_resolved' => true,
+        'db_table_count' => 758,
+        'present_table_count' => 758,
+        'missing_table_count' => 2,
+        'unexpected_tables' => [],
+        'migration_table_present' => true,
+        'applied_migration_count' => 125,
+        'migration_file_count' => 128,
+        'pending_migration_count' => 3,
+        'pending_migration_ids' => [
+            '124_world_class_closure_authoritative_controls',
+            '125_change_effect_exact_release_semantics',
+            '126_e_signature_auth_challenges',
+        ],
+    ],
+    760,
+    2
+);
+smoke_assert(($migrationBacklogTarget['status'] ?? '') === 'migration_backlog', 'Pending migration ledger backlog should be the DB target root cause before incomplete table coverage.');
+smoke_assert(str_contains((string)($migrationBacklogTarget['reason'] ?? ''), '125/128'), 'Migration backlog reason should include the applied/file migration count.');
+smoke_assert(str_contains((string)($migrationBacklogTarget['reason'] ?? ''), '758/760'), 'Migration backlog reason should preserve live DB authority coverage evidence.');
+
 smoke_assert(is_array($workspace['metrics'] ?? null), 'Data schema workspace should expose metrics.');
 smoke_assert(is_array($workspace['connection'] ?? null), 'Data schema workspace should expose connection state.');
 smoke_assert(is_array($workspace['lists'] ?? null), 'Data schema workspace should expose list collections.');

@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-14T10:13:41.320Z",
+    "generatedAt": "2026-04-14T11:32:46.153Z",
     "enumCount": 876
   },
   "so_status": {
@@ -41553,7 +41553,6 @@
     "standard": "AS9100",
     "sourceTable": "e_signature_auth_challenges",
     "statusColumn": "challenge_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -41639,7 +41638,6 @@
     "standard": "internal",
     "sourceTable": "emergency_change_controls",
     "statusColumn": "emergency_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -41725,7 +41723,6 @@
     "standard": "internal",
     "sourceTable": "genealogy_edge_facts",
     "statusColumn": "fact_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -41811,7 +41808,6 @@
     "standard": "internal",
     "sourceTable": "governed_route_registry",
     "statusColumn": "route_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -41897,7 +41893,6 @@
     "standard": "internal",
     "sourceTable": "legacy_authority_sunset",
     "statusColumn": "sunset_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -41983,7 +41978,6 @@
     "standard": "internal",
     "sourceTable": "periodic_evaluations",
     "statusColumn": "evaluation_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -42069,7 +42063,6 @@
     "standard": "internal",
     "sourceTable": "rollback_requirements",
     "statusColumn": "rollback_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -42155,7 +42148,6 @@
     "standard": "internal",
     "sourceTable": "traceability_5m_obligations",
     "statusColumn": "gate_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -42241,7 +42233,6 @@
     "standard": "internal",
     "sourceTable": "traceability_5m_policy_rules",
     "statusColumn": "policy_state",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
