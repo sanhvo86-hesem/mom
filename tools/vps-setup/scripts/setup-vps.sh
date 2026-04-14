@@ -196,8 +196,10 @@ log "Configuring PHP-FPM pool..."
 # Copy pool config
 cp "$SITE_DIR/tools/vps-setup/php-fpm/mom.conf" /etc/php/8.2/fpm/pool.d/mom.conf
 
-# Inject the generated DB password
-sed -i "s/CHANGE_ME_STRONG_PASSWORD/$DB_PASS/" /etc/php/8.2/fpm/pool.d/mom.conf
+# Inject the generated DB password into both DB_PASSWORD (read by database/config.php)
+# and DB_PASS (legacy alias used by CLI migration tools).
+# Using | as sed delimiter to avoid issues if password contains slashes.
+sed -i "s|CHANGE_ME_STRONG_PASSWORD|$DB_PASS|g" /etc/php/8.2/fpm/pool.d/mom.conf
 
 # Remove default pool to avoid socket conflicts
 rm -f /etc/php/8.2/fpm/pool.d/www.conf
