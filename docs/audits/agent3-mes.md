@@ -7,6 +7,7 @@ Branch audited: `codex/worldclass-reaudit-20260414-203827`
 - Confirmed P1 mobile snapshot weakness: mobile task start/complete mutated queue rows without an event journal. Remediation in this pass adds `mobile/task_events.json` as an append-only compatibility ledger while keeping `work_queue.json` as the snapshot.
 - Confirmed P1 mobile lifecycle gap: tasks could be completed without start or overwritten after completion. Remediation enforces `pending -> in_progress -> completed`, rejects pending completion and completed overwrite, and records assignment/start/completion events.
 - Confirmed P2 labor validation gap: clock-out allowed scrap greater than zero with zero completed quantity. Remediation rejects `qty_scrap > qty_completed` unconditionally.
+- Refuted current AI execution-authority risk for shopfloor reporting after remediation: AI schedule apply/PM endpoints now explicitly require human planning action and cannot mutate dispatch targets, schedule slots, maintenance work, or production reports.
 
 ## Findings
 

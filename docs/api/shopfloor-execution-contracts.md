@@ -93,7 +93,48 @@ Behavior:
 - The aliases route to the existing scheduling controller handlers, not to order ownership logic.
 - Schedule slot create/update requires authenticated scheduling write authority and CSRF.
 - Create/update validates `YYYY-MM-DD` dates, 24-hour `HH:MM` times, same-day `end_time > start_time`, and priority values `low`, `normal`, `high`, or `urgent`.
+- Create/update rejects overlapping slots for the same machine on the same date in both DB-backed and JSON fallback storage modes.
 - Scheduling remains planning/advisory capacity context. Dispatch target creation remains the execution-intent path for shopfloor work.
+
+## AI schedule advisory actions
+
+Handlers: existing AI scheduling aliases in `AiSchedulingController`.
+
+`ai_schedule_apply` payload:
+
+```json
+{
+  "optimization_id": "OPT-1001",
+  "review_reason": "Planner will evaluate the proposed sequence change."
+}
+```
+
+Response semantics:
+
+- `applied` is always `false`.
+- `slots_moved` is always `0`.
+- `advisory_only` is `true`.
+- `execution_authority` is `false`.
+- `requires_human_planning_action` is `true`.
+- The route records review intent only; a governed schedule create/update path must perform any real planning mutation.
+
+`ai_schedule_pm` payload:
+
+```json
+{
+  "tool_id": "MC-5AX-01",
+  "scheduled_date": "2026-04-15",
+  "reason": "preventive review"
+}
+```
+
+Response semantics:
+
+- `scheduled` is always `false`.
+- `advisory_only` is `true`.
+- `execution_authority` is `false`.
+- `requires_human_planning_action` is `true`.
+- The route returns a proposal identifier and next action only. It does not create maintenance execution or reserve machine capacity.
 
 ## Operator work retrieval
 

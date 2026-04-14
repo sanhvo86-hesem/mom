@@ -7,6 +7,7 @@ Branch audited: `codex/worldclass-reaudit-20260414-203827`
 - Confirmed P1 planning lifecycle gap: work orders could be created under terminal parent job orders. Remediation in this pass blocks WO creation unless the parent JO is `planned`, `released`, or `active`.
 - Confirmed P1 hold history gap: order holds were only represented as a mutable sidecar snapshot. Remediation adds an append-only `orders/hold_events.json` compatibility event journal for hold set/release while preserving the existing hold snapshot.
 - Confirmed P2 planning data-quality gap: JO quantity and date inputs, plus WO operation/setup/run estimates, needed stricter validation. Remediation in this pass adds positive/non-negative and date-format checks in the order API.
+- Confirmed P2 planning schedule conflict gap: DB-backed schedule slot create/update could persist overlapping machine windows. Remediation adds shared conflict guards before DB and JSON schedule writes.
 - Deferred: active-hold lifecycle policy remains blocked by the need for a hold-category matrix across SO/JO/WO transition types.
 
 ## Findings

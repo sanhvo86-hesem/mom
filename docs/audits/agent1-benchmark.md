@@ -10,6 +10,8 @@ Branch audited: `codex/worldclass-reaudit-20260414-203827`
 - Confirmed P1 CNC/setup-sheet drift: setup sheets previously lacked explicit release status. Remediation in this pass makes newly created setup sheets `draft` and treats missing status as not released for strict dispatch reference enforcement.
 - Confirmed P1 EQMS closure gap: canonical evidence finalization needed a role gate. Remediation in this pass requires controlled evidence finalization roles before CSRF-protected finalization.
 - Confirmed P2 AI/security gap: legacy AI read surfaces were not consistently AI-role scoped. Remediation in this pass adds AI read gates to prediction, SPC anomaly, tool-wear, and legacy dashboard reads.
+- Confirmed P2 AI scheduling boundary gap: AI-named schedule apply and PM routes could be interpreted as execution writes. Remediation makes them advisory review/proposal responses with no schedule or maintenance mutation.
+- Confirmed P2 scheduling consistency gap: DB-backed slot writes lacked the JSON fallback overlap guard. Remediation applies machine/date/time overlap checks to both storage modes.
 
 ## Findings
 
