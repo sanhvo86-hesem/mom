@@ -47,6 +47,59 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertSame(1, $clockOut['quantity_scrap']);
     }
 
+    public function testCompleteTaskPersistsResultQuantitiesAndRejectsContradictions(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1001', 'operation_complete', []);
+
+        $completed = $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'partial',
+            'qty_completed' => 7,
+            'qty_scrap' => 1,
+            'notes' => 'One insert issue.',
+        ]);
+
+        $this->assertSame('completed', $completed['task_status']);
+        $this->assertSame('partial', $completed['result']);
+        $this->assertSame(7, $completed['qty_completed']);
+        $this->assertSame(1, $completed['qty_scrap']);
+
+        $task2 = $service->assignTask('operator-1', 'WO-1002', 'operation_complete', []);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('pass_result_cannot_have_scrap');
+        $service->completeTask((string)$task2['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 5,
+            'qty_scrap' => 1,
+        ]);
+    }
+
+    public function testResolveConflictRequiresOwningOperatorUnlessOverrideIsExplicit(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $entry = [
+            '_type' => 'time_entry',
+            'entry_id' => 'entry-1',
+            'wo_number' => 'WO-1001',
+            'operation_seq' => 20,
+            'machine_id' => 'MC-5AX-01',
+            'entry_type' => 'clock_in',
+            'entry_time' => '2026-04-14T08:00:00+00:00',
+        ];
+        $service->submitOfflineBatch([$entry], 'operator-1');
+
+        try {
+            $service->resolveConflict('entry-1', 'keep_server', 'operator-2');
+            $this->fail('Non-owner conflict resolution should be rejected.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('forbidden_conflict_operator', $e->getMessage());
+        }
+
+        $resolved = $service->resolveConflict('entry-1', 'keep_server', 'operator-2', true);
+        $this->assertSame('synced', $resolved['sync_status']);
+        $this->assertSame('operator-2', $resolved['conflict_override']['resolved_by']);
+    }
+
     public function testFirstPieceInspectionRequiresStructuredMeasurements(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);
@@ -72,6 +125,13 @@ final class MobileWorkQueueServiceTest extends TestCase
             'operation_seq' => 20,
             'capture_type' => 'first_piece',
             'inspection_plan_id' => 'IP-714-OP20',
+            'cnc_program_id' => 'NC-714-OP20',
+            'cnc_program_revision' => 'B',
+            'setup_sheet_id' => 'SETUP-714-OP20',
+            'setup_sheet_revision' => 'A',
+            'part_revision' => 'REV-C',
+            'org_plant_id' => 'P01',
+            'org_site_id' => 'SITE-HCM',
             'measurements' => [
                 [
                     'characteristic' => 'OD-1',
@@ -88,6 +148,9 @@ final class MobileWorkQueueServiceTest extends TestCase
         $this->assertSame('pass', $capture['overall_result']);
         $this->assertSame('OD-1', $capture['measurements'][0]['characteristic_id']);
         $this->assertSame('tablet-1-fp-1', $capture['client_capture_id']);
+        $this->assertSame('NC-714-OP20', $capture['cnc_program_id']);
+        $this->assertSame('SETUP-714-OP20', $capture['setup_sheet_id']);
+        $this->assertSame('P01', $capture['org_plant_id']);
         $this->assertNotSame('', $capture['idempotency_key']);
         $this->assertNotSame('', $capture['inspection_fingerprint']);
     }
