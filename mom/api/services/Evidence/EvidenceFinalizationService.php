@@ -111,6 +111,13 @@ final class EvidenceFinalizationService
         if ($evidenceKey === '') {
             $evidenceKey = 'EV-' . substr(hash('sha256', $subjectType . '|' . $subjectId . '|' . ($package['package_hash_sha256'] ?? '')), 0, 24);
         }
+        $idempotencyBase = $this->nullableText($input['idempotency_key'] ?? null);
+        $amendmentNo = max(0, (int)($input['amendment_no'] ?? 0));
+        $sourceVersionId = $this->nullableUuid($input['source_version_id'] ?? $input['source_evidence_version_id'] ?? null);
+        $sourceChangeOrderId = $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null);
+        if (($amendmentNo > 0 || $sourceVersionId !== null) && $sourceChangeOrderId === null) {
+            throw new RuntimeException('evidence_amendment_change_order_required');
+        }
         $recordMetadata = ['source' => 'EvidenceFinalizationService'];
         $scope = is_array($input['scope'] ?? null) ? $input['scope'] : [];
         $orgId = $this->nullableText($input['org_id'] ?? $scope['org_id'] ?? null);
@@ -149,14 +156,23 @@ final class EvidenceFinalizationService
         if (!is_array($record) || $this->text($record['evidence_record_id'] ?? '') === '') {
             throw new RuntimeException('evidence_record_persistence_failed');
         }
-
-        $idempotencyBase = $this->nullableText($input['idempotency_key'] ?? null);
-        $amendmentNo = max(0, (int)($input['amendment_no'] ?? 0));
-        $sourceVersionId = $this->nullableUuid($input['source_version_id'] ?? $input['source_evidence_version_id'] ?? null);
-        $sourceChangeOrderId = $this->nullableUuid($input['source_change_order_id'] ?? $input['change_order_id'] ?? null);
-        if (($amendmentNo > 0 || $sourceVersionId !== null) && $sourceChangeOrderId === null) {
-            throw new RuntimeException('evidence_amendment_change_order_required');
+        $this->assertEvidenceRecordReplayEquivalent($record, [
+            'evidence_key' => $evidenceKey,
+            'subject_type' => $subjectType,
+            'subject_id' => $subjectId,
+            'source_issuance_id' => $this->nullableUuid($input['source_issuance_id'] ?? null),
+            'source_attempt_id' => $this->nullableUuid($input['source_attempt_id'] ?? null),
+        ]);
+        if ($this->text($record['record_state'] ?? '') === 'finalized') {
+            if ($sourceVersionId === null) {
+                throw new RuntimeException('evidence_finalization_amendment_required');
+            }
+            if ($sourceChangeOrderId === null) {
+                throw new RuntimeException('evidence_amendment_change_order_required');
+            }
+            $this->assertReleasedEvidenceChangeAuthority($db, $sourceChangeOrderId, $record, $sourceVersionId, $input);
         }
+
         $version = $db->queryOne(
             "WITH inserted AS (
                 INSERT INTO evidence_versions
@@ -195,6 +211,15 @@ final class EvidenceFinalizationService
         if (!is_array($version) || $this->text($version['evidence_version_id'] ?? '') === '') {
             throw new RuntimeException('evidence_version_persistence_failed');
         }
+        $this->assertEvidenceVersionReplayEquivalent($version, [
+            'evidence_record_id' => (string)$record['evidence_record_id'],
+            'package_hash_sha256' => (string)$package['package_hash_sha256'],
+            'manifest_hash_sha256' => (string)$package['manifest_hash_sha256'],
+            'canonical_payload_hash_sha256' => (string)$package['canonical_payload_hash_sha256'],
+            'readable_snapshot_hash_sha256' => (string)$package['readable_snapshot_hash_sha256'],
+            'source_version_id' => $sourceVersionId,
+            'source_change_order_id' => $sourceChangeOrderId,
+        ]);
 
         $artifacts = [];
         foreach (['original', 'canonical_payload', 'readable_snapshot', 'hash_signature_manifest'] as $role) {
@@ -333,8 +358,14 @@ final class EvidenceFinalizationService
 
             $payloadHash = $this->nullableHash($event['signed_payload_hash_sha256'] ?? null)
                 ?? (string)$package['manifest_hash_sha256'];
+            if (!isset($event['displayed_record_hash_sha256']) && !isset($event['displayed_payload_hash_sha256'])) {
+                $event['displayed_record_hash_sha256'] = $payloadHash;
+            }
+            $ceremony = (new ElectronicSignatureService())->validateEvidenceSignature($event, [
+                'signed_payload_hash_sha256' => $payloadHash,
+            ]);
             $signatureHash = $this->nullableHash($event['signature_hash_sha256'] ?? null)
-                ?? hash('sha256', $payloadHash . '|' . ($signerUserId ?? $signerRef) . '|' . $meaning);
+                ?? hash('sha256', $payloadHash . '|' . ($signerUserId ?? $signerRef) . '|' . $meaning . '|' . $ceremony['auth_result_hash_sha256']);
             $idempotencyKey = $this->nullableText($event['idempotency_key'] ?? null)
                 ?? hash('sha256', (string)$version['evidence_version_id'] . '|signature|' . $index . '|' . $signatureHash);
 
@@ -343,11 +374,15 @@ final class EvidenceFinalizationService
                     INSERT INTO signature_events
                         (signed_object_type, signed_object_id, signed_object_version, signer_user_id, signer_ref,
                          signer_role, signature_meaning, signature_state, signed_payload_hash_sha256,
-                         signature_hash_sha256, signed_at, idempotency_key, metadata)
+                         signature_hash_sha256, auth_challenge_id, auth_method, auth_result_hash_sha256,
+                         signer_identity_snapshot, displayed_record_hash_sha256, signature_manifestation,
+                         signed_at, idempotency_key, metadata)
                     VALUES
                         ('evidence_version', :signed_object_id, :signed_object_version, CAST(:signer_user_id AS uuid), :signer_ref,
                          :signer_role, :signature_meaning, :signature_state, :signed_payload_hash_sha256,
-                         :signature_hash_sha256, CAST(:signed_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
+                         :signature_hash_sha256, :auth_challenge_id, :auth_method, :auth_result_hash_sha256,
+                         CAST(:signer_identity_snapshot AS jsonb), :displayed_record_hash_sha256, :signature_manifestation,
+                         CAST(:signed_at AS timestamptz), :idempotency_key, CAST(:metadata AS jsonb))
                     ON CONFLICT (idempotency_key) DO NOTHING
                     RETURNING *
                  )
@@ -365,6 +400,12 @@ final class EvidenceFinalizationService
                     ':signature_state' => $this->signatureState($event['signature_state'] ?? 'applied'),
                     ':signed_payload_hash_sha256' => $payloadHash,
                     ':signature_hash_sha256' => $signatureHash,
+                    ':auth_challenge_id' => $ceremony['auth_challenge_id'],
+                    ':auth_method' => $ceremony['auth_method'],
+                    ':auth_result_hash_sha256' => $ceremony['auth_result_hash_sha256'],
+                    ':signer_identity_snapshot' => $this->json($ceremony['signer_identity_snapshot']),
+                    ':displayed_record_hash_sha256' => $ceremony['displayed_record_hash_sha256'],
+                    ':signature_manifestation' => $ceremony['signature_manifestation'],
                     ':signed_at' => $this->nullableText($event['signed_at'] ?? null) ?? gmdate('c'),
                     ':idempotency_key' => $idempotencyKey,
                     ':metadata' => $this->json([
@@ -381,6 +422,10 @@ final class EvidenceFinalizationService
                     'signature_meaning' => $meaning,
                     'signed_payload_hash_sha256' => $payloadHash,
                     'signature_hash_sha256' => $signatureHash,
+                    'auth_challenge_id' => $ceremony['auth_challenge_id'],
+                    'auth_method' => $ceremony['auth_method'],
+                    'auth_result_hash_sha256' => $ceremony['auth_result_hash_sha256'],
+                    'displayed_record_hash_sha256' => $ceremony['displayed_record_hash_sha256'],
                     'signer_user_id' => $signerUserId,
                     'signer_ref' => $signerRef,
                 ]);
@@ -402,6 +447,9 @@ final class EvidenceFinalizationService
     {
         $attemptId = $this->nullableUuid($input['source_attempt_id'] ?? $input['frm_submission_attempt_id'] ?? null);
         if ($attemptId === null) {
+            if ($this->requiresAcceptedSourceAttempt($input)) {
+                throw new RuntimeException('source_submission_attempt_required');
+            }
             return;
         }
 
@@ -442,12 +490,204 @@ final class EvidenceFinalizationService
     }
 
     /**
+     * @param array<string, mixed> $input
+     */
+    private function requiresAcceptedSourceAttempt(array $input): bool
+    {
+        if ($this->nullableUuid($input['source_issuance_id'] ?? $input['frm_issuance_id'] ?? null) !== null) {
+            return true;
+        }
+        foreach (['subject_type', 'evidence_origin', 'capture_channel', 'source_type'] as $key) {
+            $value = strtolower($this->text($input[$key] ?? ''));
+            foreach (['form', 'offline', 'online', 'submission', 'excel'] as $marker) {
+                if ($value !== '' && str_contains($value, $marker)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertEvidenceRecordReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['evidence_key', 'subject_type', 'subject_id', 'source_issuance_id', 'source_attempt_id'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('evidence_record_idempotency_conflict');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertEvidenceVersionReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['evidence_record_id', 'package_hash_sha256', 'manifest_hash_sha256', 'canonical_payload_hash_sha256', 'readable_snapshot_hash_sha256', 'source_version_id', 'source_change_order_id'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('evidence_version_idempotency_conflict');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     * @param array<string, mixed> $input
+     */
+    private function assertReleasedEvidenceChangeAuthority(object $db, string $changeOrderId, array $record, string $sourceVersionId, array $input): void
+    {
+        if (!method_exists($db, 'query')) {
+            throw new RuntimeException('authoritative_change_authority_store_required');
+        }
+
+        $fieldPaths = $this->fieldPaths($input['field_paths'] ?? $input['affected_fields'] ?? ['canonical_payload']);
+        $rows = $db->query(
+            "SELECT
+                co.plm_change_order_id::text AS plm_change_order_id,
+                co.change_order_number,
+                co.status,
+                cao.object_type,
+                cao.object_id,
+                cao.affected_fields,
+                eff.plm_change_effectivity_id::text AS plm_change_effectivity_id,
+                eff.effectivity_scope,
+                eff.effective_from,
+                eff.effective_to
+             FROM plm_change_orders co
+             INNER JOIN plm_change_affected_objects cao
+                ON cao.plm_change_order_id = co.plm_change_order_id
+             INNER JOIN plm_change_effectivities eff
+                ON eff.plm_change_order_id = co.plm_change_order_id
+             WHERE co.plm_change_order_id = CAST(:change_order_id AS uuid)
+               AND co.status = 'released'
+               AND lower(cao.object_type) IN ('evidence_version', 'evidence_record')
+               AND (cao.object_id = :source_version_id OR cao.object_id = :evidence_record_id)
+               AND cao.disposition = 'accepted'
+             ORDER BY eff.effective_from DESC",
+            [
+                ':change_order_id' => $changeOrderId,
+                ':source_version_id' => $sourceVersionId,
+                ':evidence_record_id' => $this->text($record['evidence_record_id'] ?? ''),
+            ],
+        );
+
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            if (!is_array($row) || $this->text($row['plm_change_effectivity_id'] ?? '') === '') {
+                continue;
+            }
+            if (!$this->fieldListCovers($row['affected_fields'] ?? null, $fieldPaths)) {
+                continue;
+            }
+            if (!$this->effectivityScopeMatches($row, $input)) {
+                continue;
+            }
+            return;
+        }
+
+        throw new RuntimeException('evidence_finalization_change_authority_not_verified');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fieldPaths(mixed $raw): array
+    {
+        if (is_string($raw) && trim($raw) !== '') {
+            return [trim($raw)];
+        }
+        if (!is_array($raw)) {
+            return [];
+        }
+        $paths = [];
+        foreach ($raw as $value) {
+            $text = $this->text($value);
+            if ($text !== '') {
+                $paths[] = $text;
+            }
+        }
+        return array_values(array_unique($paths));
+    }
+
+    /**
+     * @param list<string> $fieldPaths
+     */
+    private function fieldListCovers(mixed $raw, array $fieldPaths): bool
+    {
+        $available = $this->textList($raw);
+        foreach ($fieldPaths as $path) {
+            if (!in_array(strtolower($path), $available, true)) {
+                return false;
+            }
+        }
+        return $fieldPaths !== [];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function textList(mixed $raw): array
+    {
+        if (is_array($raw)) {
+            return array_values(array_unique(array_filter(array_map(
+                fn(mixed $value): string => is_scalar($value) ? strtolower(trim((string)$value)) : '',
+                $raw,
+            ))));
+        }
+        if (!is_string($raw) || trim($raw) === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            return $this->textList($decoded);
+        }
+        $text = trim($raw, "{}");
+        return array_values(array_unique(array_filter(array_map(
+            static fn(string $value): string => strtolower(trim($value, " \t\n\r\0\x0B\"'")),
+            str_getcsv($text, ',', '"', '\\'),
+        ))));
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $input
+     */
+    private function effectivityScopeMatches(array $row, array $input): bool
+    {
+        $scopeRaw = $row['effectivity_scope'] ?? [];
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scopeRaw = is_array($decoded) ? $decoded : [];
+        }
+        $scope = is_array($scopeRaw) ? $scopeRaw : [];
+        $context = is_array($input['effectivity'] ?? null) ? $input['effectivity'] : (is_array($input['effectivity_context'] ?? null) ? $input['effectivity_context'] : $input);
+        foreach (['site', 'plant', 'product', 'lot', 'serial', 'order_id', 'role'] as $key) {
+            if (!array_key_exists($key, $scope)) {
+                continue;
+            }
+            $actual = $context[$key] ?? $context['effectivity_' . $key] ?? null;
+            $expected = $scope[$key];
+            if (is_array($expected)) {
+                if (!in_array($actual, $expected, true)) {
+                    return false;
+                }
+            } elseif ((string)$expected !== (string)$actual) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param array<string, mixed> $row
      * @param array<string, mixed> $expected
      */
     private function assertSignatureConflictEquivalent(array $row, array $expected): void
     {
-        foreach (['signed_object_type', 'signed_object_id', 'signature_meaning', 'signed_payload_hash_sha256', 'signature_hash_sha256'] as $field) {
+        foreach (['signed_object_type', 'signed_object_id', 'signature_meaning', 'signed_payload_hash_sha256', 'signature_hash_sha256', 'auth_challenge_id', 'auth_method', 'auth_result_hash_sha256', 'displayed_record_hash_sha256'] as $field) {
             if (isset($row[$field]) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
                 throw new RuntimeException('evidence_finalization_idempotency_conflict');
             }

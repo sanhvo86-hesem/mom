@@ -357,7 +357,7 @@ final class ChangeLifecycleCommandService
                     ':disposition' => $this->enum($object['disposition'] ?? 'pending', ['pending', 'accepted', 'rejected', 'deferred', 'cancelled']),
                     ':effectivity_rule' => $this->json(is_array($object['effectivity_rule'] ?? null) ? $object['effectivity_rule'] : []),
                     ':wip_disposition' => $this->json(is_array($object['wip_disposition'] ?? null) ? $object['wip_disposition'] : []),
-                    ':idempotency_key' => hash('sha256', 'affected|' . $this->text($requestId) . '|' . $this->text($orderId) . '|' . $this->requiredText($object, 'object_type') . '|' . $this->requiredText($object, 'object_id')),
+                    ':idempotency_key' => hash('sha256', 'affected|' . $this->text($requestId) . '|' . $this->text($orderId) . '|' . $this->requiredText($object, 'object_type') . '|' . $this->requiredText($object, 'object_id') . '|' . ($this->nullableText($object['object_revision'] ?? null) ?? '') . '|' . $this->postgresTextArray($object['affected_fields'] ?? []) . '|' . $this->text($object['requested_effect'] ?? 'metadata_update') . '|' . $this->json(is_array($object['effectivity_rule'] ?? null) ? $object['effectivity_rule'] : []) . '|' . $this->json(is_array($object['wip_disposition'] ?? null) ? $object['wip_disposition'] : [])),
                     ':metadata' => $this->json(['authority' => 'change_lifecycle_command']),
                 ],
             );
@@ -398,7 +398,7 @@ final class ChangeLifecycleCommandService
                     ':resulting_revision' => $this->nullableText($object['resulting_revision'] ?? null),
                     ':result_role' => $this->enum($object['result_role'] ?? 'configuration_item', ['new_revision', 'replacement', 'superseding_record', 'published_record', 'training_release', 'configuration_item']),
                     ':release_state' => $this->enum($object['release_state'] ?? 'planned', ['planned', 'ready', 'released', 'blocked', 'withdrawn', 'superseded']),
-                    ':idempotency_key' => hash('sha256', 'resulting|' . $this->text($orderId) . '|' . $this->requiredText($object, 'object_type') . '|' . $this->requiredText($object, 'object_id')),
+                    ':idempotency_key' => hash('sha256', 'resulting|' . $this->text($orderId) . '|' . $affectedObjectId . '|' . $this->requiredText($object, 'object_type') . '|' . $this->requiredText($object, 'object_id') . '|' . ($this->nullableText($object['resulting_revision'] ?? null) ?? '') . '|' . $this->text($object['result_role'] ?? 'configuration_item') . '|' . $this->text($object['release_state'] ?? 'planned')),
                     ':metadata' => $this->json(['authority' => 'change_lifecycle_command']),
                 ],
             );
@@ -629,7 +629,7 @@ final class ChangeLifecycleCommandService
                     ':requirement_state' => $this->enum($requirement['requirement_state'] ?? 'open', ['open', 'satisfied', 'waived', 'expired', 'superseded', 'cancelled']),
                     ':due_at' => $this->nullableText($requirement['due_at'] ?? null),
                     ':satisfied_at' => $this->nullableText($requirement['satisfied_at'] ?? null),
-                    ':idempotency_key' => hash('sha256', 'training|' . $this->text($orderId) . '|' . $this->requiredText($requirement, 'object_type') . '|' . $this->requiredText($requirement, 'object_id') . '|' . $this->requiredText($requirement, 'audience_ref')),
+                    ':idempotency_key' => hash('sha256', 'training|' . $this->text($orderId) . '|' . $this->requiredText($requirement, 'object_type') . '|' . $this->requiredText($requirement, 'object_id') . '|' . $this->enum($requirement['audience_type'] ?? 'role', ['user', 'role', 'department', 'site', 'plant']) . '|' . $this->requiredText($requirement, 'audience_ref') . '|' . $this->enum($requirement['training_requirement_type'] ?? 'read_ack', ['read_ack', 'qualification', 'training_course', 'practical_assessment']) . '|' . ($this->bool($requirement['due_before_effective'] ?? true) ? 'due_before' : 'advisory')),
                     ':metadata' => $this->json(['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command']),
                 ],
             );
@@ -663,7 +663,7 @@ final class ChangeLifecycleCommandService
                     ':evidence_record_id' => $this->nullableUuid($verification['evidence_record_id'] ?? null),
                     ':verified_at' => $this->nullableText($verification['verified_at'] ?? null),
                     ':failure_reason' => $this->nullableText($verification['failure_reason'] ?? null),
-                    ':idempotency_key' => hash('sha256', 'verification|' . $this->text($orderId) . '|' . $this->enum($verification['verification_type'] ?? 'implementation', ['implementation', 'document_release', 'training_complete', 'publication_complete', 'process_validation', 'first_article', 'audit']) . '|' . $this->text($verification['object_id'] ?? '')),
+                    ':idempotency_key' => hash('sha256', 'verification|' . $this->text($orderId) . '|' . $this->enum($verification['verification_type'] ?? 'implementation', ['implementation', 'document_release', 'training_complete', 'publication_complete', 'process_validation', 'first_article', 'audit']) . '|' . $this->text($verification['object_type'] ?? '') . '|' . $this->text($verification['object_id'] ?? '') . '|' . ($this->nullableUuid($verification['evidence_record_id'] ?? null) ?? '') . '|' . $this->enum($verification['verification_state'] ?? 'planned', ['planned', 'in_progress', 'passed', 'failed', 'waived', 'blocked', 'cancelled'])),
                     ':metadata' => $this->json(array_merge(
                         ['actor_ref' => $actorRef, 'authority' => 'change_lifecycle_command'],
                         is_array($verification['metadata'] ?? null) ? $verification['metadata'] : [],
@@ -960,9 +960,10 @@ final class ChangeLifecycleCommandService
         if ($this->text($overrides['emergency_justification'] ?? $metadata['emergency_justification'] ?? $control['declared_reason'] ?? '') === '') {
             $blockers[] = $this->blocker('emergency_justification_required', 'Emergency change requires justification.');
         }
-        if (!$this->bool($overrides['risk_accepted'] ?? $metadata['risk_accepted'] ?? $riskPayload['risk_accepted'] ?? false)
-            && $this->text($overrides['risk_acceptance_signature_event_id'] ?? $metadata['risk_acceptance_signature_event_id'] ?? $riskPayload['risk_acceptance_signature_event_id'] ?? $control['signature_event_id'] ?? '') === '') {
-            $blockers[] = $this->blocker('emergency_risk_acceptance_required', 'Emergency change requires risk acceptance or e-signature.');
+        $riskSignature = $this->text($overrides['risk_acceptance_signature_event_id'] ?? $metadata['risk_acceptance_signature_event_id'] ?? $riskPayload['risk_acceptance_signature_event_id'] ?? $control['signature_event_id'] ?? '');
+        $riskWaiver = $this->text($overrides['risk_acceptance_waiver_id'] ?? $metadata['risk_acceptance_waiver_id'] ?? $riskPayload['risk_acceptance_waiver_id'] ?? '');
+        if ($riskSignature === '' && $riskWaiver === '') {
+            $blockers[] = $this->blocker('emergency_risk_signature_or_waiver_required', 'Emergency change requires a durable risk-acceptance e-signature or approved waiver record.');
         }
         foreach (['rollback_strategy', 'rollback_trigger'] as $field) {
             if ($this->text($rollback[$field] ?? '') === '') {

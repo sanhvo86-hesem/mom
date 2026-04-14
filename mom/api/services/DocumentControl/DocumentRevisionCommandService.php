@@ -62,6 +62,11 @@ final class DocumentRevisionCommandService
         if (!is_array($family) || $this->text($family['doc_family_id'] ?? '') === '') {
             throw new RuntimeException('doc_family_persistence_failed');
         }
+        $this->assertFamilyReplayEquivalent($family, [
+            'doc_code' => $this->requiredText($input, 'doc_code'),
+            'doc_type' => $this->docType($input['doc_type'] ?? 'OTHER'),
+            'title' => $this->requiredText($input, 'title'),
+        ]);
 
         if (in_array($lifecycleState, ['released', 'superseded', 'obsolete', 'withdrawn'], true)) {
             $this->assertReleasedDocumentChangeAuthority(
@@ -114,6 +119,14 @@ final class DocumentRevisionCommandService
         if (!is_array($revision) || $this->text($revision['doc_revision_id'] ?? '') === '') {
             throw new RuntimeException('doc_revision_persistence_failed');
         }
+        $this->assertRevisionReplayEquivalent($revision, [
+            'doc_family_id' => (string)$family['doc_family_id'],
+            'revision_label' => $this->requiredText($input, 'revision_label'),
+            'revision_sequence' => (string)max(1, (int)($input['revision_sequence'] ?? 1)),
+            'lifecycle_state' => $lifecycleState,
+            'source_change_order_id' => $sourceChangeOrderId,
+            'manifest_hash_sha256' => $this->nullableSha256($input['manifest_hash_sha256'] ?? null),
+        ]);
 
         return [
             'authority' => 'canonical_document_control',
@@ -372,9 +385,18 @@ final class DocumentRevisionCommandService
                 cao.requested_effect,
                 cao.effectivity_rule,
                 cao.disposition
+                ,eff.plm_change_effectivity_id::text AS plm_change_effectivity_id
+                ,eff.effectivity_type
+                ,eff.effectivity_scope
+                ,eff.effective_from
+                ,eff.effective_to
              FROM plm_change_orders co
              INNER JOIN plm_change_affected_objects cao
                ON cao.plm_change_order_id = co.plm_change_order_id
+             LEFT JOIN plm_change_effectivities eff
+               ON eff.plm_change_order_id = co.plm_change_order_id
+              AND lower(eff.object_type) = lower(cao.object_type)
+              AND (eff.object_id = cao.object_id OR eff.object_id = '*')
              WHERE co.plm_change_order_id = CAST(:change_order_id AS uuid)
                AND co.status = 'released'
                AND cao.disposition = 'accepted'
@@ -410,7 +432,7 @@ final class DocumentRevisionCommandService
             if (!$this->effectListContains($row['requested_effect'] ?? null, $requestedEffect)) {
                 continue;
             }
-            if (!$this->effectivityRuleMatches($row['effectivity_rule'] ?? null, $context)) {
+            if (!$this->canonicalEffectivityMatches($row, $context)) {
                 continue;
             }
             return;
@@ -475,26 +497,28 @@ final class DocumentRevisionCommandService
     }
 
     /**
+     * @param array<string, mixed> $row
      * @param array<string, mixed> $context
      */
-    private function effectivityRuleMatches(mixed $ruleRaw, array $context): bool
+    private function canonicalEffectivityMatches(array $row, array $context): bool
     {
-        $rule = $ruleRaw;
-        if (is_string($ruleRaw)) {
-            $decoded = json_decode($ruleRaw, true);
-            $rule = is_array($decoded) ? $decoded : [];
-        }
-        if (!is_array($rule) || $rule === []) {
-            return true;
+        if ($this->text($row['plm_change_effectivity_id'] ?? '') === '') {
+            return false;
         }
 
-        $effectivity = is_array($context['effectivity'] ?? null) ? $context['effectivity'] : $context;
-        foreach (['site', 'plant', 'lot', 'serial', 'order_id'] as $key) {
-            if (!array_key_exists($key, $rule)) {
+        $scopeRaw = $row['effectivity_scope'] ?? [];
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scopeRaw = is_array($decoded) ? $decoded : [];
+        }
+        $scope = is_array($scopeRaw) ? $scopeRaw : [];
+        $contextScope = $this->effectivityContext($context);
+        foreach (['site', 'plant', 'product', 'lot', 'serial', 'order_id', 'role'] as $key) {
+            if (!array_key_exists($key, $scope)) {
                 continue;
             }
-            $actual = $effectivity[$key] ?? $effectivity['effectivity_' . $key] ?? null;
-            $expected = $rule[$key];
+            $actual = $contextScope[$key] ?? $contextScope['effectivity_' . $key] ?? null;
+            $expected = $scope[$key];
             if (is_array($expected)) {
                 if (!in_array($actual, $expected, true)) {
                     return false;
@@ -504,7 +528,61 @@ final class DocumentRevisionCommandService
             }
         }
 
+        $effectiveAt = strtotime($this->nullableText($contextScope['effective_at'] ?? $context['effective_at'] ?? null) ?? gmdate('c'));
+        $from = strtotime($this->text($row['effective_from'] ?? ''));
+        $to = strtotime($this->text($row['effective_to'] ?? ''));
+        if ($from !== false && $effectiveAt !== false && $from > $effectiveAt) {
+            return false;
+        }
+        if ($to !== false && $effectiveAt !== false && $to <= $effectiveAt) {
+            return false;
+        }
+
         return true;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    private function effectivityContext(array $context): array
+    {
+        if (is_array($context['effectivity'] ?? null)) {
+            return $context['effectivity'];
+        }
+        if (is_array($context['effectivity_context'] ?? null)) {
+            return $context['effectivity_context'];
+        }
+        if (is_array($context['effectivities'][0]['effectivity_scope'] ?? null)) {
+            return $context['effectivities'][0]['effectivity_scope'];
+        }
+        return $context;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertFamilyReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['doc_code', 'doc_type', 'title'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('doc_family_idempotency_conflict');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertRevisionReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['doc_family_id', 'revision_label', 'revision_sequence', 'lifecycle_state', 'source_change_order_id', 'manifest_hash_sha256'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('doc_revision_idempotency_conflict');
+            }
+        }
     }
 
     private function normalizeDb(?object $db): ?object

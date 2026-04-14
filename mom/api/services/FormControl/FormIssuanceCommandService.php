@@ -102,6 +102,14 @@ final class FormIssuanceCommandService
         if (!is_array($row) || $this->text($row['frm_issuance_id'] ?? '') === '') {
             throw new RuntimeException('form_issuance_persistence_failed');
         }
+        $this->assertIssuanceReplayEquivalent($row, [
+            'allocation_id' => $this->requiredText($input, 'allocation_id'),
+            'issued_record_id' => $this->requiredText($input, 'issued_record_id'),
+            'frm_template_revision_id' => $templateRevisionId,
+            'frm_schema_version_id' => $schemaVersionId,
+            'delivery_mode' => $deliveryMode,
+            'issuance_manifest_hash_sha256' => (string)$manifest['carrier_manifest_hash_sha256'],
+        ]);
 
         return [
             'authority' => 'canonical_form_control',
@@ -170,7 +178,7 @@ final class FormIssuanceCommandService
                 ':submitted_by_ref' => $this->nullableText($input['submitted_by_ref'] ?? $actorRef),
                 ':original_artifact_uri' => $this->nullableText($input['original_artifact_uri'] ?? null),
                 ':original_hash_sha256' => $hash,
-                ':parsed_payload' => $this->json($input['parsed_payload'] ?? $input['canonical_payload'] ?? []),
+                ':parsed_payload' => $this->json($serverValidation['canonical_payload'] ?? $input['parsed_payload'] ?? $input['canonical_payload'] ?? []),
                 ':validation_errors' => $this->json($validationErrors),
                 ':duplicate_of_attempt_id' => $this->nullableUuid($duplicate['frm_submission_attempt_id'] ?? $input['duplicate_of_attempt_id'] ?? null),
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
@@ -185,6 +193,11 @@ final class FormIssuanceCommandService
         if (!is_array($row) || $this->text($row['frm_submission_attempt_id'] ?? '') === '') {
             throw new RuntimeException('form_submission_attempt_persistence_failed');
         }
+        $this->assertSubmissionAttemptReplayEquivalent($row, [
+            'frm_issuance_id' => $issuanceId,
+            'attempt_state' => $attemptState,
+            'original_hash_sha256' => $hash,
+        ]);
 
         $validationInput = array_merge($input, [
             'validation_state' => (string)$serverValidation['validation_state'],
@@ -249,6 +262,12 @@ final class FormIssuanceCommandService
 
         $errors = [];
         if (is_array($result) && $this->text($result['submission_validation_result_id'] ?? '') !== '') {
+            $this->assertValidationReplayEquivalent($result, [
+                'validation_state' => $validationState,
+                'schema_version_id' => $this->nullableUuid($input['schema_version_id'] ?? $input['frm_schema_version_id'] ?? null),
+                'canonical_payload_hash_sha256' => $this->nullableSha256($input['canonical_payload_hash_sha256'] ?? null),
+                'original_artifact_hash_sha256' => $originalHash,
+            ]);
             foreach ($this->validationErrors($input['validation_errors'] ?? []) as $error) {
                 $row = $db->queryOne(
                     "INSERT INTO submission_validation_errors
@@ -382,7 +401,10 @@ final class FormIssuanceCommandService
                     tr.frm_family_id,
                     tr.template_revision,
                     tr.template_checksum_sha256,
-                    sv.schema_version
+                    sv.schema_version,
+                    sv.json_schema,
+                    sv.validation_rules,
+                    sv.canonicalization_rules
              FROM frm_issuances fi
              JOIN frm_template_revisions tr ON tr.frm_template_revision_id = fi.frm_template_revision_id
              JOIN frm_schema_versions sv ON sv.frm_schema_version_id = fi.frm_schema_version_id
@@ -578,6 +600,45 @@ final class FormIssuanceCommandService
         }
 
         return $normalized;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertIssuanceReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['allocation_id', 'issued_record_id', 'frm_template_revision_id', 'frm_schema_version_id', 'delivery_mode', 'issuance_manifest_hash_sha256'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('form_issuance_idempotency_conflict');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertSubmissionAttemptReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['frm_issuance_id', 'attempt_state', 'original_hash_sha256'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('form_submission_attempt_idempotency_conflict');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expected
+     */
+    private function assertValidationReplayEquivalent(array $row, array $expected): void
+    {
+        foreach (['validation_state', 'schema_version_id', 'canonical_payload_hash_sha256', 'original_artifact_hash_sha256'] as $field) {
+            if (array_key_exists($field, $row) && $this->text($row[$field]) !== $this->text($expected[$field] ?? '')) {
+                throw new RuntimeException('submission_validation_idempotency_conflict');
+            }
+        }
     }
 
     /**

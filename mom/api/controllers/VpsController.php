@@ -15,7 +15,7 @@ final class VpsController extends BaseController
     public function __construct(\MOM\Database\DataLayer $data, string $rootDir, string $dataDir)
     {
         parent::__construct($data, $rootDir, $dataDir);
-        $this->service = new VpsService($dataDir, $rootDir);
+        $this->service = new VpsService($dataDir, $rootDir, $data);
     }
 
     /**

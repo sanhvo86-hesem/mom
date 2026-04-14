@@ -604,7 +604,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'attempt_state' => 'valid',
             'submitted_by_ref' => 'operator-1',
             'original_artifact_hash_sha256' => str_repeat('c', 64),
-            'canonical_payload_hash_sha256' => str_repeat('d', 64),
+            'canonical_payload_hash_sha256' => hash('sha256', json_encode(['result' => 'pass'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)),
             'parsed_payload' => ['result' => 'pass'],
             'validation_errors' => [[
                 'severity' => 'info',
@@ -653,6 +653,61 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('failed', $attempt['validation_result']['validation_state']);
         $this->assertSame('original_artifact_hash_required', $attempt['server_validation']['errors'][0]['error_code']);
         $this->assertNotSame('passed', $db->lastValidationState);
+    }
+
+    public function testFormValidationRejectsCallerCanonicalHashMismatchAgainstIssuedSchema(): void
+    {
+        $result = (new EqmsFormExecutionService())->validateSubmissionAttempt(
+            [
+                'issuance_state' => 'issued',
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+                'json_schema' => ['required' => ['result'], 'properties' => ['result' => ['type' => 'string']]],
+            ],
+            [
+                'allocation_id' => 'ALLOC-1',
+                'issued_record_id' => 'FRM-1',
+                'template_revision_id' => 'TPL-1',
+                'schema_version_id' => 'SCH-1',
+            ],
+            [
+                'original_artifact_hash_sha256' => str_repeat('a', 64),
+                'canonical_payload_hash_sha256' => str_repeat('b', 64),
+                'parsed_payload' => ['result' => 'pass'],
+            ],
+        );
+
+        $this->assertSame('failed', $result['validation_state']);
+        $this->assertContains('canonical_payload_hash_mismatch', array_column($result['errors'], 'error_code'));
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $result['canonical_payload_hash_sha256']);
+    }
+
+    public function testDocumentChangeAuthorityRequiresCanonicalEffectivityMatch(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('released_document_change_authority_required');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb(
+            changeAuthorityVerified: true,
+            documentEffectivityScope: ['site' => 'VN-DN'],
+        )))->createRevision([
+            'doc_code' => 'SOP-100',
+            'doc_type' => 'SOP',
+            'title' => 'Machine setup control',
+            'revision_label' => 'A',
+            'revision_sequence' => 1,
+            'lifecycle_state' => 'released',
+            'source_change_order_id' => '00000000-0000-0000-0000-000000000701',
+            'canonical_payload' => ['purpose' => 'controlled setup'],
+            'manifest_hash_sha256' => str_repeat('a', 64),
+            'effectivities' => [[
+                'effectivity_type' => 'site',
+                'effectivity_scope' => ['site' => 'VN-HCMC'],
+                'effective_from' => '2026-04-14T00:00:00Z',
+            ]],
+        ], 'qa-1');
     }
 
     public function testEffectivityGateBlocksReleaseForOpenConflictAndIncompleteTraining(): void
@@ -727,11 +782,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
                 'retention_class' => 'quality_record',
-                'signature_events' => [[
+                'signature_events' => [$this->evidenceSignatureEvent([
                     'signer_ref' => 'qa-1',
                     'signer_role' => 'qa_qms',
                     'signature_meaning' => 'final evidence package approval',
-                ]],
+                ])],
             ]);
 
             $this->assertSame('finalized', $result['finalization_state']);
@@ -780,12 +835,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
                 'retention_class' => 'quality_record',
-                'signature_events' => [[
+                'signature_events' => [$this->evidenceSignatureEvent([
                     'signer_ref' => 'qa-1',
                     'signer_role' => 'qa_qms',
                     'signature_meaning' => 'final evidence package approval',
                     'idempotency_key' => 'sig-key-1',
-                ]],
+                ])],
             ]);
         } finally {
             $this->removeTree($dir);
@@ -809,10 +864,10 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'canonical_payload' => ['result' => 'pass'],
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
-                'signature_events' => [[
+                'signature_events' => [$this->evidenceSignatureEvent([
                     'signer_ref' => 'qa-1',
                     'signature_meaning' => 'final evidence package approval',
-                ]],
+                ])],
             ]);
         } finally {
             $this->removeTree($dir);
@@ -836,6 +891,56 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'canonical_payload' => ['result' => 'pass'],
                 'readable_snapshot_html' => '<html><body>pass</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationRequiresAcceptedSubmissionAttemptForFormDerivedEvidence(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-source-attempt-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('source_submission_attempt_required');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb()))->finalize([
+                'subject_type' => 'form_submission',
+                'subject_id' => 'FRM-1',
+                'source_issuance_id' => '00000000-0000-0000-0000-000000000803',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original',
+                'canonical_payload' => ['result' => 'pass'],
+                'readable_snapshot_html' => '<html><body>pass</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationBlocksNewPackageForFinalizedRecordWithoutAmendment(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-existing-final-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_finalization_amendment_required');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(existingFinalizedRecord: true)))->finalize([
+                'evidence_key' => 'EV-EXISTING',
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original amended',
+                'canonical_payload' => ['result' => 'amended'],
+                'readable_snapshot_html' => '<html><body>amended</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
             ]);
         } finally {
             $this->removeTree($dir);
@@ -1028,6 +1133,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'emergency_change' => true,
             'emergency_justification' => 'Containment needed before next shipment.',
             'risk_accepted' => true,
+            'risk_acceptance_signature_event_id' => '00000000-0000-0000-0000-000000000777',
             'post_implementation_review_due_at' => '2026-04-21T00:00:00Z',
             'rollback_plan' => [
                 'rollback_strategy' => 'restore prior SOP revision and quarantine WIP',
@@ -1090,6 +1196,71 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('released', $released['status']);
     }
 
+    public function testEmergencyChangeDoesNotTreatBooleanRiskAcceptanceAsSignature(): void
+    {
+        $db = new ChangeLifecycleFakeDb();
+        $service = new ChangeLifecycleCommandService($db);
+
+        $service->createChangeOrder([
+            'change_order_number' => 'CO-EMERGENCY-NO-SIG',
+            'order_type' => 'temporary_deviation',
+            'title' => 'Emergency containment deviation without durable risk signature',
+            'emergency_change' => true,
+            'emergency_justification' => 'Containment needed before next shipment.',
+            'risk_accepted' => true,
+            'post_implementation_review_due_at' => '2026-04-21T00:00:00Z',
+            'rollback_plan' => [
+                'rollback_strategy' => 'restore prior revision',
+                'rollback_trigger' => 'verification failure',
+            ],
+            'affected_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10',
+                'affected_fields' => ['operation.20.method'],
+                'requested_effect' => 'deviation',
+            ]],
+            'resulting_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'result_role' => 'replacement',
+            ]],
+            'effectivities' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'effectivity_type' => 'date',
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'release_impact' => 'wip_hold',
+            ]],
+            'training_requirements' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'audience_type' => 'role',
+                'audience_ref' => 'operator',
+                'training_requirement_type' => 'read_ack',
+                'requirement_state' => 'satisfied',
+            ]],
+            'verifications' => [[
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ]],
+            'effectiveness_reviews' => [[
+                'review_state' => 'scheduled',
+                'review_due_at' => '2026-04-21T00:00:00Z',
+            ]],
+        ], 'qa-1');
+
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'impact_assessment'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'in_review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'approved'], 'qa-1');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('change_order_release_gate_blocked');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'released'], 'qa-1');
+    }
+
     public function testUnifiedEvidenceGraphBuilds5mLinksAndImpactClosure(): void
     {
         $service = new UnifiedEvidenceGraphService();
@@ -1136,6 +1307,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('consume', $fact['edge_fact_type']);
         $this->assertArrayHasKey('projected_graph', $fact);
+        $this->assertSame(1, $db->transactionCount);
         $this->assertNotEmpty($db->queryOneCalls);
         $sawEdgeInsert = false;
         foreach ($db->queryOneCalls as $call) {
@@ -1171,6 +1343,32 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'method_required' => false,
             'measurement_required' => false,
             'manpower_required' => false,
+            'context' => [
+                'equipment_id' => 'MILL-1',
+            ],
+        ]);
+
+        $this->assertFalse($gate['allowed']);
+        $this->assertContains('material', $gate['missing_context']);
+        $this->assertContains('method', $gate['missing_context']);
+        $this->assertContains('measurement', $gate['missing_context']);
+        $this->assertContains('manpower', $gate['missing_context']);
+    }
+
+    public function test5MGateRejectsCallerSpoofedGovernedPolicySource(): void
+    {
+        $gate = (new GenealogyGraphService(new GenealogyGraphFakeDb()))->evaluateAndPersist5M([
+            'operation_class' => 'cnc_milling',
+            'object_type' => 'work_order',
+            'object_id' => 'WO-1',
+            'required_5m_policy_source' => 'control_plan',
+            'required_5m_policy' => [
+                'material_required' => false,
+                'machine_required' => false,
+                'method_required' => false,
+                'measurement_required' => false,
+                'manpower_required' => false,
+            ],
             'context' => [
                 'equipment_id' => 'MILL-1',
             ],
@@ -1266,6 +1464,28 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('process', $thread['subject_type']);
         $this->assertSame('PROC-OP10', $thread['subject_id']);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<string, mixed>
+     */
+    private function evidenceSignatureEvent(array $overrides = []): array
+    {
+        return $overrides + [
+            'signer_ref' => 'qa-1',
+            'signer_role' => 'qa_qms',
+            'signature_meaning' => 'final evidence package approval',
+            'auth_challenge_id' => 'reauth-challenge-1',
+            'auth_method' => 'password_mfa',
+            'auth_result_hash_sha256' => str_repeat('8', 64),
+            'signer_identity_snapshot' => [
+                'username' => 'qa-1',
+                'display_name' => 'QA User',
+                'role' => 'qa_qms',
+            ],
+            'signature_manifestation' => 'Signed by qa-1 for final evidence package approval after re-authentication.',
+        ];
     }
 
     private function removeTree(string $dir): void
@@ -1445,7 +1665,13 @@ final class DocumentFormControlFakeDb
 
     public string $lastIssuanceManifestHash = '';
 
-    public function __construct(private readonly bool $changeAuthorityVerified = true)
+    /**
+     * @param array<string, mixed> $documentEffectivityScope
+     */
+    public function __construct(
+        private readonly bool $changeAuthorityVerified = true,
+        private readonly array $documentEffectivityScope = ['site' => 'VN-HCMC'],
+    )
     {
     }
 
@@ -1469,6 +1695,10 @@ final class DocumentFormControlFakeDb
             'requested_effect' => 'release',
             'effectivity_rule' => '{}',
             'disposition' => 'accepted',
+            'plm_change_effectivity_id' => '00000000-0000-0000-0000-000000000711',
+            'effectivity_scope' => json_encode($this->documentEffectivityScope, JSON_THROW_ON_ERROR),
+            'effective_from' => '2026-04-14T00:00:00Z',
+            'effective_to' => null,
         ], [
             'plm_change_order_id' => (string)$params[':change_order_id'],
             'change_order_number' => 'CO-DOC',
@@ -1479,6 +1709,10 @@ final class DocumentFormControlFakeDb
             'requested_effect' => 'supersede',
             'effectivity_rule' => '{}',
             'disposition' => 'accepted',
+            'plm_change_effectivity_id' => '00000000-0000-0000-0000-000000000712',
+            'effectivity_scope' => '{}',
+            'effective_from' => '2026-04-14T00:00:00Z',
+            'effective_to' => null,
         ]];
     }
 
@@ -1505,6 +1739,9 @@ final class DocumentFormControlFakeDb
                 'frm_template_revision_id' => (string)$params[':frm_template_revision_id'],
                 'schema_version' => '1.0.0',
                 'lifecycle_state' => 'released',
+                'json_schema' => '{"required":["result"],"properties":{"result":{"type":"string"}}}',
+                'validation_rules' => '{}',
+                'canonicalization_rules' => '{}',
             ];
         }
         if (str_contains($trimmed, 'FROM frm_issuances fi')) {
@@ -1522,6 +1759,9 @@ final class DocumentFormControlFakeDb
                 'template_revision' => 'R1',
                 'template_checksum_sha256' => str_repeat('b', 64),
                 'schema_version' => '1.0.0',
+                'json_schema' => '{"required":["result"],"properties":{"result":{"type":"string"}}}',
+                'validation_rules' => '{}',
+                'canonicalization_rules' => '{}',
             ];
         }
         if (str_contains($trimmed, 'INSERT INTO doc_families')) {
@@ -1626,6 +1866,14 @@ final class GenealogyGraphFakeDb
 
     public bool $sawProjectionWrite = false;
 
+    public int $transactionCount = 0;
+
+    public function transactional(callable $callback): mixed
+    {
+        $this->transactionCount++;
+        return $callback();
+    }
+
     /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>|null
@@ -1633,6 +1881,9 @@ final class GenealogyGraphFakeDb
     public function queryOne(string $sql, array $params = []): ?array
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM traceability_5m_policy_rules')) {
+            return null;
+        }
         if (str_contains($sql, 'SELECT 1 FROM genealogy_edge_facts')) {
             return null;
         }
@@ -1752,7 +2003,12 @@ final class EvidenceFinalizationFakeDb
 
     public int $transactionCount = 0;
 
-    public function __construct(private readonly bool $signatureConflict = false)
+    public function __construct(
+        private readonly bool $signatureConflict = false,
+        private readonly bool $existingFinalizedRecord = false,
+        private readonly bool $sourceAttemptAccepted = true,
+        private readonly bool $changeAuthorityVerified = true,
+    )
     {
     }
 
@@ -1769,11 +2025,42 @@ final class EvidenceFinalizationFakeDb
     public function queryOne(string $sql, array $params = []): array
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM frm_submission_attempts')) {
+            if (!$this->sourceAttemptAccepted) {
+                return [];
+            }
+            return [
+                'frm_submission_attempt_id' => (string)$params[':attempt_id'],
+                'frm_issuance_id' => '00000000-0000-0000-0000-000000000803',
+                'schema_version_id' => '00000000-0000-0000-0000-000000000802',
+                'attempt_state' => 'accepted',
+                'validation_state' => 'passed',
+            ];
+        }
         if (str_contains($sql, 'INSERT INTO evidence_records')) {
-            return ['evidence_record_id' => 'EVREC-1', 'evidence_key' => (string)$params[':evidence_key'], 'record_state' => 'open'];
+            return [
+                'evidence_record_id' => 'EVREC-1',
+                'evidence_key' => (string)$params[':evidence_key'],
+                'subject_type' => (string)$params[':subject_type'],
+                'subject_id' => (string)$params[':subject_id'],
+                'source_issuance_id' => (string)($params[':source_issuance_id'] ?? ''),
+                'source_attempt_id' => (string)($params[':source_attempt_id'] ?? ''),
+                'record_state' => $this->existingFinalizedRecord ? 'finalized' : 'open',
+                'current_version_id' => $this->existingFinalizedRecord ? '00000000-0000-0000-0000-000000000601' : null,
+            ];
         }
         if (str_contains($sql, 'INSERT INTO evidence_versions')) {
-            return ['evidence_version_id' => 'EVVER-1', 'evidence_record_id' => (string)$params[':evidence_record_id'], 'version_state' => 'locked'];
+            return [
+                'evidence_version_id' => 'EVVER-1',
+                'evidence_record_id' => (string)$params[':evidence_record_id'],
+                'version_state' => 'locked',
+                'package_hash_sha256' => (string)$params[':package_hash_sha256'],
+                'manifest_hash_sha256' => (string)$params[':manifest_hash_sha256'],
+                'canonical_payload_hash_sha256' => (string)$params[':canonical_payload_hash_sha256'],
+                'readable_snapshot_hash_sha256' => (string)$params[':readable_snapshot_hash_sha256'],
+                'source_version_id' => (string)($params[':source_version_id'] ?? ''),
+                'source_change_order_id' => (string)($params[':source_change_order_id'] ?? ''),
+            ];
         }
         if (str_contains($sql, 'INSERT INTO evidence_artifacts')) {
             return ['evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'], 'artifact_role' => (string)$params[':artifact_role']];
@@ -1791,6 +2078,10 @@ final class EvidenceFinalizationFakeDb
                 'signature_meaning' => (string)$params[':signature_meaning'],
                 'signed_payload_hash_sha256' => (string)$params[':signed_payload_hash_sha256'],
                 'signature_hash_sha256' => $this->signatureConflict ? str_repeat('0', 64) : (string)$params[':signature_hash_sha256'],
+                'auth_challenge_id' => (string)$params[':auth_challenge_id'],
+                'auth_method' => (string)$params[':auth_method'],
+                'auth_result_hash_sha256' => (string)$params[':auth_result_hash_sha256'],
+                'displayed_record_hash_sha256' => (string)$params[':displayed_record_hash_sha256'],
             ];
         }
         if (str_contains($sql, 'INSERT INTO retention_locks')) {
@@ -1807,6 +2098,30 @@ final class EvidenceFinalizationFakeDb
             return ['evidence_record_id' => 'EVREC-1', 'current_version_id' => (string)$params[':evidence_version_id'], 'record_state' => 'finalized'];
         }
         return [];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        if (!$this->changeAuthorityVerified || !str_contains($sql, 'FROM plm_change_orders co')) {
+            return [];
+        }
+
+        return [[
+            'plm_change_order_id' => (string)$params[':change_order_id'],
+            'change_order_number' => 'CO-EV-FINALIZE',
+            'status' => 'released',
+            'object_type' => 'evidence_version',
+            'object_id' => (string)$params[':source_version_id'],
+            'affected_fields' => '{canonical_payload}',
+            'plm_change_effectivity_id' => '00000000-0000-0000-0000-000000000991',
+            'effectivity_scope' => '{}',
+            'effective_from' => '2026-04-14T00:00:00Z',
+            'effective_to' => null,
+        ]];
     }
 
     public function combinedSql(): string

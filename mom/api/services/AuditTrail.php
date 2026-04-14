@@ -186,6 +186,7 @@ final class AuditTrail
             $lockAcquired = $this->acquireAggregateAuditLock($event, $requiresAuthoritativeStore);
 
             // Build hash chain: hash of this event includes the previous event's hash
+            $record['aggregate_sequence'] = $this->allocateAggregateSequence($event, $requiresAuthoritativeStore);
             $prevHash = $this->getLastEventHash($event->aggregateType, $event->aggregateId, $requiresAuthoritativeStore);
             $record['prev_hash'] = $prevHash;
             $record['event_hash'] = hash(self::HASH_ALGO, json_encode($this->canonicalHashRecord($record), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -505,16 +506,17 @@ final class AuditTrail
             ':metadata'       => json_encode($storageMetadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ':recorded_at'    => $record['recorded_at'],
             ':source_event_hash' => $record['event_hash'] ?? '',
+            ':aggregate_sequence' => $record['aggregate_sequence'] ?? null,
         ];
 
         $sql = <<<'SQL'
             INSERT INTO audit_events (
                 event_id, event_type, aggregate_type, aggregate_id,
-                actor_id, actor_name, payload, metadata, recorded_at, source_event_hash
+                actor_id, actor_name, payload, metadata, recorded_at, source_event_hash, aggregate_sequence
             ) VALUES (
                 CAST(:event_id AS uuid), :event_type, :aggregate_type, :aggregate_id,
                 CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb), CAST(:metadata AS jsonb),
-                CAST(:recorded_at AS timestamptz), :source_event_hash
+                CAST(:recorded_at AS timestamptz), :source_event_hash, :aggregate_sequence
             )
         SQL;
 
@@ -522,12 +524,14 @@ final class AuditTrail
             $this->db->execute($sql, $params);
             return;
         } catch (\Throwable $e) {
-            if (!str_contains(strtolower($e->getMessage()), 'source_event_hash')) {
+            $message = strtolower($e->getMessage());
+            if (!str_contains($message, 'source_event_hash') && !str_contains($message, 'aggregate_sequence')) {
                 throw $e;
             }
         }
 
         unset($params[':source_event_hash']);
+        unset($params[':aggregate_sequence']);
         $fallbackSql = <<<'SQL'
             INSERT INTO audit_events (
                 event_id, event_type, aggregate_type, aggregate_id,
@@ -586,6 +590,35 @@ final class AuditTrail
         return strtolower($event->aggregateType) . ':' . $event->aggregateId;
     }
 
+    private function allocateAggregateSequence(AuditEvent $event, bool $requiresAuthoritativeStore): ?int
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            if ($requiresAuthoritativeStore) {
+                throw new RuntimeException('Authoritative audit store is required for controlled event.');
+            }
+            return null;
+        }
+
+        try {
+            $row = $this->db->queryOne(
+                "SELECT COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence
+                 FROM audit_events
+                 WHERE aggregate_type = :t AND aggregate_id = :id",
+                [':t' => $event->aggregateType, ':id' => $event->aggregateId],
+            );
+            return max(1, (int)($row['next_sequence'] ?? 1));
+        } catch (\Throwable $e) {
+            if ($requiresAuthoritativeStore) {
+                throw new RuntimeException(
+                    'Authoritative audit sequence allocation failed for controlled event: ' . $e->getMessage(),
+                    0,
+                    $e,
+                );
+            }
+            return null;
+        }
+    }
+
     /**
      * Query events from PostgreSQL with filters.
      */
@@ -624,7 +657,7 @@ final class AuditTrail
         if (!empty($where)) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
-        $sql .= ' ORDER BY recorded_at ASC LIMIT :lim OFFSET :off';
+        $sql .= ' ORDER BY COALESCE(aggregate_sequence, 0) ASC, recorded_at ASC LIMIT :lim OFFSET :off';
         $params[':lim'] = $limit;
         $params[':off'] = $offset;
 
@@ -744,7 +777,7 @@ final class AuditTrail
                     "SELECT COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash') AS event_hash
                      FROM audit_events
                      WHERE aggregate_type = :t AND aggregate_id = :id
-                     ORDER BY recorded_at DESC LIMIT 1",
+                     ORDER BY COALESCE(aggregate_sequence, 0) DESC, recorded_at DESC LIMIT 1",
                     [':t' => $aggType, ':id' => $aggId],
                 );
                 if ($row !== null) {
@@ -757,7 +790,7 @@ final class AuditTrail
                         "SELECT metadata -> 'audit_chain' ->> 'event_hash' AS event_hash
                          FROM audit_events
                          WHERE aggregate_type = :t AND aggregate_id = :id
-                         ORDER BY recorded_at DESC LIMIT 1",
+                         ORDER BY COALESCE(aggregate_sequence, 0) DESC, recorded_at DESC LIMIT 1",
                         [':t' => $aggType, ':id' => $aggId],
                     );
                     if ($row !== null) {

@@ -13,7 +13,7 @@ use MOM\Services\ControlPlane\PeriodicEvaluationService;
 use MOM\Services\ControlPlane\RepoBoundaryScanner;
 use MOM\Services\ChangeControl\ChangeLifecycleCommandService;
 use MOM\Services\DocumentControl\DocumentRevisionCommandService;
-use MOM\Services\Evidence\AuditPackExporter;
+use MOM\Services\Evidence\AuditPackExportService;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
@@ -342,6 +342,21 @@ final class EqmsControlPlaneController extends BaseController
     {
         $this->requireAuth();
         $body = $this->jsonBody();
+        if (isset($body['change_order_id'])) {
+            try {
+                $result = (new ChangeLifecycleCommandService($this->data))->evaluateChangeOrderReleaseReadiness(
+                    trim((string)$body['change_order_id']),
+                    is_array($body['overrides'] ?? null) ? $body['overrides'] : [],
+                );
+                if (!$result['allowed']) {
+                    $this->error('change_release_gate_blocked', 409, 'Change order release gates are not complete.', ['release_gate' => $result]);
+                }
+                $this->success(['release_gate' => $result + ['authority' => 'canonical_change_lifecycle_package']]);
+            } catch (\Throwable $e) {
+                $this->error($e->getMessage(), 409);
+            }
+        }
+
         $this->requireFields($body, ['change_order']);
 
         $result = (new EffectivityGateService())->evaluateChangeOrderRelease(
@@ -357,7 +372,7 @@ final class EqmsControlPlaneController extends BaseController
         if (!$result['allowed']) {
             $this->error('change_release_gate_blocked', 409, 'Change order release gates are not complete.', ['release_gate' => $result]);
         }
-        $this->success(['release_gate' => $result]);
+        $this->success(['release_gate' => $result + ['authority' => 'preview_only_not_release_authority']]);
     }
 
     public function createChangeRequest(): never
@@ -467,6 +482,8 @@ final class EqmsControlPlaneController extends BaseController
     public function requestPublicationAction(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'change_coordinator']);
+        $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['publication_id', 'action', 'reason']);
         $idempotencyKey = trim((string)($body['idempotency_key'] ?? $this->requestHeader('Idempotency-Key') ?? ''));
@@ -498,6 +515,7 @@ final class EqmsControlPlaneController extends BaseController
     public function buildAuditPackManifest(): never
     {
         $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'auditor']);
         $body = $this->jsonBody();
         $this->requireFields($body, ['scope']);
 
@@ -508,53 +526,13 @@ final class EqmsControlPlaneController extends BaseController
                 $this->error('org_context_required', 400);
             }
 
-            // Filter evidence packages by org_id
-            $evidencePackages = (array)($body['evidence_packages'] ?? []);
-            $filteredEvidencePackages = [];
-            foreach ($evidencePackages as $pkg) {
-                $pkgOrgId = is_array($pkg) ? ($pkg['org_id'] ?? null) : null;
-                if ($pkgOrgId === $userOrgId) {
-                    $filteredEvidencePackages[] = $pkg;
+            foreach (['evidence_packages', 'audit_events', 'change_authorities', 'genealogy_links'] as $callerRecordSet) {
+                if (array_key_exists($callerRecordSet, $body)) {
+                    $this->error('audit_pack_caller_supplied_records_rejected', 400, 'Audit pack export accepts scope only; records are loaded from canonical stores.');
                 }
             }
 
-            // Filter audit events by org_id
-            $auditEvents = (array)($body['audit_events'] ?? []);
-            $filteredAuditEvents = [];
-            foreach ($auditEvents as $event) {
-                $eventOrgId = is_array($event) ? ($event['org_id'] ?? null) : null;
-                if ($eventOrgId === $userOrgId) {
-                    $filteredAuditEvents[] = $event;
-                }
-            }
-
-            // Filter change authorities by org_id
-            $changeAuthorities = (array)($body['change_authorities'] ?? []);
-            $filteredChangeAuthorities = [];
-            foreach ($changeAuthorities as $auth) {
-                $authOrgId = is_array($auth) ? ($auth['org_id'] ?? null) : null;
-                if ($authOrgId === $userOrgId) {
-                    $filteredChangeAuthorities[] = $auth;
-                }
-            }
-
-            // Filter genealogy links by org_id
-            $genealogyLinks = (array)($body['genealogy_links'] ?? []);
-            $filteredGenealogyLinks = [];
-            foreach ($genealogyLinks as $link) {
-                $linkOrgId = is_array($link) ? ($link['org_id'] ?? null) : null;
-                if ($linkOrgId === $userOrgId) {
-                    $filteredGenealogyLinks[] = $link;
-                }
-            }
-
-            $manifest = (new AuditPackExporter())->buildManifest(
-                (array)$body['scope'],
-                $filteredEvidencePackages,
-                $filteredAuditEvents,
-                $filteredChangeAuthorities,
-                $filteredGenealogyLinks,
-            );
+            $manifest = (new AuditPackExportService($this->data))->buildForScope((array)$body['scope'], (string)$userOrgId);
 
             // GOV-008: Final assertion - verify no cross-org records made it through
             if (!$this->assertAuditPackIsOrgScoped($manifest, $userOrgId)) {
@@ -778,7 +756,8 @@ final class EqmsControlPlaneController extends BaseController
 
     public function closePeriodicEvaluation(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer']);
         $this->requireCsrf();
         $body = $this->jsonBody();
         try {

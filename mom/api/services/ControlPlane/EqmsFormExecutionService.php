@@ -95,6 +95,28 @@ final class EqmsFormExecutionService
             $errors[] = $this->error('canonical_payload_hash_required', 'Canonical payload SHA-256 hash is required.');
         }
 
+        $payload = $this->submissionPayload($submission);
+        $schema = $this->schemaFromIssuance($issuance);
+        $validationRules = $this->rulesFromIssuance($issuance);
+        $canonicalPayload = [];
+        if ($payload !== null) {
+            $canonicalPayload = $this->canonicalizePayload($payload);
+            $serverPayloadHash = $this->hash($canonicalPayload);
+            if ($payloadHash !== '' && $this->isSha256($payloadHash) && !hash_equals($serverPayloadHash, $payloadHash)) {
+                $errors[] = $this->error(
+                    'canonical_payload_hash_mismatch',
+                    'Canonical payload hash must be computed by the server from parsed submission payload.',
+                );
+            }
+            $payloadHash = $serverPayloadHash;
+        } elseif ($schema !== [] || $validationRules !== []) {
+            $errors[] = $this->error('canonical_payload_required', 'Parsed canonical payload is required for server-authoritative validation.');
+        }
+
+        foreach ($this->validatePayloadAgainstSchema($canonicalPayload, $schema, $validationRules) as $error) {
+            $errors[] = $error;
+        }
+
         $duplicate = $this->detectDuplicate($originalHash, $payloadHash, $knownFingerprints);
         if ($duplicate !== null) {
             $errors[] = $this->error('duplicate_submission', 'Duplicate submission detected.', ['duplicate' => $duplicate]);
@@ -105,6 +127,7 @@ final class EqmsFormExecutionService
             'errors' => $errors,
             'warnings' => $warnings,
             'canonical_payload_hash_sha256' => $payloadHash,
+            'canonical_payload' => $canonicalPayload,
             'original_artifact_hash_sha256' => $originalHash,
             'duplicate' => $duplicate,
         ];
@@ -157,6 +180,133 @@ final class EqmsFormExecutionService
             }
         }
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $submission
+     * @return array<string, mixed>|null
+     */
+    private function submissionPayload(array $submission): ?array
+    {
+        foreach (['canonical_payload', 'parsed_payload', 'payload'] as $key) {
+            if (is_array($submission[$key] ?? null)) {
+                return $submission[$key];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $issuance
+     * @return array<string, mixed>
+     */
+    private function schemaFromIssuance(array $issuance): array
+    {
+        foreach (['json_schema', 'schema', 'schema_payload'] as $key) {
+            $value = $issuance[$key] ?? null;
+            if (is_array($value)) {
+                return $value;
+            }
+            if (is_string($value) && trim($value) !== '') {
+                $decoded = json_decode($value, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $issuance
+     * @return array<string, mixed>
+     */
+    private function rulesFromIssuance(array $issuance): array
+    {
+        foreach (['validation_rules', 'canonicalization_rules'] as $key) {
+            $value = $issuance[$key] ?? null;
+            if (is_array($value)) {
+                return $value;
+            }
+            if (is_string($value) && trim($value) !== '') {
+                $decoded = json_decode($value, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function canonicalizePayload(array $payload): array
+    {
+        $canonical = $payload;
+        $this->ksortRecursive($canonical);
+        return $canonical;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $schema
+     * @param array<string, mixed> $rules
+     * @return list<array{error_code: string, message: string, data: array<string, mixed>}>
+     */
+    private function validatePayloadAgainstSchema(array $payload, array $schema, array $rules): array
+    {
+        if ($payload === [] && $schema === [] && $rules === []) {
+            return [];
+        }
+
+        $errors = [];
+        $required = [];
+        if (is_array($schema['required'] ?? null)) {
+            $required = array_merge($required, array_values($schema['required']));
+        }
+        if (is_array($rules['required_fields'] ?? null)) {
+            $required = array_merge($required, array_values($rules['required_fields']));
+        }
+
+        foreach (array_unique(array_filter(array_map(fn(mixed $field): string => $this->text($field), $required))) as $field) {
+            if (!array_key_exists($field, $payload) || $payload[$field] === null || $payload[$field] === '') {
+                $errors[] = $this->error('required_field_missing', 'Required field is missing from canonical payload.', [
+                    'field_path' => $field,
+                ]);
+            }
+        }
+
+        $properties = is_array($schema['properties'] ?? null) ? $schema['properties'] : [];
+        foreach ($properties as $field => $definition) {
+            if (!is_string($field) || !array_key_exists($field, $payload) || !is_array($definition)) {
+                continue;
+            }
+            $type = $this->text($definition['type'] ?? '');
+            if ($type === '' || $this->jsonTypeMatches($payload[$field], $type)) {
+                continue;
+            }
+            $errors[] = $this->error('field_type_mismatch', 'Canonical payload field type does not match issued schema.', [
+                'field_path' => $field,
+                'expected_type' => $type,
+            ]);
+        }
+
+        return $errors;
+    }
+
+    private function jsonTypeMatches(mixed $value, string $type): bool
+    {
+        return match ($type) {
+            'string' => is_string($value),
+            'number' => is_int($value) || is_float($value),
+            'integer' => is_int($value),
+            'boolean' => is_bool($value),
+            'array' => is_array($value) && array_is_list($value),
+            'object' => is_array($value) && !array_is_list($value),
+            'null' => $value === null,
+            default => true,
+        };
     }
 
     /**

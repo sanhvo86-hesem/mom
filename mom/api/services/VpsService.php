@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use MOM\Database\Connection;
+use MOM\Database\DataLayer;
 use RuntimeException;
 
 final class VpsService
@@ -31,7 +33,7 @@ final class VpsService
 
     private string $rootDir;
 
-    public function __construct(string $dataDir, string $rootDir)
+    public function __construct(string $dataDir, string $rootDir, private readonly ?object $db = null)
     {
         $dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
@@ -363,6 +365,134 @@ final class VpsService
         if ($confirmation !== $expectedConfirmation) {
             throw new RuntimeException('deployment_confirmation_required');
         }
+        $this->assertReleasedDeploymentChangeAuthority($actionId, $context, $manifestRef, $changeAuthorityRef, $intent);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function assertReleasedDeploymentChangeAuthority(
+        string $actionId,
+        array $context,
+        string $manifestRef,
+        string $changeAuthorityRef,
+        string $intent,
+    ): void {
+        $db = $this->normalizeDb($this->db);
+        if ($db === null || !method_exists($db, 'query')) {
+            throw new RuntimeException('deployment_change_authority_store_required');
+        }
+
+        $targetEnvironment = strtolower(trim((string)($context['target_environment'] ?? $context['environment'] ?? 'production')));
+        $manifestHash = strtolower(trim((string)($context['release_manifest_hash_sha256'] ?? $context['manifest_hash_sha256'] ?? '')));
+        $rows = $db->query(
+            "SELECT
+                co.plm_change_order_id::text AS plm_change_order_id,
+                co.change_order_number,
+                co.status,
+                lower(cao.object_type) AS object_type,
+                cao.object_id,
+                cao.affected_fields,
+                cao.requested_effect,
+                cao.effectivity_rule,
+                eff.plm_change_effectivity_id::text AS plm_change_effectivity_id,
+                eff.effectivity_scope
+             FROM plm_change_orders co
+             INNER JOIN plm_change_affected_objects cao
+                ON cao.plm_change_order_id = co.plm_change_order_id
+             INNER JOIN plm_change_effectivities eff
+                ON eff.plm_change_order_id = co.plm_change_order_id
+             WHERE (co.plm_change_order_id::text = :change_ref OR co.change_order_number = :change_ref)
+               AND co.status = 'released'
+               AND lower(cao.object_type) IN ('deployment_manifest', 'release_manifest', 'runtime_environment', 'controlled_source')
+               AND cao.disposition = 'accepted'
+             ORDER BY eff.effective_from DESC",
+            [':change_ref' => $changeAuthorityRef],
+        );
+
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $objectId = trim((string)($row['object_id'] ?? ''));
+            if (!in_array($objectId, [$manifestRef, $manifestHash, $targetEnvironment, $actionId, '*'], true)) {
+                continue;
+            }
+            $fields = $this->textList($row['affected_fields'] ?? null);
+            if ($fields !== [] && !in_array($actionId, $fields, true) && !in_array($intent, $fields, true) && !in_array('deployment', $fields, true)) {
+                continue;
+            }
+            if (!$this->deploymentEffectivityMatches($row['effectivity_scope'] ?? null, $targetEnvironment, $manifestRef, $manifestHash)) {
+                continue;
+            }
+            return;
+        }
+
+        throw new RuntimeException('deployment_change_authority_not_verified');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function textList(mixed $raw): array
+    {
+        if (is_array($raw)) {
+            return array_values(array_unique(array_filter(array_map(
+                fn(mixed $value): string => is_scalar($value) ? strtolower(trim((string)$value)) : '',
+                $raw,
+            ))));
+        }
+        if (!is_string($raw) || trim($raw) === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            return $this->textList($decoded);
+        }
+        return array_values(array_unique(array_filter(array_map(
+            static fn(string $value): string => strtolower(trim($value, " \t\n\r\0\x0B{}\"'")),
+            str_getcsv($raw, ',', '"', '\\'),
+        ))));
+    }
+
+    private function deploymentEffectivityMatches(mixed $scopeRaw, string $targetEnvironment, string $manifestRef, string $manifestHash): bool
+    {
+        if (is_string($scopeRaw)) {
+            $decoded = json_decode($scopeRaw, true);
+            $scopeRaw = is_array($decoded) ? $decoded : [];
+        }
+        $scope = is_array($scopeRaw) ? $scopeRaw : [];
+        foreach (['target_environment', 'environment'] as $key) {
+            if (isset($scope[$key]) && strtolower((string)$scope[$key]) !== $targetEnvironment) {
+                return false;
+            }
+        }
+        if (isset($scope['release_manifest_ref']) && (string)$scope['release_manifest_ref'] !== $manifestRef) {
+            return false;
+        }
+        if ($manifestHash !== '' && isset($scope['release_manifest_hash_sha256']) && strtolower((string)$scope['release_manifest_hash_sha256']) !== $manifestHash) {
+            return false;
+        }
+        return true;
+    }
+
+    private function normalizeDb(?object $db): ?object
+    {
+        if ($db instanceof DataLayer) {
+            return $db->getConnection();
+        }
+        if ($db instanceof Connection) {
+            return $db;
+        }
+        if ($db !== null && method_exists($db, 'getConnection')) {
+            try {
+                $candidate = $db->getConnection();
+                return is_object($candidate) ? $candidate : null;
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+        return $db;
     }
 
     /**

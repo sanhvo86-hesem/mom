@@ -45,7 +45,19 @@ final class GenealogyGraphService
     public function recordEdgeFact(array $fact, string $actorRef): array
     {
         $this->requireDb();
+        if (method_exists($this->db, 'transactional')) {
+            return $this->db->transactional(fn(): array => $this->recordEdgeFactInsideTransaction($fact, $actorRef));
+        }
 
+        return $this->recordEdgeFactInsideTransaction($fact, $actorRef);
+    }
+
+    /**
+     * @param array<string, mixed> $fact
+     * @return array<string, mixed>
+     */
+    private function recordEdgeFactInsideTransaction(array $fact, string $actorRef): array
+    {
         $edgeFactType = $this->requiredToken($fact, 'edge_fact_type');
         if (!in_array($edgeFactType, self::EDGE_FACT_TYPES, true)) {
             throw new RuntimeException('unsupported_genealogy_edge_fact_type');
@@ -630,9 +642,8 @@ final class GenealogyGraphService
      */
     private function required5M(array $request): array
     {
-        $policy = is_array($request['required_5m_policy'] ?? null) ? $request['required_5m_policy'] : [];
-        $source = $this->normalizeToken((string)($request['required_5m_policy_source'] ?? $policy['source'] ?? ''));
-        if (in_array($source, ['traceability_5m_policy_rules', 'control_plan', 'operation_policy'], true)) {
+        $policy = $this->loadPersisted5MPolicy($request);
+        if ($policy !== []) {
             return [
                 'material' => $this->truthy($policy['material_required'] ?? true),
                 'machine' => $this->truthy($policy['machine_required'] ?? true),
@@ -651,6 +662,43 @@ final class GenealogyGraphService
             'measurement' => true,
             'manpower' => true,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $request
+     * @return array<string, mixed>
+     */
+    private function loadPersisted5MPolicy(array $request): array
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            return [];
+        }
+
+        try {
+            $row = $this->db->queryOne(
+                "SELECT material_required, machine_required, method_required, measurement_required, manpower_required,
+                        policy_source, policy_state, effective_from, effective_to
+                 FROM traceability_5m_policy_rules
+                 WHERE operation_class = :operation_class
+                   AND object_type = :object_type
+                   AND (object_id = :object_id OR object_id = '*')
+                   AND policy_state = 'active'
+                   AND effective_from <= COALESCE(CAST(:effective_at AS timestamptz), now())
+                   AND (effective_to IS NULL OR effective_to > COALESCE(CAST(:effective_at AS timestamptz), now()))
+                 ORDER BY object_id DESC, effective_from DESC
+                 LIMIT 1",
+                [
+                    ':operation_class' => $this->requiredToken($request, 'operation_class'),
+                    ':object_type' => $this->requiredToken($request, 'object_type'),
+                    ':object_id' => $this->requiredText($request, 'object_id'),
+                    ':effective_at' => $this->nullableText($request['effective_at'] ?? null),
+                ],
+            );
+        } catch (\Throwable) {
+            return [];
+        }
+
+        return is_array($row) ? $row : [];
     }
 
     /**
