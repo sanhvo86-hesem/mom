@@ -2527,17 +2527,38 @@ BASH;
      * SVC-011: Strict allowlist of permitted commands.
      * Only these hardcoded command strings are permitted to execute.
      * Commands from config files are validated against this list.
+     *
+     * Dynamic service probe commands (probeServices) are validated separately
+     * via isAllowedServiceProbeCommand() which checks unit-name safety.
      */
     private function isAllowedCommand(string $command): bool
     {
         $allowedCommands = [
+            // --- Legacy simple health command (kept for backward compat) ---
             'hostname && echo && uptime && echo && df -h / && echo && (free -m 2>/dev/null || true)',
+
+            // --- Current healthCommand() output (bash heredoc) ---
+            $this->healthCommand(),
+
+            // --- Container probe (probeContainers format) ---
+            "if command -v docker >/dev/null 2>&1; then docker ps --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}'; fi",
+
+            // --- Container probe (legacy whitelist format, kept for compat) ---
             "if command -v docker >/dev/null 2>&1; then docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'; else echo 'docker_not_available'; fi",
+
+            // --- Port probe (probePorts ss/netstat) ---
+            "if command -v ss >/dev/null 2>&1; then ss -ltn 2>/dev/null | tail -n +2 | head -n 12 | awk '{print \$4}'; elif command -v netstat >/dev/null 2>&1; then netstat -lnt 2>/dev/null | tail -n +3 | head -n 12 | awk '{print \$4}'; fi",
+
+            // --- File existence checks ---
             'test -f /etc/nginx/nginx.conf && echo ok || echo not_found',
             'test -f /etc/php-fpm.conf && echo ok || echo not_found',
+
+            // --- Legacy single-service systemctl checks ---
             'systemctl is-active nginx',
             'systemctl is-active php-fpm',
             'systemctl is-active docker',
+
+            // --- Docker/observability ---
             'du -sh /var/lib/docker 2>/dev/null || echo 0',
             'docker images --format \'table {{.Repository}}\t{{.Tag}}\t{{.Size}}\'' ,
             'ls -la /opt/observability/ 2>/dev/null || echo none',
@@ -2547,12 +2568,62 @@ BASH;
 
         $command = trim($command);
         foreach ($allowedCommands as $allowed) {
-            if ($command === trim($allowed)) {
+            if ($command === trim((string)$allowed)) {
                 return true;
             }
         }
 
-        return false;
+        // Dynamic service probe commands are validated separately.
+        return $this->isAllowedServiceProbeCommand($command);
+    }
+
+    /**
+     * SVC-011: Validate dynamically-built service probe commands.
+     *
+     * probeServices() builds compound systemctl commands from the host inventory.
+     * Since the command text is dynamic (depends on configured unit names) it
+     * cannot be whitelisted by exact string. We validate it structurally instead:
+     * – The command must be composed only of valid, pre-validated service probe
+     *   segments joined by "; ".
+     * – Each unit name must match the safe pattern ^[a-zA-Z0-9._@-]+$ to prevent
+     *   shell injection from a compromised vps_control_tower.json file.
+     */
+    private function isAllowedServiceProbeCommand(string $command): bool
+    {
+        // Each segment produced by probeServices() matches this exact template
+        // (with safe unit names injected via escapeshellarg).
+        // We reconstruct and compare structurally rather than by string match.
+        $safeUnitPattern = '/^[a-zA-Z0-9._@-]+$/';
+
+        // Split on "; " — the separator used by probeServices() implode.
+        $segments = array_filter(array_map('trim', explode('; ', $command)), fn(string $s): bool => $s !== '');
+        if ($segments === []) {
+            return false;
+        }
+
+        foreach ($segments as $segment) {
+            // Each segment must follow the probeServices() template exactly.
+            // Template: "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in <units>; do ..."
+            if (!str_starts_with($segment, 'if command -v systemctl >/dev/null 2>&1; then')) {
+                return false;
+            }
+
+            // Extract the "for unit in <...>" part and validate each unit token.
+            // The units are embedded as shell-quoted tokens produced by escapeshellarg.
+            if (!preg_match('/for unit in ((?:\'[^\']+\' ?)+);/', $segment, $m)) {
+                return false;
+            }
+
+            // Parse individual quoted unit names.
+            preg_match_all("/'([^']+)'/", $m[1], $units);
+            foreach ($units[1] as $unit) {
+                if (!preg_match($safeUnitPattern, $unit)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

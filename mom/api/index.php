@@ -230,9 +230,44 @@ use MOM\Api\Services\DomainEvent;
 use MOM\Services\SliceObservability;
 use MOM\Database\DataLayer;
 
-// â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-$dataLayer = new DataLayer($DATA_DIR, $ROOT_DIR);
+// ── Bootstrap DataLayer ──────────────────────────────────────────────────────
+//
+// DataLayer construction may throw RuntimeException when the PostgreSQL path is
+// explicitly enabled (USE_POSTGRES=1) but the required DB_PASSWORD (or legacy
+// DB_PASS) environment variable is absent. Rather than letting the exception
+// propagate to the global handler and returning an opaque “server_error”, we
+// catch it here, log a clear diagnostic, and fall back to JSON_ONLY mode so
+// all stateless / read-only surfaces (including the auth endpoints and the
+// Data Schema workspace) continue to work without DB credentials.
+try {
+    $dataLayer = new DataLayer($DATA_DIR, $ROOT_DIR);
+} catch (RuntimeException $e) {
+    @error_log('[API index bootstrap] DataLayer init failed, falling back to JSON_ONLY: ' . $e->getMessage());
+    // Force JSON_ONLY config — password and postgres flags are stripped so the
+    // override succeeds even when database/config.php enforced a password guard.
+    $dataLayer = new DataLayer($DATA_DIR, $ROOT_DIR, [
+        'use_postgres'       => false,
+        'shadow_write'       => false,
+        'json_fallback'      => false,
+        'allow_empty_password' => true,
+        'driver'             => 'pgsql',
+        'host'               => 'localhost',
+        'port'               => 5432,
+        'database'           => 'mom',
+        'username'           => 'mom_app',
+        'password'           => '',
+        'charset'            => 'utf8',
+        'schema'             => 'public',
+        'sslmode'            => 'prefer',
+        'connect_timeout'    => 5,
+        'statement_timeout'  => 30000,
+        'read_retry_count'   => 3,
+        'read_retry_delay_ms'=> 150,
+        'log_queries'        => false,
+        'log_file'           => $DATA_DIR . '/data/db_queries.log',
+        'slow_query_ms'      => 500,
+    ]);
+}
 SliceObservability::beginRequest($DATA_DIR);
 
 // â”€â”€ Build Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
