@@ -34,5 +34,5 @@ Repository `AGENTS.md` prefers fast-forward merge to `main`. Final plan:
 
 - Delete only tranche15-created branches/worktrees.
 - No tranche15 helper worktrees were created.
-- Preserve pre-existing `/Users/a10/Documents/mom-worktrees/worldclass-closure-20260414-2020` because it contains unique commits not reachable from `main`.
+- Recheck pre-existing `/Users/a10/Documents/mom-worktrees/worldclass-closure-20260414-2020` before final cleanup. At final gate it was a clean `main` worktree with no unique commits beyond `origin/main`, so it was removable to allow the root workspace to finish on `main`.
 - Final required state: checked out on `main`, integration branch deleted, `git status` clean.

@@ -60,4 +60,4 @@ Date: 2026-04-14
 - Live OTel collector/exporter proof is external.
 - Production immutable storage/WORM proof is external.
 - Part 11 validation scope is a product/compliance decision.
-- Pre-existing old worktree with unique commits is preserved to avoid data loss.
+- Pre-existing old worktree was rechecked at final gate, found clean on `main` with no unique commits beyond `origin/main`, and became safe to remove during final cleanup.
