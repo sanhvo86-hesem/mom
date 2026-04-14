@@ -1,7 +1,7 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-14T11:33:01.899Z",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
+    "generated_at": "2026-04-14T14:23:43.807Z",
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
     "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {
       "count": 760,
@@ -54,8 +54,8 @@
       ]
     },
     "readiness": {
-      "ready": 766,
-      "partial": 5,
+      "ready": 771,
+      "partial": 0,
       "blocked": 0,
       "total": 771,
       "description": "Current readiness counts are taken directly from frontend-foundation-catalog.json and reflect the live publication state, not historical onboarding assumptions."

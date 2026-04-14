@@ -58,6 +58,69 @@ final class MobileWorkQueueServiceTest extends TestCase
         $service->clockOut((string)$clockIn['entry_id'], 0, 1, 'operator-1');
     }
 
+    public function testClockOutAllowsExactOnlineIdempotentReplayAndRejectsConflict(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $clockIn = $service->clockIn('operator-1', 'WO-1001', 20, 'MC-5AX-01');
+
+        $first = $service->clockOut((string)$clockIn['entry_id'], 3, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+            'device_id' => 'tablet-1',
+        ]);
+        $second = $service->clockOut((string)$clockIn['entry_id'], 3, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+            'device_id' => 'tablet-1',
+        ]);
+
+        $this->assertSame($first['entry_id'], $second['entry_id']);
+        $this->assertTrue($second['idempotent_replay']);
+        $this->assertSame('tablet-1-clockout-0001', $second['idempotency_key']);
+        $this->assertSame('tablet-1', $second['device_id']);
+
+        $entries = json_decode((string)file_get_contents($this->tmpDir . '/mobile/time_entries.json'), true);
+        $this->assertIsArray($entries);
+        $this->assertCount(2, $entries);
+        $this->assertSame('tablet-1-clockout-0001', $entries[0]['clock_out_idempotency_key']);
+        $this->assertSame($first['entry_id'], $entries[0]['clocked_out_entry_id']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('clock_out_idempotency_conflict');
+
+        $service->clockOut((string)$clockIn['entry_id'], 4, 1, 'operator-1', [
+            'idempotency_key' => 'tablet-1-clockout-0001',
+        ]);
+    }
+
+    public function testClockInAllowsExactOnlineIdempotentReplayAndRejectsConflict(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+
+        $first = $service->clockIn('operator-1', 'WO-1001', 20, 'MC-5AX-01', 'run', [
+            'idempotency_key' => 'tablet-1-clockin-0001',
+            'device_id' => 'tablet-1',
+        ]);
+        $second = $service->clockIn('operator-1', 'WO-1001', 20, 'MC-5AX-01', 'run', [
+            'idempotency_key' => 'tablet-1-clockin-0001',
+            'device_id' => 'tablet-1',
+        ]);
+
+        $this->assertSame($first['entry_id'], $second['entry_id']);
+        $this->assertTrue($second['idempotent_replay']);
+        $this->assertSame('tablet-1-clockin-0001', $second['idempotency_key']);
+        $this->assertSame('tablet-1', $second['device_id']);
+
+        $entries = json_decode((string)file_get_contents($this->tmpDir . '/mobile/time_entries.json'), true);
+        $this->assertIsArray($entries);
+        $this->assertCount(1, $entries);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('clock_in_idempotency_conflict');
+
+        $service->clockIn('operator-1', 'WO-CHANGED', 20, 'MC-5AX-01', 'run', [
+            'idempotency_key' => 'tablet-1-clockin-0001',
+        ]);
+    }
+
     public function testCompleteTaskPersistsResultQuantitiesAndRejectsContradictions(): void
     {
         $service = new MobileWorkQueueService($this->tmpDir);
@@ -89,6 +152,79 @@ final class MobileWorkQueueServiceTest extends TestCase
             'result' => 'pass',
             'qty_completed' => 5,
             'qty_scrap' => 1,
+        ]);
+    }
+
+    public function testOperatorQueueMaintainsDerivedIndexForScaleReads(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+
+        $service->assignTask('operator-1', 'WO-LOW', 'operation_complete', ['priority' => 50]);
+        $service->assignTask('operator-2', 'WO-OTHER', 'operation_complete', ['priority' => 1]);
+        $service->assignTask('operator-1', 'WO-HIGH', 'operation_complete', ['priority' => 5]);
+
+        $queue = $service->getOperatorQueue('operator-1', date('Y-m-d'));
+
+        $this->assertSame(['WO-HIGH', 'WO-LOW'], array_column($queue, 'wo_number'));
+
+        $indexPath = $this->tmpDir . '/mobile/work_queue.index.json';
+        $this->assertFileExists($indexPath);
+        $index = json_decode((string)file_get_contents($indexPath), true);
+        $this->assertIsArray($index);
+        $this->assertSame('mobile_work_queue_index.v1', $index['_meta']['schema'] ?? null);
+        $this->assertSame('derived_read_model', $index['_meta']['authority'] ?? null);
+        $this->assertCount(2, $index['by_operator_date'] ?? []);
+    }
+
+    public function testCompleteTaskAllowsExactOnlineIdempotentReplay(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1001', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
+
+        $first = $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 3,
+            'qty_scrap' => 0,
+            'idempotency_key' => 'tablet-1-complete-0001',
+        ]);
+        $second = $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 3,
+            'qty_scrap' => 0,
+            'idempotency_key' => 'tablet-1-complete-0001',
+        ]);
+
+        $this->assertSame('completed', $first['task_status']);
+        $this->assertTrue($second['idempotent_replay']);
+        $this->assertSame('tablet-1-complete-0001', $second['completion_idempotency_key']);
+
+        $events = json_decode((string)file_get_contents($this->tmpDir . '/mobile/task_events.json'), true);
+        $this->assertIsArray($events);
+        $this->assertSame(['mobile.task_assigned', 'mobile.task_started', 'mobile.task_completed'], array_column($events, 'event_type'));
+    }
+
+    public function testCompleteTaskRejectsSameIdempotencyKeyWithChangedPayload(): void
+    {
+        $service = new MobileWorkQueueService($this->tmpDir);
+        $task = $service->assignTask('operator-1', 'WO-1001', 'operation_complete', []);
+        $service->startTask((string)$task['queue_id'], 'operator-1');
+
+        $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 3,
+            'qty_scrap' => 0,
+            'idempotency_key' => 'tablet-1-complete-0001',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('completion_idempotency_conflict');
+
+        $service->completeTask((string)$task['queue_id'], 'operator-1', [
+            'result' => 'pass',
+            'qty_completed' => 4,
+            'qty_scrap' => 0,
+            'idempotency_key' => 'tablet-1-complete-0001',
         ]);
     }
 

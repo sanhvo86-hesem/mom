@@ -1663,54 +1663,143 @@ final class WorkflowEngine
             ],
 
             'AUD' => [
-                'initial'  => 'planned',
-                'terminal' => ['closed'],
-                'states'   => ['planned', 'in_progress', 'reporting', 'follow_up', 'closed'],
+                'initial'  => 'draft',
+                'terminal' => ['closed', 'rejected'],
+                'states'   => ['draft', 'submitted', 'under_review', 'approved', 'implemented', 'verified', 'closed', 'rejected'],
                 'transitions' => [
-                    'planned' => [
-                        'in_progress' => [
-                            'label'    => 'Start Audit',
-                            'label_vi' => 'Bat dau danh gia',
+                    'draft' => [
+                        'submitted' => [
+                            'label'    => 'Submit Audit',
+                            'label_vi' => 'Gui danh gia',
                             'roles'    => ['auditor', 'qa_manager', 'admin'],
-                            'actions'  => [],
+                            'actions'  => ['notify_approver'],
                             'requires' => [],
                         ],
-                    ],
-                    'in_progress' => [
-                        'reporting' => [
-                            'label'    => 'Draft Report',
-                            'label_vi' => 'Soan bao cao',
-                            'roles'    => ['auditor', 'qa_manager', 'admin'],
-                            'actions'  => [],
-                            'requires' => [],
-                        ],
-                    ],
-                    'reporting' => [
-                        'follow_up' => [
-                            'label'    => 'Issue Findings',
-                            'label_vi' => 'Ban hanh phat hien',
-                            'roles'    => ['auditor', 'qa_manager', 'admin'],
-                            'actions'  => ['set_due_date_30d'],
-                            'requires' => [],
-                        ],
-                    ],
-                    'follow_up' => [
                         'closed' => [
-                            'label'    => 'Close Audit',
-                            'label_vi' => 'Dong danh gia',
+                            'label'    => 'Close Draft Audit',
+                            'label_vi' => 'Dong ban nhap danh gia',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => ['clear_due_date'],
                             'requires' => [],
                         ],
-                        'reporting' => [
-                            'label'    => 'Reopen Reporting',
-                            'label_vi' => 'Mo lai bao cao',
+                        'rejected' => [
+                            'label'    => 'Reject Draft Audit',
+                            'label_vi' => 'Tu choi ban nhap danh gia',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'submitted' => [
+                        'under_review' => [
+                            'label'    => 'Start Audit Review',
+                            'label_vi' => 'Bat dau xem xet danh gia',
+                            'roles'    => ['auditor', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'closed' => [
+                            'label'    => 'Close Submitted Audit',
+                            'label_vi' => 'Dong danh gia da gui',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Submitted Audit',
+                            'label_vi' => 'Tu choi danh gia da gui',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'under_review' => [
+                        'approved' => [
+                            'label'    => 'Approve Audit',
+                            'label_vi' => 'Phe duyet danh gia',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_30d'],
+                            'requires' => [],
+                        ],
+                        'closed' => [
+                            'label'    => 'Close Audit Review',
+                            'label_vi' => 'Dong xem xet danh gia',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Audit',
+                            'label_vi' => 'Tu choi danh gia',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'approved' => [
+                        'implemented' => [
+                            'label'    => 'Implement Audit Actions',
+                            'label_vi' => 'Thuc hien hanh dong danh gia',
+                            'roles'    => ['auditor', 'qa_manager', 'admin', 'assignee'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'closed' => [
+                            'label'    => 'Close Approved Audit',
+                            'label_vi' => 'Dong danh gia da phe duyet',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Approved Audit',
+                            'label_vi' => 'Tu choi danh gia da phe duyet',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'implemented' => [
+                        'verified' => [
+                            'label'    => 'Verify Audit Actions',
+                            'label_vi' => 'Xac minh hanh dong danh gia',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => [],
                             'requires' => [],
                         ],
+                        'closed' => [
+                            'label'    => 'Close Implemented Audit',
+                            'label_vi' => 'Dong danh gia da thuc hien',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Implemented Audit',
+                            'label_vi' => 'Tu choi danh gia da thuc hien',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'verified' => [
+                        'closed' => [
+                            'label'    => 'Close Verified Audit',
+                            'label_vi' => 'Dong danh gia da xac minh',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Verified Audit',
+                            'label_vi' => 'Tu choi danh gia da xac minh',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
                     ],
                     'closed' => [],
+                    'rejected' => [],
                 ],
             ],
 
@@ -1758,54 +1847,116 @@ final class WorkflowEngine
             ],
 
             'ECR' => [
-                'initial'  => 'submitted',
-                'terminal' => ['verified'],
-                'states'   => ['submitted', 'review', 'approved', 'implemented', 'verified'],
+                'initial'  => 'pending',
+                'terminal' => ['complete', 'broken'],
+                'states'   => ['pending', 'partial', 'complete', 'broken'],
                 'transitions' => [
-                    'submitted' => [
-                        'review' => [
-                            'label'    => 'Start Review',
-                            'label_vi' => 'Bat dau xem xet',
-                            'roles'    => ['engineering_manager', 'admin'],
+                    'pending' => [
+                        'partial' => [
+                            'label'    => 'Mark Partially Reviewed',
+                            'label_vi' => 'Danh dau xem xet mot phan',
+                            'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
                             'actions'  => ['notify_approver'],
                             'requires' => [],
                         ],
-                    ],
-                    'review' => [
-                        'approved' => [
-                            'label'    => 'Approve Change',
-                            'label_vi' => 'Phe duyet thay doi',
+                        'complete' => [
+                            'label'    => 'Complete Change Request',
+                            'label_vi' => 'Hoan tat yeu cau thay doi',
                             'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
-                            'actions'  => ['notify_owner', 'set_due_date_30d'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
                             'requires' => [],
                         ],
-                        'submitted' => [
-                            'label'    => 'Return for Revision',
-                            'label_vi' => 'Tra ve chinh sua',
-                            'roles'    => ['engineering_manager', 'admin'],
+                        'broken' => [
+                            'label'    => 'Mark Change Request Broken',
+                            'label_vi' => 'Danh dau yeu cau thay doi loi',
+                            'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
                             'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
                     ],
-                    'approved' => [
-                        'implemented' => [
-                            'label'    => 'Mark Implemented',
-                            'label_vi' => 'Danh dau da thuc hien',
-                            'roles'    => ['engineering_manager', 'process_engineer', 'admin', 'assignee'],
-                            'actions'  => [],
+                    'partial' => [
+                        'complete' => [
+                            'label'    => 'Complete Change Request',
+                            'label_vi' => 'Hoan tat yeu cau thay doi',
+                            'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'broken' => [
+                            'label'    => 'Mark Change Request Broken',
+                            'label_vi' => 'Danh dau yeu cau thay doi loi',
+                            'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
                     ],
-                    'implemented' => [
-                        'verified' => [
-                            'label'    => 'Verify Implementation',
-                            'label_vi' => 'Xac minh thuc hien',
-                            'roles'    => ['qa_manager', 'admin'],
-                            'actions'  => ['notify_owner', 'clear_due_date'],
-                            'requires' => ['has_verification'],
+                    'broken' => [
+                        'partial' => [
+                            'label'    => 'Resume Partial Change Request',
+                            'label_vi' => 'Khoi phuc yeu cau thay doi mot phan',
+                            'roles'    => ['engineering_manager', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
                         ],
                     ],
-                    'verified' => [],
+                    'complete' => [],
+                ],
+            ],
+
+            'DEVIATION' => [
+                'initial'  => 'pending',
+                'terminal' => ['complete', 'broken'],
+                'states'   => ['pending', 'partial', 'complete', 'broken'],
+                'transitions' => [
+                    'pending' => [
+                        'partial' => [
+                            'label'    => 'Mark Deviation Partially Assessed',
+                            'label_vi' => 'Danh dau sai lech danh gia mot phan',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                        'complete' => [
+                            'label'    => 'Complete Deviation',
+                            'label_vi' => 'Hoan tat sai lech',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'broken' => [
+                            'label'    => 'Mark Deviation Broken',
+                            'label_vi' => 'Danh dau sai lech loi',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'partial' => [
+                        'complete' => [
+                            'label'    => 'Complete Deviation',
+                            'label_vi' => 'Hoan tat sai lech',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'broken' => [
+                            'label'    => 'Mark Deviation Broken',
+                            'label_vi' => 'Danh dau sai lech loi',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'broken' => [
+                        'partial' => [
+                            'label'    => 'Resume Deviation Review',
+                            'label_vi' => 'Khoi phuc xem xet sai lech',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'complete' => [],
                 ],
             ],
 
@@ -1914,63 +2065,141 @@ final class WorkflowEngine
             ],
 
             'IMP' => [
-                'initial'  => 'proposed',
-                'terminal' => ['closed'],
-                'states'   => ['proposed', 'approved', 'pdca_do', 'pdca_check', 'pdca_act', 'closed'],
+                'initial'  => 'draft',
+                'terminal' => ['closed', 'rejected', 'archived'],
+                'states'   => ['draft', 'submitted', 'under_review', 'approved', 'implemented', 'on_hold', 'verified', 'closed', 'rejected', 'archived'],
                 'transitions' => [
-                    'proposed' => [
+                    'draft' => [
+                        'submitted' => [
+                            'label'    => 'Submit Improvement Project',
+                            'label_vi' => 'Gui du an cai tien',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'submitted' => [
+                        'under_review' => [
+                            'label'    => 'Start Improvement Review',
+                            'label_vi' => 'Bat dau xem xet cai tien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'under_review' => [
                         'approved' => [
-                            'label'    => 'Approve Project',
-                            'label_vi' => 'Phe duyet du an',
+                            'label'    => 'Approve Improvement Project',
+                            'label_vi' => 'Phe duyet du an cai tien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'set_due_date_30d'],
+                            'requires' => [],
+                        ],
+                        'on_hold' => [
+                            'label'    => 'Put Improvement On Hold',
+                            'label_vi' => 'Tam dung du an cai tien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Improvement Project',
+                            'label_vi' => 'Tu choi du an cai tien',
                             'roles'    => ['production_director', 'general_manager', 'admin'],
                             'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
                     ],
                     'approved' => [
-                        'pdca_do' => [
-                            'label'    => 'Begin DO Phase',
-                            'label_vi' => 'Bat dau giai doan DO',
-                            'roles'    => ['assignee', 'admin', 'owner'],
-                            'actions'  => ['set_due_date_30d'],
-                            'requires' => [],
-                        ],
-                    ],
-                    'pdca_do' => [
-                        'pdca_check' => [
-                            'label'    => 'Move to CHECK Phase',
-                            'label_vi' => 'Chuyen sang giai doan CHECK',
-                            'roles'    => ['assignee', 'admin', 'owner'],
+                        'implemented' => [
+                            'label'    => 'Implement Improvement Project',
+                            'label_vi' => 'Thuc hien du an cai tien',
+                            'roles'    => ['assignee', 'owner', 'admin'],
                             'actions'  => [],
                             'requires' => [],
                         ],
-                    ],
-                    'pdca_check' => [
-                        'pdca_act' => [
-                            'label'    => 'Move to ACT Phase',
-                            'label_vi' => 'Chuyen sang giai doan ACT',
-                            'roles'    => ['assignee', 'admin', 'owner'],
-                            'actions'  => [],
-                            'requires' => [],
-                        ],
-                        'pdca_do' => [
-                            'label'    => 'Return to DO Phase',
-                            'label_vi' => 'Quay lai giai doan DO',
-                            'roles'    => ['assignee', 'admin', 'owner'],
-                            'actions'  => [],
+                        'on_hold' => [
+                            'label'    => 'Put Approved Improvement On Hold',
+                            'label_vi' => 'Tam dung du an cai tien da phe duyet',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
                     ],
-                    'pdca_act' => [
+                    'implemented' => [
+                        'verified' => [
+                            'label'    => 'Verify Improvement Project',
+                            'label_vi' => 'Xac minh du an cai tien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                        'on_hold' => [
+                            'label'    => 'Put Implemented Improvement On Hold',
+                            'label_vi' => 'Tam dung du an cai tien da thuc hien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'on_hold' => [
+                        'approved' => [
+                            'label'    => 'Resume Approved Improvement',
+                            'label_vi' => 'Tiep tuc du an cai tien da phe duyet',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                        'implemented' => [
+                            'label'    => 'Resume Implemented Improvement',
+                            'label_vi' => 'Tiep tuc du an cai tien da thuc hien',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Held Improvement',
+                            'label_vi' => 'Tu choi du an cai tien dang tam dung',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'verified' => [
                         'closed' => [
-                            'label'    => 'Close Project',
-                            'label_vi' => 'Dong du an',
+                            'label'    => 'Close Improvement Project',
+                            'label_vi' => 'Dong du an cai tien',
                             'roles'    => ['production_director', 'general_manager', 'admin'],
                             'actions'  => ['notify_owner', 'clear_due_date'],
-                            'requires' => ['has_verification'],
+                            'requires' => [],
+                        ],
+                        'rejected' => [
+                            'label'    => 'Reject Verified Improvement',
+                            'label_vi' => 'Tu choi du an cai tien da xac minh',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
                         ],
                     ],
-                    'closed' => [],
+                    'closed' => [
+                        'archived' => [
+                            'label'    => 'Archive Improvement Project',
+                            'label_vi' => 'Luu tru du an cai tien',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'rejected' => [
+                        'archived' => [
+                            'label'    => 'Archive Rejected Improvement',
+                            'label_vi' => 'Luu tru du an cai tien bi tu choi',
+                            'roles'    => ['production_director', 'general_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'archived' => [],
                 ],
             ],
 
@@ -2711,7 +2940,7 @@ final class WorkflowEngine
                 'attachments' => ['trial_video'],
             ],
             // ── AUD (Audit) Steps ──
-            'AUD::in_progress' => [
+            'AUD::submitted' => [
                 'table' => 'audits',
                 'required_fields' => [
                     'audit_scope' => ['label' => 'Audit Scope', 'label_vi' => 'Pham vi danh gia', 'type' => 'text'],
@@ -2720,7 +2949,7 @@ final class WorkflowEngine
                 'optional_fields' => ['audit_plan_ref'],
                 'attachments' => ['audit_plan'],
             ],
-            'AUD::reporting' => [
+            'AUD::under_review' => [
                 'table' => 'audit_findings',
                 'required_fields' => [
                     'findings' => ['label' => 'Audit Findings', 'label_vi' => 'Phat hien danh gia', 'type' => 'json_array'],
@@ -2729,13 +2958,21 @@ final class WorkflowEngine
                 'optional_fields' => ['observations', 'opportunities_for_improvement'],
                 'attachments' => ['audit_evidence'],
             ],
-            'AUD::follow_up' => [
+            'AUD::implemented' => [
                 'table' => 'audit_actions',
                 'required_fields' => [
                     'action_items' => ['label' => 'Corrective Action Items', 'label_vi' => 'Hang muc hanh dong khac phuc', 'type' => 'json_array'],
                 ],
                 'optional_fields' => ['linked_capa_ids'],
                 'attachments' => [],
+            ],
+            'AUD::verified' => [
+                'table' => 'audit_actions',
+                'required_fields' => [
+                    'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
+                ],
+                'optional_fields' => ['linked_capa_ids'],
+                'attachments' => ['verification_evidence'],
             ],
             'AUD::closed' => [
                 'table' => 'audits',
@@ -2775,7 +3012,7 @@ final class WorkflowEngine
                 'attachments' => ['certificate'],
             ],
             // ── ECR (Engineering Change Request) Steps ──
-            'ECR::review' => [
+            'ECR::partial' => [
                 'table' => 'engineering_change_requests',
                 'required_fields' => [
                     'change_description' => ['label' => 'Change Description', 'label_vi' => 'Mo ta thay doi', 'type' => 'text'],
@@ -2785,30 +3022,50 @@ final class WorkflowEngine
                 'optional_fields' => ['revision_from', 'revision_to'],
                 'attachments' => ['redline_drawing'],
             ],
-            'ECR::approved' => [
-                'table' => 'engineering_change_requests',
-                'required_fields' => [
-                    'approval_justification' => ['label' => 'Approval Justification', 'label_vi' => 'Ly do phe duyet', 'type' => 'text'],
-                ],
-                'optional_fields' => [],
-                'attachments' => [],
-            ],
-            'ECR::implemented' => [
+            'ECR::complete' => [
                 'table' => 'engineering_change_requests',
                 'required_fields' => [
                     'implementation_evidence' => ['label' => 'Implementation Evidence', 'label_vi' => 'Bang chung thuc hien', 'type' => 'text'],
                     'documents_updated' => ['label' => 'Documents Updated', 'label_vi' => 'Tai lieu da cap nhat', 'type' => 'json_array'],
-                ],
-                'optional_fields' => ['cam_program_id', 'baseline_version'],
-                'attachments' => ['updated_drawings'],
-            ],
-            'ECR::verified' => [
-                'table' => 'engineering_change_requests',
-                'required_fields' => [
                     'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
                 ],
-                'optional_fields' => [],
-                'attachments' => ['verification_evidence'],
+                'optional_fields' => ['cam_program_id', 'baseline_version'],
+                'attachments' => ['updated_drawings', 'verification_evidence'],
+            ],
+            'ECR::broken' => [
+                'table' => 'engineering_change_requests',
+                'required_fields' => [
+                    'blocker_reason' => ['label' => 'Blocker Reason', 'label_vi' => 'Ly do loi', 'type' => 'text'],
+                ],
+                'optional_fields' => ['required_rework'],
+                'attachments' => ['blocker_evidence'],
+            ],
+            // ── DEVIATION Steps ──
+            'DEVIATION::partial' => [
+                'table' => 'deviations',
+                'required_fields' => [
+                    'deviation_description' => ['label' => 'Deviation Description', 'label_vi' => 'Mo ta sai lech', 'type' => 'text'],
+                    'impact_assessment' => ['label' => 'Impact Assessment', 'label_vi' => 'Danh gia tac dong', 'type' => 'text'],
+                ],
+                'optional_fields' => ['containment_action'],
+                'attachments' => ['deviation_evidence'],
+            ],
+            'DEVIATION::complete' => [
+                'table' => 'deviations',
+                'required_fields' => [
+                    'disposition' => ['label' => 'Disposition', 'label_vi' => 'Xu ly', 'type' => 'text'],
+                    'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
+                ],
+                'optional_fields' => ['linked_capa_id'],
+                'attachments' => ['closure_evidence'],
+            ],
+            'DEVIATION::broken' => [
+                'table' => 'deviations',
+                'required_fields' => [
+                    'blocker_reason' => ['label' => 'Blocker Reason', 'label_vi' => 'Ly do loi', 'type' => 'text'],
+                ],
+                'optional_fields' => ['required_rework'],
+                'attachments' => ['blocker_evidence'],
             ],
             // ── SCAR (WorkflowEngine version) Steps ──
             'SCAR::response_due' => [
@@ -2868,8 +3125,8 @@ final class WorkflowEngine
                 'optional_fields' => ['risk_trend'],
                 'attachments' => [],
             ],
-            // ── IMP (Improvement/PDCA) Steps ──
-            'IMP::approved' => [
+            // ── IMP (Improvement) Steps ──
+            'IMP::submitted' => [
                 'table' => 'improvement_projects',
                 'required_fields' => [
                     'project_title' => ['label' => 'Project Title', 'label_vi' => 'Ten du an', 'type' => 'text'],
@@ -2880,28 +3137,43 @@ final class WorkflowEngine
                 'optional_fields' => ['sponsor'],
                 'attachments' => ['project_charter'],
             ],
-            'IMP::pdca_do' => [
+            'IMP::approved' => [
                 'table' => 'improvement_projects',
                 'required_fields' => [
-                    'do_actions' => ['label' => 'DO Phase Actions', 'label_vi' => 'Hanh dong giai doan DO', 'type' => 'json_array'],
+                    'approval_justification' => ['label' => 'Approval Justification', 'label_vi' => 'Ly do phe duyet', 'type' => 'text'],
                 ],
                 'optional_fields' => [],
                 'attachments' => [],
             ],
-            'IMP::pdca_check' => [
+            'IMP::implemented' => [
                 'table' => 'improvement_projects',
                 'required_fields' => [
-                    'check_results' => ['label' => 'CHECK Results vs Target', 'label_vi' => 'Ket qua CHECK so voi muc tieu', 'type' => 'text'],
+                    'implementation_actions' => ['label' => 'Implementation Actions', 'label_vi' => 'Hanh dong thuc hien', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['implementation_evidence'],
+            ],
+            'IMP::verified' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
                     'actual_value' => ['label' => 'Actual KPI Value', 'label_vi' => 'Gia tri KPI thuc te', 'type' => 'number'],
                 ],
                 'optional_fields' => [],
                 'attachments' => ['results_data'],
             ],
-            'IMP::pdca_act' => [
+            'IMP::closed' => [
                 'table' => 'improvement_projects',
                 'required_fields' => [
-                    'standardize_or_revise' => ['label' => 'ACT: Standardize or Revise?', 'label_vi' => 'ACT: Chuan hoa hay Dieu chinh?', 'type' => 'select'],
-                    'act_actions' => ['label' => 'ACT Phase Actions', 'label_vi' => 'Hanh dong giai doan ACT', 'type' => 'json_array'],
+                    'closure_summary' => ['label' => 'Closure Summary', 'label_vi' => 'Tom tat dong du an', 'type' => 'text'],
+                ],
+                'optional_fields' => ['standardization_ref'],
+                'attachments' => ['closure_evidence'],
+            ],
+            'IMP::rejected' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'rejection_reason' => ['label' => 'Rejection Reason', 'label_vi' => 'Ly do tu choi', 'type' => 'text'],
                 ],
                 'optional_fields' => [],
                 'attachments' => [],

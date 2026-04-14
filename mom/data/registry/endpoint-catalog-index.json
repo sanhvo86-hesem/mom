@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.1",
     "description": "Compact endpoint index for admin/runtime workspace lists and metrics. Rebuilt from endpoint-catalog.json after canonical onboarding.",
-    "generatedAt": "2026-04-14T11:32:50.966618+00:00",
+    "generatedAt": "2026-04-14T14:17:16.093982+00:00",
     "endpointCount": 4192,
     "activeEndpoints": 4192,
     "blockedEndpoints": 0,
@@ -2834,7 +2834,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -2857,7 +2857,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -2880,7 +2880,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -2903,7 +2903,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -2926,7 +2926,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -2949,7 +2949,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -3708,7 +3708,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -3731,7 +3731,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -3754,7 +3754,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -3777,7 +3777,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -3800,7 +3800,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -3823,7 +3823,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58172,7 +58172,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58195,7 +58195,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58218,7 +58218,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58241,7 +58241,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58264,7 +58264,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -58287,7 +58287,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "soft_delete",
       "source": "table-registry+data-fields"
@@ -70362,7 +70362,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70385,7 +70385,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70408,7 +70408,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70431,7 +70431,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70454,7 +70454,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70477,7 +70477,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70500,7 +70500,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70523,7 +70523,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70546,7 +70546,7 @@
       "csrf_required": false,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70569,7 +70569,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70592,7 +70592,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"
@@ -70615,7 +70615,7 @@
       "csrf_required": true,
       "admin_only": false,
       "permission_count": 1,
-      "workflow_mode": "workflow_engine_required",
+      "workflow_mode": "workflow_engine",
       "runtime_safe": false,
       "deletion_mode": "archive_only",
       "source": "table-registry+data-fields"

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T11:32:55.384Z",
+    "generatedAt": "2026-04-14T14:17:20.384Z",
     "description": "Wave 4 normalization decisions for production-quality execution, QA/QC role split, and reaction-loop closure."
   },
   "quality_execution_targets": {

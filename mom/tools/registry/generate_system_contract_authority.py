@@ -526,6 +526,13 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
             }
         )
 
+    if graphics_summary["releaseBlocked"]:
+        release_readiness_score = 0
+    elif len(critical_gaps) == 0:
+        release_readiness_score = 100
+    else:
+        release_readiness_score = max(0, 100 - (len(critical_gaps) * 20))
+
     summary = {
         "tableCount": len(tables),
         "relationCount": len(relation_edges),
@@ -549,7 +556,7 @@ def build_artifacts() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], d
         "graphicsNonCompliantModuleCount": graphics_summary["nonCompliantModuleCount"],
         "graphicsReleaseBlockerCount": graphics_summary["releaseBlockerCount"],
         "graphicsGovernanceReleaseBlocked": graphics_summary["releaseBlocked"],
-        "releaseReadinessScore": 100 if len(critical_gaps) == 0 and not graphics_summary["releaseBlocked"] else max(0, 100 - (len(critical_gaps) * 20) - (int(graphics_summary["releaseBlockerCount"]) * 5)),
+        "releaseReadinessScore": release_readiness_score,
     }
 
     domains = [

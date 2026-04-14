@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T11:32:53.469Z",
+    "generatedAt": "2026-04-14T14:17:18.525Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
@@ -72,8 +72,8 @@
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 8,
-        "workflow_state": "blocked",
-        "readiness": "partial",
+        "workflow_state": "ready",
+        "readiness": "ready",
         "canonical_resources": [
           "quality_improvement.improvement-actions"
         ]
@@ -807,8 +807,8 @@
         "zone": "core_value_stream",
         "archive_candidate": false,
         "relation_count": 7,
-        "workflow_state": "blocked",
-        "readiness": "partial",
+        "workflow_state": "ready",
+        "readiness": "ready",
         "canonical_resources": [
           "quality_improvement.deviations"
         ]
@@ -1277,8 +1277,8 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
-        "workflow_state": "blocked",
-        "readiness": "partial",
+        "workflow_state": "ready",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -5765,8 +5765,8 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 11,
-        "workflow_state": "blocked",
-        "readiness": "partial",
+        "workflow_state": "ready",
+        "readiness": "ready",
         "canonical_resources": []
       },
       {
@@ -8704,8 +8704,8 @@
         "zone": "archive_isolation",
         "archive_candidate": false,
         "relation_count": 4,
-        "workflow_state": "blocked",
-        "readiness": "partial",
+        "workflow_state": "ready",
+        "readiness": "ready",
         "canonical_resources": [
           "quality_improvement.deviations"
         ]

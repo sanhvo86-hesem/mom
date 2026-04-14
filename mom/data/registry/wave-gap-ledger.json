@@ -1,120 +1,17 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T11:33:03.135Z",
-    "publication_run_id": "ca1595bd-aa21-4efa-b73c-b800bfb9626a",
+    "generatedAt": "2026-04-14T14:17:27.780Z",
+    "publication_run_id": "345bed0d-c9ce-4dcb-9119-4609292dde62",
     "generator_name": "canonical_publication_orchestrator",
     "source_catalog": "data/registry/frontend-foundation-catalog.json"
   },
   "summary": {
     "total_entities": 771,
-    "ready": 766,
-    "partial": 5,
+    "ready": 771,
+    "partial": 0,
     "blocked": 0,
-    "partial_by_reason": {
-      "workflow_blocked": 5
-    },
-    "closure_modes": {
-      "generator_automatable": 5
-    }
+    "partial_by_reason": {},
+    "closure_modes": {}
   },
-  "entities": {
-    "audit_risk.audit": {
-      "verdict": "partial",
-      "score": 82,
-      "profile": "governed_case",
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "warnings": [
-        "missing_owner_field"
-      ],
-      "publishable": false,
-      "reasons": [
-        "Workflow engine bridge mapping not yet implemented"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
-    "quality_management.deviation": {
-      "verdict": "partial",
-      "score": 82,
-      "profile": "governed_case",
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "warnings": [
-        "missing_owner_field",
-        "no_reverse_related_lists",
-        "legacy_alias_isolated_from_live_publication"
-      ],
-      "publishable": false,
-      "reasons": [
-        "Workflow engine bridge mapping not yet implemented"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
-    "quality_management.deviations": {
-      "verdict": "partial",
-      "score": 82,
-      "profile": "governed_case",
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "warnings": [
-        "missing_owner_field",
-        "no_reverse_related_lists"
-      ],
-      "publishable": false,
-      "reasons": [
-        "Workflow engine bridge mapping not yet implemented"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
-    "plm_change_control.engineering_change_requests": {
-      "verdict": "partial",
-      "score": 82,
-      "profile": "governed_case",
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "warnings": [
-        "no_reverse_related_lists"
-      ],
-      "publishable": false,
-      "reasons": [
-        "Workflow engine bridge mapping not yet implemented"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    },
-    "audit_risk.improvement_projects": {
-      "verdict": "partial",
-      "score": 82,
-      "profile": "governed_case",
-      "blockers": [
-        "workflow_engine_bridge_blocked"
-      ],
-      "warnings": [
-        "no_reverse_related_lists"
-      ],
-      "publishable": false,
-      "reasons": [
-        "Workflow engine bridge mapping not yet implemented"
-      ],
-      "reason_bucket": "workflow_blocked",
-      "closure_mode": "generator_automatable",
-      "wave_assignment": "P1",
-      "blocker_summary": "Workflow engine bridge mapping not yet implemented"
-    }
-  }
+  "entities": {}
 }
