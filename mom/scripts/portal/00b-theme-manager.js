@@ -125,6 +125,35 @@ function _loadPreviewPrefs(){
   return _previewPrefs;
 }
 
+function _markPreviewDirty(reason){
+  _adminConfigPreviewDirty = true;
+  _adminConfigPreviewReason = reason || 'admin-preview-overrides';
+  if(_adminConfigAuthorityState === 'backend-attested'){
+    _adminConfigAuthorityState = 'preview-overridden';
+  }
+}
+
+function _hasPreviewOverrides(){
+  var prefs = _previewPrefs || {};
+  return Object.keys(prefs).some(function(key){
+    if(key === '_cssVarPreviewOverrides'){
+      return Object.keys(prefs[key] || {}).length > 0;
+    }
+    return prefs[key] !== undefined && prefs[key] !== null && prefs[key] !== '';
+  });
+}
+
+function _clearPreviewOverrideDirty(){
+  if(_hasPreviewOverrides()) return;
+  if(_adminConfigPreviewReason === 'admin-preview-overrides' || _adminConfigPreviewReason === 'inline-css-var-preview'){
+    _adminConfigPreviewDirty = false;
+    _adminConfigPreviewReason = '';
+    if(_adminConfigAuthorityState === 'preview-overridden'){
+      _adminConfigAuthorityState = (_adminConfigVersion || _adminConfigEtag) ? 'backend-attested' : 'unknown';
+    }
+  }
+}
+
 /* ── Resolve: preview → user → admin → default ──────────────────────────── */
 function _resolve(key){
   var previewPrefs = _loadPreviewPrefs();
@@ -710,16 +739,19 @@ function setPreviewDeep(path, value){
     obj = obj[parts[i]];
   }
   obj[parts[parts.length - 1]] = value;
+  _markPreviewDirty('admin-preview-overrides');
   _apply();
 }
 
 function setPreviewAll(prefs){
   _deepMerge(_loadPreviewPrefs(), prefs || {});
+  _markPreviewDirty('admin-preview-overrides');
   _apply();
 }
 
 function clearPreviewOverrides(){
   _previewPrefs = {};
+  _clearPreviewOverrideDirty();
   _apply();
 }
 
@@ -732,8 +764,8 @@ function clearPreviewOverrides(){
     prefs._cssVarPreviewOverrides = prefs._cssVarPreviewOverrides || {};
     if(value === undefined || value === null || value === '') delete prefs._cssVarPreviewOverrides[varName];
     else prefs._cssVarPreviewOverrides[varName] = value;
-    _adminConfigPreviewDirty = true;
-    _adminConfigPreviewReason = 'inline-css-var-preview';
+    if(_hasPreviewOverrides()) _markPreviewDirty('inline-css-var-preview');
+    else _clearPreviewOverrideDirty();
     _apply();
     return true;
   }
@@ -750,6 +782,8 @@ function setAll(prefs){
 function reset(){
   _userPrefs = {};
   _saveUserPrefs();
+  _previewPrefs = {};
+  _clearPreviewOverrideDirty();
   /* Remove all inline style overrides */
   ROOT.removeAttribute('style');
   _apply();
