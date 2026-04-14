@@ -172,6 +172,14 @@ Six-agent closure loop result after remediation:
 - Regulated records/data integrity: P0 = 0, non-waived P1 = 0.
 - Product benchmark: P0 = 0, non-waived P1 = 0; WORM provider remains accepted P1 waiver; durable audit-pack bundle and productized impact/effectivity explorer remain P2 roadmap.
 
+## 2026-04-14 21:40 Agent 5 Chain-Proof Closure Addendum
+
+| Late audit finding | Closure evidence |
+|---|---|
+| Finalization audit event was present but not chain-verifiable under the regulated audit contract. | `EvidenceFinalizationService` now persists/replays `evidence.finalized` with deterministic event id, aggregate advisory lock, aggregate sequence, previous hash, canonical `AuditTrail.canonicalHashRecord.v1` hash, and `metadata.audit_chain.event_hash`. |
+| Audit-pack readiness accepted syntactic finalization markers. | `AuditPackExportService` selects `aggregate_sequence`, `event_hash`, and `prev_hash`; `AuditPackExporter` requires finalization event hash, chain hash, sequence, and package-hash match before reporting `ready`. |
+| Missing proof-of-completion for chain failure path. | `WorldClassControlPlaneExecutionTest` now covers rejection of a finalization event without chain proof plus the finalization persistence path; `composer check` passed with PHPStan clean and 457 PHPUnit tests / 2579 assertions / 1 skipped. |
+
 ## Non-Authority Legacy Surfaces
 
 The following paths may remain for read/import compatibility only and must not be used as governed write authority:

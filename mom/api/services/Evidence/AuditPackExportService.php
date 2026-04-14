@@ -56,7 +56,9 @@ final class AuditPackExportService
         $aggregateIds = $this->scopeAggregateIds($scopeRef, $evidencePackages);
         $auditEvents = $this->queryRows(
             "SELECT event_id, event_type, aggregate_type, aggregate_id, actor_id, actor_name,
-                    payload, metadata, recorded_at, source_event_hash,
+                    payload, metadata, recorded_at, source_event_hash, aggregate_sequence,
+                    COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash') AS event_hash,
+                    metadata -> 'audit_chain' ->> 'prev_hash' AS prev_hash,
                     COALESCE(metadata ->> 'org_id', metadata -> 'scope' ->> 'org_id') AS org_id
              FROM audit_events
              WHERE (

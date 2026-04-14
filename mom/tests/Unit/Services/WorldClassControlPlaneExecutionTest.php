@@ -1127,7 +1127,14 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                     'aggregate_id' => 'EV-1',
                     'actor_id' => 'qa-1',
                     'org_id' => 'ORG-1',
-                    'event_hash_sha256' => str_repeat('1', 64),
+                    'aggregate_sequence' => 1,
+                    'event_hash' => str_repeat('1', 64),
+                    'metadata' => [
+                        'audit_chain' => [
+                            'prev_hash' => '',
+                            'event_hash' => str_repeat('1', 64),
+                        ],
+                    ],
                     'payload' => [
                         'evidence_record_id' => 'EV-1',
                         'package_hash_sha256' => str_repeat('d', 64),
@@ -1169,6 +1176,37 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'event_type' => 'viewed',
                 'aggregate_type' => 'evidence_record',
                 'aggregate_id' => 'EV-1',
+            ]],
+        );
+
+        $this->assertSame('failed', $manifest['export_state']);
+        $this->assertContains('audit_timeline_missing_finalization_event', array_column($manifest['exceptions'], 'exception_code'));
+    }
+
+    public function testAuditPackExporterRejectsFinalizationEventWithoutChainProof(): void
+    {
+        $manifest = (new AuditPackExporter())->buildManifest(
+            ['scope_type' => 'evidence_record', 'scope_ref' => 'EV-1'],
+            [[
+                'subject_type' => 'ncr',
+                'subject_id' => 'NCR-1',
+                'package_hash_sha256' => str_repeat('d', 64),
+                'manifest_hash_sha256' => str_repeat('e', 64),
+                'artifacts' => [
+                    'original' => ['sha256' => str_repeat('a', 64)],
+                    'canonical_payload' => ['sha256' => str_repeat('b', 64)],
+                    'readable_snapshot' => ['sha256' => str_repeat('c', 64)],
+                    'hash_signature_manifest' => ['sha256' => str_repeat('f', 64)],
+                ],
+            ]],
+            [[
+                'event_type' => 'evidence.finalized',
+                'aggregate_type' => 'evidence_record',
+                'aggregate_id' => 'EV-1',
+                'payload' => [
+                    'evidence_record_id' => 'EV-1',
+                    'package_hash_sha256' => str_repeat('d', 64),
+                ],
             ]],
         );
 
@@ -1221,6 +1259,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             $this->assertStringContainsString('ON CONFLICT (idempotency_key) DO NOTHING', $sql);
             $this->assertStringContainsString('ON CONFLICT (evidence_version_id, publication_target) DO NOTHING', $sql);
             $this->assertStringContainsString('ON CONFLICT (object_type, object_id, lock_type) WHERE lock_state =', $sql);
+            $this->assertStringContainsString('pg_advisory_xact_lock', $sql);
+            $this->assertStringContainsString('aggregate_sequence', $sql);
+            $this->assertStringContainsString('audit_chain', $sql);
             $this->assertStringNotContainsString('metadata = evidence_versions.metadata || EXCLUDED.metadata', $sql);
             $this->assertStringNotContainsString('metadata = evidence_artifacts.metadata || EXCLUDED.metadata', $sql);
             $this->assertStringNotContainsString('metadata = signature_events.metadata || EXCLUDED.metadata', $sql);
@@ -2378,7 +2419,14 @@ final class AuditPackExportFakeDb
                 'aggregate_type' => 'evidence_record',
                 'aggregate_id' => 'EV-1',
                 'actor_id' => 'qa-1',
-                'event_hash_sha256' => str_repeat('1', 64),
+                'aggregate_sequence' => 1,
+                'event_hash' => str_repeat('1', 64),
+                'metadata' => [
+                    'audit_chain' => [
+                        'prev_hash' => '',
+                        'event_hash' => str_repeat('1', 64),
+                    ],
+                ],
                 'payload' => [
                     'evidence_record_id' => 'EV-1',
                     'package_hash_sha256' => str_repeat('a', 64),
@@ -3092,13 +3140,14 @@ final class EvidenceFinalizationFakeDb
         if (str_contains($sql, 'INSERT INTO audit_events')) {
             $this->sawAuditEventInsert = true;
             return [
-                'event_id' => 'AUD-1',
+                'event_id' => (string)$params[':event_id'],
                 'event_type' => 'evidence.finalized',
                 'aggregate_type' => 'evidence_record',
                 'aggregate_id' => (string)$params[':aggregate_id'],
-                'source_event_hash' => (string)$params[':source_event_hash'],
-                'aggregate_sequence' => 1,
-                'metadata' => ['audit_chain' => ['prev_hash' => '', 'event_hash' => (string)$params[':source_event_hash']]],
+                'payload' => json_decode((string)$params[':payload'], true) ?: [],
+                'source_event_hash' => (string)$params[':event_hash'],
+                'aggregate_sequence' => (int)$params[':aggregate_sequence'],
+                'metadata' => ['audit_chain' => ['prev_hash' => (string)$params[':prev_hash'], 'event_hash' => (string)$params[':event_hash']]],
             ];
         }
         if (str_starts_with(ltrim($sql), 'UPDATE evidence_records')) {

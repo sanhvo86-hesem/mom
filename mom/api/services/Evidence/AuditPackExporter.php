@@ -62,10 +62,10 @@ final class AuditPackExporter
                 ];
             }
         }
-        if ($evidencePackages !== [] && !$this->hasFinalizationAuditEvent($auditEvents)) {
+        if ($evidencePackages !== [] && !$this->hasFinalizationAuditEvent($auditEvents, $evidencePackages)) {
             $exceptions[] = [
                 'exception_code' => 'audit_timeline_missing_finalization_event',
-                'missing' => ['evidence.finalized audit event'],
+                'missing' => ['chain-verifiable evidence.finalized audit event'],
             ];
         }
 
@@ -314,22 +314,35 @@ final class AuditPackExporter
 
     /**
      * @param list<array<string, mixed>> $auditEvents
+     * @param list<array<string, mixed>> $evidencePackages
      */
-    private function hasFinalizationAuditEvent(array $auditEvents): bool
+    private function hasFinalizationAuditEvent(array $auditEvents, array $evidencePackages): bool
     {
+        $packageHashes = array_values(array_filter(array_map(
+            fn(array $package): string => $this->text($package['package_hash_sha256'] ?? ''),
+            $evidencePackages,
+        ), fn(string $hash): bool => $this->isSha256($hash)));
+
         foreach ($auditEvents as $event) {
             $eventType = strtolower($this->text($event['event_type'] ?? ''));
             $aggregateType = strtolower($this->text($event['aggregate_type'] ?? ''));
-            $payload = $event['payload'] ?? [];
-            if (is_string($payload)) {
-                $decoded = json_decode($payload, true);
-                $payload = is_array($decoded) ? $decoded : [];
-            }
+            $payload = $this->arrayValue($event['payload'] ?? []);
+            $metadata = $this->arrayValue($event['metadata'] ?? []);
+            $chain = $this->arrayValue($metadata['audit_chain'] ?? []);
+            $eventHash = strtolower($this->text(
+                $event['event_hash'] ?? $event['source_event_hash'] ?? $event['event_hash_sha256'] ?? ''
+            ));
+            $chainHash = strtolower($this->text($chain['event_hash'] ?? ''));
+            $packageHash = strtolower($this->text($payload['package_hash_sha256'] ?? ''));
             if ($eventType === 'evidence.finalized'
                 && in_array($aggregateType, ['evidence_record', 'evidence_version'], true)
-                && is_array($payload)
                 && $this->text($payload['evidence_record_id'] ?? $event['aggregate_id'] ?? '') !== ''
-                && $this->isSha256($this->text($payload['package_hash_sha256'] ?? ''))
+                && $this->isSha256($packageHash)
+                && ($packageHashes === [] || in_array($packageHash, $packageHashes, true))
+                && (int)($event['aggregate_sequence'] ?? 0) >= 1
+                && $this->isSha256($eventHash)
+                && $this->isSha256($chainHash)
+                && hash_equals($eventHash, $chainHash)
             ) {
                 return true;
             }
@@ -374,7 +387,9 @@ final class AuditPackExporter
                 'aggregate_type' => $this->text($event['aggregate_type'] ?? ''),
                 'aggregate_id' => $this->text($event['aggregate_id'] ?? ''),
                 'actor_id' => $this->text($event['actor_id'] ?? $event['actor_ref'] ?? ''),
-                'event_hash_sha256' => $this->text($event['event_hash'] ?? $event['event_hash_sha256'] ?? ''),
+                'aggregate_sequence' => (int)($event['aggregate_sequence'] ?? 0),
+                'prev_hash_sha256' => $this->text($event['prev_hash'] ?? ''),
+                'event_hash_sha256' => $this->text($event['event_hash'] ?? $event['source_event_hash'] ?? $event['event_hash_sha256'] ?? ''),
             ];
         }
         usort($out, static fn(array $a, array $b): int => strcmp($a['recorded_at'], $b['recorded_at']));
@@ -421,6 +436,21 @@ final class AuditPackExporter
     private function text(mixed $value): string
     {
         return is_scalar($value) ? trim((string)$value) : '';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function arrayValue(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && trim($value) !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
     }
 
     private function isSha256(string $value): bool

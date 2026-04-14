@@ -4,7 +4,7 @@ Branch: `codex/worldclass-closure-20260414-2020`
 Base branch: `main`
 Original base head: `c7c3cdaa0c83`
 Synced base heads: `7d3500918270`, `13ef99b2f1bb`, `a5171d020e3e`, `7d562788b05f`
-Current validated code head before this evidence-only register update: `431e43193155`
+Current validated code head before Agent 5 final chain-proof remediation: `76f3c5bbc447`
 Sync strategy: initial `git fetch origin main` + `git merge --ff-only origin/main`; later `git merge --no-ff origin/main` when `main` moved during remediation.
 Record state: post-remediation controlled closure register for the branch-level remediation pass.
 
@@ -19,9 +19,10 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Previous closure artifacts did not govern this exact branch | P1 | Closed | Added branch-specific closure register plus manifest, promotion receipt, and reverse-sync intake for `worldclass-closure-20260414-2020`. |
 | Evidence finalization could accept a merely `valid` submission attempt | P1 | Closed | `EvidenceFinalizationService` now requires the source submission attempt state to be exactly `accepted`; focused test proves `valid` is rejected. |
 | Evidence finalization had no mandatory authoritative audit event | P1 | Closed | Finalization now persists or replays an `audit_events` row of type `evidence.finalized`, fails closed if the authoritative audit store cannot confirm it, and binds it to evidence record/version/package hashes. |
+| Finalization audit event was not chain-verifiable by the regulated audit contract | P1 | Closed | `EvidenceFinalizationService` now uses a deterministic event id, aggregate advisory lock, aggregate sequence, previous hash, canonical `AuditTrail.canonicalHashRecord.v1` event hash, and `metadata.audit_chain` proof for finalization events. |
 | Evidence finalization could continue without canonical publication/artifact persistence | P1 | Closed | `EvidenceFinalizationService` now requires persisted artifact rows, a persisted `evidence_publication_id`, matching `publication_state`, and an audit event carrying publication id. |
 | Retention lock path could silently continue without persisted lock evidence | P1 | Closed | Final evidence finalization now throws `retention_lock_required_for_final_evidence` when no lock row or lock id is persisted. |
-| Audit pack export could report ready without finalization audit timeline | P1 | Closed | `AuditPackExporter` now rejects packages with persisted evidence packages but no finalization audit event. |
+| Audit pack export could report ready without finalization audit timeline | P1 | Closed | `AuditPackExporter` now rejects packages with persisted evidence packages but no chain-verifiable finalization audit event tied to the exported package hash. |
 | Audit pack event query over-included same-type aggregate events | P1 | Closed | `AuditPackExportService` now scopes audit events to the requested aggregate id plus exact evidence package ids/hashes. |
 | Final evidence package hash depended on mutable packaging timestamp | P1 | Closed | `EvidencePackageBuilder` now emits a stable `record_content_hash_sha256` over original, canonical, readable, publication, and manifest content while keeping package timestamp metadata separate. |
 | Direct released document creation lacked signature ceremony evidence | P1 | Closed | `DocumentRevisionCommandService` now requires release signature evidence or a controlled import receipt for direct released revisions. |
@@ -58,10 +59,10 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 | Agent | Current-state findings | P0/P1/P2 defects | Benchmark gap | Remediation and proof |
 |---|---|---|---|---|
 | 1. Platform governance and repo hygiene | Branch was stale versus `origin/main`; previous release evidence did not bind this branch; source boundary gates existed and passed after sync. | P0 stale branch; P1 branch-specific manifest/receipt/reverse-sync missing; P2 prompt hygiene. | NIST SP 800-128-style controlled baselines require known promotion state, not undocumented branch drift. | Fast-forward sync to `origin/main`; add branch manifest/receipt/reverse-sync; rerun boundary and workflow authority checks. |
-| 2. Document/form/evidence control | Evidence, document, and distribution models existed but several finality gates were still permissive. | P1 accepted-vs-valid source attempt, missing finalization audit event, retention lock not fail-closed, direct released doc signature gap, group acknowledgement over-completion. | Connected QMS requires document-change-training-evidence linkage with final records controlled by ceremony and durable event evidence. | Hardened finalization, retention, audit event, direct release signature, and read ack semantics; added focused tests. |
+| 2. Document/form/evidence control | Evidence, document, and distribution models existed but several finality gates were still permissive. | P1 accepted-vs-valid source attempt, missing chain-verifiable finalization audit event, retention lock not fail-closed, direct released doc signature gap, group acknowledgement over-completion. | Connected QMS requires document-change-training-evidence linkage with final records controlled by ceremony and durable event evidence. | Hardened finalization, retention, audit-chain proof, direct release signature, and read ack semantics; added focused tests. |
 | 3. Change authority/configuration control | CR/CO tables existed but release execution was closer to workflow than configuration control. | P1 auth-only endpoints, weak SoD/reason/signature, passive conflict detection, missing side effects, orphan resulting objects. | Windchill-class PLM patterns require affected objects, resulting objects, effectivity, verification, and executed implementation effects. | Added role gates, lifecycle governance, `EffectivityConflictService`, `ChangeReleaseSideEffectService`, and migration 128. |
 | 4. MES/MOM/genealogy/digital thread | Event ledger and genealogy primitives existed; endpoint scope and replay semantics were weak. | P1 caller-supplied scope, fact source not content-bound, semantic mutation on replay, multiple current snapshots. | SAP/Siemens-class MOM traceability needs scoped genealogy, dates/times, 5M context, and deterministic as-manufactured records. | Injected session scope, content-bound fact fingerprinting, replay conflict detection, and current snapshot uniqueness. |
-| 5. Regulated electronic records/data integrity | Audit and package services existed; fail-closed proof and package/event linkage were incomplete. | P1 no finalization audit event, audit pack timeline false-ready, broad event query, weak stable content hash. | Part 11/ALCOA+/Annex 11 patterns require attributable events, durable auditability, preserved content and meaning, and retrievable packages. | Added finalization audit event, exact audit pack scope, timeline guard, stable record content hash, and tests. |
+| 5. Regulated electronic records/data integrity | Audit and package services existed; fail-closed proof and package/event linkage were incomplete. | P1 no finalization audit event, audit pack timeline false-ready, broad event query, weak stable content hash, missing chain-verifiable finalization proof. | Part 11/ALCOA+/Annex 11 patterns require attributable events, durable auditability, preserved content and meaning, and retrievable packages. | Added finalization audit event, exact audit pack scope, chain-proof timeline guard, stable record content hash, and tests. |
 | 6. Product capability benchmark | Foundations existed but several differentiators were partial or undocumented in API contracts. | P1 OpenAPI coverage gap; P1 publication/WORM/training/full closure remain dependency or roadmap; P2 product UI depth. | SAP DM, Siemens Opcenter, and PLM-class systems expose operational monitors, impact explorers, and audit-ready export surfaces. | Added OpenAPI contracts and waiver/roadmap discipline; retained operational workers as explicit dependency-waived items. |
 
 ## D. Merged Brutal Re-Audit
@@ -70,7 +71,7 @@ This register is the governed delivery package for the 20:20 closure branch. It 
 |---|---:|---|---|---|---|---|
 | Branch drift before remediation and during remediation | P0 | Feature branch was not always based on current `origin/main`. | Repo governance, merge safety. | NIST SP 800-128 controlled baseline discipline. | Sync branch to `origin/main` with auditable merges before merge. | `merge-base --is-ancestor origin/main HEAD`, repo gates clean. |
 | Evidence source attempt not acceptance-strict | P1 | Validation state and business acceptance state were conflated. | Form execution, evidence finalization. | Connected QMS evidence acceptance. | Require `frm_submission_attempts.submission_state = accepted`. | Unit test proving `valid` fails. |
-| Finalization no audit-event proof | P1 | Evidence persistence and audit trail were not transactionally evidenced. | Evidence, audit, audit pack. | Part 11 and ALCOA+ event attribution. | Persist/replay `evidence.finalized` event or fail closed. | Audit insert/replay test and audit-pack finalization-event guard. |
+| Finalization no chain-verifiable audit-event proof | P1 | Evidence persistence and audit trail were not transactionally evidenced through the same hash-chain contract used by regulated audit events. | Evidence, audit, audit pack. | Part 11 and ALCOA+ event attribution. | Persist/replay `evidence.finalized` with deterministic event id, aggregate lock, sequence, previous hash, canonical event hash, and `metadata.audit_chain`; audit pack readiness requires the same proof. | Audit insert/replay test, missing-chain negative test, and audit-pack chain-proof guard. |
 | Retention not fail-closed | P1 | Local retention row could be absent while finalization succeeded. | Evidence, retention. | Annex 11 record retention and availability. | Require persisted lock id for final evidence. | Unit test proving failure when lock is not persisted. |
 | Change authority too close to workflow | P1 | Lifecycle states did not execute release implementation controls. | Change, document, training, effectivity. | PLM affected/resulting/effectivity patterns. | Add transition governance, effectivity conflict persistence, side-effect service. | Focused lifecycle tests and migration 128. |
 | Group document ack over-completion | P1 | Distribution audience semantics were not separated from user acknowledgement rows. | Document control, training/read-understand. | Connected QMS training linkage. | Only individual/user audience rows complete on one actor ack. | SQL assertion in document control test. |
@@ -105,7 +106,7 @@ External sources refreshed without sending repository content:
 |---|---|---|---|
 | Document Control | `doc_families`, `doc_revisions`, `doc_effectivities`, `doc_distributions`, `doc_read_acknowledgements` | Draft -> review -> released -> superseded/withdrawn; released direct create requires signature/import receipt; group ack cannot complete from one actor. | `DocumentRevisionCommandService`, document APIs. |
 | Form and Template Control | `frm_families`, `frm_template_revisions`, `frm_schema_versions`, `frm_issuances`, `frm_submission_attempts` | Template revision and schema version remain separate; offline Excel is carrier only; source submission must be accepted before final evidence. | `EqmsFormExecutionService`, EQMS form APIs. |
-| Evidence Control | `evidence_records`, `evidence_versions`, `evidence_artifacts`, `signature_events`, `retention_locks`, `evidence_publications` | Draft/accepted/finalized/amended/superseded; finalization requires canonical package, signature event, retention lock, and finalization audit event. | `EvidenceFinalizationService`, `EvidencePackageBuilder`, evidence APIs. |
+| Evidence Control | `evidence_records`, `evidence_versions`, `evidence_artifacts`, `signature_events`, `retention_locks`, `evidence_publications` | Draft/accepted/finalized/amended/superseded; finalization requires canonical package, signature event, retention lock, and chain-verifiable finalization audit event. | `EvidenceFinalizationService`, `EvidencePackageBuilder`, evidence APIs. |
 | Change Authority | `plm_change_requests`, `plm_change_orders`, affected/resulting/effectivity/training/verification/review tables | CR/CO lifecycle requires role, reason, SoD, signature on release, effectivity conflict evaluation, and release side effects. | `ChangeLifecycleCommandService`, `EffectivityConflictService`, `ChangeReleaseSideEffectService`. |
 | Publication and Retention | `evidence_publications`, `publication_attempts`, `publication_receipts`, `immutable_storage_objects`, `retention_locks` | Publication is async and separate from acceptance/finalization; SharePoint is read-only/discovery publication target. | Publication orchestrator and future Graph worker. |
 | Genealogy / Manufacturing Traceability | `mes_operational_event_ledger`, `genealogy_edge_facts`, `genealogy_edges`, `as_manufactured_snapshots`, 5M obligation tables | Scope comes from session; facts are content-fingerprinted; current snapshots are unique; replay mismatch fails. | `GenealogyGraphService`, MES controllers. |
@@ -128,7 +129,7 @@ External sources refreshed without sending repository content:
 |---|---|---|---|
 | `mom/api/services/WorkflowEngine.php` | Keep | No broad workflow rewrite; change authority is handled in specialized services to preserve MVC/router semantics. | Existing workflow status authority scanner. |
 | `mom/api/services/AuditTrail.php` | Keep | No direct change; finalization now writes required `audit_events` through DB in `EvidenceFinalizationService`. | `AuditTrailIntegrityTest`, audit pack tests. |
-| `mom/api/services/Evidence/EvidenceFinalizationService.php` | Refactor | Requires accepted source attempt, persisted retention lock, finalization audit event, and record content hash in metadata. | Evidence finalization tests. |
+| `mom/api/services/Evidence/EvidenceFinalizationService.php` | Refactor | Requires accepted source attempt, persisted retention lock, chain-verifiable finalization audit event, and record content hash in metadata. | Evidence finalization tests. |
 | `mom/api/services/Evidence/EvidencePackageBuilder.php` | Refactor | Adds stable `record_content_hash_sha256` independent from package creation timestamp. | Evidence finalization package assertions. |
 | `mom/api/services/Evidence/AuditPackExportService.php` | Refactor | Exact aggregate/package scoped audit event loading. | Audit pack scope tests. |
 | `mom/api/services/Evidence/AuditPackExporter.php` | Refactor | Fails ready audit pack when finalization event is missing. | `testAuditPackExporterFailsWithoutFinalizationAuditEvent`. |
@@ -207,6 +208,7 @@ Closed P0: stale branch.
 
 Closed non-waived P1:
 - Evidence acceptance state, retention, audit event, and audit pack proof.
+- Evidence finalization audit event hash-chain proof and audit-pack chain-proof readiness.
 - Direct released document signature/import evidence.
 - Read acknowledgement audience semantics.
 - CR/CO role, reason, SoD, signature, conflict, and side-effect execution.
@@ -218,16 +220,17 @@ Closed non-waived P1:
 Final validation evidence after latest `origin/main` sync and deploy-binding remediation:
 - `php tools/release/check_repo_boundary.php`: passed, `repo boundary clean`.
 - `php tools/release/check_workflow_status_authority.php`: passed, `workflow status authority clean`.
-- Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed; release manifest binding focused test passed.
+- Focused PHPUnit: `WorldClassControlPlaneExecutionTest` passed, including chain-proof audit-pack rejection and evidence finalization audit-chain persistence; release manifest binding focused test passed.
 - `composer analyse -- --memory-limit=1G`: passed.
-- `composer test`: passed, 456 tests, 2574 assertions, 1 skipped.
-- `composer check`: passed, PHPStan clean plus 456 tests, 2574 assertions, 1 skipped.
+- `composer test`: passed, 457 tests, 2579 assertions, 1 skipped.
+- `composer check`: passed, PHPStan clean plus 457 tests, 2579 assertions, 1 skipped.
 
 ## N. Second Six-Agent Re-Audit
 
 Second and closure-loop audits found additional P0/P1 issues that were remediated in this branch:
 - stale branch after `origin/main` moved again: closed by repeated `git merge --no-ff origin/main`, latest synced head `7d562788b05f`;
 - release e-signature UUID-only validation: closed by `ChangeReleaseSignatureValidator` and migration 129;
+- Agent 5 final regulated-records P1 that finalization/audit-pack proof was syntactic instead of chain-verifiable: closed by canonical finalization audit-chain hashing, audit event selection of `aggregate_sequence`/`event_hash`/`prev_hash`, audit-pack chain-proof readiness, and focused negative/positive tests;
 - role/idempotency/effectivity-conflict gaps: closed by mandatory actor roles, request hash replay checks, baseline conflict detection, and idempotent conflict replay;
 - publication/artifact persistence gaps: closed by fail-closed artifact/publication row checks;
 - submission acceptance path gap: closed by `FormSubmissionAcceptanceService` and route/OpenAPI/test coverage;
@@ -286,7 +289,7 @@ No P0 waiver is accepted.
 
 Summary:
 - Fast-forwarded the remediation branch to current `origin/main` before changes.
-- Hardened evidence finalization around accepted source attempts, retention lock persistence, finalization audit events, and stable record content hash.
+- Hardened evidence finalization around accepted source attempts, retention lock persistence, chain-verifiable finalization audit events, and stable record content hash.
 - Hardened document release signature/import evidence and read acknowledgement semantics.
 - Added change release governance: role/reason/SoD/signature checks, effectivity conflict persistence, release side effects, and resulting-object integrity migration.
 - Hardened manufacturing/genealogy scope authority, content-bound genealogy replay, and current snapshot uniqueness.
@@ -315,7 +318,7 @@ Rollback:
 | Unresolved non-waived P1 = 0 | Closed by code/migration/API/test evidence; dependency waivers are explicit below. |
 | Required migrations present | Present: migrations 128 and 129. |
 | Required backend changes present | Present. |
-| Required tests green | Passed after latest `origin/main` sync and deploy-binding remediation: 456 tests, 2574 assertions, 1 skipped; PHPStan clean. |
+| Required tests green | Passed after latest `origin/main` sync and Agent 5 chain-proof remediation: 457 tests, 2579 assertions, 1 skipped; PHPStan clean. |
 | Runbooks/operational notes present | Present in this register and release artifacts. |
 | Waivers documented | Present. |
 | PR summary updated | Draft body prepared above. |
@@ -350,7 +353,7 @@ If only accepted waivers/P2 remain:
 
 The platform is not strongest-in-class until all of the following are true:
 1. Every final evidence package includes original artifact, canonical structured payload, readable snapshot, hash/signature manifest, and publication receipt or publication state record.
-2. Finalization fails closed without accepted source attempt when applicable, signature event, retention lock, canonical persistence, and finalization audit event.
+2. Finalization fails closed without accepted source attempt when applicable, signature event, retention lock, canonical persistence, and chain-verifiable finalization audit event.
 3. Any post-release edit is blocked unless a released CO covers exact object, field set, and effectivity.
 4. Change authority has affected objects, resulting objects, effectivity, training requirements, verification, effectiveness review, emergency change, and rollback evidence.
 5. Training/read-and-understand can act as an effectivity gate, not just a notification.

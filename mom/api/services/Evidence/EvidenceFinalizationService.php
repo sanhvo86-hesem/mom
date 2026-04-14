@@ -631,62 +631,148 @@ final class EvidenceFinalizationService
         $metadata = array_filter([
             'authority' => 'EvidenceFinalizationService',
             'authoritative_audit_required' => true,
+            'canonical_hash_contract' => 'AuditTrail.canonicalHashRecord.v1',
             'org_id' => $this->nullableText($input['org_id'] ?? null),
             'session_id' => $this->nullableText($input['session_id'] ?? null),
         ], static fn(mixed $value): bool => $value !== null && $value !== '');
-        $sourceEventHash = hash('sha256', $recordId . '|' . $versionId . '|' . (string)$package['package_hash_sha256'] . '|evidence.finalized');
+        $actorUuid = $this->nullableUuid($input['authenticated_user_id'] ?? $input['finalized_by_user_id'] ?? $input['actor_id'] ?? null);
+        $actorRef = $this->nullableText($input['authenticated_signer_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null);
+        $actorOriginal = $actorUuid ?? $actorRef ?? '';
+        $eventId = $this->deterministicUuid('evidence.finalized|' . $recordId . '|' . $versionId . '|' . (string)$package['package_hash_sha256']);
 
-        $row = $db->queryOne(
-            "WITH chain AS (
-                 SELECT
-                    COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence,
-                    COALESCE(
-                        (ARRAY_AGG(source_event_hash ORDER BY COALESCE(aggregate_sequence, 0) DESC, recorded_at DESC))[1],
-                        ''
-                    ) AS prev_hash
-                 FROM audit_events
-                 WHERE aggregate_type = 'evidence_record'
-                   AND aggregate_id = :aggregate_id
-             ),
-             inserted AS (
-                 INSERT INTO audit_events
-                    (event_type, aggregate_type, aggregate_id, actor_id, actor_name, payload, metadata, source_event_hash, aggregate_sequence)
-                 VALUES
-                    ('evidence.finalized', 'evidence_record', :aggregate_id,
-                     CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb),
-                     CAST(:metadata AS jsonb) || jsonb_build_object(
-                        'audit_chain',
-                        jsonb_build_object(
-                            'prev_hash', (SELECT prev_hash FROM chain),
-                            'event_hash', :source_event_hash
-                        )
-                     ),
-                     :source_event_hash,
-                     (SELECT next_sequence FROM chain))
-                 ON CONFLICT DO NOTHING
-                 RETURNING event_id, event_type, aggregate_type, aggregate_id, source_event_hash, aggregate_sequence, metadata
-             )
-             SELECT event_id, event_type, aggregate_type, aggregate_id, source_event_hash, aggregate_sequence, metadata
-             FROM inserted
-             UNION ALL
-             SELECT event_id, event_type, aggregate_type, aggregate_id, source_event_hash, aggregate_sequence, metadata
+        $existing = $db->queryOne(
+            "SELECT event_id, event_type, aggregate_type, aggregate_id, payload, metadata,
+                    source_event_hash, aggregate_sequence
              FROM audit_events
-             WHERE source_event_hash = :source_event_hash
+             WHERE event_id = CAST(:event_id AS uuid)
                AND event_type = 'evidence.finalized'
                AND aggregate_type = 'evidence_record'
                AND aggregate_id = :aggregate_id
              LIMIT 1",
             [
+                ':event_id' => $eventId,
                 ':aggregate_id' => $recordId,
-                ':actor_id' => $this->nullableUuid($input['authenticated_user_id'] ?? $input['finalized_by_user_id'] ?? $input['actor_id'] ?? null),
-                ':actor_name' => $this->nullableText($input['authenticated_signer_ref'] ?? $input['actor_ref'] ?? $input['actor_id'] ?? null),
-                ':payload' => $this->json($payload),
-                ':metadata' => $this->json($metadata),
-                ':source_event_hash' => $sourceEventHash,
             ],
         );
-        if (!is_array($row) || $this->text($row['event_type'] ?? '') === '' || (int)($row['aggregate_sequence'] ?? 0) < 1) {
+        if (is_array($existing) && $this->text($existing['event_type'] ?? '') === 'evidence.finalized') {
+            $this->assertFinalizationAuditEventVerifiable($existing, $payload);
+            return;
+        }
+
+        $db->queryOne(
+            'SELECT pg_advisory_xact_lock(hashtext(:audit_chain_key)) AS locked',
+            [':audit_chain_key' => 'audit_events|evidence_record|' . $recordId],
+        );
+        $chain = $db->queryOne(
+            "SELECT
+                COALESCE(MAX(aggregate_sequence), 0) + 1 AS next_sequence,
+                COALESCE(
+                    (ARRAY_AGG(COALESCE(source_event_hash, metadata -> 'audit_chain' ->> 'event_hash')
+                        ORDER BY COALESCE(aggregate_sequence, 0) DESC, recorded_at DESC))[1],
+                    ''
+                ) AS prev_hash
+             FROM audit_events
+             WHERE aggregate_type = 'evidence_record'
+               AND aggregate_id = :aggregate_id",
+            [':aggregate_id' => $recordId],
+        );
+        $aggregateSequence = max(1, (int)($chain['next_sequence'] ?? 1));
+        $prevHash = $this->text($chain['prev_hash'] ?? '');
+        $recordedAt = gmdate('Y-m-d\TH:i:s.v\Z');
+        $eventHash = $this->canonicalAuditEventHash([
+            'event_id' => $eventId,
+            'event_type' => 'evidence.finalized',
+            'aggregate_type' => 'evidence_record',
+            'aggregate_id' => $recordId,
+            'actor_id' => $actorOriginal,
+            'payload' => $payload,
+            'metadata' => $metadata,
+            'esig_reason' => null,
+            'recorded_at' => $recordedAt,
+            'prev_hash' => $prevHash,
+        ]);
+
+        $row = $db->queryOne(
+            "WITH inserted AS (
+                 INSERT INTO audit_events
+                    (event_id, event_type, aggregate_type, aggregate_id, actor_id, actor_name,
+                     payload, metadata, recorded_at, source_event_hash, aggregate_sequence)
+                 VALUES
+                    (CAST(:event_id AS uuid), 'evidence.finalized', 'evidence_record', :aggregate_id,
+                     CAST(:actor_id AS uuid), :actor_name, CAST(:payload AS jsonb),
+                     CAST(:metadata AS jsonb) || jsonb_build_object(
+                        'audit_chain',
+                        jsonb_build_object(
+                            'prev_hash', :prev_hash,
+                            'event_hash', :event_hash,
+                            'esig_reason', NULL,
+                            'original_actor_id', :actor_original
+                        )
+                     ),
+                     CAST(:recorded_at AS timestamptz),
+                     :event_hash,
+                     :aggregate_sequence)
+                 ON CONFLICT DO NOTHING
+                 RETURNING event_id, event_type, aggregate_type, aggregate_id, payload,
+                           source_event_hash, aggregate_sequence, metadata
+             )
+             SELECT event_id, event_type, aggregate_type, aggregate_id, payload,
+                    source_event_hash, aggregate_sequence, metadata
+             FROM inserted
+             UNION ALL
+             SELECT event_id, event_type, aggregate_type, aggregate_id, payload,
+                    source_event_hash, aggregate_sequence, metadata
+             FROM audit_events
+             WHERE event_id = CAST(:event_id AS uuid)
+               AND event_type = 'evidence.finalized'
+               AND aggregate_type = 'evidence_record'
+               AND aggregate_id = :aggregate_id
+             LIMIT 1",
+            [
+                ':event_id' => $eventId,
+                ':aggregate_id' => $recordId,
+                ':actor_id' => $actorUuid,
+                ':actor_name' => $actorUuid === null ? $actorRef : null,
+                ':actor_original' => $actorOriginal,
+                ':payload' => $this->json($payload),
+                ':metadata' => $this->json($metadata),
+                ':recorded_at' => $recordedAt,
+                ':event_hash' => $eventHash,
+                ':prev_hash' => $prevHash,
+                ':aggregate_sequence' => $aggregateSequence,
+            ],
+        );
+        if (!is_array($row)) {
             throw new RuntimeException('finalization_audit_event_required');
+        }
+        $this->assertFinalizationAuditEventVerifiable($row, $payload);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $expectedPayload
+     */
+    private function assertFinalizationAuditEventVerifiable(array $row, array $expectedPayload): void
+    {
+        $eventHash = $this->nullableHash($row['source_event_hash'] ?? $row['event_hash'] ?? null);
+        $metadata = $this->arrayValue($row['metadata'] ?? []);
+        $chain = $this->arrayValue($metadata['audit_chain'] ?? []);
+        $chainHash = $this->nullableHash($chain['event_hash'] ?? null);
+        if ($this->text($row['event_type'] ?? '') !== 'evidence.finalized'
+            || $this->text($row['aggregate_type'] ?? '') !== 'evidence_record'
+            || (int)($row['aggregate_sequence'] ?? 0) < 1
+            || $eventHash === null
+            || $chainHash === null
+            || !hash_equals($eventHash, $chainHash)
+        ) {
+            throw new RuntimeException('finalization_audit_event_required');
+        }
+
+        $payload = $this->arrayValue($row['payload'] ?? []);
+        foreach (['evidence_record_id', 'evidence_version_id', 'package_hash_sha256', 'manifest_hash_sha256'] as $field) {
+            if ($this->text($payload[$field] ?? '') !== $this->text($expectedPayload[$field] ?? '')) {
+                throw new RuntimeException('finalization_audit_event_payload_mismatch');
+            }
         }
     }
 
@@ -906,6 +992,66 @@ final class EvidenceFinalizationService
         if (isset($row['signer_ref']) && $this->text($row['signer_ref']) !== $this->text($expected['signer_ref'] ?? '')) {
             throw new RuntimeException('evidence_finalization_idempotency_conflict');
         }
+    }
+
+    private function deterministicUuid(string $seed): string
+    {
+        $hex = substr(hash('sha256', $seed), 0, 32);
+        $hex[12] = '5';
+        $hex[16] = dechex((hexdec($hex[16]) & 0x3) | 0x8);
+
+        return substr($hex, 0, 8) . '-'
+            . substr($hex, 8, 4) . '-'
+            . substr($hex, 12, 4) . '-'
+            . substr($hex, 16, 4) . '-'
+            . substr($hex, 20, 12);
+    }
+
+    /**
+     * Mirrors AuditTrail::canonicalHashRecord() so evidence finalization events
+     * can be verified by the same tamper-evident event-hash contract.
+     *
+     * @param array<string, mixed> $event
+     */
+    private function canonicalAuditEventHash(array $event): string
+    {
+        $metadata = is_array($event['metadata'] ?? null) ? $event['metadata'] : [];
+        unset($metadata['audit_chain'], $metadata['esig']);
+
+        $record = [
+            'event_id' => (string)($event['event_id'] ?? ''),
+            'event_type' => (string)($event['event_type'] ?? ''),
+            'aggregate_type' => (string)($event['aggregate_type'] ?? ''),
+            'aggregate_id' => (string)($event['aggregate_id'] ?? ''),
+            'actor_id' => (string)($event['actor_id'] ?? ''),
+            'payload' => is_array($event['payload'] ?? null) ? $event['payload'] : [],
+            'metadata' => $metadata,
+            'esig_reason' => $event['esig_reason'] ?? null,
+            'recorded_at' => (string)($event['recorded_at'] ?? ''),
+            'prev_hash' => (string)($event['prev_hash'] ?? ''),
+        ];
+
+        $json = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            throw new RuntimeException('finalization_audit_hash_encode_failed');
+        }
+
+        return hash('sha256', $json);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function arrayValue(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && trim($value) !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
     }
 
     private function normalizeDb(?object $db): ?object
