@@ -333,20 +333,17 @@ class RateLimitMiddleware
         if ($forwarded !== '') {
             $ips = array_map('trim', explode(',', $forwarded));
 
-            // SECURITY FIX PIPE-RATELIMIT-002: Validate ALL IPs in the chain, not just the first
-            // If any IP in the chain is invalid, fall back to REMOTE_ADDR
+            // Treat any malformed hop as an untrusted forwarded chain.
             $validIps = [];
             foreach ($ips as $ip) {
                 if (filter_var($ip, FILTER_VALIDATE_IP)) {
                     $validIps[] = $ip;
-                } else {
-                    // Invalid IP in chain; reject the entire header
-                    return $remoteAddr;
+                    continue;
                 }
+
+                return $remoteAddr;
             }
 
-            // All IPs are valid; explode() on a non-empty header yields at
-            // least one element, so the first validated IP is the client IP.
             return $validIps[0];
         }
 
