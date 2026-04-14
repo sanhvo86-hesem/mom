@@ -5069,6 +5069,47 @@ paths:
                     type: string
                     enum: [duplicate_submission, carrier_manifest_mismatch, canonical_payload_hash_mismatch, form_submission_attempt_idempotency_conflict]
 
+  /api/v1/eqms/forms/submission-attempts/{attempt_id}/accept:
+    post:
+      operationId: eqmsAcceptSubmissionAttempt
+      tags: [EQMS Control Plane]
+      summary: Accept a validated submission attempt under e-signature
+      description: Moves a validated offline or online form attempt into accepted state before evidence finalization can use it as authoritative source input.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - in: path
+          name: attempt_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [signature_event_id, reason]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Submission attempt accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Acceptance blocked by validation or signature ceremony state.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [form_submission_attempt_not_validated, submission_acceptance_signature_not_authoritative]
+
   /api/v1/eqms/evidence/finalize:
     post:
       operationId: eqmsFinalizeEvidence
@@ -5105,6 +5146,78 @@ paths:
                     type: string
                     enum: [source_submission_attempt_not_accepted, signature_auth_challenge_not_valid, retention_lock_required_for_final_evidence, finalization_audit_event_required, evidence_amendment_change_order_required]
 
+  /api/v1/eqms/change-requests:
+    post:
+      operationId: eqmsCreateChangeRequest
+      tags: [EQMS Control Plane]
+      summary: Create a governed change request
+      description: Creates a portal-originated change request with affected-object intent and mandatory idempotency replay protection.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idempotency_key, title]
+              additionalProperties: true
+      responses:
+        '201':
+          description: Change request created.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Change request command blocked.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [change_request_idempotency_conflict, change_request_terminal_status_requires_transition]
+
+  /api/v1/eqms/change-requests/transition:
+    post:
+      operationId: eqmsTransitionChangeRequest
+      tags: [EQMS Control Plane]
+      summary: Transition a governed change request
+      description: Requires actor roles and reason for state transitions before change-order authorization.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [change_request_id, target_status, reason, actor_roles]
+              additionalProperties: true
+      responses:
+        '200':
+          description: Change request transitioned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Transition blocked by governance state.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [change_request_transition_actor_roles_required, change_request_transition_role_not_authorized, invalid_change_request_transition]
+
   /api/v1/eqms/change-orders:
     post:
       operationId: eqmsCreateChangeOrder
@@ -5120,7 +5233,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [title, affected_objects]
+              required: [idempotency_key, title, affected_objects]
               additionalProperties: true
       responses:
         '201':
@@ -5141,7 +5254,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    enum: [resulting_object_affected_object_required, change_command_idempotency_conflict]
+                    enum: [resulting_object_affected_object_required, change_order_idempotency_conflict]
 
   /api/v1/eqms/change-orders/transition:
     post:
@@ -5158,7 +5271,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [change_order_id, target_status, reason]
+              required: [change_order_id, target_status, reason, actor_roles]
               additionalProperties: true
       responses:
         '200':
@@ -5177,9 +5290,9 @@ paths:
                 properties:
                   error:
                     type: string
-                    enum: [change_order_release_gate_blocked, change_order_release_signature_required, change_order_transition_role_not_authorized, change_release_side_effect_failed]
+                    enum: [change_order_release_gate_blocked, change_order_release_signature_required, change_order_release_signature_not_authoritative, change_order_transition_actor_roles_required, change_order_transition_role_not_authorized, change_release_side_effect_failed]
 
-  /api/v1/eqms/audit-packs:
+  /api/v1/eqms/audit-packs/manifest:
     post:
       operationId: eqmsBuildAuditPack
       tags: [EQMS Control Plane]
@@ -5214,6 +5327,99 @@ paths:
                   error:
                     type: string
                     enum: [audit_pack_incomplete, audit_timeline_missing_finalization_event]
+
+  /api/v1/eqms/audit-packs/export:
+    get:
+      operationId: eqmsReadAuditPackExport
+      tags: [EQMS Control Plane]
+      summary: Read a previously built audit pack export
+      description: Returns the durable audit-pack export receipt and bundle metadata by export id or scope reference.
+      security:
+        - sessionCookie: []
+      parameters:
+        - in: query
+          name: audit_pack_export_id
+          required: false
+          schema: { type: string }
+        - in: query
+          name: scope_type
+          required: false
+          schema: { type: string }
+        - in: query
+          name: scope_ref
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Audit pack export returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Audit pack export not found.
+
+  /api/v1/eqms/genealogy/facts:
+    post:
+      operationId: eqmsRecordGenealogyFact
+      tags: [EQMS Control Plane]
+      summary: Record a scoped genealogy edge fact
+      description: Writes append-only 5M/genealogy linkage under authenticated session scope; caller-supplied org or plant scope fields are rejected.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source_type, source_id, target_type, target_id, edge_type]
+              additionalProperties: true
+      responses:
+        '201':
+          description: Genealogy fact recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: Genealogy write rejected.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [scope_context_required, caller_scope_field_forbidden, genealogy_edge_fact_fingerprint_required_for_replay]
+
+  /api/v1/eqms/genealogy/5m/evaluate:
+    post:
+      operationId: eqmsEvaluate5MGate
+      tags: [EQMS Control Plane]
+      summary: Evaluate required 5M context before release or production acceptance
+      description: Returns blockers when material, machine, method, measurement, or man/personnel context is incomplete.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: 5M gate evaluation returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
 
   /api/v1/eqms/genealogy/as-manufactured:
     get:

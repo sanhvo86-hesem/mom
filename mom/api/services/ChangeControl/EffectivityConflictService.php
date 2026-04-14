@@ -22,8 +22,67 @@ final class EffectivityConflictService
     public function detectAndPersist(string $changeOrderId, array $effectivities): array
     {
         $conflicts = $this->detectInPackageConflicts($effectivities);
+        $conflicts = array_merge($conflicts, $this->detectBaselineConflicts($changeOrderId, $effectivities));
         foreach ($conflicts as $conflict) {
             $this->persistConflict($changeOrderId, $conflict);
+        }
+
+        return $conflicts;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $effectivities
+     * @return list<array<string, mixed>>
+     */
+    private function detectBaselineConflicts(string $changeOrderId, array $effectivities): array
+    {
+        if ($this->db === null || !method_exists($this->db, 'query')) {
+            return [];
+        }
+
+        $conflicts = [];
+        foreach ($effectivities as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+            $rows = $this->db->query(
+                "SELECT e.*
+                 FROM plm_change_effectivities e
+                 JOIN plm_change_orders co ON co.plm_change_order_id = e.plm_change_order_id
+                 WHERE e.plm_change_order_id::text <> :change_order_id
+                   AND co.status IN ('approved', 'released', 'implemented', 'closed')
+                   AND lower(e.object_type) = lower(:object_type)
+                   AND e.object_id = :object_id
+                   AND e.effective_from < COALESCE(CAST(:effective_to AS timestamptz), 'infinity'::timestamptz)
+                   AND COALESCE(e.effective_to, 'infinity'::timestamptz) > CAST(:effective_from AS timestamptz)",
+                [
+                    ':change_order_id' => $changeOrderId,
+                    ':object_type' => $this->text($candidate['object_type'] ?? ''),
+                    ':object_id' => $this->text($candidate['object_id'] ?? ''),
+                    ':effective_from' => $this->text($candidate['effective_from'] ?? ''),
+                    ':effective_to' => $this->nullableText($candidate['effective_to'] ?? null),
+                ],
+            );
+            foreach (is_array($rows) ? $rows : [] as $row) {
+                if (is_array($row) && $this->text($row['plm_change_order_id'] ?? '') === $changeOrderId) {
+                    continue;
+                }
+                if (!is_array($row) || !$this->semanticScopesOverlap($candidate, $row)) {
+                    continue;
+                }
+                $conflicts[] = [
+                    'conflict_type' => 'baseline_overlap',
+                    'conflict_state' => 'open',
+                    'object_type' => $this->text($candidate['object_type'] ?? ''),
+                    'object_id' => $this->text($candidate['object_id'] ?? ''),
+                    'left_effectivity' => $this->summarizeEffectivity($candidate),
+                    'right_effectivity' => $this->summarizeEffectivity($row),
+                    'conflict_hash_sha256' => hash('sha256', $this->canonicalJson([
+                        'candidate' => $this->summarizeEffectivity($candidate),
+                        'baseline' => $this->summarizeEffectivity($row),
+                    ])),
+                ];
+            }
         }
 
         return $conflicts;
@@ -76,6 +135,27 @@ final class EffectivityConflictService
         }
 
         return $this->canonicalJson($this->scope($left)) === $this->canonicalJson($this->scope($right));
+    }
+
+    /**
+     * @param array<string, mixed> $left
+     * @param array<string, mixed> $right
+     */
+    private function semanticScopesOverlap(array $left, array $right): bool
+    {
+        $leftScope = $this->scope($left);
+        $rightScope = $this->scope($right);
+        if ($leftScope === [] || $rightScope === []) {
+            return true;
+        }
+        foreach (['lot', 'lot_id', 'serial', 'serial_id', 'order', 'order_id', 'site', 'plant', 'product'] as $key) {
+            $leftValue = $this->text($leftScope[$key] ?? '');
+            $rightValue = $this->text($rightScope[$key] ?? '');
+            if ($leftValue !== '' && $rightValue !== '' && $leftValue !== $rightValue) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -136,13 +216,19 @@ final class EffectivityConflictService
             return;
         }
         $row = $this->db->queryOne(
-            "INSERT INTO effectivity_conflicts
-                (plm_change_order_id, conflict_type, conflict_state, object_type, object_id, conflict_payload, idempotency_key, metadata)
-             VALUES
-                (CAST(:change_order_id AS uuid), :conflict_type, :conflict_state, :object_type, :object_id,
-                 CAST(:conflict_payload AS jsonb), :idempotency_key, CAST(:metadata AS jsonb))
-             ON CONFLICT (idempotency_key) DO NOTHING
-             RETURNING *",
+            "WITH inserted AS (
+                 INSERT INTO effectivity_conflicts
+                    (plm_change_order_id, conflict_type, conflict_state, object_type, object_id, conflict_payload, idempotency_key, metadata)
+                 VALUES
+                    (CAST(:change_order_id AS uuid), :conflict_type, :conflict_state, :object_type, :object_id,
+                     CAST(:conflict_payload AS jsonb), :idempotency_key, CAST(:metadata AS jsonb))
+                 ON CONFLICT (idempotency_key) DO NOTHING
+                 RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM effectivity_conflicts WHERE idempotency_key = :idempotency_key
+             LIMIT 1",
             [
                 ':change_order_id' => $this->nullableUuid($changeOrderId),
                 ':conflict_type' => $this->text($conflict['conflict_type'] ?? 'overlap'),
@@ -168,6 +254,12 @@ final class EffectivityConflictService
     {
         $text = $this->text($value);
         return preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    private function nullableText(mixed $value): ?string
+    {
+        $text = $this->text($value);
+        return $text === '' ? null : $text;
     }
 
     /**

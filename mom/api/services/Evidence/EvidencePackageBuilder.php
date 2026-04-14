@@ -60,9 +60,9 @@ final class EvidencePackageBuilder
             'subject_id' => $subjectId,
             'publication_state' => $publicationState,
             'artifacts' => [
-                'original' => $this->artifactManifest($artifacts['original']),
-                'canonical_payload' => $this->artifactManifest($artifacts['canonical_payload']),
-                'readable_snapshot' => $this->artifactManifest($artifacts['readable_snapshot']),
+                'original' => $this->contentArtifactManifest($artifacts['original']),
+                'canonical_payload' => $this->contentArtifactManifest($artifacts['canonical_payload']),
+                'readable_snapshot' => $this->contentArtifactManifest($artifacts['readable_snapshot']),
             ],
         ]));
 
@@ -166,6 +166,18 @@ final class EvidencePackageBuilder
     }
 
     /**
+     * @param array<string, mixed> $artifact
+     * @return array{sha256: string, size_bytes: int}
+     */
+    private function contentArtifactManifest(array $artifact): array
+    {
+        return [
+            'sha256' => (string)$artifact['sha256'],
+            'size_bytes' => (int)$artifact['size_bytes'],
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
@@ -181,7 +193,7 @@ final class EvidencePackageBuilder
             ];
         }
 
-        $publicationState = strtolower(trim((string)($state['state'] ?? 'pending')));
+        $publicationState = strtolower(trim((string)($state['publication_state'] ?? $state['state'] ?? 'pending')));
         if (!in_array($publicationState, self::PUBLICATION_STATES, true)) {
             throw new RuntimeException('Invalid publication_state.state for evidence package.');
         }
@@ -195,7 +207,8 @@ final class EvidencePackageBuilder
             throw new RuntimeException('Evidence package cannot represent direct user upload to publication target.');
         }
 
-        $state['state'] = $publicationState;
+        $state['publication_state'] = $publicationState;
+        unset($state['state']);
         $state['authority_role'] = $authorityRole;
         return $state;
     }
@@ -256,11 +269,6 @@ final class EvidencePackageBuilder
         return $subjectType . '_' . $subjectId . '_' . $suffix;
     }
 
-    private function nowIso(): string
-    {
-        return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
-    }
-
     /**
      * @param array<string, mixed> $input
      */
@@ -279,6 +287,6 @@ final class EvidencePackageBuilder
             }
         }
 
-        return $this->nowIso();
+        return '1970-01-01T00:00:00+00:00';
     }
 }

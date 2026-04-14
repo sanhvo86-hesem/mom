@@ -32,6 +32,32 @@ use PHPUnit\Framework\TestCase;
 
 final class WorldClassControlPlaneExecutionTest extends TestCase
 {
+    public function testEqmsControlPlaneOpenApiTracksGovernedRoutes(): void
+    {
+        $root = dirname(__DIR__, 3);
+        $routes = file_get_contents($root . '/api/routes/eqms-control-plane-routes.php');
+        $openapi = file_get_contents($root . '/api/openapi.yaml');
+
+        $this->assertIsString($routes);
+        $this->assertIsString($openapi);
+
+        foreach ([
+            '/api/v1/eqms/forms/submission-attempts/{attempt_id}/accept',
+            '/api/v1/eqms/change-requests',
+            '/api/v1/eqms/change-requests/transition',
+            '/api/v1/eqms/change-orders',
+            '/api/v1/eqms/change-orders/transition',
+            '/api/v1/eqms/audit-packs/manifest',
+            '/api/v1/eqms/audit-packs/export',
+            '/api/v1/eqms/genealogy/facts',
+            '/api/v1/eqms/genealogy/5m/evaluate',
+            '/api/v1/eqms/genealogy/as-manufactured',
+        ] as $path) {
+            $this->assertStringContainsString($path, $routes);
+            $this->assertStringContainsString($path . ':', $openapi);
+        }
+    }
+
     public function testRepoBoundaryScannerClassifiesGeneratedArtifacts(): void
     {
         $findings = (new RepoBoundaryScanner())->scanPaths([
@@ -997,14 +1023,19 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         mkdir($dir, 0775, true);
 
         try {
-            $manifest = (new AuditPackExportService(new AuditPackExportFakeDb()))->buildForScope([
+            $db = new AuditPackExportFakeDb();
+            $service = new AuditPackExportService($db);
+            $manifest = $service->buildForScope([
                 'scope_type' => 'evidence_record',
                 'scope_ref' => 'EV-1',
             ], 'org-1');
             $exporter = new AuditPackExporter($dir);
             $export = $exporter->exportManifest($manifest);
+            $lifecycle = $service->recordExportLifecycle($manifest, $export, '00000000-0000-0000-0000-000000000123');
 
             $this->assertSame('ready', $export['export_state']);
+            $this->assertSame('ready', $lifecycle['export_state']);
+            $this->assertSame($export['package_hash_sha256'], $lifecycle['package_hash_sha256']);
             $this->assertSame($manifest['manifest_hash_sha256'], $export['manifest_hash_sha256']);
             $this->assertFileExists($dir . '/' . $export['package_uri']);
             $this->assertFileExists($dir . '/' . $export['receipt_uri']);
@@ -1077,6 +1108,10 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                     'actor_id' => 'qa-1',
                     'org_id' => 'ORG-1',
                     'event_hash_sha256' => str_repeat('1', 64),
+                    'payload' => [
+                        'evidence_record_id' => 'EV-1',
+                        'package_hash_sha256' => str_repeat('d', 64),
+                    ],
                 ]],
             );
 
@@ -1660,6 +1695,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $request = $service->createChangeRequest([
             'change_request_number' => 'CR-1',
+            'idempotency_key' => 'CR-1-create',
             'request_type' => 'ecr',
             'title' => 'Revise inspection form',
             'affected_objects' => [[
@@ -1673,6 +1709,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $order = $service->createChangeOrder([
             'change_order_number' => 'CO-1',
+            'idempotency_key' => 'CO-1-create',
             'order_type' => 'eco',
             'title' => 'Release revised inspection form',
             'affected_objects' => [[
@@ -1721,36 +1758,41 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'change_order_id' => 'CO-1',
             'target_status' => 'impact_assessment',
             'reason' => 'scope is ready for impact assessment',
-        ], 'qa-1');
+            'actor_roles' => ['change_coordinator'],
+        ], 'change-coord-1');
         $this->assertSame('impact_assessment', $impactAssessment['status']);
 
         $inReview = $service->transitionChangeOrder([
             'change_order_id' => 'CO-1',
             'target_status' => 'in_review',
             'reason' => 'submitted for review',
-        ], 'qa-1');
+            'actor_roles' => ['change_coordinator'],
+        ], 'change-coord-1');
         $this->assertSame('in_review', $inReview['status']);
 
         $approved = $service->transitionChangeOrder([
             'change_order_id' => 'CO-1',
             'target_status' => 'approved',
             'reason' => 'approved review',
-        ], 'qa-1');
+            'actor_roles' => ['qa_manager'],
+        ], 'qa-manager-1');
         $this->assertSame('approved', $approved['status']);
 
         $released = $service->transitionChangeOrder([
             'change_order_id' => 'CO-1',
             'target_status' => 'released',
             'reason' => 'approved implementation',
+            'actor_roles' => ['change_coordinator'],
             'release_signature_event_id' => '00000000-0000-0000-0000-000000000778',
-        ], 'qa-1');
+        ], 'release-coord-1');
         $this->assertSame('released', $released['status']);
 
         $implemented = $service->transitionChangeOrder([
             'change_order_id' => 'CO-1',
             'target_status' => 'implemented',
             'reason' => 'implementation evidence complete',
-        ], 'qa-1');
+            'actor_roles' => ['implementation_owner'],
+        ], 'impl-owner-1');
         $this->assertSame('implemented', $implemented['status']);
         $this->assertNotEmpty($db->queryOneCalls);
     }
@@ -1762,6 +1804,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $service->createChangeOrder([
             'change_order_number' => 'CO-BLOCK',
+            'idempotency_key' => 'CO-BLOCK-create',
             'title' => 'Incomplete change',
             'affected_objects' => [[
                 'object_type' => 'document_revision',
@@ -1769,9 +1812,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'affected_fields' => ['release_state'],
             ]],
         ], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'in_review', 'reason' => 'submit for review'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'approved', 'reason' => 'approve review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'in_review', 'reason' => 'submit for review', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-BLOCK', 'target_status' => 'approved', 'reason' => 'approve review', 'actor_roles' => ['qa_manager']], 'qa-manager-1');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('change_order_release_gate_blocked');
@@ -1779,8 +1822,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'change_order_id' => 'CO-BLOCK',
             'target_status' => 'released',
             'reason' => 'release blocked until lifecycle complete',
+            'actor_roles' => ['change_coordinator'],
             'release_signature_event_id' => '00000000-0000-0000-0000-000000000778',
-        ], 'qa-1');
+        ], 'release-coord-1');
     }
 
     public function testChangeOrderCreationUsesTransactionForPackageRollback(): void
@@ -1793,6 +1837,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         try {
             (new ChangeLifecycleCommandService($db))->createChangeOrder([
                 'change_order_number' => 'CO-TX-FAIL',
+                'idempotency_key' => 'CO-TX-FAIL-create',
                 'title' => 'Transaction failure proof',
                 'affected_objects' => [[
                     'object_type' => 'document_revision',
@@ -1815,6 +1860,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $service->createChangeOrder([
             'change_order_number' => 'CO-EMERGENCY',
+            'idempotency_key' => 'CO-EMERGENCY-create',
             'order_type' => 'temporary_deviation',
             'title' => 'Emergency containment deviation',
             'emergency_change' => true,
@@ -1875,15 +1921,16 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertNotEmpty($db->rollbackRequirements);
         $this->assertNotEmpty($db->emergencyChangeControls);
 
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'in_review', 'reason' => 'submit for review'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'approved', 'reason' => 'approve emergency review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'in_review', 'reason' => 'submit for review', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY', 'target_status' => 'approved', 'reason' => 'approve emergency review', 'actor_roles' => ['qa_manager']], 'qa-manager-1');
         $released = $service->transitionChangeOrder([
             'change_order_id' => 'CO-EMERGENCY',
             'target_status' => 'released',
             'reason' => 'release emergency containment',
+            'actor_roles' => ['change_coordinator'],
             'release_signature_event_id' => '00000000-0000-0000-0000-000000000778',
-        ], 'qa-1');
+        ], 'release-coord-1');
 
         $this->assertSame('released', $released['status']);
     }
@@ -1895,6 +1942,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $service->createChangeOrder([
             'change_order_number' => 'CO-EMERGENCY-NO-SIG',
+            'idempotency_key' => 'CO-EMERGENCY-NO-SIG-create',
             'order_type' => 'temporary_deviation',
             'title' => 'Emergency containment deviation without durable risk signature',
             'emergency_change' => true,
@@ -1944,9 +1992,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             ]],
         ], 'qa-1');
 
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'in_review', 'reason' => 'submit for review'], 'qa-1');
-        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'approved', 'reason' => 'approve emergency review'], 'qa-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'impact_assessment', 'reason' => 'start impact assessment', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'in_review', 'reason' => 'submit for review', 'actor_roles' => ['change_coordinator']], 'change-coord-1');
+        $service->transitionChangeOrder(['change_order_id' => 'CO-EMERGENCY-NO-SIG', 'target_status' => 'approved', 'reason' => 'approve emergency review', 'actor_roles' => ['qa_manager']], 'qa-manager-1');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('change_order_release_gate_blocked');
@@ -1954,8 +2002,9 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'change_order_id' => 'CO-EMERGENCY-NO-SIG',
             'target_status' => 'released',
             'reason' => 'try release without risk signature',
+            'actor_roles' => ['change_coordinator'],
             'release_signature_event_id' => '00000000-0000-0000-0000-000000000778',
-        ], 'qa-1');
+        ], 'release-coord-1');
     }
 
     public function testUnifiedEvidenceGraphBuilds5mLinksAndImpactClosure(): void
@@ -2169,7 +2218,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
      */
     private function evidenceSignatureEvent(array $overrides = []): array
     {
-        $displayedHash = hash('sha256', json_encode(['result' => 'pass'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+        $displayedHash = $this->defaultEvidenceRecordContentHash();
         return $overrides + [
             'signer_ref' => 'qa-1',
             'signer_role' => 'qa_qms',
@@ -2186,6 +2235,54 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             ],
             'signature_manifestation' => 'Signed by qa-1 for final evidence package approval after re-authentication.',
         ];
+    }
+
+    private function defaultEvidenceRecordContentHash(): string
+    {
+        return hash('sha256', $this->canonicalTestJson([
+            'subject_type' => 'evidence_record',
+            'subject_id' => 'EV-1',
+            'publication_state' => [
+                'authority_role' => 'read_only_replica',
+                'publication_state' => 'pending',
+            ],
+            'artifacts' => [
+                'original' => [
+                    'sha256' => hash('sha256', 'raw original'),
+                    'size_bytes' => strlen('raw original'),
+                ],
+                'canonical_payload' => [
+                    'sha256' => hash('sha256', '{"result":"pass"}'),
+                    'size_bytes' => strlen('{"result":"pass"}'),
+                ],
+                'readable_snapshot' => [
+                    'sha256' => hash('sha256', '<html><body>pass</body></html>'),
+                    'size_bytes' => strlen('<html><body>pass</body></html>'),
+                ],
+            ],
+        ]));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function canonicalTestJson(array $data): string
+    {
+        $this->ksortRecursiveTest($data);
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function ksortRecursiveTest(array &$data): void
+    {
+        ksort($data);
+        foreach ($data as &$value) {
+            if (is_array($value)) {
+                $this->ksortRecursiveTest($value);
+            }
+        }
     }
 
     private function removeTree(string $dir): void
@@ -2226,6 +2323,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 final class AuditPackExportFakeDb
 {
     /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryOneCalls = [];
+
+    /**
      * @param array<string, mixed> $params
      * @return list<array<string, mixed>>
      */
@@ -2257,8 +2359,33 @@ final class AuditPackExportFakeDb
                 'aggregate_id' => 'EV-1',
                 'actor_id' => 'qa-1',
                 'event_hash_sha256' => str_repeat('1', 64),
+                'payload' => [
+                    'evidence_record_id' => 'EV-1',
+                    'package_hash_sha256' => str_repeat('a', 64),
+                ],
             ]];
         }
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    public function queryOne(string $sql, array $params = []): array
+    {
+        $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'INSERT INTO audit_pack_exports')) {
+            return [
+                'audit_pack_export_id' => '00000000-0000-0000-0000-000000000903',
+                'export_scope' => (string)$params[':export_scope'],
+                'scope_ref' => (string)$params[':scope_ref'],
+                'export_state' => (string)$params[':export_state'],
+                'package_uri' => (string)($params[':package_uri'] ?? ''),
+                'package_hash_sha256' => (string)($params[':package_hash_sha256'] ?? ''),
+            ];
+        }
+
         return [];
     }
 }
@@ -2881,7 +3008,12 @@ final class EvidenceFinalizationFakeDb
             ];
         }
         if (str_contains($sql, 'INSERT INTO evidence_artifacts')) {
-            return ['evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'], 'artifact_role' => (string)$params[':artifact_role']];
+            return [
+                'evidence_artifact_id' => 'ART-' . (string)$params[':artifact_role'],
+                'artifact_role' => (string)$params[':artifact_role'],
+                'sha256' => (string)$params[':sha256'],
+                'storage_uri' => (string)$params[':storage_uri'],
+            ];
         }
         if (str_starts_with(ltrim($sql), 'UPDATE e_signature_auth_challenges')) {
             if (!$this->authChallengeValid) {
@@ -2945,6 +3077,8 @@ final class EvidenceFinalizationFakeDb
                 'aggregate_type' => 'evidence_record',
                 'aggregate_id' => (string)$params[':aggregate_id'],
                 'source_event_hash' => (string)$params[':source_event_hash'],
+                'aggregate_sequence' => 1,
+                'metadata' => ['audit_chain' => ['prev_hash' => '', 'event_hash' => (string)$params[':source_event_hash']]],
             ];
         }
         if (str_starts_with(ltrim($sql), 'UPDATE evidence_records')) {
@@ -3189,16 +3323,42 @@ class ChangeLifecycleFakeDb
     {
         $this->queryOneCalls[] = ['sql' => $sql, 'params' => $params];
         $trimmed = ltrim($sql);
-        if (str_starts_with($trimmed, 'INSERT INTO plm_change_requests')) {
-            return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => (string)$params[':number'], 'status' => (string)$params[':status']];
+        if (str_contains($trimmed, 'FROM signature_events')) {
+            return [
+                'signature_event_id' => (string)($params[':signature_event_id'] ?? '00000000-0000-0000-0000-000000000778'),
+                'signed_object_type' => 'change_order',
+                'signed_object_id' => (string)($params[':change_order_id'] ?? $params[':change_order_number'] ?? 'CO-1'),
+                'signer_ref' => (string)($params[':actor_ref'] ?? ''),
+                'signature_meaning' => 'change_order_release',
+                'signature_state' => 'applied',
+                'signed_payload_hash_sha256' => (string)($params[':release_package_hash_sha256'] ?? ''),
+                'displayed_record_hash_sha256' => (string)($params[':release_package_hash_sha256'] ?? ''),
+                'auth_challenge_id' => 'release-auth-1',
+                'auth_method' => 'password_mfa',
+                'auth_result_hash_sha256' => str_repeat('9', 64),
+                'signature_manifestation' => 'Release signed after re-authentication.',
+            ];
+        }
+        if (str_contains($trimmed, 'INSERT INTO plm_change_requests')) {
+            return [
+                'plm_change_request_id' => '00000000-0000-0000-0000-000000000101',
+                'change_request_number' => (string)$params[':number'],
+                'status' => (string)$params[':status'],
+                'metadata' => json_decode((string)($params[':metadata'] ?? '{}'), true) ?: [],
+            ];
         }
         if (str_starts_with($trimmed, 'SELECT * FROM plm_change_requests')) {
-            return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => 'CR-1', 'status' => 'draft'];
+            return [
+                'plm_change_request_id' => '00000000-0000-0000-0000-000000000101',
+                'change_request_number' => 'CR-1',
+                'status' => 'draft',
+                'metadata' => ['actor_ref' => 'qa-1', 'request_hash_sha256' => str_repeat('1', 64)],
+            ];
         }
         if (str_starts_with($trimmed, 'UPDATE plm_change_requests')) {
             return ['plm_change_request_id' => '00000000-0000-0000-0000-000000000101', 'change_request_number' => 'CR-1', 'status' => (string)$params[':status']];
         }
-        if (str_starts_with($trimmed, 'INSERT INTO plm_change_orders')) {
+        if (str_contains($trimmed, 'INSERT INTO plm_change_orders')) {
             $row = [
                 'plm_change_order_id' => '00000000-0000-0000-0000-000000000201',
                 'change_order_number' => (string)$params[':number'],
@@ -3221,6 +3381,12 @@ class ChangeLifecycleFakeDb
             $id = (string)($params[':id'] ?? '');
             $row = $this->changeOrders[$id] ?? ['plm_change_order_id' => '00000000-0000-0000-0000-000000000201', 'change_order_number' => $id === '' ? 'CO-1' : $id];
             $row['status'] = (string)$params[':status'];
+            if (($params[':release_signature_event_id'] ?? null) !== null) {
+                $row['release_signature_event_id'] = (string)$params[':release_signature_event_id'];
+            }
+            if (($params[':release_package_hash_sha256'] ?? null) !== null) {
+                $row['release_package_hash_sha256'] = (string)$params[':release_package_hash_sha256'];
+            }
             $row['metadata'] = array_merge(
                 is_array($row['metadata'] ?? null) ? $row['metadata'] : [],
                 json_decode((string)($params[':metadata'] ?? '{}'), true) ?: [],
@@ -3422,7 +3588,7 @@ final class FailingTransactionalChangeLifecycleFakeDb extends ChangeLifecycleFak
      */
     public function queryOne(string $sql, array $params = []): array
     {
-        if (str_starts_with(ltrim($sql), 'INSERT INTO plm_change_affected_objects')) {
+        if (str_contains(ltrim($sql), 'INSERT INTO plm_change_affected_objects')) {
             throw new \RuntimeException('simulated_child_insert_failure');
         }
 

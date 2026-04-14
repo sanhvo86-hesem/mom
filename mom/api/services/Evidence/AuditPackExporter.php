@@ -320,8 +320,16 @@ final class AuditPackExporter
         foreach ($auditEvents as $event) {
             $eventType = strtolower($this->text($event['event_type'] ?? ''));
             $aggregateType = strtolower($this->text($event['aggregate_type'] ?? ''));
-            if (in_array($eventType, ['evidence.finalized', 'evidence_finalized', 'finalized', 'approved'], true)
+            $payload = $event['payload'] ?? [];
+            if (is_string($payload)) {
+                $decoded = json_decode($payload, true);
+                $payload = is_array($decoded) ? $decoded : [];
+            }
+            if ($eventType === 'evidence.finalized'
                 && in_array($aggregateType, ['evidence_record', 'evidence_version'], true)
+                && is_array($payload)
+                && $this->text($payload['evidence_record_id'] ?? $event['aggregate_id'] ?? '') !== ''
+                && $this->isSha256($this->text($payload['package_hash_sha256'] ?? ''))
             ) {
                 return true;
             }

@@ -45,7 +45,8 @@ final class EvidencePackageBuilderTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $package['package_hash_sha256']);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $package['manifest_hash_sha256']);
         $this->assertSame($package['snapshot_hash_sha256'], $package['readable_snapshot_hash_sha256']);
-        $this->assertSame('pending', $package['manifest']['publication_state']['state']);
+        $this->assertSame('pending', $package['manifest']['publication_state']['publication_state']);
+        $this->assertArrayNotHasKey('state', $package['manifest']['publication_state']);
         $this->assertSame('read_only_replica', $package['manifest']['publication_state']['authority_role']);
         $this->assertSame([], $package['manifest']['signature_events']);
     }

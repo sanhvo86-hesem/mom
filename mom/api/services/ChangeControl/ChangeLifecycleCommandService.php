@@ -32,6 +32,7 @@ final class ChangeLifecycleCommandService
         if ($status === 'approved_for_order') {
             throw new RuntimeException('change_request_terminal_status_requires_transition');
         }
+        $idempotencyKey = $this->requiredText($input, 'idempotency_key');
         $requestHash = $this->requestHash($input);
 
         $number = $this->text($input['change_request_number'] ?? '');
@@ -40,14 +41,20 @@ final class ChangeLifecycleCommandService
         }
 
         $row = $this->db->queryOne(
-            "INSERT INTO plm_change_requests
-                (change_request_number, request_type, title, problem_statement, proposed_solution,
-                 impact_summary, priority, status, target_effective_date, metadata)
-             VALUES
-                (:number, :request_type, :title, :problem_statement, :proposed_solution,
-                 :impact_summary, :priority, :status, :target_effective_date, CAST(:metadata AS jsonb))
-             ON CONFLICT (change_request_number) DO UPDATE SET updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO plm_change_requests
+                    (change_request_number, request_type, title, problem_statement, proposed_solution,
+                     impact_summary, priority, status, target_effective_date, metadata)
+                VALUES
+                    (:number, :request_type, :title, :problem_statement, :proposed_solution,
+                     :impact_summary, :priority, :status, :target_effective_date, CAST(:metadata AS jsonb))
+                ON CONFLICT (change_request_number) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM plm_change_requests WHERE change_request_number = :number
+             LIMIT 1",
             [
                 ':number' => $number,
                 ':request_type' => $this->enum($input['request_type'] ?? 'internal', ['ecr', 'customer_change', 'supplier_change', 'internal']),
@@ -61,7 +68,7 @@ final class ChangeLifecycleCommandService
                 ':metadata' => $this->json([
                     'actor_ref' => $actorRef,
                     'authority' => 'change_lifecycle_command',
-                    'idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
+                    'idempotency_key' => $idempotencyKey,
                     'request_hash_sha256' => $requestHash,
                 ]),
             ],
@@ -70,6 +77,7 @@ final class ChangeLifecycleCommandService
         if (!is_array($row)) {
             throw new RuntimeException('change_request_create_failed');
         }
+        $this->assertRequestReplayEquivalent($row, $requestHash, 'change_request');
         $this->persistAffectedObjects($row['plm_change_request_id'] ?? null, null, $input['affected_objects'] ?? []);
         return $this->normalizeRow($row);
     }
@@ -131,6 +139,7 @@ final class ChangeLifecycleCommandService
         if (in_array($status, ['released', 'implemented', 'closed'], true)) {
             throw new RuntimeException('change_order_release_requires_transition');
         }
+        $idempotencyKey = $this->requiredText($input, 'idempotency_key');
         $requestHash = $this->requestHash($input);
 
         $number = $this->text($input['change_order_number'] ?? '');
@@ -139,16 +148,22 @@ final class ChangeLifecycleCommandService
         }
 
         $row = $this->db->queryOne(
-            "INSERT INTO plm_change_orders
-                (change_order_number, plm_change_request_id, order_type, title, effectivity_type,
-                 effective_from_date, effective_to_date, serial_effective_from, serial_effective_to,
-                 status, implementation_due_date, metadata)
-             VALUES
-                (:number, CAST(:request_id AS uuid), :order_type, :title, :effectivity_type,
-                 :effective_from_date, :effective_to_date, :serial_effective_from, :serial_effective_to,
-                 :status, :implementation_due_date, CAST(:metadata AS jsonb))
-             ON CONFLICT (change_order_number) DO UPDATE SET updated_at = now()
-             RETURNING *",
+            "WITH inserted AS (
+                INSERT INTO plm_change_orders
+                    (change_order_number, plm_change_request_id, order_type, title, effectivity_type,
+                     effective_from_date, effective_to_date, serial_effective_from, serial_effective_to,
+                     status, implementation_due_date, metadata)
+                VALUES
+                    (:number, CAST(:request_id AS uuid), :order_type, :title, :effectivity_type,
+                     :effective_from_date, :effective_to_date, :serial_effective_from, :serial_effective_to,
+                     :status, :implementation_due_date, CAST(:metadata AS jsonb))
+                ON CONFLICT (change_order_number) DO NOTHING
+                RETURNING *
+             )
+             SELECT * FROM inserted
+             UNION ALL
+             SELECT * FROM plm_change_orders WHERE change_order_number = :number
+             LIMIT 1",
             [
                 ':number' => $number,
                 ':request_id' => $this->nullableUuid($input['plm_change_request_id'] ?? $input['change_request_id'] ?? null),
@@ -162,7 +177,7 @@ final class ChangeLifecycleCommandService
                 ':status' => $status,
                 ':implementation_due_date' => $this->nullableText($input['implementation_due_date'] ?? null),
                 ':metadata' => $this->json($this->changeOrderMetadata($input, $actorRef) + [
-                    'idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
+                    'idempotency_key' => $idempotencyKey,
                     'request_hash_sha256' => $requestHash,
                 ]),
             ],
@@ -171,6 +186,7 @@ final class ChangeLifecycleCommandService
         if (!is_array($row)) {
             throw new RuntimeException('change_order_create_failed');
         }
+        $this->assertRequestReplayEquivalent($row, $requestHash, 'change_order');
         $orderId = $row['plm_change_order_id'] ?? null;
         $affectedObjects = $this->persistAffectedObjects(null, $orderId, $input['affected_objects'] ?? []);
         $this->persistResultingObjects($orderId, $input['resulting_objects'] ?? [], $affectedObjects);
@@ -191,6 +207,19 @@ final class ChangeLifecycleCommandService
     public function transitionChangeOrder(array $input, string $actorRef): array
     {
         $this->requireDb();
+        if (method_exists($this->db, 'transactional')) {
+            return $this->db->transactional(fn(): array => $this->transitionChangeOrderInsideTransaction($input, $actorRef));
+        }
+
+        return $this->transitionChangeOrderInsideTransaction($input, $actorRef);
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private function transitionChangeOrderInsideTransaction(array $input, string $actorRef): array
+    {
         $target = $this->enum($input['target_status'] ?? $input['status'] ?? '', ['draft', 'impact_assessment', 'in_review', 'approved', 'released', 'implemented', 'closed', 'cancelled']);
         $id = $this->requiredText($input, 'change_order_id');
         $current = $this->loadChangeOrderRow($id);
@@ -199,6 +228,8 @@ final class ChangeLifecycleCommandService
 
         $releaseGate = null;
         $releaseSideEffects = null;
+        $releaseSignature = null;
+        $releasePackageHash = null;
         if ($target === 'released') {
             $releaseGate = $this->evaluateChangeOrderReleaseReadiness($id, $input);
             if (!$releaseGate['allowed']) {
@@ -207,10 +238,22 @@ final class ChangeLifecycleCommandService
                     $releaseGate['blockers'],
                 )));
             }
+            $releasePackageHash = $this->releasePackageHash($current, $releaseGate);
+            $releaseSignatureEventId = $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null);
+            if ($releaseSignatureEventId === null) {
+                throw new RuntimeException('change_order_release_signature_required');
+            }
+            $releaseSignature = (new ChangeReleaseSignatureValidator($this->db))->requireValidReleaseSignature(
+                $releaseSignatureEventId,
+                $current,
+                $releasePackageHash,
+                $actorRef,
+            );
             $releaseSideEffects = (new ChangeReleaseSideEffectService($this->db))->apply($current, [
                 'change_order_id' => $this->text($current['plm_change_order_id'] ?? $id),
                 'actor_ref' => $actorRef,
-                'signature_event_id' => $this->nullableUuid($input['signature_event_id'] ?? $input['release_signature_event_id'] ?? null),
+                'signature_event_id' => $releaseSignatureEventId,
+                'release_package_hash_sha256' => $releasePackageHash,
             ]);
         }
 
@@ -226,6 +269,8 @@ final class ChangeLifecycleCommandService
             "UPDATE plm_change_orders
              SET status = :status,
                  approved_at = CASE WHEN :status IN ('approved', 'released') AND approved_at IS NULL THEN now() ELSE approved_at END,
+                 release_signature_event_id = CASE WHEN :status = 'released' THEN CAST(:release_signature_event_id AS uuid) ELSE release_signature_event_id END,
+                 release_package_hash_sha256 = CASE WHEN :status = 'released' THEN :release_package_hash_sha256 ELSE release_package_hash_sha256 END,
                  metadata = COALESCE(metadata, '{}'::jsonb) || CAST(:metadata AS jsonb),
                  updated_at = now()
              WHERE plm_change_order_id::text = :id OR change_order_number = :id
@@ -233,10 +278,14 @@ final class ChangeLifecycleCommandService
             [
                 ':status' => $target,
                 ':id' => $id,
+                ':release_signature_event_id' => is_array($releaseSignature) ? $this->nullableUuid($releaseSignature['signature_event_id'] ?? null) : null,
+                ':release_package_hash_sha256' => $releasePackageHash,
                 ':metadata' => $this->json(array_filter([
                     'transitioned_by' => $actorRef,
                     'reason' => $this->text($input['reason'] ?? ''),
                     'release_gate' => $releaseGate,
+                    'release_package_hash_sha256' => $releasePackageHash,
+                    'release_signature_event_id' => is_array($releaseSignature) ? $this->text($releaseSignature['signature_event_id'] ?? '') : null,
                     'release_side_effects' => $releaseSideEffects,
                 ], static fn(mixed $value): bool => $value !== null && $value !== '')),
             ],
@@ -404,7 +453,7 @@ final class ChangeLifecycleCommandService
             if (!is_array($object)) {
                 continue;
             }
-            $affectedObjectId = $this->resolveAffectedObjectId($object, $affectedObjects);
+            $affectedObjectId = $this->resolveAffectedObjectId($orderId, $object, $affectedObjects);
             $this->db->queryOne(
                 "INSERT INTO plm_change_resulting_objects
                     (plm_change_order_id, affected_object_id, object_type, object_id, resulting_revision, result_role, release_state,
@@ -433,10 +482,29 @@ final class ChangeLifecycleCommandService
      * @param array<string, mixed> $resultingObject
      * @param list<array<string, mixed>> $affectedObjects
      */
-    private function resolveAffectedObjectId(array $resultingObject, array $affectedObjects): string
+    private function resolveAffectedObjectId(mixed $orderId, array $resultingObject, array $affectedObjects): string
     {
         $explicit = $this->nullableUuid($resultingObject['affected_object_id'] ?? null);
         if ($explicit !== null) {
+            foreach ($affectedObjects as $affected) {
+                if ($this->text($affected['plm_change_affected_object_id'] ?? '') === $explicit) {
+                    return $explicit;
+                }
+            }
+            $row = $this->db->queryOne(
+                "SELECT plm_change_affected_object_id
+                 FROM plm_change_affected_objects
+                 WHERE plm_change_order_id = CAST(:order_id AS uuid)
+                   AND plm_change_affected_object_id = CAST(:affected_object_id AS uuid)
+                 LIMIT 1",
+                [
+                    ':order_id' => $this->nullableUuid($orderId),
+                    ':affected_object_id' => $explicit,
+                ],
+            );
+            if (!is_array($row) || $this->text($row['plm_change_affected_object_id'] ?? '') !== $explicit) {
+                throw new RuntimeException('resulting_object_affected_object_not_in_change_order');
+            }
             return $explicit;
         }
 
@@ -855,11 +923,14 @@ final class ChangeLifecycleCommandService
         }
 
         $roles = $this->normalizedRoles($input['actor_roles'] ?? $input['_actor_roles'] ?? []);
-        if ($roles !== [] && !$this->transitionRoleAllowed($aggregateType, $target, $roles)) {
+        if ($roles === []) {
+            throw new RuntimeException($aggregateType . '_transition_actor_roles_required');
+        }
+        if (!$this->transitionRoleAllowed($aggregateType, $target, $roles)) {
             throw new RuntimeException($aggregateType . '_transition_role_not_authorized');
         }
 
-        if ($roles !== [] && $aggregateType === 'change_order' && in_array($target, ['approved', 'released', 'closed'], true)) {
+        if ($aggregateType === 'change_order' && in_array($target, ['approved', 'released', 'closed'], true)) {
             $creator = $this->creatorRef($currentRow);
             if ($creator !== '' && hash_equals($creator, $actorRef)) {
                 throw new RuntimeException('change_order_transition_sod_violation');
@@ -935,6 +1006,26 @@ final class ChangeLifecycleCommandService
         return is_array($metadata) ? $this->text($metadata['actor_ref'] ?? $metadata['created_by_actor_ref'] ?? '') : '';
     }
 
+    /**
+     * @param array<string, mixed> $changeOrder
+     * @param array<string, mixed> $releaseGate
+     */
+    private function releasePackageHash(array $changeOrder, array $releaseGate): string
+    {
+        return hash('sha256', $this->json([
+            'package_type' => 'change_order_release',
+            'change_order_id' => $this->text($changeOrder['plm_change_order_id'] ?? ''),
+            'change_order_number' => $this->text($changeOrder['change_order_number'] ?? ''),
+            'from_state' => $this->text($changeOrder['status'] ?? ''),
+            'to_state' => 'released',
+            'release_gate' => [
+                'allowed' => (bool)($releaseGate['allowed'] ?? false),
+                'blockers' => $releaseGate['blockers'] ?? [],
+                'canonical_lifecycle_sources' => $releaseGate['canonical_lifecycle_sources'] ?? [],
+            ],
+        ]));
+    }
+
     private function assertAllowedOrderTransition(string $current, string $target): void
     {
         $allowed = [
@@ -961,6 +1052,23 @@ final class ChangeLifecycleCommandService
         $copy = $input;
         unset($copy['idempotency_key']);
         return hash('sha256', $this->json($copy));
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function assertRequestReplayEquivalent(array $row, string $requestHash, string $aggregateType): void
+    {
+        $metadata = $row['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+
+        $storedHash = is_array($metadata) ? $this->text($metadata['request_hash_sha256'] ?? '') : '';
+        if ($storedHash === '' || !hash_equals($storedHash, $requestHash)) {
+            throw new RuntimeException($aggregateType . '_idempotency_conflict');
+        }
     }
 
     private function assertEffectivenessClosure(string $id): void

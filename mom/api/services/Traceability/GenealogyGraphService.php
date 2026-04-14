@@ -140,16 +140,19 @@ final class GenealogyGraphService
         $metadata['authority'] = 'canonical_genealogy_edge_fact';
         $metadata['change_authority'] = $authority;
         $metadata['fact_fingerprint_sha256'] = $factFingerprint;
+        $scope = $this->trustedScope($fact);
+        $metadata['scope'] = $scope;
 
         $row = $this->db->queryOne(
             "INSERT INTO genealogy_edge_facts
                 (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id,
                  quantity, uom, effective_at, evidence_record_id, change_order_id, source_event_id,
-                 fact_state, metadata)
+                 fact_state, metadata, org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (:edge_fact_type, :from_object_type, :from_object_id, :to_object_type, :to_object_id,
                  :quantity, :uom, :effective_at, CAST(:evidence_record_id AS uuid), CAST(:change_order_id AS uuid),
-                 :source_event_id, :fact_state, CAST(:metadata AS jsonb))
+                 :source_event_id, :fact_state, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
              ON CONFLICT (edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id, source_event_id)
              DO NOTHING
              RETURNING *",
@@ -167,6 +170,10 @@ final class GenealogyGraphService
                 ':source_event_id' => $sourceEventId,
                 ':fact_state' => $this->text($fact['fact_state'] ?? 'active') ?: 'active',
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
 
@@ -471,8 +478,9 @@ final class GenealogyGraphService
         array $fact,
         array $metadata,
     ): array {
-        $fromNode = $this->upsertNode($fromType, $fromId, $metadata);
-        $toNode = $this->upsertNode($toType, $toId, $metadata);
+        $scope = is_array($metadata['scope'] ?? null) ? $metadata['scope'] : [];
+        $fromNode = $this->upsertNode($fromType, $fromId, $metadata, $scope);
+        $toNode = $this->upsertNode($toType, $toId, $metadata, $scope);
         $edge = $this->upsertProjectedEdge(
             (string)($fromNode['genealogy_node_id'] ?? ''),
             (string)($toNode['genealogy_node_id'] ?? ''),
@@ -480,6 +488,7 @@ final class GenealogyGraphService
             $sourceEventId,
             $fact,
             $metadata,
+            $scope,
         );
         $snapshot = $this->upsertSnapshot($toType, $toId, [
             'source_event_id' => $sourceEventId,
@@ -487,7 +496,7 @@ final class GenealogyGraphService
             'from' => ['type' => $fromType, 'id' => $fromId],
             'to' => ['type' => $toType, 'id' => $toId],
             'metadata' => $metadata,
-        ], $fact);
+        ], $fact, $scope);
 
         return ['from_node' => $fromNode, 'to_node' => $toNode, 'edge' => $edge, 'snapshot' => $snapshot];
     }
@@ -496,11 +505,15 @@ final class GenealogyGraphService
      * @param array<string, mixed> $metadata
      * @return array<string, mixed>
      */
-    private function upsertNode(string $type, string $id, array $metadata): array
+    private function upsertNode(string $type, string $id, array $metadata, array $scope): array
     {
         $row = $this->db->queryOne(
-            "INSERT INTO genealogy_nodes (node_type, node_ref, canonical_label, lifecycle_state, metadata)
-             VALUES (:node_type, :node_ref, :canonical_label, :lifecycle_state, CAST(:metadata AS jsonb))
+            "INSERT INTO genealogy_nodes
+                (node_type, node_ref, canonical_label, lifecycle_state, metadata,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
+             VALUES
+                (:node_type, :node_ref, :canonical_label, :lifecycle_state, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
              ON CONFLICT (node_type, node_ref) DO UPDATE
                 SET metadata = genealogy_nodes.metadata || EXCLUDED.metadata
              RETURNING *",
@@ -510,6 +523,10 @@ final class GenealogyGraphService
                 ':canonical_label' => $type . ':' . $id,
                 ':lifecycle_state' => 'active',
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['node_type' => $type, 'node_ref' => $id];
@@ -520,14 +537,16 @@ final class GenealogyGraphService
      * @param array<string, mixed> $metadata
      * @return array<string, mixed>
      */
-    private function upsertProjectedEdge(string $fromNodeId, string $toNodeId, string $edgeType, string $sourceEventId, array $fact, array $metadata): array
+    private function upsertProjectedEdge(string $fromNodeId, string $toNodeId, string $edgeType, string $sourceEventId, array $fact, array $metadata, array $scope): array
     {
         $row = $this->db->queryOne(
             "INSERT INTO genealogy_edges
-                (from_node_id, to_node_id, edge_type, event_time, evidence_record_id, source_event_id, metadata)
+                (from_node_id, to_node_id, edge_type, event_time, evidence_record_id, source_event_id, metadata,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (CAST(:from_node_id AS uuid), CAST(:to_node_id AS uuid), :edge_type, CAST(:event_time AS timestamptz),
-                 CAST(:evidence_record_id AS uuid), :source_event_id, CAST(:metadata AS jsonb))
+                 CAST(:evidence_record_id AS uuid), :source_event_id, CAST(:metadata AS jsonb),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
              ON CONFLICT (from_node_id, to_node_id, edge_type, source_event_id) DO UPDATE
                 SET metadata = genealogy_edges.metadata || EXCLUDED.metadata
              RETURNING *",
@@ -539,6 +558,10 @@ final class GenealogyGraphService
                 ':evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
                 ':source_event_id' => $sourceEventId,
                 ':metadata' => $this->json($metadata),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['edge_type' => $edgeType, 'source_event_id' => $sourceEventId];
@@ -549,7 +572,7 @@ final class GenealogyGraphService
      * @param array<string, mixed> $fact
      * @return array<string, mixed>
      */
-    private function upsertSnapshot(string $subjectType, string $subjectRef, array $payload, array $fact): array
+    private function upsertSnapshot(string $subjectType, string $subjectRef, array $payload, array $fact, array $scope): array
     {
         $snapshotSubject = $this->snapshotSubjectType($subjectType);
         if ($snapshotSubject === '') {
@@ -564,6 +587,10 @@ final class GenealogyGraphService
                  row_version = row_version + 1
              WHERE subject_type = :subject_type
                AND subject_ref = :subject_ref
+               AND COALESCE(org_company_code, '') = COALESCE(:org_company_code, '')
+               AND COALESCE(org_legal_entity_code, '') = COALESCE(:org_legal_entity_code, '')
+               AND COALESCE(org_plant_id, '') = COALESCE(:org_plant_id, '')
+               AND COALESCE(org_site_id, '') = COALESCE(:org_site_id, '')
                AND snapshot_state = 'current'
                AND snapshot_hash_sha256 <> :snapshot_hash_sha256
              RETURNING as_manufactured_snapshot_id",
@@ -571,14 +598,20 @@ final class GenealogyGraphService
                 ':subject_type' => $snapshotSubject,
                 ':subject_ref' => $subjectRef,
                 ':snapshot_hash_sha256' => $hash,
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         $row = $this->db->queryOne(
             "INSERT INTO as_manufactured_snapshots
-                (subject_type, subject_ref, snapshot_state, snapshot_payload, snapshot_hash_sha256, evidence_record_id)
+                (subject_type, subject_ref, snapshot_state, snapshot_payload, snapshot_hash_sha256, evidence_record_id,
+                 org_company_code, org_legal_entity_code, org_plant_id, org_site_id)
              VALUES
                 (:subject_type, :subject_ref, 'current', CAST(:snapshot_payload AS jsonb), :snapshot_hash_sha256,
-                 CAST(:evidence_record_id AS uuid))
+                 CAST(:evidence_record_id AS uuid),
+                 :org_company_code, :org_legal_entity_code, :org_plant_id, :org_site_id)
              ON CONFLICT (subject_type, subject_ref, snapshot_hash_sha256) DO UPDATE
                 SET built_at = now()
              RETURNING *",
@@ -588,6 +621,10 @@ final class GenealogyGraphService
                 ':snapshot_payload' => $payloadJson,
                 ':snapshot_hash_sha256' => $hash,
                 ':evidence_record_id' => $this->nullableUuid($fact['evidence_record_id'] ?? null),
+                ':org_company_code' => $scope['org_company_code'] ?? null,
+                ':org_legal_entity_code' => $scope['org_legal_entity_code'] ?? null,
+                ':org_plant_id' => $scope['org_plant_id'] ?? null,
+                ':org_site_id' => $scope['org_site_id'] ?? null,
             ],
         );
         return is_array($row) ? $this->normalizeRow($row) : ['subject_type' => $snapshotSubject, 'subject_ref' => $subjectRef, 'snapshot_hash_sha256' => $hash];
@@ -620,9 +657,29 @@ final class GenealogyGraphService
             $metadata = is_array($decoded) ? $decoded : [];
         }
         $recorded = is_array($metadata) ? $this->text($metadata['fact_fingerprint_sha256'] ?? '') : '';
-        if ($recorded !== '' && !hash_equals($recorded, $factFingerprint)) {
+        if ($recorded === '') {
+            throw new RuntimeException('genealogy_edge_fact_fingerprint_required_for_replay');
+        }
+        if (!hash_equals($recorded, $factFingerprint)) {
             throw new RuntimeException('genealogy_edge_fact_idempotency_conflict');
         }
+    }
+
+    /**
+     * @param array<string, mixed> $fact
+     * @return array<string, string>
+     */
+    private function trustedScope(array $fact): array
+    {
+        $scope = is_array($fact['scope'] ?? null) ? $fact['scope'] : [];
+        $normalized = [];
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $value = $this->text($scope[$field] ?? $fact[$field] ?? '');
+            if ($value !== '') {
+                $normalized[$field] = $value;
+            }
+        }
+        return $normalized;
     }
 
     /**

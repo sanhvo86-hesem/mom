@@ -19,6 +19,7 @@ use MOM\Services\Evidence\CanonicalEvidenceReadService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
+use MOM\Services\FormControl\FormSubmissionAcceptanceService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Traceability\GenealogyGraphService;
@@ -339,6 +340,27 @@ final class EqmsControlPlaneController extends BaseController
         }
     }
 
+    public function acceptSubmissionAttempt(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'qa_manager', 'qms_engineer', 'quality_manager', 'document_control']);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $body['attempt_id'] = (string)$this->query('attempt_id', $body['attempt_id'] ?? '');
+        $this->requireFields($body, ['attempt_id', 'signature_event_id', 'reason']);
+
+        try {
+            $this->success([
+                'form_control' => (new FormSubmissionAcceptanceService($this->data))->accept(
+                    $body,
+                    (string)($user['username'] ?? $user['user_id'] ?? 'authenticated_user'),
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage(), 409);
+        }
+    }
+
     public function evaluateChangeRelease(): never
     {
         $this->requireAuth();
@@ -382,7 +404,10 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireAnyRole($user, $this->changeRequesterRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
-        $this->requireFields($body, ['title']);
+        if (!isset($body['idempotency_key'])) {
+            $body['idempotency_key'] = trim((string)($this->requestHeader('Idempotency-Key') ?? ''));
+        }
+        $this->requireFields($body, ['idempotency_key', 'title']);
         $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
@@ -427,7 +452,10 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireAnyRole($user, $this->changeCoordinatorRoles());
         $this->requireCsrf();
         $body = $this->jsonBody();
-        $this->requireFields($body, ['title']);
+        if (!isset($body['idempotency_key'])) {
+            $body['idempotency_key'] = trim((string)($this->requestHeader('Idempotency-Key') ?? ''));
+        }
+        $this->requireFields($body, ['idempotency_key', 'title']);
         $body['_actor_roles'] = $this->rolesForUser($user);
 
         try {
@@ -541,8 +569,14 @@ final class EqmsControlPlaneController extends BaseController
                 }
             }
 
-            $manifest = (new AuditPackExportService($this->data))->buildForScope((array)$body['scope'], (string)$userOrgId);
+            $auditPackService = new AuditPackExportService($this->data);
+            $manifest = $auditPackService->buildForScope((array)$body['scope'], (string)$userOrgId);
             $export = (new AuditPackExporter($this->dataDir))->exportManifest($manifest);
+            $lifecycle = $auditPackService->recordExportLifecycle(
+                $manifest,
+                $export,
+                is_scalar($user['user_id'] ?? null) ? (string)$user['user_id'] : null,
+            );
 
             // GOV-008: Final assertion - verify no cross-org records made it through
             if (!$this->assertAuditPackIsOrgScoped($manifest, $userOrgId)) {
@@ -558,6 +592,7 @@ final class EqmsControlPlaneController extends BaseController
             $this->success([
                 'audit_pack_manifest' => $manifest,
                 'audit_pack_export' => $export,
+                'audit_pack_export_lifecycle' => $lifecycle,
             ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);
@@ -701,6 +736,8 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireCsrf();
         $body = $this->jsonBody();
         $this->requireFields($body, ['edge_fact_type', 'from_object_type', 'from_object_id', 'to_object_type', 'to_object_id']);
+        $this->rejectCallerScopeFields($body);
+        $body['scope'] = $this->requiredSessionOrgScope($user);
 
         try {
             $fact = (new GenealogyGraphService($this->data))->recordEdgeFact(
@@ -754,7 +791,7 @@ final class EqmsControlPlaneController extends BaseController
                     $subjectType,
                     $subjectId,
                     (int)$this->query('limit', '200'),
-                    $this->sessionOrgScope(),
+                    $this->requiredSessionOrgScope($user),
                 ),
             ]);
         } catch (\Throwable $e) {
@@ -904,5 +941,32 @@ final class EqmsControlPlaneController extends BaseController
             'org_legal_entity_code' => (string)($_SESSION['org_legal_entity_code'] ?? ''),
             'org_site_id' => (string)($_SESSION['org_site_id'] ?? ''),
         ], static fn(string $value): bool => $value !== '');
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return array<string, string>
+     */
+    private function requiredSessionOrgScope(array $user): array
+    {
+        $scope = $this->sessionOrgScope();
+        if ($scope === [] && array_intersect($this->rolesForUser($user), admin_roles()) === []) {
+            $this->error('scope_context_required', 403, 'Traceability operations require an authenticated session scope.');
+        }
+        return $scope;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    private function rejectCallerScopeFields(array $body): void
+    {
+        $scope = is_array($body['scope'] ?? null) ? $body['scope'] : [];
+        foreach (['plant_id', 'org_plant_id', 'org_id', 'org_company_code', 'org_legal_entity_code', 'org_site_id'] as $field) {
+            $value = $body[$field] ?? $scope[$field] ?? null;
+            if (is_scalar($value) && trim((string)$value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be supplied by request body.');
+            }
+        }
     }
 }

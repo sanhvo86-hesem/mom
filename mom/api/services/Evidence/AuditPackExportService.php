@@ -101,6 +101,53 @@ final class AuditPackExportService
     }
 
     /**
+     * @param array<string, mixed> $manifest
+     * @param array<string, mixed> $export
+     * @return array<string, mixed>
+     */
+    public function recordExportLifecycle(array $manifest, array $export, ?string $requestedByUserId = null): array
+    {
+        if ($this->db === null || !method_exists($this->db, 'queryOne')) {
+            throw new RuntimeException('authoritative_audit_pack_store_required');
+        }
+
+        $scope = is_array($manifest['scope'] ?? null) ? $manifest['scope'] : [];
+        $scopeType = $this->requiredText($scope, 'scope_type');
+        $scopeRef = $this->requiredText($scope, 'scope_ref');
+        $state = (string)($export['export_state'] ?? $manifest['export_state'] ?? 'failed');
+        if (!in_array($state, ['ready', 'failed'], true)) {
+            $state = 'failed';
+        }
+
+        $row = $this->db->queryOne(
+            "INSERT INTO audit_pack_exports
+                (export_scope, scope_ref, export_state, requested_by, completed_at,
+                 package_uri, package_hash_sha256, manifest_payload, error_code, error_message)
+             VALUES
+                (:export_scope, :scope_ref, :export_state, CAST(:requested_by AS uuid), now(),
+                 :package_uri, :package_hash_sha256, CAST(:manifest_payload AS jsonb), :error_code, :error_message)
+             RETURNING *",
+            [
+                ':export_scope' => $scopeType,
+                ':scope_ref' => $scopeRef,
+                ':export_state' => $state,
+                ':requested_by' => $this->nullableUuid($requestedByUserId),
+                ':package_uri' => $this->nullableText($export['package_uri'] ?? null),
+                ':package_hash_sha256' => $this->nullableSha256($export['package_hash_sha256'] ?? null),
+                ':manifest_payload' => $this->json($manifest),
+                ':error_code' => $this->nullableText($export['error_code'] ?? $manifest['error_code'] ?? null),
+                ':error_message' => $this->nullableText($export['error_message'] ?? null),
+            ],
+        );
+
+        if (!is_array($row) || trim((string)($row['audit_pack_export_id'] ?? '')) === '') {
+            throw new RuntimeException('audit_pack_export_lifecycle_record_required');
+        }
+
+        return $row;
+    }
+
+    /**
      * @param array<string, mixed> $params
      * @return list<array<string, mixed>>
      */
@@ -164,6 +211,32 @@ final class AuditPackExportService
     {
         $text = is_scalar($value) ? trim((string)$value) : '';
         return $text === '' ? null : $text;
+    }
+
+    private function nullableText(mixed $value): ?string
+    {
+        $text = is_scalar($value) ? trim((string)$value) : '';
+        return $text === '' ? null : $text;
+    }
+
+    private function nullableUuid(mixed $value): ?string
+    {
+        $text = $this->nullableText($value);
+        return $text !== null && preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    private function nullableSha256(mixed $value): ?string
+    {
+        $text = strtolower($this->nullableText($value) ?? '');
+        return preg_match('/^[a-f0-9]{64}$/', $text) === 1 ? $text : null;
+    }
+
+    /**
+     * @param array<string, mixed> $value
+     */
+    private function json(array $value): string
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
 
     /**

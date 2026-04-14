@@ -19,6 +19,7 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/forms/issuance-manifest/validate', EqmsControlPlaneController::class, 'validateIssuanceManifest');
     $router->post('/api/v1/eqms/forms/submission-attempts', EqmsControlPlaneController::class, 'recordFormSubmissionAttempt');
     $router->post('/api/v1/eqms/forms/submission-attempts/validate', EqmsControlPlaneController::class, 'validateSubmissionAttempt');
+    $router->post('/api/v1/eqms/forms/submission-attempts/{attempt_id}/accept', EqmsControlPlaneController::class, 'acceptSubmissionAttempt');
     $router->post('/api/v1/eqms/change-requests', EqmsControlPlaneController::class, 'createChangeRequest');
     $router->post('/api/v1/eqms/change-requests/transition', EqmsControlPlaneController::class, 'transitionChangeRequest');
     $router->post('/api/v1/eqms/change-orders', EqmsControlPlaneController::class, 'createChangeOrder');

@@ -24,7 +24,7 @@ final class ManufacturingEventController extends BaseController
                 }
             }
             $this->rejectCallerScopeFields();
-            $filters += $this->sessionScopeFilters();
+            $filters += $this->sessionScopeFilters($user);
             $filters['limit'] = (int)($this->input('limit', '100') ?? '100');
 
             $timeline = $this->service()->productionTimeline($filters);
@@ -66,7 +66,7 @@ final class ManufacturingEventController extends BaseController
                 }
             }
             $this->rejectCallerScopeFields();
-            $filters += $this->sessionScopeFilters();
+            $filters += $this->sessionScopeFilters($user);
             $filters['limit'] = (int)($this->input('limit', '100') ?? '100');
 
             $packet = (new ProductionHistoryReadModelService(
@@ -99,15 +99,30 @@ final class ManufacturingEventController extends BaseController
     /**
      * @return array<string, string>
      */
-    private function sessionScopeFilters(): array
+    private function sessionScopeFilters(array $user): array
     {
-        return array_filter([
+        $scope = array_filter([
             'plant_id' => (string)($_SESSION['plant_id'] ?? ''),
             'org_plant_id' => (string)($_SESSION['plant_id'] ?? ''),
             'org_company_code' => (string)($_SESSION['org_company_code'] ?? ''),
             'org_legal_entity_code' => (string)($_SESSION['org_legal_entity_code'] ?? ''),
             'org_site_id' => (string)($_SESSION['org_site_id'] ?? ''),
         ], static fn(string $value): bool => $value !== '');
+        if ($scope === [] && !$this->isAdminUser($user)) {
+            $this->error('scope_context_required', 403, 'MES and traceability reads require an authenticated session scope.');
+        }
+
+        return $scope;
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function isAdminUser(array $user): bool
+    {
+        $roles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+        $roles = array_values(array_filter(array_map(static fn(mixed $role): string => strtolower(trim((string)$role)), $roles)));
+        return array_intersect($roles, admin_roles()) !== [];
     }
 
     /**
