@@ -6,6 +6,7 @@ namespace MOM\Services\FormControl;
 
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
+use MOM\Services\ControlPlane\EqmsFormExecutionService;
 use RuntimeException;
 
 /**
@@ -35,6 +36,23 @@ final class FormIssuanceCommandService
         if ($templateRevisionId === $schemaVersionId) {
             throw new RuntimeException('template_revision_schema_version_must_be_distinct');
         }
+        $templateRevision = $this->loadTemplateRevision($db, $templateRevisionId);
+        $schemaVersion = $this->loadSchemaVersion($db, $schemaVersionId, $templateRevisionId);
+        $manifest = (new EqmsFormExecutionService())->buildIssuanceManifest(
+            $templateRevision,
+            $schemaVersion,
+            [
+                'delivery_mode' => $deliveryMode,
+                'issued_record_id' => $this->requiredText($input, 'issued_record_id'),
+                'allocation_id' => $this->requiredText($input, 'allocation_id'),
+                'subject' => is_array($input['subject'] ?? null) ? $input['subject'] : ($input['issued_for_context'] ?? []),
+                'effectivity_context' => is_array($input['effectivity_context'] ?? null) ? $input['effectivity_context'] : [],
+            ],
+        );
+        $callerManifestHash = $this->nullableSha256($input['issuance_manifest_hash_sha256'] ?? $input['carrier_manifest_hash_sha256'] ?? null);
+        if ($callerManifestHash !== null && !hash_equals($callerManifestHash, (string)$manifest['carrier_manifest_hash_sha256'])) {
+            throw new RuntimeException('issuance_manifest_hash_mismatch');
+        }
 
         $row = $db->queryOne(
             "INSERT INTO frm_issuances
@@ -63,15 +81,17 @@ final class FormIssuanceCommandService
                 ':issued_to_ref' => $this->nullableText($input['issued_to_ref'] ?? $actorRef),
                 ':issued_for_context' => $this->json($input['issued_for_context'] ?? $input['subject'] ?? []),
                 ':issued_artifact_uri' => $this->nullableText($input['issued_artifact_uri'] ?? null),
-                ':issuance_manifest_hash_sha256' => $this->nullableSha256($input['issuance_manifest_hash_sha256'] ?? $input['carrier_manifest_hash_sha256'] ?? null),
+                ':issuance_manifest_hash_sha256' => (string)$manifest['carrier_manifest_hash_sha256'],
                 ':expires_at' => $this->nullableText($input['expires_at'] ?? null),
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
                 ':metadata' => $this->json([
                     'authority' => 'FormIssuanceCommandService',
                     'actor_ref' => $actorRef,
+                    'server_authoritative_validation' => true,
                     'offline_excel_role' => 'controlled_capture_carrier',
                     'template_revision_id' => $templateRevisionId,
                     'schema_version_id' => $schemaVersionId,
+                    'issuance_manifest' => $manifest,
                 ]),
             ],
         );
@@ -82,6 +102,7 @@ final class FormIssuanceCommandService
         return [
             'authority' => 'canonical_form_control',
             'issuance' => $row,
+            'issuance_manifest' => $manifest,
             'version_semantics' => [
                 'template_revision_id' => $templateRevisionId,
                 'schema_version_id' => $schemaVersionId,
@@ -97,11 +118,25 @@ final class FormIssuanceCommandService
     public function recordSubmissionAttempt(array $input, string $actorRef): array
     {
         $db = $this->requireDb();
-        $attemptState = $this->attemptState($input['attempt_state'] ?? 'received');
-        $hash = $this->nullableSha256($input['original_hash_sha256'] ?? $input['original_artifact_hash_sha256'] ?? null);
-        if ($hash === null && in_array($attemptState, ['valid', 'accepted', 'duplicate'], true)) {
-            throw new RuntimeException('submission_original_hash_required');
+        $issuanceId = $this->requiredUuid($input, 'frm_issuance_id');
+        $issuance = $this->loadIssuanceForSubmission($db, $issuanceId);
+        $carrierManifest = $this->carrierManifestFromInputOrIssuance($input, $issuance);
+        $submission = is_array($input['submission'] ?? null) ? $input['submission'] : $input;
+        if (!isset($submission['original_artifact_hash_sha256']) && isset($submission['original_hash_sha256'])) {
+            $submission['original_artifact_hash_sha256'] = $submission['original_hash_sha256'];
         }
+        $serverValidation = (new EqmsFormExecutionService())->validateSubmissionAttempt(
+            $issuance,
+            $carrierManifest,
+            $submission,
+            $this->knownFingerprints($db, $submission),
+        );
+        $attemptState = $this->attemptStateFromValidation($serverValidation);
+        $hash = $this->nullableSha256($input['original_hash_sha256'] ?? $input['original_artifact_hash_sha256'] ?? null);
+        $hash = $this->nullableSha256($serverValidation['original_artifact_hash_sha256'] ?? null) ?? $hash;
+        $validationErrors = is_array($serverValidation['errors'] ?? null) ? $serverValidation['errors'] : [];
+        $canonicalPayloadHash = $this->nullableSha256($serverValidation['canonical_payload_hash_sha256'] ?? null);
+        $duplicate = is_array($serverValidation['duplicate'] ?? null) ? $serverValidation['duplicate'] : null;
 
         $row = $db->queryOne(
             "INSERT INTO frm_submission_attempts
@@ -119,7 +154,7 @@ final class FormIssuanceCommandService
                  updated_at = now()
              RETURNING *",
             [
-                ':frm_issuance_id' => $this->requiredUuid($input, 'frm_issuance_id'),
+                ':frm_issuance_id' => $issuanceId,
                 ':attempt_no' => max(1, (int)($input['attempt_no'] ?? 1)),
                 ':attempt_state' => $attemptState,
                 ':submitted_by_user_id' => $this->nullableUuid($input['submitted_by_user_id'] ?? null),
@@ -127,12 +162,13 @@ final class FormIssuanceCommandService
                 ':original_artifact_uri' => $this->nullableText($input['original_artifact_uri'] ?? null),
                 ':original_hash_sha256' => $hash,
                 ':parsed_payload' => $this->json($input['parsed_payload'] ?? $input['canonical_payload'] ?? []),
-                ':validation_errors' => $this->json($input['validation_errors'] ?? []),
-                ':duplicate_of_attempt_id' => $this->nullableUuid($input['duplicate_of_attempt_id'] ?? null),
+                ':validation_errors' => $this->json($validationErrors),
+                ':duplicate_of_attempt_id' => $this->nullableUuid($duplicate['frm_submission_attempt_id'] ?? $input['duplicate_of_attempt_id'] ?? null),
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
                 ':metadata' => $this->json([
                     'authority' => 'FormIssuanceCommandService',
                     'actor_ref' => $actorRef,
+                    'server_authoritative_validation' => true,
                     'carrier_role' => 'offline_or_online_capture_not_source_of_truth',
                 ]),
             ],
@@ -141,12 +177,22 @@ final class FormIssuanceCommandService
             throw new RuntimeException('form_submission_attempt_persistence_failed');
         }
 
-        $validation = $this->persistValidationLedger($db, (string)$row['frm_submission_attempt_id'], $input, $attemptState, $hash);
-        $fingerprints = $this->persistDuplicateFingerprints($db, (string)$row['frm_submission_attempt_id'], $input, $hash);
+        $validationInput = array_merge($input, [
+            'validation_state' => (string)$serverValidation['validation_state'],
+            'validation_errors' => $validationErrors,
+            'validation_summary' => $serverValidation,
+            'canonical_payload_hash_sha256' => $canonicalPayloadHash,
+            'original_artifact_hash_sha256' => $hash,
+            'frm_schema_version_id' => $issuance['schema_version_id'] ?? $issuance['frm_schema_version_id'] ?? null,
+            'validator_version' => 'server_submission_validator.v1',
+        ]);
+        $validation = $this->persistValidationLedger($db, (string)$row['frm_submission_attempt_id'], $validationInput, $attemptState, $hash);
+        $fingerprints = $this->persistDuplicateFingerprints($db, (string)$row['frm_submission_attempt_id'], $validationInput, $hash);
 
         return [
             'authority' => 'canonical_form_control',
             'submission_attempt' => $row,
+            'server_validation' => $serverValidation,
             'validation_result' => $validation['result'],
             'validation_errors' => $validation['errors'],
             'duplicate_detection_fingerprints' => $fingerprints,
@@ -265,6 +311,146 @@ final class FormIssuanceCommandService
         return $fingerprints;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadTemplateRevision(object $db, string $templateRevisionId): array
+    {
+        $row = $db->queryOne(
+            "SELECT frm_template_revision_id, frm_family_id, template_revision, lifecycle_state,
+                    template_checksum_sha256, issuance_policy, naming_policy
+             FROM frm_template_revisions
+             WHERE frm_template_revision_id = CAST(:frm_template_revision_id AS uuid)",
+            [':frm_template_revision_id' => $templateRevisionId],
+        );
+        if (!is_array($row) || $this->text($row['frm_template_revision_id'] ?? '') === '') {
+            throw new RuntimeException('form_template_revision_not_found');
+        }
+        return $row;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadSchemaVersion(object $db, string $schemaVersionId, string $templateRevisionId): array
+    {
+        $row = $db->queryOne(
+            "SELECT frm_schema_version_id, frm_template_revision_id, schema_version, lifecycle_state,
+                    json_schema, validation_rules, render_profile
+             FROM frm_schema_versions
+             WHERE frm_schema_version_id = CAST(:frm_schema_version_id AS uuid)
+               AND frm_template_revision_id = CAST(:frm_template_revision_id AS uuid)",
+            [
+                ':frm_schema_version_id' => $schemaVersionId,
+                ':frm_template_revision_id' => $templateRevisionId,
+            ],
+        );
+        if (!is_array($row) || $this->text($row['frm_schema_version_id'] ?? '') === '') {
+            throw new RuntimeException('form_schema_version_not_found_for_template_revision');
+        }
+        return $row;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadIssuanceForSubmission(object $db, string $issuanceId): array
+    {
+        $row = $db->queryOne(
+            "SELECT fi.frm_issuance_id,
+                    fi.allocation_id,
+                    fi.issued_record_id,
+                    fi.frm_template_revision_id AS template_revision_id,
+                    fi.frm_schema_version_id AS schema_version_id,
+                    fi.issuance_state,
+                    fi.delivery_mode,
+                    fi.issuance_manifest_hash_sha256 AS carrier_manifest_hash_sha256,
+                    fi.metadata,
+                    tr.frm_family_id,
+                    tr.template_revision,
+                    tr.template_checksum_sha256,
+                    sv.schema_version
+             FROM frm_issuances fi
+             JOIN frm_template_revisions tr ON tr.frm_template_revision_id = fi.frm_template_revision_id
+             JOIN frm_schema_versions sv ON sv.frm_schema_version_id = fi.frm_schema_version_id
+             WHERE fi.frm_issuance_id = CAST(:frm_issuance_id AS uuid)",
+            [':frm_issuance_id' => $issuanceId],
+        );
+        if (!is_array($row) || $this->text($row['frm_issuance_id'] ?? '') === '') {
+            throw new RuntimeException('form_issuance_not_found');
+        }
+        if (is_string($row['metadata'] ?? null)) {
+            $decoded = json_decode((string)$row['metadata'], true);
+            if (is_array($decoded)) {
+                $row['metadata'] = $decoded;
+            }
+        }
+        return $row;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @param array<string, mixed> $issuance
+     * @return array<string, mixed>
+     */
+    private function carrierManifestFromInputOrIssuance(array $input, array $issuance): array
+    {
+        if (is_array($input['carrier_manifest'] ?? null)) {
+            return $input['carrier_manifest'];
+        }
+        $metadata = is_array($issuance['metadata'] ?? null) ? $issuance['metadata'] : [];
+        if (is_array($metadata['issuance_manifest'] ?? null)) {
+            return $metadata['issuance_manifest'];
+        }
+        return [
+            'allocation_id' => (string)($issuance['allocation_id'] ?? ''),
+            'issued_record_id' => (string)($issuance['issued_record_id'] ?? ''),
+            'template_revision_id' => (string)($issuance['template_revision_id'] ?? ''),
+            'schema_version_id' => (string)($issuance['schema_version_id'] ?? ''),
+            'carrier_manifest_hash_sha256' => (string)($issuance['carrier_manifest_hash_sha256'] ?? ''),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $submission
+     * @return list<array<string, mixed>>
+     */
+    private function knownFingerprints(object $db, array $submission): array
+    {
+        if (!method_exists($db, 'query')) {
+            return [];
+        }
+        $hashes = array_values(array_filter([
+            $this->nullableSha256($submission['original_artifact_hash_sha256'] ?? $submission['original_hash_sha256'] ?? null),
+            $this->nullableSha256($submission['canonical_payload_hash_sha256'] ?? null),
+        ]));
+        if ($hashes === []) {
+            return [];
+        }
+
+        $rows = $db->query(
+            "SELECT *
+             FROM duplicate_detection_fingerprints
+             WHERE fingerprint_value_sha256 IN (:hash_a, :hash_b)",
+            [
+                ':hash_a' => $hashes[0] ?? '',
+                ':hash_b' => $hashes[1] ?? $hashes[0] ?? '',
+            ],
+        );
+        return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+    }
+
+    /**
+     * @param array<string, mixed> $validation
+     */
+    private function attemptStateFromValidation(array $validation): string
+    {
+        if (is_array($validation['duplicate'] ?? null)) {
+            return 'duplicate';
+        }
+        return (string)($validation['validation_state'] ?? '') === 'passed' ? 'valid' : 'invalid';
+    }
+
     private function requireDb(): object
     {
         if ($this->db === null || !method_exists($this->db, 'queryOne')) {
@@ -299,15 +485,6 @@ final class FormIssuanceCommandService
             throw new RuntimeException('unsupported_delivery_mode');
         }
         return $mode;
-    }
-
-    private function attemptState(mixed $value): string
-    {
-        $state = strtolower($this->text($value));
-        if (!in_array($state, ['received', 'parsing', 'validating', 'valid', 'invalid', 'duplicate', 'quarantined', 'accepted', 'rejected'], true)) {
-            throw new RuntimeException('invalid_submission_attempt_state');
-        }
-        return $state;
     }
 
     private function validationStateForAttempt(string $attemptState): string

@@ -9,6 +9,21 @@ use RuntimeException;
 final class PostgresManufacturingEventRepository implements ManufacturingEventRepository
 {
     private const TABLE = 'mes_operational_event_ledger';
+    private const REQUIRED_CONTEXT_COLUMNS = [
+        'equipment_id',
+        'operator_id',
+        'tool_id',
+        'process_id',
+        'material_id',
+        'material_lot_id',
+        'material_batch_id',
+        'batch_number',
+        'routing_id',
+        'setup_sheet_id',
+        'inspection_plan_id',
+        'nc_program_id',
+        'cnc_program_id',
+    ];
 
     public function __construct(private readonly Connection $db)
     {
@@ -70,17 +85,21 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
             // GOV-005: Use parameterized query for table existence check
             $row = $this->db->queryOne("SELECT to_regclass(:table_name) AS table_name", [':table_name' => self::TABLE]);
             $available = trim((string)($row['table_name'] ?? '')) !== '';
+            $missingColumns = $available ? $this->missingContextColumns() : self::REQUIRED_CONTEXT_COLUMNS;
             $count = $available ? (int)$this->db->queryScalar('SELECT COUNT(*) FROM ' . self::TABLE) : 0;
+            $authoritative = $available && $missingColumns === [];
 
             return [
                 'slice' => 'manufacturing_events',
                 'backend' => 'postgres',
                 'primary_backend' => 'postgres',
-                'readiness_state' => $available ? 'authoritative_ready' : 'degraded',
-                'authority_mode' => $available ? 'postgres_primary' : 'degraded',
-                'authoritative' => $available,
+                'readiness_state' => $authoritative ? 'authoritative_ready' : 'degraded',
+                'authority_mode' => $authoritative ? 'postgres_primary' : 'degraded',
+                'authoritative' => $authoritative,
                 'fallback_only' => false,
                 'table_available' => $available,
+                'schema_complete' => $missingColumns === [],
+                'missing_columns' => $missingColumns,
                 'event_count' => $count,
                 'table' => self::TABLE,
             ];
@@ -94,11 +113,39 @@ final class PostgresManufacturingEventRepository implements ManufacturingEventRe
                 'authoritative' => false,
                 'fallback_only' => false,
                 'table_available' => false,
+                'schema_complete' => false,
+                'missing_columns' => self::REQUIRED_CONTEXT_COLUMNS,
                 'event_count' => 0,
                 'table' => self::TABLE,
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function missingContextColumns(): array
+    {
+        $quoted = implode(', ', array_map(
+            static fn(string $column): string => "'" . str_replace("'", "''", $column) . "'",
+            self::REQUIRED_CONTEXT_COLUMNS,
+        ));
+        $rows = $this->db->query(
+            "SELECT column_name
+             FROM information_schema.columns
+             WHERE table_name = :table_name
+               AND column_name IN ({$quoted})",
+            [':table_name' => self::TABLE],
+        );
+        $present = [];
+        foreach ($rows as $row) {
+            if (is_array($row) && isset($row['column_name'])) {
+                $present[] = (string)$row['column_name'];
+            }
+        }
+
+        return array_values(array_diff(self::REQUIRED_CONTEXT_COLUMNS, $present));
     }
 
     /**

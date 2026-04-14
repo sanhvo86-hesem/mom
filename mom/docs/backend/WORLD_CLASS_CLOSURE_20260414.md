@@ -1,6 +1,11 @@
 # World-Class Closure Register - 2026-04-14
 
-Branch: `codex/worldclass-closure-20260414-1212`
+Branch: `codex/worldclass-closure-20260414-1257`
+
+Branch governance note: a prior remediation branch was fast-forwarded into
+`main` by an external process during the closure loop. This branch was created
+from that new `main` head to finish the remaining non-waived P1 issues without
+continuing uncommitted remediation directly on `main`.
 
 This register records the implementation-oriented closure pass for ERP + MOM + MES + EQMS control-plane maturity. It is a governed closure artifact, not a generated agent report.
 
@@ -11,22 +16,25 @@ This register records the implementation-oriented closure pass for ERP + MOM + M
 | Runtime/build/test/report artifacts tracked beside source | P1 | Closed | `RepoBoundaryScanner` now flags `.DS_Store`, `.ai/index.log`, `.vscode`, vendored PHP runtime, local runtime pid/logs, form backups, schema archives, sessions/log archives. Tracked P1 artifacts were removed from source. |
 | Release governance is template-only | P1 | Closed for code discipline, operational receipts remain per-release | `ReleaseGovernanceBuilder` test remains the source mechanism; this register records branch-level closure and validation evidence. Actual deploy receipts must be produced per environment promotion. |
 | Form submission validation ledger not written by canonical submission command | P1 | Closed | `FormIssuanceCommandService::recordSubmissionAttempt()` writes `submission_validation_results`, `submission_validation_errors`, and `duplicate_detection_fingerprints`. |
+| Form issuance write path could bypass released template/schema validation | P1 | Closed | `FormIssuanceCommandService::issue()` now loads template/schema rows from the authoritative DB, runs `EqmsFormExecutionService::buildIssuanceManifest()`, rejects manifest hash mismatch, and persists only the server-generated manifest hash. |
+| Submission validation ledger could be caller-shaped | P1 | Closed | `recordSubmissionAttempt()` now loads issuance state from DB, normalizes the carrier manifest, runs `EqmsFormExecutionService::validateSubmissionAttempt()`, and persists server-authored validation state/errors/fingerprints regardless of caller-supplied `validation_state`. |
 | Document read acknowledgement and supersession command surface missing | P1 | Closed | `DocumentRevisionCommandService::acknowledgeRead()` and `supersedeRevision()` plus API routes under `/api/v1/eqms/documents/*`. |
-| Evidence finalization retry can update immutable rows after partial success | P1 | Closed | `EvidenceFinalizationService` and `RetentionLockService` use insert-or-select / `DO NOTHING` for immutable package, artifact, signature, publication, and retention rows. |
+| Evidence finalization retry can update immutable rows after partial success | P1 | Closed | `EvidenceFinalizationService` and `RetentionLockService` use insert-or-select / `DO NOTHING` for immutable package, artifact, signature, publication, and retention rows; finalization persistence now runs inside a DB transaction when available and detects signature idempotency collisions. |
 | Evidence amendment command missing | P1 | Closed | `EvidenceAmendmentService::createAmendment()` creates a draft amendment version without editing the locked source version, guarded by released change authority and field paths. |
-| Publication monitor queues actions without state-machine authorization | P1 | Closed | `PublicationMonitorService::queueAction()` validates retry/withdraw/supersede through `PublicationStateService` before enqueueing outbox work. |
-| MES event timeline lacks 5M/digital-thread filters | P1 | Closed | Migration `122_digital_thread_event_context_filters.sql`, `ManufacturingEventBackboneService::timelineFilterFields()`, and `PostgresManufacturingEventRepository` include equipment/operator/tool/process/material/routing/setup/inspection/CNC filters. |
+| Publication monitor queues actions without state-machine authorization | P1 | Closed | `PublicationMonitorService::queueAction()` validates retry/withdraw/supersede through `PublicationStateService` before enqueueing outbox work; `processQueuedAction()` now persists `publication_attempts`, withdrawal/supersession receipts, and publication state transitions under released change authority. |
+| MES event timeline lacks 5M/digital-thread filters | P1 | Closed | Migration `122_digital_thread_event_context_filters.sql`, `ManufacturingEventBackboneService::timelineFilterFields()`, and `PostgresManufacturingEventRepository` include equipment/operator/tool/process/material/routing/setup/inspection/CNC filters; repository probe now degrades if migration 122 columns are absent. |
 | As-manufactured snapshot subjects narrower than runtime ontology | P1 | Closed | `GenealogyGraphService` now validates expanded subject types through `nodeType()` for snapshot and thread reads. |
+| Runtime-generated `mom/data/registry/*.json` projections tracked as source | P1 | Closed | Removed 44 generated registry projection files from source. Runtime registry fallback continues to use controlled `mom/contracts/table-registry.json` when `mom/data/registry` is absent or unusable. |
 | Legacy prompt/tmp artifacts remain | P2 | Deferred roadmap | 33 P2 warnings remain: `mom/docs/tmp/*`, root `prompts/*`, `standards/prompts/*`, and `tools/prompts/*`. These are non-blocking but should be moved to a governed knowledge base or removed in a docs hygiene wave. |
 
 ## Six-Agent Re-Audit Summary
 
 | Agent | P0 | P1 closed in this pass | P2/deferred |
 | --- | ---: | --- | --- |
-| Platform governance / repo hygiene | 0 | Removed tracked backups, logs, archives, binaries, agent reports; scanner widened. | Prompt/tmp sprawl. |
-| Document/form/evidence control | 0 | Validation ledger, read acknowledgement, supersession, evidence amendment, immutable retry safety. | Durable audit-pack bundle storage remains roadmap. |
-| Change/configuration authority | 0 | Evidence amendment requires released change authority with field paths/effectivity. | Change impact browser and one-shot consumed authorization UX. |
-| MES/genealogy/digital thread | 0 | 5M event filters and expanded as-manufactured subjects. | Unified graph product browser remains roadmap. |
+| Platform governance / repo hygiene | 0 | Removed tracked backups, logs, archives, binaries, agent reports, and generated registry projections; scanner P0/P1 clean. | Prompt/tmp sprawl. |
+| Document/form/evidence control | 0 | Server-authored issuance/submission validation, read acknowledgement, supersession, evidence amendment, immutable retry safety. | Durable audit-pack bundle storage remains roadmap. |
+| Change/configuration authority | 0 | Evidence amendment and publication withdrawal/supersession require released change authority with persisted trail. | Change impact browser and one-shot consumed authorization UX. |
+| MES/genealogy/digital thread | 0 | 5M event filters, expanded as-manufactured subjects, and schema-complete runtime probe. | Unified graph product browser remains roadmap. |
 | Regulated records/data integrity | 0 | No conflict updates on immutable evidence rows; publication remains async. | WORM/Object Lock provider remains adapter roadmap. |
 | Product benchmark | 0 | Backend hooks for effectivity, amendment, publication monitor, evidence graph, genealogy filters. | Full cockpit UX and durable export bundles remain P2 roadmap. |
 
@@ -48,7 +56,7 @@ This register records the implementation-oriented closure pass for ERP + MOM + M
 | `POST /api/v1/eqms/documents/read-acknowledgements` | Record read-and-understand acknowledgement. | Auth + CSRF; writes canonical `doc_read_acknowledgements`; closes matching distributions. |
 | `POST /api/v1/eqms/documents/revisions/supersede` | Supersede released/approved document revision. | Auth + CSRF; requires `source_change_order_id`; updates revision/distribution state. |
 | `POST /api/v1/eqms/evidence/amendments` | Create amendment draft without editing final evidence. | Evidence finalization roles + CSRF; requires released change authority, field paths, effectivity. |
-| `POST /api/v1/eqms/publications/actions` | Retry/withdraw/supersede publication asynchronously. | Publication state-machine guard; withdrawal/supersession require released change. |
+| `POST /api/v1/eqms/publications/actions` | Retry/withdraw/supersede publication asynchronously. | Publication state-machine guard; withdrawal/supersession require released change and worker-side attempt/receipt/state trail. |
 | `GET /api/v1/eqms/genealogy/as-manufactured` | Retrieve projected graph/snapshot for expanded digital-thread subject types. | Reads canonical graph/snapshot tables. |
 
 ## Migration Plan
@@ -62,23 +70,31 @@ This register records the implementation-oriented closure pass for ERP + MOM + M
 | Worker/job | Status | Contract |
 | --- | --- | --- |
 | `CanonicalOutboxWorker` | Existing | Dispatches handler-key based jobs from `outbox_events`. |
-| `publication.retry`, `publication.withdraw`, `publication.supersede` | Strengthened | Queue only after publication state-machine validation. SharePoint remains read-only publication target. |
+| `publication.retry`, `publication.withdraw`, `publication.supersede` | Strengthened | Queue only after publication state-machine validation; `PublicationMonitorService::processQueuedAction()` writes publication attempts, receipts, and final state. SharePoint remains read-only publication target. |
 | Audit pack export | Existing manifest builder; durable bundle P2 | Must eventually persist retrievable audit-pack bundle and export receipt. |
 | Periodic evaluation | Existing | Used to schedule and close evaluation rows with digest/audit-pack evidence. |
 
 ## Validation Evidence
 
-Focused validation run in this branch:
+Focused and full validation run in this branch:
 
 - `php -l` on touched services/controllers: passed.
-- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php --testdox`: passed, 36 tests / 233 assertions.
+- `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php tests/Unit/Services/ManufacturingEventBackboneServiceTest.php --testdox`: passed, 46 tests / 300 assertions.
 - `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/ManufacturingEventBackboneServiceTest.php tests/Unit/Services/MobileWorkQueueServiceTest.php --testdox`: passed, 18 tests / 92 assertions.
 - `APP_ENV=test DB_PASSWORD=test_password vendor/bin/phpunit tests/Unit/Services/GenericCrudServiceEventBusTest.php tests/Unit/Services/CanonicalManufacturingSpineServiceTest.php tests/Unit/Controllers/HealthControllerRuntimeAuthorityTest.php tests/Unit/Services/RuntimeAuthorityServiceTest.php --testdox`: passed, 11 tests / 248 assertions.
 - `php tools/release/check_repo_boundary.php`: P0/P1 clean; 33 P2 warnings remain.
 - `php tools/release/check_workflow_status_authority.php`: clean.
 - `./composer analyse -- --memory-limit=1G`: passed; PHPStan 217 files with no errors.
-- `./composer test`: passed; PHPUnit 392 tests / 2261 assertions, 1 skipped.
-- `./composer check`: passed; PHPStan 217 files with no errors, PHPUnit 392 tests / 2261 assertions, 1 skipped.
+- `./composer test`: passed; PHPUnit 396 tests / 2283 assertions, 1 skipped.
+- `./composer check`: passed; PHPStan 217 files with no errors, PHPUnit 396 tests / 2283 assertions, 1 skipped.
+
+## Closure Loop Result
+
+| Pass | Result | Closure action |
+| --- | --- | --- |
+| First six-agent audit | P0 = 0, multiple P1 | Implemented repo hygiene, EQMS document/form/evidence controls, publication state guard, 5M genealogy filters, immutable package retry safety. |
+| Second six-agent audit | P0 = 0, non-waived P1 remained | Closed server-authoritative issuance/submission, publication worker trail, finalization transaction/collision proof, migration-122 readiness probe, generated registry source spill. |
+| Final validation | P0 = 0, non-waived P1 = 0 | `composer check` green; boundary P0/P1 clean; only P2 waivers/roadmap remain. |
 
 ## Accepted Waivers
 
