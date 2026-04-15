@@ -1,0 +1,96 @@
+{
+    "_meta": {
+        "domain": "analytics",
+        "table_count": 5,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "inventory_balance_snapshot": {
+            "defined_in": "077_canonical_inventory_cost_traceability.sql",
+            "extended_in": [
+                "090_canonical_projection_lineage_hardening.sql"
+            ],
+            "primary_key": "inventory_balance_snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "item_site_id",
+                    "ref": "item_site(item_site_id)"
+                },
+                {
+                    "col": "warehouse_id",
+                    "ref": "org_warehouse(warehouse_id)"
+                },
+                {
+                    "col": "lot_id",
+                    "ref": "lot(lot_id)"
+                },
+                {
+                    "col": "serial_id",
+                    "ref": "serial(serial_id)"
+                }
+            ],
+            "contract": "analytics.inventory-balance-snapshots"
+        },
+        "mes_oee_snapshots": {
+            "defined_in": "025_mes_tables.sql",
+            "extended_in": [
+                "090_canonical_projection_lineage_hardening.sql"
+            ],
+            "primary_key": "snapshot_id",
+            "foreign_keys": [],
+            "contract": "analytics.mes-oee-snapshots"
+        },
+        "plant_performance_snapshots": {
+            "defined_in": "089_canonical_analytics_plant_performance_snapshots.sql",
+            "extended_in": [],
+            "primary_key": "plant_performance_snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "org_site_id",
+                    "ref": "org_site(site_id)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plant(plant_id)"
+                }
+            ],
+            "contract": "analytics.plant-performance-snapshots"
+        },
+        "production_order_bom_snapshot": {
+            "defined_in": "075_canonical_planning_erp_orchestration.sql",
+            "extended_in": [
+                "090_canonical_projection_lineage_hardening.sql"
+            ],
+            "primary_key": "production_order_bom_snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "production_order_id",
+                    "ref": "production_order(production_order_id)"
+                },
+                {
+                    "col": "bom_version_id",
+                    "ref": "bom_version(bom_version_id)"
+                }
+            ],
+            "contract": "analytics.production-bom-snapshots"
+        },
+        "production_order_route_snapshot": {
+            "defined_in": "075_canonical_planning_erp_orchestration.sql",
+            "extended_in": [
+                "090_canonical_projection_lineage_hardening.sql"
+            ],
+            "primary_key": "production_order_route_snapshot_id",
+            "foreign_keys": [
+                {
+                    "col": "production_order_id",
+                    "ref": "production_order(production_order_id)"
+                },
+                {
+                    "col": "work_definition_version_id",
+                    "ref": "work_definition_version(work_definition_version_id)"
+                }
+            ],
+            "contract": "analytics.production-route-snapshots"
+        }
+    }
+}

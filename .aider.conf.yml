@@ -1,0 +1,15 @@
+# Aider Configuration — HESEM MOM ERP
+
+# Always read context files before making changes
+read:
+  - .ai/repo-map.json
+  - CLAUDE.md
+  - AGENTS.md
+
+# Auto-read conventions when working
+auto_commits: false
+
+# Default model guidance embedded as a note:
+# IMPORTANT — read .ai/CONVENTIONS.md before creating any file.
+# NEVER place files at root. Use .ai/db-map/index.json to find tables.
+# PHP: declare(strict_types=1), final class, PSR-4, no framework.

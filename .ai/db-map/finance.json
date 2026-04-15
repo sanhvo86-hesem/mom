@@ -1,0 +1,85 @@
+{
+    "_meta": {
+        "domain": "finance",
+        "table_count": 3,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "ap_invoice_lines": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "ap_invoice_line_id",
+            "foreign_keys": [
+                {
+                    "col": "ap_invoice_id",
+                    "ref": "ap_invoices(ap_invoice_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "purchase_receipt_line_id",
+                    "ref": "purchase_receipt_lines(purchase_receipt_line_id)"
+                }
+            ],
+            "contract": "finance.ap-invoices"
+        },
+        "ap_invoices": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "ap_invoice_id",
+            "foreign_keys": [
+                {
+                    "col": "vendor_id",
+                    "ref": "vendors(vendor_id)"
+                },
+                {
+                    "col": "po_id",
+                    "ref": "purchase_orders(po_id)"
+                },
+                {
+                    "col": "purchase_receipt_id",
+                    "ref": "purchase_receipts(purchase_receipt_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "finance.ap-invoices"
+        },
+        "inventory_valuations": {
+            "defined_in": "088_canonical_finance_inventory_valuations.sql",
+            "extended_in": [],
+            "primary_key": "inventory_valuation_id",
+            "foreign_keys": [
+                {
+                    "col": "inventory_item_id",
+                    "ref": "item(item_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "org_site(site_id)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plant(plant_id)"
+                }
+            ],
+            "contract": "finance.inventory-valuations"
+        }
+    }
+}

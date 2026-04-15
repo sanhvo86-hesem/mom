@@ -1,0 +1,304 @@
+{
+    "_meta": {
+        "domain": "quality_improvement",
+        "table_count": 15,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "apqp_gate_reviews": {
+            "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "gate_id",
+            "foreign_keys": [
+                {
+                    "col": "apqp_id",
+                    "ref": "apqp_projects(apqp_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.control-plans"
+        },
+        "audit_findings": {
+            "defined_in": "014_audit_risk.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "finding_id",
+            "foreign_keys": [
+                {
+                    "col": "audit_id",
+                    "ref": "audits(audit_id)"
+                }
+            ],
+            "contract": "quality_improvement.audit-programs"
+        },
+        "calibration_grr_studies": {
+            "defined_in": "069_lean_manufacturing_world_class.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "grr_id",
+            "foreign_keys": [
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "performed_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "master_data.measuring-devices"
+        },
+        "capa_records": {
+            "defined_in": "011_quality.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "capa_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "source_ncr_id",
+                    "ref": "ncr_records(ncr_number)"
+                },
+                {
+                    "col": "action_owner",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.corrective-actions"
+        },
+        "concessions": {
+            "defined_in": "034_exception_management.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "concession_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                },
+                {
+                    "col": "internal_approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.concessions"
+        },
+        "control_plan_characteristics": {
+            "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "characteristic_id",
+            "foreign_keys": [
+                {
+                    "col": "control_plan_id",
+                    "ref": "control_plans(control_plan_id)"
+                },
+                {
+                    "col": "linked_failure_mode_id",
+                    "ref": "fmea_failure_modes(failure_mode_id)"
+                },
+                {
+                    "col": "linked_inspection_plan_id",
+                    "ref": "inspection_plans(plan_id)"
+                }
+            ],
+            "contract": "quality_improvement.control-plans"
+        },
+        "control_plans": {
+            "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "control_plan_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "linked_fmea_id",
+                    "ref": "fmea_records(fmea_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.control-plans"
+        },
+        "deviations": {
+            "defined_in": "034_exception_management.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "deviation_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "requested_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.deviations"
+        },
+        "electronic_signature": {
+            "defined_in": "072_canonical_foundation_governance.sql",
+            "extended_in": [
+                "091_runtime_governance_continuity.sql"
+            ],
+            "primary_key": "electronic_signature_id",
+            "foreign_keys": [
+                {
+                    "col": "signed_by_party_id",
+                    "ref": "party(party_id)"
+                }
+            ],
+            "contract": "finance.backdate-exceptions"
+        },
+        "fmea_records": {
+            "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "fmea_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "team_lead",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.control-plans"
+        },
+        "improvement_projects": {
+            "defined_in": "014_audit_risk.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "improvement_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                }
+            ],
+            "contract": "quality_improvement.improvement-actions"
+        },
+        "ncr_records": {
+            "defined_in": "011_quality.sql",
+            "extended_in": [
+                "042_fmea_apqp_control_plan_mobile.sql",
+                "042_fmea_apqp_control_plan_mobile.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "ncr_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                }
+            ],
+            "contract": "quality_improvement.nonconformances"
+        },
+        "oqc_inspections": {
+            "defined_in": "045_oqc_packing_outsource.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "oqc_id",
+            "foreign_keys": [
+                {
+                    "col": "inspector_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.fqc-inspections"
+        },
+        "qual_audit_programs": {
+            "defined_in": "061_quality_lab_compliance.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "qual_audit_program_id",
+            "foreign_keys": [
+                {
+                    "col": "owner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "quality_improvement.audit-programs"
+        },
+        "spc_data": {
+            "defined_in": "011_quality.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "spc_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "quality_improvement.spc-observations"
+        }
+    }
+}

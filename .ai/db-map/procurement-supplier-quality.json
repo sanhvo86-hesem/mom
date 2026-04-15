@@ -1,0 +1,342 @@
+{
+    "_meta": {
+        "domain": "procurement_supplier_quality",
+        "table_count": 12,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "incoming_inspection_results": {
+            "defined_in": "035_supplier_quality_management.sql",
+            "extended_in": [],
+            "primary_key": "result_id",
+            "foreign_keys": [
+                {
+                    "col": "inspection_id",
+                    "ref": "incoming_inspections(inspection_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.iqc-inspections"
+        },
+        "incoming_inspections": {
+            "defined_in": "035_supplier_quality_management.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "inspection_id",
+            "foreign_keys": [
+                {
+                    "col": "vendor_id",
+                    "ref": "vendors(vendor_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "inspector_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "inspection_plan_id",
+                    "ref": "inspection_plans(plan_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.iqc-inspections"
+        },
+        "purchase_order_line": {
+            "defined_in": "075_canonical_planning_erp_orchestration.sql",
+            "extended_in": [
+                "091_runtime_governance_continuity.sql"
+            ],
+            "primary_key": "purchase_order_line_id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_order_id",
+                    "ref": "purchase_order(purchase_order_id)"
+                },
+                {
+                    "col": "item_revision_id",
+                    "ref": "item_revision(item_revision_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.supplier-purchase-orders"
+        },
+        "purchase_order_lines": {
+            "defined_in": "008_vendors_purchasing.sql",
+            "extended_in": [
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "po_line_id",
+            "foreign_keys": [
+                {
+                    "col": "po_id",
+                    "ref": "purchase_orders(po_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.supplier-purchase-orders"
+        },
+        "purchase_receipt_correction_lines": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_receipt_correction_line_id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_receipt_correction_id",
+                    "ref": "purchase_receipt_corrections(purchase_receipt_correction_id)"
+                },
+                {
+                    "col": "purchase_receipt_line_id",
+                    "ref": "purchase_receipt_lines(purchase_receipt_line_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-receipt-corrections"
+        },
+        "purchase_receipt_corrections": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_receipt_correction_id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_receipt_id",
+                    "ref": "purchase_receipts(purchase_receipt_id)"
+                },
+                {
+                    "col": "ap_invoice_id",
+                    "ref": "ap_invoices(ap_invoice_id)"
+                },
+                {
+                    "col": "requested_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "posted_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-receipt-corrections"
+        },
+        "purchase_receipt_lines": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_receipt_line_id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_receipt_id",
+                    "ref": "purchase_receipts(purchase_receipt_id)"
+                },
+                {
+                    "col": "po_line_id",
+                    "ref": "purchase_order_lines(po_line_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "location_id",
+                    "ref": "inventory_locations(location_id)"
+                },
+                {
+                    "col": "lot_number",
+                    "ref": "lot_master(lot_number)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-receipts"
+        },
+        "purchase_receipts": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_receipt_id",
+            "foreign_keys": [
+                {
+                    "col": "po_id",
+                    "ref": "purchase_orders(po_id)"
+                },
+                {
+                    "col": "supplier_asn_id",
+                    "ref": "supplier_asns(supplier_asn_id)"
+                },
+                {
+                    "col": "vendor_id",
+                    "ref": "vendors(vendor_id)"
+                },
+                {
+                    "col": "warehouse_id",
+                    "ref": "warehouses(warehouse_id)"
+                },
+                {
+                    "col": "received_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "reversed_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-receipts"
+        },
+        "purchase_requisition_lines": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_requisition_line_id",
+            "foreign_keys": [
+                {
+                    "col": "purchase_requisition_id",
+                    "ref": "purchase_requisitions(purchase_requisition_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "preferred_supplier_id",
+                    "ref": "vendors(vendor_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-requisitions"
+        },
+        "purchase_requisitions": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "purchase_requisition_id",
+            "foreign_keys": [
+                {
+                    "col": "vendor_id",
+                    "ref": "vendors(vendor_id)"
+                },
+                {
+                    "col": "job_order_id",
+                    "ref": "job_orders(job_order_id)"
+                },
+                {
+                    "col": "requested_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "sourcing_owner_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.purchase-requisitions"
+        },
+        "supplier_asn_lines": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "supplier_asn_line_id",
+            "foreign_keys": [
+                {
+                    "col": "supplier_asn_id",
+                    "ref": "supplier_asns(supplier_asn_id)"
+                },
+                {
+                    "col": "po_line_id",
+                    "ref": "purchase_order_lines(po_line_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.supplier-asns"
+        },
+        "supplier_asns": {
+            "defined_in": "083_procurement_recovery_chain.sql",
+            "extended_in": [],
+            "primary_key": "supplier_asn_id",
+            "foreign_keys": [
+                {
+                    "col": "po_id",
+                    "ref": "purchase_orders(po_id)"
+                },
+                {
+                    "col": "vendor_id",
+                    "ref": "vendors(vendor_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "procurement_supplier_quality.supplier-asns"
+        }
+    }
+}

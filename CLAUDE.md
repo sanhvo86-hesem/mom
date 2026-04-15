@@ -1,22 +1,40 @@
 # HESEM MOM ERP — Claude Code Guide
 
+## File Placement Rules
+
+**Before creating any file, read `.ai/CONVENTIONS.md`.**
+It defines exactly where every type of file belongs. NEVER place files at the repo root.
+
 ## AI Context Loading Protocol
 
-**ALWAYS read these index files FIRST before opening any source file.**
-This repository has 45+ controllers, 120+ services, 97 SQL migrations, and 55+ contract objects.
+**ALWAYS read the index files FIRST before opening any source file.**
+This repository has 54 controllers, 122 services, 137 SQL migrations, and 67 contract objects.
 The `.ai/` directory is a pre-built knowledge index that lets you find the right file in seconds.
 
 ### Step-by-step context loading
 
 1. **`.ai/repo-map.json`** — Start here. Project topology, namespace map, infra services, file counts.
 2. **`.ai/route-map.json`** — Find which controller + method handles a given route or action key.
-3. **`.ai/db-map.json`** — Find which migration defines a table, its primary key, foreign keys.
+3. **`.ai/db-map/index.json`** — Grep for table name to find its domain. Then read `.ai/db-map/<domain>.json` for full details. Do NOT read the full `.ai/db-map.json` (280K) unless you need cross-domain analysis.
 4. **`.ai/contracts-map.json`** — Find which domain owns a resource and which table stores it.
-5. **`.ai/symbols.json`** — Find which file contains a class or method by name.
+5. **`.ai/symbols.json`** — Grep for a class or method name to find its file path. Do NOT read the full file.
 6. **`.ai/module-summaries/<domain>.md`** — Business rules, gotchas, entry points for that domain.
 
 **Only AFTER reading the index, open the minimal set of source files needed.**
 Do NOT scan unrelated files. Do NOT read entire directories.
+
+### Token-efficient lookup patterns
+
+```
+# Find which domain owns a table:
+Grep "table_name" in .ai/db-map/index.json → get domain → Read .ai/db-map/<domain>.json
+
+# Find which file contains a class:
+Grep "ClassName" in .ai/symbols.json → get file path → Read that file
+
+# Find which controller handles a route:
+Grep "action_key" in .ai/route-map.json → get controller + method
+```
 
 ### Domains
 
@@ -39,7 +57,7 @@ Do NOT scan unrelated files. Do NOT read entire directories.
 
 - Which module/domain is affected
 - Which endpoint(s) are involved (`route-map.json`)
-- Which table(s) are read/written (`db-map.json`)
+- Which table(s) are read/written (`db-map/<domain>.json`)
 - Regression surface (what else might break)
 
 ---

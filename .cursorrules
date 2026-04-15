@@ -1,0 +1,36 @@
+# Cursor Rules — HESEM MOM ERP
+
+## CRITICAL: File Placement
+Before creating any file, read `.ai/CONVENTIONS.md`.
+NEVER place files at the repo root (exceptions: CLAUDE.md, AGENTS.md, index.html, index.php, robots.txt, favicon.ico, dotfiles).
+
+## Project Navigation
+- Read `.ai/repo-map.json` first for project orientation
+- Find a table's domain: Grep `.ai/db-map/index.json`, then read `.ai/db-map/<domain>.json`
+- Find a class/method: Grep `.ai/symbols.json` (do NOT read the full file)
+- Domain business rules: `.ai/module-summaries/<domain>.md`
+- Full protocol: `CLAUDE.md`
+
+## Stack
+- PHP 8.2+, PostgreSQL, Redis, RabbitMQ — no framework
+- Entry: `mom/api/index.php`, autoload: `mom/composer.json` (PSR-4)
+- Namespaces: `MOM\Api\Controllers\`, `MOM\Api\Services\`, `MOM\Database\`
+- Data layer: JSON_ONLY → SHADOW_WRITE → POSTGRES_PRIMARY → POSTGRES_ONLY
+
+## Code Rules
+- `declare(strict_types=1)` on every PHP file
+- `final class` for all services and controllers
+- Always provide fallbacks: try infrastructure → catch Throwable → file fallback → log
+- No framework rewrites. No microservices without scaling justification.
+- Production write paths: role-guarded, auditable, least-privilege
+
+## Where files go (quick reference)
+- AI prompt docs → `mom/docs/ai-prompts/`
+- Architecture specs → `docs/architecture/`
+- Security audits → `docs/audits/`
+- QMS standards → `standards/`
+- Build scripts → `tools/scripts/<category>/`
+- Generated reports → `_reports/<category>/`
+- PHP controllers → `mom/api/controllers/`
+- PHP services → `mom/api/services/`
+- SQL migrations → `mom/database/migrations/`

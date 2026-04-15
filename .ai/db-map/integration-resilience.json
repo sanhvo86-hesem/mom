@@ -1,0 +1,19 @@
+{
+    "_meta": {
+        "domain": "integration_resilience",
+        "table_count": 1,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "mes_erp_reconciliation_exceptions": {
+            "defined_in": "028_epicor_mes_integration_foundations.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "093_runtime_observed_contract_columns.sql"
+            ],
+            "primary_key": "reconciliation_id",
+            "foreign_keys": [],
+            "contract": "integration_resilience.reconciliation-exceptions"
+        }
+    }
+}

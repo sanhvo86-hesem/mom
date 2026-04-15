@@ -1,0 +1,215 @@
+{
+    "_meta": {
+        "domain": "inventory_logistics",
+        "table_count": 9,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "freight_order_stops": {
+            "defined_in": "086_canonical_transportation_freight_orders.sql",
+            "extended_in": [],
+            "primary_key": "freight_order_stop_id",
+            "foreign_keys": [
+                {
+                    "col": "freight_order_id",
+                    "ref": "freight_orders(freight_order_id)"
+                }
+            ],
+            "contract": "inventory_logistics.freight-orders"
+        },
+        "freight_orders": {
+            "defined_in": "086_canonical_transportation_freight_orders.sql",
+            "extended_in": [],
+            "primary_key": "freight_order_id",
+            "foreign_keys": [
+                {
+                    "col": "shipment_id",
+                    "ref": "shipments(shipment_id)"
+                },
+                {
+                    "col": "tms_shipment_id",
+                    "ref": "tms_shipments(tms_shipment_id)"
+                },
+                {
+                    "col": "carrier_party_id",
+                    "ref": "party(party_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "inventory_logistics.freight-orders"
+        },
+        "rma_orders": {
+            "defined_in": "017_subcontracting_rma.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "rma_id",
+            "foreign_keys": [
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "inventory_logistics.customer-returns"
+        },
+        "shipment_packages": {
+            "defined_in": "016_shipping_compliance.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "package_id",
+            "foreign_keys": [
+                {
+                    "col": "shipment_id",
+                    "ref": "shipments(shipment_id)"
+                }
+            ],
+            "contract": "inventory_logistics.shipments"
+        },
+        "shipments": {
+            "defined_in": "016_shipping_compliance.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "shipment_id",
+            "foreign_keys": [
+                {
+                    "col": "ship_from_warehouse",
+                    "ref": "warehouses(warehouse_id)"
+                },
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                }
+            ],
+            "contract": "inventory_logistics.shipments"
+        },
+        "stock_balances": {
+            "defined_in": "084_execution_quality_projection.sql",
+            "extended_in": [],
+            "primary_key": "stock_balance_id",
+            "foreign_keys": [
+                {
+                    "col": "inventory_item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "warehouse_id",
+                    "ref": "warehouses(warehouse_id)"
+                },
+                {
+                    "col": "location_id",
+                    "ref": "inventory_locations(location_id)"
+                },
+                {
+                    "col": "lot_number",
+                    "ref": "lot_master(lot_number)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "inventory_logistics.stock-balances"
+        },
+        "warehouses": {
+            "defined_in": "009_inventory.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "warehouse_id",
+            "foreign_keys": [],
+            "contract": "inventory_logistics.warehouses"
+        },
+        "wms_cycle_count_plans": {
+            "defined_in": "050_wms_extended_warehouse.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "wms_cycle_count_plan_id",
+            "foreign_keys": [
+                {
+                    "col": "warehouse_id",
+                    "ref": "warehouses(warehouse_id)"
+                },
+                {
+                    "col": "wms_zone_id",
+                    "ref": "wms_zones(wms_zone_id)"
+                },
+                {
+                    "col": "owner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "inventory_logistics.cycle-count-plans"
+        },
+        "wms_cycle_count_results": {
+            "defined_in": "050_wms_extended_warehouse.sql",
+            "extended_in": [],
+            "primary_key": "wms_cycle_count_result_id",
+            "foreign_keys": [
+                {
+                    "col": "wms_cycle_count_plan_id",
+                    "ref": "wms_cycle_count_plans(wms_cycle_count_plan_id)"
+                },
+                {
+                    "col": "wms_storage_bin_id",
+                    "ref": "wms_storage_bins(wms_storage_bin_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "adjuster_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "inventory_logistics.cycle-count-plans"
+        }
+    }
+}

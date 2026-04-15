@@ -646,7 +646,6 @@ $dbMap = [
                 'primary_key'     => $info['primary_key'],
                 'foreign_keys'    => $info['foreign_keys'],
                 'contract'        => $ownerContract,
-                'related_services'=> array_values(array_unique($tableToServices[$tableName] ?? [])),
             ];
         }
         ksort($out);
@@ -654,8 +653,54 @@ $dbMap = [
     })(),
 ];
 
-file_put_contents($AI_DIR . '/db-map.json', json_encode($dbMap, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-vout("db-map.json", $verbose);
+// Write compact full db-map (no pretty-print to save ~70% size)
+file_put_contents($AI_DIR . '/db-map.json', json_encode($dbMap, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+vout("db-map.json (compact)", $verbose);
+
+// Write domain-split db-map files for targeted loading
+$dbMapDomainDir = $AI_DIR . '/db-map';
+if (!is_dir($dbMapDomainDir)) mkdir($dbMapDomainDir, 0755, true);
+
+// Build table → domain lookup from contracts
+$tableToDomain = [];
+foreach ($contracts as $c) {
+    $d = $c['domain'];
+    if ($c['primary_table']) $tableToDomain[$c['primary_table']] = $d;
+    foreach ($c['child_tables'] as $ct) $tableToDomain[$ct] = $d;
+}
+// Fallback: infer domain from migration file name patterns
+foreach ($tableIndex as $tName => $tInfo) {
+    if (isset($tableToDomain[$tName])) continue;
+    $tableToDomain[$tName] = 'unclassified';
+}
+
+$tablesByDomain = [];
+$domainIndex = [];   // table_name => domain (lightweight index)
+foreach ($dbMap['tables'] as $tName => $tData) {
+    $d = $tableToDomain[$tName] ?? 'unclassified';
+    $tablesByDomain[$d][$tName] = $tData;
+    $domainIndex[$tName] = $d;
+}
+
+foreach ($tablesByDomain as $domain => $tables) {
+    $domainFile = $dbMapDomainDir . '/' . str_replace('_', '-', $domain) . '.json';
+    file_put_contents($domainFile, json_encode([
+        '_meta' => ['domain' => $domain, 'table_count' => count($tables), 'generated_at' => date(DATE_ATOM)],
+        'tables' => $tables,
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    vout("db-map/$domain.json (" . count($tables) . " tables)", $verbose);
+}
+
+// Write lightweight domain index
+file_put_contents($dbMapDomainDir . '/index.json', json_encode([
+    '_meta' => [
+        'description' => 'Table → domain lookup. Use this to find which domain file to load.',
+        'usage' => 'Grep table name here, then read .ai/db-map/<domain>.json for full details.',
+        'generated_at' => date(DATE_ATOM),
+    ],
+    'table_domain_map' => $domainIndex,
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+vout("db-map/index.json", $verbose);
 
 // 6d. symbols.json
 $symbolsMap = [
@@ -667,7 +712,7 @@ $symbolsMap = [
     'symbols' => $allSymbols,
 ];
 
-file_put_contents($AI_DIR . '/symbols.json', json_encode($symbolsMap, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+file_put_contents($AI_DIR . '/symbols.json', json_encode($symbolsMap, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 vout("symbols.json", $verbose);
 
 // 6e. contracts-map.json
@@ -678,7 +723,6 @@ $contractsMap = [
         'contracts_dir'=> 'mom/contracts/objects/',
         'usage'        => 'Find which domain owns a resource and which table stores it. Use primary_table for SQL queries.',
     ],
-    'by_domain'    => $contractsByDomain,
     'all_contracts'=> $contracts,
 ];
 
@@ -780,7 +824,8 @@ out(str_repeat('─', 60));
 out("Done. Index written to .ai/");
 out("  repo-map.json     — " . count($parsedByType['controllers']) . " controllers, " . count($parsedByType['services']) . " services");
 out("  route-map.json    — " . count($enrichedActions) . " action routes, " . count($enrichedRest) . " REST routes");
-out("  db-map.json       — " . count($tableIndex) . " tables from " . count($parsedMigrations) . " migrations");
+out("  db-map.json       — " . count($tableIndex) . " tables from " . count($parsedMigrations) . " migrations (compact)");
+out("  db-map/           — " . count($tablesByDomain) . " domain files + index.json");
 out("  symbols.json      — " . count($allSymbols) . " PHP classes indexed");
 out("  contracts-map.json— " . count($contracts) . " contracts across " . count($contractsByDomain) . " domains");
 out("  module-summaries/ — " . count($domains) . " domain files");

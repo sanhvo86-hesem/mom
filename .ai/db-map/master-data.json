@@ -1,0 +1,169 @@
+{
+    "_meta": {
+        "domain": "master_data",
+        "table_count": 8,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "calibration_oot_investigations": {
+            "defined_in": "069_lean_manufacturing_world_class.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "oot_id",
+            "foreign_keys": [
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "linked_ncr_id",
+                    "ref": "ncr_records(ncr_id)"
+                },
+                {
+                    "col": "investigator_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "master_data.measuring-devices"
+        },
+        "calibration_records": {
+            "defined_in": "012_calibration_equipment.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "cal_id",
+            "foreign_keys": [
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "performed_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "master_data.measuring-devices"
+        },
+        "customers": {
+            "defined_in": "007_customers_sales.sql",
+            "extended_in": [
+                "032_order_management_world_class_foundations.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "customer_id",
+            "foreign_keys": [],
+            "contract": "master_data.customers"
+        },
+        "employees": {
+            "defined_in": "013_training_hr.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "employee_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "dept_code",
+                    "ref": "departments(dept_code)"
+                }
+            ],
+            "contract": "master_data.employees"
+        },
+        "equipment": {
+            "defined_in": "012_calibration_equipment.sql",
+            "extended_in": [
+                "025_mes_tables.sql",
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "equipment_id",
+            "foreign_keys": [
+                {
+                    "col": "department_id",
+                    "ref": "departments(dept_code)"
+                }
+            ],
+            "contract": "master_data.equipment"
+        },
+        "qual_compliance_obligations": {
+            "defined_in": "061_quality_lab_compliance.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql"
+            ],
+            "primary_key": "qual_compliance_obligation_id",
+            "foreign_keys": [
+                {
+                    "col": "owner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "master_data.compliance-obligations"
+        },
+        "tool_transactions": {
+            "defined_in": "012_calibration_equipment.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "txn_id",
+            "foreign_keys": [
+                {
+                    "col": "tool_id",
+                    "ref": "tools(tool_id)"
+                },
+                {
+                    "col": "performed_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "master_data.tools"
+        },
+        "tools": {
+            "defined_in": "012_calibration_equipment.sql",
+            "extended_in": [
+                "025_mes_tables.sql",
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "tool_id",
+            "foreign_keys": [
+                {
+                    "col": "tool_vendor_id",
+                    "ref": "vendors(vendor_id)"
+                }
+            ],
+            "contract": "master_data.measuring-devices"
+        }
+    }
+}

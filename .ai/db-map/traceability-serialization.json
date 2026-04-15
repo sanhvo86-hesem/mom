@@ -1,0 +1,66 @@
+{
+    "_meta": {
+        "domain": "traceability_serialization",
+        "table_count": 4,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "genealogy_link": {
+            "defined_in": "076_canonical_mes_execution_spine.sql",
+            "extended_in": [
+                "091_runtime_governance_continuity.sql"
+            ],
+            "primary_key": "genealogy_link_id",
+            "foreign_keys": [
+                {
+                    "col": "production_order_id",
+                    "ref": "production_order(production_order_id)"
+                }
+            ],
+            "contract": "traceability_serialization.lot-genealogy"
+        },
+        "mes_part_genealogy": {
+            "defined_in": "025_mes_tables.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "genealogy_id",
+            "foreign_keys": [],
+            "contract": "traceability_serialization.lot-genealogy"
+        },
+        "trace_genealogy_batches": {
+            "defined_in": "066_traceability_serialization.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "trace_genealogy_batch_id",
+            "foreign_keys": [
+                {
+                    "col": "job_number",
+                    "ref": "job_orders(job_number)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "lot_number",
+                    "ref": "lot_master(lot_number)"
+                }
+            ],
+            "contract": "traceability_serialization.lot-genealogy"
+        },
+        "trace_genealogy_links": {
+            "defined_in": "066_traceability_serialization.sql",
+            "extended_in": [],
+            "primary_key": "trace_genealogy_link_id",
+            "foreign_keys": [
+                {
+                    "col": "trace_genealogy_batch_id",
+                    "ref": "trace_genealogy_batches(trace_genealogy_batch_id)"
+                }
+            ],
+            "contract": "traceability_serialization.lot-genealogy"
+        }
+    }
+}

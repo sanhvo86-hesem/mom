@@ -1,0 +1,35 @@
+# Windsurf Rules — HESEM MOM ERP
+
+## File Placement (MANDATORY)
+Read `.ai/CONVENTIONS.md` before creating any file.
+NEVER place documentation, scripts, data files, or reports at the repo root.
+
+## Context Loading — Always do this first
+1. `.ai/repo-map.json` — project topology
+2. `.ai/db-map/index.json` — Grep for table → get domain → read `.ai/db-map/<domain>.json`
+3. `.ai/symbols.json` — Grep for class/method → get file path
+4. `.ai/module-summaries/<domain>.md` — business rules for that domain
+See `CLAUDE.md` for full protocol.
+
+## Tech Stack
+PHP 8.2+, PostgreSQL 16, Redis 7, RabbitMQ — custom MVC, no framework.
+54 controllers, 122 services, 137 migrations, 766 tables.
+
+## Non-negotiable Rules
+- `declare(strict_types=1)` + `final class` on all PHP files
+- Never rewrite to Laravel, Symfony, or any framework
+- Every infra call (Redis, RabbitMQ, S3, Loki) needs a file-based fallback
+- AI routes must return advisory proposals only — never mutate execution truth
+- Validate at system boundaries only (user input, external APIs)
+
+## File placement quick reference
+| Type | Location |
+|------|----------|
+| AI prompts | `mom/docs/ai-prompts/` |
+| Specs/architecture | `docs/architecture/` or `docs/backend/` |
+| Audits | `docs/audits/` |
+| Standards | `standards/` |
+| Scripts | `tools/scripts/<category>/` |
+| CI reports | `_reports/<category>/` |
+| PHP source | `mom/api/controllers/` or `mom/api/services/` |
+| SQL migrations | `mom/database/migrations/` |

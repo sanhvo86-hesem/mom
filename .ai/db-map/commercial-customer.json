@@ -1,0 +1,130 @@
+{
+    "_meta": {
+        "domain": "commercial_customer",
+        "table_count": 6,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "crm_customer_touchpoints": {
+            "defined_in": "053_crm_pipeline_management.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql"
+            ],
+            "primary_key": "crm_customer_touchpoint_id",
+            "foreign_keys": [
+                {
+                    "col": "crm_account_id",
+                    "ref": "crm_accounts(crm_account_id)"
+                },
+                {
+                    "col": "owner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "commercial_customer.customer-care-cases"
+        },
+        "qual_effectiveness_reviews": {
+            "defined_in": "061_quality_lab_compliance.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "qual_effectiveness_review_id",
+            "foreign_keys": [
+                {
+                    "col": "related_record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "reviewer_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "commercial_customer.quote-effectiveness-reviews"
+        },
+        "quote_lines": {
+            "defined_in": "036_quoting_estimation.sql",
+            "extended_in": [],
+            "primary_key": "line_id",
+            "foreign_keys": [
+                {
+                    "col": "quote_id",
+                    "ref": "quotes(quote_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "commercial_customer.quotations"
+        },
+        "quotes": {
+            "defined_in": "036_quoting_estimation.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "quote_id",
+            "foreign_keys": [
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                },
+                {
+                    "col": "prepared_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "reviewed_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "approved_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "commercial_customer.quotations"
+        },
+        "sales_order_lines": {
+            "defined_in": "007_customers_sales.sql",
+            "extended_in": [
+                "032_order_management_world_class_foundations.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "so_line_id",
+            "foreign_keys": [
+                {
+                    "col": "sales_order_id",
+                    "ref": "sales_orders(sales_order_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "commercial_customer.sales-orders"
+        },
+        "sales_orders": {
+            "defined_in": "007_customers_sales.sql",
+            "extended_in": [
+                "032_order_management_world_class_foundations.sql",
+                "033_order_management_extended.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "sales_order_id",
+            "foreign_keys": [
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                }
+            ],
+            "contract": "commercial_customer.sales-orders"
+        }
+    }
+}

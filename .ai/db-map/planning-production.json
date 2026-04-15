@@ -1,0 +1,233 @@
+{
+    "_meta": {
+        "domain": "planning_production",
+        "table_count": 10,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "aps_capacity_buckets": {
+            "defined_in": "047_advanced_planning_scheduling.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "aps_capacity_bucket_id",
+            "foreign_keys": [
+                {
+                    "col": "aps_scenario_id",
+                    "ref": "aps_planning_scenarios(aps_scenario_id)"
+                },
+                {
+                    "col": "work_center_id",
+                    "ref": "work_centers(work_center_id)"
+                }
+            ],
+            "contract": "planning_production.production-plans"
+        },
+        "aps_demand_forecasts": {
+            "defined_in": "047_advanced_planning_scheduling.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "aps_forecast_id",
+            "foreign_keys": [
+                {
+                    "col": "aps_scenario_id",
+                    "ref": "aps_planning_scenarios(aps_scenario_id)"
+                },
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "planner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "planning_production.production-plans"
+        },
+        "ipqc_inspection_results": {
+            "defined_in": "084_execution_quality_projection.sql",
+            "extended_in": [],
+            "primary_key": "ipqc_inspection_result_id",
+            "foreign_keys": [
+                {
+                    "col": "ipqc_inspection_id",
+                    "ref": "ipqc_inspections(ipqc_inspection_id)"
+                }
+            ],
+            "contract": "planning_production.ipqc-inspections"
+        },
+        "ipqc_inspections": {
+            "defined_in": "084_execution_quality_projection.sql",
+            "extended_in": [],
+            "primary_key": "ipqc_inspection_id",
+            "foreign_keys": [
+                {
+                    "col": "work_order_id",
+                    "ref": "work_orders(work_order_id)"
+                },
+                {
+                    "col": "job_op_id",
+                    "ref": "job_operations(job_op_id)"
+                },
+                {
+                    "col": "inspection_plan_id",
+                    "ref": "inspection_plans(plan_id)"
+                },
+                {
+                    "col": "lot_number",
+                    "ref": "lot_master(lot_number)"
+                },
+                {
+                    "col": "inspector_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "planning_production.ipqc-inspections"
+        },
+        "job_orders": {
+            "defined_in": "010_production.sql",
+            "extended_in": [
+                "032_order_management_world_class_foundations.sql",
+                "033_order_management_extended.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "job_order_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "customer_id",
+                    "ref": "customers(customer_id)"
+                }
+            ],
+            "contract": "planning_production.job-orders"
+        },
+        "mes_dispatch_queue": {
+            "defined_in": "025_mes_tables.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "queue_id",
+            "foreign_keys": [],
+            "contract": "planning_production.dispatch-lists"
+        },
+        "mrp_planned_orders": {
+            "defined_in": "018_projects_kpi.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "planned_order_id",
+            "foreign_keys": [
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                }
+            ],
+            "contract": "planning_production.production-plans"
+        },
+        "production_schedule": {
+            "defined_in": "010_production.sql",
+            "extended_in": [
+                "025_mes_tables.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "schedule_id",
+            "foreign_keys": [
+                {
+                    "col": "work_center_id",
+                    "ref": "work_centers(work_center_id)"
+                }
+            ],
+            "contract": "planning_production.production-plans"
+        },
+        "production_schedule_slots": {
+            "defined_in": "041_ai_predictive_quality_aps.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "slot_id",
+            "foreign_keys": [
+                {
+                    "col": "locked_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "planning_production.production-plans"
+        },
+        "work_orders": {
+            "defined_in": "084_execution_quality_projection.sql",
+            "extended_in": [],
+            "primary_key": "work_order_id",
+            "foreign_keys": [
+                {
+                    "col": "job_order_id",
+                    "ref": "job_orders(job_order_id)"
+                },
+                {
+                    "col": "job_op_id",
+                    "ref": "job_operations(job_op_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "warehouse_id",
+                    "ref": "warehouses(warehouse_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "planning_production.work-orders"
+        }
+    }
+}

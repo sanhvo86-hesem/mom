@@ -1,0 +1,63 @@
+{
+    "_meta": {
+        "domain": "mes_execution",
+        "table_count": 3,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "downtime_event": {
+            "defined_in": "076_canonical_mes_execution_spine.sql",
+            "extended_in": [],
+            "primary_key": "downtime_event_id",
+            "foreign_keys": [
+                {
+                    "col": "work_unit_id",
+                    "ref": "org_work_unit(work_unit_id)"
+                },
+                {
+                    "col": "production_order_id",
+                    "ref": "production_order(production_order_id)"
+                }
+            ],
+            "contract": "mes_execution.machine-alarms"
+        },
+        "maintenance_work_orders": {
+            "defined_in": "012_calibration_equipment.sql",
+            "extended_in": [
+                "025_mes_tables.sql",
+                "070_enterprise_governance_uplift.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "maint_wo_id",
+            "foreign_keys": [
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "requested_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "assigned_to",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "mes_execution.machine-alarms"
+        },
+        "mes_machine_alarms": {
+            "defined_in": "025_mes_tables.sql",
+            "extended_in": [
+                "027_mes_alarm_governance_alignment.sql",
+                "070_enterprise_governance_uplift.sql",
+                "093_runtime_observed_contract_columns.sql"
+            ],
+            "primary_key": "alarm_id, alarm_time",
+            "foreign_keys": [],
+            "contract": "mes_execution.machine-alarms"
+        }
+    }
+}

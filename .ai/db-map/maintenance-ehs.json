@@ -1,0 +1,199 @@
+{
+    "_meta": {
+        "domain": "maintenance_ehs",
+        "table_count": 9,
+        "generated_at": "2026-04-15T12:04:25+00:00"
+    },
+    "tables": {
+        "ehs_incidents": {
+            "defined_in": "011_quality.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql",
+                "085_operational_lifecycle_hardening.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql",
+                "113_audit_columns.sql"
+            ],
+            "primary_key": "incident_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "reported_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.incidents"
+        },
+        "ehs_permit_register": {
+            "defined_in": "062_ehs_sustainability_management.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "ehs_permit_id",
+            "foreign_keys": [],
+            "contract": "maintenance_ehs.permits"
+        },
+        "lean_5s_audits": {
+            "defined_in": "069_lean_manufacturing_world_class.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "audit_5s_id",
+            "foreign_keys": [
+                {
+                    "col": "record_id",
+                    "ref": "records(record_id)"
+                },
+                {
+                    "col": "auditor_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.five-s-audits"
+        },
+        "pm_maintenance_plans": {
+            "defined_in": "046_plant_maintenance_cmms.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "maintenance_plan_id",
+            "foreign_keys": [
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "planner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.maintenance-plans"
+        },
+        "pm_work_order_operations": {
+            "defined_in": "046_plant_maintenance_cmms.sql",
+            "extended_in": [],
+            "primary_key": "pm_work_order_operation_id",
+            "foreign_keys": [
+                {
+                    "col": "pm_work_order_id",
+                    "ref": "pm_work_orders(pm_work_order_id)"
+                },
+                {
+                    "col": "completed_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.maintenance-work-orders"
+        },
+        "pm_work_order_parts": {
+            "defined_in": "046_plant_maintenance_cmms.sql",
+            "extended_in": [],
+            "primary_key": "pm_work_order_part_id",
+            "foreign_keys": [
+                {
+                    "col": "pm_work_order_id",
+                    "ref": "pm_work_orders(pm_work_order_id)"
+                },
+                {
+                    "col": "item_id",
+                    "ref": "items(item_id)"
+                },
+                {
+                    "col": "lot_number",
+                    "ref": "lot_master(lot_number)"
+                },
+                {
+                    "col": "warehouse_id",
+                    "ref": "warehouses(warehouse_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.maintenance-work-orders"
+        },
+        "pm_work_orders": {
+            "defined_in": "046_plant_maintenance_cmms.sql",
+            "extended_in": [
+                "070_enterprise_governance_uplift.sql"
+            ],
+            "primary_key": "pm_work_order_id",
+            "foreign_keys": [
+                {
+                    "col": "legacy_maint_wo_id",
+                    "ref": "maintenance_work_orders(maint_wo_id)"
+                },
+                {
+                    "col": "equipment_id",
+                    "ref": "equipment(equipment_id)"
+                },
+                {
+                    "col": "maintenance_plan_id",
+                    "ref": "pm_maintenance_plans(maintenance_plan_id)"
+                },
+                {
+                    "col": "requested_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "assigned_to",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.maintenance-work-orders"
+        },
+        "safety_observation_actions": {
+            "defined_in": "087_canonical_ehs_safety_observations.sql",
+            "extended_in": [],
+            "primary_key": "safety_observation_action_id",
+            "foreign_keys": [
+                {
+                    "col": "safety_observation_id",
+                    "ref": "safety_observations(safety_observation_id)"
+                },
+                {
+                    "col": "action_owner_employee_id",
+                    "ref": "employees(employee_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.safety-observations"
+        },
+        "safety_observations": {
+            "defined_in": "087_canonical_ehs_safety_observations.sql",
+            "extended_in": [],
+            "primary_key": "safety_observation_id",
+            "foreign_keys": [
+                {
+                    "col": "employee_id",
+                    "ref": "employees(employee_id)"
+                },
+                {
+                    "col": "incident_id",
+                    "ref": "ehs_incidents(incident_id)"
+                },
+                {
+                    "col": "assigned_to_employee_id",
+                    "ref": "employees(employee_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
+                }
+            ],
+            "contract": "maintenance_ehs.safety-observations"
+        }
+    }
+}

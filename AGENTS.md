@@ -64,6 +64,20 @@ Run the maximum safe subset for every change:
 - CNC/digital-thread work: item revision, operation, setup sheet, CNC program, inspection plan, genealogy, MTConnect/OPC UA readiness.
 - AI/security/reliability work: AI advisory boundaries, projections, copilot grounding, OT/IT controls, audit, CSRF, replay safety, DevEx.
 
+## File Placement
+
+- **Read `.ai/CONVENTIONS.md` before creating any file.** It defines exactly where every type of file belongs.
+- NEVER place documentation, scripts, data files, or reports at the repo root.
+- Root directory is reserved for: `CLAUDE.md`, `AGENTS.md`, web entry files (`index.html`, `index.php`, `robots.txt`, `favicon.ico`), and dotfiles (`.editorconfig`, `.htaccess`, `.gitignore`).
+- When in doubt, check the directory map in `.ai/CONVENTIONS.md`.
+
+## AI Index Usage
+
+- Start every task by reading `.ai/repo-map.json` for orientation.
+- Use Grep on `.ai/db-map/index.json` to find a table's domain, then read `.ai/db-map/<domain>.json`.
+- Use Grep on `.ai/symbols.json` to find a class, do NOT read the full file.
+- After significant code changes, regenerate: `php tools/scripts/ai-index/generate.php --verbose`
+
 ## Change Discipline
 
 - Every future change must preserve ERP/MOM/MES/EQMS boundary discipline.
