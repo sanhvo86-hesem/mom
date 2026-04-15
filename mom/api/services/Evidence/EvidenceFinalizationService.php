@@ -6,6 +6,7 @@ namespace MOM\Services\Evidence;
 
 use MOM\Database\Connection;
 use MOM\Database\DataLayer;
+use MOM\Services\Publication\PublicationStateService;
 use RuntimeException;
 
 /**
@@ -272,6 +273,18 @@ final class EvidenceFinalizationService
         }
 
         $publicationState = is_array($package['manifest']['publication_state'] ?? null) ? $package['manifest']['publication_state'] : [];
+        $publicationValidation = (new PublicationStateService())->validatePublicationRecord([
+            'publication_state' => $this->text($publicationState['publication_state'] ?? $publicationState['state'] ?? 'pending') ?: 'pending',
+            'authority_role' => 'read_only_replica',
+            'direct_user_upload' => false,
+            'publication_receipt' => $publicationState['publication_receipt'] ?? [],
+            'target_uri' => $publicationState['target_uri'] ?? null,
+            'published_hash_sha256' => $publicationState['published_hash_sha256'] ?? $publicationState['target_hash_sha256'] ?? null,
+            'last_error_code' => $publicationState['last_error_code'] ?? null,
+        ]);
+        if (empty($publicationValidation['valid'])) {
+            throw new RuntimeException((string)($publicationValidation['errors'][0]['error_code'] ?? 'publication_state_invalid'));
+        }
         $publication = $db->queryOne(
             "WITH inserted AS (
                 INSERT INTO evidence_publications

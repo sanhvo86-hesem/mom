@@ -5433,7 +5433,7 @@ paths:
                 signature_action:
                   type: string
                   default: evidence_finalize
-                  enum: [evidence_finalize, document_release, document_read_acknowledgement, periodic_evaluation_waiver, change_order_release, verification_waiver]
+                  enum: [evidence_finalize, document_release, document_read_acknowledgement, form_submission_acceptance, periodic_evaluation_waiver, change_order_release, verification_waiver]
                 signed_payload_hash_sha256:
                   type: string
                   pattern: '^[a-f0-9]{64}$'
@@ -5700,7 +5700,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [scope_type, scope_ref]
+              required: [scope]
               additionalProperties: true
       responses:
         '200':
@@ -5824,7 +5824,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [scope_type, scope_ref]
+              required: [evidence_record_id]
               additionalProperties: true
       responses:
         '200':
@@ -5850,7 +5850,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [source_type, source_id, target_type, target_id, edge_type]
+              required: [edge_fact_type, from_object_type, from_object_id, to_object_type, to_object_id]
               additionalProperties: true
       responses:
         '201':

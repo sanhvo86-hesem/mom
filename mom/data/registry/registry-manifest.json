@@ -2,21 +2,21 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-14T17:51:32.935Z",
+    "generatedAt": "2026-04-15T03:40:59.553Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
-    "enterpriseAuthorityGeneratedAt": "2026-04-14T17:51:38.803565+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-14T17:51:38.952467+00:00"
+    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "enterpriseAuthorityGeneratedAt": "2026-04-15T03:47:29.144047+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-15T03:47:53.363239+00:00"
   },
   "coverage": {
     "router_actions": 4198,
     "field_registry_actions": 4191,
-    "field_definitions": 56209,
+    "field_definitions": 56211,
     "unique_field_keys": 5215,
     "status_sets": 877,
     "workflow_count": 336,
-    "relation_edges": 3462,
+    "relation_edges": 3463,
     "validation_rules": 48682,
     "formula_count": 1353,
     "domain_pack_count": 4613,
@@ -240,7 +240,7 @@
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3462
+      "records": 3463
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",

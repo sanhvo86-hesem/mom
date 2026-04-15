@@ -1,8 +1,8 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-04-14T17:51:39+00:00",
-        "authoritative_schema_source": "database/migrations/*.sql (001–132)",
+        "declared_at": "2026-04-15T03:51:11+00:00",
+        "authoritative_schema_source": "database/migrations/*.sql (001–133)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",
         "table_count": 761,
@@ -27,9 +27,9 @@
             "labor_txn_2026_h2",
             "labor_txn_default"
         ],
-        "migration_range": "001–132",
-        "migration_count": 134,
-        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–132",
+        "migration_range": "001–133",
+        "migration_count": 135,
+        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–133",
         "snapshot_role": "generated_aggregate — built by build_schema_snapshot.php from migrations, for quick reference only",
         "snapshot_generator": "database/build_schema_snapshot.php",
         "reference_sql_artifacts": [

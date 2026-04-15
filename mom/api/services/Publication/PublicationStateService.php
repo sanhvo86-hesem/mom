@@ -47,8 +47,11 @@ final class PublicationStateService
         }
 
         if ($state === 'published') {
-            foreach (['publication_receipt', 'target_uri', 'target_hash_sha256'] as $required) {
+            foreach (['publication_receipt', 'target_uri', 'published_hash_sha256'] as $required) {
                 $value = $publication[$required] ?? null;
+                if ($required === 'published_hash_sha256' && $value === null) {
+                    $value = $publication['target_hash_sha256'] ?? null;
+                }
                 if ($required === 'publication_receipt') {
                     if (!is_array($value) || $value === []) {
                         $errors[] = $this->error('publication_receipt_required', 'Published state requires a publication receipt.');

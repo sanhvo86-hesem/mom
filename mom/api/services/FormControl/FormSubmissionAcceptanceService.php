@@ -59,19 +59,34 @@ final class FormSubmissionAcceptanceService
             throw new RuntimeException('submission_attempt_validation_not_passed');
         }
 
+        $canonicalPayloadHash = $this->requiredSha256($validation['canonical_payload_hash_sha256'] ?? null, 'canonical_payload_hash_sha256');
+        $originalArtifactHash = $this->requiredSha256($validation['original_artifact_hash_sha256'] ?? null, 'original_artifact_hash_sha256');
         $signature = $this->db->queryOne(
-            "SELECT signature_event_id
-             FROM signature_events
-             WHERE signature_event_id = CAST(:signature_event_id AS uuid)
-               AND signature_state = 'applied'
-               AND signed_object_type IN ('frm_submission_attempt', 'form_submission_attempt')
-               AND signed_object_id = :attempt_id
-               AND lower(replace(signature_meaning, ' ', '_')) IN ('form_submission_acceptance', 'submission_acceptance')
-               AND NULLIF(trim(COALESCE(auth_challenge_id, '')), '') IS NOT NULL
+            "SELECT se.signature_event_id
+             FROM signature_events se
+             INNER JOIN e_signature_auth_challenges ac
+                ON ac.auth_challenge_id = se.auth_challenge_id
+             WHERE se.signature_event_id = CAST(:signature_event_id AS uuid)
+               AND se.signature_state = 'applied'
+               AND se.signed_object_type IN ('frm_submission_attempt', 'form_submission_attempt')
+               AND se.signed_object_id = :attempt_id
+               AND lower(replace(se.signature_meaning, ' ', '_')) = 'form_submission_acceptance'
+               AND se.signed_payload_hash_sha256 = :canonical_payload_hash_sha256
+               AND se.displayed_record_hash_sha256 = :original_artifact_hash_sha256
+               AND ac.challenge_state = 'consumed'
+               AND ac.consumed_at IS NOT NULL
+               AND ac.signature_action = 'form_submission_acceptance'
+               AND ac.signed_payload_hash_sha256 = :canonical_payload_hash_sha256
+               AND ac.displayed_record_hash_sha256 = :original_artifact_hash_sha256
+               AND (se.signer_ref IS NULL OR se.signer_ref = :actor_ref)
+               AND (ac.signer_ref IS NULL OR ac.signer_ref = :actor_ref)
              LIMIT 1",
             [
                 ':signature_event_id' => $signatureEventId,
                 ':attempt_id' => $attemptId,
+                ':actor_ref' => $actorRef,
+                ':canonical_payload_hash_sha256' => $canonicalPayloadHash,
+                ':original_artifact_hash_sha256' => $originalArtifactHash,
             ],
         );
         if (!is_array($signature) || trim((string)($signature['signature_event_id'] ?? '')) === '') {
@@ -142,6 +157,15 @@ final class FormSubmissionAcceptanceService
         $text = is_scalar($value) ? trim((string)$value) : '';
         if (preg_match('/^[a-f0-9-]{36}$/i', $text) !== 1) {
             throw new RuntimeException('uuid_required');
+        }
+        return $text;
+    }
+
+    private function requiredSha256(mixed $value, string $field): string
+    {
+        $text = is_scalar($value) ? strtolower(trim((string)$value)) : '';
+        if (preg_match('/^[a-f0-9]{64}$/', $text) !== 1) {
+            throw new RuntimeException($field . '_required');
         }
         return $text;
     }

@@ -2,8 +2,8 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
-    "generated_at": "2026-04-14T17:51:44.381Z",
+    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "generated_at": "2026-04-15T03:54:27.166Z",
     "schema_authority": "database/migrations -> schema.sql own storage truth; table-registry publishes logical runtime-contract tables, excluding physical partition children.",
     "schema_authority_counts": {
       "logical_contract_table_count": 761,
@@ -33,7 +33,7 @@
     },
     "openapi": {
       "version": "3.1.2",
-      "path_count": 164,
+      "path_count": 165,
       "foundation_governance_paths": 10
     },
     "publishability": {

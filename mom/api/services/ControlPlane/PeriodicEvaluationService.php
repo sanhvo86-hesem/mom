@@ -23,23 +23,31 @@ final class PeriodicEvaluationService
     /**
      * @return array<string, mixed>
      */
-    public function dashboard(int $limit = 100): array
+    public function dashboard(int $limit = 100, array $scope = []): array
     {
         $this->requireDb();
         $limit = max(1, min(500, $limit));
+        $orgId = $this->nullableText($scope['org_id'] ?? null);
+        $where = $orgId === null ? '' : "WHERE result_payload->>'org_id' = :org_id";
+        $params = $orgId === null ? [':limit' => $limit] : [':limit' => $limit, ':org_id' => $orgId];
+        $countWhere = $orgId === null ? '' : "WHERE result_payload->>'org_id' = :org_id";
+        $countParams = $orgId === null ? [] : [':org_id' => $orgId];
 
         $items = $this->db->query(
             "SELECT *
              FROM periodic_evaluations
+             {$where}
              ORDER BY due_at ASC, created_at DESC
              LIMIT :limit",
-            [':limit' => $limit],
+            $params,
         );
         $counts = $this->db->query(
             "SELECT evaluation_state, count(*) AS count
              FROM periodic_evaluations
+             {$countWhere}
              GROUP BY evaluation_state
              ORDER BY evaluation_state",
+            $countParams,
         );
 
         return ['counts' => $counts, 'items' => array_map([$this, 'decodeJsonColumns'], is_array($items) ? $items : [])];

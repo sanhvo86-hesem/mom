@@ -43,6 +43,10 @@ final class FormSubmissionAcceptanceServiceTest extends TestCase
         $this->assertSame('accepted', $row['attempt_state']);
         $this->assertSame('qa-1', $row['accepted_by_ref']);
         $this->assertTrue($db->sawAcceptanceUpdate);
+        $this->assertTrue($db->sawConsumedChallengeSignatureQuery);
+        $this->assertSame(str_repeat('a', 64), $db->signatureParams[':canonical_payload_hash_sha256'] ?? null);
+        $this->assertSame(str_repeat('b', 64), $db->signatureParams[':original_artifact_hash_sha256'] ?? null);
+        $this->assertSame('qa-1', $db->signatureParams[':actor_ref'] ?? null);
     }
 
     /**
@@ -61,6 +65,9 @@ final class FormSubmissionAcceptanceServiceTest extends TestCase
 final class FormAcceptanceFakeDb
 {
     public bool $sawAcceptanceUpdate = false;
+    public bool $sawConsumedChallengeSignatureQuery = false;
+    /** @var array<string, mixed> */
+    public array $signatureParams = [];
 
     public function __construct(
         private readonly string $attemptState = 'valid',
@@ -85,6 +92,11 @@ final class FormAcceptanceFakeDb
         }
 
         if (str_contains($sql, 'FROM signature_events')) {
+            $this->sawConsumedChallengeSignatureQuery = str_contains($sql, 'INNER JOIN e_signature_auth_challenges')
+                && str_contains($sql, "ac.signature_action = 'form_submission_acceptance'")
+                && str_contains($sql, "ac.challenge_state = 'consumed'")
+                && str_contains($sql, 'se.displayed_record_hash_sha256 = :original_artifact_hash_sha256');
+            $this->signatureParams = $params;
             return $this->signaturePresent
                 ? ['signature_event_id' => (string)$params[':signature_event_id']]
                 : null;

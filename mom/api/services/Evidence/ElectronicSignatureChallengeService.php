@@ -21,6 +21,7 @@ final class ElectronicSignatureChallengeService
         'evidence_finalize',
         'document_release',
         'document_read_acknowledgement',
+        'form_submission_acceptance',
         'periodic_evaluation_waiver',
         'change_order_release',
         'verification_waiver',

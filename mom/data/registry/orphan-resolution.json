@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-14T17:51:20.496Z",
+    "generatedAt": "2026-04-15T03:36:52.957Z",
     "description": "Resolution plan for 0 orphan registry fields and 462 orphan DB column names."
   },
   "orphan_fields": {

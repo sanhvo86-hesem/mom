@@ -35,29 +35,39 @@ final class PublicationMonitorService
         $this->requireDb();
 
         $state = $this->text($filters['state'] ?? '');
+        $orgId = $this->text($filters['org_id'] ?? '');
         $limit = max(1, min(500, (int)($filters['limit'] ?? 100)));
-        $where = '';
+        $where = [];
         $params = [':limit' => $limit];
         if ($state !== '') {
-            $where = 'WHERE ep.publication_state = :state';
+            $where[] = 'ep.publication_state = :state';
             $params[':state'] = $state;
         }
+        if ($orgId !== '') {
+            $where[] = "(ep.metadata->>'org_id' = :org_id OR ev.metadata->>'org_id' = :org_id)";
+            $params[':org_id'] = $orgId;
+        }
+        $whereSql = $where === [] ? '' : 'WHERE ' . implode(' AND ', $where);
 
         $items = $this->db->query(
             "SELECT ep.*, ev.evidence_record_id
              FROM evidence_publications ep
              JOIN evidence_versions ev ON ev.evidence_version_id = ep.evidence_version_id
-             {$where}
+             {$whereSql}
              ORDER BY ep.updated_at DESC, ep.created_at DESC
              LIMIT :limit",
             $params,
         );
 
+        $countWhereSql = $orgId === '' ? '' : "WHERE metadata->>'org_id' = :org_id";
+        $countParams = $orgId === '' ? [] : [':org_id' => $orgId];
         $counts = $this->db->query(
             "SELECT publication_state, count(*) AS count
              FROM evidence_publications
+             {$countWhereSql}
              GROUP BY publication_state
              ORDER BY publication_state",
+            $countParams,
         );
 
         return [

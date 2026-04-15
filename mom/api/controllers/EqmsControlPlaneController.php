@@ -505,11 +505,14 @@ final class EqmsControlPlaneController extends BaseController
 
     public function publicationMonitor(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'auditor']);
+        $orgId = $this->requireOrgContext($user);
         try {
             $monitor = (new PublicationMonitorService($this->data))->summarize([
                 'state' => (string)$this->query('state', ''),
                 'limit' => (int)$this->query('limit', '100'),
+                'org_id' => $orgId,
             ]);
             $this->success(['publication_monitor' => $monitor]);
         } catch (\Throwable $e) {
@@ -862,10 +865,15 @@ final class EqmsControlPlaneController extends BaseController
 
     public function periodicEvaluationDashboard(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer', 'auditor']);
+        $orgId = $this->requireOrgContext($user);
         try {
             $this->success([
-                'periodic_evaluations' => (new PeriodicEvaluationService($this->data))->dashboard((int)$this->query('limit', '100')),
+                'periodic_evaluations' => (new PeriodicEvaluationService($this->data))->dashboard(
+                    (int)$this->query('limit', '100'),
+                    ['org_id' => $orgId],
+                ),
             ]);
         } catch (\Throwable $e) {
             $this->error($e->getMessage(), 409);

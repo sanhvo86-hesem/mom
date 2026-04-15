@@ -234,7 +234,7 @@
  <tr><td><strong>1</strong></td><td>User yêu cầu Record-ID qua portal</td><td>Chọn chức năng <em>"Xin mã hồ sơ mới"</em> trên portal. Server cấp mã từ atomic counter (<span class="code">LOCK_EX</span>) và ghi allocation log.</td></tr>
  <tr><td><strong>2</strong></td><td>User tải blank form từ portal</td><td>Form được version-stamped (mã form, phiên bản, ngày phát hành) để đảm bảo đúng revision đang hiệu lực.</td></tr>
  <tr><td><strong>3</strong></td><td>User điền Excel form tại máy cá nhân</td><td>Lưu file với đúng naming convention bắt buộc theo file plan.</td></tr>
- <tr><td><strong>4</strong></td><td>User upload lên SharePoint</td><td>Validation script tại SharePoint kiểm tra naming convention, version stamp và metadata bắt buộc trước khi chấp nhận.</td></tr>
+ <tr><td><strong>4</strong></td><td>User upload lại vào portal</td><td>Portal tiếp nhận file Excel như controlled capture carrier, kiểm tra issuance ledger, version stamp, metadata và hash trước khi tạo submission attempt. SharePoint chỉ nhận bản snapshot/read-only do server publish sau finalization.</td></tr>
  </tbody>
  </table>
  </div>

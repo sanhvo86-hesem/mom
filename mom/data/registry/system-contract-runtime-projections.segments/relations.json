@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-14T17:51:43.620Z",
+    "generatedAt": "2026-04-15T03:54:02.005Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "51dffd80-0733-463d-af48-891fbdd0701f",
+    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "relations",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "a33b956aa63535cd61019903e2288658b739b2dc82ce68a4be80f942cc970e1f",
-    "sourceGeneratedAt": "2026-04-14T17:51:43.620Z",
+    "sourceSha256": "7c6a5cfb31b0cd50b9984c8b58217d7c7e9938b01660d905030f17d57bbad094",
+    "sourceGeneratedAt": "2026-04-15T03:54:02.005Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -57558,6 +57558,34 @@
       "lookupEndpoint": "record_system.audit_pack_exports.list",
       "displayField": "error_code",
       "valueField": "audit_pack_export_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_periodic_evaluations_waiver_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "periodic_evaluations",
+        "field": "waiver_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_periodic_evaluations_waiver_signature_event_id",
+      "nullable": true,
+      "label": "Periodic Evaluation → Chữ ký sự kiện",
+      "labelEn": "Periodic Evaluations → Signature Events",
+      "domain": "record_system -> foundation_governance",
+      "fromDomain": "record_system",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "waiver_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
       "digitalThread": true,
       "cascadeActions": []
     },

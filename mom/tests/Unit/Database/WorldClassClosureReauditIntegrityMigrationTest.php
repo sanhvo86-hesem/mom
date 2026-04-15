@@ -10,6 +10,7 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
 {
     private string $sql;
     private string $closureSql;
+    private string $finalHardeningSql;
 
     protected function setUp(): void
     {
@@ -22,6 +23,11 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $closureSql = file_get_contents($closurePath);
         self::assertIsString($closureSql);
         $this->closureSql = $closureSql;
+
+        $finalHardeningPath = dirname(__DIR__, 3) . '/database/migrations/134_world_class_closure_final_record_integrity.sql';
+        $finalHardeningSql = file_get_contents($finalHardeningPath);
+        self::assertIsString($finalHardeningSql);
+        $this->finalHardeningSql = $finalHardeningSql;
     }
 
     public function testSignatureEventsAreRelationallyBoundToAuthChallenges(): void
@@ -64,5 +70,19 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $this->assertStringContainsString('NEW.metadata IS DISTINCT FROM OLD.metadata', $this->closureSql);
         $this->assertStringContainsString('fk_periodic_evaluations_waiver_signature_event', $this->closureSql);
         $this->assertStringContainsString('audit.integrity_digest.daily', $this->closureSql);
+    }
+
+    public function testFinalRecordIntegrityMigrationHardensSignatureEvidenceRetentionAndDigestRows(): void
+    {
+        $this->assertStringContainsString('chk_signature_events_applied_regulated_ceremony', $this->finalHardeningSql);
+        $this->assertStringContainsString('form_submission_acceptance', $this->finalHardeningSql);
+        $this->assertStringContainsString('prevent_final_evidence_record_mutation', $this->finalHardeningSql);
+        $this->assertStringContainsString('final_evidence_record_delete_blocked', $this->finalHardeningSql);
+        $this->assertStringContainsString('prevent_integrity_digest_mutation', $this->finalHardeningSql);
+        $this->assertStringContainsString('integrity_digest_delete_blocked', $this->finalHardeningSql);
+        $this->assertStringContainsString('prevent_integrity_exception_identity_mutation', $this->finalHardeningSql);
+        $this->assertStringContainsString('integrity_exception_delete_blocked', $this->finalHardeningSql);
+        $this->assertStringContainsString('prevent_active_retention_lock_mutation', $this->finalHardeningSql);
+        $this->assertStringContainsString('active_retention_lock_delete_blocked', $this->finalHardeningSql);
     }
 }
