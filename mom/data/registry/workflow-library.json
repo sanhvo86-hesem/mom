@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-15T03:39:27.703Z",
+    "generatedAt": "2026-04-15T08:07:15.591Z",
     "workflowCount": 336
   },
   "workflows": {
@@ -3131,6 +3131,7 @@
       "relatedTables": [
         "audit_pack_exports",
         "users",
+        "periodic_evaluation_closure_events",
         "periodic_evaluations"
       ],
       "stateField": "export_state",
@@ -21298,6 +21299,7 @@
       "relatedTables": [
         "integrity_digests",
         "integrity_exceptions",
+        "periodic_evaluation_closure_events",
         "periodic_evaluations"
       ],
       "stateField": "digest_state",
@@ -38006,7 +38008,8 @@
         "users",
         "integrity_digests",
         "audit_pack_exports",
-        "signature_events"
+        "signature_events",
+        "periodic_evaluation_closure_events"
       ],
       "stateField": "evaluation_state",
       "statusSet": "periodic_evaluations_evaluation_state",

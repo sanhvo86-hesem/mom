@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-15T03:39:27.703Z",
-    "enumCount": 877
+    "generatedAt": "2026-04-15T08:07:15.591Z",
+    "enumCount": 878
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -5398,8 +5398,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "controlled_import_receipts",
-    "statusColumn": "receipt_state",
+    "sourceTable": "periodic_evaluation_closure_events",
+    "statusColumn": "terminal_state",
     "options": [
       {
         "value": "complete",
@@ -42400,6 +42400,48 @@
     "standard": "internal",
     "sourceTable": "controlled_import_receipts",
     "statusColumn": "receipt_state",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "periodic_evaluation_closure_events_terminal_state": {
+    "label": "Periodic Evaluation đóng sự kiện - Terminal State",
+    "labelEn": "Periodic Evaluation Closure Events Terminal State",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "periodic_evaluation_closure_events",
+    "statusColumn": "terminal_state",
     "options": [
       {
         "value": "complete",

@@ -7130,6 +7130,29 @@
     "source_record_id",
     "source_system"
   ],
+  "machine_raw_events": [
+    "actor_ref",
+    "adapter_id",
+    "created_at",
+    "event_type",
+    "machine_raw_event_id",
+    "org_company_code",
+    "org_legal_entity_code",
+    "org_plant_id",
+    "org_site_id",
+    "payload_schema_version",
+    "quality_code",
+    "raw_payload",
+    "raw_payload_hash_sha256",
+    "received_at",
+    "replay_key",
+    "row_version",
+    "sequence_no",
+    "source_node_id",
+    "source_record_id",
+    "source_system",
+    "source_timestamp"
+  ],
   "machine_telemetry_extended": [
     "coolant_temperature",
     "feed_rate_actual",
@@ -10245,6 +10268,19 @@
     "source_record_id",
     "source_system"
   ],
+  "periodic_evaluation_closure_events": [
+    "actor_ref",
+    "audit_pack_export_id",
+    "closure_payload",
+    "closure_payload_hash_sha256",
+    "created_at",
+    "integrity_digest_id",
+    "org_id",
+    "periodic_evaluation_closure_event_id",
+    "periodic_evaluation_id",
+    "terminal_state",
+    "waiver_signature_event_id"
+  ],
   "periodic_evaluations": [
     "assigned_role",
     "assigned_user_id",
@@ -10255,6 +10291,7 @@
     "evaluation_scope",
     "evaluation_state",
     "integrity_digest_id",
+    "org_id",
     "periodic_evaluation_id",
     "result_payload",
     "scope_ref",
@@ -11449,6 +11486,21 @@
     "source_record_id",
     "source_system",
     "status_code"
+  ],
+  "production_derived_events": [
+    "actor_ref",
+    "created_at",
+    "derivation_profile_id",
+    "derived_event_type",
+    "event_time",
+    "machine_id",
+    "machine_raw_event_id",
+    "payload",
+    "payload_hash_sha256",
+    "production_derived_event_id",
+    "replay_key",
+    "work_center_id",
+    "work_order_id"
   ],
   "production_order": [
     "item_revision_id",

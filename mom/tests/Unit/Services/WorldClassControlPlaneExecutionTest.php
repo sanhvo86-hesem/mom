@@ -27,6 +27,7 @@ use MOM\Services\Evidence\ElectronicSignatureChallengeService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
+use MOM\Services\Mes\MachineEventSpineService;
 use MOM\Services\Publication\PublicationMonitorService;
 use MOM\Services\Publication\PublicationStateService;
 use MOM\Services\Traceability\GenealogyGraphService;
@@ -437,13 +438,15 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $dueAt = gmdate('Y-m-d\TH:i:s\Z', strtotime('+1 day'));
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'scheduled',
-            'result_payload' => '{}',
+            'result_payload' => '{"org_id":"ORG-1"}',
         ];
 
         $row = (new PeriodicEvaluationService($db))->schedule([
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'due_at' => $dueAt,
@@ -458,14 +461,23 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $db = new CanonicalOutboxFakeDb();
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'passed',
             'integrity_digest_id' => '00000000-0000-0000-0000-000000000021',
-            'result_payload' => '{"result":"ok"}',
+            'result_payload' => '{"org_id":"ORG-1","result":"ok"}',
+        ];
+        $db->queryOneRows[] = [
+            'periodic_evaluation_closure_event_id' => '00000000-0000-0000-0000-000000000022',
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
+            'terminal_state' => 'passed',
+            'closure_payload_hash_sha256' => str_repeat('a', 64),
         ];
 
         $row = (new PeriodicEvaluationService($db))->close([
+            'org_id' => 'ORG-1',
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
             'evaluation_state' => 'passed',
             'integrity_digest_id' => '00000000-0000-0000-0000-000000000021',
@@ -474,12 +486,18 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('passed', $row['evaluation_state']);
         $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString('org_id = :org_id', $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString(")\n               AND org_id = :org_id", $db->queryOneCalls[0]['sql']);
+        $this->assertSame('ORG-1', $db->queryOneCalls[0]['params'][':org_id']);
+        $this->assertStringContainsString('INSERT INTO periodic_evaluation_closure_events', $db->queryOneCalls[1]['sql']);
+        $this->assertSame(1, substr_count($db->queryOneCalls[1]['sql'], 'CAST(:waiver_signature_event_id AS uuid), :actor_ref)'));
     }
 
     public function testPeriodicEvaluationWaiverRequiresAuthoritativeSignatureChallengeProof(): void
     {
         $payloadHash = hash('sha256', json_encode([
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'waived',
@@ -489,6 +507,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $db = new CanonicalOutboxFakeDb();
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'scheduled',
@@ -504,14 +523,23 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ];
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'waived',
             'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
             'result_payload' => '{"waiver":"risk accepted"}',
         ];
+        $db->queryOneRows[] = [
+            'periodic_evaluation_closure_event_id' => '00000000-0000-0000-0000-000000000031',
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
+            'terminal_state' => 'waived',
+            'closure_payload_hash_sha256' => str_repeat('b', 64),
+        ];
 
         $row = (new PeriodicEvaluationService($db))->close([
+            'org_id' => 'ORG-1',
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
             'evaluation_state' => 'waived',
             'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
@@ -521,10 +549,16 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
         $this->assertSame('waived', $row['evaluation_state']);
         $this->assertStringContainsString(':periodic_evaluation_id IS NULL', $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString('AND org_id = :org_id', $db->queryOneCalls[0]['sql']);
+        $this->assertSame('ORG-1', $db->queryOneCalls[0]['params'][':org_id']);
         $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $db->queryOneCalls[1]['sql']);
         $this->assertStringContainsString("signature_action = 'periodic_evaluation_waiver'", $db->queryOneCalls[1]['sql']);
         $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[2]['sql']);
         $this->assertStringContainsString(':periodic_evaluation_id IS NULL', $db->queryOneCalls[2]['sql']);
+        $this->assertStringContainsString(")\n               AND org_id = :org_id", $db->queryOneCalls[2]['sql']);
+        $this->assertSame('ORG-1', $db->queryOneCalls[2]['params'][':org_id']);
+        $this->assertStringContainsString('INSERT INTO periodic_evaluation_closure_events', $db->queryOneCalls[3]['sql']);
+        $this->assertSame(1, substr_count($db->queryOneCalls[3]['sql'], 'CAST(:waiver_signature_event_id AS uuid), :actor_ref)'));
     }
 
     public function testPeriodicEvaluationWaiverRejectsCallerSuppliedHashMismatch(): void
@@ -532,6 +566,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $db = new CanonicalOutboxFakeDb();
         $db->queryOneRows[] = [
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'org_id' => 'ORG-1',
             'evaluation_scope' => 'system_integrity',
             'scope_ref' => 'daily-digest',
             'evaluation_state' => 'scheduled',
@@ -542,12 +577,76 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->expectExceptionMessage('periodic_evaluation_waiver_payload_hash_mismatch');
 
         (new PeriodicEvaluationService($db))->close([
+            'org_id' => 'ORG-1',
             'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
             'evaluation_state' => 'waived',
             'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
             'waiver_payload_hash_sha256' => str_repeat('f', 64),
             'result_payload' => ['waiver' => 'risk accepted'],
         ]);
+    }
+
+    public function testMachineEventSpineRecordsRawEventsAndDerivesProductionEventsIdempotently(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $payload = [
+            'machine_id' => 'MILL-1',
+            'work_center_id' => 'WC-1',
+            'wo_number' => 'WO-1',
+            'machine_state' => 'running',
+            'part_count' => 12,
+        ];
+        $payloadHash = hash('sha256', json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $db->queryOneRows[] = [
+            'machine_raw_event_id' => '00000000-0000-0000-0000-00000000aa01',
+            'adapter_id' => 'ADP-1',
+            'source_node_id' => 'MILL-1',
+            'event_type' => 'mtconnect.current',
+            'source_timestamp' => '2026-04-15T03:00:00Z',
+            'quality_code' => 'good',
+            'replay_key' => 'rk-1',
+            'raw_payload' => json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'raw_payload_hash_sha256' => $payloadHash,
+        ];
+        $db->queryOneRows[] = [
+            'machine_raw_event_id' => '00000000-0000-0000-0000-00000000aa01',
+            'source_node_id' => 'MILL-1',
+            'event_type' => 'mtconnect.current',
+            'source_timestamp' => '2026-04-15T03:00:00Z',
+            'quality_code' => 'good',
+            'raw_payload' => json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        ];
+        $db->queryOneRows[] = [
+            'production_derived_event_id' => '00000000-0000-0000-0000-00000000bb01',
+            'machine_raw_event_id' => '00000000-0000-0000-0000-00000000aa01',
+            'derivation_profile_id' => 'mtconnect.current.v1',
+            'derived_event_type' => 'cycle',
+            'payload' => '{"derived_by":"MachineEventSpineService"}',
+            'payload_hash_sha256' => str_repeat('c', 64),
+        ];
+
+        $service = new MachineEventSpineService($db);
+        $raw = $service->recordMachineEvent([
+            'adapter_id' => 'ADP-1',
+            'source_node_id' => 'MILL-1',
+            'event_type' => 'mtconnect.current',
+            'source_timestamp' => '2026-04-15T03:00:00Z',
+            'quality_code' => 'good',
+            'replay_key' => 'rk-1',
+            'raw_payload' => $payload,
+        ], 'connector-1');
+        $derived = $service->deriveProductionEvent([
+            'machine_raw_event_id' => '00000000-0000-0000-0000-00000000aa01',
+            'derivation_profile_id' => 'mtconnect.current.v1',
+        ], 'mes-worker-1');
+
+        $this->assertSame('MILL-1', $raw['source_node_id']);
+        $this->assertSame('cycle', $derived['derived_event_type']);
+        $sql = $db->combinedSql();
+        $this->assertStringContainsString('INSERT INTO machine_raw_events', $sql);
+        $this->assertStringContainsString('ON CONFLICT (adapter_id, replay_key) DO NOTHING', $sql);
+        $this->assertStringContainsString('INSERT INTO production_derived_events', $sql);
+        $this->assertStringContainsString('ON CONFLICT (machine_raw_event_id, derivation_profile_id, derived_event_type, replay_key) DO NOTHING', $sql);
     }
 
     public function testIntegrityDigestWorkerComputesDailyDigestRows(): void
@@ -3084,6 +3183,14 @@ final class CanonicalOutboxFakeDb
             'idempotency_key' => (string)($params[':idempotency_key'] ?? ''),
             'scope_key' => (string)($params[':scope_key'] ?? ''),
         ];
+    }
+
+    public function combinedSql(): string
+    {
+        return implode("\n", array_map(
+            static fn(array $call): string => $call['sql'],
+            $this->queryOneCalls,
+        ));
     }
 }
 

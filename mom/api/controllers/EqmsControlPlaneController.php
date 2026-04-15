@@ -886,6 +886,8 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer']);
         $this->requireCsrf();
         $body = $this->jsonBody();
+        $this->rejectCallerScopeFields($body);
+        $body['org_id'] = $this->requireOrgContext($user);
         try {
             $this->success([
                 'periodic_evaluation' => (new PeriodicEvaluationService($this->data))->schedule($body),
@@ -901,6 +903,8 @@ final class EqmsControlPlaneController extends BaseController
         $this->requireAnyRole($user, ['admin', 'it_admin', 'qa_manager', 'qms_engineer']);
         $this->requireCsrf();
         $body = $this->jsonBody();
+        $this->rejectCallerScopeFields($body);
+        $body['org_id'] = $this->requireOrgContext($user);
         try {
             $this->success([
                 'periodic_evaluation' => (new PeriodicEvaluationService($this->data))->close($body),

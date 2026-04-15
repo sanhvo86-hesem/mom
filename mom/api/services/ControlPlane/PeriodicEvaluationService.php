@@ -28,9 +28,9 @@ final class PeriodicEvaluationService
         $this->requireDb();
         $limit = max(1, min(500, $limit));
         $orgId = $this->nullableText($scope['org_id'] ?? null);
-        $where = $orgId === null ? '' : "WHERE result_payload->>'org_id' = :org_id";
+        $where = $orgId === null ? '' : "WHERE org_id = :org_id";
         $params = $orgId === null ? [':limit' => $limit] : [':limit' => $limit, ':org_id' => $orgId];
-        $countWhere = $orgId === null ? '' : "WHERE result_payload->>'org_id' = :org_id";
+        $countWhere = $orgId === null ? '' : "WHERE org_id = :org_id";
         $countParams = $orgId === null ? [] : [':org_id' => $orgId];
 
         $items = $this->db->query(
@@ -65,25 +65,32 @@ final class PeriodicEvaluationService
                 throw new RuntimeException('missing_' . $field);
             }
         }
+        $orgId = $this->nullableText($request['org_id'] ?? $request['scope']['org_id'] ?? null);
+        if ($orgId === null) {
+            throw new RuntimeException('periodic_evaluation_org_scope_required');
+        }
 
         // FOUND-003 FIX: Validate due_at does not exceed 1 year in future
         $dueAtStr = trim((string)$request['due_at']);
         $this->validateDueAt($dueAtStr);
+        $resultPayload = (array)($request['result_payload'] ?? []);
+        $resultPayload['org_id'] = $orgId;
 
         $row = $this->db->queryOne(
             "INSERT INTO periodic_evaluations
-                (evaluation_scope, scope_ref, due_at, assigned_role, result_payload)
+                (org_id, evaluation_scope, scope_ref, due_at, assigned_role, result_payload)
              VALUES
-                (:evaluation_scope, :scope_ref, CAST(:due_at AS timestamptz), :assigned_role, CAST(:result_payload AS jsonb))
-             ON CONFLICT (evaluation_scope, scope_ref, due_at) DO UPDATE
+                (:org_id, :evaluation_scope, :scope_ref, CAST(:due_at AS timestamptz), :assigned_role, CAST(:result_payload AS jsonb))
+             ON CONFLICT (org_id, evaluation_scope, scope_ref, due_at) DO UPDATE
                 SET updated_at = now()
              RETURNING *",
             [
+                ':org_id' => $orgId,
                 ':evaluation_scope' => trim((string)$request['evaluation_scope']),
                 ':scope_ref' => trim((string)$request['scope_ref']),
                 ':due_at' => $dueAtStr,
                 ':assigned_role' => $this->nullableText($request['assigned_role'] ?? null),
-                ':result_payload' => json_encode((array)($request['result_payload'] ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':result_payload' => json_encode($resultPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             ],
         );
 
@@ -108,6 +115,10 @@ final class PeriodicEvaluationService
         $id = $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null);
         $scope = $this->nullableText($request['evaluation_scope'] ?? null);
         $scopeRef = $this->nullableText($request['scope_ref'] ?? null);
+        $orgId = $this->nullableText($request['org_id'] ?? $request['scope']['org_id'] ?? null);
+        if ($orgId === null) {
+            throw new RuntimeException('periodic_evaluation_org_scope_required');
+        }
         if ($id === null && ($scope === null || $scopeRef === null)) {
             throw new RuntimeException('periodic_evaluation_identity_required');
         }
@@ -126,6 +137,9 @@ final class PeriodicEvaluationService
             throw new RuntimeException('periodic_evaluation_closure_evidence_required');
         }
 
+        $resultPayload = (array)($request['result_payload'] ?? []);
+        $resultPayload['org_id'] = $orgId;
+
         $row = $this->db->queryOne(
             "UPDATE periodic_evaluations
              SET evaluation_state = :evaluation_state,
@@ -137,23 +151,28 @@ final class PeriodicEvaluationService
                  waiver_signature_event_id = COALESCE(CAST(:waiver_signature_event_id AS uuid), waiver_signature_event_id),
                  updated_at = now()
              WHERE (
-                   :periodic_evaluation_id IS NOT NULL
-                   AND periodic_evaluation_id::text = :periodic_evaluation_id
+                   (
+                       :periodic_evaluation_id IS NOT NULL
+                       AND periodic_evaluation_id::text = :periodic_evaluation_id
+                   )
+                   OR (
+                       :periodic_evaluation_id IS NULL
+                       AND :evaluation_scope IS NOT NULL
+                       AND :scope_ref IS NOT NULL
+                       AND evaluation_scope = :evaluation_scope
+                       AND scope_ref = :scope_ref
+                   )
                )
-                OR (
-                   :periodic_evaluation_id IS NULL
-                   AND :evaluation_scope IS NOT NULL
-                   AND :scope_ref IS NOT NULL
-                   AND evaluation_scope = :evaluation_scope
-                   AND scope_ref = :scope_ref
-               )
+               AND org_id = :org_id
+               AND evaluation_state NOT IN ('passed', 'failed', 'waived')
              RETURNING *",
             [
                 ':evaluation_state' => $target,
                 ':periodic_evaluation_id' => $id,
                 ':evaluation_scope' => $scope,
                 ':scope_ref' => $scopeRef,
-                ':result_payload' => json_encode((array)($request['result_payload'] ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':org_id' => $orgId,
+                ':result_payload' => json_encode($resultPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 ':integrity_digest_id' => $this->nullableUuid($request['integrity_digest_id'] ?? null),
                 ':audit_pack_export_id' => $this->nullableUuid($request['audit_pack_export_id'] ?? null),
                 ':waiver_signature_event_id' => $this->nullableUuid($request['waiver_signature_event_id'] ?? null),
@@ -163,7 +182,64 @@ final class PeriodicEvaluationService
         if (!is_array($row)) {
             throw new RuntimeException('periodic_evaluation_not_found');
         }
-        return $this->decodeJsonColumns($row);
+        $closureEvent = $this->appendClosureEvent($row, $request, $target, $orgId);
+        $decoded = $this->decodeJsonColumns($row);
+        $decoded['closure_event'] = $closureEvent;
+        return $decoded;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<string, mixed> $request
+     * @return array<string, mixed>
+     */
+    private function appendClosureEvent(array $row, array $request, string $target, string $orgId): array
+    {
+        $payload = [
+            'periodic_evaluation_id' => $this->nullableText($row['periodic_evaluation_id'] ?? null),
+            'org_id' => $orgId,
+            'evaluation_scope' => $this->nullableText($row['evaluation_scope'] ?? null),
+            'scope_ref' => $this->nullableText($row['scope_ref'] ?? null),
+            'terminal_state' => $target,
+            'result_payload' => $this->decodeJsonValue($row['result_payload'] ?? []),
+            'integrity_digest_id' => $this->nullableText($row['integrity_digest_id'] ?? $request['integrity_digest_id'] ?? null),
+            'audit_pack_export_id' => $this->nullableText($row['audit_pack_export_id'] ?? $request['audit_pack_export_id'] ?? null),
+            'waiver_signature_event_id' => $this->nullableText($row['waiver_signature_event_id'] ?? $request['waiver_signature_event_id'] ?? null),
+        ];
+        $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($payloadJson)) {
+            throw new RuntimeException('periodic_evaluation_closure_payload_encode_failed');
+        }
+        $payloadHash = hash('sha256', $payloadJson);
+        $event = $this->db->queryOne(
+            "INSERT INTO periodic_evaluation_closure_events
+                (periodic_evaluation_id, org_id, terminal_state, closure_payload,
+                 closure_payload_hash_sha256, integrity_digest_id, audit_pack_export_id,
+                 waiver_signature_event_id, actor_ref)
+             VALUES
+                (CAST(:periodic_evaluation_id AS uuid), :org_id, :terminal_state, CAST(:closure_payload AS jsonb),
+                 :closure_payload_hash_sha256, CAST(:integrity_digest_id AS uuid), CAST(:audit_pack_export_id AS uuid),
+                 CAST(:waiver_signature_event_id AS uuid), :actor_ref)
+             ON CONFLICT (periodic_evaluation_id, terminal_state, closure_payload_hash_sha256) DO NOTHING
+             RETURNING *",
+            [
+                ':periodic_evaluation_id' => $payload['periodic_evaluation_id'],
+                ':org_id' => $orgId,
+                ':terminal_state' => $target,
+                ':closure_payload' => $payloadJson,
+                ':closure_payload_hash_sha256' => $payloadHash,
+                ':integrity_digest_id' => $this->nullableUuid($payload['integrity_digest_id'] ?? null),
+                ':audit_pack_export_id' => $this->nullableUuid($payload['audit_pack_export_id'] ?? null),
+                ':waiver_signature_event_id' => $this->nullableUuid($payload['waiver_signature_event_id'] ?? null),
+                ':actor_ref' => $this->nullableText($request['actor_ref'] ?? $request['reviewer_ref'] ?? null) ?? 'system',
+            ],
+        );
+
+        return is_array($event) ? $this->decodeJsonColumns($event) : [
+            'terminal_state' => $target,
+            'closure_payload_hash_sha256' => $payloadHash,
+            'replayed' => true,
+        ];
     }
 
     private function requireDb(): void
@@ -223,6 +299,7 @@ final class PeriodicEvaluationService
         $explicit = strtolower($this->nullableText($request['waiver_payload_hash_sha256'] ?? $request['signed_payload_hash_sha256'] ?? '') ?? '');
         $payload = [
             'periodic_evaluation_id' => $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null),
+            'org_id' => $this->nullableText($request['org_id'] ?? $request['scope']['org_id'] ?? null),
             'evaluation_scope' => $this->nullableText($request['evaluation_scope'] ?? null),
             'scope_ref' => $this->nullableText($request['scope_ref'] ?? null),
             'evaluation_state' => 'waived',
@@ -252,25 +329,33 @@ final class PeriodicEvaluationService
         $id = $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null);
         $scope = $this->nullableText($request['evaluation_scope'] ?? null);
         $scopeRef = $this->nullableText($request['scope_ref'] ?? null);
+        $orgId = $this->nullableText($request['org_id'] ?? $request['scope']['org_id'] ?? null);
+        if ($orgId === null) {
+            throw new RuntimeException('periodic_evaluation_org_scope_required');
+        }
         $row = $this->db->queryOne(
-            "SELECT periodic_evaluation_id, evaluation_scope, scope_ref, evaluation_state, result_payload
+            "SELECT periodic_evaluation_id, org_id, evaluation_scope, scope_ref, evaluation_state, result_payload
              FROM periodic_evaluations
              WHERE (
-                   :periodic_evaluation_id IS NOT NULL
-                   AND periodic_evaluation_id::text = :periodic_evaluation_id
+                   (
+                       :periodic_evaluation_id IS NOT NULL
+                       AND periodic_evaluation_id::text = :periodic_evaluation_id
+                   )
+                   OR (
+                       :periodic_evaluation_id IS NULL
+                       AND :evaluation_scope IS NOT NULL
+                       AND :scope_ref IS NOT NULL
+                       AND evaluation_scope = :evaluation_scope
+                       AND scope_ref = :scope_ref
+                   )
                )
-                OR (
-                   :periodic_evaluation_id IS NULL
-                   AND :evaluation_scope IS NOT NULL
-                   AND :scope_ref IS NOT NULL
-                   AND evaluation_scope = :evaluation_scope
-                   AND scope_ref = :scope_ref
-               )
+               AND org_id = :org_id
              LIMIT 1",
             [
                 ':periodic_evaluation_id' => $id,
                 ':evaluation_scope' => $scope,
                 ':scope_ref' => $scopeRef,
+                ':org_id' => $orgId,
             ],
         );
         if (!is_array($row)) {
@@ -278,6 +363,7 @@ final class PeriodicEvaluationService
         }
         return array_merge($request, [
             'periodic_evaluation_id' => $this->nullableText($row['periodic_evaluation_id'] ?? null),
+            'org_id' => $this->nullableText($request['org_id'] ?? $row['org_id'] ?? null),
             'evaluation_scope' => $this->nullableText($row['evaluation_scope'] ?? null),
             'scope_ref' => $this->nullableText($row['scope_ref'] ?? null),
         ]);
@@ -310,13 +396,19 @@ final class PeriodicEvaluationService
     {
         foreach (['result_payload'] as $key) {
             if (isset($row[$key]) && is_string($row[$key])) {
-                $decoded = json_decode($row[$key], true);
-                if (is_array($decoded)) {
-                    $row[$key] = $decoded;
-                }
+                $row[$key] = $this->decodeJsonValue($row[$key]);
             }
         }
         return $row;
+    }
+
+    private function decodeJsonValue(mixed $value): mixed
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+        $decoded = json_decode($value, true);
+        return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
     }
 
     private function nullableText(mixed $value): ?string

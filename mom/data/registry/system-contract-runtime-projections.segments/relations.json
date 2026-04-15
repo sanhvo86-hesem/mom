@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T03:54:02.005Z",
+    "generatedAt": "2026-04-15T08:07:31.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "publication_run_id": "76b9fbd0-6d1a-4b41-9006-fea3153d1633",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "relations",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "7c6a5cfb31b0cd50b9984c8b58217d7c7e9938b01660d905030f17d57bbad094",
-    "sourceGeneratedAt": "2026-04-15T03:54:02.005Z",
+    "sourceSha256": "d4cd2e3c537f691b2596349b0473c09126bb203fa9e629db47407cda30f7f5b0",
+    "sourceGeneratedAt": "2026-04-15T08:07:31.280Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -57478,6 +57478,118 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_periodic_evaluation_closure_events_periodic_evaluation_id_periodic_evaluations_periodic_evaluation_id",
+      "from": {
+        "entity": "periodic_evaluation_closure_events",
+        "field": "periodic_evaluation_id"
+      },
+      "to": {
+        "entity": "periodic_evaluations",
+        "field": "periodic_evaluation_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_periodic_evaluation_closure_events_periodic_evaluation_id",
+      "nullable": false,
+      "label": "Periodic Evaluation đóng sự kiện → Periodic Evaluation",
+      "labelEn": "Periodic Evaluation Closure Events → Periodic Evaluations",
+      "domain": "record_system -> record_system",
+      "fromDomain": "record_system",
+      "toDomain": "record_system",
+      "sourceColumn": "periodic_evaluation_id",
+      "targetColumn": "periodic_evaluation_id",
+      "lookupEntity": "periodic_evaluations",
+      "lookupEndpoint": "record_system.periodic_evaluations.list",
+      "displayField": "assigned_role",
+      "valueField": "periodic_evaluation_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_periodic_evaluation_closure_events_integrity_digest_id_integrity_digests_integrity_digest_id",
+      "from": {
+        "entity": "periodic_evaluation_closure_events",
+        "field": "integrity_digest_id"
+      },
+      "to": {
+        "entity": "integrity_digests",
+        "field": "integrity_digest_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_periodic_evaluation_closure_events_integrity_digest_id",
+      "nullable": true,
+      "label": "Periodic Evaluation đóng sự kiện → Integrity Digest",
+      "labelEn": "Periodic Evaluation Closure Events → Integrity Digests",
+      "domain": "record_system -> evidence_vault",
+      "fromDomain": "record_system",
+      "toDomain": "evidence_vault",
+      "sourceColumn": "integrity_digest_id",
+      "targetColumn": "integrity_digest_id",
+      "lookupEntity": "integrity_digests",
+      "lookupEndpoint": "evidence_vault.integrity_digests.list",
+      "displayField": "org_company_code",
+      "valueField": "integrity_digest_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_periodic_evaluation_closure_events_audit_pack_export_id_audit_pack_exports_audit_pack_export_id",
+      "from": {
+        "entity": "periodic_evaluation_closure_events",
+        "field": "audit_pack_export_id"
+      },
+      "to": {
+        "entity": "audit_pack_exports",
+        "field": "audit_pack_export_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_periodic_evaluation_closure_events_audit_pack_export_id",
+      "nullable": true,
+      "label": "Periodic Evaluation đóng sự kiện → Pack Xuất khẩu Đánh giá",
+      "labelEn": "Periodic Evaluation Closure Events → Audit Pack Exports",
+      "domain": "record_system -> record_system",
+      "fromDomain": "record_system",
+      "toDomain": "record_system",
+      "sourceColumn": "audit_pack_export_id",
+      "targetColumn": "audit_pack_export_id",
+      "lookupEntity": "audit_pack_exports",
+      "lookupEndpoint": "record_system.audit_pack_exports.list",
+      "displayField": "error_code",
+      "valueField": "audit_pack_export_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_periodic_evaluation_closure_events_waiver_signature_event_id_signature_events_signature_event_id",
+      "from": {
+        "entity": "periodic_evaluation_closure_events",
+        "field": "waiver_signature_event_id"
+      },
+      "to": {
+        "entity": "signature_events",
+        "field": "signature_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_periodic_evaluation_closure_events_waiver_signature_event_id",
+      "nullable": true,
+      "label": "Periodic Evaluation đóng sự kiện → Chữ ký sự kiện",
+      "labelEn": "Periodic Evaluation Closure Events → Signature Events",
+      "domain": "record_system -> foundation_governance",
+      "fromDomain": "record_system",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "waiver_signature_event_id",
+      "targetColumn": "signature_event_id",
+      "lookupEntity": "signature_events",
+      "lookupEndpoint": "foundation_governance.signature_events.list",
+      "displayField": "auth_challenge_id",
+      "valueField": "signature_event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_periodic_evaluations_assigned_user_id_users_user_id",
       "from": {
         "entity": "periodic_evaluations",
@@ -65712,6 +65824,34 @@
       "lookupEndpoint": "mes_execution.mes_sites.list",
       "displayField": "site_name",
       "valueField": "site_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_production_derived_events_machine_raw_event_id_machine_raw_events_machine_raw_event_id",
+      "from": {
+        "entity": "production_derived_events",
+        "field": "machine_raw_event_id"
+      },
+      "to": {
+        "entity": "machine_raw_events",
+        "field": "machine_raw_event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_production_derived_events_machine_raw_event_id",
+      "nullable": false,
+      "label": "Sản xuất Derived sự kiện → Raw sự kiện Máy",
+      "labelEn": "Production Derived Events → Machine Raw Events",
+      "domain": "mes_execution -> mes_execution",
+      "fromDomain": "mes_execution",
+      "toDomain": "mes_execution",
+      "sourceColumn": "machine_raw_event_id",
+      "targetColumn": "machine_raw_event_id",
+      "lookupEntity": "machine_raw_events",
+      "lookupEndpoint": "mes_execution.machine_raw_events.list",
+      "displayField": "org_company_code",
+      "valueField": "machine_raw_event_id",
       "digitalThread": true,
       "cascadeActions": []
     },

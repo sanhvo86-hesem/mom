@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T03:47:29.144047+00:00",
+    "generatedAt": "2026-04-15T08:07:26.728832+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -22,16 +22,16 @@
   "status": "watch",
   "scorecard": {
     "tables": {
-      "count": 761,
+      "count": 764,
       "domains": 49,
       "missingOwnerRole": 0,
       "missingSystemOfRecord": 0,
       "governanceOverlayApplied": true,
-      "governanceOverlayCount": 761
+      "governanceOverlayCount": 764
     },
     "endpoints": {
-      "count": 4198,
-      "classified": 4198,
+      "count": 4214,
+      "classified": 4214,
       "hardDelete": 0,
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
@@ -55,7 +55,7 @@
       "manifestDeletionModes": {
         "hard_delete": 12,
         "soft_delete": 63,
-        "archive_only": 698
+        "archive_only": 701
       },
       "openapiVersion": "3.1.2",
       "aiAuthorityChainGenerated": true,
@@ -75,9 +75,9 @@
         "classificationSummary": {
           "authorityClass": {
             "admin_governance_contract": 279,
-            "canonical_process_contract": 2441,
+            "canonical_process_contract": 2447,
             "generic_runtime_contract": 555,
-            "machine_runtime_contract": 500,
+            "machine_runtime_contract": 510,
             "master_data_contract": 90,
             "support_or_read_model_contract": 333
           },
@@ -85,15 +85,15 @@
             "admin_governance": 258,
             "admin_or_internal": 333,
             "blocked_runtime_internal": 1035,
-            "frontend_process": 1613,
-            "machine_or_operator_ui": 404,
+            "frontend_process": 1619,
+            "machine_or_operator_ui": 414,
             "needs_owner_review": 555
           },
           "sideEffectLevel": {
-            "destructive": 754,
-            "none": 1542,
-            "transactional_write": 714,
-            "workflow_transition": 1188
+            "destructive": 757,
+            "none": 1548,
+            "transactional_write": 718,
+            "workflow_transition": 1191
           },
           "gapCounts": {
             "generic_runtime_classification": 555,

@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T03:39:50.331Z",
+    "generatedAt": "2026-04-15T08:07:16.282Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
-    "tableOverrideCount": 144
+    "tableOverrideCount": 147
   },
   "defaults": {
     "list": [
@@ -4030,6 +4030,36 @@
       ],
       "delete": []
     },
+    "machine_raw_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "material_cost_templates": {
       "list": [
         "authenticated"
@@ -4867,6 +4897,36 @@
       ],
       "delete": []
     },
+    "periodic_evaluation_closure_events": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
     "plant_performance_snapshots": {
       "create": [],
       "update": [],
@@ -5144,6 +5204,36 @@
       "delete": []
     },
     "prj_resource_assignments": {
+      "list": [
+        "authenticated"
+      ],
+      "detail": [
+        "authenticated"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "delete": []
+    },
+    "production_derived_events": {
       "list": [
         "authenticated"
       ],

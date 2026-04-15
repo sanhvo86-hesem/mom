@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T03:53:00.877Z",
+    "generatedAt": "2026-04-15T08:07:29.040Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 22140,
+    "idempotency_mentions": 22222,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -45,15 +45,15 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 22140,
-      "optimistic_concurrency_mentions": 8332,
-      "if_match_mentions": 3397,
-      "row_version_mentions": 26988,
+      "idempotency_mentions": 22222,
+      "optimistic_concurrency_mentions": 8364,
+      "if_match_mentions": 3402,
+      "row_version_mentions": 27025,
       "compensation_markers": 5,
       "correction_markers": 2259,
       "effective_dating_markers": 834,
       "override_mentions": 139,
-      "waiver_mentions": 172,
+      "waiver_mentions": 196,
       "heartbeat_mentions": 33,
       "quarantine_mentions": 364,
       "disposition_mentions": 786,
@@ -61,19 +61,19 @@
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
       "backdate_exception_mentions": 35,
-      "archive_mentions": 27517,
+      "archive_mentions": 27622,
       "snapshot_mentions": 1458,
       "esign_mentions": 441,
       "cycle_count_mentions": 342
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2656,
-      "idempotent_endpoint_count": 2656,
+      "mutating_endpoint_count": 2666,
+      "idempotent_endpoint_count": 2666,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2656,
+      "default_retry_safe_endpoint_count": 2666,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2656
+      "response_replay_documented_count": 2666
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -105,16 +105,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 22140,
-        "if_match_mentions": 3397,
-        "row_version_mentions": 26988,
-        "mutating_endpoint_count": 2656,
-        "idempotent_endpoint_count": 2656,
+        "idempotency_mentions": 22222,
+        "if_match_mentions": 3402,
+        "row_version_mentions": 27025,
+        "mutating_endpoint_count": 2666,
+        "idempotent_endpoint_count": 2666,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2656,
+        "default_retry_safe_endpoint_count": 2666,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2656
+        "response_replay_documented_count": 2666
       },
       "required_controls": []
     },
@@ -200,7 +200,7 @@
       ],
       "evidence": {
         "override_mentions": 139,
-        "waiver_mentions": 172,
+        "waiver_mentions": 196,
         "esign_mentions": 441,
         "override_resources": [
           "quality_improvement.concessions",
@@ -223,7 +223,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 33,
-        "idempotency_mentions": 22140,
+        "idempotency_mentions": 22222,
         "compensation_markers": 5,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -240,7 +240,7 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 27517,
+        "archive_mentions": 27622,
         "correction_markers": 2259,
         "esign_mentions": 441
       },

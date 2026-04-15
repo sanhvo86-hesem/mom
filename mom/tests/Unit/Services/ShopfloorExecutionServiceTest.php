@@ -755,6 +755,35 @@ final class ShopfloorExecutionServiceTest extends TestCase
         $this->assertNotEmpty($db->queryOneCalls);
     }
 
+    public function testProductionReportAutoEmitsGenealogyEdgesWhenReleasedChangeAuthorityProvided(): void
+    {
+        $target = $this->target();
+        $target['material_lot_number'] = 'MAT-LOT-1';
+        $target['output_lot_id'] = 'LOT-OUT-1';
+        $target['inspection_plan_id'] = 'IP-714-OP20';
+        $target['change_order_id'] = '00000000-0000-0000-0000-000000000201';
+
+        $db = new ShopfloorGenealogyGateFakeDb();
+        $service = new ShopfloorExecutionService(
+            $this->dataDir,
+            genealogyGraph: new GenealogyGraphService($db),
+        );
+
+        $log = $service->buildProductionLog([
+            'quantity_good' => 8,
+            'actual_run_minutes' => 40,
+            'inspection_result_id' => 'IPQC-RESULT-1',
+        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+
+        $projection = $service->appendProductionReportEvent($log, $target, 'operator-1');
+
+        $this->assertSame('recorded', $projection['projection_status']);
+        $this->assertSame('emitted', $projection['genealogy_emission']['status']);
+        $this->assertSame(2, $projection['genealogy_emission']['attempted']);
+        $this->assertSame(2, $projection['genealogy_emission']['emitted']);
+        $this->assertGreaterThanOrEqual(2, $db->edgeInsertCount);
+    }
+
     public function testProductionReportIdempotencyReplaysSameFingerprint(): void
     {
         $service = $this->service();
@@ -1300,6 +1329,13 @@ class ShopfloorGenealogyGateFakeDb
     public array $queryOneCalls = [];
 
     /**
+     * @var list<array{sql: string, params: array<string, mixed>}>
+     */
+    public array $queryCalls = [];
+
+    public int $edgeInsertCount = 0;
+
+    /**
      * @param array<string, mixed> $params
      * @return array<string, mixed>|null
      */
@@ -1317,6 +1353,48 @@ class ShopfloorGenealogyGateFakeDb
                 'policy_state' => 'active',
             ];
         }
+        if (str_contains($sql, 'SELECT 1 FROM genealogy_edge_facts')) {
+            return null;
+        }
+        if (str_contains($sql, 'WITH RECURSIVE path')) {
+            return null;
+        }
+        if (str_contains($sql, 'INSERT INTO genealogy_edge_facts')) {
+            $this->edgeInsertCount++;
+            return [
+                'edge_fact_type' => (string)$params[':edge_fact_type'],
+                'from_object_type' => (string)$params[':from_object_type'],
+                'from_object_id' => (string)$params[':from_object_id'],
+                'to_object_type' => (string)$params[':to_object_type'],
+                'to_object_id' => (string)$params[':to_object_id'],
+                'source_event_id' => (string)$params[':source_event_id'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'genealogy_nodes')) {
+            return [
+                'genealogy_node_id' => '00000000-0000-0000-0000-000000000301',
+                'node_type' => (string)$params[':node_type'],
+                'node_ref' => (string)$params[':node_ref'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'genealogy_edges')) {
+            return [
+                'genealogy_edge_id' => '00000000-0000-0000-0000-000000000401',
+                'edge_type' => (string)$params[':edge_type'],
+                'source_event_id' => (string)$params[':source_event_id'],
+                'metadata' => (string)$params[':metadata'],
+            ];
+        }
+        if (str_contains($sql, 'as_manufactured_snapshots')) {
+            return [
+                'as_manufactured_snapshot_id' => '00000000-0000-0000-0000-000000000501',
+                'subject_type' => (string)$params[':subject_type'],
+                'subject_ref' => (string)$params[':subject_ref'],
+                'snapshot_hash_sha256' => (string)$params[':snapshot_hash_sha256'],
+            ];
+        }
 
         return [
             'operation_class' => (string)($params[':operation_class'] ?? ''),
@@ -1325,6 +1403,24 @@ class ShopfloorGenealogyGateFakeDb
             'gate_state' => (string)($params[':gate_state'] ?? ''),
             'missing_context' => (string)($params[':missing_context'] ?? '[]'),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array<string, mixed>>
+     */
+    public function query(string $sql, array $params = []): array
+    {
+        $this->queryCalls[] = ['sql' => $sql, 'params' => $params];
+        if (str_contains($sql, 'FROM plm_change_orders')) {
+            return [[
+                'plm_change_order_id' => '00000000-0000-0000-0000-000000000201',
+                'change_order_number' => 'CO-GENEALOGY',
+                'status' => 'released',
+            ]];
+        }
+
+        return [];
     }
 }
 

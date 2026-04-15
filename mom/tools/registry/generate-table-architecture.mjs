@@ -715,6 +715,7 @@ const migrationDomainDefaults = new Map([
   ['107_phase1_shopfloor_execution_bridge.sql', 'production'],
   ['108_world_class_control_plane_execution.sql', 'record_system'],
   ['109_control_plane_cutover_hardening.sql', 'record_system'],
+  ['135_world_class_mes_event_spine_periodic_closure.sql', 'mes_execution'],
 ]);
 
 const tableDomainOverrides = {
@@ -739,6 +740,7 @@ const tableDomainOverrides = {
   electronic_signature: 'foundation_governance',
   attachment: 'foundation_governance',
   approval: 'foundation_governance',
+  periodic_evaluation_closure_events: 'record_system',
   lot_policy: 'master_data',
   serial_policy: 'master_data',
   shelf_life_policy: 'master_data',

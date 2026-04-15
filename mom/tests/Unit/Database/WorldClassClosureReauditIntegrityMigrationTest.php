@@ -11,6 +11,7 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
     private string $sql;
     private string $closureSql;
     private string $finalHardeningSql;
+    private string $mesClosureSql;
 
     protected function setUp(): void
     {
@@ -28,6 +29,11 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $finalHardeningSql = file_get_contents($finalHardeningPath);
         self::assertIsString($finalHardeningSql);
         $this->finalHardeningSql = $finalHardeningSql;
+
+        $mesClosurePath = dirname(__DIR__, 3) . '/database/migrations/135_world_class_mes_event_spine_periodic_closure.sql';
+        $mesClosureSql = file_get_contents($mesClosurePath);
+        self::assertIsString($mesClosureSql);
+        $this->mesClosureSql = $mesClosureSql;
     }
 
     public function testSignatureEventsAreRelationallyBoundToAuthChallenges(): void
@@ -84,5 +90,21 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $this->assertStringContainsString('integrity_exception_delete_blocked', $this->finalHardeningSql);
         $this->assertStringContainsString('prevent_active_retention_lock_mutation', $this->finalHardeningSql);
         $this->assertStringContainsString('active_retention_lock_delete_blocked', $this->finalHardeningSql);
+    }
+
+    public function testMesEventSpineMigrationClosesPeriodicAndMachineEventP1Gaps(): void
+    {
+        $this->assertStringContainsString('ADD COLUMN IF NOT EXISTS org_id TEXT', $this->mesClosureSql);
+        $this->assertStringContainsString('ux_periodic_evaluations_org_scope_due', $this->mesClosureSql);
+        $this->assertStringContainsString('periodic_evaluation_closure_events', $this->mesClosureSql);
+        $this->assertStringContainsString('prevent_closed_periodic_evaluation_mutation', $this->mesClosureSql);
+        $this->assertStringContainsString('closed_periodic_evaluation_is_immutable', $this->mesClosureSql);
+        $this->assertStringContainsString('machine_raw_events', $this->mesClosureSql);
+        $this->assertStringContainsString('production_derived_events', $this->mesClosureSql);
+        $this->assertStringContainsString("payload_schema_version TEXT NOT NULL DEFAULT 'mes_machine_raw_event.v1'", $this->mesClosureSql);
+        $this->assertStringContainsString('row_version INTEGER NOT NULL DEFAULT 1', $this->mesClosureSql);
+        $this->assertStringContainsString('prevent_append_only_mes_spine_mutation', $this->mesClosureSql);
+        $this->assertStringContainsString('RecordMachineEvent', $this->mesClosureSql);
+        $this->assertStringContainsString('DeriveProductionEvent', $this->mesClosureSql);
     }
 }

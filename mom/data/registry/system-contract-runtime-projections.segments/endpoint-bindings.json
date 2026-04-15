@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T03:54:02.005Z",
+    "generatedAt": "2026-04-15T08:07:31.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "publication_run_id": "76b9fbd0-6d1a-4b41-9006-fea3153d1633",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "endpointBindings",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "7c6a5cfb31b0cd50b9984c8b58217d7c7e9938b01660d905030f17d57bbad094",
-    "sourceGeneratedAt": "2026-04-15T03:54:02.005Z",
+    "sourceSha256": "d4cd2e3c537f691b2596349b0473c09126bb203fa9e629db47407cda30f7f5b0",
+    "sourceGeneratedAt": "2026-04-15T08:07:31.280Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -10399,6 +10399,35 @@
       ]
     },
     {
+      "tableKey": "public.machine_raw_events",
+      "table": "machine_raw_events",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "mes_execution.machine_raw_events.create",
+        "mes_execution.machine_raw_events.delete",
+        "mes_execution.machine_raw_events.detail",
+        "mes_execution.machine_raw_events.list",
+        "mes_execution.machine_raw_events.update"
+      ],
+      "paths": [
+        "/api/runtime/mes_execution/machine_raw_events",
+        "/api/runtime/mes_execution/machine_raw_events/{id}"
+      ]
+    },
+    {
       "tableKey": "public.machine_telemetry_extended",
       "table": "machine_telemetry_extended",
       "endpointCount": 5,
@@ -14461,6 +14490,38 @@
       ]
     },
     {
+      "tableKey": "public.periodic_evaluation_closure_events",
+      "table": "periodic_evaluation_closure_events",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "record_system.periodic_evaluation_closure_events.create",
+        "record_system.periodic_evaluation_closure_events.delete",
+        "record_system.periodic_evaluation_closure_events.detail",
+        "record_system.periodic_evaluation_closure_events.list",
+        "record_system.periodic_evaluation_closure_events.transition",
+        "record_system.periodic_evaluation_closure_events.update"
+      ],
+      "paths": [
+        "/api/runtime/record_system/periodic_evaluation_closure_events",
+        "/api/runtime/record_system/periodic_evaluation_closure_events/{id}",
+        "/api/runtime/record_system/periodic_evaluation_closure_events/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.periodic_evaluations",
       "table": "periodic_evaluations",
       "endpointCount": 6,
@@ -16198,6 +16259,35 @@
         "/api/runtime/mes_execution/production_completion",
         "/api/runtime/mes_execution/production_completion/{id}",
         "/api/runtime/mes_execution/production_completion/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.production_derived_events",
+      "table": "production_derived_events",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "mes_execution.production_derived_events.create",
+        "mes_execution.production_derived_events.delete",
+        "mes_execution.production_derived_events.detail",
+        "mes_execution.production_derived_events.list",
+        "mes_execution.production_derived_events.update"
+      ],
+      "paths": [
+        "/api/runtime/mes_execution/production_derived_events",
+        "/api/runtime/mes_execution/production_derived_events/{id}"
       ]
     },
     {

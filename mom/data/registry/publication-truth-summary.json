@@ -2,33 +2,33 @@
   "publication_truth": {
     "scope": "platform_global",
     "truth_model": "global_canonical_plus_slice_summary",
-    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
-    "generated_at": "2026-04-15T03:54:27.166Z",
+    "publication_run_id": "76b9fbd0-6d1a-4b41-9006-fea3153d1633",
+    "generated_at": "2026-04-15T08:07:31.943Z",
     "schema_authority": "database/migrations -> schema.sql own storage truth; table-registry publishes logical runtime-contract tables, excluding physical partition children.",
     "schema_authority_counts": {
-      "logical_contract_table_count": 761,
-      "registry_contract_table_count": 761,
-      "physical_table_count": 774,
+      "logical_contract_table_count": 764,
+      "registry_contract_table_count": 764,
+      "physical_table_count": 777,
       "partition_table_count": 13,
       "matches_registry": true
     },
-    "table_count": 761,
+    "table_count": 764,
     "entity_counts": {
-      "total": 772,
-      "ready": 772,
+      "total": 775,
+      "ready": 775,
       "partial": 0,
       "blocked": 0,
-      "explanation": "772 frontend entities are published from 761 registered tables, with 8 non-table entities and 3 additional view aliases."
+      "explanation": "775 frontend entities are published from 764 registered tables, with 8 non-table entities and 3 additional view aliases."
     },
     "field_coverage": {
-      "tables_with_fields": 761,
+      "tables_with_fields": 764,
       "tables_without_fields": 0,
       "explanation": "All registered tables currently have field coverage."
     },
     "workflow_engine_bridge": {
       "ready": 345,
       "blocked": 0,
-      "unneeded": 427,
+      "unneeded": 430,
       "counting_model": "Entities with persisted or guarded runtime workflows need an explicit bridge; stateless or generic status flows do not."
     },
     "openapi": {

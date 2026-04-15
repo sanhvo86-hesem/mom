@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T03:45:59.584Z",
+    "generatedAt": "2026-04-15T08:07:25.343Z",
     "description": "Wave 6 normalization decisions for finance posting controls, valuation projections, and plant-performance snapshots."
   },
   "service_finance_gate_targets": {

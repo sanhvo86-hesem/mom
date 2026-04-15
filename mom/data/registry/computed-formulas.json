@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-15T03:39:27.703Z",
-    "formulaCount": 1353
+    "generatedAt": "2026-04-15T08:07:15.591Z",
+    "formulaCount": 1357
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -29715,6 +29715,90 @@
       {
         "type": "endpoint",
         "id": "record_system.controlled_import_receipts.transition"
+      }
+    ]
+  },
+  "f_machine_raw_events_record_count": {
+    "formulaId": "f_machine_raw_events_record_count",
+    "name": "Raw sự kiện Máy - Số bản ghi",
+    "nameEn": "Machine Raw Events Record Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM machine_raw_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "machine_raw_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.machine_raw_events.list"
+      }
+    ]
+  },
+  "f_periodic_evaluation_closure_events_record_count": {
+    "formulaId": "f_periodic_evaluation_closure_events_record_count",
+    "name": "Periodic Evaluation đóng sự kiện - Số bản ghi",
+    "nameEn": "Periodic Evaluation Closure Events Record Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM periodic_evaluation_closure_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "periodic_evaluation_closure_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.periodic_evaluation_closure_events.list"
+      }
+    ]
+  },
+  "f_periodic_evaluation_closure_events_closed_count": {
+    "formulaId": "f_periodic_evaluation_closure_events_closed_count",
+    "name": "Periodic Evaluation đóng sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Periodic Evaluation Closure Events Closed Count",
+    "category": "system",
+    "domain": "record_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE terminal_state IN ('closed','completed','archived','paid','delivered')) FROM periodic_evaluation_closure_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "periodic_evaluation_closure_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "record_system.periodic_evaluation_closure_events.transition"
+      }
+    ]
+  },
+  "f_production_derived_events_record_count": {
+    "formulaId": "f_production_derived_events_record_count",
+    "name": "Sản xuất Derived sự kiện - Số bản ghi",
+    "nameEn": "Production Derived Events Record Count",
+    "category": "manufacturing",
+    "domain": "mes_execution",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM production_derived_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "production_derived_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "mes_execution.production_derived_events.list"
       }
     ]
   }

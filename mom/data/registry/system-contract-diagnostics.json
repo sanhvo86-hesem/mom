@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T03:54:02.005Z",
+    "generatedAt": "2026-04-15T08:07:31.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "publication_run_id": "76b9fbd0-6d1a-4b41-9006-fea3153d1633",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,23 +24,23 @@
     "purpose": "Authority diagnostics proving the published contract is registry-derived, not workspace-draft-derived."
   },
   "summary": {
-    "tableCount": 761,
-    "authoritativeLogicalTableCount": 761,
-    "authoritativePhysicalTableCount": 774,
+    "tableCount": 764,
+    "authoritativeLogicalTableCount": 764,
+    "authoritativePhysicalTableCount": 777,
     "authoritativePartitionTableCount": 13,
-    "schemaAuthorityRegistryTableCount": 761,
-    "relationCount": 3463,
-    "relationEntityCount": 761,
-    "endpointCount": 4198,
-    "endpointBoundTableCount": 761,
+    "schemaAuthorityRegistryTableCount": 764,
+    "relationCount": 3468,
+    "relationEntityCount": 764,
+    "endpointCount": 4214,
+    "endpointBoundTableCount": 764,
     "workflowCount": 336,
-    "workflowEligibleTableCount": 401,
+    "workflowEligibleTableCount": 402,
     "workflowBoundTableCount": 356,
     "workflowBindingCoveragePercent": 89,
-    "statusManagedTableCount": 382,
-    "supportTableCount": 127,
+    "statusManagedTableCount": 383,
+    "supportTableCount": 130,
     "domainCount": 49,
-    "contractCount": 761,
+    "contractCount": 764,
     "criticalGapCount": 0,
     "warningCount": 2,
     "capabilityCount": 15,
@@ -62,7 +62,7 @@
     {
       "id": "status_columns_without_workflow_binding",
       "severity": "watch",
-      "count": 45,
+      "count": 46,
       "samples": [
         "ap_invoice_lines",
         "as_manufactured_snapshots",
@@ -87,13 +87,13 @@
         "order_collaboration_events",
         "order_document_requirements",
         "outbox_events",
+        "periodic_evaluation_closure_events",
         "plm_change_effectiveness_reviews",
         "plm_change_order_lines",
         "plm_change_training_requirements",
         "plm_requirements",
         "plm_test_results",
-        "pm_work_order_operations",
-        "purchase_order_line"
+        "pm_work_order_operations"
       ],
       "interpretation": "Status-only support/reference objects can be valid, but lifecycle owners should explicitly document why no workflow is required."
     },

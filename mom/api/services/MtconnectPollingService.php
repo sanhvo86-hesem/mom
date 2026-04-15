@@ -5,10 +5,12 @@ namespace MOM\Services;
 
 use DateTimeImmutable;
 use MOM\Database\DataLayer;
+use MOM\Services\Mes\MachineEventSpineService;
 use RuntimeException;
 use Throwable;
 
 require_once __DIR__ . '/EdgeConnectorService.php';
+require_once __DIR__ . '/Mes/MachineEventSpineService.php';
 require_once dirname(__DIR__, 2) . '/database/DataLayer.php';
 
 /**
@@ -25,8 +27,9 @@ final class MtconnectPollingService
 
     private EdgeConnectorService $edge;
     private ?DataLayer $dataLayer = null;
+    private ?MachineEventSpineService $machineEventSpine = null;
 
-    public function __construct(string $dataDir, string $rootDir, ?DataLayer $dataLayer = null)
+    public function __construct(string $dataDir, string $rootDir, ?DataLayer $dataLayer = null, ?MachineEventSpineService $machineEventSpine = null)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
@@ -36,6 +39,7 @@ final class MtconnectPollingService
         $this->observabilityFile = $this->dataDir . '/runtime-shadow/runtime-observability.json';
         $this->edge = new EdgeConnectorService();
         $this->dataLayer = $dataLayer;
+        $this->machineEventSpine = $machineEventSpine;
     }
 
     /**
@@ -247,6 +251,10 @@ final class MtconnectPollingService
         }
 
         $saved = $this->upsertConnectorRuntime($mes, $machine, $normalized, $username);
+        $rawMachineEvent = $this->recordMachineRawEvent($adapter, $machine, $normalized, $xml, $username);
+        $derivedProductionEvent = $rawMachineEvent['status'] === 'recorded' || $rawMachineEvent['status'] === 'replayed'
+            ? $this->deriveProductionEvent($rawMachineEvent, $saved, $normalized, $username)
+            : ['status' => 'not_available', 'reason' => $rawMachineEvent['reason'] ?? 'machine_raw_event_not_recorded'];
         $event = $this->appendConnectivityEvent($mes, [
             'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
             'machine_id' => $machineId,
@@ -277,9 +285,135 @@ final class MtconnectPollingService
             'poll_url' => $pollUrl,
             'feed' => $saved['feed'],
             'signal' => $saved['signal'],
+            'machine_raw_event' => $rawMachineEvent,
+            'production_derived_event' => $derivedProductionEvent,
             'event' => $event,
             'ingest_warnings' => array_values((array)($saved['ingest_warnings'] ?? [])),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $adapter
+     * @param array<string, mixed> $machine
+     * @param array<string, mixed> $normalized
+     * @return array<string, mixed>
+     */
+    private function recordMachineRawEvent(array $adapter, array $machine, array $normalized, string $xml, string $username): array
+    {
+        $spine = $this->machineEventSpine();
+        if ($spine === null) {
+            return ['status' => 'deferred', 'reason' => 'authoritative_machine_event_spine_store_required'];
+        }
+
+        try {
+            $sourceTimestamp = trim((string)($normalized['signal_at'] ?? $normalized['last_heartbeat_at'] ?? '')) ?: $this->nowIso();
+            $row = $spine->recordMachineEvent([
+                'adapter_id' => (string)($adapter['adapter_id'] ?? $adapter['adapter_name'] ?? 'mtconnect'),
+                'source_node_id' => (string)($normalized['machine_id'] ?? $machine['machine_id'] ?? ''),
+                'event_type' => 'mtconnect.current',
+                'source_timestamp' => $sourceTimestamp,
+                'quality_code' => $this->qualityCodeFromNormalized($normalized),
+                'sequence_no' => (string)($normalized['sequence_no'] ?? ''),
+                'raw_payload' => [
+                    'connector_type' => 'mtconnect',
+                    'machine_id' => (string)($normalized['machine_id'] ?? $machine['machine_id'] ?? ''),
+                    'work_center_id' => (string)($machine['work_center_id'] ?? ''),
+                    'wo_number' => (string)($normalized['wo_number'] ?? ''),
+                    'operator_id' => (string)($normalized['operator_id'] ?? ''),
+                    'machine_state' => (string)($normalized['machine_state'] ?? ''),
+                    'signal_at' => $sourceTimestamp,
+                    'last_heartbeat_at' => (string)($normalized['last_heartbeat_at'] ?? ''),
+                    'current_program_id' => (string)($normalized['current_program_id'] ?? ''),
+                    'part_count' => $normalized['part_count'] ?? null,
+                    'mtconnect_xml_sha256' => hash('sha256', $xml),
+                    'mtconnect_xml' => $xml,
+                ],
+                'source_system' => 'mtconnect.poller',
+                'source_record_id' => (string)($adapter['adapter_id'] ?? ''),
+                'org_company_code' => (string)($machine['org_company_code'] ?? ''),
+                'org_legal_entity_code' => (string)($machine['org_legal_entity_code'] ?? ''),
+                'org_plant_id' => (string)($machine['org_plant_id'] ?? ''),
+                'org_site_id' => (string)($machine['org_site_id'] ?? ''),
+            ], $username);
+
+            return [
+                'status' => !empty($row['replayed']) ? 'replayed' : 'recorded',
+                'machine_raw_event' => $row,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'status' => 'dead_letter',
+                'reason' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $rawMachineEvent
+     * @param array<string, mixed> $saved
+     * @param array<string, mixed> $normalized
+     * @return array<string, mixed>
+     */
+    private function deriveProductionEvent(array $rawMachineEvent, array $saved, array $normalized, string $username): array
+    {
+        $spine = $this->machineEventSpine();
+        $rawRow = is_array($rawMachineEvent['machine_raw_event'] ?? null) ? $rawMachineEvent['machine_raw_event'] : [];
+        $rawId = trim((string)($rawRow['machine_raw_event_id'] ?? ''));
+        if ($spine === null || $rawId === '') {
+            return ['status' => 'deferred', 'reason' => 'machine_raw_event_id_required'];
+        }
+
+        try {
+            $row = $spine->deriveProductionEvent([
+                'machine_raw_event_id' => $rawId,
+                'derivation_profile_id' => 'mtconnect.current.v1',
+                'event_time' => (string)($normalized['signal_at'] ?? $saved['signal']['signal_at'] ?? $this->nowIso()),
+                'machine_id' => (string)($normalized['machine_id'] ?? $saved['signal']['machine_id'] ?? ''),
+                'work_center_id' => (string)($saved['signal']['work_center_id'] ?? ''),
+                'work_order_id' => (string)($normalized['wo_number'] ?? $saved['signal']['wo_number'] ?? ''),
+                'payload' => [
+                    'machine_state' => (string)($normalized['machine_state'] ?? $saved['signal']['machine_state'] ?? ''),
+                    'part_count' => $normalized['part_count'] ?? $saved['signal']['part_count'] ?? null,
+                    'program_id' => (string)($normalized['current_program_id'] ?? $saved['signal']['current_program_id'] ?? ''),
+                ],
+            ], $username);
+
+            return [
+                'status' => !empty($row['replayed']) ? 'replayed' : 'derived',
+                'production_derived_event' => $row,
+            ];
+        } catch (Throwable $e) {
+            return ['status' => 'dead_letter', 'reason' => $e->getMessage()];
+        }
+    }
+
+    private function machineEventSpine(): ?MachineEventSpineService
+    {
+        if ($this->machineEventSpine !== null) {
+            return $this->machineEventSpine;
+        }
+        if ($this->dataLayer === null || $this->dataLayer->getMode() === DataLayer::MODE_JSON_ONLY) {
+            return null;
+        }
+        $connection = $this->dataLayer->getConnection();
+        if ($connection === null) {
+            return null;
+        }
+        $this->machineEventSpine = new MachineEventSpineService($connection);
+        return $this->machineEventSpine;
+    }
+
+    /**
+     * @param array<string, mixed> $normalized
+     */
+    private function qualityCodeFromNormalized(array $normalized): string
+    {
+        $warnings = (array)($normalized['_ingest']['warnings'] ?? []);
+        if ($warnings !== []) {
+            return 'questionable';
+        }
+        $state = strtolower(trim((string)($normalized['machine_state'] ?? '')));
+        return in_array($state, ['unavailable', 'unknown'], true) ? 'unknown' : 'good';
     }
 
     /**

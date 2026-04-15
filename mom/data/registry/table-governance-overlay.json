@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T03:47:29.144047+00:00",
+    "generatedAt": "2026-04-15T08:07:26.728832+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 761
+    "tableCount": 764
   },
   "summary": {
     "domains": {
@@ -40,7 +40,7 @@
       "lean_manufacturing": 8,
       "master_data": 17,
       "master_data_governance": 21,
-      "mes_execution": 70,
+      "mes_execution": 72,
       "mfg_engineering": 25,
       "mobile_operations": 3,
       "outsource_execution": 15,
@@ -51,7 +51,7 @@
       "purchasing": 14,
       "quality_lab": 16,
       "quality_management": 37,
-      "record_system": 21,
+      "record_system": 22,
       "sales": 17,
       "service_warranty": 13,
       "shipping_compliance": 7,
@@ -69,12 +69,12 @@
       "asset_lifecycle": 18,
       "domain_runtime": 106,
       "governed_support": 24,
-      "machine_runtime": 91,
+      "machine_runtime": 93,
       "platform_governance": 18,
-      "process_runtime": 475
+      "process_runtime": 476
     },
     "targetDeletionMode": {
-      "archive_only": 761
+      "archive_only": 764
     },
     "hardDeleteWaiverRequired": 0
   },
@@ -16194,6 +16194,51 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "machine_raw_events": {
+      "systemOfRecord": "postgres_migration:135_world_class_mes_event_spine_periodic_closure.sql",
+      "authorityMode": "machine_runtime",
+      "ownerRole": "production_manager",
+      "stewardRole": "mes_data_steward",
+      "dataClassification": "operational_machine_record",
+      "retentionClass": "machine_trace_record_3y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "mes_execution.machine_raw_events.create",
+        "mes_execution.machine_raw_events.delete",
+        "mes_execution.machine_raw_events.detail",
+        "mes_execution.machine_raw_events.list",
+        "mes_execution.machine_raw_events.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "manual_machine_runtime",
+        "operator_mes_console",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "machine_telemetry_extended": {
       "systemOfRecord": "postgres_migration:099_ai_integration_foundation.sql",
       "authorityMode": "machine_runtime",
@@ -22473,6 +22518,56 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "periodic_evaluation_closure_events": {
+      "systemOfRecord": "postgres_migration:135_world_class_mes_event_spine_periodic_closure.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "compliance_manager",
+      "stewardRole": "records_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "record_system.periodic_evaluation_closure_events.create",
+        "record_system.periodic_evaluation_closure_events.delete",
+        "record_system.periodic_evaluation_closure_events.detail",
+        "record_system.periodic_evaluation_closure_events.list",
+        "record_system.periodic_evaluation_closure_events.transition",
+        "record_system.periodic_evaluation_closure_events.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:periodic_evaluation_closure_events_terminal_state"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "periodic_evaluations": {
       "systemOfRecord": "postgres_migration:109_control_plane_cutover_hardening.sql",
       "authorityMode": "process_runtime",
@@ -25137,6 +25232,52 @@
       ],
       "aiAuthority": {
         "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "production_derived_events": {
+      "systemOfRecord": "postgres_migration:135_world_class_mes_event_spine_periodic_closure.sql",
+      "authorityMode": "machine_runtime",
+      "ownerRole": "production_manager",
+      "stewardRole": "mes_data_steward",
+      "dataClassification": "operational_machine_record",
+      "retentionClass": "machine_trace_record_3y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "mes_execution.production_derived_events.create",
+        "mes_execution.production_derived_events.delete",
+        "mes_execution.production_derived_events.detail",
+        "mes_execution.production_derived_events.list",
+        "mes_execution.production_derived_events.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "manual_machine_runtime",
+        "operator_mes_console",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
         "mustNotInferFrom": [
           "workspace_design",
           "frontend_label",

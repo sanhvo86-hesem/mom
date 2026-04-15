@@ -5974,7 +5974,7 @@ paths:
       operationId: eqmsPeriodicEvaluationDashboard
       tags: [EQMS Control Plane]
       summary: Read periodic evaluation dashboard
-      description: Returns periodic evaluation register, due state, integrity/audit-pack references, exceptions, and closure state.
+      description: Returns the org-scoped periodic evaluation register, due state, integrity/audit-pack references, exceptions, closure state, and append-only closure-event proof.
       security:
         - sessionCookie: []
       responses:
@@ -5989,7 +5989,7 @@ paths:
       operationId: eqmsSchedulePeriodicEvaluation
       tags: [EQMS Control Plane]
       summary: Schedule a periodic evaluation
-      description: Creates a governed periodic evaluation item with owner, due date, scope, and proof expectations.
+      description: Creates a governed periodic evaluation item with server-resolved org scope, owner, due date, scope, and proof expectations.
       security:
         - sessionCookie: []
           csrfHeader: []
@@ -6000,6 +6000,20 @@ paths:
             schema:
               type: object
               required: [evaluation_scope, scope_ref, due_at]
+              properties:
+                evaluation_scope:
+                  type: string
+                  enum: [evidence_record, change_order, document_revision, publication, genealogy_graph, system_integrity]
+                scope_ref:
+                  type: string
+                due_at:
+                  type: string
+                  format: date-time
+                assigned_role:
+                  type: string
+                result_payload:
+                  type: object
+                  additionalProperties: true
               additionalProperties: true
       responses:
         '201':
@@ -6015,7 +6029,7 @@ paths:
       operationId: eqmsClosePeriodicEvaluation
       tags: [EQMS Control Plane]
       summary: Close a periodic evaluation
-      description: Closes periodic evaluation only when required integrity, audit-pack, exception, and reviewer proof are recorded.
+      description: Closes an org-scoped periodic evaluation only when required integrity, audit-pack, waiver signature, and reviewer proof are recorded; terminal rows are immutable and closure is represented by an append-only event.
       security:
         - sessionCookie: []
           csrfHeader: []
@@ -6025,7 +6039,28 @@ paths:
           application/json:
             schema:
               type: object
-              required: [periodic_evaluation_id, closure_reason]
+              required: [periodic_evaluation_id, evaluation_state]
+              properties:
+                periodic_evaluation_id:
+                  type: string
+                  format: uuid
+                evaluation_state:
+                  type: string
+                  enum: [passed, failed, waived]
+                integrity_digest_id:
+                  type: string
+                  format: uuid
+                audit_pack_export_id:
+                  type: string
+                  format: uuid
+                waiver_signature_event_id:
+                  type: string
+                  format: uuid
+                closure_reason:
+                  type: string
+                result_payload:
+                  type: object
+                  additionalProperties: true
               additionalProperties: true
       responses:
         '200':

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T03:54:02.005Z",
+    "generatedAt": "2026-04-15T08:07:31.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "bf4ce477-45af-4961-b42b-1e756c6c5abf",
+    "publication_run_id": "76b9fbd0-6d1a-4b41-9006-fea3153d1633",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,23 +24,23 @@
     "purpose": "Full DB-derived table contract index. Read-only; regenerate from registry authority."
   },
   "summary": {
-    "tableCount": 761,
-    "authoritativeLogicalTableCount": 761,
-    "authoritativePhysicalTableCount": 774,
+    "tableCount": 764,
+    "authoritativeLogicalTableCount": 764,
+    "authoritativePhysicalTableCount": 777,
     "authoritativePartitionTableCount": 13,
-    "schemaAuthorityRegistryTableCount": 761,
-    "relationCount": 3463,
-    "relationEntityCount": 761,
-    "endpointCount": 4198,
-    "endpointBoundTableCount": 761,
+    "schemaAuthorityRegistryTableCount": 764,
+    "relationCount": 3468,
+    "relationEntityCount": 764,
+    "endpointCount": 4214,
+    "endpointBoundTableCount": 764,
     "workflowCount": 336,
-    "workflowEligibleTableCount": 401,
+    "workflowEligibleTableCount": 402,
     "workflowBoundTableCount": 356,
     "workflowBindingCoveragePercent": 89,
-    "statusManagedTableCount": 382,
-    "supportTableCount": 127,
+    "statusManagedTableCount": 383,
+    "supportTableCount": 130,
     "domainCount": 49,
-    "contractCount": 761,
+    "contractCount": 764,
     "criticalGapCount": 0,
     "warningCount": 2,
     "capabilityCount": 15,
@@ -11459,6 +11459,39 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.machine_raw_events",
+      "table": "machine_raw_events",
+      "schema": "public",
+      "domain": "mes_execution",
+      "label": "Raw sự kiện Máy",
+      "labelEn": "Machine Raw Events",
+      "primaryKey": "machine_raw_event_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 21,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
       "tableKey": "public.machine_telemetry_extended",
       "table": "machine_telemetry_extended",
       "schema": "public",
@@ -15977,6 +16010,40 @@
       "governanceMissingCount": 0
     },
     {
+      "tableKey": "public.periodic_evaluation_closure_events",
+      "table": "periodic_evaluation_closure_events",
+      "schema": "public",
+      "domain": "record_system",
+      "label": "Periodic Evaluation đóng sự kiện",
+      "labelEn": "Periodic Evaluation Closure Events",
+      "primaryKey": "periodic_evaluation_closure_event_id",
+      "statusColumn": "terminal_state",
+      "statusSet": "periodic_evaluation_closure_events_terminal_state",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 11,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
+    },
+    {
       "tableKey": "public.periodic_evaluations",
       "table": "periodic_evaluations",
       "schema": "public",
@@ -15989,7 +16056,7 @@
       "workflowId": "wf_periodic_evaluation",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 15,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -17885,6 +17952,39 @@
         "update": 1
       },
       "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.production_derived_events",
+      "table": "production_derived_events",
+      "schema": "public",
+      "domain": "mes_execution",
+      "label": "Sản xuất Derived sự kiện",
+      "labelEn": "Production Derived Events",
+      "primaryKey": "production_derived_event_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 13,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 8
     },
     {
       "tableKey": "public.production_order",

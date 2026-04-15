@@ -1364,9 +1364,11 @@ final class ShopfloorExecutionService
                     'ot_boundary' => 'manual_capture_no_machine_control',
                 ],
             ]);
+            $genealogyEmission = $this->emitProductionGenealogyEdges($log, $target, $actorId, is_array($result['event'] ?? null) ? (array)$result['event'] : []);
             return [
                 'projection_status' => !empty($result['replayed']) ? 'replayed' : 'recorded',
                 'manufacturing_event' => is_array($result['event'] ?? null) ? $result['event'] : [],
+                'genealogy_emission' => $genealogyEmission,
                 'replayed' => (bool)($result['replayed'] ?? false),
             ];
         } catch (Throwable $e) {
@@ -1379,6 +1381,161 @@ final class ShopfloorExecutionService
                 'dead_letter' => $deadLetter,
             ];
         }
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     * @param array<string, mixed> $target
+     * @param array<string, mixed> $manufacturingEvent
+     * @return array<string, mixed>
+     */
+    private function emitProductionGenealogyEdges(array $log, array $target, string $actorId, array $manufacturingEvent): array
+    {
+        $facts = $this->productionGenealogyFacts($log, $target, $manufacturingEvent);
+        if ($facts === []) {
+            return [
+                'status' => 'not_applicable',
+                'reason' => 'no_production_genealogy_edges_available',
+                'attempted' => 0,
+                'emitted' => 0,
+            ];
+        }
+
+        $changeRef = $this->stringValue(
+            $log['genealogy_change_order_id']
+            ?? $log['change_order_id']
+            ?? $target['genealogy_change_order_id']
+            ?? $target['change_order_id']
+            ?? '',
+        );
+        if ($changeRef === '') {
+            return [
+                'status' => 'blocked_change_authority_required',
+                'reason' => 'genealogy_change_authority_required',
+                'attempted' => count($facts),
+                'emitted' => 0,
+            ];
+        }
+
+        $service = $this->genealogyGraph;
+        if ($service === null && $this->dataLayer !== null) {
+            $service = new GenealogyGraphService($this->dataLayer);
+        }
+        if ($service === null) {
+            return [
+                'status' => 'blocked_authoritative_store_required',
+                'reason' => 'authoritative_genealogy_store_required',
+                'attempted' => count($facts),
+                'emitted' => 0,
+            ];
+        }
+
+        $emitted = [];
+        $blocked = [];
+        foreach ($facts as $fact) {
+            $fact['change_order_id'] = $changeRef;
+            try {
+                $emitted[] = $service->recordEdgeFact($fact, $actorId);
+            } catch (Throwable $e) {
+                $blocked[] = [
+                    'edge_fact_type' => (string)($fact['edge_fact_type'] ?? ''),
+                    'from_object_type' => (string)($fact['from_object_type'] ?? ''),
+                    'from_object_id' => (string)($fact['from_object_id'] ?? ''),
+                    'to_object_type' => (string)($fact['to_object_type'] ?? ''),
+                    'to_object_id' => (string)($fact['to_object_id'] ?? ''),
+                    'reason' => $e->getMessage(),
+                ];
+            }
+        }
+
+        return [
+            'status' => $blocked === [] ? 'emitted' : ($emitted === [] ? 'blocked' : 'partially_emitted'),
+            'attempted' => count($facts),
+            'emitted' => count($emitted),
+            'blocked' => $blocked,
+            'edge_facts' => $emitted,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $log
+     * @param array<string, mixed> $target
+     * @param array<string, mixed> $manufacturingEvent
+     * @return list<array<string, mixed>>
+     */
+    private function productionGenealogyFacts(array $log, array $target, array $manufacturingEvent): array
+    {
+        $sourceEventId = $this->stringValue($manufacturingEvent['event_id'] ?? $log['log_id'] ?? '');
+        if ($sourceEventId === '') {
+            $sourceEventId = 'production-log-' . hash('sha256', $this->stringValue($log['report_fingerprint'] ?? ''));
+        }
+        $eventTime = $this->stringValue($log['actual_end'] ?? $log['updated_at'] ?? '') ?: gmdate(DATE_ATOM);
+        $workOrderId = $this->stringValue($log['wo_number'] ?? $target['wo_number'] ?? $target['target_id'] ?? '');
+        if ($workOrderId === '') {
+            return [];
+        }
+
+        $scope = $this->traceability5MScope($this->traceability5MContext($log, $target, $this->stringValue($log['operator_id'] ?? '')));
+        if ($scope === []) {
+            return [];
+        }
+
+        $facts = [];
+        $materialLot = $this->stringValue($log['material_lot_id'] ?? $log['material_lot_number'] ?? $target['material_lot_id'] ?? $target['material_lot_number'] ?? '');
+        if ($materialLot !== '') {
+            $facts[] = [
+                'edge_fact_type' => 'consume',
+                'from_object_type' => 'material',
+                'from_object_id' => $materialLot,
+                'to_object_type' => 'work_order',
+                'to_object_id' => $workOrderId,
+                'quantity' => max(0, (int)($log['quantity_total'] ?? 0)),
+                'uom' => $this->stringValue($log['uom'] ?? $target['uom'] ?? 'EA') ?: 'EA',
+                'effective_at' => $eventTime,
+                'source_event_id' => $sourceEventId . ':consume:' . $materialLot,
+                'field_path' => 'genealogy.consume',
+                'requested_effect' => 'metadata_update',
+                'scope' => $scope,
+                'metadata' => [
+                    'source' => 'shopfloor_execution_auto_emission',
+                    'log_id' => $this->stringValue($log['log_id'] ?? ''),
+                    'target_id' => $this->stringValue($target['target_id'] ?? ''),
+                ],
+            ];
+        }
+
+        $outputLot = $this->stringValue(
+            $log['output_lot_id']
+            ?? $log['produced_lot_id']
+            ?? $log['lot_number']
+            ?? $target['output_lot_id']
+            ?? $target['produced_lot_id']
+            ?? $target['lot_number']
+            ?? '',
+        );
+        if ($outputLot !== '') {
+            $facts[] = [
+                'edge_fact_type' => 'produce',
+                'from_object_type' => 'work_order',
+                'from_object_id' => $workOrderId,
+                'to_object_type' => 'lot',
+                'to_object_id' => $outputLot,
+                'quantity' => max(0, (int)($log['quantity_good'] ?? 0)),
+                'uom' => $this->stringValue($log['uom'] ?? $target['uom'] ?? 'EA') ?: 'EA',
+                'effective_at' => $eventTime,
+                'source_event_id' => $sourceEventId . ':produce:' . $outputLot,
+                'field_path' => 'genealogy.produce',
+                'requested_effect' => 'metadata_update',
+                'scope' => $scope,
+                'metadata' => [
+                    'source' => 'shopfloor_execution_auto_emission',
+                    'log_id' => $this->stringValue($log['log_id'] ?? ''),
+                    'target_id' => $this->stringValue($target['target_id'] ?? ''),
+                ],
+            ];
+        }
+
+        return $facts;
     }
 
     /**
