@@ -224,6 +224,9 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
   const backendContract = readJson('mom/design/repo-alignment/backend-graphics-authority-api-contract.json');
 
   if (templateAuthority) {
+    if (templateAuthority.artifactRole !== 'imported-planning-projection' || templateAuthority.snapshotOnly !== true || templateAuthority.productionAuthority !== false) {
+      errors.push('mom/design/graphics/template-registry-authority.json: imported template registry must be explicitly marked as snapshot-only non-production projection');
+    }
     const templates = Array.isArray(templateAuthority.templates) ? templateAuthority.templates : [];
     if (templates.length !== packets.length) {
       errors.push(`mom/design/graphics/template-registry-authority.json: expected ${packets.length} templates from canonical manifest, found ${templates.length}`);
@@ -252,8 +255,18 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
   }
 
   if (themeMatrix) {
+    if (themeMatrix.artifactRole !== 'runtime-compatibility-projection' || themeMatrix.productionAuthority !== false) {
+      errors.push('mom/design/graphics/theme-compatibility-matrix.json: theme matrix must be explicitly marked as non-production runtime compatibility projection');
+    }
     const rows = Array.isArray(themeMatrix.matrix) ? themeMatrix.matrix : [];
     if (!rows.length) errors.push('mom/design/graphics/theme-compatibility-matrix.json: matrix must not be empty');
+    const runtimeRows = rows.filter((row) => row && row.runtimePresetExists === true);
+    if (Number(themeMatrix.adminUiThemeCount || 0) !== rows.length) {
+      errors.push(`mom/design/graphics/theme-compatibility-matrix.json: adminUiThemeCount ${themeMatrix.adminUiThemeCount} does not match matrix length ${rows.length}`);
+    }
+    if (Number(themeMatrix.exactOverlapCountKnownInCurrentMom || 0) !== runtimeRows.length) {
+      errors.push(`mom/design/graphics/theme-compatibility-matrix.json: exactOverlapCountKnownInCurrentMom ${themeMatrix.exactOverlapCountKnownInCurrentMom} does not match runtime-supported rows ${runtimeRows.length}`);
+    }
     for (const row of rows) {
       const status = String(row.status || '').toLowerCase();
       const hasRuntime = row.runtimePresetExists === true;

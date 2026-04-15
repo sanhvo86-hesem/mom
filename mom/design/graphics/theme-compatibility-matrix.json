@@ -1,7 +1,16 @@
 {
-  "adminUiThemeCount": 20,
-  "runtimePresetCountKnownInCurrentMom": 8,
-  "exactOverlapCountKnownInCurrentMom": 5,
+  "artifactRole": "runtime-compatibility-projection",
+  "snapshotOnly": false,
+  "productionAuthority": false,
+  "sourcePackId": "module-layout-template-design-system-v4-current-mom-worldclass",
+  "sourceOfTruth": [
+    "mom/scripts/portal/00b-theme-manager.js",
+    "mom/scripts/portal/00c-admin-appearance.js"
+  ],
+  "consumerRule": "This matrix is a checked projection of Admin selectable themes against HmTheme runtime presets. Admin publish/apply remains gated by runtime support and backend graphics governance.",
+  "adminUiThemeCount": 23,
+  "runtimePresetCountKnownInCurrentMom": 23,
+  "exactOverlapCountKnownInCurrentMom": 23,
   "matrix": [
     {
       "adminThemeId": "professional-light",
@@ -40,109 +49,130 @@
     },
     {
       "adminThemeId": "sunrise-warm",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset or explicit alias."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "sunrise-warm",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "sunset-ember",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "sunset-ember",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "arctic-snow",
-      "runtimePresetExists": false,
-      "status": "derived-map-candidate",
-      "runtimeMapping": null,
-      "requiredAction": "Could derive from slate-ice with explicit mapping."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "arctic-snow",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "cherry-blossom",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "cherry-blossom",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "lavender-dream",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "lavender-dream",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "industrial-steel",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset or de-scope from admin."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "industrial-steel",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "shopfloor-signal",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset and kiosk/shopfloor contrast proof."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "shopfloor-signal",
+      "requiredAction": "Runtime preset exists; shopfloor rollout still requires impact/compliance proof."
     },
     {
       "adminThemeId": "executive-glass",
-      "runtimePresetExists": false,
-      "status": "blocked-until-fallback",
-      "runtimeMapping": null,
-      "requiredAction": "Must provide non-blur fallback and runtime mapping."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "executive-glass",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "compliance-paper",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs print/readability runtime mapping."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "compliance-paper",
+      "requiredAction": "Runtime preset exists; regulated rollout still requires evidence proof."
     },
     {
       "adminThemeId": "focus-mode",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "focus-mode",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "vibrant-energy",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset; verify gradient policy."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "vibrant-energy",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "soft-pastel",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "soft-pastel",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "earth-tone",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset and contrast proof."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "earth-tone",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     },
     {
       "adminThemeId": "neon-pulse",
-      "runtimePresetExists": false,
-      "status": "blocked-until-motion-proof",
-      "runtimeMapping": null,
-      "requiredAction": "Needs reduced-motion and contrast proof."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "neon-pulse",
+      "requiredAction": "Runtime preset exists; rollout still requires reduced-motion and contrast evidence."
     },
     {
       "adminThemeId": "zen-minimal",
-      "runtimePresetExists": false,
-      "status": "preview-only",
-      "runtimeMapping": null,
-      "requiredAction": "Needs runtime preset."
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "zen-minimal",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
+    },
+    {
+      "adminThemeId": "ember-industrial",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "ember-industrial",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
+    },
+    {
+      "adminThemeId": "graphite-amber",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "graphite-amber",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
+    },
+    {
+      "adminThemeId": "slate-ice",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "slate-ice",
+      "requiredAction": "Runtime preset exists; publish/apply remains backend-gated."
     }
   ],
-  "governanceRule": "A theme selectable in Admin UI must not be treated as production-ready until runtime preset mapping, token coverage, reduced-motion coverage and contrast evidence are complete."
+  "governanceRule": "A theme selectable in Admin UI must have an HmTheme runtime preset. Runtime support is necessary but not sufficient: backend impact, compliance, drift, waiver and release evidence gates still control publish/apply."
 }

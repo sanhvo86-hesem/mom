@@ -1,5 +1,11 @@
 {
   "version": "2026.04.14-current-mom-worldclass",
+  "artifactRole": "imported-planning-projection",
+  "snapshotOnly": true,
+  "productionAuthority": false,
+  "sourcePackId": "module-layout-template-design-system-v4-current-mom-worldclass",
+  "promotionAuthority": "backend-graphics-governance",
+  "consumerRule": "This file is an imported planning projection. Production template authority must be read from the backend graphics governance registry and promoted through validate/publish/apply gates.",
   "templates": [
     {
       "templateId": "T-object-page-commercial-master",

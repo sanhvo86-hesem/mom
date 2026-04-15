@@ -564,6 +564,14 @@ def main() -> int:
         }
         check("graphics_release_link_complete", isinstance(release_link, dict) and link_fields.issubset(release_link.keys()),
               f"keys={sorted(release_link.keys()) if isinstance(release_link, dict) else []}")
+        authority_refs = release_link.get("graphicsAuthorityRefs", []) if isinstance(release_link, dict) else []
+        graphics_pack_refs = [
+            str(ref) for ref in authority_refs
+            if isinstance(ref, str) and ref.startswith("mom/design/graphics/")
+        ]
+        check("graphics_release_link_references_graphics_pack",
+              len(graphics_pack_refs) >= 5,
+              f"graphics_pack_refs={graphics_pack_refs}")
         release_blockers = graphics.get("releaseBlockers", {}).get("blockers", [])
         active_graphics_release_blockers = [
             row for row in release_blockers
@@ -580,6 +588,19 @@ def main() -> int:
             check("graphics_no_active_blockers_mark_ready",
                   (not release_blocked) and release_link.get("releaseReadinessState", "ready") == "ready",
                   f"releaseBlocked={release_blocked} state={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
+        dashboard = graphics.get("graphicsReleaseDashboard", {})
+        dashboard_evidence = dashboard.get("blockers", {}).get("evidence", {}) if isinstance(dashboard, dict) else {}
+        check("graphics_release_dashboard_matches_release_link",
+              isinstance(dashboard, dict)
+              and dashboard.get("readiness") == release_link.get("releaseReadinessState")
+              and bool(dashboard_evidence.get("releaseBlocked")) == release_blocked
+              and dashboard_evidence.get("releaseReadinessState") == release_link.get("releaseReadinessState"),
+              f"dashboardReadiness={dashboard.get('readiness') if isinstance(dashboard, dict) else None} dashboardBlocked={dashboard_evidence.get('releaseBlocked') if isinstance(dashboard_evidence, dict) else None} linkBlocked={release_blocked} linkState={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
+        evidence_pack = graphics.get("graphicsReleaseEvidencePack", {})
+        evidence_pack_ready = isinstance(evidence_pack, dict) and evidence_pack.get("status") == "ready" and evidence_pack.get("releaseBlockersStatus") == "ready"
+        check("graphics_release_evidence_pack_matches_release_link",
+              evidence_pack_ready == ((not release_blocked) and release_link.get("releaseReadinessState") == "ready"),
+              f"evidencePackStatus={evidence_pack.get('status') if isinstance(evidence_pack, dict) else None} releaseBlockersStatus={evidence_pack.get('releaseBlockersStatus') if isinstance(evidence_pack, dict) else None} linkBlocked={release_blocked} linkState={release_link.get('releaseReadinessState') if isinstance(release_link, dict) else None}")
         evidence_refs: set[str] = set()
         collect_graphics_evidence_refs(graphics, evidence_refs)
         untracked_evidence_refs = sorted(ref for ref in evidence_refs if not git_tracked(ref))
@@ -623,6 +644,11 @@ def main() -> int:
             template_authority_path = pack_artifacts["template_registry_authority"]
             if template_authority_path.is_file():
                 template_authority = load(template_authority_path)
+                check("graphics_pack_template_authority_marked_projection",
+                      template_authority.get("artifactRole") == "imported-planning-projection"
+                      and template_authority.get("snapshotOnly") is True
+                      and template_authority.get("productionAuthority") is False,
+                      f"artifactRole={template_authority.get('artifactRole')} snapshotOnly={template_authority.get('snapshotOnly')} productionAuthority={template_authority.get('productionAuthority')}")
                 pack_templates = template_authority.get("templates", [])
                 check("graphics_pack_template_count_matches_manifest",
                       isinstance(pack_templates, list) and len(pack_templates) == pack_count,
@@ -640,6 +666,18 @@ def main() -> int:
             if theme_matrix_path.is_file():
                 theme_matrix = load(theme_matrix_path)
                 theme_rows = theme_matrix.get("matrix", [])
+                runtime_rows = [
+                    row for row in theme_rows
+                    if isinstance(row, dict) and row.get("runtimePresetExists") is True
+                ]
+                check("graphics_pack_theme_matrix_marked_projection",
+                      theme_matrix.get("artifactRole") == "runtime-compatibility-projection"
+                      and theme_matrix.get("productionAuthority") is False,
+                      f"artifactRole={theme_matrix.get('artifactRole')} productionAuthority={theme_matrix.get('productionAuthority')}")
+                check("graphics_pack_theme_matrix_counts_match_rows",
+                      int(theme_matrix.get("adminUiThemeCount") or 0) == len(theme_rows)
+                      and int(theme_matrix.get("exactOverlapCountKnownInCurrentMom") or 0) == len(runtime_rows),
+                      f"adminUiThemeCount={theme_matrix.get('adminUiThemeCount')} rows={len(theme_rows)} exactOverlap={theme_matrix.get('exactOverlapCountKnownInCurrentMom')} runtimeRows={len(runtime_rows)}")
                 unsafe_rows = [
                     row.get("adminThemeId", "unknown")
                     for row in theme_rows
@@ -676,6 +714,11 @@ def main() -> int:
             check("truth_graphics_release_gate_ready",
                   graphics_gate.get("ready") is True,
                   f"graphics_release_gate={graphics_gate}")
+        if "release_link" in locals() and isinstance(release_link, dict):
+            release_link_ready = (not bool(release_link.get("releaseBlocked"))) and release_link.get("releaseReadinessState") == "ready"
+            check("truth_graphics_release_gate_matches_release_link",
+                  graphics_gate.get("ready") == release_link_ready,
+                  f"truthReady={graphics_gate.get('ready')} releaseLinkReady={release_link_ready} releaseLinkState={release_link.get('releaseReadinessState')}")
 
     # Gate L: Entity accounting
     print("\nGate L: Entity accounting")
