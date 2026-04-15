@@ -30,7 +30,7 @@ PHP 8.2+, PostgreSQL 16, Redis 7, RabbitMQ — custom MVC, no framework.
 ## File placement quick reference
 | Type | Location |
 |------|----------|
-| AI prompts | `mom/docs/ai-prompts/` |
+| AI prompts | `docs/ai-prompts/` |
 | Specs/architecture | `docs/architecture/` or `docs/backend/` |
 | Audits | `docs/audits/` |
 | Standards | `docs/standards/` |

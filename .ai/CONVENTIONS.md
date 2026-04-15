@@ -99,7 +99,7 @@ Each AI tool reads a different config file. All of them point here.
 
 | You are creating... | Put it in | Example |
 |---|---|---|
-| AI prompt or context doc | `mom/docs/ai-prompts/` | `backend-upgrade-prompt-2026-04-15.md` |
+| AI prompt or context doc | `docs/ai-prompts/` | `backend-upgrade-prompt-2026-04-15.md` |
 | Architecture spec or decision | `docs/architecture/` | `event-sourcing-decision.md` |
 | API specification | `docs/api/` | `billing-api-contracts.md` |
 | Backend specification | `docs/backend/` | `CACHE_INVALIDATION_SPEC.md` |

@@ -16,8 +16,8 @@ smoke_assert(
     portal_normalize_streamed_doc_url(
         'mom/docs/operations/references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html',
         '../../../assets/style.css'
-    ) === '/assets/style.css',
-    'Inline doc CSS should resolve to the root assets path.'
+    ) === '/mom/assets/style.css',
+    'Inline doc CSS should resolve to the canonical mom/assets path.'
 );
 smoke_assert(
     portal_normalize_streamed_doc_url(
@@ -46,7 +46,7 @@ $rewrittenSample = portal_rewrite_streamed_html(
     $sampleHtml,
     'mom/docs/operations/references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html'
 );
-smoke_assert(str_contains($rewrittenSample, 'href="/assets/style.css"'), 'Rewritten HTML should expose root-relative stylesheet links.');
+smoke_assert(str_contains($rewrittenSample, 'href="/mom/assets/style.css"'), 'Rewritten HTML should expose canonical /mom/assets stylesheet links.');
 smoke_assert(str_contains($rewrittenSample, 'href="/mom/portal.html"'), 'Rewritten HTML should expose root-relative portal links.');
 
 $portalHtml = file_get_contents(QMS_TEST_ROOT_DIR . '/mom/portal.html');

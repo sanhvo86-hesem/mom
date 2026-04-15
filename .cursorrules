@@ -31,7 +31,7 @@ NEVER place files at repo root. NEVER put reports in `mom/docs/`.
 - Production write paths: role-guarded, auditable, least-privilege
 
 ## Where files go (quick reference)
-- AI prompt docs → `mom/docs/ai-prompts/`
+- AI prompt docs → `docs/ai-prompts/`
 - Architecture specs → `docs/architecture/`
 - Security audits → `docs/audits/`
 - QMS standards → `docs/standards/`

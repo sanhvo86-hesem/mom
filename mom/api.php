@@ -465,6 +465,8 @@ function portal_doc_legacy_to_canonical_prefix_map(): array {
     '04-Bieu-Mau/' => 'mom/docs/forms/',
     '10-Training-Academy/' => 'mom/docs/training/',
     '01-QMS-Portal/' => 'mom/',
+    // Asset path redirect: old root-level assets/ → canonical mom/assets/
+    'assets/' => 'mom/assets/',
   ];
   return $map;
 }
@@ -15896,8 +15898,8 @@ switch ($action) {
     $folderTrim = trim($folder, '/');
     $depth = ($folderTrim === '') ? 0 : count(array_filter(explode('/', $folderTrim)));
     $rootHref = str_repeat('../', $depth) . 'mom/portal.html';
-    $assetsCss = str_repeat('../', $depth) . 'assets/style.css';
-    $assetsJs  = str_repeat('../', $depth) . 'assets/app.js';
+    $assetsCss = str_repeat('../', $depth) . 'mom/assets/style.css';
+    $assetsJs  = str_repeat('../', $depth) . 'mom/assets/app.js';
 
     $docHtml = '<!DOCTYPE html>' . "\n" .
       '<html lang="vi">' . "\n" .
@@ -18022,7 +18024,6 @@ if ($username === '') {
         $relFound = rel_path($file->getPathname(), $ROOT_DIR);
         if (
           str_starts_with($relFound, 'mom/')
-          || str_starts_with($relFound, 'assets/')
           || str_starts_with($relFound, 'mom/docs/glossary/')
         ) {
           continue;
@@ -18346,7 +18347,6 @@ if ($username === '') {
           $relFound = rel_path($file->getPathname(), $ROOT_DIR);
           if (
             str_starts_with($relFound, 'mom/')
-            || str_starts_with($relFound, 'assets/')
             || str_starts_with($relFound, 'mom/docs/glossary/')
           ) {
             continue;
@@ -19438,7 +19438,6 @@ if ($username === '') {
           // Skip portal and data dirs
           if (
             str_starts_with($rel, 'mom/')
-            || str_starts_with($rel, 'assets/')
             || str_starts_with($rel, 'mom/docs/glossary/')
           ) continue;
       if (!filename_matches_doc_code($file->getFilename(), $oldCode)) continue;
