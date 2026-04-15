@@ -2,9 +2,11 @@
 
 Branch: `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033`
 
-Validated remediation head before first release-evidence commit: `c8b09002ff408bf31ac06fe423a0dc35d986fd6d`
+Validated remediation head before first release-evidence commit: `14dc430d2b07e995ca87f936c6554c832fe5866f`
 
-Closure-loop remediation head: `b908f82de6e745339478d3497d80eefd5d8a8208`
+Closure-loop remediation head: `48b7f967ab9ac927261b7d33d76b5fef56a771d4`
+
+Main sync note: after interruption recovery, local `main` had advanced to `8f4b703066a299a8780ed7dc11633727d6d34cb8`. The remediation branch was rebased onto that exact `main` head before push/PR/merge; no remote remediation branch existed, so no force-push was required.
 
 ## Residual Debt Register
 
@@ -93,3 +95,9 @@ Reference sources:
 | Runbooks/evidence present | Yes |
 | Waivers documented | Yes |
 | Promotion claimed | No; pre-merge validation only |
+
+## 2026-04-15 15:20 Main Sync Addendum
+
+| Late sync finding | Closure evidence |
+|---|---|
+| The interrupted workspace returned on `main`, and local `main` was ahead of `origin/main` by `8f4b703066a299a8780ed7dc11633727d6d34cb8`. Merging the remediation branch without synchronizing would have stranded either graphics governance proof gates or the closure remediation. | Rebased `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033` onto local `main` at `8f4b703066a299a8780ed7dc11633727d6d34cb8`. New closure-loop remediation commit is `48b7f967ab9ac927261b7d33d76b5fef56a771d4`; release evidence was updated to bind that rebase result. |

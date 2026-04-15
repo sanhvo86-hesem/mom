@@ -33,8 +33,8 @@
     "Exit WORM provider waiver by implementing Azure Immutable Blob or S3 Object Lock adapter"
   ],
   "closure_loop_evidence": [
-    "Second re-audit P1 for MES event spine closed by b908f82de6e745339478d3497d80eefd5d8a8208",
-    "Second re-audit P1 for periodic evaluation immutability/scope closed by b908f82de6e745339478d3497d80eefd5d8a8208",
+    "Second re-audit P1 for MES event spine closed by 48b7f967ab9ac927261b7d33d76b5fef56a771d4 after rebasing onto main 8f4b703066a299a8780ed7dc11633727d6d34cb8",
+    "Second re-audit P1 for periodic evaluation immutability/scope closed by 48b7f967ab9ac927261b7d33d76b5fef56a771d4 after rebasing onto main 8f4b703066a299a8780ed7dc11633727d6d34cb8",
     "Validation after closure loop: composer analyse, composer test, composer check, repo boundary, release candidate verifier, schema publication orchestrator"
   ]
 }

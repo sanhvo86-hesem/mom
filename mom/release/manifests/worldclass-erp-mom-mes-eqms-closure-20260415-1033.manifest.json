@@ -3,9 +3,9 @@
   "manifest_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1033",
   "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
   "base_branch": "main",
-  "base_head": "a7b499ec4ce412f5945bd371770166790292777a",
-  "validated_head": "b908f82de6e745339478d3497d80eefd5d8a8208",
-  "validated_tree": "d3063274c7d63c70591d888046b7087f41f77ea6",
+  "base_head": "8f4b703066a299a8780ed7dc11633727d6d34cb8",
+  "validated_head": "48b7f967ab9ac927261b7d33d76b5fef56a771d4",
+  "validated_tree": "4b10a524b6ca0336c161dcf1f9fa5869ec3be0ca",
   "record_state": "pre_merge_validated_controlled_source_manifest",
   "created_at": "2026-04-15T07:41:10Z",
   "change_authority": {
@@ -15,10 +15,10 @@
   },
   "branch_activity_note": {
     "created_branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
-    "checkpoint_commit": "332b86dc31bbb4d205d8eb479162aff4449c5dc1",
-    "remediation_commit": "c8b09002ff408bf31ac06fe423a0dc35d986fd6d",
-    "closure_loop_commit": "b908f82de6e745339478d3497d80eefd5d8a8208",
-    "note": "Branch was created for the current closure run. HEAD was explicitly corrected back to the new branch after a stale interrupted agent left the worktree attached to the inherited tranche18 branch at the same commit."
+    "checkpoint_commit": "62e3c66631f94257ff5c645e880c2af8c5936c2c",
+    "remediation_commit": "14dc430d2b07e995ca87f936c6554c832fe5866f",
+    "closure_loop_commit": "48b7f967ab9ac927261b7d33d76b5fef56a771d4",
+    "note": "Branch was created for the current closure run. HEAD was explicitly corrected back to the new branch after a stale interrupted agent left the worktree attached to the inherited tranche18 branch at the same commit. After interruption recovery, local main had advanced to 8f4b703066a299a8780ed7dc11633727d6d34cb8; this branch was rebased onto that main head before push/PR/merge. No remote remediation branch existed, so no force-push was required."
   },
   "tracked_manifest_binding_note": {
     "waiver_ref": "tracked_manifest_self_commit_hash_limitation",
