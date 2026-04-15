@@ -1,7 +1,7 @@
 {
   "artifact_type": "reverse_sync_intake",
-  "intake_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1033",
-  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "intake_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1516",
+  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516",
   "created_at": "2026-04-15T07:41:10Z",
   "source_of_change": "codex_worldclass_closure_program",
   "disposition_state": "accepted_controlled_source_update",
@@ -33,8 +33,9 @@
     "Exit WORM provider waiver by implementing Azure Immutable Blob or S3 Object Lock adapter"
   ],
   "closure_loop_evidence": [
-    "Second re-audit P1 for MES event spine closed by 48b7f967ab9ac927261b7d33d76b5fef56a771d4 after rebasing onto main 8f4b703066a299a8780ed7dc11633727d6d34cb8",
-    "Second re-audit P1 for periodic evaluation immutability/scope closed by 48b7f967ab9ac927261b7d33d76b5fef56a771d4 after rebasing onto main 8f4b703066a299a8780ed7dc11633727d6d34cb8",
+    "Second re-audit P1 for MES event spine closed by b969b1bf8d891562cfdd73f80d68e0c9d1419c05",
+    "Second re-audit P1 for periodic evaluation immutability/scope closed by b969b1bf8d891562cfdd73f80d68e0c9d1419c05",
+    "Boundary cleanup after interruption closed by 2a1def8c66c18e96b19c871264cef4d76895bcba",
     "Validation after closure loop: composer analyse, composer test, composer check, repo boundary, release candidate verifier, schema publication orchestrator"
   ]
 }

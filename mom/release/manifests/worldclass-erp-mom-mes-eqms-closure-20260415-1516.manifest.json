@@ -1,24 +1,25 @@
 {
   "artifact_type": "source_promotion_manifest",
-  "manifest_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1033",
-  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "manifest_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1516",
+  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516",
   "base_branch": "main",
-  "base_head": "8f4b703066a299a8780ed7dc11633727d6d34cb8",
-  "validated_head": "48b7f967ab9ac927261b7d33d76b5fef56a771d4",
-  "validated_tree": "4b10a524b6ca0336c161dcf1f9fa5869ec3be0ca",
+  "base_head": "5c9579195bfebb9681ce6f5f904ee30d8100b757",
+  "validated_head": "2a1def8c66c18e96b19c871264cef4d76895bcba",
+  "validated_tree": "e2488707723637947fbf70f693724ee12097f7d5",
   "record_state": "pre_merge_validated_controlled_source_manifest",
   "created_at": "2026-04-15T07:41:10Z",
   "change_authority": {
     "authority_type": "codex_remediation_request",
-    "authority_ref": "WORLDCLASS-ERP-MOM-MES-EQMS-CLOSURE-20260415-1033",
+    "authority_ref": "WORLDCLASS-ERP-MOM-MES-EQMS-CLOSURE-20260415-1516",
     "scope": "repo_boundary_api_contract_signature_evidence_retention_integrity_publication_periodic_evaluation_sharepoint_offline_flow"
   },
   "branch_activity_note": {
-    "created_branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
-    "checkpoint_commit": "62e3c66631f94257ff5c645e880c2af8c5936c2c",
-    "remediation_commit": "14dc430d2b07e995ca87f936c6554c832fe5866f",
-    "closure_loop_commit": "48b7f967ab9ac927261b7d33d76b5fef56a771d4",
-    "note": "Branch was created for the current closure run. HEAD was explicitly corrected back to the new branch after a stale interrupted agent left the worktree attached to the inherited tranche18 branch at the same commit. After interruption recovery, local main had advanced to 8f4b703066a299a8780ed7dc11633727d6d34cb8; this branch was rebased onto that main head before push/PR/merge. No remote remediation branch existed, so no force-push was required."
+    "created_branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516",
+    "checkpoint_commit": "956d39240d5d824927b0ae5b60402e78c71fef50",
+    "remediation_commit": "508f495529c5915265f4ebfd61c45f1959b3e97b",
+    "closure_loop_commit": "b969b1bf8d891562cfdd73f80d68e0c9d1419c05",
+    "boundary_cleanup_commit": "2a1def8c66c18e96b19c871264cef4d76895bcba",
+    "note": "Branch was created after interruption recovery from local main at 5c9579195bfebb9681ce6f5f904ee30d8100b757. It preserves the graphics governance proof gates and closure remediation already present on local main, then removes generated tranche18 inventory artifacts that still blocked the repo boundary. No remote cleanup branch existed, so no force-push was required."
   },
   "tracked_manifest_binding_note": {
     "waiver_ref": "tracked_manifest_self_commit_hash_limitation",

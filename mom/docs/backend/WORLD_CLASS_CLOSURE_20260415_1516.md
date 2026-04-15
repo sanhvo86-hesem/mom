@@ -1,12 +1,14 @@
-# World-Class Closure Register - 2026-04-15 10:33
+# World-Class Closure Register - 2026-04-15 15:16
 
-Branch: `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033`
+Branch: `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516`
 
-Validated remediation head before first release-evidence commit: `14dc430d2b07e995ca87f936c6554c832fe5866f`
+Validated remediation head before first release-evidence commit: `508f495529c5915265f4ebfd61c45f1959b3e97b`
 
-Closure-loop remediation head: `48b7f967ab9ac927261b7d33d76b5fef56a771d4`
+Closure-loop remediation head: `b969b1bf8d891562cfdd73f80d68e0c9d1419c05`
 
-Main sync note: after interruption recovery, local `main` had advanced to `8f4b703066a299a8780ed7dc11633727d6d34cb8`. The remediation branch was rebased onto that exact `main` head before push/PR/merge; no remote remediation branch existed, so no force-push was required.
+Boundary cleanup head: `2a1def8c66c18e96b19c871264cef4d76895bcba`
+
+Main sync note: after interruption recovery, local `main` included graphics governance proof gates plus an interrupted local fast-forward of the closure work through `5c9579195bfebb9681ce6f5f904ee30d8100b757`. The final cleanup branch was created from that exact local `main` head, removed generated tranche18 inventory artifacts from controlled source, and required no force-push because no remote cleanup branch existed.
 
 ## Residual Debt Register
 
@@ -100,4 +102,4 @@ Reference sources:
 
 | Late sync finding | Closure evidence |
 |---|---|
-| The interrupted workspace returned on `main`, and local `main` was ahead of `origin/main` by `8f4b703066a299a8780ed7dc11633727d6d34cb8`. Merging the remediation branch without synchronizing would have stranded either graphics governance proof gates or the closure remediation. | Rebased `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033` onto local `main` at `8f4b703066a299a8780ed7dc11633727d6d34cb8`. New closure-loop remediation commit is `48b7f967ab9ac927261b7d33d76b5fef56a771d4`; release evidence was updated to bind that rebase result. |
+| The interrupted workspace returned on `main`, and local `main` had already advanced with graphics governance proof gates plus an interrupted closure fast-forward. Continuing on `main` would have violated the branch rule, and using stale branch evidence would have hidden a boundary failure. | Created `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516` from local `main` at `5c9579195bfebb9681ce6f5f904ee30d8100b757`; removed tracked generated inventory artifacts in `2a1def8c66c18e96b19c871264cef4d76895bcba`; release evidence now binds the actual cleanup branch and validated cleanup head. |
