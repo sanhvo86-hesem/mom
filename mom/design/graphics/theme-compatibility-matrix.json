@@ -1,0 +1,148 @@
+{
+  "adminUiThemeCount": 20,
+  "runtimePresetCountKnownInCurrentMom": 8,
+  "exactOverlapCountKnownInCurrentMom": 5,
+  "matrix": [
+    {
+      "adminThemeId": "professional-light",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "professional-light",
+      "requiredAction": "Default light runtime preset."
+    },
+    {
+      "adminThemeId": "professional-dark",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "professional-dark",
+      "requiredAction": "Default dark runtime preset."
+    },
+    {
+      "adminThemeId": "midnight-navy",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "midnight-navy",
+      "requiredAction": "Runtime preset exists; verify dark contrast."
+    },
+    {
+      "adminThemeId": "ocean-breeze",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "ocean-breeze",
+      "requiredAction": "Runtime preset exists."
+    },
+    {
+      "adminThemeId": "forest-calm",
+      "runtimePresetExists": true,
+      "status": "exact-match",
+      "runtimeMapping": "forest-calm",
+      "requiredAction": "Runtime preset exists."
+    },
+    {
+      "adminThemeId": "sunrise-warm",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset or explicit alias."
+    },
+    {
+      "adminThemeId": "sunset-ember",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    },
+    {
+      "adminThemeId": "arctic-snow",
+      "runtimePresetExists": false,
+      "status": "derived-map-candidate",
+      "runtimeMapping": null,
+      "requiredAction": "Could derive from slate-ice with explicit mapping."
+    },
+    {
+      "adminThemeId": "cherry-blossom",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    },
+    {
+      "adminThemeId": "lavender-dream",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    },
+    {
+      "adminThemeId": "industrial-steel",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset or de-scope from admin."
+    },
+    {
+      "adminThemeId": "shopfloor-signal",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset and kiosk/shopfloor contrast proof."
+    },
+    {
+      "adminThemeId": "executive-glass",
+      "runtimePresetExists": false,
+      "status": "blocked-until-fallback",
+      "runtimeMapping": null,
+      "requiredAction": "Must provide non-blur fallback and runtime mapping."
+    },
+    {
+      "adminThemeId": "compliance-paper",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs print/readability runtime mapping."
+    },
+    {
+      "adminThemeId": "focus-mode",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    },
+    {
+      "adminThemeId": "vibrant-energy",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset; verify gradient policy."
+    },
+    {
+      "adminThemeId": "soft-pastel",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    },
+    {
+      "adminThemeId": "earth-tone",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset and contrast proof."
+    },
+    {
+      "adminThemeId": "neon-pulse",
+      "runtimePresetExists": false,
+      "status": "blocked-until-motion-proof",
+      "runtimeMapping": null,
+      "requiredAction": "Needs reduced-motion and contrast proof."
+    },
+    {
+      "adminThemeId": "zen-minimal",
+      "runtimePresetExists": false,
+      "status": "preview-only",
+      "runtimeMapping": null,
+      "requiredAction": "Needs runtime preset."
+    }
+  ],
+  "governanceRule": "A theme selectable in Admin UI must not be treated as production-ready until runtime preset mapping, token coverage, reduced-motion coverage and contrast evidence are complete."
+}

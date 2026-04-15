@@ -1,0 +1,290 @@
+{
+  "moduleId": "M18-oee-downtime",
+  "moduleName": "OEE và dừng máy",
+  "route": "/mes/oee-downtime",
+  "primaryEntity": "downtimeEvent",
+  "endpoints": [
+    {
+      "alias": "m18.oee.downtime.list",
+      "method": "POST",
+      "path": "/mes/oee-downtime/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "downtimeEvent summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.detail",
+      "method": "GET",
+      "path": "/mes/oee-downtime/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "downtimeEvent detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.lookup",
+      "method": "POST",
+      "path": "/mes/oee-downtime/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.metrics",
+      "method": "GET",
+      "path": "/mes/oee-downtime/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.update",
+      "method": "PATCH",
+      "path": "/mes/oee-downtime/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.command.reclassify-downtime",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/reclassify-downtime",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.reclassify",
+      "auditEvent": "ReclassifyDowntimeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.command.approve-adjustment",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/approve-adjustment",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.approve",
+      "auditEvent": "ApproveAdjustmentRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.export",
+      "method": "POST",
+      "path": "/mes/oee-downtime/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ],
+  "envelope": {
+    "headers": {
+      "X-Request-Id": "uuid",
+      "X-User-Timezone": "IANA string",
+      "If-Match": "etag for PATCH when concurrency controlled",
+      "Idempotency-Key": "required for POST command endpoints"
+    },
+    "responseEnvelope": {
+      "data": "payload",
+      "meta": {
+        "requestId": "uuid",
+        "timestamp": "iso-8601",
+        "freshness": "fresh|stale|expired"
+      },
+      "permissions": "action-level allow/deny flags",
+      "errors": "structured error array when failed"
+    }
+  }
+}

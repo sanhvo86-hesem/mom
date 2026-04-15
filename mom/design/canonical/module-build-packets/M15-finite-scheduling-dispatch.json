@@ -1,0 +1,237 @@
+{
+  "moduleId": "M15-finite-scheduling-dispatch",
+  "moduleName": "Lập lịch hữu hạn và điều độ",
+  "route": "/mom/planning/dispatch",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Production Control",
+  "processOwner": "Scheduling Manager",
+  "primaryEntity": "dispatchPlan",
+  "contractRefs": [
+    "mom/contracts/objects/dispatchPlan/contract.json",
+    "mom/design/module-api-catalog/M15-finite-scheduling-dispatch.json"
+  ],
+  "templateId": "T-planning-board-dispatch",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M15-finite-scheduling-dispatch.dispatch-board",
+      "screenName": "Dispatch board",
+      "type": "planning-board",
+      "blocks": [
+        "M15-finite-scheduling-dispatch.header",
+        "M15-finite-scheduling-dispatch.main",
+        "M15-finite-scheduling-dispatch.actions"
+      ]
+    },
+    {
+      "screenId": "M15-finite-scheduling-dispatch.resource-calendar",
+      "screenName": "Resource calendar",
+      "type": "supporting-screen",
+      "blocks": [
+        "M15-finite-scheduling-dispatch.header",
+        "M15-finite-scheduling-dispatch.main",
+        "M15-finite-scheduling-dispatch.actions"
+      ]
+    },
+    {
+      "screenId": "M15-finite-scheduling-dispatch.conflict-panel",
+      "screenName": "Conflict panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M15-finite-scheduling-dispatch.header",
+        "M15-finite-scheduling-dispatch.main",
+        "M15-finite-scheduling-dispatch.actions"
+      ]
+    },
+    {
+      "screenId": "M15-finite-scheduling-dispatch.what-if-scenario",
+      "screenName": "What-if scenario",
+      "type": "supporting-screen",
+      "blocks": [
+        "M15-finite-scheduling-dispatch.header",
+        "M15-finite-scheduling-dispatch.main",
+        "M15-finite-scheduling-dispatch.actions"
+      ]
+    },
+    {
+      "screenId": "M15-finite-scheduling-dispatch.publish-dispatch",
+      "screenName": "Publish dispatch",
+      "type": "supporting-screen",
+      "blocks": [
+        "M15-finite-scheduling-dispatch.header",
+        "M15-finite-scheduling-dispatch.main",
+        "M15-finite-scheduling-dispatch.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M15-finite-scheduling-dispatch.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M15-finite-scheduling-dispatch.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M15-finite-scheduling-dispatch.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M15-finite-scheduling-dispatch.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m15.finite.scheduling.dispatch.list",
+    "m15.finite.scheduling.dispatch.detail",
+    "m15.finite.scheduling.dispatch.lookup",
+    "m15.finite.scheduling.dispatch.metrics",
+    "m15.finite.scheduling.dispatch.update",
+    "m15.finite.scheduling.dispatch.command.generate",
+    "m15.finite.scheduling.dispatch.command.simulate",
+    "m15.finite.scheduling.dispatch.command.resolve-conflict",
+    "m15.finite.scheduling.dispatch.command.publish",
+    "m15.finite.scheduling.dispatch.command.supersede",
+    "m15.finite.scheduling.dispatch.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft_plan",
+      "reviewed",
+      "published",
+      "superseded"
+    ],
+    "transitions": [
+      {
+        "action": "generate",
+        "transition": "draft_plan -> reviewed"
+      },
+      {
+        "action": "publish",
+        "transition": "reviewed -> published"
+      },
+      {
+        "action": "supersede",
+        "transition": "published -> superseded"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "dispatch.read",
+      "dispatch.generate",
+      "dispatch.publish",
+      "dispatch.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "GenerateRequested",
+      "SimulateRequested",
+      "ResolveConflictRequested",
+      "PublishRequested",
+      "SupersedeRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M15-finite-scheduling-dispatch/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "dispatchPlan",
+      "dispatchPlan",
+      "dispatchOperation",
+      "resourceCalendar"
+    ]
+  },
+  "moduleArchetype": "planning-board",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

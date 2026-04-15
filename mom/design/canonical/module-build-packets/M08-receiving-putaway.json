@@ -1,0 +1,262 @@
+{
+  "moduleId": "M08-receiving-putaway",
+  "moduleName": "Nhận hàng và cất kho",
+  "route": "/mom/warehouse/receiving",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Warehouse Operations",
+  "processOwner": "Warehouse Supervisor",
+  "primaryEntity": "receipt",
+  "contractRefs": [
+    "mom/contracts/objects/receipt/contract.json",
+    "mom/design/module-api-catalog/M08-receiving-putaway.json"
+  ],
+  "templateId": "T-operator-execution-receiving",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M08-receiving-putaway.inbound-queue",
+      "screenName": "Inbound queue",
+      "type": "operator-execution",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.receipt-execution",
+      "screenName": "Receipt execution",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.scan-panel",
+      "screenName": "Scan panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.disposition-panel",
+      "screenName": "Disposition panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.putaway-tasks",
+      "screenName": "Putaway tasks",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.exception-log",
+      "screenName": "Exception log",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M08-receiving-putaway.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M08-receiving-putaway.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M08-receiving-putaway.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M08-receiving-putaway.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m08.receiving.putaway.list",
+    "m08.receiving.putaway.detail",
+    "m08.receiving.putaway.lookup",
+    "m08.receiving.putaway.metrics",
+    "m08.receiving.putaway.update",
+    "m08.receiving.putaway.command.start",
+    "m08.receiving.putaway.command.scan",
+    "m08.receiving.putaway.command.match",
+    "m08.receiving.putaway.command.record-discrepancy",
+    "m08.receiving.putaway.command.route-to-iqc",
+    "m08.receiving.putaway.command.confirm-putaway",
+    "m08.receiving.putaway.command.complete",
+    "m08.receiving.putaway.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "receiving",
+      "awaiting_iqc",
+      "putaway_pending",
+      "completed",
+      "exception"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> receiving"
+      },
+      {
+        "action": "routeToIqc",
+        "transition": "receiving -> awaiting_iqc"
+      },
+      {
+        "action": "createPutaway",
+        "transition": "receiving|awaiting_iqc -> putaway_pending"
+      },
+      {
+        "action": "complete",
+        "transition": "putaway_pending -> completed"
+      },
+      {
+        "action": "exception",
+        "transition": "receiving -> exception"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "receipt.read",
+      "receipt.execute",
+      "receipt.discrepancy",
+      "receipt.complete",
+      "receipt.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "ScanRequested",
+      "MatchRequested",
+      "RecordDiscrepancyRequested",
+      "RouteToIqcRequested",
+      "ConfirmPutawayRequested",
+      "CompleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M08-receiving-putaway/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "receipt",
+      "receipt",
+      "receiptLine",
+      "putawayTask"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

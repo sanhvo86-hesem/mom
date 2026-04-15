@@ -1,0 +1,930 @@
+{
+  "moduleId": "M29-document-control",
+  "moduleName": "Kiểm soát tài liệu",
+  "route": "/eqms/documents",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "Document Control Manager",
+  "primaryEntity": "controlledDocument",
+  "contractRefs": [
+    "mom/contracts/objects/controlledDocument/contract.json",
+    "mom/design/module-api-catalog/M29-document-control.json"
+  ],
+  "templateId": "T-evidence-workspace-document-control",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M29-document-control.document-register",
+      "screenName": "Document register",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.document-workspace",
+      "screenName": "Document workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.review-approval-panel",
+      "screenName": "Review/approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.effective-copy-preview",
+      "screenName": "Effective copy preview",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.acknowledgment-dashboard",
+      "screenName": "Acknowledgment dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M29-document-control.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M29-document-control.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M29-document-control.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M29-document-control.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M29-document-control.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m29.document.control.list",
+    "m29.document.control.detail",
+    "m29.document.control.lookup",
+    "m29.document.control.metrics",
+    "m29.document.control.create",
+    "m29.document.control.update",
+    "m29.document.control.command.submit-review",
+    "m29.document.control.command.approve",
+    "m29.document.control.command.release",
+    "m29.document.control.command.supersede",
+    "m29.document.control.command.obsolete",
+    "m29.document.control.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "in_review",
+      "approved",
+      "effective",
+      "superseded",
+      "obsolete"
+    ],
+    "transitions": [
+      {
+        "action": "submitReview",
+        "transition": "draft -> in_review"
+      },
+      {
+        "action": "approve",
+        "transition": "in_review -> approved"
+      },
+      {
+        "action": "release",
+        "transition": "approved -> effective"
+      },
+      {
+        "action": "supersede",
+        "transition": "effective -> superseded"
+      },
+      {
+        "action": "obsolete",
+        "transition": "superseded -> obsolete"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "document.read",
+      "document.create",
+      "document.review",
+      "document.approve",
+      "document.release",
+      "document.sign",
+      "document.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitReviewRequested",
+      "ApproveRequested",
+      "ReleaseRequested",
+      "SupersedeRequested",
+      "ObsoleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M29-document-control/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "controlledDocument",
+      "controlledDocument",
+      "documentRevision",
+      "acknowledgmentRecord"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Draft, review, approve, release, supersede and archive controlled documents with distribution and acknowledgment.",
+    "workflowNote": "Controlled documents require signatures, effective dates and controlled distribution records.",
+    "personas": [
+      "Document owner",
+      "Reviewer",
+      "Approver",
+      "Document control admin"
+    ],
+    "inputs": [
+      "Draft content",
+      "Metadata/classification",
+      "Review comments",
+      "Approval signatures",
+      "Distribution matrix"
+    ],
+    "outputs": [
+      "Released document",
+      "Effective revision",
+      "Acknowledgment status",
+      "Superseded copy",
+      "Audit trail and controlled copy"
+    ],
+    "coreScreensNarrative": [
+      "Document register",
+      "Document workspace",
+      "Review/approval panel",
+      "Effective copy preview",
+      "Acknowledgment dashboard",
+      "Audit history"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M29-document-control.document-register",
+      "title": "Document register",
+      "type": "evidence-workspace",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.document-workspace",
+      "title": "Document workspace",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.review-approval-panel",
+      "title": "Review/approval panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.effective-copy-preview",
+      "title": "Effective copy preview",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.acknowledgment-dashboard",
+      "title": "Acknowledgment dashboard",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.audit-history",
+      "title": "Audit history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m29.document.control.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/eqms/documents",
+      "permission": "document.create",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/documents/{id}",
+      "permission": "document.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.command.submit-review",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/submit-review",
+      "permission": "document.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitReviewRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/approve",
+      "permission": "document.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/release",
+      "permission": "document.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.command.supersede",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/supersede",
+      "permission": "document.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SupersedeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.command.obsolete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/obsolete",
+      "permission": "document.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ObsoleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m29.document.control.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/documents/export",
+      "permission": "document.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m29.document.control.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/documents/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m29.document.control.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/documents/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m29.document.control.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/documents/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m29.document.control.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/documents/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m29.document.control.list",
+      "method": "POST",
+      "path": "/eqms/documents/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "controlledDocument summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m29.document.control.detail",
+      "method": "GET",
+      "path": "/eqms/documents/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "controlledDocument detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m29.document.control.lookup",
+      "method": "POST",
+      "path": "/eqms/documents/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m29.document.control.metrics",
+      "method": "GET",
+      "path": "/eqms/documents/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m29.document.control.create",
+      "method": "POST",
+      "path": "/eqms/documents",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "controlledDocument draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m29.document.control.update",
+      "method": "PATCH",
+      "path": "/eqms/documents/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m29.document.control.command.submit-review",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/submit-review",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.approve",
+      "auditEvent": "SubmitReviewRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m29.document.control.command.approve",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m29.document.control.command.release",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m29.document.control.command.supersede",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/supersede",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.approve",
+      "auditEvent": "SupersedeRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m29.document.control.command.obsolete",
+      "method": "POST",
+      "path": "/eqms/documents/{id}/actions/obsolete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.approve",
+      "auditEvent": "ObsoleteRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m29.document.control.export",
+      "method": "POST",
+      "path": "/eqms/documents/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "document.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

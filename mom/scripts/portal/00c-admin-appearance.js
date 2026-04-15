@@ -1289,6 +1289,57 @@ function inferZoneLayout(zones){
   return { gridCols:'1fr', gridRows:'auto 1fr auto' };
 }
 
+function themeRuntimeCapability(themeId){
+  var id = String(themeId || '');
+  var hm = window.HmTheme || null;
+  var runtimeIds = [];
+  if(hm && typeof hm.isVisualThemeRuntimeSupported === 'function'){
+    var direct = false;
+    try { direct = hm.isVisualThemeRuntimeSupported(id) === true; } catch(e0){ direct = false; }
+    if(direct){
+      return {
+        supported: true,
+        status: 'runtime-supported',
+        badge: L('Runtime supported', 'Runtime supported'),
+        reason: L('Theme này có preset runtime trong HmTheme và có thể preview qua control plane.', 'This theme has an HmTheme runtime preset and can be previewed through the control plane.'),
+        runtimeCount: null
+      };
+    }
+  }
+  if(hm && typeof hm.getVisualThemePresetIds === 'function'){
+    try { runtimeIds = hm.getVisualThemePresetIds() || []; } catch(e){ runtimeIds = []; }
+  } else if(hm && typeof hm.getVisualThemePresets === 'function'){
+    try { runtimeIds = Object.keys(hm.getVisualThemePresets() || {}); } catch(e2){ runtimeIds = []; }
+  }
+  var supported = runtimeIds.indexOf(id) >= 0;
+  return {
+    supported: supported,
+    status: supported ? 'runtime-supported' : 'publish-blocked',
+    badge: supported ? L('Runtime supported', 'Runtime supported') : L('Runtime blocked', 'Runtime blocked'),
+    reason: supported
+      ? L('Theme này có preset runtime trong HmTheme và có thể preview qua control plane.', 'This theme has an HmTheme runtime preset and can be previewed through the control plane.')
+      : L('Theme này chưa có preset runtime được kiểm soát; không được apply/publish từ Admin.', 'This theme does not have a governed runtime preset; Admin apply/publish is blocked.'),
+    runtimeCount: runtimeIds.length
+  };
+}
+
+function renderThemeControlButton(theme){
+  var cap = themeRuntimeCapability(theme.id);
+  var disabled = cap.supported ? '' : ' disabled aria-disabled="true"';
+  var cursor = cap.supported ? 'pointer' : 'not-allowed';
+  var opacity = cap.supported ? '1' : '.62';
+  var border = _templateThemePreview === theme.id ? 'var(--brand-2)' : (cap.supported ? 'var(--border)' : 'var(--danger,#dc2626)');
+  var onclick = cap.supported
+    ? "_admTplApplyTheme('"+esc(theme.id)+"')"
+    : "announceGraphics('"+esc(cap.reason)+"')";
+  return '<button type="button"'+disabled+' onclick="'+onclick+'" title="'+esc(cap.reason)+'" style="text-align:left;padding:10px;border:1px solid '+border+';border-radius:10px;background:var(--bg-surface);cursor:'+cursor+';opacity:'+opacity+'">'
+    + '<div class="theme-swatch-bar"><div style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></div><div style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></div><div style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></div><div style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></div></div>'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div><span style="font-size:9px;font-weight:800;text-transform:uppercase;color:'+(cap.supported ? 'var(--success,#16a34a)' : 'var(--danger,#dc2626)')+'">'+esc(cap.badge)+'</span></div>'
+    + '<div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div>'
+    + '<div style="font-size:10px;color:var(--text-tertiary);margin-top:4px">'+esc(cap.reason)+'</div>'
+    + '</button>';
+}
+
 function buildTemplatePresets(){
   var presets = [];
   TEMPLATE_CATEGORIES.forEach(function(cat){
@@ -2507,6 +2558,12 @@ window._admTplSaveZone = function(id, index, key, value){
 
 window._admTplApplyTheme = function(themeId){
   if(!window.HmTheme) return;
+  var cap = themeRuntimeCapability(themeId);
+  if(!cap.supported){
+    announceGraphics(cap.reason);
+    if(typeof showToast === 'function') showToast(cap.reason, 'error');
+    return;
+  }
   _templateThemePreview = themeId;
   var applied = false;
   if(typeof HmTheme.applyVisualTheme === 'function'){
@@ -2772,7 +2829,7 @@ function renderTemplateEditor(id){
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">Live Preview</div>'+renderZoneMiniDiagram(tpl)+'<div style="margin-top:10px;padding:10px;border:1px dashed var(--border);border-radius:10px;background:var(--bg-surface-alt,#f8fafc)">'+renderTemplateSvg(tpl)+'</div></div>';
   h += '<div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)"><div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-primary)">'+esc(T('themeLibrary'))+'</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">';
   VISUAL_THEMES.forEach(function(theme){
-    h += '<button type="button" onclick="_admTplApplyTheme(\''+theme.id+'\')" style="text-align:left;padding:10px;border:1px solid '+(_templateThemePreview === theme.id ? 'var(--brand-2)' : 'var(--border)')+';border-radius:10px;background:var(--bg-surface);cursor:pointer"><div class="theme-swatch-bar"><div style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></div><div style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></div><div style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></div><div style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></div></div><div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div><div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div></button>';
+    h += renderThemeControlButton(theme);
   });
   h += '</div></div>';
   h += '</div></div>';
@@ -3541,16 +3598,7 @@ function renderGovernance(){
   var allTemplates = getAllTemplates();
   var customTemplates = allTemplates.filter(function(tpl){ return /^C/.test(tpl.id); });
   var themeCards = VISUAL_THEMES.map(function(theme){
-    return '<button type="button" onclick="_admTplApplyTheme(\''+theme.id+'\')" style="text-align:left;padding:10px;border:1px solid '+(_templateThemePreview === theme.id ? 'var(--brand-2)' : 'var(--border)')+';border-radius:10px;background:var(--bg-surface);cursor:pointer">'
-      + '<div style="display:flex;gap:4px;height:18px;margin-bottom:8px">'
-      + '<span style="flex:2;border-radius:4px;background:'+theme.colors.brand+'"></span>'
-      + '<span style="flex:2;border-radius:4px;background:'+theme.colors.brand2+'"></span>'
-      + '<span style="flex:3;border-radius:4px;background:'+theme.colors.bgSurface+';border:1px solid rgba(148,163,184,.24)"></span>'
-      + '<span style="flex:1;border-radius:4px;background:'+theme.colors.accent+'"></span>'
-      + '</div>'
-      + '<div style="font-size:11px;font-weight:700;color:var(--text-primary)">'+esc(theme.name[lang === 'en' ? 'en' : 'vi'])+'</div>'
-      + '<div style="font-size:10px;color:var(--text-secondary);margin-top:3px">'+esc(theme.desc[lang === 'en' ? 'en' : 'vi'])+'</div>'
-      + '</button>';
+    return renderThemeControlButton(theme);
   }).join('');
   var modules = [
     {

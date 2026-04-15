@@ -1,0 +1,260 @@
+{
+  "moduleId": "M10-shipping-fulfillment",
+  "moduleName": "Soạn hàng đóng gói giao hàng",
+  "route": "/mom/warehouse/shipping",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Warehouse Operations",
+  "processOwner": "Shipping Supervisor",
+  "primaryEntity": "shipment",
+  "contractRefs": [
+    "mom/contracts/objects/shipment/contract.json",
+    "mom/design/module-api-catalog/M10-shipping-fulfillment.json"
+  ],
+  "templateId": "T-operator-execution-shipping",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M10-shipping-fulfillment.shipment-queue",
+      "screenName": "Shipment queue",
+      "type": "operator-execution",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    },
+    {
+      "screenId": "M10-shipping-fulfillment.pick-execution",
+      "screenName": "Pick execution",
+      "type": "supporting-screen",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    },
+    {
+      "screenId": "M10-shipping-fulfillment.pack-station",
+      "screenName": "Pack station",
+      "type": "supporting-screen",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    },
+    {
+      "screenId": "M10-shipping-fulfillment.shipment-confirmation",
+      "screenName": "Shipment confirmation",
+      "type": "supporting-screen",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    },
+    {
+      "screenId": "M10-shipping-fulfillment.document-print",
+      "screenName": "Document print",
+      "type": "supporting-screen",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    },
+    {
+      "screenId": "M10-shipping-fulfillment.exception-handling",
+      "screenName": "Exception handling",
+      "type": "supporting-screen",
+      "blocks": [
+        "M10-shipping-fulfillment.header",
+        "M10-shipping-fulfillment.main",
+        "M10-shipping-fulfillment.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M10-shipping-fulfillment.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M10-shipping-fulfillment.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M10-shipping-fulfillment.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M10-shipping-fulfillment.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m10.shipping.fulfillment.list",
+    "m10.shipping.fulfillment.detail",
+    "m10.shipping.fulfillment.lookup",
+    "m10.shipping.fulfillment.metrics",
+    "m10.shipping.fulfillment.update",
+    "m10.shipping.fulfillment.command.start-pick",
+    "m10.shipping.fulfillment.command.scan-pick",
+    "m10.shipping.fulfillment.command.pack",
+    "m10.shipping.fulfillment.command.print-docs",
+    "m10.shipping.fulfillment.command.confirm-ship",
+    "m10.shipping.fulfillment.command.record-exception",
+    "m10.shipping.fulfillment.export"
+  ],
+  "workflow": {
+    "states": [
+      "released",
+      "picking",
+      "packing",
+      "ready_to_ship",
+      "shipped",
+      "exception"
+    ],
+    "transitions": [
+      {
+        "action": "startPick",
+        "transition": "released -> picking"
+      },
+      {
+        "action": "pack",
+        "transition": "picking -> packing"
+      },
+      {
+        "action": "readyToShip",
+        "transition": "packing -> ready_to_ship"
+      },
+      {
+        "action": "confirmShip",
+        "transition": "ready_to_ship -> shipped"
+      },
+      {
+        "action": "exception",
+        "transition": "picking|packing|ready_to_ship -> exception"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "shipment.read",
+      "shipment.execute",
+      "shipment.confirm",
+      "shipment.print",
+      "shipment.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartPickRequested",
+      "ScanPickRequested",
+      "PackRequested",
+      "PrintDocsRequested",
+      "ConfirmShipRequested",
+      "RecordExceptionRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M10-shipping-fulfillment/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "shipment",
+      "shipment",
+      "shipmentLine",
+      "pickTask"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

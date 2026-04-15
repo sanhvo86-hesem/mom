@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graphics Change Set",
+  "type": "object",
+  "required": [
+    "changeSetId",
+    "changeType",
+    "scope",
+    "initiator",
+    "proposedAt",
+    "changes"
+  ],
+  "properties": {
+    "changeSetId": {
+      "type": "string"
+    },
+    "changeType": {
+      "enum": [
+        "token",
+        "theme",
+        "component-contract",
+        "template-zone",
+        "template-allowed-block",
+        "global-css-governance"
+      ]
+    },
+    "scope": {
+      "type": "object"
+    },
+    "initiator": {
+      "type": "string"
+    },
+    "proposedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "changes": {
+      "type": "array"
+    },
+    "riskClass": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "regulated",
+        "shopfloor-critical"
+      ]
+    },
+    "requiresImpactAnalysis": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

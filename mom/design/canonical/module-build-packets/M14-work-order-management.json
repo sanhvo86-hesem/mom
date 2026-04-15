@@ -1,0 +1,279 @@
+{
+  "moduleId": "M14-work-order-management",
+  "moduleName": "Lệnh sản xuất",
+  "route": "/mom/production/work-orders",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Production Control",
+  "processOwner": "Production Control Manager",
+  "primaryEntity": "workOrder",
+  "contractRefs": [
+    "mom/contracts/objects/workOrder/contract.json",
+    "mom/design/module-api-catalog/M14-work-order-management.json"
+  ],
+  "templateId": "T-object-page-work-order",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M14-work-order-management.wo-list",
+      "screenName": "WO list",
+      "type": "object-page",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.wo-detail",
+      "screenName": "WO detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.operation-sequence",
+      "screenName": "Operation sequence",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.material-tab",
+      "screenName": "Material tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.execution-status",
+      "screenName": "Execution status",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.exceptions",
+      "screenName": "Exceptions",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M14-work-order-management.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M14-work-order-management.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M14-work-order-management.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M14-work-order-management.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m14.work.order.management.list",
+    "m14.work.order.management.detail",
+    "m14.work.order.management.lookup",
+    "m14.work.order.management.metrics",
+    "m14.work.order.management.create",
+    "m14.work.order.management.update",
+    "m14.work.order.management.command.release",
+    "m14.work.order.management.command.hold",
+    "m14.work.order.management.command.resume",
+    "m14.work.order.management.command.complete",
+    "m14.work.order.management.command.close",
+    "m14.work.order.management.command.cancel",
+    "m14.work.order.management.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "released",
+      "in_progress",
+      "on_hold",
+      "completed",
+      "closed",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "release",
+        "transition": "draft -> released"
+      },
+      {
+        "action": "start",
+        "transition": "released -> in_progress"
+      },
+      {
+        "action": "hold",
+        "transition": "in_progress -> on_hold"
+      },
+      {
+        "action": "resume",
+        "transition": "on_hold -> in_progress"
+      },
+      {
+        "action": "complete",
+        "transition": "in_progress -> completed"
+      },
+      {
+        "action": "close",
+        "transition": "completed -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "workOrder.read",
+      "workOrder.create",
+      "workOrder.release",
+      "workOrder.hold",
+      "workOrder.close",
+      "workOrder.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "ReleaseRequested",
+      "HoldRequested",
+      "ResumeRequested",
+      "CompleteRequested",
+      "CloseRequested",
+      "CancelRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M14-work-order-management/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "workOrder",
+      "workOrder",
+      "woOperation",
+      "woMaterialRequirement"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

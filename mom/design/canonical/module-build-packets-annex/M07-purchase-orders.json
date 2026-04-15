@@ -1,0 +1,756 @@
+{
+  "moduleProfile": {
+    "purpose": "Issue and control purchase orders, revisions, confirmations and supplier commitments.",
+    "workflowNote": "Released PO becomes commercial contract to supplier; changes require controlled revision.",
+    "personas": [
+      "Buyer",
+      "Procurement manager",
+      "Supplier coordinator",
+      "AP analyst"
+    ],
+    "inputs": [
+      "Approved requisition",
+      "Supplier master",
+      "Quoted pricing",
+      "Lead times",
+      "Terms/conditions"
+    ],
+    "outputs": [
+      "Released PO",
+      "Supplier acknowledgment",
+      "Schedule commitments",
+      "PO change history",
+      "AP three-way-match reference"
+    ],
+    "coreScreensNarrative": [
+      "PO list",
+      "PO detail",
+      "Line schedule",
+      "Acknowledgment panel",
+      "Revision history",
+      "Receipts linkage"
+    ],
+    "policiesNarrative": "Freshness: erp-order-state Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M07-purchase-orders.po-list",
+      "title": "PO list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M07-purchase-orders.po-detail",
+      "title": "PO detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M07-purchase-orders.line-schedule",
+      "title": "Line schedule",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M07-purchase-orders.acknowledgment-panel",
+      "title": "Acknowledgment panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M07-purchase-orders.revision-history",
+      "title": "Revision history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M07-purchase-orders.receipts-linkage",
+      "title": "Receipts linkage",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M07-purchase-orders.header",
+        "M07-purchase-orders.main",
+        "M07-purchase-orders.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m07.purchase.orders.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/purchasing/orders",
+      "permission": "po.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/purchasing/orders/{id}",
+      "permission": "po.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.submit-approval",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/submit-approval",
+      "permission": "po.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "SubmitApprovalRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/approve",
+      "permission": "po.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/release",
+      "permission": "po.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.record-ack",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/record-ack",
+      "permission": "po.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordAckRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.revise",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/revise",
+      "permission": "po.revise",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ReviseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/cancel",
+      "permission": "po.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/close",
+      "permission": "po.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m07.purchase.orders.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/export",
+      "permission": "po.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m07.purchase.orders.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/query",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m07.purchase.orders.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/purchasing/orders/{id}",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m07.purchase.orders.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/lookup",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m07.purchase.orders.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/purchasing/orders/metrics",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m07.purchase.orders.list",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "purchaseOrder summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.detail",
+      "method": "GET",
+      "path": "/erp/purchasing/orders/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "purchaseOrder detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.lookup",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.metrics",
+      "method": "GET",
+      "path": "/erp/purchasing/orders/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.create",
+      "method": "POST",
+      "path": "/erp/purchasing/orders",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "purchaseOrder draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.update",
+      "method": "PATCH",
+      "path": "/erp/purchasing/orders/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.submit-approval",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/submit-approval",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.approve",
+      "auditEvent": "SubmitApprovalRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.approve",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.release",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.record-ack",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/record-ack",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.approve",
+      "auditEvent": "RecordAckRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.revise",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/revise",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.revise",
+      "auditEvent": "ReviseRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.cancel",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.approve",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.command.close",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.approve",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m07.purchase.orders.export",
+      "method": "POST",
+      "path": "/erp/purchasing/orders/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "po.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

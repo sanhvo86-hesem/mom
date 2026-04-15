@@ -1,0 +1,669 @@
+{
+  "moduleProfile": {
+    "purpose": "Maintain authoritative supplier identity, commercial, quality, compliance and payment profile.",
+    "workflowNote": "Supplier status governs buying, receiving and IQC routing.",
+    "personas": [
+      "Buyer",
+      "Supplier quality engineer",
+      "AP analyst"
+    ],
+    "inputs": [
+      "Supplier onboarding request",
+      "Legal/commercial profile",
+      "Banking/tax data",
+      "Approved process/capability data",
+      "Quality survey/audit outcome"
+    ],
+    "outputs": [
+      "Approved supplier record",
+      "Payment profile",
+      "Approved commodity map",
+      "Supplier risk profile",
+      "Downstream lookup for PO/IQC/AP"
+    ],
+    "coreScreensNarrative": [
+      "Supplier list",
+      "Supplier detail",
+      "Quality tab",
+      "Commercial tab",
+      "Banking/tax tab",
+      "Change history"
+    ],
+    "policiesNarrative": "Freshness: erp-reference Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M05-supplier-master.supplier-list",
+      "title": "Supplier list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.supplier-detail",
+      "title": "Supplier detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.quality-tab",
+      "title": "Quality tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.commercial-tab",
+      "title": "Commercial tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.banking-tax-tab",
+      "title": "Banking/tax tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.change-history",
+      "title": "Change history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m05.supplier.master.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/suppliers",
+      "permission": "supplier.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/suppliers/{id}",
+      "permission": "supplier.update",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.command.qualify",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/qualify",
+      "permission": "supplier.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "QualifyRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/approve",
+      "permission": "supplier.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/hold",
+      "permission": "supplier.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.command.deactivate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/deactivate",
+      "permission": "supplier.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "DeactivateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.command.link-commodity",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/link-commodity",
+      "permission": "supplier.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "LinkCommodityRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m05.supplier.master.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/suppliers/export",
+      "permission": "supplier.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m05.supplier.master.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/suppliers/query",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m05.supplier.master.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/suppliers/{id}",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m05.supplier.master.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/suppliers/lookup",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m05.supplier.master.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/suppliers/metrics",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m05.supplier.master.list",
+      "method": "POST",
+      "path": "/erp/suppliers/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "supplier summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.detail",
+      "method": "GET",
+      "path": "/erp/suppliers/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "supplier detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.lookup",
+      "method": "POST",
+      "path": "/erp/suppliers/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m05.supplier.master.metrics",
+      "method": "GET",
+      "path": "/erp/suppliers/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.create",
+      "method": "POST",
+      "path": "/erp/suppliers",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "supplier draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.update",
+      "method": "PATCH",
+      "path": "/erp/suppliers/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.update",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.command.qualify",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/qualify",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.approve",
+      "auditEvent": "QualifyRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.command.approve",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.command.hold",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.approve",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.command.deactivate",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/deactivate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.approve",
+      "auditEvent": "DeactivateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.command.link-commodity",
+      "method": "POST",
+      "path": "/erp/suppliers/{id}/actions/link-commodity",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.approve",
+      "auditEvent": "LinkCommodityRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m05.supplier.master.export",
+      "method": "POST",
+      "path": "/erp/suppliers/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "supplier.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

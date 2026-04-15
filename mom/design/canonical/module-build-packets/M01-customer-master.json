@@ -1,0 +1,272 @@
+{
+  "moduleId": "M01-customer-master",
+  "moduleName": "Khách hàng",
+  "route": "/erp/customers",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Commercial",
+  "processOwner": "Sales Administration",
+  "primaryEntity": "customer",
+  "contractRefs": [
+    "mom/contracts/objects/customer/contract.json",
+    "mom/design/module-api-catalog/M01-customer-master.json"
+  ],
+  "templateId": "T-object-page-commercial-master",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M01-customer-master.customer-list",
+      "screenName": "Customer list",
+      "type": "object-page",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.customer-detail",
+      "screenName": "Customer detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.commercial-terms-tab",
+      "screenName": "Commercial terms tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.quality-requirements-tab",
+      "screenName": "Quality requirements tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.credit-status-tab",
+      "screenName": "Credit status tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.related-documents-tab",
+      "screenName": "Related documents tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.change-history-tab",
+      "screenName": "Change history tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M01-customer-master.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M01-customer-master.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M01-customer-master.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M01-customer-master.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m01.customer.master.list",
+    "m01.customer.master.detail",
+    "m01.customer.master.lookup",
+    "m01.customer.master.metrics",
+    "m01.customer.master.create",
+    "m01.customer.master.update",
+    "m01.customer.master.command.update",
+    "m01.customer.master.command.activate",
+    "m01.customer.master.command.hold",
+    "m01.customer.master.command.deactivate",
+    "m01.customer.master.command.link-approved-part",
+    "m01.customer.master.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "in_review",
+      "approved",
+      "active",
+      "on_hold",
+      "inactive"
+    ],
+    "transitions": [
+      {
+        "action": "submitForReview",
+        "transition": "draft -> in_review"
+      },
+      {
+        "action": "approve",
+        "transition": "in_review -> approved"
+      },
+      {
+        "action": "activate",
+        "transition": "approved -> active"
+      },
+      {
+        "action": "hold",
+        "transition": "active -> on_hold"
+      },
+      {
+        "action": "deactivate",
+        "transition": "active|on_hold -> inactive"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "customer.read",
+      "customer.create",
+      "customer.update",
+      "customer.approve",
+      "customer.activate",
+      "customer.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "UpdateRequested",
+      "ActivateRequested",
+      "HoldRequested",
+      "DeactivateRequested",
+      "LinkApprovedPartRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M01-customer-master/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "customer",
+      "customer",
+      "customerAddress",
+      "customerContact"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

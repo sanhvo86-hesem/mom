@@ -1,0 +1,289 @@
+{
+  "moduleId": "M25-ncr-mrb",
+  "moduleName": "NCR và xử lý bất phù hợp",
+  "route": "/eqms/ncr",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "MRB Chair",
+  "primaryEntity": "ncr",
+  "contractRefs": [
+    "mom/contracts/objects/ncr/contract.json",
+    "mom/design/module-api-catalog/M25-ncr-mrb.json"
+  ],
+  "templateId": "T-exception-hub-ncr",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M25-ncr-mrb.ncr-queue",
+      "screenName": "NCR queue",
+      "type": "exception-hub",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.ncr-detail",
+      "screenName": "NCR detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.containment-tab",
+      "screenName": "Containment tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.mrb-tab",
+      "screenName": "MRB tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.disposition-signature-panel",
+      "screenName": "Disposition/signature panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.linked-records",
+      "screenName": "Linked records",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M25-ncr-mrb.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M25-ncr-mrb.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M25-ncr-mrb.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M25-ncr-mrb.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M25-ncr-mrb.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m25.ncr.mrb.list",
+    "m25.ncr.mrb.detail",
+    "m25.ncr.mrb.lookup",
+    "m25.ncr.mrb.metrics",
+    "m25.ncr.mrb.create",
+    "m25.ncr.mrb.update",
+    "m25.ncr.mrb.command.contain",
+    "m25.ncr.mrb.command.investigate",
+    "m25.ncr.mrb.command.submit-mrb",
+    "m25.ncr.mrb.command.record-disposition",
+    "m25.ncr.mrb.command.close",
+    "m25.ncr.mrb.command.void",
+    "m25.ncr.mrb.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "contained",
+      "under_investigation",
+      "mrb_pending",
+      "dispositioned",
+      "closed",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "contain",
+        "transition": "new -> contained"
+      },
+      {
+        "action": "investigate",
+        "transition": "contained -> under_investigation"
+      },
+      {
+        "action": "submitMrb",
+        "transition": "under_investigation -> mrb_pending"
+      },
+      {
+        "action": "recordDisposition",
+        "transition": "mrb_pending -> dispositioned"
+      },
+      {
+        "action": "close",
+        "transition": "dispositioned -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "ncr.read",
+      "ncr.create",
+      "ncr.contain",
+      "ncr.investigate",
+      "ncr.dispose",
+      "ncr.sign",
+      "ncr.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "ContainRequested",
+      "InvestigateRequested",
+      "SubmitMrbRequested",
+      "RecordDispositionRequested",
+      "CloseRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M25-ncr-mrb/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "ncr",
+      "ncr",
+      "ncrContainment",
+      "mrbDecision"
+    ]
+  },
+  "moduleArchetype": "exception-hub",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

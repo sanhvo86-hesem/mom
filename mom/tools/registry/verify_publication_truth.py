@@ -91,6 +91,7 @@ CONTRACT_ARTIFACTS = [
 
 SCHEMA_AUTHORITY = PORTAL / "database" / "schema-authority-summary.json"
 PROMPT_LINEAGE = PORTAL / "docs" / "ai-prompts" / "prompt-lineage-index-2026-04-07.json"
+DESIGN = PORTAL / "design"
 
 checks_passed = 0
 checks_failed = 0
@@ -143,6 +144,16 @@ def sha256_file(path: Path) -> str:
 
 def portal_relative_path(path_text: str) -> Path:
     clean = path_text.strip().replace("\\", "/").lstrip("/")
+    return PORTAL / clean
+
+def design_relative_path(path_text: str) -> Path:
+    clean = path_text.strip().replace("\\", "/").lstrip("/")
+    clean = clean.replace("mom-design-canonical/", "design/canonical/")
+    clean = clean.replace("mom-design-enriched/", "design/enriched/")
+    clean = clean.replace("mom-design-graphics/", "design/graphics/")
+    clean = clean.replace("mom-design-repo-alignment/", "design/repo-alignment/")
+    if clean.startswith("mom/"):
+        clean = clean[4:]
     return PORTAL / clean
 
 def finish() -> int:
@@ -574,6 +585,70 @@ def main() -> int:
         untracked_evidence_refs = sorted(ref for ref in evidence_refs if not git_tracked(ref))
         check("graphics_release_evidence_refs_tracked", not untracked_evidence_refs,
               f"untracked={untracked_evidence_refs[:10]}")
+
+        pack_manifest_path = DESIGN / "canonical" / "manifest.json"
+        check("graphics_pack_canonical_manifest_exists", pack_manifest_path.is_file(), f"Missing: {pack_manifest_path}")
+        if pack_manifest_path.is_file():
+            pack_manifest = load(pack_manifest_path)
+            pack_packets = pack_manifest.get("packets", [])
+            pack_count = len(pack_packets) if isinstance(pack_packets, list) else 0
+            check("graphics_pack_manifest_has_packets", pack_count > 0, f"packets={pack_count}")
+            check("graphics_pack_module_count_matches_packets",
+                  int(pack_manifest.get("moduleCount") or 0) == pack_count,
+                  f"moduleCount={pack_manifest.get('moduleCount')} packets={pack_count}")
+            missing_pack_refs = []
+            for packet in pack_packets if isinstance(pack_packets, list) else []:
+                if not isinstance(packet, dict):
+                    continue
+                for key in ("canonicalPath", "annexPath"):
+                    candidate = design_relative_path(str(packet.get(key, "")))
+                    if not candidate.is_file():
+                        missing_pack_refs.append(str(packet.get(key, "")))
+            check("graphics_pack_manifest_paths_resolve", not missing_pack_refs,
+                  f"missing={missing_pack_refs[:10]}")
+
+            pack_artifacts = {
+                "template_registry_authority": DESIGN / "graphics" / "template-registry-authority.json",
+                "theme_compatibility_matrix": DESIGN / "graphics" / "theme-compatibility-matrix.json",
+                "module_graphics_compliance_matrix": DESIGN / "graphics" / "module-graphics-compliance-matrix.json",
+                "graphics_lineage_graph": DESIGN / "graphics" / "graphics-lineage-graph.json",
+                "visual_debt_observatory": DESIGN / "graphics" / "visual-debt-observatory.json",
+                "runtime_compliance_beacon_schema": DESIGN / "graphics" / "runtime-compliance-beacon.schema.json",
+                "graphics_release_evidence_pack_schema": DESIGN / "graphics" / "graphics-release-evidence-pack.schema.json",
+                "backend_graphics_authority_contract": DESIGN / "repo-alignment" / "backend-graphics-authority-api-contract.json",
+            }
+            for name, path in pack_artifacts.items():
+                check(f"graphics_pack_artifact_exists:{name}", path.is_file(), f"Missing: {path}")
+
+            template_authority_path = pack_artifacts["template_registry_authority"]
+            if template_authority_path.is_file():
+                template_authority = load(template_authority_path)
+                pack_templates = template_authority.get("templates", [])
+                check("graphics_pack_template_count_matches_manifest",
+                      isinstance(pack_templates, list) and len(pack_templates) == pack_count,
+                      f"templates={len(pack_templates) if isinstance(pack_templates, list) else 'n/a'} packets={pack_count}")
+
+            compliance_path = pack_artifacts["module_graphics_compliance_matrix"]
+            if compliance_path.is_file():
+                compliance = load(compliance_path)
+                compliance_rows = compliance.get("modules", compliance.get("matrix", []))
+                check("graphics_pack_compliance_count_matches_manifest",
+                      isinstance(compliance_rows, list) and len(compliance_rows) == pack_count,
+                      f"rows={len(compliance_rows) if isinstance(compliance_rows, list) else 'n/a'} packets={pack_count}")
+
+            theme_matrix_path = pack_artifacts["theme_compatibility_matrix"]
+            if theme_matrix_path.is_file():
+                theme_matrix = load(theme_matrix_path)
+                theme_rows = theme_matrix.get("matrix", [])
+                unsafe_rows = [
+                    row.get("adminThemeId", "unknown")
+                    for row in theme_rows
+                    if isinstance(row, dict)
+                    and row.get("runtimePresetExists") is not True
+                    and not row.get("requiredAction")
+                ]
+                check("graphics_pack_theme_matrix_blocks_unmapped_runtime_themes", not unsafe_rows,
+                      f"unsafe_rows={unsafe_rows[:10]}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")

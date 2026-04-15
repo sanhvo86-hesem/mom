@@ -1,0 +1,266 @@
+{
+  "moduleId": "M16-operator-execution",
+  "moduleName": "Thực thi công việc tại trạm",
+  "route": "/mes/operator/execution",
+  "domain": "MES",
+  "criticality": "shopfloor-critical",
+  "ownerTeam": "MES Runtime",
+  "processOwner": "Production Supervisor",
+  "primaryEntity": "operatorTask",
+  "contractRefs": [
+    "mom/contracts/objects/operatorTask/contract.json",
+    "mom/design/module-api-catalog/M16-operator-execution.json"
+  ],
+  "templateId": "T-operator-execution-shopfloor",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M16-operator-execution.current-task",
+      "screenName": "Current task",
+      "type": "operator-execution",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.instruction-panel",
+      "screenName": "Instruction panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.scan-input-area",
+      "screenName": "Scan/input area",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.large-action-bar",
+      "screenName": "Large action bar",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.exception-drawer",
+      "screenName": "Exception drawer",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.completion-summary",
+      "screenName": "Completion summary",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M16-operator-execution.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M16-operator-execution.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M16-operator-execution.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M16-operator-execution.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m16.operator.execution.list",
+    "m16.operator.execution.detail",
+    "m16.operator.execution.lookup",
+    "m16.operator.execution.metrics",
+    "m16.operator.execution.update",
+    "m16.operator.execution.command.start",
+    "m16.operator.execution.command.pause",
+    "m16.operator.execution.command.hold",
+    "m16.operator.execution.command.resume",
+    "m16.operator.execution.command.record-count",
+    "m16.operator.execution.command.complete",
+    "m16.operator.execution.command.report-issue",
+    "m16.operator.execution.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "running",
+      "paused",
+      "hold",
+      "completed",
+      "exception"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> running"
+      },
+      {
+        "action": "pause",
+        "transition": "running -> paused"
+      },
+      {
+        "action": "hold",
+        "transition": "running|paused -> hold"
+      },
+      {
+        "action": "resume",
+        "transition": "paused|hold -> running"
+      },
+      {
+        "action": "complete",
+        "transition": "running -> completed"
+      },
+      {
+        "action": "reportIssue",
+        "transition": "running|paused|hold -> exception"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "operator.read",
+      "operator.execute",
+      "operator.hold",
+      "operator.complete",
+      "operator.reportIssue"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": false
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "PauseRequested",
+      "HoldRequested",
+      "ResumeRequested",
+      "RecordCountRequested",
+      "CompleteRequested",
+      "ReportIssueRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M16-operator-execution/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "operatorTask",
+      "operatorTask",
+      "executionStep",
+      "productionCount"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "limited_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

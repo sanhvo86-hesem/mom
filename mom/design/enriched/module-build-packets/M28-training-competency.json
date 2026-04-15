@@ -1,0 +1,904 @@
+{
+  "moduleId": "M28-training-competency",
+  "moduleName": "Đào tạo và năng lực",
+  "route": "/eqms/training",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "HR & Quality Systems",
+  "processOwner": "Training Coordinator",
+  "primaryEntity": "trainingRecord",
+  "contractRefs": [
+    "mom/contracts/objects/trainingRecord/contract.json",
+    "mom/design/module-api-catalog/M28-training-competency.json"
+  ],
+  "templateId": "T-approval-queue-training",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M28-training-competency.training-matrix",
+      "screenName": "Training matrix",
+      "type": "approval-queue",
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.training-assignment-queue",
+      "screenName": "Training assignment queue",
+      "type": "supporting-screen",
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.session-record",
+      "screenName": "Session record",
+      "type": "supporting-screen",
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.assessment-review",
+      "screenName": "Assessment review",
+      "type": "supporting-screen",
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.competency-dashboard",
+      "screenName": "Competency dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M28-training-competency.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M28-training-competency.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M28-training-competency.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M28-training-competency.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M28-training-competency.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m28.training.competency.list",
+    "m28.training.competency.detail",
+    "m28.training.competency.lookup",
+    "m28.training.competency.metrics",
+    "m28.training.competency.update",
+    "m28.training.competency.command.assign",
+    "m28.training.competency.command.record-completion",
+    "m28.training.competency.command.record-assessment",
+    "m28.training.competency.command.verify-effectiveness",
+    "m28.training.competency.command.expire",
+    "m28.training.competency.command.waive",
+    "m28.training.competency.export"
+  ],
+  "workflow": {
+    "states": [
+      "assigned",
+      "in_progress",
+      "completed",
+      "effective",
+      "expired",
+      "waived"
+    ],
+    "transitions": [
+      {
+        "action": "recordCompletion",
+        "transition": "assigned -> completed"
+      },
+      {
+        "action": "verifyEffectiveness",
+        "transition": "completed -> effective"
+      },
+      {
+        "action": "expire",
+        "transition": "effective -> expired"
+      },
+      {
+        "action": "waive",
+        "transition": "assigned -> waived"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "training.read",
+      "training.assign",
+      "training.complete",
+      "training.verify",
+      "training.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AssignRequested",
+      "RecordCompletionRequested",
+      "RecordAssessmentRequested",
+      "VerifyEffectivenessRequested",
+      "ExpireRequested",
+      "WaiveRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M28-training-competency/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "trainingRecord",
+      "trainingRequirement",
+      "trainingRecord",
+      "competencyStatus"
+    ]
+  },
+  "moduleArchetype": "approval-queue",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Assign training, record completion, evaluate effectiveness and maintain competency status for controlled roles.",
+    "workflowNote": "Competency status can gate permissions for regulated or safety-adjacent actions.",
+    "personas": [
+      "Trainer",
+      "Trainee",
+      "Department manager",
+      "Quality reviewer"
+    ],
+    "inputs": [
+      "Training matrix",
+      "JD/role requirements",
+      "Course/session records",
+      "Assessment results",
+      "Effectiveness verification"
+    ],
+    "outputs": [
+      "Training record",
+      "Competency status",
+      "Expired training alerts",
+      "Qualification snapshot",
+      "Audit evidence"
+    ],
+    "coreScreensNarrative": [
+      "Training matrix",
+      "Training assignment queue",
+      "Session record",
+      "Assessment review",
+      "Competency dashboard"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M28-training-competency.training-matrix",
+      "title": "Training matrix",
+      "type": "approval-queue",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.training-assignment-queue",
+      "title": "Training assignment queue",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.session-record",
+      "title": "Session record",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.assessment-review",
+      "title": "Assessment review",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    },
+    {
+      "screenId": "M28-training-competency.competency-dashboard",
+      "title": "Competency dashboard",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M28-training-competency.header",
+        "M28-training-competency.main",
+        "M28-training-competency.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m28.training.competency.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/training/{id}",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.assign",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/assign",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AssignRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.record-completion",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/record-completion",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCompletionRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.record-assessment",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/record-assessment",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordAssessmentRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.verify-effectiveness",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/verify-effectiveness",
+      "permission": "training.verify",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "VerifyEffectivenessRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.expire",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/expire",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ExpireRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.command.waive",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/waive",
+      "permission": "training.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "WaiveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m28.training.competency.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/training/export",
+      "permission": "training.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m28.training.competency.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/training/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m28.training.competency.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/training/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m28.training.competency.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/training/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m28.training.competency.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/training/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m28.training.competency.list",
+      "method": "POST",
+      "path": "/eqms/training/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "trainingRecord summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m28.training.competency.detail",
+      "method": "GET",
+      "path": "/eqms/training/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "trainingRecord detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m28.training.competency.lookup",
+      "method": "POST",
+      "path": "/eqms/training/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m28.training.competency.metrics",
+      "method": "GET",
+      "path": "/eqms/training/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m28.training.competency.update",
+      "method": "PATCH",
+      "path": "/eqms/training/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.assign",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/assign",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "AssignRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.record-completion",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/record-completion",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "RecordCompletionRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.record-assessment",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/record-assessment",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "RecordAssessmentRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.verify-effectiveness",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/verify-effectiveness",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.verify",
+      "auditEvent": "VerifyEffectivenessRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.expire",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/expire",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "ExpireRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.command.waive",
+      "method": "POST",
+      "path": "/eqms/training/{id}/actions/waive",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.assign",
+      "auditEvent": "WaiveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m28.training.competency.export",
+      "method": "POST",
+      "path": "/eqms/training/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "training.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

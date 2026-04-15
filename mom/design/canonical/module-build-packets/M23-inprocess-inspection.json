@@ -1,0 +1,266 @@
+{
+  "moduleId": "M23-inprocess-inspection",
+  "moduleName": "Kiểm tra trong quá trình",
+  "route": "/mes/quality/inprocess",
+  "domain": "MES",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Operations",
+  "processOwner": "Process Quality Lead",
+  "primaryEntity": "inprocessInspection",
+  "contractRefs": [
+    "mom/contracts/objects/inprocessInspection/contract.json",
+    "mom/design/module-api-catalog/M23-inprocess-inspection.json"
+  ],
+  "templateId": "T-operator-execution-inprocess-quality",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M23-inprocess-inspection.inspection-queue",
+      "screenName": "Inspection queue",
+      "type": "operator-execution",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.execution-form",
+      "screenName": "Execution form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.characteristic-grid",
+      "screenName": "Characteristic grid",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.escalation-panel",
+      "screenName": "Escalation panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M23-inprocess-inspection.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.signatures",
+      "blockType": "signature-panel",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m23.inprocess.inspection.list",
+    "m23.inprocess.inspection.detail",
+    "m23.inprocess.inspection.lookup",
+    "m23.inprocess.inspection.metrics",
+    "m23.inprocess.inspection.update",
+    "m23.inprocess.inspection.command.start",
+    "m23.inprocess.inspection.command.record-value",
+    "m23.inprocess.inspection.command.flag-nonconformance",
+    "m23.inprocess.inspection.command.submit-review",
+    "m23.inprocess.inspection.command.accept",
+    "m23.inprocess.inspection.command.reject",
+    "m23.inprocess.inspection.command.hold",
+    "m23.inprocess.inspection.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "running",
+      "pending_review",
+      "accepted",
+      "rejected",
+      "hold"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> running"
+      },
+      {
+        "action": "submitReview",
+        "transition": "running -> pending_review"
+      },
+      {
+        "action": "accept",
+        "transition": "pending_review -> accepted"
+      },
+      {
+        "action": "reject",
+        "transition": "pending_review -> rejected"
+      },
+      {
+        "action": "hold",
+        "transition": "running|pending_review -> hold"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "inprocess.read",
+      "inprocess.execute",
+      "inprocess.review",
+      "inprocess.disposition",
+      "inprocess.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "RecordValueRequested",
+      "FlagNonconformanceRequested",
+      "SubmitReviewRequested",
+      "AcceptRequested",
+      "RejectRequested",
+      "HoldRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M23-inprocess-inspection/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "inprocessInspection",
+      "inprocessInspection",
+      "inspectionCharacteristic",
+      "defectObservation"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "limited_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

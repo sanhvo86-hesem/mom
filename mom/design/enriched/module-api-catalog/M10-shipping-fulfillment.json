@@ -1,0 +1,418 @@
+{
+  "moduleId": "M10-shipping-fulfillment",
+  "moduleName": "Soạn hàng đóng gói giao hàng",
+  "route": "/mom/warehouse/shipping",
+  "primaryEntity": "shipment",
+  "endpoints": [
+    {
+      "alias": "m10.shipping.fulfillment.list",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "shipment summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.detail",
+      "method": "GET",
+      "path": "/mom/warehouse/shipping/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "shipment detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.lookup",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.metrics",
+      "method": "GET",
+      "path": "/mom/warehouse/shipping/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.update",
+      "method": "PATCH",
+      "path": "/mom/warehouse/shipping/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.start-pick",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/start-pick",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.confirm",
+      "auditEvent": "StartPickRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.scan-pick",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/scan-pick",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.confirm",
+      "auditEvent": "ScanPickRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.pack",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/pack",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.confirm",
+      "auditEvent": "PackRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.print-docs",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/print-docs",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.print",
+      "auditEvent": "PrintDocsRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.confirm-ship",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/confirm-ship",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.confirm",
+      "auditEvent": "ConfirmShipRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.command.record-exception",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/{id}/actions/record-exception",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.confirm",
+      "auditEvent": "RecordExceptionRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m10.shipping.fulfillment.export",
+      "method": "POST",
+      "path": "/mom/warehouse/shipping/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "shipment.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ],
+  "envelope": {
+    "headers": {
+      "X-Request-Id": "uuid",
+      "X-User-Timezone": "IANA string",
+      "If-Match": "etag for PATCH when concurrency controlled",
+      "Idempotency-Key": "required for POST command endpoints"
+    },
+    "responseEnvelope": {
+      "data": "payload",
+      "meta": {
+        "requestId": "uuid",
+        "timestamp": "iso-8601",
+        "freshness": "fresh|stale|expired"
+      },
+      "permissions": "action-level allow/deny flags",
+      "errors": "structured error array when failed"
+    }
+  }
+}

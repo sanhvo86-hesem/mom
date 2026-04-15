@@ -1,0 +1,982 @@
+{
+  "moduleId": "M22-receiving-iqc",
+  "moduleName": "Kiểm tra đầu vào",
+  "route": "/mes/quality/iqc",
+  "domain": "MES",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Operations",
+  "processOwner": "Incoming Quality Lead",
+  "primaryEntity": "incomingInspection",
+  "contractRefs": [
+    "mom/contracts/objects/incomingInspection/contract.json",
+    "mom/design/module-api-catalog/M22-receiving-iqc.json"
+  ],
+  "templateId": "T-transactional-form-iqc",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M22-receiving-iqc.iqc-queue",
+      "screenName": "IQC queue",
+      "type": "transactional-form",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.inspection-form",
+      "screenName": "Inspection form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.sampling-detail",
+      "screenName": "Sampling detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.disposition-panel",
+      "screenName": "Disposition panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.linked-supplier-po-context",
+      "screenName": "Linked supplier/PO context",
+      "type": "supporting-screen",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M22-receiving-iqc.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M22-receiving-iqc.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M22-receiving-iqc.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M22-receiving-iqc.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M22-receiving-iqc.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m22.receiving.iqc.list",
+    "m22.receiving.iqc.detail",
+    "m22.receiving.iqc.lookup",
+    "m22.receiving.iqc.metrics",
+    "m22.receiving.iqc.update",
+    "m22.receiving.iqc.command.start",
+    "m22.receiving.iqc.command.record-result",
+    "m22.receiving.iqc.command.submit-review",
+    "m22.receiving.iqc.command.accept",
+    "m22.receiving.iqc.command.reject",
+    "m22.receiving.iqc.command.hold",
+    "m22.receiving.iqc.command.void",
+    "m22.receiving.iqc.export"
+  ],
+  "workflow": {
+    "states": [
+      "queued",
+      "in_progress",
+      "pending_review",
+      "accepted",
+      "rejected",
+      "on_hold",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "queued -> in_progress"
+      },
+      {
+        "action": "submitReview",
+        "transition": "in_progress -> pending_review"
+      },
+      {
+        "action": "accept",
+        "transition": "pending_review -> accepted"
+      },
+      {
+        "action": "reject",
+        "transition": "pending_review -> rejected"
+      },
+      {
+        "action": "hold",
+        "transition": "pending_review -> on_hold"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "iqc.read",
+      "iqc.execute",
+      "iqc.review",
+      "iqc.disposition",
+      "iqc.sign",
+      "iqc.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "RecordResultRequested",
+      "SubmitReviewRequested",
+      "AcceptRequested",
+      "RejectRequested",
+      "HoldRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M22-receiving-iqc/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "incomingInspection",
+      "incomingInspection",
+      "sampleResult",
+      "inspectionDisposition"
+    ]
+  },
+  "moduleArchetype": "transactional-form",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "workflow",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "limited_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Inspect incoming material against sampling plan, specs and supplier status before release to stock.",
+    "workflowNote": "IQC decision controls inventory release and must remain audit-reconstructable.",
+    "personas": [
+      "IQC inspector",
+      "Receiver",
+      "Quality lead"
+    ],
+    "inputs": [
+      "Receipt lot",
+      "Sampling plan",
+      "Inspection spec",
+      "Measurement results",
+      "Disposition decision"
+    ],
+    "outputs": [
+      "IQC record",
+      "Accept/reject/hold disposition",
+      "Supplier quality signal",
+      "Stock release/hold update",
+      "Audit trail"
+    ],
+    "coreScreensNarrative": [
+      "IQC queue",
+      "Inspection form",
+      "Sampling detail",
+      "Disposition panel",
+      "Linked supplier/PO context",
+      "Audit history"
+    ],
+    "policiesNarrative": "Freshness: inspection-spec Offline: limited_capture_only Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M22-receiving-iqc.iqc-queue",
+      "title": "IQC queue",
+      "type": "transactional-form",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.inspection-form",
+      "title": "Inspection form",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.sampling-detail",
+      "title": "Sampling detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.disposition-panel",
+      "title": "Disposition panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.linked-supplier-po-context",
+      "title": "Linked supplier/PO context",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    },
+    {
+      "screenId": "M22-receiving-iqc.audit-history",
+      "title": "Audit history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M22-receiving-iqc.header",
+        "M22-receiving-iqc.main",
+        "M22-receiving-iqc.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m22.receiving.iqc.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/quality/iqc/{id}",
+      "permission": "iqc.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/start",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.record-result",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/record-result",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordResultRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.submit-review",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/submit-review",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitReviewRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.accept",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/accept",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AcceptRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.reject",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/reject",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RejectRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/hold",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.command.void",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/void",
+      "permission": "iqc.sign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "VoidRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m22.receiving.iqc.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/quality/iqc/export",
+      "permission": "iqc.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m22.receiving.iqc.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/quality/iqc/query",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m22.receiving.iqc.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/iqc/{id}",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m22.receiving.iqc.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/quality/iqc/lookup",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m22.receiving.iqc.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/iqc/metrics",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m22.receiving.iqc.list",
+      "method": "POST",
+      "path": "/mes/quality/iqc/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "incomingInspection summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.detail",
+      "method": "GET",
+      "path": "/mes/quality/iqc/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "incomingInspection detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.lookup",
+      "method": "POST",
+      "path": "/mes/quality/iqc/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.metrics",
+      "method": "GET",
+      "path": "/mes/quality/iqc/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.update",
+      "method": "PATCH",
+      "path": "/mes/quality/iqc/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.start",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.record-result",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/record-result",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "RecordResultRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.submit-review",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/submit-review",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "SubmitReviewRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.accept",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/accept",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "AcceptRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.reject",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/reject",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "RejectRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.hold",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.command.void",
+      "method": "POST",
+      "path": "/mes/quality/iqc/{id}/actions/void",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.sign",
+      "auditEvent": "VoidRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m22.receiving.iqc.export",
+      "method": "POST",
+      "path": "/mes/quality/iqc/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "iqc.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

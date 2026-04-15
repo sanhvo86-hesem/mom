@@ -1,0 +1,730 @@
+{
+  "moduleId": "M34-executive-control-tower",
+  "moduleName": "Trung tâm điều hành",
+  "route": "/executive/control-tower",
+  "domain": "cross-domain",
+  "criticality": "high",
+  "ownerTeam": "Platform Analytics",
+  "processOwner": "COO",
+  "primaryEntity": "executiveKpi",
+  "contractRefs": [
+    "mom/contracts/objects/executiveKpi/contract.json",
+    "mom/design/module-api-catalog/M34-executive-control-tower.json"
+  ],
+  "templateId": "T-control-tower-executive",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M34-executive-control-tower.executive-overview",
+      "screenName": "Executive overview",
+      "type": "control-tower",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.kpi-tiles",
+      "screenName": "KPI tiles",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.exception-list",
+      "screenName": "Exception list",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.trend-charts",
+      "screenName": "Trend charts",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.drilldown-launcher",
+      "screenName": "Drilldown launcher",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.report-export",
+      "screenName": "Report export",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M34-executive-control-tower.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M34-executive-control-tower.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M34-executive-control-tower.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M34-executive-control-tower.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M34-executive-control-tower.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m34.executive.control.tower.list",
+    "m34.executive.control.tower.detail",
+    "m34.executive.control.tower.lookup",
+    "m34.executive.control.tower.metrics",
+    "m34.executive.control.tower.update",
+    "m34.executive.control.tower.command.acknowledge-exception",
+    "m34.executive.control.tower.command.export-pack",
+    "m34.executive.control.tower.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "acknowledgeException",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "tower.read",
+      "tower.acknowledge",
+      "tower.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AcknowledgeExceptionRequested",
+      "ExportPackRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M34-executive-control-tower/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "executiveKpi",
+      "executiveKpi",
+      "exceptionFeed",
+      "siteComparison"
+    ]
+  },
+  "moduleArchetype": "control-tower",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "chart-area",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Provide cross-domain operational visibility across delivery, quality, throughput, inventory, finance and risk.",
+    "workflowNote": "This module is cross-domain, read-mostly and must expose source freshness and drilldown provenance for every KPI.",
+    "personas": [
+      "COO",
+      "Plant manager",
+      "Quality director",
+      "Supply chain director"
+    ],
+    "inputs": [
+      "ERP/MOM/MES/eQMS aggregated KPIs",
+      "Alert thresholds",
+      "Trend data",
+      "Exception feeds"
+    ],
+    "outputs": [
+      "Executive dashboard",
+      "Exception drilldown links",
+      "Cross-site comparison",
+      "Daily/weekly packs",
+      "Escalation actions"
+    ],
+    "coreScreensNarrative": [
+      "Executive overview",
+      "KPI tiles",
+      "Exception list",
+      "Trend charts",
+      "Drilldown launcher",
+      "Report export"
+    ],
+    "policiesNarrative": "Freshness: control-tower-near-real-time Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M34-executive-control-tower.executive-overview",
+      "title": "Executive overview",
+      "type": "control-tower",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.kpi-tiles",
+      "title": "KPI tiles",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.exception-list",
+      "title": "Exception list",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.trend-charts",
+      "title": "Trend charts",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.drilldown-launcher",
+      "title": "Drilldown launcher",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.report-export",
+      "title": "Report export",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "chart-area",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m34.executive.control.tower.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/executive/control-tower/{id}",
+      "permission": "tower.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m34.executive.control.tower.command.acknowledge-exception",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/executive/control-tower/{id}/actions/acknowledge-exception",
+      "permission": "tower.acknowledge",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "AcknowledgeExceptionRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m34.executive.control.tower.command.export-pack",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/executive/control-tower/{id}/actions/export-pack",
+      "permission": "tower.export",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ExportPackRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m34.executive.control.tower.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/executive/control-tower/export",
+      "permission": "tower.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m34.executive.control.tower.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/executive/control-tower/query",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m34.executive.control.tower.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/executive/control-tower/{id}",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m34.executive.control.tower.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/executive/control-tower/lookup",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m34.executive.control.tower.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/executive/control-tower/metrics",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m34.executive.control.tower.list",
+      "method": "POST",
+      "path": "/executive/control-tower/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "executiveKpi summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.detail",
+      "method": "GET",
+      "path": "/executive/control-tower/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "executiveKpi detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.lookup",
+      "method": "POST",
+      "path": "/executive/control-tower/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.metrics",
+      "method": "GET",
+      "path": "/executive/control-tower/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.update",
+      "method": "PATCH",
+      "path": "/executive/control-tower/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.command.acknowledge-exception",
+      "method": "POST",
+      "path": "/executive/control-tower/{id}/actions/acknowledge-exception",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.acknowledge",
+      "auditEvent": "AcknowledgeExceptionRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.command.export-pack",
+      "method": "POST",
+      "path": "/executive/control-tower/{id}/actions/export-pack",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.export",
+      "auditEvent": "ExportPackRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m34.executive.control.tower.export",
+      "method": "POST",
+      "path": "/executive/control-tower/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "control-tower-near-real-time",
+      "permission": "tower.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

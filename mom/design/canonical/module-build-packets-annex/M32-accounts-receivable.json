@@ -1,0 +1,647 @@
+{
+  "moduleProfile": {
+    "purpose": "Create billing from shipment/completion events, manage invoice exceptions and customer receivables status.",
+    "workflowNote": "Billing release must be consistent with shipment and commercial records; posting remains ERP-owned.",
+    "personas": [
+      "AR analyst",
+      "Billing clerk",
+      "Order management",
+      "Finance approver"
+    ],
+    "inputs": [
+      "Shipment confirmation",
+      "Sales order",
+      "Tax rules",
+      "Commercial terms",
+      "Credit status"
+    ],
+    "outputs": [
+      "Customer invoice",
+      "Billing exception list",
+      "Posting release",
+      "AR aging data",
+      "Customer billing package"
+    ],
+    "coreScreensNarrative": [
+      "Billing queue",
+      "Invoice detail",
+      "Exception panel",
+      "Release/post panel",
+      "Aging dashboard"
+    ],
+    "policiesNarrative": "Freshness: erp-financial-cost Offline: forbidden Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M32-accounts-receivable.billing-queue",
+      "title": "Billing queue",
+      "type": "approval-queue",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.invoice-detail",
+      "title": "Invoice detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.exception-panel",
+      "title": "Exception panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.release-post-panel",
+      "title": "Release/post panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.aging-dashboard",
+      "title": "Aging dashboard",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m32.accounts.receivable.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/finance/ar/{id}",
+      "permission": "ar.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.generate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/generate",
+      "permission": "ar.generate",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "GenerateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.validate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/validate",
+      "permission": "ar.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ValidateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.resolve-exception",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/resolve-exception",
+      "permission": "ar.resolve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ResolveExceptionRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/approve",
+      "permission": "ar.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.post",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/post",
+      "permission": "ar.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "PostRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.command.void",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/void",
+      "permission": "ar.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "VoidRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m32.accounts.receivable.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/finance/ar/export",
+      "permission": "ar.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m32.accounts.receivable.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/finance/ar/query",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m32.accounts.receivable.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/finance/ar/{id}",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m32.accounts.receivable.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/finance/ar/lookup",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m32.accounts.receivable.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/finance/ar/metrics",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m32.accounts.receivable.list",
+      "method": "POST",
+      "path": "/erp/finance/ar/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "customerInvoice summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.detail",
+      "method": "GET",
+      "path": "/erp/finance/ar/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "customerInvoice detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.lookup",
+      "method": "POST",
+      "path": "/erp/finance/ar/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.metrics",
+      "method": "GET",
+      "path": "/erp/finance/ar/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.update",
+      "method": "PATCH",
+      "path": "/erp/finance/ar/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.generate",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/generate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.generate",
+      "auditEvent": "GenerateRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.validate",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/validate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.approve",
+      "auditEvent": "ValidateRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.resolve-exception",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/resolve-exception",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.resolve",
+      "auditEvent": "ResolveExceptionRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.approve",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.post",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/post",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.approve",
+      "auditEvent": "PostRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.command.void",
+      "method": "POST",
+      "path": "/erp/finance/ar/{id}/actions/void",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.approve",
+      "auditEvent": "VoidRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m32.accounts.receivable.export",
+      "method": "POST",
+      "path": "/erp/finance/ar/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-financial-cost",
+      "permission": "ar.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

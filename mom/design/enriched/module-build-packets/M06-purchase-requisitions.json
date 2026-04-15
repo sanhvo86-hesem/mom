@@ -1,0 +1,890 @@
+{
+  "moduleId": "M06-purchase-requisitions",
+  "moduleName": "Yêu cầu mua hàng",
+  "route": "/erp/purchasing/requisitions",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Procurement",
+  "processOwner": "Procurement Planning Lead",
+  "primaryEntity": "purchaseRequisition",
+  "contractRefs": [
+    "mom/contracts/objects/purchaseRequisition/contract.json",
+    "mom/design/module-api-catalog/M06-purchase-requisitions.json"
+  ],
+  "templateId": "T-transactional-form-procurement-pr",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M06-purchase-requisitions.requisition-inbox",
+      "screenName": "Requisition inbox",
+      "type": "transactional-form",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.requisition-form",
+      "screenName": "Requisition form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.approval-panel",
+      "screenName": "Approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.conversion-status",
+      "screenName": "Conversion status",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M06-purchase-requisitions.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m06.purchase.requisitions.list",
+    "m06.purchase.requisitions.detail",
+    "m06.purchase.requisitions.lookup",
+    "m06.purchase.requisitions.metrics",
+    "m06.purchase.requisitions.create",
+    "m06.purchase.requisitions.update",
+    "m06.purchase.requisitions.command.submit",
+    "m06.purchase.requisitions.command.approve",
+    "m06.purchase.requisitions.command.reject",
+    "m06.purchase.requisitions.command.cancel",
+    "m06.purchase.requisitions.command.convert-to-po",
+    "m06.purchase.requisitions.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "submitted",
+      "approved",
+      "converted",
+      "rejected",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "submit",
+        "transition": "draft -> submitted"
+      },
+      {
+        "action": "approve",
+        "transition": "submitted -> approved"
+      },
+      {
+        "action": "convertToPo",
+        "transition": "approved -> converted"
+      },
+      {
+        "action": "reject",
+        "transition": "submitted -> rejected"
+      },
+      {
+        "action": "cancel",
+        "transition": "draft|submitted -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "pr.read",
+      "pr.create",
+      "pr.approve",
+      "pr.convert",
+      "pr.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitRequested",
+      "ApproveRequested",
+      "RejectRequested",
+      "CancelRequested",
+      "ConvertToPoRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M06-purchase-requisitions/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "purchaseRequisition",
+      "purchaseRequisition",
+      "purchaseRequisitionLine"
+    ]
+  },
+  "moduleArchetype": "transactional-form",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "workflow",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Capture internal demand for purchased material, services or subcontract work before sourcing.",
+    "workflowNote": "Approval threshold and sourcing route depend on commodity, value and urgency.",
+    "personas": [
+      "Planner",
+      "Buyer",
+      "Department requester"
+    ],
+    "inputs": [
+      "MRP exception",
+      "User request",
+      "Approved item/service",
+      "Need date",
+      "Budget/cost center"
+    ],
+    "outputs": [
+      "Approved requisition",
+      "Sourcing package",
+      "Approval trail",
+      "PO conversion record"
+    ],
+    "coreScreensNarrative": [
+      "Requisition inbox",
+      "Requisition form",
+      "Approval panel",
+      "Conversion status",
+      "History"
+    ],
+    "policiesNarrative": "Freshness: erp-transactional Offline: draft_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M06-purchase-requisitions.requisition-inbox",
+      "title": "Requisition inbox",
+      "type": "transactional-form",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.requisition-form",
+      "title": "Requisition form",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.approval-panel",
+      "title": "Approval panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.conversion-status",
+      "title": "Conversion status",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.history",
+      "title": "History",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m06.purchase.requisitions.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions",
+      "permission": "pr.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/purchasing/requisitions/{id}",
+      "permission": "pr.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.command.submit",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/submit",
+      "permission": "pr.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "SubmitRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/approve",
+      "permission": "pr.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.command.reject",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/reject",
+      "permission": "pr.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RejectRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/cancel",
+      "permission": "pr.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.command.convert-to-po",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/convert-to-po",
+      "permission": "pr.convert",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ConvertToPoRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m06.purchase.requisitions.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/export",
+      "permission": "pr.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m06.purchase.requisitions.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/query",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m06.purchase.requisitions.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/purchasing/requisitions/{id}",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m06.purchase.requisitions.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/lookup",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m06.purchase.requisitions.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/purchasing/requisitions/metrics",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m06.purchase.requisitions.list",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "purchaseRequisition summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.detail",
+      "method": "GET",
+      "path": "/erp/purchasing/requisitions/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "purchaseRequisition detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.lookup",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.metrics",
+      "method": "GET",
+      "path": "/erp/purchasing/requisitions/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.create",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "purchaseRequisition draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.update",
+      "method": "PATCH",
+      "path": "/erp/purchasing/requisitions/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.command.submit",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/submit",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.approve",
+      "auditEvent": "SubmitRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.command.approve",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.command.reject",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/reject",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.approve",
+      "auditEvent": "RejectRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.command.cancel",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.approve",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.command.convert-to-po",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/{id}/actions/convert-to-po",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.convert",
+      "auditEvent": "ConvertToPoRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m06.purchase.requisitions.export",
+      "method": "POST",
+      "path": "/erp/purchasing/requisitions/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "pr.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

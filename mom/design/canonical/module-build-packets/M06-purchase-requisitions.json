@@ -1,0 +1,248 @@
+{
+  "moduleId": "M06-purchase-requisitions",
+  "moduleName": "Yêu cầu mua hàng",
+  "route": "/erp/purchasing/requisitions",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Procurement",
+  "processOwner": "Procurement Planning Lead",
+  "primaryEntity": "purchaseRequisition",
+  "contractRefs": [
+    "mom/contracts/objects/purchaseRequisition/contract.json",
+    "mom/design/module-api-catalog/M06-purchase-requisitions.json"
+  ],
+  "templateId": "T-transactional-form-procurement-pr",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M06-purchase-requisitions.requisition-inbox",
+      "screenName": "Requisition inbox",
+      "type": "transactional-form",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.requisition-form",
+      "screenName": "Requisition form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.approval-panel",
+      "screenName": "Approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.conversion-status",
+      "screenName": "Conversion status",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    },
+    {
+      "screenId": "M06-purchase-requisitions.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M06-purchase-requisitions.header",
+        "M06-purchase-requisitions.main",
+        "M06-purchase-requisitions.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M06-purchase-requisitions.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M06-purchase-requisitions.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m06.purchase.requisitions.list",
+    "m06.purchase.requisitions.detail",
+    "m06.purchase.requisitions.lookup",
+    "m06.purchase.requisitions.metrics",
+    "m06.purchase.requisitions.create",
+    "m06.purchase.requisitions.update",
+    "m06.purchase.requisitions.command.submit",
+    "m06.purchase.requisitions.command.approve",
+    "m06.purchase.requisitions.command.reject",
+    "m06.purchase.requisitions.command.cancel",
+    "m06.purchase.requisitions.command.convert-to-po",
+    "m06.purchase.requisitions.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "submitted",
+      "approved",
+      "converted",
+      "rejected",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "submit",
+        "transition": "draft -> submitted"
+      },
+      {
+        "action": "approve",
+        "transition": "submitted -> approved"
+      },
+      {
+        "action": "convertToPo",
+        "transition": "approved -> converted"
+      },
+      {
+        "action": "reject",
+        "transition": "submitted -> rejected"
+      },
+      {
+        "action": "cancel",
+        "transition": "draft|submitted -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "pr.read",
+      "pr.create",
+      "pr.approve",
+      "pr.convert",
+      "pr.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitRequested",
+      "ApproveRequested",
+      "RejectRequested",
+      "CancelRequested",
+      "ConvertToPoRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M06-purchase-requisitions/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "purchaseRequisition",
+      "purchaseRequisition",
+      "purchaseRequisitionLine"
+    ]
+  },
+  "moduleArchetype": "transactional-form",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "workflow",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

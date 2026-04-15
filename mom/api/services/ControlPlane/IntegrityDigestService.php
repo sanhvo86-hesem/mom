@@ -35,6 +35,34 @@ final class IntegrityDigestService
             'source_event_count' => (int)($source['source_event_count'] ?? 0),
             'source_digest' => (string)($source['source_digest'] ?? ''),
         ]));
+        $objectId = $this->digestObjectId($scope);
+
+        $existing = $db->queryOne(
+            "SELECT integrity_digest_id, digest_value, source_high_watermark, digest_state
+             FROM integrity_digests
+             WHERE digest_scope = 'daily'
+               AND object_type = 'audit_chain'
+               AND object_id = :object_id
+               AND (:source_high_watermark IS NULL OR source_high_watermark = :source_high_watermark)
+             ORDER BY verified_at DESC
+             LIMIT 1",
+            [
+                ':object_id' => $objectId,
+                ':source_high_watermark' => $this->nullableText($source['source_high_watermark'] ?? null),
+            ],
+        );
+        if (is_array($existing)
+            && $this->text($existing['integrity_digest_id'] ?? '') !== ''
+            && $this->text($existing['digest_value'] ?? '') !== ''
+            && $this->text($existing['digest_value'] ?? '') !== $digestValue
+        ) {
+            $this->openException(
+                $scope + ['integrity_digest_id' => $this->text($existing['integrity_digest_id'])],
+                'integrity_digest_mismatch',
+                'Recomputed daily audit-chain digest does not match the existing digest for the same high-watermark.',
+                'critical',
+            );
+        }
 
         $row = $db->queryOne(
             "INSERT INTO integrity_digests
@@ -47,7 +75,7 @@ final class IntegrityDigestService
                  CAST(:metadata AS jsonb))
              RETURNING *",
             [
-                ':object_id' => $this->digestObjectId($scope),
+                ':object_id' => $objectId,
                 ':digest_value' => $digestValue,
                 ':source_high_watermark' => $this->nullableText($source['source_high_watermark'] ?? null),
                 ':org_company_code' => $scope['org_company_code'] ?? null,
@@ -56,7 +84,7 @@ final class IntegrityDigestService
                 ':org_site_id' => $scope['org_site_id'] ?? null,
                 ':metadata' => $this->json([
                     'authority' => 'IntegrityDigestService',
-                    'covered_tables' => ['audit_events', 'evidence_records', 'evidence_versions', 'evidence_publications', 'retention_locks'],
+                    'covered_tables' => ['audit_events'],
                     'source_snapshot' => $source,
                 ]),
             ],

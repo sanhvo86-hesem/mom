@@ -1,0 +1,584 @@
+{
+  "moduleProfile": {
+    "purpose": "Maintain item, part, UOM, commodity, revision and planning attributes used across ERP/MOM/MES/eQMS.",
+    "workflowNote": "Released item master controls downstream planning, purchasing and traceability.",
+    "personas": [
+      "Master data engineer",
+      "Manufacturing engineer",
+      "Planner",
+      "Buyer"
+    ],
+    "inputs": [
+      "Engineering release",
+      "Customer requirement",
+      "Commodity/classification",
+      "UOM and planning rules",
+      "Regulatory flags"
+    ],
+    "outputs": [
+      "Released item master",
+      "Revision-controlled metadata",
+      "Planning defaults",
+      "Commodity maps",
+      "Downstream lookup record"
+    ],
+    "coreScreensNarrative": [
+      "Item list",
+      "Item detail",
+      "Planning tab",
+      "Compliance tab",
+      "Related revisions",
+      "Change history"
+    ],
+    "policiesNarrative": "Freshness: erp-reference Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M11-item-part-master.item-list",
+      "title": "Item list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.item-detail",
+      "title": "Item detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.planning-tab",
+      "title": "Planning tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.compliance-tab",
+      "title": "Compliance tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.related-revisions",
+      "title": "Related revisions",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.change-history",
+      "title": "Change history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m11.item.part.master.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/engineering/items",
+      "permission": "item.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m11.item.part.master.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/engineering/items/{id}",
+      "permission": "item.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m11.item.part.master.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/approve",
+      "permission": "item.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m11.item.part.master.command.effectivity",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/effectivity",
+      "permission": "item.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "EffectivityRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m11.item.part.master.command.obsolete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/obsolete",
+      "permission": "item.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ObsoleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m11.item.part.master.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/engineering/items/export",
+      "permission": "item.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m11.item.part.master.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/engineering/items/query",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m11.item.part.master.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/engineering/items/{id}",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m11.item.part.master.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/engineering/items/lookup",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m11.item.part.master.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/engineering/items/metrics",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m11.item.part.master.list",
+      "method": "POST",
+      "path": "/erp/engineering/items/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "item summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.detail",
+      "method": "GET",
+      "path": "/erp/engineering/items/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "item detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.lookup",
+      "method": "POST",
+      "path": "/erp/engineering/items/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m11.item.part.master.metrics",
+      "method": "GET",
+      "path": "/erp/engineering/items/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.create",
+      "method": "POST",
+      "path": "/erp/engineering/items",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "item draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.update",
+      "method": "PATCH",
+      "path": "/erp/engineering/items/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.command.approve",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.command.effectivity",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/effectivity",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.approve",
+      "auditEvent": "EffectivityRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.command.obsolete",
+      "method": "POST",
+      "path": "/erp/engineering/items/{id}/actions/obsolete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.approve",
+      "auditEvent": "ObsoleteRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m11.item.part.master.export",
+      "method": "POST",
+      "path": "/erp/engineering/items/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "item.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

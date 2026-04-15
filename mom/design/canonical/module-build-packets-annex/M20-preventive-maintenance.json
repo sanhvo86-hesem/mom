@@ -1,0 +1,646 @@
+{
+  "moduleProfile": {
+    "purpose": "Plan, execute and close preventive maintenance work with controlled checklists and evidence.",
+    "workflowNote": "PM closure should require checklist completion and evidence when defined by asset criticality.",
+    "personas": [
+      "Maintenance planner",
+      "Technician",
+      "Maintenance manager"
+    ],
+    "inputs": [
+      "Asset master",
+      "PM plan",
+      "Calendar/runtime trigger",
+      "Checklist template",
+      "Spare/tool requirements"
+    ],
+    "outputs": [
+      "Released PM WO",
+      "Execution evidence",
+      "Asset history update",
+      "Overdue dashboard",
+      "Audit record"
+    ],
+    "coreScreensNarrative": [
+      "PM plan board",
+      "PM WO queue",
+      "Execution form",
+      "Evidence attachments",
+      "History"
+    ],
+    "policiesNarrative": "Freshness: maintenance-schedule Offline: draft_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M20-preventive-maintenance.pm-plan-board",
+      "title": "PM plan board",
+      "type": "approval-queue",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.pm-wo-queue",
+      "title": "PM WO queue",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.execution-form",
+      "title": "Execution form",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.evidence-attachments",
+      "title": "Evidence attachments",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.history",
+      "title": "History",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m20.preventive.maintenance.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mom/maintenance/pm/{id}",
+      "permission": "pm.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.generate-wo",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/generate-wo",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "GenerateWoRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/release",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/start",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.record-checklist",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/record-checklist",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordChecklistRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/close",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.command.defer",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/defer",
+      "permission": "pm.close",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "DeferRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m20.preventive.maintenance.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/export",
+      "permission": "pm.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m20.preventive.maintenance.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/query",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m20.preventive.maintenance.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/maintenance/pm/{id}",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m20.preventive.maintenance.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/lookup",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m20.preventive.maintenance.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/maintenance/pm/metrics",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m20.preventive.maintenance.list",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "pmWorkOrder summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.detail",
+      "method": "GET",
+      "path": "/mom/maintenance/pm/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "pmWorkOrder detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.lookup",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.metrics",
+      "method": "GET",
+      "path": "/mom/maintenance/pm/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.update",
+      "method": "PATCH",
+      "path": "/mom/maintenance/pm/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.generate-wo",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/generate-wo",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "GenerateWoRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.release",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.start",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.record-checklist",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/record-checklist",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "RecordChecklistRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.close",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.command.defer",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/{id}/actions/defer",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.close",
+      "auditEvent": "DeferRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m20.preventive.maintenance.export",
+      "method": "POST",
+      "path": "/mom/maintenance/pm/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "maintenance-schedule",
+      "permission": "pm.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,800 @@
+{
+  "moduleId": "M17-machine-monitoring-andon",
+  "moduleName": "Giám sát máy và Andon",
+  "route": "/mes/monitoring/andon",
+  "domain": "MES",
+  "criticality": "shopfloor-critical",
+  "ownerTeam": "MES Runtime",
+  "processOwner": "Manufacturing Operations Manager",
+  "primaryEntity": "machineStatus",
+  "contractRefs": [
+    "mom/contracts/objects/machineStatus/contract.json",
+    "mom/design/module-api-catalog/M17-machine-monitoring-andon.json"
+  ],
+  "templateId": "T-shopfloor-board-machine-status",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M17-machine-monitoring-andon.andon-board",
+      "screenName": "Andon board",
+      "type": "shopfloor-board",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.machine-detail",
+      "screenName": "Machine detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.alarm-rail",
+      "screenName": "Alarm rail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.trend-panel",
+      "screenName": "Trend panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.escalation-drawer",
+      "screenName": "Escalation drawer",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M17-machine-monitoring-andon.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.metrics",
+      "blockType": "chart-panel",
+      "zone": "kpi-bar"
+    }
+  ],
+  "apiBindings": [
+    "m17.machine.monitoring.andon.list",
+    "m17.machine.monitoring.andon.detail",
+    "m17.machine.monitoring.andon.lookup",
+    "m17.machine.monitoring.andon.metrics",
+    "m17.machine.monitoring.andon.update",
+    "m17.machine.monitoring.andon.command.acknowledge-alarm",
+    "m17.machine.monitoring.andon.command.shelve-alarm",
+    "m17.machine.monitoring.andon.command.assign-response",
+    "m17.machine.monitoring.andon.command.open-detail",
+    "m17.machine.monitoring.andon.export"
+  ],
+  "workflow": {
+    "states": [
+      "normal"
+    ],
+    "transitions": [
+      {
+        "action": "ack",
+        "transition": "active -> acknowledged"
+      },
+      {
+        "action": "shelve",
+        "transition": "active|acknowledged -> shelved"
+      },
+      {
+        "action": "escalate",
+        "transition": "active|acknowledged -> escalated"
+      },
+      {
+        "action": "resolve",
+        "transition": "acknowledged|escalated -> resolved"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "andon.read",
+      "andon.acknowledge",
+      "andon.shelve",
+      "andon.assign",
+      "andon.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": false
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AcknowledgeAlarmRequested",
+      "ShelveAlarmRequested",
+      "AssignResponseRequested",
+      "OpenDetailRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 1800,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M17-machine-monitoring-andon/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "machineStatus",
+      "machineStatus",
+      "machineAlarm",
+      "throughputSample"
+    ]
+  },
+  "moduleArchetype": "shopfloor-board",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "main",
+    "alert-rail",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Monitor real-time machine states, alarms, throughput and escalation across cell/line/site.",
+    "workflowNote": "Realtime fidelity, stale detection and alarm lifecycle are core contracts of this module.",
+    "personas": [
+      "Supervisor",
+      "Operations manager",
+      "Maintenance responder"
+    ],
+    "inputs": [
+      "Machine telemetry",
+      "Heartbeat",
+      "Alarm stream",
+      "Production counts",
+      "Shift context"
+    ],
+    "outputs": [
+      "Current machine state board",
+      "Alarm queue",
+      "Escalation actions",
+      "Historical drilldown",
+      "Shift snapshots"
+    ],
+    "coreScreensNarrative": [
+      "Andon board",
+      "Machine detail",
+      "Alarm rail",
+      "Trend panel",
+      "Escalation drawer"
+    ],
+    "policiesNarrative": "Freshness: machine-heartbeat Offline: forbidden Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M17-machine-monitoring-andon.andon-board",
+      "title": "Andon board",
+      "type": "shopfloor-board",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "main",
+        "alert-rail",
+        "footer"
+      ],
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.machine-detail",
+      "title": "Machine detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "main",
+        "alert-rail",
+        "footer"
+      ],
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.alarm-rail",
+      "title": "Alarm rail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "main",
+        "alert-rail",
+        "footer"
+      ],
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.trend-panel",
+      "title": "Trend panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "main",
+        "alert-rail",
+        "footer"
+      ],
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.escalation-drawer",
+      "title": "Escalation drawer",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "main",
+        "alert-rail",
+        "footer"
+      ],
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m17.machine.monitoring.andon.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/monitoring/andon/{id}",
+      "permission": "andon.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m17.machine.monitoring.andon.command.acknowledge-alarm",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/acknowledge-alarm",
+      "permission": "andon.acknowledge",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AcknowledgeAlarmRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m17.machine.monitoring.andon.command.shelve-alarm",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/shelve-alarm",
+      "permission": "andon.shelve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ShelveAlarmRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m17.machine.monitoring.andon.command.assign-response",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/assign-response",
+      "permission": "andon.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AssignResponseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m17.machine.monitoring.andon.command.open-detail",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/open-detail",
+      "permission": "andon.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "OpenDetailRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m17.machine.monitoring.andon.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/export",
+      "permission": "andon.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m17.machine.monitoring.andon.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/query",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m17.machine.monitoring.andon.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/monitoring/andon/{id}",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m17.machine.monitoring.andon.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/lookup",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m17.machine.monitoring.andon.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/monitoring/andon/metrics",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m17.machine.monitoring.andon.list",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "machineStatus summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.detail",
+      "method": "GET",
+      "path": "/mes/monitoring/andon/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "machineStatus detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.lookup",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.metrics",
+      "method": "GET",
+      "path": "/mes/monitoring/andon/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.update",
+      "method": "PATCH",
+      "path": "/mes/monitoring/andon/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.assign",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.command.acknowledge-alarm",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/acknowledge-alarm",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.acknowledge",
+      "auditEvent": "AcknowledgeAlarmRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.command.shelve-alarm",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/shelve-alarm",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.shelve",
+      "auditEvent": "ShelveAlarmRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.command.assign-response",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/assign-response",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.assign",
+      "auditEvent": "AssignResponseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.command.open-detail",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/{id}/actions/open-detail",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.assign",
+      "auditEvent": "OpenDetailRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m17.machine.monitoring.andon.export",
+      "method": "POST",
+      "path": "/mes/monitoring/andon/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "andon.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

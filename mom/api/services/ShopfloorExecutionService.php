@@ -766,12 +766,19 @@ final class ShopfloorExecutionService
             ];
         }
 
+        $context = $this->traceability5MContext($body, $target, $operatorId);
+        $scope = $this->traceability5MScope($context);
+        if ($scope === []) {
+            throw new RuntimeException('traceability_5m_partition_scope_required');
+        }
+
         $request = [
             'operation_class' => $this->operationClassFor5M($target),
             'object_type' => 'work_order',
             'object_id' => $this->stringValue($target['wo_number'] ?? $target['target_id'] ?? ''),
             'effective_at' => $effectiveAt,
-            'context' => $this->traceability5MContext($body, $target, $operatorId),
+            'scope' => $scope,
+            'context' => $context,
         ];
 
         $service = $this->genealogyGraph;
@@ -826,6 +833,27 @@ final class ShopfloorExecutionService
             'org_plant_id' => $this->stringValue($target['org_plant_id'] ?? ''),
             'org_site_id' => $this->stringValue($target['org_site_id'] ?? ''),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, string>
+     */
+    private function traceability5MScope(array $context): array
+    {
+        $scope = [];
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            $value = $this->stringValue($context[$field] ?? '');
+            if ($value !== '') {
+                $scope[$field] = $value;
+            }
+        }
+
+        if (($scope['org_site_id'] ?? '') === '' && ($scope['org_plant_id'] ?? '') === '') {
+            return [];
+        }
+
+        return $scope;
     }
 
     /**

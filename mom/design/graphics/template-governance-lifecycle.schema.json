@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Template Governance Lifecycle",
+  "type": "object",
+  "required": [
+    "templateId",
+    "version",
+    "status",
+    "owner",
+    "updatedBy",
+    "updatedAt"
+  ],
+  "properties": {
+    "templateId": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "draft-only",
+        "controlled-draft",
+        "validated",
+        "publish-blocked",
+        "published",
+        "deprecated",
+        "legacy-bridged"
+      ]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "updatedBy": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

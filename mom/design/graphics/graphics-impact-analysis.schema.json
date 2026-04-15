@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graphics Impact Analysis",
+  "type": "object",
+  "required": [
+    "changeSetId",
+    "affectedModules",
+    "affectedRoutes",
+    "gatesToRerun",
+    "blockers"
+  ],
+  "properties": {
+    "changeSetId": {
+      "type": "string"
+    },
+    "affectedModules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affectedRoutes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affectedScreens": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affectedBlockFamilies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "regulatedModulesTouched": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "shopfloorModulesTouched": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gatesToRerun": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,641 @@
+{
+  "moduleProfile": {
+    "purpose": "Schedule, execute, review and release calibration records for measuring equipment.",
+    "workflowNote": "Calibration records are controlled quality records; approval and OOT handling are regulated.",
+    "personas": [
+      "Metrology technician",
+      "Quality reviewer",
+      "Approver"
+    ],
+    "inputs": [
+      "Asset/equipment master",
+      "Calibration method",
+      "Reference standards",
+      "Measurement results",
+      "Environmental conditions"
+    ],
+    "outputs": [
+      "Calibration certificate/record",
+      "Equipment status",
+      "Due date update",
+      "Out-of-tolerance decision",
+      "Audit package"
+    ],
+    "coreScreensNarrative": [
+      "Calibration schedule",
+      "Calibration execution",
+      "Result review",
+      "Certificate preview",
+      "Audit/history"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M21-calibration-management.calibration-schedule",
+      "title": "Calibration schedule",
+      "type": "evidence-workspace",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.calibration-execution",
+      "title": "Calibration execution",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.result-review",
+      "title": "Result review",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.certificate-preview",
+      "title": "Certificate preview",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.audit-history",
+      "title": "Audit/history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m21.calibration.management.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/calibration/{id}",
+      "permission": "calibration.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/start",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.record-result",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/record-result",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordResultRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.submit-review",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/submit-review",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitReviewRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/approve",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.declare-oot",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/declare-oot",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "DeclareOotRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/close",
+      "permission": "calibration.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m21.calibration.management.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/calibration/export",
+      "permission": "calibration.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m21.calibration.management.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/calibration/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m21.calibration.management.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/calibration/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m21.calibration.management.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/calibration/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m21.calibration.management.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/calibration/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m21.calibration.management.list",
+      "method": "POST",
+      "path": "/eqms/calibration/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "calibrationRecord summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.detail",
+      "method": "GET",
+      "path": "/eqms/calibration/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "calibrationRecord detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.lookup",
+      "method": "POST",
+      "path": "/eqms/calibration/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m21.calibration.management.metrics",
+      "method": "GET",
+      "path": "/eqms/calibration/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.update",
+      "method": "PATCH",
+      "path": "/eqms/calibration/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.start",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.record-result",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/record-result",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "RecordResultRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.submit-review",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/submit-review",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "SubmitReviewRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.approve",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.declare-oot",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/declare-oot",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "DeclareOotRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.command.close",
+      "method": "POST",
+      "path": "/eqms/calibration/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.approve",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m21.calibration.management.export",
+      "method": "POST",
+      "path": "/eqms/calibration/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "calibration.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

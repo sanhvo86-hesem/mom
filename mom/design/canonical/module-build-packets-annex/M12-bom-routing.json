@@ -1,0 +1,625 @@
+{
+  "moduleProfile": {
+    "purpose": "Manage product structure, routing steps, work centers, standard times and alternates.",
+    "workflowNote": "Released revision is consumed by planning and execution; changes require effectivity control.",
+    "personas": [
+      "Manufacturing engineer",
+      "Planner",
+      "Costing analyst"
+    ],
+    "inputs": [
+      "Item revisions",
+      "Operation sequence",
+      "Work centers",
+      "Standard times",
+      "Control plan link"
+    ],
+    "outputs": [
+      "Released BOM/routing revision",
+      "Planning and costing inputs",
+      "Traveler structure reference",
+      "Revision compare evidence"
+    ],
+    "coreScreensNarrative": [
+      "BOM list",
+      "BOM detail",
+      "Routing tab",
+      "Where-used",
+      "Revision compare",
+      "Approval history"
+    ],
+    "policiesNarrative": "Freshness: erp-reference Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M12-bom-routing.bom-list",
+      "title": "BOM list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.bom-detail",
+      "title": "BOM detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.routing-tab",
+      "title": "Routing tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.where-used",
+      "title": "Where-used",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.revision-compare",
+      "title": "Revision compare",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.approval-history",
+      "title": "Approval history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m12.bom.routing.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing",
+      "permission": "bom.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/engineering/bom-routing/{id}",
+      "permission": "bom.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.command.submit-review",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/submit-review",
+      "permission": "bom.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "SubmitReviewRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/release",
+      "permission": "bom.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.command.supersede",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/supersede",
+      "permission": "bom.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "SupersedeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.command.obsolete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/obsolete",
+      "permission": "bom.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ObsoleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m12.bom.routing.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/export",
+      "permission": "bom.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m12.bom.routing.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/query",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m12.bom.routing.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/engineering/bom-routing/{id}",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m12.bom.routing.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/lookup",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m12.bom.routing.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/engineering/bom-routing/metrics",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m12.bom.routing.list",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "bomRevision summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.detail",
+      "method": "GET",
+      "path": "/erp/engineering/bom-routing/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "bomRevision detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.lookup",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m12.bom.routing.metrics",
+      "method": "GET",
+      "path": "/erp/engineering/bom-routing/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.create",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "bomRevision draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.update",
+      "method": "PATCH",
+      "path": "/erp/engineering/bom-routing/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.command.submit-review",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/submit-review",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.release",
+      "auditEvent": "SubmitReviewRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.command.release",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.command.supersede",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/supersede",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.release",
+      "auditEvent": "SupersedeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.command.obsolete",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/{id}/actions/obsolete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.release",
+      "auditEvent": "ObsoleteRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m12.bom.routing.export",
+      "method": "POST",
+      "path": "/erp/engineering/bom-routing/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "bom.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,235 @@
+{
+  "moduleId": "M33-costing-valuation",
+  "moduleName": "Giá thành và định giá tồn kho",
+  "route": "/erp/finance/costing",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "Finance",
+  "processOwner": "Cost Accounting Manager",
+  "primaryEntity": "costSnapshot",
+  "contractRefs": [
+    "mom/contracts/objects/costSnapshot/contract.json",
+    "mom/design/module-api-catalog/M33-costing-valuation.json"
+  ],
+  "templateId": "T-analytical-list-costing",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M33-costing-valuation.cost-dashboard",
+      "screenName": "Cost dashboard",
+      "type": "analytical-list",
+      "blocks": [
+        "M33-costing-valuation.header",
+        "M33-costing-valuation.main",
+        "M33-costing-valuation.actions"
+      ]
+    },
+    {
+      "screenId": "M33-costing-valuation.variance-list",
+      "screenName": "Variance list",
+      "type": "supporting-screen",
+      "blocks": [
+        "M33-costing-valuation.header",
+        "M33-costing-valuation.main",
+        "M33-costing-valuation.actions"
+      ]
+    },
+    {
+      "screenId": "M33-costing-valuation.item-cost-detail",
+      "screenName": "Item cost detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M33-costing-valuation.header",
+        "M33-costing-valuation.main",
+        "M33-costing-valuation.actions"
+      ]
+    },
+    {
+      "screenId": "M33-costing-valuation.valuation-report",
+      "screenName": "Valuation report",
+      "type": "supporting-screen",
+      "blocks": [
+        "M33-costing-valuation.header",
+        "M33-costing-valuation.main",
+        "M33-costing-valuation.actions"
+      ]
+    },
+    {
+      "screenId": "M33-costing-valuation.period-compare",
+      "screenName": "Period compare",
+      "type": "supporting-screen",
+      "blocks": [
+        "M33-costing-valuation.header",
+        "M33-costing-valuation.main",
+        "M33-costing-valuation.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M33-costing-valuation.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M33-costing-valuation.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M33-costing-valuation.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M33-costing-valuation.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M33-costing-valuation.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m33.costing.valuation.list",
+    "m33.costing.valuation.detail",
+    "m33.costing.valuation.lookup",
+    "m33.costing.valuation.metrics",
+    "m33.costing.valuation.update",
+    "m33.costing.valuation.command.recalculate-standard",
+    "m33.costing.valuation.command.approve-adjustment",
+    "m33.costing.valuation.export"
+  ],
+  "workflow": {
+    "states": [
+      "current",
+      "period_closed"
+    ],
+    "transitions": [
+      {
+        "action": "recalculateStandard",
+        "transition": "current -> current"
+      },
+      {
+        "action": "approveAdjustment",
+        "transition": "current -> current"
+      },
+      {
+        "action": "closePeriod",
+        "transition": "current -> period_closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "cost.read",
+      "cost.recalculate",
+      "cost.approve",
+      "cost.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "RecalculateStandardRequested",
+      "ApproveAdjustmentRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M33-costing-valuation/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "costSnapshot",
+      "costSnapshot",
+      "costVariance",
+      "valuationLayer"
+    ]
+  },
+  "moduleArchetype": "analytical-list",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "chart-area",
+    "main",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

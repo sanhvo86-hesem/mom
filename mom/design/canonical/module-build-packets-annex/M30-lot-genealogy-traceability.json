@@ -1,0 +1,523 @@
+{
+  "moduleProfile": {
+    "purpose": "Trace upstream/downstream material, lot, serial, work order and shipment relationships for investigation and recall readiness.",
+    "workflowNote": "Traceability queries must remain reproducible and exportable for audit and recall exercises.",
+    "personas": [
+      "Traceability analyst",
+      "Quality engineer",
+      "Customer quality",
+      "Operations manager"
+    ],
+    "inputs": [
+      "Lot/serial events",
+      "Work order completions",
+      "Material issues/receipts",
+      "Shipment links",
+      "NCR/CAPA links"
+    ],
+    "outputs": [
+      "Genealogy graph",
+      "Trace report",
+      "Impacted record set",
+      "Recall candidate list",
+      "Evidence package"
+    ],
+    "coreScreensNarrative": [
+      "Genealogy search",
+      "Graph view",
+      "Timeline view",
+      "Impacted objects list",
+      "Export package"
+    ],
+    "policiesNarrative": "Freshness: traceability-near-real-time Offline: read_only Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M30-lot-genealogy-traceability.genealogy-search",
+      "title": "Genealogy search",
+      "type": "exception-hub",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.graph-view",
+      "title": "Graph view",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.timeline-view",
+      "title": "Timeline view",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.impacted-objects-list",
+      "title": "Impacted objects list",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.export-package",
+      "title": "Export package",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m30.lot.genealogy.traceability.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mom/traceability/genealogy/{id}",
+      "permission": "genealogy.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m30.lot.genealogy.traceability.command.expand-upstream",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/expand-upstream",
+      "permission": "genealogy.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ExpandUpstreamRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m30.lot.genealogy.traceability.command.expand-downstream",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/expand-downstream",
+      "permission": "genealogy.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ExpandDownstreamRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m30.lot.genealogy.traceability.command.freeze-trace-report",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/freeze-trace-report",
+      "permission": "genealogy.freeze",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "FreezeTraceReportRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m30.lot.genealogy.traceability.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/export",
+      "permission": "genealogy.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m30.lot.genealogy.traceability.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/query",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m30.lot.genealogy.traceability.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/traceability/genealogy/{id}",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m30.lot.genealogy.traceability.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/lookup",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m30.lot.genealogy.traceability.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/traceability/genealogy/metrics",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m30.lot.genealogy.traceability.list",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "genealogyRecord summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.detail",
+      "method": "GET",
+      "path": "/mom/traceability/genealogy/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "genealogyRecord detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.lookup",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.metrics",
+      "method": "GET",
+      "path": "/mom/traceability/genealogy/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.update",
+      "method": "PATCH",
+      "path": "/mom/traceability/genealogy/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.command.expand-upstream",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/expand-upstream",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "ExpandUpstreamRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.command.expand-downstream",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/expand-downstream",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.read",
+      "auditEvent": "ExpandDownstreamRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.command.freeze-trace-report",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/{id}/actions/freeze-trace-report",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.freeze",
+      "auditEvent": "FreezeTraceReportRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m30.lot.genealogy.traceability.export",
+      "method": "POST",
+      "path": "/mom/traceability/genealogy/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "traceability-near-real-time",
+      "permission": "genealogy.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

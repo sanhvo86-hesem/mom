@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graphics Drift Report",
+  "type": "object",
+  "properties": {
+    "tokenDrift": {
+      "type": "array"
+    },
+    "componentContractDrift": {
+      "type": "array"
+    },
+    "templateDrift": {
+      "type": "array"
+    },
+    "runtimeSelectorDrift": {
+      "type": "array"
+    },
+    "privateCssDrift": {
+      "type": "array"
+    },
+    "inlineStyleDrift": {
+      "type": "array"
+    }
+  }
+}

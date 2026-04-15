@@ -1,0 +1,250 @@
+{
+  "moduleId": "M31-accounts-payable",
+  "moduleName": "Công nợ phải trả và đối chiếu 3 bên",
+  "route": "/erp/finance/ap",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "Finance",
+  "processOwner": "AP Manager",
+  "primaryEntity": "supplierInvoice",
+  "contractRefs": [
+    "mom/contracts/objects/supplierInvoice/contract.json",
+    "mom/design/module-api-catalog/M31-accounts-payable.json"
+  ],
+  "templateId": "T-approval-queue-finance-ap",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M31-accounts-payable.invoice-queue",
+      "screenName": "Invoice queue",
+      "type": "approval-queue",
+      "blocks": [
+        "M31-accounts-payable.header",
+        "M31-accounts-payable.main",
+        "M31-accounts-payable.actions"
+      ]
+    },
+    {
+      "screenId": "M31-accounts-payable.3-way-match-workspace",
+      "screenName": "3-way-match workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M31-accounts-payable.header",
+        "M31-accounts-payable.main",
+        "M31-accounts-payable.actions"
+      ]
+    },
+    {
+      "screenId": "M31-accounts-payable.exception-panel",
+      "screenName": "Exception panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M31-accounts-payable.header",
+        "M31-accounts-payable.main",
+        "M31-accounts-payable.actions"
+      ]
+    },
+    {
+      "screenId": "M31-accounts-payable.approval-release-panel",
+      "screenName": "Approval/release panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M31-accounts-payable.header",
+        "M31-accounts-payable.main",
+        "M31-accounts-payable.actions"
+      ]
+    },
+    {
+      "screenId": "M31-accounts-payable.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M31-accounts-payable.header",
+        "M31-accounts-payable.main",
+        "M31-accounts-payable.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M31-accounts-payable.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M31-accounts-payable.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M31-accounts-payable.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M31-accounts-payable.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m31.accounts.payable.list",
+    "m31.accounts.payable.detail",
+    "m31.accounts.payable.lookup",
+    "m31.accounts.payable.metrics",
+    "m31.accounts.payable.update",
+    "m31.accounts.payable.command.ingest",
+    "m31.accounts.payable.command.match",
+    "m31.accounts.payable.command.resolve-exception",
+    "m31.accounts.payable.command.approve",
+    "m31.accounts.payable.command.post",
+    "m31.accounts.payable.command.void",
+    "m31.accounts.payable.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "matching",
+      "exception",
+      "approved",
+      "posted",
+      "paid",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "match",
+        "transition": "new -> matching"
+      },
+      {
+        "action": "exception",
+        "transition": "matching -> exception"
+      },
+      {
+        "action": "approve",
+        "transition": "matching|exception -> approved"
+      },
+      {
+        "action": "post",
+        "transition": "approved -> posted"
+      },
+      {
+        "action": "void",
+        "transition": "new|matching|exception -> voided"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "ap.read",
+      "ap.match",
+      "ap.resolve",
+      "ap.approve",
+      "ap.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "IngestRequested",
+      "MatchRequested",
+      "ResolveExceptionRequested",
+      "ApproveRequested",
+      "PostRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M31-accounts-payable/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "supplierInvoice",
+      "supplierInvoice",
+      "matchException",
+      "paymentStatus"
+    ]
+  },
+  "moduleArchetype": "approval-queue",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

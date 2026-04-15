@@ -16,6 +16,16 @@ use RuntimeException;
  */
 final class ElectronicSignatureChallengeService
 {
+    private const CHALLENGE_TTL_SECONDS = 300;
+    private const ALLOWED_SIGNATURE_ACTIONS = [
+        'evidence_finalize',
+        'document_release',
+        'document_read_acknowledgement',
+        'periodic_evaluation_waiver',
+        'change_order_release',
+        'verification_waiver',
+    ];
+
     private ?object $db;
 
     public function __construct(?object $db)
@@ -30,10 +40,16 @@ final class ElectronicSignatureChallengeService
     public function issueChallenge(array $input): array
     {
         $db = $this->requireDb();
-        $challengeId = $this->nullableText($input['auth_challenge_id'] ?? null)
-            ?? 'esign-' . bin2hex(random_bytes(16));
+        if ($this->nullableText($input['auth_challenge_id'] ?? null) !== null) {
+            throw new RuntimeException('signature_auth_challenge_id_server_authoritative');
+        }
+        if ($this->nullableText($input['expires_at'] ?? null) !== null) {
+            throw new RuntimeException('signature_auth_challenge_expiry_server_authoritative');
+        }
+        $challengeId = 'esign-' . bin2hex(random_bytes(16));
         $payloadHash = $this->requiredSha256($input['signed_payload_hash_sha256'] ?? null, 'signed_payload_hash_sha256');
         $displayedHash = $this->requiredSha256($input['displayed_record_hash_sha256'] ?? null, 'displayed_record_hash_sha256');
+        $signatureAction = $this->signatureAction($input['signature_action'] ?? 'evidence_finalize');
         $signerUserId = $this->nullableUuid($input['signer_user_id'] ?? $input['user_id'] ?? null);
         $signerRef = $this->nullableText($input['signer_ref'] ?? $input['actor_ref'] ?? null);
         if ($signerUserId === null && $signerRef === null) {
@@ -57,10 +73,10 @@ final class ElectronicSignatureChallengeService
                 ':signer_ref' => $signerRef,
                 ':session_id' => $this->nullableText($input['session_id'] ?? null),
                 ':org_id' => $this->nullableText($input['org_id'] ?? null),
-                ':signature_action' => $this->nullableText($input['signature_action'] ?? null) ?? 'evidence_finalize',
+                ':signature_action' => $signatureAction,
                 ':signed_payload_hash_sha256' => $payloadHash,
                 ':displayed_record_hash_sha256' => $displayedHash,
-                ':expires_at' => $this->nullableText($input['expires_at'] ?? null) ?? gmdate('c', time() + 300),
+                ':expires_at' => gmdate('c', time() + self::CHALLENGE_TTL_SECONDS),
                 ':idempotency_key' => $this->nullableText($input['idempotency_key'] ?? null),
                 ':metadata' => $this->json(is_array($input['metadata'] ?? null) ? $input['metadata'] : []),
             ],
@@ -171,6 +187,15 @@ final class ElectronicSignatureChallengeService
     {
         $text = $this->text($value);
         return preg_match('/^[a-f0-9-]{36}$/i', $text) === 1 ? $text : null;
+    }
+
+    private function signatureAction(mixed $value): string
+    {
+        $action = $this->nullableText($value) ?? 'evidence_finalize';
+        if (!in_array($action, self::ALLOWED_SIGNATURE_ACTIONS, true)) {
+            throw new RuntimeException('signature_action_not_allowed');
+        }
+        return $action;
     }
 
     private function json(mixed $value): string

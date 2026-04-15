@@ -1,0 +1,820 @@
+{
+  "moduleProfile": {
+    "purpose": "Capture, triage, investigate and close customer complaints with linkage to NCR, CAPA and shipment history.",
+    "workflowNote": "Complaint records are controlled quality records. Closure may require customer response package and CAPA linkage.",
+    "personas": [
+      "Customer quality engineer",
+      "Quality manager",
+      "Sales manager",
+      "CAPA coordinator"
+    ],
+    "inputs": [
+      "Complaint intake",
+      "Customer return/8D request",
+      "Sales order/shipment trace",
+      "Lot genealogy",
+      "Containment actions",
+      "Investigation findings"
+    ],
+    "outputs": [
+      "Complaint record",
+      "Containment decision",
+      "Response package",
+      "CAPA linkage",
+      "Closure approval",
+      "Audit-ready evidence package"
+    ],
+    "coreScreensNarrative": [
+      "Complaint queue",
+      "Complaint detail",
+      "Containment tab",
+      "Investigation tab",
+      "Response package",
+      "Linked records",
+      "Audit trail"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M04-customer-complaints.complaint-queue",
+      "title": "Complaint queue",
+      "type": "exception-hub",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.complaint-detail",
+      "title": "Complaint detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.containment-tab",
+      "title": "Containment tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.investigation-tab",
+      "title": "Investigation tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.response-package",
+      "title": "Response package",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.linked-records",
+      "title": "Linked records",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.audit-trail",
+      "title": "Audit trail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m04.customer.complaints.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/eqms/customer-complaints",
+      "permission": "complaint.create",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/customer-complaints/{id}",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.intake",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/intake",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "IntakeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.triage",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/triage",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "TriageRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.assign",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/assign",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AssignRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.record-containment",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/record-containment",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordContainmentRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.link-capa",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/link-capa",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "LinkCapaRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.issue-response",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/issue-response",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "IssueResponseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/close",
+      "permission": "complaint.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.command.void",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/void",
+      "permission": "complaint.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "VoidRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m04.customer.complaints.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/export",
+      "permission": "complaint.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m04.customer.complaints.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m04.customer.complaints.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/customer-complaints/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m04.customer.complaints.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m04.customer.complaints.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/customer-complaints/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m04.customer.complaints.list",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "customerComplaint summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.detail",
+      "method": "GET",
+      "path": "/eqms/customer-complaints/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "customerComplaint detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.lookup",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.metrics",
+      "method": "GET",
+      "path": "/eqms/customer-complaints/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.create",
+      "method": "POST",
+      "path": "/eqms/customer-complaints",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "customerComplaint draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.update",
+      "method": "PATCH",
+      "path": "/eqms/customer-complaints/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.intake",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/intake",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "IntakeRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.triage",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/triage",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "TriageRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.assign",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/assign",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "AssignRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.record-containment",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/record-containment",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "RecordContainmentRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.link-capa",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/link-capa",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "LinkCapaRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.issue-response",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/issue-response",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "IssueResponseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.close",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.close",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.command.void",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/{id}/actions/void",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.assign",
+      "auditEvent": "VoidRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m04.customer.complaints.export",
+      "method": "POST",
+      "path": "/eqms/customer-complaints/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "complaint.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

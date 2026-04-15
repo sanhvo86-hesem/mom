@@ -1,6 +1,6 @@
 # World-Class Gap Scorecard
 
-Audited branch: `codex/worldclass-reaudit-20260415-055057`
+Audited branch: `codex/worldclass-closure-20260415-0913`
 
 Date: 2026-04-15
 
@@ -16,14 +16,14 @@ Scale: 0 means absent or unsafe. 5 means benchmark-class, governed, tested, and 
 | Workforce qualification / authorization | 3.0 | 3.3 | 4.2 | Conflict override scope is narrowed; dispatch-report skill matching remains staged. |
 | Reason-code governance | 3.6 | 3.7 | 4.3 | Mobile task completion now requires a structured reason code for fail/partial/scrap outcomes. |
 | Digital thread continuity | 3.2 | 3.8 | 4.4 | WO contracts carry plant/site/setup/CNC hooks; CNC program/version records now persist plant/site/work-center/operation/revision/inspection context; setup sheets default draft and strict dispatch rejects unreleased setup context. |
-| Traceability / genealogy | 3.1 | 3.4 | 4.3 | Migration 121 aligns `genealogy_nodes` and `as_manufactured_snapshots` constraints with runtime ontology. |
-| Multi-site / plant / site / work-center semantics | 3.0 | 3.2 | 4.0 | WO creation/update and dispatch/mobile payloads preserve plant/site context more consistently. |
+| Traceability / genealogy | 3.1 | 3.6 | 4.3 | Migration 121 aligns `genealogy_nodes` and `as_manufactured_snapshots` constraints with runtime ontology; shopfloor 5M genealogy gate calls now require explicit plant/site partition scope before canonical persistence. |
+| Multi-site / plant / site / work-center semantics | 3.0 | 3.3 | 4.0 | WO creation/update and dispatch/mobile payloads preserve plant/site context more consistently; 5M genealogy requests now pass trusted scope top-level instead of burying scope only inside context. |
 | Interoperability readiness | 3.1 | 3.3 | 4.2 | MTConnect XML parsing no longer expands entities and rejects DOCTYPE/ENTITY payloads. |
 | AI / copilot architecture quality | 3.3 | 4.65 | 4.7 | Legacy AI reads now require AI read roles, feedback requires feedback/write roles, schedule metrics and JSON prediction fallback are plant-scoped, conversation fallback reads validate ID/owner, NLQ uses a shared user/hour throttle, scheduled ETL is org-scoped/fail-closed, and AI schedule apply/PM routes are explicitly advisory-only. |
 | OT/IT security and governance | 3.2 | 4.3 | 4.5 | AI read/write surfaces, AI schedule advisory boundaries, evidence finalization/read scoping, XML parsing, exception lifecycle updates, order hold event audit, and mobile conflict overrides are hardened. |
 | Reliability / idempotency / offline resilience | 3.4 | 4.35 | 4.4 | Evidence replay key contract is aligned; mobile task events and inspection replay identity are preserved; DB and JSON schedule writes share conflict guards; online mobile clock-in, clock-out, and completion support same-key replay; mobile queue/default overview dates use the factory calendar; missing queue-index buckets rebuild from source; manufacturing-event fallback append keeps idempotency/hash-chain checks while avoiding full in-memory retention. |
 | Performance / scalability | 3.0 | 3.45 | 4.1 | Mobile operator queue retrieval uses a derived operator/date index that now fails open to source reconstruction on cache misses, and file-backed manufacturing-event append scans duplicate/hash context without retaining the whole ledger. Broader mobile/offline and dashboard indexes remain staged. |
-| Developer architecture / maintainability | 3.3 | 3.9 | 4.3 | Added root branch/cleanup rules, six audit artifacts, targeted regression tests, current-branch provenance, and focused service tests. |
+| Developer architecture / maintainability | 3.3 | 4.0 | 4.3 | Added root branch/cleanup rules, six audit artifacts, targeted regression tests, current-branch provenance, focused service tests, release-candidate graphics pack validation, and a merge gate artifact. |
 
 ## Confirmed defects and disposition
 
@@ -38,7 +38,7 @@ Scale: 0 means absent or unsafe. 5 means benchmark-class, governed, tested, and 
 | H7 reason-code governance missing | P2 | Mostly refuted for shopfloor, partially confirmed for EQMS exceptions. Deferred to exception service unification. |
 | H8 qualification controls weak | P2 | Partially confirmed. Mobile qualification gate exists; dispatch-report operation-skill policy deferred. |
 | H9 inspection gating weak | P2 | Partially refuted. Mobile first-piece gate exists; OQC/shipment JSON gate deferred. |
-| H10 digital-thread hooks incomplete | P1 | Confirmed for CNC program/setup master authority; execution payload links exist. |
+| H10 digital-thread hooks incomplete | P1 | Confirmed for CNC program/setup master authority; execution payload links exist and 5M genealogy calls now carry trusted plant/site partition scope. |
 | H11 source-of-truth drift | P1 | Confirmed across JSON/DB/projection layers; documented and bounded. |
 | H12 AI detached/unsafe | P1 | Fixed for NLQ/RCA security, AI schedule apply/PM advisory boundaries, schedule-write conflict symmetry, shared NLQ throttling, and scheduled ETL org scoping. Full semantic copilot schema registry remains deferred. |
 | H13 OT/IT controls weak | P1 | Fixed high-risk AI/evidence/override gaps; full 62443 program remains future governance. |

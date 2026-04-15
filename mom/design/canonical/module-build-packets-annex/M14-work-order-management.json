@@ -1,0 +1,731 @@
+{
+  "moduleProfile": {
+    "purpose": "Create, release, monitor and close manufacturing work orders with material, operation and quality linkage.",
+    "workflowNote": "Work order release is execution authority; holds and cancellations must show impact on schedule and WIP.",
+    "personas": [
+      "Planner",
+      "Production controller",
+      "Supervisor"
+    ],
+    "inputs": [
+      "Demand signal",
+      "BOM/routing",
+      "Material availability",
+      "Capacity plan",
+      "Quality plan"
+    ],
+    "outputs": [
+      "Released work order",
+      "Operation queue",
+      "Material reservation",
+      "Execution status",
+      "Completion/closure record"
+    ],
+    "coreScreensNarrative": [
+      "WO list",
+      "WO detail",
+      "Operation sequence",
+      "Material tab",
+      "Execution status",
+      "Exceptions",
+      "History"
+    ],
+    "policiesNarrative": "Freshness: work-order-state Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M14-work-order-management.wo-list",
+      "title": "WO list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.wo-detail",
+      "title": "WO detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.operation-sequence",
+      "title": "Operation sequence",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.material-tab",
+      "title": "Material tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.execution-status",
+      "title": "Execution status",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.exceptions",
+      "title": "Exceptions",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    },
+    {
+      "screenId": "M14-work-order-management.history",
+      "title": "History",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M14-work-order-management.header",
+        "M14-work-order-management.main",
+        "M14-work-order-management.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m14.work.order.management.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/mom/production/work-orders",
+      "permission": "workOrder.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mom/production/work-orders/{id}",
+      "permission": "workOrder.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/release",
+      "permission": "workOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/hold",
+      "permission": "workOrder.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.resume",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/resume",
+      "permission": "workOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ResumeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.complete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/complete",
+      "permission": "workOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CompleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/close",
+      "permission": "workOrder.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/cancel",
+      "permission": "workOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m14.work.order.management.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mom/production/work-orders/export",
+      "permission": "workOrder.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m14.work.order.management.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mom/production/work-orders/query",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m14.work.order.management.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/production/work-orders/{id}",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m14.work.order.management.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mom/production/work-orders/lookup",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m14.work.order.management.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/production/work-orders/metrics",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m14.work.order.management.list",
+      "method": "POST",
+      "path": "/mom/production/work-orders/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "workOrder summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.detail",
+      "method": "GET",
+      "path": "/mom/production/work-orders/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "workOrder detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.lookup",
+      "method": "POST",
+      "path": "/mom/production/work-orders/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m14.work.order.management.metrics",
+      "method": "GET",
+      "path": "/mom/production/work-orders/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.create",
+      "method": "POST",
+      "path": "/mom/production/work-orders",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "workOrder draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.update",
+      "method": "PATCH",
+      "path": "/mom/production/work-orders/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.release",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.hold",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.hold",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.resume",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/resume",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.release",
+      "auditEvent": "ResumeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.complete",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/complete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.release",
+      "auditEvent": "CompleteRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.close",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.close",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.command.cancel",
+      "method": "POST",
+      "path": "/mom/production/work-orders/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.release",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m14.work.order.management.export",
+      "method": "POST",
+      "path": "/mom/production/work-orders/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "work-order-state",
+      "permission": "workOrder.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

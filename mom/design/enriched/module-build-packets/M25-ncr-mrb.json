@@ -1,0 +1,1020 @@
+{
+  "moduleId": "M25-ncr-mrb",
+  "moduleName": "NCR và xử lý bất phù hợp",
+  "route": "/eqms/ncr",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "MRB Chair",
+  "primaryEntity": "ncr",
+  "contractRefs": [
+    "mom/contracts/objects/ncr/contract.json",
+    "mom/design/module-api-catalog/M25-ncr-mrb.json"
+  ],
+  "templateId": "T-exception-hub-ncr",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M25-ncr-mrb.ncr-queue",
+      "screenName": "NCR queue",
+      "type": "exception-hub",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.ncr-detail",
+      "screenName": "NCR detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.containment-tab",
+      "screenName": "Containment tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.mrb-tab",
+      "screenName": "MRB tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.disposition-signature-panel",
+      "screenName": "Disposition/signature panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.linked-records",
+      "screenName": "Linked records",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M25-ncr-mrb.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M25-ncr-mrb.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M25-ncr-mrb.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M25-ncr-mrb.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M25-ncr-mrb.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m25.ncr.mrb.list",
+    "m25.ncr.mrb.detail",
+    "m25.ncr.mrb.lookup",
+    "m25.ncr.mrb.metrics",
+    "m25.ncr.mrb.create",
+    "m25.ncr.mrb.update",
+    "m25.ncr.mrb.command.contain",
+    "m25.ncr.mrb.command.investigate",
+    "m25.ncr.mrb.command.submit-mrb",
+    "m25.ncr.mrb.command.record-disposition",
+    "m25.ncr.mrb.command.close",
+    "m25.ncr.mrb.command.void",
+    "m25.ncr.mrb.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "contained",
+      "under_investigation",
+      "mrb_pending",
+      "dispositioned",
+      "closed",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "contain",
+        "transition": "new -> contained"
+      },
+      {
+        "action": "investigate",
+        "transition": "contained -> under_investigation"
+      },
+      {
+        "action": "submitMrb",
+        "transition": "under_investigation -> mrb_pending"
+      },
+      {
+        "action": "recordDisposition",
+        "transition": "mrb_pending -> dispositioned"
+      },
+      {
+        "action": "close",
+        "transition": "dispositioned -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "ncr.read",
+      "ncr.create",
+      "ncr.contain",
+      "ncr.investigate",
+      "ncr.dispose",
+      "ncr.sign",
+      "ncr.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "ContainRequested",
+      "InvestigateRequested",
+      "SubmitMrbRequested",
+      "RecordDispositionRequested",
+      "CloseRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M25-ncr-mrb/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "ncr",
+      "ncr",
+      "ncrContainment",
+      "mrbDecision"
+    ]
+  },
+  "moduleArchetype": "exception-hub",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Capture, contain, investigate and disposition nonconforming product or process deviations.",
+    "workflowNote": "NCR and deviation records are controlled records requiring strong audit and approval controls.",
+    "personas": [
+      "Inspector",
+      "Quality engineer",
+      "MRB member",
+      "Approver"
+    ],
+    "inputs": [
+      "Defect/incident report",
+      "Lot/serial trace",
+      "Containment actions",
+      "Investigation findings",
+      "Disposition decision"
+    ],
+    "outputs": [
+      "NCR record",
+      "Containment status",
+      "MRB disposition",
+      "Scrap/rework/use-as-is decision",
+      "Linked CAPA",
+      "Audit package"
+    ],
+    "coreScreensNarrative": [
+      "NCR queue",
+      "NCR detail",
+      "Containment tab",
+      "MRB tab",
+      "Disposition/signature panel",
+      "Linked records",
+      "Audit history"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M25-ncr-mrb.ncr-queue",
+      "title": "NCR queue",
+      "type": "exception-hub",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.ncr-detail",
+      "title": "NCR detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.containment-tab",
+      "title": "Containment tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.mrb-tab",
+      "title": "MRB tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.disposition-signature-panel",
+      "title": "Disposition/signature panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.linked-records",
+      "title": "Linked records",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    },
+    {
+      "screenId": "M25-ncr-mrb.audit-history",
+      "title": "Audit history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M25-ncr-mrb.header",
+        "M25-ncr-mrb.main",
+        "M25-ncr-mrb.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m25.ncr.mrb.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/eqms/ncr",
+      "permission": "ncr.create",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/ncr/{id}",
+      "permission": "ncr.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.contain",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/contain",
+      "permission": "ncr.contain",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ContainRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.investigate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/investigate",
+      "permission": "ncr.investigate",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "InvestigateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.submit-mrb",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/submit-mrb",
+      "permission": "ncr.dispose",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitMrbRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.record-disposition",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/record-disposition",
+      "permission": "ncr.dispose",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordDispositionRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/close",
+      "permission": "ncr.dispose",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.command.void",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/void",
+      "permission": "ncr.dispose",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "VoidRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m25.ncr.mrb.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/ncr/export",
+      "permission": "ncr.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m25.ncr.mrb.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/ncr/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m25.ncr.mrb.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/ncr/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m25.ncr.mrb.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/ncr/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m25.ncr.mrb.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/ncr/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m25.ncr.mrb.list",
+      "method": "POST",
+      "path": "/eqms/ncr/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "ncr summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.detail",
+      "method": "GET",
+      "path": "/eqms/ncr/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "ncr detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.lookup",
+      "method": "POST",
+      "path": "/eqms/ncr/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.metrics",
+      "method": "GET",
+      "path": "/eqms/ncr/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.create",
+      "method": "POST",
+      "path": "/eqms/ncr",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "ncr draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.update",
+      "method": "PATCH",
+      "path": "/eqms/ncr/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.contain",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/contain",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.contain",
+      "auditEvent": "ContainRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.investigate",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/investigate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.investigate",
+      "auditEvent": "InvestigateRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.submit-mrb",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/submit-mrb",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.dispose",
+      "auditEvent": "SubmitMrbRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.record-disposition",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/record-disposition",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.dispose",
+      "auditEvent": "RecordDispositionRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.close",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.dispose",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.command.void",
+      "method": "POST",
+      "path": "/eqms/ncr/{id}/actions/void",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.dispose",
+      "auditEvent": "VoidRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m25.ncr.mrb.export",
+      "method": "POST",
+      "path": "/eqms/ncr/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "ncr.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

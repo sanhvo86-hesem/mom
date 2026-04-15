@@ -6918,7 +6918,14 @@
             "mom/design/template-registry.json",
             "mom/data/registry/graphics-governance-registry.json",
             "mom/docs/module-layout-template-design-system-v4.html",
-            "standards/36-frontend-module-layout-template-standard.md"
+            "standards/36-frontend-module-layout-template-standard.md",
+            "mom/design/canonical/manifest.json",
+            "mom/design/graphics/template-registry-authority.json",
+            "mom/design/graphics/module-graphics-compliance-matrix.json",
+            "mom/design/graphics/theme-compatibility-matrix.json",
+            "mom/design/graphics/graphics-lineage-graph.json",
+            "mom/design/graphics/visual-debt-observatory.json",
+            "mom/design/repo-alignment/backend-graphics-authority-api-contract.json"
         ],
         "templateRegistryVersion": "2026.04.11-p0",
         "templateRegistryChecksum": "sha256:0e21e6ac62a9891d4664598f9e1fa709",
@@ -6960,7 +6967,9 @@
             "rollbackPlan",
             "waiverRegisterSnapshot"
         ],
-        "generatedAt": "2026-04-14T13:46:12+00:00"
+        "generatedAt": "2026-04-14T13:46:12+00:00",
+        "worldclassPackRef": "mom/design/canonical/manifest.json",
+        "worldclassPackStatus": "machine-validated-planning-authority"
     },
     "graphicsReleaseEvidencePack": {
         "evidencePackId": "graphics-release-evidence-current",
@@ -7035,7 +7044,19 @@
             "rollbackPlan",
             "waiverRegisterSnapshot"
         ],
-        "generatedAt": "2026-04-14T13:46:13+00:00"
+        "generatedAt": "2026-04-14T13:46:13+00:00",
+        "packIntegrationRefs": {
+            "packId": "module-layout-template-design-system-v4-current-mom-worldclass",
+            "status": "integrated-as-canonical-planning-artifacts",
+            "productionPromotionPolicy": "canonical pack packets feed the same backend graphics authority; module promotion remains gated by validators, release blockers, impact analysis, and runtime compliance beacon evidence",
+            "canonicalManifestRef": "mom/design/canonical/manifest.json",
+            "templateRegistryAuthorityRef": "mom/design/graphics/template-registry-authority.json",
+            "themeCompatibilityMatrixRef": "mom/design/graphics/theme-compatibility-matrix.json",
+            "moduleGraphicsComplianceMatrixRef": "mom/design/graphics/module-graphics-compliance-matrix.json",
+            "graphicsLineageGraphRef": "mom/design/graphics/graphics-lineage-graph.json",
+            "visualDebtObservatoryRef": "mom/design/graphics/visual-debt-observatory.json",
+            "backendAlignmentContractRef": "mom/design/repo-alignment/backend-graphics-authority-api-contract.json"
+        }
     },
     "multiSitePlantBrandingGovernance": {
         "authority": "backend_graphics_policy_pack",
@@ -7107,6 +7128,21 @@
         "waiverRegister": "mom/data/graphics-governance/waivers.json",
         "rolloutRegister": "mom/data/graphics-governance/rollouts.json",
         "authorityPolicy": "Registry/design artifacts are backend authority; browser localStorage is cache only.",
-        "workspaceDraftAuthority": false
+        "workspaceDraftAuthority": false,
+        "worldclassCanonicalPack": "mom/design/canonical/manifest.json",
+        "worldclassGraphicsArtifacts": "mom/design/graphics/*.json",
+        "worldclassRepoAlignment": "mom/design/repo-alignment/*"
+    },
+    "packIntegration": {
+        "packId": "module-layout-template-design-system-v4-current-mom-worldclass",
+        "status": "integrated-as-canonical-planning-artifacts",
+        "productionPromotionPolicy": "canonical pack packets feed the same backend graphics authority; module promotion remains gated by validators, release blockers, impact analysis, and runtime compliance beacon evidence",
+        "canonicalManifestRef": "mom/design/canonical/manifest.json",
+        "templateRegistryAuthorityRef": "mom/design/graphics/template-registry-authority.json",
+        "themeCompatibilityMatrixRef": "mom/design/graphics/theme-compatibility-matrix.json",
+        "moduleGraphicsComplianceMatrixRef": "mom/design/graphics/module-graphics-compliance-matrix.json",
+        "graphicsLineageGraphRef": "mom/design/graphics/graphics-lineage-graph.json",
+        "visualDebtObservatoryRef": "mom/design/graphics/visual-debt-observatory.json",
+        "backendAlignmentContractRef": "mom/design/repo-alignment/backend-graphics-authority-api-contract.json"
     }
 }

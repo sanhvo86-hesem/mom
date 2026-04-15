@@ -1,6 +1,6 @@
 # Global World-Class Benchmark Refresh
 
-Audited branch: `codex/worldclass-reaudit-20260415-055057`
+Audited branch: `codex/worldclass-closure-20260415-0913`
 
 Date: 2026-04-15
 
@@ -34,6 +34,7 @@ Scope: official-source benchmark deltas that directly affect this repository's E
 - Current re-audit fix: schedule slot create/update now uses the same overlap guard in DB and JSON fallback paths, and AI-named `ai_schedule_apply` / `ai_schedule_pm` routes now return advisory review/proposal responses instead of implying schedule or maintenance execution authority.
 - Current 2026-04-15 re-audit fix: dispatch can only promote `planned` targets to `dispatched`; order holds now reject invalid order types and missing source orders before writing hold state; sales-order dates are format/bounds checked on create/update; NLQ hourly throttling moved from session-local counters to a shared per-user/hour file ledger; the manufacturing-event file fallback scans append context instead of retaining the full ledger in memory.
 - Current 2026-04-15 05:50 re-audit fix: WO creation now validates/inherits parent JO plant/site/routing/operation context, mobile queue indexes rebuild on missing buckets, shopfloor overview uses factory-date bucketing, and scheduled AI ETL now requires explicit org scopes rather than attempting unscoped snapshots.
+- Current 2026-04-15 09:13 closure fix: canonical EQMS control-plane integrity was expanded with evidence finalization scope/signature checks, change/document/effectivity lifecycle proof tests, and shopfloor 5M genealogy gate calls now fail closed unless plant/site partition scope is passed to the authoritative genealogy service.
 
 ## 2026-04-15 six-workstream benchmark deltas
 

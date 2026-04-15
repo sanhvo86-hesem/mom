@@ -1,0 +1,274 @@
+{
+  "moduleId": "M13-engineering-change",
+  "moduleName": "Thay đổi kỹ thuật",
+  "route": "/eqms/engineering-change",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Engineering Governance",
+  "processOwner": "Engineering Change Board",
+  "primaryEntity": "engineeringChange",
+  "contractRefs": [
+    "mom/contracts/objects/engineeringChange/contract.json",
+    "mom/design/module-api-catalog/M13-engineering-change.json"
+  ],
+  "templateId": "T-evidence-workspace-eco",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M13-engineering-change.eco-queue",
+      "screenName": "ECO queue",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.change-workspace",
+      "screenName": "Change workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.impact-matrix",
+      "screenName": "Impact matrix",
+      "type": "supporting-screen",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.approval-signature-panel",
+      "screenName": "Approval/signature panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.implementation-tasks",
+      "screenName": "Implementation tasks",
+      "type": "supporting-screen",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.audit-package",
+      "screenName": "Audit package",
+      "type": "supporting-screen",
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M13-engineering-change.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M13-engineering-change.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M13-engineering-change.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M13-engineering-change.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M13-engineering-change.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m13.engineering.change.list",
+    "m13.engineering.change.detail",
+    "m13.engineering.change.lookup",
+    "m13.engineering.change.metrics",
+    "m13.engineering.change.create",
+    "m13.engineering.change.update",
+    "m13.engineering.change.command.submit-assessment",
+    "m13.engineering.change.command.approve",
+    "m13.engineering.change.command.implement",
+    "m13.engineering.change.command.close",
+    "m13.engineering.change.command.cancel",
+    "m13.engineering.change.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "assessment",
+      "pending_approval",
+      "approved",
+      "implemented",
+      "closed",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "submitAssessment",
+        "transition": "draft -> assessment"
+      },
+      {
+        "action": "submitApproval",
+        "transition": "assessment -> pending_approval"
+      },
+      {
+        "action": "approve",
+        "transition": "pending_approval -> approved"
+      },
+      {
+        "action": "implement",
+        "transition": "approved -> implemented"
+      },
+      {
+        "action": "close",
+        "transition": "implemented -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "eco.read",
+      "eco.create",
+      "eco.assess",
+      "eco.approve",
+      "eco.sign",
+      "eco.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitAssessmentRequested",
+      "ApproveRequested",
+      "ImplementRequested",
+      "CloseRequested",
+      "CancelRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M13-engineering-change/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "engineeringChange",
+      "engineeringChange",
+      "affectedObject",
+      "impactAssessment"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

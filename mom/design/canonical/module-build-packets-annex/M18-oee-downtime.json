@@ -1,0 +1,479 @@
+{
+  "moduleProfile": {
+    "purpose": "Analyze equipment effectiveness, classify downtime and drive improvement actions.",
+    "workflowNote": "OEE formulas, time basis and exclusions must be explicit and version-controlled.",
+    "personas": [
+      "Supervisor",
+      "CI engineer",
+      "Plant manager"
+    ],
+    "inputs": [
+      "Machine events",
+      "Production counts",
+      "Ideal cycle data",
+      "Downtime reasons",
+      "Shift calendars"
+    ],
+    "outputs": [
+      "OEE dashboard",
+      "Downtime pareto",
+      "Loss tree",
+      "Improvement opportunities",
+      "Exportable analytics"
+    ],
+    "coreScreensNarrative": [
+      "OEE overview",
+      "Downtime event list",
+      "Pareto tab",
+      "Shift/day trend",
+      "Machine compare"
+    ],
+    "policiesNarrative": "Freshness: analytics-near-real-time Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M18-oee-downtime.oee-overview",
+      "title": "OEE overview",
+      "type": "analytical-list",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.downtime-event-list",
+      "title": "Downtime event list",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.pareto-tab",
+      "title": "Pareto tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.shift-day-trend",
+      "title": "Shift/day trend",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.machine-compare",
+      "title": "Machine compare",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m18.oee.downtime.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/oee-downtime/{id}",
+      "permission": "oee.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m18.oee.downtime.command.reclassify-downtime",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/reclassify-downtime",
+      "permission": "oee.reclassify",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ReclassifyDowntimeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m18.oee.downtime.command.approve-adjustment",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/approve-adjustment",
+      "permission": "oee.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ApproveAdjustmentRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m18.oee.downtime.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/oee-downtime/export",
+      "permission": "oee.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m18.oee.downtime.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/oee-downtime/query",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m18.oee.downtime.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/oee-downtime/{id}",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m18.oee.downtime.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/oee-downtime/lookup",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m18.oee.downtime.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/oee-downtime/metrics",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m18.oee.downtime.list",
+      "method": "POST",
+      "path": "/mes/oee-downtime/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "downtimeEvent summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.detail",
+      "method": "GET",
+      "path": "/mes/oee-downtime/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "downtimeEvent detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.lookup",
+      "method": "POST",
+      "path": "/mes/oee-downtime/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.metrics",
+      "method": "GET",
+      "path": "/mes/oee-downtime/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.update",
+      "method": "PATCH",
+      "path": "/mes/oee-downtime/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.command.reclassify-downtime",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/reclassify-downtime",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.reclassify",
+      "auditEvent": "ReclassifyDowntimeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.command.approve-adjustment",
+      "method": "POST",
+      "path": "/mes/oee-downtime/{id}/actions/approve-adjustment",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.approve",
+      "auditEvent": "ApproveAdjustmentRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m18.oee.downtime.export",
+      "method": "POST",
+      "path": "/mes/oee-downtime/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "oee.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

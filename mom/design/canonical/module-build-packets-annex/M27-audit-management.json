@@ -1,0 +1,647 @@
+{
+  "moduleProfile": {
+    "purpose": "Plan audits, execute checklists, record findings and control follow-up actions.",
+    "workflowNote": "Audit records are controlled and often drive NCR/CAPA workflows.",
+    "personas": [
+      "Lead auditor",
+      "Auditor",
+      "Auditee owner",
+      "Quality manager"
+    ],
+    "inputs": [
+      "Audit program",
+      "Checklist template",
+      "Schedule",
+      "Finding evidence",
+      "Auditee responses"
+    ],
+    "outputs": [
+      "Audit plan",
+      "Audit report",
+      "Findings list",
+      "Follow-up actions",
+      "Closure evidence"
+    ],
+    "coreScreensNarrative": [
+      "Audit calendar",
+      "Audit execution",
+      "Finding register",
+      "Report review",
+      "Closure dashboard"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M27-audit-management.audit-calendar",
+      "title": "Audit calendar",
+      "type": "approval-queue",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.audit-execution",
+      "title": "Audit execution",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.finding-register",
+      "title": "Finding register",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.report-review",
+      "title": "Report review",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.closure-dashboard",
+      "title": "Closure dashboard",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "filter",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m27.audit.management.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/audits/{id}",
+      "permission": "audit.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.schedule",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/schedule",
+      "permission": "audit.schedule",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ScheduleRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/start",
+      "permission": "audit.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.record-finding",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/record-finding",
+      "permission": "audit.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordFindingRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.issue-report",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/issue-report",
+      "permission": "audit.issue",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "IssueReportRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.close-finding",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/close-finding",
+      "permission": "audit.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseFindingRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.command.close-audit",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/close-audit",
+      "permission": "audit.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseAuditRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m27.audit.management.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/audits/export",
+      "permission": "audit.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m27.audit.management.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/audits/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m27.audit.management.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/audits/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m27.audit.management.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/audits/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m27.audit.management.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/audits/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m27.audit.management.list",
+      "method": "POST",
+      "path": "/eqms/audits/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "auditProgram summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m27.audit.management.detail",
+      "method": "GET",
+      "path": "/eqms/audits/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "auditProgram detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m27.audit.management.lookup",
+      "method": "POST",
+      "path": "/eqms/audits/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m27.audit.management.metrics",
+      "method": "GET",
+      "path": "/eqms/audits/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m27.audit.management.update",
+      "method": "PATCH",
+      "path": "/eqms/audits/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.schedule",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/schedule",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.schedule",
+      "auditEvent": "ScheduleRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.start",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.close",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.record-finding",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/record-finding",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.close",
+      "auditEvent": "RecordFindingRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.issue-report",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/issue-report",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.issue",
+      "auditEvent": "IssueReportRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.close-finding",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/close-finding",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.close",
+      "auditEvent": "CloseFindingRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.command.close-audit",
+      "method": "POST",
+      "path": "/eqms/audits/{id}/actions/close-audit",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.close",
+      "auditEvent": "CloseAuditRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m27.audit.management.export",
+      "method": "POST",
+      "path": "/eqms/audits/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "audit.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

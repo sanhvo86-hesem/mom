@@ -1,0 +1,962 @@
+{
+  "moduleId": "M01-customer-master",
+  "moduleName": "Khách hàng",
+  "route": "/erp/customers",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Commercial",
+  "processOwner": "Sales Administration",
+  "primaryEntity": "customer",
+  "contractRefs": [
+    "mom/contracts/objects/customer/contract.json",
+    "mom/design/module-api-catalog/M01-customer-master.json"
+  ],
+  "templateId": "T-object-page-commercial-master",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M01-customer-master.customer-list",
+      "screenName": "Customer list",
+      "type": "object-page",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.customer-detail",
+      "screenName": "Customer detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.commercial-terms-tab",
+      "screenName": "Commercial terms tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.quality-requirements-tab",
+      "screenName": "Quality requirements tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.credit-status-tab",
+      "screenName": "Credit status tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.related-documents-tab",
+      "screenName": "Related documents tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.change-history-tab",
+      "screenName": "Change history tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M01-customer-master.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M01-customer-master.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M01-customer-master.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M01-customer-master.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m01.customer.master.list",
+    "m01.customer.master.detail",
+    "m01.customer.master.lookup",
+    "m01.customer.master.metrics",
+    "m01.customer.master.create",
+    "m01.customer.master.update",
+    "m01.customer.master.command.update",
+    "m01.customer.master.command.activate",
+    "m01.customer.master.command.hold",
+    "m01.customer.master.command.deactivate",
+    "m01.customer.master.command.link-approved-part",
+    "m01.customer.master.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "in_review",
+      "approved",
+      "active",
+      "on_hold",
+      "inactive"
+    ],
+    "transitions": [
+      {
+        "action": "submitForReview",
+        "transition": "draft -> in_review"
+      },
+      {
+        "action": "approve",
+        "transition": "in_review -> approved"
+      },
+      {
+        "action": "activate",
+        "transition": "approved -> active"
+      },
+      {
+        "action": "hold",
+        "transition": "active -> on_hold"
+      },
+      {
+        "action": "deactivate",
+        "transition": "active|on_hold -> inactive"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "customer.read",
+      "customer.create",
+      "customer.update",
+      "customer.approve",
+      "customer.activate",
+      "customer.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "UpdateRequested",
+      "ActivateRequested",
+      "HoldRequested",
+      "DeactivateRequested",
+      "LinkApprovedPartRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M01-customer-master/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "customer",
+      "customer",
+      "customerAddress",
+      "customerContact"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Maintain authoritative customer account, contractual, shipping, commercial and quality requirement data.",
+    "workflowNote": "Customer master changes require controlled review when they affect commercial terms, compliance flags or quality clauses.",
+    "personas": [
+      "Sales admin",
+      "Sales manager",
+      "Customer quality engineer",
+      "Finance credit controller"
+    ],
+    "inputs": [
+      "Customer onboarding request",
+      "Legal entity profile",
+      "Address/contact records",
+      "Commercial terms",
+      "Customer quality requirements",
+      "Credit approval decision",
+      "Approved product/customer link"
+    ],
+    "outputs": [
+      "Released customer master record",
+      "Commercial term set",
+      "Credit status",
+      "Customer-specific quality requirement profile",
+      "Audit trail for changes",
+      "Lookup data for quotations/orders/complaints"
+    ],
+    "coreScreensNarrative": [
+      "Customer list",
+      "Customer detail",
+      "Commercial terms tab",
+      "Quality requirements tab",
+      "Credit status tab",
+      "Related documents tab",
+      "Change history tab"
+    ],
+    "policiesNarrative": "Freshness: erp-reference Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M01-customer-master.customer-list",
+      "title": "Customer list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.customer-detail",
+      "title": "Customer detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.commercial-terms-tab",
+      "title": "Commercial terms tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.quality-requirements-tab",
+      "title": "Quality requirements tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.credit-status-tab",
+      "title": "Credit status tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.related-documents-tab",
+      "title": "Related documents tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    },
+    {
+      "screenId": "M01-customer-master.change-history-tab",
+      "title": "Change history tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M01-customer-master.header",
+        "M01-customer-master.main",
+        "M01-customer-master.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m01.customer.master.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/customers",
+      "permission": "customer.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/customers/{id}",
+      "permission": "customer.update",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.command.update",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/update",
+      "permission": "customer.update",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "UpdateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.command.activate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/activate",
+      "permission": "customer.activate",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ActivateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/hold",
+      "permission": "customer.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.command.deactivate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/deactivate",
+      "permission": "customer.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "DeactivateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.command.link-approved-part",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/link-approved-part",
+      "permission": "customer.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "LinkApprovedPartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m01.customer.master.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/customers/export",
+      "permission": "customer.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m01.customer.master.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/customers/query",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m01.customer.master.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/customers/{id}",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m01.customer.master.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/customers/lookup",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m01.customer.master.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/customers/metrics",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m01.customer.master.list",
+      "method": "POST",
+      "path": "/erp/customers/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "customer summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m01.customer.master.detail",
+      "method": "GET",
+      "path": "/erp/customers/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "customer detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m01.customer.master.lookup",
+      "method": "POST",
+      "path": "/erp/customers/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m01.customer.master.metrics",
+      "method": "GET",
+      "path": "/erp/customers/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m01.customer.master.create",
+      "method": "POST",
+      "path": "/erp/customers",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "customer draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m01.customer.master.update",
+      "method": "PATCH",
+      "path": "/erp/customers/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.update",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m01.customer.master.command.update",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/update",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.update",
+      "auditEvent": "UpdateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m01.customer.master.command.activate",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/activate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.activate",
+      "auditEvent": "ActivateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m01.customer.master.command.hold",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.approve",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m01.customer.master.command.deactivate",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/deactivate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.approve",
+      "auditEvent": "DeactivateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m01.customer.master.command.link-approved-part",
+      "method": "POST",
+      "path": "/erp/customers/{id}/actions/link-approved-part",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.approve",
+      "auditEvent": "LinkApprovedPartRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m01.customer.master.export",
+      "method": "POST",
+      "path": "/erp/customers/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-reference",
+      "permission": "customer.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

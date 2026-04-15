@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graphics Release Evidence Pack",
+  "type": "object",
+  "required": [
+    "releaseId",
+    "graphicsAuthorityRefs",
+    "impactAnalysisRef",
+    "complianceMatrixRef",
+    "rollbackPlanRef"
+  ],
+  "properties": {
+    "releaseId": {
+      "type": "string"
+    },
+    "graphicsAuthorityRefs": {
+      "type": "array"
+    },
+    "impactAnalysisRef": {
+      "type": "string"
+    },
+    "complianceMatrixRef": {
+      "type": "string"
+    },
+    "driftReportRef": {
+      "type": "string"
+    },
+    "rollbackPlanRef": {
+      "type": "string"
+    }
+  }
+}

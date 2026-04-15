@@ -1,0 +1,953 @@
+{
+  "moduleId": "M23-inprocess-inspection",
+  "moduleName": "Kiểm tra trong quá trình",
+  "route": "/mes/quality/inprocess",
+  "domain": "MES",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Operations",
+  "processOwner": "Process Quality Lead",
+  "primaryEntity": "inprocessInspection",
+  "contractRefs": [
+    "mom/contracts/objects/inprocessInspection/contract.json",
+    "mom/design/module-api-catalog/M23-inprocess-inspection.json"
+  ],
+  "templateId": "T-operator-execution-inprocess-quality",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M23-inprocess-inspection.inspection-queue",
+      "screenName": "Inspection queue",
+      "type": "operator-execution",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.execution-form",
+      "screenName": "Execution form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.characteristic-grid",
+      "screenName": "Characteristic grid",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.escalation-panel",
+      "screenName": "Escalation panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M23-inprocess-inspection.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M23-inprocess-inspection.signatures",
+      "blockType": "signature-panel",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m23.inprocess.inspection.list",
+    "m23.inprocess.inspection.detail",
+    "m23.inprocess.inspection.lookup",
+    "m23.inprocess.inspection.metrics",
+    "m23.inprocess.inspection.update",
+    "m23.inprocess.inspection.command.start",
+    "m23.inprocess.inspection.command.record-value",
+    "m23.inprocess.inspection.command.flag-nonconformance",
+    "m23.inprocess.inspection.command.submit-review",
+    "m23.inprocess.inspection.command.accept",
+    "m23.inprocess.inspection.command.reject",
+    "m23.inprocess.inspection.command.hold",
+    "m23.inprocess.inspection.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "running",
+      "pending_review",
+      "accepted",
+      "rejected",
+      "hold"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> running"
+      },
+      {
+        "action": "submitReview",
+        "transition": "running -> pending_review"
+      },
+      {
+        "action": "accept",
+        "transition": "pending_review -> accepted"
+      },
+      {
+        "action": "reject",
+        "transition": "pending_review -> rejected"
+      },
+      {
+        "action": "hold",
+        "transition": "running|pending_review -> hold"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "inprocess.read",
+      "inprocess.execute",
+      "inprocess.review",
+      "inprocess.disposition",
+      "inprocess.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "RecordValueRequested",
+      "FlagNonconformanceRequested",
+      "SubmitReviewRequested",
+      "AcceptRequested",
+      "RejectRequested",
+      "HoldRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M23-inprocess-inspection/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "inprocessInspection",
+      "inprocessInspection",
+      "inspectionCharacteristic",
+      "defectObservation"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "limited_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Capture in-process inspection results tied to work order, operation and characteristic.",
+    "workflowNote": "Inspection execution may be operator-driven or inspector-driven depending on control plan and authority.",
+    "personas": [
+      "Operator",
+      "Quality inspector",
+      "Supervisor"
+    ],
+    "inputs": [
+      "Work order/operation context",
+      "Control plan",
+      "Sampling rule",
+      "Measured values",
+      "Defect observations"
+    ],
+    "outputs": [
+      "Inspection record",
+      "Pass/fail/hold decision",
+      "Real-time quality signal",
+      "Escalation event",
+      "Traceability link"
+    ],
+    "coreScreensNarrative": [
+      "Inspection queue",
+      "Execution form",
+      "Characteristic grid",
+      "Escalation panel",
+      "History"
+    ],
+    "policiesNarrative": "Freshness: inspection-spec Offline: limited_capture_only Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M23-inprocess-inspection.inspection-queue",
+      "title": "Inspection queue",
+      "type": "operator-execution",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.execution-form",
+      "title": "Execution form",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.characteristic-grid",
+      "title": "Characteristic grid",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.escalation-panel",
+      "title": "Escalation panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    },
+    {
+      "screenId": "M23-inprocess-inspection.history",
+      "title": "History",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M23-inprocess-inspection.header",
+        "M23-inprocess-inspection.main",
+        "M23-inprocess-inspection.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m23.inprocess.inspection.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/quality/inprocess/{id}",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/start",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.record-value",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/record-value",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordValueRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.flag-nonconformance",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/flag-nonconformance",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "FlagNonconformanceRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.submit-review",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/submit-review",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitReviewRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.accept",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/accept",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AcceptRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.reject",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/reject",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RejectRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/hold",
+      "permission": "inprocess.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m23.inprocess.inspection.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/export",
+      "permission": "inprocess.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m23.inprocess.inspection.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/query",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m23.inprocess.inspection.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/inprocess/{id}",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m23.inprocess.inspection.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/lookup",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m23.inprocess.inspection.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/inprocess/metrics",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m23.inprocess.inspection.list",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "inprocessInspection summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.detail",
+      "method": "GET",
+      "path": "/mes/quality/inprocess/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "inprocessInspection detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.lookup",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.metrics",
+      "method": "GET",
+      "path": "/mes/quality/inprocess/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.update",
+      "method": "PATCH",
+      "path": "/mes/quality/inprocess/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.start",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.record-value",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/record-value",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "RecordValueRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.flag-nonconformance",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/flag-nonconformance",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "FlagNonconformanceRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.submit-review",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/submit-review",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "SubmitReviewRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.accept",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/accept",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "AcceptRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.reject",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/reject",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "RejectRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.command.hold",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.execute",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m23.inprocess.inspection.export",
+      "method": "POST",
+      "path": "/mes/quality/inprocess/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "inspection-spec",
+      "permission": "inprocess.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

@@ -109,6 +109,7 @@ final class PeriodicEvaluationService
             if ($waiverSignatureEventId === null) {
                 throw new RuntimeException('waiver_signature_event_required');
             }
+            $request = $this->canonicalWaiverRequest($request);
             $this->assertWaiverSignatureAuthoritative($waiverSignatureEventId, $request);
         }
         if (in_array($target, ['passed', 'failed'], true)
@@ -203,9 +204,6 @@ final class PeriodicEvaluationService
     private function waiverPayloadHash(array $request): string
     {
         $explicit = strtolower($this->nullableText($request['waiver_payload_hash_sha256'] ?? $request['signed_payload_hash_sha256'] ?? '') ?? '');
-        if (preg_match('/^[a-f0-9]{64}$/', $explicit) === 1) {
-            return $explicit;
-        }
         $payload = [
             'periodic_evaluation_id' => $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null),
             'evaluation_scope' => $this->nullableText($request['evaluation_scope'] ?? null),
@@ -218,7 +216,45 @@ final class PeriodicEvaluationService
         if (!is_string($json)) {
             throw new RuntimeException('periodic_evaluation_waiver_payload_hash_failed');
         }
-        return hash('sha256', $json);
+        $computed = hash('sha256', $json);
+        if ($explicit !== '' && $explicit !== $computed) {
+            throw new RuntimeException('periodic_evaluation_waiver_payload_hash_mismatch');
+        }
+        return $computed;
+    }
+
+    /**
+     * @param array<string, mixed> $request
+     * @return array<string, mixed>
+     */
+    private function canonicalWaiverRequest(array $request): array
+    {
+        if (!method_exists($this->db, 'queryOne')) {
+            throw new RuntimeException('authoritative_periodic_evaluation_signature_store_required');
+        }
+        $id = $this->nullableText($request['periodic_evaluation_id'] ?? $request['evaluation_id'] ?? null);
+        $scope = $this->nullableText($request['evaluation_scope'] ?? null);
+        $scopeRef = $this->nullableText($request['scope_ref'] ?? null);
+        $row = $this->db->queryOne(
+            "SELECT periodic_evaluation_id, evaluation_scope, scope_ref, evaluation_state, result_payload
+             FROM periodic_evaluations
+             WHERE (:periodic_evaluation_id IS NOT NULL AND periodic_evaluation_id::text = :periodic_evaluation_id)
+                OR (:evaluation_scope IS NOT NULL AND :scope_ref IS NOT NULL AND evaluation_scope = :evaluation_scope AND scope_ref = :scope_ref)
+             LIMIT 1",
+            [
+                ':periodic_evaluation_id' => $id,
+                ':evaluation_scope' => $scope,
+                ':scope_ref' => $scopeRef,
+            ],
+        );
+        if (!is_array($row)) {
+            throw new RuntimeException('periodic_evaluation_not_found');
+        }
+        return array_merge($request, [
+            'periodic_evaluation_id' => $this->nullableText($row['periodic_evaluation_id'] ?? null),
+            'evaluation_scope' => $this->nullableText($row['evaluation_scope'] ?? null),
+            'scope_ref' => $this->nullableText($row['scope_ref'] ?? null),
+        ]);
     }
 
     private function normalizeDb(?object $db): ?object

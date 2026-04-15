@@ -1,0 +1,23 @@
+{
+  "version": "2026.04.14-current-mom-worldclass",
+  "summary": {
+    "adminUiThemeCount": 20,
+    "runtimeThemePresetCount": 8,
+    "exactThemeOverlap": 5,
+    "canonicalPacketCount": 34,
+    "enrichedPacketCount": 34,
+    "endpointAliasCount": 395,
+    "modulesPendingGraphicsAudit": 34,
+    "browserAuthorityKeysDetected": [
+      "hesem_layout_templates",
+      "hesem_module_template_binding"
+    ],
+    "zoneWhitelistRuntimeStatus": "spec-only-or-unverified"
+  },
+  "priorityDebt": [
+    "Demote browser-backed template authority to preview/draft cache only.",
+    "Close Admin UI theme vs runtime preset mismatch.",
+    "Attach runtime compliance beacon to every governed module route.",
+    "Promote graphics governance into Builder/release blockers."
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "moduleId": "M20-preventive-maintenance",
+  "moduleName": "Bảo trì phòng ngừa",
+  "route": "/mom/maintenance/pm",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Maintenance",
+  "processOwner": "Maintenance Manager",
+  "primaryEntity": "pmWorkOrder",
+  "contractRefs": [
+    "mom/contracts/objects/pmWorkOrder/contract.json",
+    "mom/design/module-api-catalog/M20-preventive-maintenance.json"
+  ],
+  "templateId": "T-approval-queue-maintenance",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M20-preventive-maintenance.pm-plan-board",
+      "screenName": "PM plan board",
+      "type": "approval-queue",
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.pm-wo-queue",
+      "screenName": "PM WO queue",
+      "type": "supporting-screen",
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.execution-form",
+      "screenName": "Execution form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.evidence-attachments",
+      "screenName": "Evidence attachments",
+      "type": "supporting-screen",
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    },
+    {
+      "screenId": "M20-preventive-maintenance.history",
+      "screenName": "History",
+      "type": "supporting-screen",
+      "blocks": [
+        "M20-preventive-maintenance.header",
+        "M20-preventive-maintenance.main",
+        "M20-preventive-maintenance.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M20-preventive-maintenance.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M20-preventive-maintenance.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M20-preventive-maintenance.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M20-preventive-maintenance.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m20.preventive.maintenance.list",
+    "m20.preventive.maintenance.detail",
+    "m20.preventive.maintenance.lookup",
+    "m20.preventive.maintenance.metrics",
+    "m20.preventive.maintenance.update",
+    "m20.preventive.maintenance.command.generate-wo",
+    "m20.preventive.maintenance.command.release",
+    "m20.preventive.maintenance.command.start",
+    "m20.preventive.maintenance.command.record-checklist",
+    "m20.preventive.maintenance.command.close",
+    "m20.preventive.maintenance.command.defer",
+    "m20.preventive.maintenance.export"
+  ],
+  "workflow": {
+    "states": [
+      "planned",
+      "released",
+      "in_progress",
+      "awaiting_review",
+      "closed",
+      "overdue"
+    ],
+    "transitions": [
+      {
+        "action": "release",
+        "transition": "planned -> released"
+      },
+      {
+        "action": "start",
+        "transition": "released -> in_progress"
+      },
+      {
+        "action": "submitReview",
+        "transition": "in_progress -> awaiting_review"
+      },
+      {
+        "action": "close",
+        "transition": "awaiting_review -> closed"
+      },
+      {
+        "action": "overdue",
+        "transition": "released -> overdue"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "pm.read",
+      "pm.plan",
+      "pm.execute",
+      "pm.close",
+      "pm.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "GenerateWoRequested",
+      "ReleaseRequested",
+      "StartRequested",
+      "RecordChecklistRequested",
+      "CloseRequested",
+      "DeferRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M20-preventive-maintenance/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "pmWorkOrder",
+      "pmPlan",
+      "pmWorkOrder",
+      "pmChecklist"
+    ]
+  },
+  "moduleArchetype": "approval-queue",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

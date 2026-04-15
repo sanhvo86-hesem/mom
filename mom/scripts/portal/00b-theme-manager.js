@@ -1330,6 +1330,10 @@ function getVisualThemePresetIds(){
   return Object.keys(VISUAL_THEME_PRESETS).concat(Object.keys(VISUAL_THEME_PRESET_ALIASES));
 }
 
+function isVisualThemeRuntimeSupported(themeId){
+  return _resolveVisualThemePresetId(themeId) !== '';
+}
+
 function getVisualThemeCatalogParity(){
   return {
     canonicalIds: Object.keys(VISUAL_THEME_PRESETS),
@@ -1422,6 +1426,7 @@ window.HmTheme = {
 	  resolveWithTemplate: resolveWithTemplate,
 	  getVisualThemePresets: getVisualThemePresets,
 	  getVisualThemePresetIds: getVisualThemePresetIds,
+  isVisualThemeRuntimeSupported: isVisualThemeRuntimeSupported,
   getVisualThemeCatalogParity: getVisualThemeCatalogParity,
 	  applyVisualTheme: applyVisualTheme,
   DEFAULTS: DEFAULTS

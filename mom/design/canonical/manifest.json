@@ -1,0 +1,215 @@
+{
+  "name": "mom-design-canonical",
+  "version": "2026.04.14-current-mom-worldclass",
+  "description": "Canonical 30-field build packets split from enriched planning packets for current MOM alignment.",
+  "source": "module-layout-template-design-system-v4-current-mom-worldclass pack",
+  "moduleCount": 34,
+  "canonicalFieldCount": 30,
+  "annexFieldCount": 5,
+  "packets": [
+    {
+      "moduleId": "M01-customer-master",
+      "templateId": "T-object-page-commercial-master",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M01-customer-master.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M01-customer-master.json"
+    },
+    {
+      "moduleId": "M02-sales-quotations",
+      "templateId": "T-transactional-form-commercial-quote",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M02-sales-quotations.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M02-sales-quotations.json"
+    },
+    {
+      "moduleId": "M03-sales-orders",
+      "templateId": "T-object-page-commercial-order",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M03-sales-orders.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M03-sales-orders.json"
+    },
+    {
+      "moduleId": "M04-customer-complaints",
+      "templateId": "T-exception-hub-complaint",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M04-customer-complaints.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M04-customer-complaints.json"
+    },
+    {
+      "moduleId": "M05-supplier-master",
+      "templateId": "T-object-page-supplier-master",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M05-supplier-master.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M05-supplier-master.json"
+    },
+    {
+      "moduleId": "M06-purchase-requisitions",
+      "templateId": "T-transactional-form-procurement-pr",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M06-purchase-requisitions.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M06-purchase-requisitions.json"
+    },
+    {
+      "moduleId": "M07-purchase-orders",
+      "templateId": "T-object-page-procurement-po",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M07-purchase-orders.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M07-purchase-orders.json"
+    },
+    {
+      "moduleId": "M08-receiving-putaway",
+      "templateId": "T-operator-execution-receiving",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M08-receiving-putaway.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M08-receiving-putaway.json"
+    },
+    {
+      "moduleId": "M09-inventory-control",
+      "templateId": "T-analytical-list-inventory",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M09-inventory-control.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M09-inventory-control.json"
+    },
+    {
+      "moduleId": "M10-shipping-fulfillment",
+      "templateId": "T-operator-execution-shipping",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M10-shipping-fulfillment.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M10-shipping-fulfillment.json"
+    },
+    {
+      "moduleId": "M11-item-part-master",
+      "templateId": "T-object-page-item-master",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M11-item-part-master.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M11-item-part-master.json"
+    },
+    {
+      "moduleId": "M12-bom-routing",
+      "templateId": "T-object-page-engineering-structure",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M12-bom-routing.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M12-bom-routing.json"
+    },
+    {
+      "moduleId": "M13-engineering-change",
+      "templateId": "T-evidence-workspace-eco",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M13-engineering-change.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M13-engineering-change.json"
+    },
+    {
+      "moduleId": "M14-work-order-management",
+      "templateId": "T-object-page-work-order",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M14-work-order-management.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M14-work-order-management.json"
+    },
+    {
+      "moduleId": "M15-finite-scheduling-dispatch",
+      "templateId": "T-planning-board-dispatch",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M15-finite-scheduling-dispatch.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M15-finite-scheduling-dispatch.json"
+    },
+    {
+      "moduleId": "M16-operator-execution",
+      "templateId": "T-operator-execution-shopfloor",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M16-operator-execution.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M16-operator-execution.json"
+    },
+    {
+      "moduleId": "M17-machine-monitoring-andon",
+      "templateId": "T-shopfloor-board-machine-status",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M17-machine-monitoring-andon.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M17-machine-monitoring-andon.json"
+    },
+    {
+      "moduleId": "M18-oee-downtime",
+      "templateId": "T-analytical-list-oee",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M18-oee-downtime.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M18-oee-downtime.json"
+    },
+    {
+      "moduleId": "M19-tool-management",
+      "templateId": "T-object-page-tooling",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M19-tool-management.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M19-tool-management.json"
+    },
+    {
+      "moduleId": "M20-preventive-maintenance",
+      "templateId": "T-approval-queue-maintenance",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M20-preventive-maintenance.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M20-preventive-maintenance.json"
+    },
+    {
+      "moduleId": "M21-calibration-management",
+      "templateId": "T-evidence-workspace-calibration",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M21-calibration-management.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M21-calibration-management.json"
+    },
+    {
+      "moduleId": "M22-receiving-iqc",
+      "templateId": "T-transactional-form-iqc",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M22-receiving-iqc.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M22-receiving-iqc.json"
+    },
+    {
+      "moduleId": "M23-inprocess-inspection",
+      "templateId": "T-operator-execution-inprocess-quality",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M23-inprocess-inspection.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M23-inprocess-inspection.json"
+    },
+    {
+      "moduleId": "M24-spc-quality-analytics",
+      "templateId": "T-analytical-list-spc",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M24-spc-quality-analytics.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M24-spc-quality-analytics.json"
+    },
+    {
+      "moduleId": "M25-ncr-mrb",
+      "templateId": "T-exception-hub-ncr",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M25-ncr-mrb.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M25-ncr-mrb.json"
+    },
+    {
+      "moduleId": "M26-capa",
+      "templateId": "T-evidence-workspace-capa",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M26-capa.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M26-capa.json"
+    },
+    {
+      "moduleId": "M27-audit-management",
+      "templateId": "T-approval-queue-audit",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M27-audit-management.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M27-audit-management.json"
+    },
+    {
+      "moduleId": "M28-training-competency",
+      "templateId": "T-approval-queue-training",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M28-training-competency.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M28-training-competency.json"
+    },
+    {
+      "moduleId": "M29-document-control",
+      "templateId": "T-evidence-workspace-document-control",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M29-document-control.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M29-document-control.json"
+    },
+    {
+      "moduleId": "M30-lot-genealogy-traceability",
+      "templateId": "T-exception-hub-genealogy",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M30-lot-genealogy-traceability.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M30-lot-genealogy-traceability.json"
+    },
+    {
+      "moduleId": "M31-accounts-payable",
+      "templateId": "T-approval-queue-finance-ap",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M31-accounts-payable.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M31-accounts-payable.json"
+    },
+    {
+      "moduleId": "M32-accounts-receivable",
+      "templateId": "T-approval-queue-finance-ar",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M32-accounts-receivable.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M32-accounts-receivable.json"
+    },
+    {
+      "moduleId": "M33-costing-valuation",
+      "templateId": "T-analytical-list-costing",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M33-costing-valuation.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M33-costing-valuation.json"
+    },
+    {
+      "moduleId": "M34-executive-control-tower",
+      "templateId": "T-control-tower-executive",
+      "canonicalPath": "mom-design-canonical/module-build-packets/M34-executive-control-tower.json",
+      "annexPath": "mom-design-canonical/module-build-packets-annex/M34-executive-control-tower.json"
+    }
+  ]
+}

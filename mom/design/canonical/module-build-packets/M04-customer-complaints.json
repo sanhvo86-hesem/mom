@@ -1,0 +1,292 @@
+{
+  "moduleId": "M04-customer-complaints",
+  "moduleName": "Khiếu nại khách hàng",
+  "route": "/eqms/customer-complaints",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "Customer Quality Manager",
+  "primaryEntity": "customerComplaint",
+  "contractRefs": [
+    "mom/contracts/objects/customerComplaint/contract.json",
+    "mom/design/module-api-catalog/M04-customer-complaints.json"
+  ],
+  "templateId": "T-exception-hub-complaint",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M04-customer-complaints.complaint-queue",
+      "screenName": "Complaint queue",
+      "type": "exception-hub",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.complaint-detail",
+      "screenName": "Complaint detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.containment-tab",
+      "screenName": "Containment tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.investigation-tab",
+      "screenName": "Investigation tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.response-package",
+      "screenName": "Response package",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.linked-records",
+      "screenName": "Linked records",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    },
+    {
+      "screenId": "M04-customer-complaints.audit-trail",
+      "screenName": "Audit trail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M04-customer-complaints.header",
+        "M04-customer-complaints.main",
+        "M04-customer-complaints.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M04-customer-complaints.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M04-customer-complaints.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M04-customer-complaints.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M04-customer-complaints.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M04-customer-complaints.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m04.customer.complaints.list",
+    "m04.customer.complaints.detail",
+    "m04.customer.complaints.lookup",
+    "m04.customer.complaints.metrics",
+    "m04.customer.complaints.create",
+    "m04.customer.complaints.update",
+    "m04.customer.complaints.command.intake",
+    "m04.customer.complaints.command.triage",
+    "m04.customer.complaints.command.assign",
+    "m04.customer.complaints.command.record-containment",
+    "m04.customer.complaints.command.link-capa",
+    "m04.customer.complaints.command.issue-response",
+    "m04.customer.complaints.command.close",
+    "m04.customer.complaints.command.void",
+    "m04.customer.complaints.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "triaged",
+      "investigating",
+      "customer_response_pending",
+      "closed",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "triage",
+        "transition": "new -> triaged"
+      },
+      {
+        "action": "startInvestigation",
+        "transition": "triaged -> investigating"
+      },
+      {
+        "action": "issueResponse",
+        "transition": "investigating -> customer_response_pending"
+      },
+      {
+        "action": "close",
+        "transition": "customer_response_pending -> closed"
+      },
+      {
+        "action": "void",
+        "transition": "new|triaged -> voided"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "complaint.read",
+      "complaint.create",
+      "complaint.assign",
+      "complaint.investigate",
+      "complaint.close",
+      "complaint.export",
+      "complaint.sign"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "IntakeRequested",
+      "TriageRequested",
+      "AssignRequested",
+      "RecordContainmentRequested",
+      "LinkCapaRequested",
+      "IssueResponseRequested",
+      "CloseRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M04-customer-complaints/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "customerComplaint",
+      "customerComplaint",
+      "complaintResponse",
+      "complaintContainment"
+    ]
+  },
+  "moduleArchetype": "exception-hub",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

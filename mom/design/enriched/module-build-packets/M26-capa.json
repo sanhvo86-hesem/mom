@@ -1,0 +1,930 @@
+{
+  "moduleId": "M26-capa",
+  "moduleName": "Hành động khắc phục phòng ngừa",
+  "route": "/eqms/capa",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "CAPA Board",
+  "primaryEntity": "capa",
+  "contractRefs": [
+    "mom/contracts/objects/capa/contract.json",
+    "mom/design/module-api-catalog/M26-capa.json"
+  ],
+  "templateId": "T-evidence-workspace-capa",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M26-capa.capa-queue",
+      "screenName": "CAPA queue",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.capa-workspace",
+      "screenName": "CAPA workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.action-plan-tab",
+      "screenName": "Action plan tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.effectiveness-tab",
+      "screenName": "Effectiveness tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.approval-signature-panel",
+      "screenName": "Approval/signature panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M26-capa.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M26-capa.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M26-capa.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M26-capa.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M26-capa.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m26.capa.list",
+    "m26.capa.detail",
+    "m26.capa.lookup",
+    "m26.capa.metrics",
+    "m26.capa.create",
+    "m26.capa.update",
+    "m26.capa.command.start-analysis",
+    "m26.capa.command.assign-action",
+    "m26.capa.command.submit-verification",
+    "m26.capa.command.close",
+    "m26.capa.command.cancel",
+    "m26.capa.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "analysis",
+      "action_open",
+      "verification_pending",
+      "closed",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "startAnalysis",
+        "transition": "new -> analysis"
+      },
+      {
+        "action": "assignAction",
+        "transition": "analysis -> action_open"
+      },
+      {
+        "action": "submitVerification",
+        "transition": "action_open -> verification_pending"
+      },
+      {
+        "action": "close",
+        "transition": "verification_pending -> closed"
+      },
+      {
+        "action": "cancel",
+        "transition": "new|analysis -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "capa.read",
+      "capa.create",
+      "capa.assign",
+      "capa.verify",
+      "capa.close",
+      "capa.sign",
+      "capa.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "StartAnalysisRequested",
+      "AssignActionRequested",
+      "SubmitVerificationRequested",
+      "CloseRequested",
+      "CancelRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M26-capa/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "capa",
+      "capa",
+      "capaAction",
+      "effectivenessCheck"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Drive root-cause, action plan, effectiveness verification and closure for corrective/preventive actions.",
+    "workflowNote": "CAPA closure must prove effectiveness and maintain full traceability to origin events.",
+    "personas": [
+      "CAPA coordinator",
+      "Process owner",
+      "Approver",
+      "Reviewer"
+    ],
+    "inputs": [
+      "Trigger from NCR/audit/complaint",
+      "Root cause analysis",
+      "Action plan",
+      "Due dates",
+      "Effectiveness evidence"
+    ],
+    "outputs": [
+      "CAPA record",
+      "Assigned actions",
+      "Effectiveness verification",
+      "Closure decision",
+      "Audit package"
+    ],
+    "coreScreensNarrative": [
+      "CAPA queue",
+      "CAPA workspace",
+      "Action plan tab",
+      "Effectiveness tab",
+      "Approval/signature panel",
+      "Audit history"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M26-capa.capa-queue",
+      "title": "CAPA queue",
+      "type": "evidence-workspace",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.capa-workspace",
+      "title": "CAPA workspace",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.action-plan-tab",
+      "title": "Action plan tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.effectiveness-tab",
+      "title": "Effectiveness tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.approval-signature-panel",
+      "title": "Approval/signature panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.audit-history",
+      "title": "Audit history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m26.capa.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/eqms/capa",
+      "permission": "capa.create",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/capa/{id}",
+      "permission": "capa.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.command.start-analysis",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/start-analysis",
+      "permission": "capa.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "StartAnalysisRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.command.assign-action",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/assign-action",
+      "permission": "capa.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "AssignActionRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.command.submit-verification",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/submit-verification",
+      "permission": "capa.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitVerificationRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/close",
+      "permission": "capa.close",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/cancel",
+      "permission": "capa.assign",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m26.capa.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/capa/export",
+      "permission": "capa.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m26.capa.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/capa/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m26.capa.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/capa/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m26.capa.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/capa/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m26.capa.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/capa/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m26.capa.list",
+      "method": "POST",
+      "path": "/eqms/capa/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "capa summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m26.capa.detail",
+      "method": "GET",
+      "path": "/eqms/capa/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "capa detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m26.capa.lookup",
+      "method": "POST",
+      "path": "/eqms/capa/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m26.capa.metrics",
+      "method": "GET",
+      "path": "/eqms/capa/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m26.capa.create",
+      "method": "POST",
+      "path": "/eqms/capa",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "capa draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m26.capa.update",
+      "method": "PATCH",
+      "path": "/eqms/capa/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.assign",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m26.capa.command.start-analysis",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/start-analysis",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.assign",
+      "auditEvent": "StartAnalysisRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m26.capa.command.assign-action",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/assign-action",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.assign",
+      "auditEvent": "AssignActionRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m26.capa.command.submit-verification",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/submit-verification",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.assign",
+      "auditEvent": "SubmitVerificationRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m26.capa.command.close",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.close",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m26.capa.command.cancel",
+      "method": "POST",
+      "path": "/eqms/capa/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.assign",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m26.capa.export",
+      "method": "POST",
+      "path": "/eqms/capa/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "capa.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

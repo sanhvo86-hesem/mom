@@ -1,0 +1,967 @@
+{
+  "moduleId": "M08-receiving-putaway",
+  "moduleName": "Nhận hàng và cất kho",
+  "route": "/mom/warehouse/receiving",
+  "domain": "MOM",
+  "criticality": "high",
+  "ownerTeam": "Warehouse Operations",
+  "processOwner": "Warehouse Supervisor",
+  "primaryEntity": "receipt",
+  "contractRefs": [
+    "mom/contracts/objects/receipt/contract.json",
+    "mom/design/module-api-catalog/M08-receiving-putaway.json"
+  ],
+  "templateId": "T-operator-execution-receiving",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M08-receiving-putaway.inbound-queue",
+      "screenName": "Inbound queue",
+      "type": "operator-execution",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.receipt-execution",
+      "screenName": "Receipt execution",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.scan-panel",
+      "screenName": "Scan panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.disposition-panel",
+      "screenName": "Disposition panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.putaway-tasks",
+      "screenName": "Putaway tasks",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.exception-log",
+      "screenName": "Exception log",
+      "type": "supporting-screen",
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M08-receiving-putaway.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M08-receiving-putaway.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M08-receiving-putaway.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M08-receiving-putaway.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m08.receiving.putaway.list",
+    "m08.receiving.putaway.detail",
+    "m08.receiving.putaway.lookup",
+    "m08.receiving.putaway.metrics",
+    "m08.receiving.putaway.update",
+    "m08.receiving.putaway.command.start",
+    "m08.receiving.putaway.command.scan",
+    "m08.receiving.putaway.command.match",
+    "m08.receiving.putaway.command.record-discrepancy",
+    "m08.receiving.putaway.command.route-to-iqc",
+    "m08.receiving.putaway.command.confirm-putaway",
+    "m08.receiving.putaway.command.complete",
+    "m08.receiving.putaway.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "receiving",
+      "awaiting_iqc",
+      "putaway_pending",
+      "completed",
+      "exception"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> receiving"
+      },
+      {
+        "action": "routeToIqc",
+        "transition": "receiving -> awaiting_iqc"
+      },
+      {
+        "action": "createPutaway",
+        "transition": "receiving|awaiting_iqc -> putaway_pending"
+      },
+      {
+        "action": "complete",
+        "transition": "putaway_pending -> completed"
+      },
+      {
+        "action": "exception",
+        "transition": "receiving -> exception"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "receipt.read",
+      "receipt.execute",
+      "receipt.discrepancy",
+      "receipt.complete",
+      "receipt.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "ScanRequested",
+      "MatchRequested",
+      "RecordDiscrepancyRequested",
+      "RouteToIqcRequested",
+      "ConfirmPutawayRequested",
+      "CompleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M08-receiving-putaway/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "receipt",
+      "receipt",
+      "receiptLine",
+      "putawayTask"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Receive inbound material, validate against ASN/PO, route to IQC or stock, and complete putaway.",
+    "workflowNote": "Execution is scan-heavy and must support barcode-first flow with strong duplicate/mismatch handling.",
+    "personas": [
+      "Receiver",
+      "Warehouse clerk",
+      "IQC inspector"
+    ],
+    "inputs": [
+      "ASN/PO",
+      "Supplier delivery",
+      "Barcode scan",
+      "Location master",
+      "IQC route rules"
+    ],
+    "outputs": [
+      "Receipt transaction",
+      "Putaway task",
+      "Hold/IQC routing",
+      "Inventory balance update",
+      "Dock-to-stock metrics"
+    ],
+    "coreScreensNarrative": [
+      "Inbound queue",
+      "Receipt execution",
+      "Scan panel",
+      "Disposition panel",
+      "Putaway tasks",
+      "Exception log"
+    ],
+    "policiesNarrative": "Freshness: warehouse-real-time Offline: draft_capture_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M08-receiving-putaway.inbound-queue",
+      "title": "Inbound queue",
+      "type": "operator-execution",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.receipt-execution",
+      "title": "Receipt execution",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.scan-panel",
+      "title": "Scan panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.disposition-panel",
+      "title": "Disposition panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.putaway-tasks",
+      "title": "Putaway tasks",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    },
+    {
+      "screenId": "M08-receiving-putaway.exception-log",
+      "title": "Exception log",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M08-receiving-putaway.header",
+        "M08-receiving-putaway.main",
+        "M08-receiving-putaway.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m08.receiving.putaway.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mom/warehouse/receiving/{id}",
+      "permission": "receipt.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/start",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.scan",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/scan",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ScanRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.match",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/match",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "MatchRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.record-discrepancy",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/record-discrepancy",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordDiscrepancyRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.route-to-iqc",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/route-to-iqc",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RouteToIqcRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.confirm-putaway",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/confirm-putaway",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ConfirmPutawayRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.command.complete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/complete",
+      "permission": "receipt.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CompleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m08.receiving.putaway.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/export",
+      "permission": "receipt.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m08.receiving.putaway.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/query",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m08.receiving.putaway.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/warehouse/receiving/{id}",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m08.receiving.putaway.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/lookup",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m08.receiving.putaway.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mom/warehouse/receiving/metrics",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m08.receiving.putaway.list",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/query",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "receipt summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.detail",
+      "method": "GET",
+      "path": "/mom/warehouse/receiving/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "receipt detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.lookup",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.metrics",
+      "method": "GET",
+      "path": "/mom/warehouse/receiving/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.update",
+      "method": "PATCH",
+      "path": "/mom/warehouse/receiving/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.start",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.scan",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/scan",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "ScanRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.match",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/match",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "MatchRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.record-discrepancy",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/record-discrepancy",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "RecordDiscrepancyRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.route-to-iqc",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/route-to-iqc",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "RouteToIqcRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.confirm-putaway",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/confirm-putaway",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "ConfirmPutawayRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.command.complete",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/{id}/actions/complete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.complete",
+      "auditEvent": "CompleteRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m08.receiving.putaway.export",
+      "method": "POST",
+      "path": "/mom/warehouse/receiving/export",
+      "interactionType": "export",
+      "ownerSystem": "MOM",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "warehouse-real-time",
+      "permission": "receipt.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Canonical Execution Source of Truth
 
-Audited branch: `codex/worldclass-reaudit-20260415-055057`
+Audited branch: `codex/worldclass-closure-20260415-0913`
 
 Date: 2026-04-15
 
@@ -31,7 +31,7 @@ This document defines the current Phase 1 execution truth model for CNC/discrete
 | CNC program version | CNC program management module | Dispatch target copied program revision | Execution freezes references; CNC program store owns release/version truth. Program and version rows now persist plant/site/work-center/operation/part-revision/inspection context for CNC traceability. |
 | Setup sheet revision | CNC setup sheet store | Dispatch target copied setup revision | Execution freezes references; setup sheet store owns release/version truth. New setup sheets start as `draft`; missing setup status is not treated as released. |
 | Inspection plan | Quality/mobile inspection plan store | Dispatch target copied `inspection_plan_id` | Inspection plan is quality truth; dispatch/report store references and gate policy. |
-| Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. |
+| Genealogy/traceability | Existing traceability/genealogy services and DB tables | Report material lot/heat/traveler context | Report payloads carry trace-ready fields; full edge emission is deferred. Shopfloor 5M gate persistence now passes plant/site partition scope as trusted top-level request scope and fails closed when scope is missing. |
 | AI prediction/analytics projection | AI/analytics modules and projection files/tables | Execution records carrying advisory fields | AI is advisory only. It cannot mutate dispatch target, production report, quality evidence, or machine control. |
 | AI model/dashboard/read surfaces | `AiSchedulingController` role-scoped advisory read APIs | Any authenticated session | AI model list, prediction list, SPC anomaly, tool-wear, legacy dashboard, and combined dashboard reads require AI read roles; model config/training source metadata is admin-only. |
 | AI natural-language query | `NaturalLanguageQueryService` over read-only PostgreSQL SELECTs | Conversation history in `ai_conversations` | NLQ is scoped, CSRF-protected, audited, read-only, and cannot write execution truth. |

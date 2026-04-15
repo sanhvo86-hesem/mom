@@ -1,0 +1,274 @@
+{
+  "moduleId": "M26-capa",
+  "moduleName": "Hành động khắc phục phòng ngừa",
+  "route": "/eqms/capa",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "CAPA Board",
+  "primaryEntity": "capa",
+  "contractRefs": [
+    "mom/contracts/objects/capa/contract.json",
+    "mom/design/module-api-catalog/M26-capa.json"
+  ],
+  "templateId": "T-evidence-workspace-capa",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M26-capa.capa-queue",
+      "screenName": "CAPA queue",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.capa-workspace",
+      "screenName": "CAPA workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.action-plan-tab",
+      "screenName": "Action plan tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.effectiveness-tab",
+      "screenName": "Effectiveness tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.approval-signature-panel",
+      "screenName": "Approval/signature panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    },
+    {
+      "screenId": "M26-capa.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M26-capa.header",
+        "M26-capa.main",
+        "M26-capa.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M26-capa.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M26-capa.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M26-capa.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M26-capa.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M26-capa.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m26.capa.list",
+    "m26.capa.detail",
+    "m26.capa.lookup",
+    "m26.capa.metrics",
+    "m26.capa.create",
+    "m26.capa.update",
+    "m26.capa.command.start-analysis",
+    "m26.capa.command.assign-action",
+    "m26.capa.command.submit-verification",
+    "m26.capa.command.close",
+    "m26.capa.command.cancel",
+    "m26.capa.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "analysis",
+      "action_open",
+      "verification_pending",
+      "closed",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "startAnalysis",
+        "transition": "new -> analysis"
+      },
+      {
+        "action": "assignAction",
+        "transition": "analysis -> action_open"
+      },
+      {
+        "action": "submitVerification",
+        "transition": "action_open -> verification_pending"
+      },
+      {
+        "action": "close",
+        "transition": "verification_pending -> closed"
+      },
+      {
+        "action": "cancel",
+        "transition": "new|analysis -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "capa.read",
+      "capa.create",
+      "capa.assign",
+      "capa.verify",
+      "capa.close",
+      "capa.sign",
+      "capa.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "StartAnalysisRequested",
+      "AssignActionRequested",
+      "SubmitVerificationRequested",
+      "CloseRequested",
+      "CancelRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M26-capa/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "capa",
+      "capa",
+      "capaAction",
+      "effectivenessCheck"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

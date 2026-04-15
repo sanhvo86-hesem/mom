@@ -69,6 +69,22 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_traceability_5m_obligations_scoped
 CREATE OR REPLACE FUNCTION prevent_released_document_form_control_mutation()
 RETURNS TRIGGER AS $$
 BEGIN
+    IF TG_OP = 'DELETE' THEN
+        IF TG_TABLE_NAME = 'doc_revisions'
+           AND OLD.lifecycle_state IN ('released', 'superseded', 'obsolete', 'withdrawn') THEN
+            RAISE EXCEPTION 'released_doc_revision_delete_blocked';
+        END IF;
+        IF TG_TABLE_NAME = 'frm_template_revisions'
+           AND OLD.lifecycle_state IN ('released', 'superseded', 'obsolete', 'withdrawn') THEN
+            RAISE EXCEPTION 'released_form_template_revision_delete_blocked';
+        END IF;
+        IF TG_TABLE_NAME = 'frm_schema_versions'
+           AND OLD.lifecycle_state IN ('released', 'superseded', 'withdrawn') THEN
+            RAISE EXCEPTION 'released_form_schema_version_delete_blocked';
+        END IF;
+        RETURN OLD;
+    END IF;
+
     IF TG_TABLE_NAME = 'doc_revisions'
        AND OLD.lifecycle_state IN ('released', 'superseded', 'obsolete', 'withdrawn')
        AND (
@@ -79,6 +95,11 @@ BEGIN
            OR NEW.canonical_payload IS DISTINCT FROM OLD.canonical_payload
            OR NEW.readable_snapshot_uri IS DISTINCT FROM OLD.readable_snapshot_uri
            OR NEW.manifest_hash_sha256 IS DISTINCT FROM OLD.manifest_hash_sha256
+           OR NEW.approved_by IS DISTINCT FROM OLD.approved_by
+           OR NEW.approved_at IS DISTINCT FROM OLD.approved_at
+           OR NEW.released_at IS DISTINCT FROM OLD.released_at
+           OR NEW.superseded_by_revision_id IS DISTINCT FROM OLD.superseded_by_revision_id
+           OR NEW.metadata IS DISTINCT FROM OLD.metadata
        ) THEN
         RAISE EXCEPTION 'released_doc_revision_immutable';
     END IF;
@@ -96,6 +117,8 @@ BEGIN
            OR NEW.naming_policy IS DISTINCT FROM OLD.naming_policy
            OR NEW.issuance_policy IS DISTINCT FROM OLD.issuance_policy
            OR NEW.manifest_hash_sha256 IS DISTINCT FROM OLD.manifest_hash_sha256
+           OR NEW.released_at IS DISTINCT FROM OLD.released_at
+           OR NEW.metadata IS DISTINCT FROM OLD.metadata
        ) THEN
         RAISE EXCEPTION 'released_form_template_revision_immutable';
     END IF;
@@ -111,6 +134,7 @@ BEGIN
            OR NEW.validation_rules IS DISTINCT FROM OLD.validation_rules
            OR NEW.render_profile IS DISTINCT FROM OLD.render_profile
            OR NEW.source_change_order_id IS DISTINCT FROM OLD.source_change_order_id
+           OR NEW.metadata IS DISTINCT FROM OLD.metadata
        ) THEN
         RAISE EXCEPTION 'released_form_schema_version_immutable';
     END IF;
@@ -125,15 +149,33 @@ CREATE TRIGGER trg_doc_revisions_released_immutable
     FOR EACH ROW
     EXECUTE FUNCTION prevent_released_document_form_control_mutation();
 
+DROP TRIGGER IF EXISTS trg_doc_revisions_released_delete_immutable ON doc_revisions;
+CREATE TRIGGER trg_doc_revisions_released_delete_immutable
+    BEFORE DELETE ON doc_revisions
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_released_document_form_control_mutation();
+
 DROP TRIGGER IF EXISTS trg_frm_template_revisions_released_immutable ON frm_template_revisions;
 CREATE TRIGGER trg_frm_template_revisions_released_immutable
     BEFORE UPDATE ON frm_template_revisions
     FOR EACH ROW
     EXECUTE FUNCTION prevent_released_document_form_control_mutation();
 
+DROP TRIGGER IF EXISTS trg_frm_template_revisions_released_delete_immutable ON frm_template_revisions;
+CREATE TRIGGER trg_frm_template_revisions_released_delete_immutable
+    BEFORE DELETE ON frm_template_revisions
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_released_document_form_control_mutation();
+
 DROP TRIGGER IF EXISTS trg_frm_schema_versions_released_immutable ON frm_schema_versions;
 CREATE TRIGGER trg_frm_schema_versions_released_immutable
     BEFORE UPDATE ON frm_schema_versions
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_released_document_form_control_mutation();
+
+DROP TRIGGER IF EXISTS trg_frm_schema_versions_released_delete_immutable ON frm_schema_versions;
+CREATE TRIGGER trg_frm_schema_versions_released_delete_immutable
+    BEFORE DELETE ON frm_schema_versions
     FOR EACH ROW
     EXECUTE FUNCTION prevent_released_document_form_control_mutation();
 

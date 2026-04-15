@@ -1818,8 +1818,24 @@ blocked transitions:
 <div class="info-box info-box-blue"><strong>Deliberate non-adoption.</strong> HESEM MOM does not adopt free-form module theming, permanent custom CSS authority, unreviewed semantic color overrides, or UI-only rollout decisions. Those patterns conflict with regulated ERP/MOM/MES/eQMS traceability.</div>
 </section>
 
+<section class="section" id="worldclass-pack-integration-map">
+<h2 class="section-title"><span class="section-number">2U</span>Worldclass Pack Integration Map <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<p class="section-subtitle">Gói worldclass được hấp thụ vào authority map hiện tại. Không được copy đè, không tạo workflow song song và không được nâng draft artifact thành production truth khi chưa qua validator/backend/release gate.</p>
+<div class="card"><div class="card-body" style="padding:0"><table class="spec-table">
+<thead><tr><th>Pack layer</th><th>Official MOM path</th><th>Authority role</th><th>Promotion rule</th></tr></thead>
+<tbody>
+<tr><td>HTML authority</td><td><code>mom/docs/module-layout-template-design-system-v4.html</code></td><td>Human-readable authority only.</td><td>Merge/reconcile into this one official path; never maintain a competing pack HTML as active authority.</td></tr>
+<tr><td>Canonical build packets</td><td><code>mom/design/canonical/manifest.json</code> and <code>mom/design/canonical/module-build-packets/*.json</code></td><td>Imported 34-module canonical planning authority.</td><td>Machine-validated by design/release gates; production module promotion still requires active build-packet compatibility, template governance and runtime compliance beacon evidence.</td></tr>
+<tr><td>Enriched catalogs</td><td><code>mom/design/enriched/*</code></td><td>Projection/catalog layer.</td><td>May help builder/API discovery but cannot override canonical packets, backend authority or Standard 36.</td></tr>
+<tr><td>Graphics governance artifacts</td><td><code>mom/design/graphics/*</code></td><td>Template authority, theme compatibility, compliance, lineage, debt/drift, waiver/rollout/evidence schemas.</td><td>Release and validation gates must read these refs; preview-only themes or unresolved compliance cannot publish.</td></tr>
+<tr><td>Repo alignment notes</td><td><code>mom/design/repo-alignment/*</code></td><td>Migration and backend-alignment evidence.</td><td>Reference only; backend truth remains <code>GraphicsGovernanceController</code>, service, repository, OpenAPI and registry projections.</td></tr>
+</tbody>
+</table></div></div>
+<div class="info-box info-box-red"><strong>Block rule.</strong> If a pack artifact is copied into the repository but is not referenced by validator, publication truth, backend graphics registry or release evidence, it is documentation-only and may not be claimed as production-enforced.</div>
+</section>
+
 <section class="section" id="multi-agent-governance-routing">
-<h2 class="section-title"><span class="section-number">2U</span>Multi-Agent Governance Routing <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
+<h2 class="section-title"><span class="section-number">2V</span>Multi-Agent Governance Routing <span class="chip chip-red" style="margin-left:12px;font-size:0.625rem;vertical-align:middle">P0 AUTHORITY</span></h2>
 <p class="section-subtitle">Multi-agent work is allowed only when every agent resolves to the same backend-attested authority chain, evidence pack and release blocker state.</p>
 <div class="card">
 <div class="card-body" style="padding:0">

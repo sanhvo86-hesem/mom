@@ -1,0 +1,234 @@
+{
+  "moduleId": "M34-executive-control-tower",
+  "moduleName": "Trung tâm điều hành",
+  "route": "/executive/control-tower",
+  "domain": "cross-domain",
+  "criticality": "high",
+  "ownerTeam": "Platform Analytics",
+  "processOwner": "COO",
+  "primaryEntity": "executiveKpi",
+  "contractRefs": [
+    "mom/contracts/objects/executiveKpi/contract.json",
+    "mom/design/module-api-catalog/M34-executive-control-tower.json"
+  ],
+  "templateId": "T-control-tower-executive",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M34-executive-control-tower.executive-overview",
+      "screenName": "Executive overview",
+      "type": "control-tower",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.kpi-tiles",
+      "screenName": "KPI tiles",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.exception-list",
+      "screenName": "Exception list",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.trend-charts",
+      "screenName": "Trend charts",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.drilldown-launcher",
+      "screenName": "Drilldown launcher",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    },
+    {
+      "screenId": "M34-executive-control-tower.report-export",
+      "screenName": "Report export",
+      "type": "supporting-screen",
+      "blocks": [
+        "M34-executive-control-tower.header",
+        "M34-executive-control-tower.main",
+        "M34-executive-control-tower.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M34-executive-control-tower.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M34-executive-control-tower.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M34-executive-control-tower.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M34-executive-control-tower.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M34-executive-control-tower.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m34.executive.control.tower.list",
+    "m34.executive.control.tower.detail",
+    "m34.executive.control.tower.lookup",
+    "m34.executive.control.tower.metrics",
+    "m34.executive.control.tower.update",
+    "m34.executive.control.tower.command.acknowledge-exception",
+    "m34.executive.control.tower.command.export-pack",
+    "m34.executive.control.tower.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "acknowledgeException",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "tower.read",
+      "tower.acknowledge",
+      "tower.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AcknowledgeExceptionRequested",
+      "ExportPackRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M34-executive-control-tower/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "executiveKpi",
+      "executiveKpi",
+      "exceptionFeed",
+      "siteComparison"
+    ]
+  },
+  "moduleArchetype": "control-tower",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "chart-area",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

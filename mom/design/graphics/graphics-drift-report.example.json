@@ -1,0 +1,18 @@
+{
+  "tokenDrift": [
+    "Admin theme selected in UI without runtime preset mapping"
+  ],
+  "componentContractDrift": [
+    "Shared table density token not yet verified against all module tables"
+  ],
+  "templateDrift": [
+    "Template registry still partially browser-backed in current MOM"
+  ],
+  "runtimeSelectorDrift": [
+    "Portal still loads per-module stylesheets outside unified graphics authority"
+  ],
+  "privateCssDrift": [
+    "Module CSS inventory needs runtime beacon to confirm debt"
+  ],
+  "inlineStyleDrift": []
+}

@@ -23,6 +23,7 @@ use MOM\Services\DocumentControl\DocumentRevisionCommandService;
 use MOM\Services\Evidence\AuditPackExportService;
 use MOM\Services\Evidence\AuditPackExporter;
 use MOM\Services\Evidence\CanonicalEvidenceReadService;
+use MOM\Services\Evidence\ElectronicSignatureChallengeService;
 use MOM\Services\Evidence\EvidenceAmendmentService;
 use MOM\Services\Evidence\EvidenceFinalizationService;
 use MOM\Services\FormControl\FormIssuanceCommandService;
@@ -477,8 +478,22 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
 
     public function testPeriodicEvaluationWaiverRequiresAuthoritativeSignatureChallengeProof(): void
     {
-        $payloadHash = str_repeat('a', 64);
+        $payloadHash = hash('sha256', json_encode([
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'waived',
+            'closure_reason' => null,
+            'result_payload' => ['waiver' => 'risk accepted'],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'scheduled',
+            'result_payload' => '{}',
+        ];
         $db->queryOneRows[] = [
             'signature_event_id' => '00000000-0000-0000-0000-000000000030',
             'signature_state' => 'applied',
@@ -505,9 +520,32 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ]);
 
         $this->assertSame('waived', $row['evaluation_state']);
-        $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $db->queryOneCalls[0]['sql']);
-        $this->assertStringContainsString("signature_action = 'periodic_evaluation_waiver'", $db->queryOneCalls[0]['sql']);
-        $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[1]['sql']);
+        $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $db->queryOneCalls[1]['sql']);
+        $this->assertStringContainsString("signature_action = 'periodic_evaluation_waiver'", $db->queryOneCalls[1]['sql']);
+        $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[2]['sql']);
+    }
+
+    public function testPeriodicEvaluationWaiverRejectsCallerSuppliedHashMismatch(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryOneRows[] = [
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_scope' => 'system_integrity',
+            'scope_ref' => 'daily-digest',
+            'evaluation_state' => 'scheduled',
+            'result_payload' => '{}',
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('periodic_evaluation_waiver_payload_hash_mismatch');
+
+        (new PeriodicEvaluationService($db))->close([
+            'periodic_evaluation_id' => '00000000-0000-0000-0000-000000000020',
+            'evaluation_state' => 'waived',
+            'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000030',
+            'waiver_payload_hash_sha256' => str_repeat('f', 64),
+            'result_payload' => ['waiver' => 'risk accepted'],
+        ]);
     }
 
     public function testIntegrityDigestWorkerComputesDailyDigestRows(): void
@@ -518,6 +556,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'source_event_count' => 3,
             'source_digest' => str_repeat('b', 64),
         ]];
+        $db->queryOneRows[] = null;
         $db->queryOneRows[] = [
             'integrity_digest_id' => '00000000-0000-0000-0000-000000000040',
             'digest_scope' => 'daily',
@@ -532,7 +571,82 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame(1, $result['processed']);
         $this->assertSame('valid', $result['digests'][0]['digest_state']);
         $this->assertStringContainsString('FROM audit_events', $db->lastQuerySql);
-        $this->assertStringContainsString('INSERT INTO integrity_digests', $db->queryOneCalls[0]['sql']);
+        $this->assertStringContainsString('INSERT INTO integrity_digests', $db->queryOneCalls[1]['sql']);
+        $metadata = json_decode((string)$db->queryOneCalls[1]['params'][':metadata'], true);
+        $this->assertSame(['audit_events'], $metadata['covered_tables']);
+    }
+
+    public function testIntegrityDigestMismatchOpensException(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $db->queryRows = [[
+            'source_high_watermark' => '2026-04-15T00:00:00Z',
+            'source_event_count' => 3,
+            'source_digest' => str_repeat('b', 64),
+        ]];
+        $db->queryOneRows[] = [
+            'integrity_digest_id' => '00000000-0000-0000-0000-000000000041',
+            'digest_value' => str_repeat('d', 64),
+            'source_high_watermark' => '2026-04-15T00:00:00Z',
+            'digest_state' => 'valid',
+        ];
+        $db->queryOneRows[] = [
+            'integrity_exception_id' => '00000000-0000-0000-0000-000000000042',
+            'reason_code' => 'integrity_digest_mismatch',
+        ];
+        $db->queryOneRows[] = [
+            'integrity_digest_id' => '00000000-0000-0000-0000-000000000043',
+            'digest_scope' => 'daily',
+            'object_type' => 'audit_chain',
+            'object_id' => 'global',
+            'digest_value' => str_repeat('c', 64),
+            'digest_state' => 'valid',
+        ];
+
+        $result = (new IntegrityDigestService($db))->computeDailyDigest();
+
+        $this->assertSame('valid', $result['digest_state']);
+        $this->assertStringContainsString('INSERT INTO integrity_exceptions', $db->queryOneCalls[1]['sql']);
+        $this->assertSame('integrity_digest_mismatch', $db->queryOneCalls[1]['params'][':reason_code']);
+    }
+
+    public function testElectronicSignatureChallengeRejectsCallerControlledIdExpiryAndUnknownAction(): void
+    {
+        $db = new CanonicalOutboxFakeDb();
+        $service = new ElectronicSignatureChallengeService($db);
+
+        try {
+            $service->issueChallenge([
+                'auth_challenge_id' => 'caller-id',
+                'signed_payload_hash_sha256' => str_repeat('a', 64),
+                'displayed_record_hash_sha256' => str_repeat('b', 64),
+                'signer_ref' => 'qa-1',
+            ]);
+            $this->fail('caller supplied challenge id should be rejected');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('signature_auth_challenge_id_server_authoritative', $exception->getMessage());
+        }
+
+        try {
+            $service->issueChallenge([
+                'expires_at' => '2099-01-01T00:00:00Z',
+                'signed_payload_hash_sha256' => str_repeat('a', 64),
+                'displayed_record_hash_sha256' => str_repeat('b', 64),
+                'signer_ref' => 'qa-1',
+            ]);
+            $this->fail('caller supplied expiry should be rejected');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('signature_auth_challenge_expiry_server_authoritative', $exception->getMessage());
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('signature_action_not_allowed');
+        $service->issueChallenge([
+            'signature_action' => 'unregistered_action',
+            'signed_payload_hash_sha256' => str_repeat('a', 64),
+            'displayed_record_hash_sha256' => str_repeat('b', 64),
+            'signer_ref' => 'qa-1',
+        ]);
     }
 
     public function testCanonicalOutboxWorkerDispatchesByHandlerKey(): void
@@ -2104,6 +2218,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'object_type' => 'process_route',
                 'object_id' => 'ROUTE-10-TEMP',
                 'effectivity_type' => 'date',
+                'effectivity_scope' => [
+                    'impacted_wip_objects' => [[
+                        'object_type' => 'work_order',
+                        'object_id' => 'WO-10',
+                    ]],
+                ],
                 'effective_from' => '2026-04-14T00:00:00Z',
                 'release_impact' => 'wip_hold',
             ]],
@@ -2186,6 +2306,12 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'object_type' => 'process_route',
                 'object_id' => 'ROUTE-10-TEMP',
                 'effectivity_type' => 'date',
+                'effectivity_scope' => [
+                    'impacted_wip_objects' => [[
+                        'object_type' => 'work_order',
+                        'object_id' => 'WO-10',
+                    ]],
+                ],
                 'effective_from' => '2026-04-14T00:00:00Z',
                 'release_impact' => 'wip_hold',
             ]],
@@ -2773,7 +2899,7 @@ final class CanonicalOutboxFakeDb
     public array $queryOneCalls = [];
 
     /**
-     * @var list<array<string, mixed>>
+     * @var list<array<string, mixed>|null>
      */
     public array $queryOneRows = [];
 

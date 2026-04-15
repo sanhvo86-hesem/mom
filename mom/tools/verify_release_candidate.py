@@ -96,6 +96,40 @@ if pub_path.is_file():
         check("no publishability blockers", blocked_by == [], f"blockedBy={blocked_by}")
     check("no graphics release blockers active", "graphics_release_blockers_active" not in blocked_by, f"ready={ready} blockedBy={blocked_by}")
     check("release readiness state ready", readiness_state == "ready", f"state={readiness_state}")
+    graphics_gate = truth.get("graphics_release_gate", {})
+    check("graphics release gate exists", isinstance(graphics_gate, dict) and graphics_gate != {}, f"graphics_release_gate={graphics_gate}")
+
+print("\nGraphics Pack Proof:")
+design = PORTAL / "design"
+canonical_manifest_path = design / "canonical/manifest.json"
+graphics_registry_path = resolve_registry_dir() / "graphics-governance-registry.json"
+check("canonical graphics pack manifest exists", canonical_manifest_path.is_file())
+check("graphics governance registry exists", graphics_registry_path.is_file())
+if canonical_manifest_path.is_file():
+    manifest = json.loads(canonical_manifest_path.read_text(encoding="utf-8"))
+    packets = manifest.get("packets", [])
+    packet_count = len(packets) if isinstance(packets, list) else 0
+    check("canonical graphics pack has module packets", packet_count > 0, f"packets={packet_count}")
+    check("canonical graphics pack module count matches packets", int(manifest.get("moduleCount") or 0) == packet_count, f"moduleCount={manifest.get('moduleCount')} packets={packet_count}")
+    required_pack_paths = [
+        design / "graphics/template-registry-authority.json",
+        design / "graphics/theme-compatibility-matrix.json",
+        design / "graphics/module-graphics-compliance-matrix.json",
+        design / "graphics/graphics-lineage-graph.json",
+        design / "graphics/visual-debt-observatory.json",
+        design / "graphics/graphics-release-evidence-pack.schema.json",
+        design / "repo-alignment/backend-graphics-authority-api-contract.json",
+    ]
+    for artifact_path in required_pack_paths:
+        check(f"graphics pack artifact exists:{artifact_path.relative_to(PORTAL)}", artifact_path.is_file())
+if graphics_registry_path.is_file():
+    graphics = json.loads(graphics_registry_path.read_text(encoding="utf-8"))
+    release_link = graphics.get("graphicsReleaseLink", {})
+    evidence_pack = graphics.get("graphicsReleaseEvidencePack", {})
+    check("graphics release link is machine-readable", isinstance(release_link, dict) and bool(release_link), f"graphicsReleaseLink={release_link}")
+    check("graphics evidence pack is machine-readable", isinstance(evidence_pack, dict) and bool(evidence_pack), f"graphicsReleaseEvidencePack={evidence_pack}")
+    for key in ["moduleGraphicsCompliance", "moduleGraphicsLineageGraph", "runtimeGraphicsComplianceBeacon", "visualDebtObservatory"]:
+        check(f"graphics registry has {key}", isinstance(graphics.get(key), dict), f"{key} missing")
 
 # 5. OpenAPI
 print("\nOpenAPI:")

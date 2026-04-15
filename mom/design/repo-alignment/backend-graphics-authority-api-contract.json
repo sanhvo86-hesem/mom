@@ -1,0 +1,43 @@
+{
+  "version": "2026.04.14-current-mom-worldclass",
+  "currentKnownEndpointsInMom": [
+    {
+      "action": "admin_design_config",
+      "method": "GET",
+      "path": "api.php?action=admin_design_config",
+      "status": "current-authority-for-design-config"
+    },
+    {
+      "action": "admin_design_config_save",
+      "method": "POST",
+      "path": "api.php?action=admin_design_config_save",
+      "status": "current-authority-for-design-config-save"
+    }
+  ],
+  "targetGraphicsGovernanceEndpoints": [
+    "admin_template_registry_get",
+    "admin_template_get",
+    "admin_template_draft_save",
+    "admin_template_validate",
+    "admin_template_publish",
+    "admin_template_deprecate",
+    "admin_template_modules_get",
+    "admin_graphics_impact_token",
+    "admin_graphics_impact_template",
+    "admin_graphics_impact_component",
+    "admin_graphics_compliance_get",
+    "admin_graphics_non_compliant_get",
+    "admin_graphics_debt_get",
+    "admin_graphics_drift_get",
+    "admin_graphics_rollout_stage",
+    "admin_graphics_rollout_apply",
+    "admin_graphics_rollout_rollback",
+    "admin_graphics_audit_history_get",
+    "admin_graphics_waiver_create",
+    "admin_graphics_waiver_approve",
+    "admin_graphics_waiver_expire",
+    "admin_graphics_waiver_active_get",
+    "admin_graphics_release_blockers_get"
+  ],
+  "governanceRule": "Do not treat localStorage or UI seed data as production template authority. All publish/apply/rollback states must become backend-controlled."
+}

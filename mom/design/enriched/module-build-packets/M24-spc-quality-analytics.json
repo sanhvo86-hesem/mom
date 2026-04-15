@@ -1,0 +1,707 @@
+{
+  "moduleId": "M24-spc-quality-analytics",
+  "moduleName": "SPC và phân tích chất lượng",
+  "route": "/mes/quality/spc",
+  "domain": "MES",
+  "criticality": "high",
+  "ownerTeam": "Quality Analytics",
+  "processOwner": "Quality Systems Manager",
+  "primaryEntity": "spcStudy",
+  "contractRefs": [
+    "mom/contracts/objects/spcStudy/contract.json",
+    "mom/design/module-api-catalog/M24-spc-quality-analytics.json"
+  ],
+  "templateId": "T-analytical-list-spc",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M24-spc-quality-analytics.spc-overview",
+      "screenName": "SPC overview",
+      "type": "analytical-list",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.chart-workspace",
+      "screenName": "Chart workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.violation-queue",
+      "screenName": "Violation queue",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.capability-tab",
+      "screenName": "Capability tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.raw-data-table",
+      "screenName": "Raw data table",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M24-spc-quality-analytics.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m24.spc.quality.analytics.list",
+    "m24.spc.quality.analytics.detail",
+    "m24.spc.quality.analytics.lookup",
+    "m24.spc.quality.analytics.metrics",
+    "m24.spc.quality.analytics.update",
+    "m24.spc.quality.analytics.command.recalculate-limits",
+    "m24.spc.quality.analytics.command.acknowledge-violation",
+    "m24.spc.quality.analytics.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "acknowledgeViolation",
+        "transition": "current -> current"
+      },
+      {
+        "action": "recalculateLimits",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "spc.read",
+      "spc.recalculate",
+      "spc.acknowledge",
+      "spc.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "RecalculateLimitsRequested",
+      "AcknowledgeViolationRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M24-spc-quality-analytics/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "spcStudy",
+      "spcStudy",
+      "spcSample",
+      "spcViolation"
+    ]
+  },
+  "moduleArchetype": "analytical-list",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "chart-area",
+    "main",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Monitor process behavior using deterministic SPC chart families, alerts and drilldown.",
+    "workflowNote": "SPC chart family selection and rule evaluation must be deterministic and auditable.",
+    "personas": [
+      "Quality engineer",
+      "Process engineer",
+      "Operations manager"
+    ],
+    "inputs": [
+      "Characteristic measurements",
+      "Control limits",
+      "Rule engine",
+      "Sampling context",
+      "Spec limits"
+    ],
+    "outputs": [
+      "SPC dashboard",
+      "Rule violation alerts",
+      "Capability summary",
+      "Drilldown to raw samples",
+      "Exportable datasets"
+    ],
+    "coreScreensNarrative": [
+      "SPC overview",
+      "Chart workspace",
+      "Violation queue",
+      "Capability tab",
+      "Raw data table"
+    ],
+    "policiesNarrative": "Freshness: analytics-near-real-time Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M24-spc-quality-analytics.spc-overview",
+      "title": "SPC overview",
+      "type": "analytical-list",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.chart-workspace",
+      "title": "Chart workspace",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.violation-queue",
+      "title": "Violation queue",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.capability-tab",
+      "title": "Capability tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.raw-data-table",
+      "title": "Raw data table",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "filter",
+        "chart-area",
+        "main",
+        "footer"
+      ],
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m24.spc.quality.analytics.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/quality/spc/{id}",
+      "permission": "spc.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m24.spc.quality.analytics.command.recalculate-limits",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/spc/{id}/actions/recalculate-limits",
+      "permission": "spc.recalculate",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecalculateLimitsRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m24.spc.quality.analytics.command.acknowledge-violation",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/quality/spc/{id}/actions/acknowledge-violation",
+      "permission": "spc.acknowledge",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "AcknowledgeViolationRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m24.spc.quality.analytics.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/quality/spc/export",
+      "permission": "spc.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m24.spc.quality.analytics.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/quality/spc/query",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m24.spc.quality.analytics.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/spc/{id}",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m24.spc.quality.analytics.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/quality/spc/lookup",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m24.spc.quality.analytics.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/quality/spc/metrics",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m24.spc.quality.analytics.list",
+      "method": "POST",
+      "path": "/mes/quality/spc/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "spcStudy summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.detail",
+      "method": "GET",
+      "path": "/mes/quality/spc/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "spcStudy detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.lookup",
+      "method": "POST",
+      "path": "/mes/quality/spc/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.metrics",
+      "method": "GET",
+      "path": "/mes/quality/spc/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.update",
+      "method": "PATCH",
+      "path": "/mes/quality/spc/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.command.recalculate-limits",
+      "method": "POST",
+      "path": "/mes/quality/spc/{id}/actions/recalculate-limits",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.recalculate",
+      "auditEvent": "RecalculateLimitsRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.command.acknowledge-violation",
+      "method": "POST",
+      "path": "/mes/quality/spc/{id}/actions/acknowledge-violation",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.acknowledge",
+      "auditEvent": "AcknowledgeViolationRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m24.spc.quality.analytics.export",
+      "method": "POST",
+      "path": "/mes/quality/spc/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "analytics-near-real-time",
+      "permission": "spc.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

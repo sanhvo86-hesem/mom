@@ -167,12 +167,16 @@ final class DocumentRevisionCommandService
             throw new RuntimeException('document_read_ack_actor_required');
         }
         $signatureEventId = $this->nullableUuid($input['signature_event_id'] ?? null);
-        if ($this->requiresSignatureBackedAcknowledgement($input) && $signatureEventId === null) {
-            throw new RuntimeException('document_read_ack_signature_required');
-        }
-
+        $canonicalRequiresSignature = $this->canonicalReadAckSignatureRequired($db, $revisionId, $audienceUserId, $effectiveActor);
         $ackHash = $this->nullableSha256($input['acknowledgement_hash_sha256'] ?? null)
             ?? hash('sha256', $revisionId . '|' . ($audienceUserId ?? $effectiveActor) . '|read_ack');
+        if (($canonicalRequiresSignature || $this->requiresSignatureBackedAcknowledgement($input)) && $signatureEventId === null) {
+            throw new RuntimeException('document_read_ack_signature_required');
+        }
+        if ($signatureEventId !== null) {
+            $this->assertReadAckSignatureAuthoritative($db, $signatureEventId, $revisionId, $audienceUserId, $effectiveActor, $ackHash);
+        }
+
         $ack = $db->queryOne(
             "INSERT INTO doc_read_acknowledgements
                 (doc_revision_id, audience_user_id, actor_ref, acknowledged_at, signature_event_id,
@@ -249,7 +253,6 @@ final class DocumentRevisionCommandService
             "UPDATE doc_revisions
              SET lifecycle_state = 'superseded',
                  source_change_order_id = COALESCE(source_change_order_id, CAST(:source_change_order_id AS uuid)),
-                 metadata = metadata || CAST(:metadata AS jsonb),
                  updated_at = now(),
                  row_version = row_version + 1
              WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
@@ -258,11 +261,6 @@ final class DocumentRevisionCommandService
             [
                 ':doc_revision_id' => $revisionId,
                 ':source_change_order_id' => $sourceChangeOrderId,
-                ':metadata' => $this->json([
-                    'authority' => 'DocumentRevisionCommandService',
-                    'actor_ref' => $actorRef,
-                    'superseded_by_doc_revision_id' => $supersededBy,
-                ]),
             ],
         );
         if (!is_array($revision) || $this->text($revision['doc_revision_id'] ?? '') === '') {
@@ -788,6 +786,76 @@ final class DocumentRevisionCommandService
             || $this->truthy($metadata['signature_required'] ?? false)
             || $this->truthy($metadata['training_gate'] ?? false)
             || $this->truthy($metadata['effectivity_gate'] ?? false);
+    }
+
+    private function canonicalReadAckSignatureRequired(object $db, string $revisionId, ?string $audienceUserId, ?string $actorRef): bool
+    {
+        $row = $db->queryOne(
+            "SELECT bool_or(read_ack_required) AS read_ack_required
+             FROM doc_distributions
+             WHERE doc_revision_id = CAST(:doc_revision_id AS uuid)
+               AND read_ack_required = true
+               AND (
+                   (audience_type = 'user' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
+                   OR (audience_type IN ('role', 'department', 'site', 'plant') AND audience_ref = :actor_ref)
+               )",
+            [
+                ':doc_revision_id' => $revisionId,
+                ':actor_ref' => $actorRef,
+                ':audience_user_id' => $audienceUserId,
+            ],
+        );
+        return is_array($row) && $this->truthy($row['read_ack_required'] ?? false);
+    }
+
+    private function assertReadAckSignatureAuthoritative(
+        object $db,
+        string $signatureEventId,
+        string $revisionId,
+        ?string $audienceUserId,
+        ?string $actorRef,
+        string $acknowledgementHash,
+    ): void {
+        $row = $db->queryOne(
+            "SELECT
+                se.signature_event_id,
+                se.signature_state,
+                se.signature_meaning,
+                se.signed_payload_hash_sha256,
+                se.signer_user_id,
+                se.signer_ref,
+                esc.challenge_state,
+                esc.consumed_at,
+                esc.signature_action,
+                esc.signed_payload_hash_sha256 AS challenge_payload_hash_sha256,
+                esc.displayed_record_hash_sha256
+             FROM signature_events se
+             INNER JOIN e_signature_auth_challenges esc
+                ON esc.auth_challenge_id = se.auth_challenge_id
+             WHERE se.signature_event_id = CAST(:signature_event_id AS uuid)
+               AND se.signature_state = 'applied'
+               AND se.signature_meaning = 'document_read_acknowledgement'
+               AND se.signed_payload_hash_sha256 = :acknowledgement_hash_sha256
+               AND esc.challenge_state = 'consumed'
+               AND esc.consumed_at IS NOT NULL
+               AND esc.signature_action = 'document_read_acknowledgement'
+               AND esc.signed_payload_hash_sha256 = :acknowledgement_hash_sha256
+               AND esc.displayed_record_hash_sha256 = :acknowledgement_hash_sha256
+               AND (:audience_user_id IS NULL OR se.signer_user_id = CAST(:audience_user_id AS uuid))
+               AND (:actor_ref IS NULL OR se.signer_ref = :actor_ref)
+               AND (se.metadata->>'doc_revision_id' = :doc_revision_id OR esc.metadata->>'doc_revision_id' = :doc_revision_id)
+             LIMIT 1",
+            [
+                ':signature_event_id' => $signatureEventId,
+                ':doc_revision_id' => $revisionId,
+                ':audience_user_id' => $audienceUserId,
+                ':actor_ref' => $actorRef,
+                ':acknowledgement_hash_sha256' => $acknowledgementHash,
+            ],
+        );
+        if (!is_array($row) || $this->nullableUuid($row['signature_event_id'] ?? null) === null) {
+            throw new RuntimeException('document_read_ack_signature_not_authoritative');
+        }
     }
 
     private function truthy(mixed $value): bool

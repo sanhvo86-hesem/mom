@@ -1,0 +1,277 @@
+{
+  "moduleId": "M03-sales-orders",
+  "moduleName": "Đơn bán hàng",
+  "route": "/erp/sales/orders",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Commercial",
+  "processOwner": "Order Management Lead",
+  "primaryEntity": "salesOrder",
+  "contractRefs": [
+    "mom/contracts/objects/salesOrder/contract.json",
+    "mom/design/module-api-catalog/M03-sales-orders.json"
+  ],
+  "templateId": "T-object-page-commercial-order",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M03-sales-orders.order-list",
+      "screenName": "Order list",
+      "type": "object-page",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.order-detail",
+      "screenName": "Order detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.line-schedule",
+      "screenName": "Line schedule",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.allocation-panel",
+      "screenName": "Allocation panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.fulfillment-status",
+      "screenName": "Fulfillment status",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.commercial-tab",
+      "screenName": "Commercial tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.audit-history-tab",
+      "screenName": "Audit/history tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M03-sales-orders.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M03-sales-orders.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M03-sales-orders.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M03-sales-orders.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m03.sales.orders.list",
+    "m03.sales.orders.detail",
+    "m03.sales.orders.lookup",
+    "m03.sales.orders.metrics",
+    "m03.sales.orders.create",
+    "m03.sales.orders.update",
+    "m03.sales.orders.command.validate",
+    "m03.sales.orders.command.release",
+    "m03.sales.orders.command.hold",
+    "m03.sales.orders.command.change-request",
+    "m03.sales.orders.command.cancel",
+    "m03.sales.orders.command.allocate",
+    "m03.sales.orders.command.acknowledge",
+    "m03.sales.orders.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "validated",
+      "released",
+      "partially_fulfilled",
+      "fulfilled",
+      "on_hold",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "validate",
+        "transition": "draft -> validated"
+      },
+      {
+        "action": "release",
+        "transition": "validated -> released"
+      },
+      {
+        "action": "hold",
+        "transition": "released|partially_fulfilled -> on_hold"
+      },
+      {
+        "action": "cancel",
+        "transition": "draft|validated -> cancelled"
+      },
+      {
+        "action": "close",
+        "transition": "fulfilled -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "salesOrder.read",
+      "salesOrder.create",
+      "salesOrder.update",
+      "salesOrder.release",
+      "salesOrder.hold",
+      "salesOrder.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "ValidateRequested",
+      "ReleaseRequested",
+      "HoldRequested",
+      "ChangeRequestRequested",
+      "CancelRequested",
+      "AllocateRequested",
+      "AcknowledgeRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M03-sales-orders/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "salesOrder",
+      "salesOrder",
+      "salesOrderLine",
+      "deliverySchedule"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

@@ -1,0 +1,250 @@
+{
+  "moduleId": "M32-accounts-receivable",
+  "moduleName": "Công nợ phải thu và lập hóa đơn",
+  "route": "/erp/finance/ar",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "Finance",
+  "processOwner": "AR Manager",
+  "primaryEntity": "customerInvoice",
+  "contractRefs": [
+    "mom/contracts/objects/customerInvoice/contract.json",
+    "mom/design/module-api-catalog/M32-accounts-receivable.json"
+  ],
+  "templateId": "T-approval-queue-finance-ar",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M32-accounts-receivable.billing-queue",
+      "screenName": "Billing queue",
+      "type": "approval-queue",
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.invoice-detail",
+      "screenName": "Invoice detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.exception-panel",
+      "screenName": "Exception panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.release-post-panel",
+      "screenName": "Release/post panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    },
+    {
+      "screenId": "M32-accounts-receivable.aging-dashboard",
+      "screenName": "Aging dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M32-accounts-receivable.header",
+        "M32-accounts-receivable.main",
+        "M32-accounts-receivable.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M32-accounts-receivable.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M32-accounts-receivable.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M32-accounts-receivable.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M32-accounts-receivable.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m32.accounts.receivable.list",
+    "m32.accounts.receivable.detail",
+    "m32.accounts.receivable.lookup",
+    "m32.accounts.receivable.metrics",
+    "m32.accounts.receivable.update",
+    "m32.accounts.receivable.command.generate",
+    "m32.accounts.receivable.command.validate",
+    "m32.accounts.receivable.command.resolve-exception",
+    "m32.accounts.receivable.command.approve",
+    "m32.accounts.receivable.command.post",
+    "m32.accounts.receivable.command.void",
+    "m32.accounts.receivable.export"
+  ],
+  "workflow": {
+    "states": [
+      "new",
+      "ready_to_bill",
+      "exception",
+      "approved",
+      "posted",
+      "paid",
+      "voided"
+    ],
+    "transitions": [
+      {
+        "action": "validate",
+        "transition": "new -> ready_to_bill"
+      },
+      {
+        "action": "exception",
+        "transition": "ready_to_bill -> exception"
+      },
+      {
+        "action": "approve",
+        "transition": "ready_to_bill|exception -> approved"
+      },
+      {
+        "action": "post",
+        "transition": "approved -> posted"
+      },
+      {
+        "action": "void",
+        "transition": "new|ready_to_bill|exception -> voided"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "ar.read",
+      "ar.generate",
+      "ar.resolve",
+      "ar.approve",
+      "ar.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "GenerateRequested",
+      "ValidateRequested",
+      "ResolveExceptionRequested",
+      "ApproveRequested",
+      "PostRequested",
+      "VoidRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M32-accounts-receivable/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "customerInvoice",
+      "customerInvoice",
+      "billingException",
+      "receivableStatus"
+    ]
+  },
+  "moduleArchetype": "approval-queue",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

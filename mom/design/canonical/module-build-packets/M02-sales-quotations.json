@@ -1,0 +1,265 @@
+{
+  "moduleId": "M02-sales-quotations",
+  "moduleName": "Báo giá bán hàng",
+  "route": "/erp/sales/quotations",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Commercial",
+  "processOwner": "Sales Manager",
+  "primaryEntity": "salesQuotation",
+  "contractRefs": [
+    "mom/contracts/objects/salesQuotation/contract.json",
+    "mom/design/module-api-catalog/M02-sales-quotations.json"
+  ],
+  "templateId": "T-transactional-form-commercial-quote",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M02-sales-quotations.quotation-inbox",
+      "screenName": "Quotation inbox",
+      "type": "transactional-form",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.quotation-form",
+      "screenName": "Quotation form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.pricing-breakdown",
+      "screenName": "Pricing breakdown",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.approval-panel",
+      "screenName": "Approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.revision-compare",
+      "screenName": "Revision compare",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.export-preview",
+      "screenName": "Export preview",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M02-sales-quotations.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M02-sales-quotations.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M02-sales-quotations.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M02-sales-quotations.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m02.sales.quotations.list",
+    "m02.sales.quotations.detail",
+    "m02.sales.quotations.lookup",
+    "m02.sales.quotations.metrics",
+    "m02.sales.quotations.create",
+    "m02.sales.quotations.update",
+    "m02.sales.quotations.command.price",
+    "m02.sales.quotations.command.submit-approval",
+    "m02.sales.quotations.command.approve",
+    "m02.sales.quotations.command.release",
+    "m02.sales.quotations.command.expire",
+    "m02.sales.quotations.command.cancel",
+    "m02.sales.quotations.command.convert-to-order",
+    "m02.sales.quotations.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "priced",
+      "pending_approval",
+      "released",
+      "expired",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "price",
+        "transition": "draft -> priced"
+      },
+      {
+        "action": "submitApproval",
+        "transition": "priced -> pending_approval"
+      },
+      {
+        "action": "approve",
+        "transition": "pending_approval -> released"
+      },
+      {
+        "action": "expire",
+        "transition": "released -> expired"
+      },
+      {
+        "action": "cancel",
+        "transition": "draft|priced|pending_approval -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "quotation.read",
+      "quotation.create",
+      "quotation.update",
+      "quotation.price",
+      "quotation.approve",
+      "quotation.release",
+      "quotation.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "PriceRequested",
+      "SubmitApprovalRequested",
+      "ApproveRequested",
+      "ReleaseRequested",
+      "ExpireRequested",
+      "CancelRequested",
+      "ConvertToOrderRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M02-sales-quotations/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "salesQuotation",
+      "salesQuotation",
+      "salesQuotationLine",
+      "quoteRevision"
+    ]
+  },
+  "moduleArchetype": "transactional-form",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "workflow",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

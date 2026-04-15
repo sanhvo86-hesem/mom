@@ -1,0 +1,777 @@
+{
+  "moduleProfile": {
+    "purpose": "Receive, validate, allocate and release customer orders into the operational planning stream.",
+    "workflowNote": "Order release establishes demand signal downstream; holds must include reason and downstream impact.",
+    "personas": [
+      "Order coordinator",
+      "Planner",
+      "Finance AR",
+      "Customer service"
+    ],
+    "inputs": [
+      "Released quotation or direct PO",
+      "Customer master",
+      "Item master",
+      "ATP/available inventory",
+      "Pricing terms",
+      "Tax terms",
+      "Shipment requirements"
+    ],
+    "outputs": [
+      "Released sales order",
+      "Delivery schedule",
+      "Reservation demand",
+      "Order acknowledgment",
+      "Order change audit trail"
+    ],
+    "coreScreensNarrative": [
+      "Order list",
+      "Order detail",
+      "Line schedule",
+      "Allocation panel",
+      "Fulfillment status",
+      "Commercial tab",
+      "Audit/history tab"
+    ],
+    "policiesNarrative": "Freshness: erp-order-state Offline: read_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M03-sales-orders.order-list",
+      "title": "Order list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.order-detail",
+      "title": "Order detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.line-schedule",
+      "title": "Line schedule",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.allocation-panel",
+      "title": "Allocation panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.fulfillment-status",
+      "title": "Fulfillment status",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.commercial-tab",
+      "title": "Commercial tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    },
+    {
+      "screenId": "M03-sales-orders.audit-history-tab",
+      "title": "Audit/history tab",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M03-sales-orders.header",
+        "M03-sales-orders.main",
+        "M03-sales-orders.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m03.sales.orders.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/sales/orders",
+      "permission": "salesOrder.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/sales/orders/{id}",
+      "permission": "salesOrder.update",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.validate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/validate",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ValidateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/release",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/hold",
+      "permission": "salesOrder.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.change-request",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/change-request",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ChangeRequestRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/cancel",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.allocate",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/allocate",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "AllocateRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.command.acknowledge",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/acknowledge",
+      "permission": "salesOrder.release",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "AcknowledgeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m03.sales.orders.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/sales/orders/export",
+      "permission": "salesOrder.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m03.sales.orders.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/sales/orders/query",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m03.sales.orders.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/sales/orders/{id}",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m03.sales.orders.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/sales/orders/lookup",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m03.sales.orders.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/sales/orders/metrics",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m03.sales.orders.list",
+      "method": "POST",
+      "path": "/erp/sales/orders/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "salesOrder summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.detail",
+      "method": "GET",
+      "path": "/erp/sales/orders/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "salesOrder detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.lookup",
+      "method": "POST",
+      "path": "/erp/sales/orders/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m03.sales.orders.metrics",
+      "method": "GET",
+      "path": "/erp/sales/orders/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.create",
+      "method": "POST",
+      "path": "/erp/sales/orders",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "salesOrder draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.update",
+      "method": "PATCH",
+      "path": "/erp/sales/orders/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.update",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.validate",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/validate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "ValidateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.release",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.hold",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.hold",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.change-request",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/change-request",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "ChangeRequestRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.cancel",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.allocate",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/allocate",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "AllocateRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.command.acknowledge",
+      "method": "POST",
+      "path": "/erp/sales/orders/{id}/actions/acknowledge",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.release",
+      "auditEvent": "AcknowledgeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m03.sales.orders.export",
+      "method": "POST",
+      "path": "/erp/sales/orders/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-order-state",
+      "permission": "salesOrder.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

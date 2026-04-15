@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EnrichedModuleBuildPacket",
+  "type": "object",
+  "required": [
+    "moduleId",
+    "moduleName",
+    "route",
+    "domain",
+    "criticality",
+    "ownerTeam",
+    "processOwner",
+    "primaryEntity",
+    "contractRefs",
+    "templateId",
+    "templateVersion",
+    "screens",
+    "blocks",
+    "apiBindings",
+    "workflow",
+    "permissions",
+    "audit",
+    "i18n",
+    "responsive",
+    "accessibility",
+    "performance",
+    "qa",
+    "traceability",
+    "moduleArchetype",
+    "version",
+    "zones",
+    "regulatoryScope",
+    "densityModes",
+    "offlineSupport",
+    "releaseDate"
+  ],
+  "properties": {
+    "moduleId": {
+      "description": "Canonical field moduleId"
+    },
+    "moduleName": {
+      "description": "Canonical field moduleName"
+    },
+    "route": {
+      "description": "Canonical field route"
+    },
+    "domain": {
+      "description": "Canonical field domain"
+    },
+    "criticality": {
+      "description": "Canonical field criticality"
+    },
+    "ownerTeam": {
+      "description": "Canonical field ownerTeam"
+    },
+    "processOwner": {
+      "description": "Canonical field processOwner"
+    },
+    "primaryEntity": {
+      "description": "Canonical field primaryEntity"
+    },
+    "contractRefs": {
+      "description": "Canonical field contractRefs"
+    },
+    "templateId": {
+      "description": "Canonical field templateId"
+    },
+    "templateVersion": {
+      "description": "Canonical field templateVersion"
+    },
+    "screens": {
+      "description": "Canonical field screens"
+    },
+    "blocks": {
+      "description": "Canonical field blocks"
+    },
+    "apiBindings": {
+      "description": "Canonical field apiBindings"
+    },
+    "workflow": {
+      "description": "Canonical field workflow"
+    },
+    "permissions": {
+      "description": "Canonical field permissions"
+    },
+    "audit": {
+      "description": "Canonical field audit"
+    },
+    "i18n": {
+      "description": "Canonical field i18n"
+    },
+    "responsive": {
+      "description": "Canonical field responsive"
+    },
+    "accessibility": {
+      "description": "Canonical field accessibility"
+    },
+    "performance": {
+      "description": "Canonical field performance"
+    },
+    "qa": {
+      "description": "Canonical field qa"
+    },
+    "traceability": {
+      "description": "Canonical field traceability"
+    },
+    "moduleArchetype": {
+      "description": "Canonical field moduleArchetype"
+    },
+    "version": {
+      "description": "Canonical field version"
+    },
+    "zones": {
+      "description": "Canonical field zones"
+    },
+    "regulatoryScope": {
+      "description": "Canonical field regulatoryScope"
+    },
+    "densityModes": {
+      "description": "Canonical field densityModes"
+    },
+    "offlineSupport": {
+      "description": "Canonical field offlineSupport"
+    },
+    "releaseDate": {
+      "description": "Canonical field releaseDate"
+    },
+    "moduleProfile": {
+      "type": "object"
+    },
+    "screenInventory": {
+      "type": "array"
+    },
+    "actionInventory": {
+      "type": "array"
+    },
+    "queryInventory": {
+      "type": "array"
+    },
+    "endpointInventory": {
+      "type": "array"
+    }
+  }
+}

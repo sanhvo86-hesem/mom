@@ -164,6 +164,10 @@ final class EffectivityGateService
                     $blockers[] = $this->blocker('verification_waiver_signature_required', 'Verification waiver requires risk acceptance or e-signature.', $verification);
                 } else {
                     $warnings[] = $this->blocker('verification_waived', 'Verification was waived and must be shown in audit pack.', $verification);
+                    $key = $this->verificationObjectKey($verification);
+                    if ($key !== '') {
+                        $coveredObjects[$key] = true;
+                    }
                 }
                 continue;
             }

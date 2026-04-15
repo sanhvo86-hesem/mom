@@ -1,0 +1,230 @@
+{
+  "moduleId": "M18-oee-downtime",
+  "moduleName": "OEE và dừng máy",
+  "route": "/mes/oee-downtime",
+  "domain": "MES",
+  "criticality": "high",
+  "ownerTeam": "MES Analytics",
+  "processOwner": "Continuous Improvement Lead",
+  "primaryEntity": "downtimeEvent",
+  "contractRefs": [
+    "mom/contracts/objects/downtimeEvent/contract.json",
+    "mom/design/module-api-catalog/M18-oee-downtime.json"
+  ],
+  "templateId": "T-analytical-list-oee",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M18-oee-downtime.oee-overview",
+      "screenName": "OEE overview",
+      "type": "analytical-list",
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.downtime-event-list",
+      "screenName": "Downtime event list",
+      "type": "supporting-screen",
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.pareto-tab",
+      "screenName": "Pareto tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.shift-day-trend",
+      "screenName": "Shift/day trend",
+      "type": "supporting-screen",
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    },
+    {
+      "screenId": "M18-oee-downtime.machine-compare",
+      "screenName": "Machine compare",
+      "type": "supporting-screen",
+      "blocks": [
+        "M18-oee-downtime.header",
+        "M18-oee-downtime.main",
+        "M18-oee-downtime.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M18-oee-downtime.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M18-oee-downtime.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M18-oee-downtime.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M18-oee-downtime.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M18-oee-downtime.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m18.oee.downtime.list",
+    "m18.oee.downtime.detail",
+    "m18.oee.downtime.lookup",
+    "m18.oee.downtime.metrics",
+    "m18.oee.downtime.update",
+    "m18.oee.downtime.command.reclassify-downtime",
+    "m18.oee.downtime.command.approve-adjustment",
+    "m18.oee.downtime.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "reclassify",
+        "transition": "current -> current"
+      },
+      {
+        "action": "approveAdjustment",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "oee.read",
+      "oee.reclassify",
+      "oee.approve",
+      "oee.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "ReclassifyDowntimeRequested",
+      "ApproveAdjustmentRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M18-oee-downtime/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "downtimeEvent",
+      "downtimeEvent",
+      "oeeSnapshot",
+      "lossReason"
+    ]
+  },
+  "moduleArchetype": "analytical-list",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "chart-area",
+    "main",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

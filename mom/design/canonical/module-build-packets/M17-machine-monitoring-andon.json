@@ -1,0 +1,242 @@
+{
+  "moduleId": "M17-machine-monitoring-andon",
+  "moduleName": "Giám sát máy và Andon",
+  "route": "/mes/monitoring/andon",
+  "domain": "MES",
+  "criticality": "shopfloor-critical",
+  "ownerTeam": "MES Runtime",
+  "processOwner": "Manufacturing Operations Manager",
+  "primaryEntity": "machineStatus",
+  "contractRefs": [
+    "mom/contracts/objects/machineStatus/contract.json",
+    "mom/design/module-api-catalog/M17-machine-monitoring-andon.json"
+  ],
+  "templateId": "T-shopfloor-board-machine-status",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M17-machine-monitoring-andon.andon-board",
+      "screenName": "Andon board",
+      "type": "shopfloor-board",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.machine-detail",
+      "screenName": "Machine detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.alarm-rail",
+      "screenName": "Alarm rail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.trend-panel",
+      "screenName": "Trend panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    },
+    {
+      "screenId": "M17-machine-monitoring-andon.escalation-drawer",
+      "screenName": "Escalation drawer",
+      "type": "supporting-screen",
+      "blocks": [
+        "M17-machine-monitoring-andon.header",
+        "M17-machine-monitoring-andon.main",
+        "M17-machine-monitoring-andon.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M17-machine-monitoring-andon.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M17-machine-monitoring-andon.metrics",
+      "blockType": "chart-panel",
+      "zone": "kpi-bar"
+    }
+  ],
+  "apiBindings": [
+    "m17.machine.monitoring.andon.list",
+    "m17.machine.monitoring.andon.detail",
+    "m17.machine.monitoring.andon.lookup",
+    "m17.machine.monitoring.andon.metrics",
+    "m17.machine.monitoring.andon.update",
+    "m17.machine.monitoring.andon.command.acknowledge-alarm",
+    "m17.machine.monitoring.andon.command.shelve-alarm",
+    "m17.machine.monitoring.andon.command.assign-response",
+    "m17.machine.monitoring.andon.command.open-detail",
+    "m17.machine.monitoring.andon.export"
+  ],
+  "workflow": {
+    "states": [
+      "normal"
+    ],
+    "transitions": [
+      {
+        "action": "ack",
+        "transition": "active -> acknowledged"
+      },
+      {
+        "action": "shelve",
+        "transition": "active|acknowledged -> shelved"
+      },
+      {
+        "action": "escalate",
+        "transition": "active|acknowledged -> escalated"
+      },
+      {
+        "action": "resolve",
+        "transition": "acknowledged|escalated -> resolved"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "andon.read",
+      "andon.acknowledge",
+      "andon.shelve",
+      "andon.assign",
+      "andon.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": false
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AcknowledgeAlarmRequested",
+      "ShelveAlarmRequested",
+      "AssignResponseRequested",
+      "OpenDetailRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 1800,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M17-machine-monitoring-andon/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "machineStatus",
+      "machineStatus",
+      "machineAlarm",
+      "throughputSample"
+    ]
+  },
+  "moduleArchetype": "shopfloor-board",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "main",
+    "alert-rail",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

@@ -1,0 +1,246 @@
+{
+  "moduleId": "M11-item-part-master",
+  "moduleName": "Mã vật tư và chi tiết",
+  "route": "/erp/engineering/items",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "Engineering Data Management",
+  "processOwner": "Master Data Lead",
+  "primaryEntity": "item",
+  "contractRefs": [
+    "mom/contracts/objects/item/contract.json",
+    "mom/design/module-api-catalog/M11-item-part-master.json"
+  ],
+  "templateId": "T-object-page-item-master",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M11-item-part-master.item-list",
+      "screenName": "Item list",
+      "type": "object-page",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.item-detail",
+      "screenName": "Item detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.planning-tab",
+      "screenName": "Planning tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.compliance-tab",
+      "screenName": "Compliance tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.related-revisions",
+      "screenName": "Related revisions",
+      "type": "supporting-screen",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    },
+    {
+      "screenId": "M11-item-part-master.change-history",
+      "screenName": "Change history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M11-item-part-master.header",
+        "M11-item-part-master.main",
+        "M11-item-part-master.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M11-item-part-master.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M11-item-part-master.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M11-item-part-master.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M11-item-part-master.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m11.item.part.master.list",
+    "m11.item.part.master.detail",
+    "m11.item.part.master.lookup",
+    "m11.item.part.master.metrics",
+    "m11.item.part.master.create",
+    "m11.item.part.master.update",
+    "m11.item.part.master.command.approve",
+    "m11.item.part.master.command.effectivity",
+    "m11.item.part.master.command.obsolete",
+    "m11.item.part.master.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "approved",
+      "effective",
+      "obsolete"
+    ],
+    "transitions": [
+      {
+        "action": "approve",
+        "transition": "draft -> approved"
+      },
+      {
+        "action": "effectivity",
+        "transition": "approved -> effective"
+      },
+      {
+        "action": "obsolete",
+        "transition": "effective -> obsolete"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "item.read",
+      "item.create",
+      "item.approve",
+      "item.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "ApproveRequested",
+      "EffectivityRequested",
+      "ObsoleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M11-item-part-master/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "item",
+      "item",
+      "itemRevision",
+      "uomConversion"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

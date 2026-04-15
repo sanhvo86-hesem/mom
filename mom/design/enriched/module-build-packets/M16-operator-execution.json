@@ -1,0 +1,971 @@
+{
+  "moduleId": "M16-operator-execution",
+  "moduleName": "Thực thi công việc tại trạm",
+  "route": "/mes/operator/execution",
+  "domain": "MES",
+  "criticality": "shopfloor-critical",
+  "ownerTeam": "MES Runtime",
+  "processOwner": "Production Supervisor",
+  "primaryEntity": "operatorTask",
+  "contractRefs": [
+    "mom/contracts/objects/operatorTask/contract.json",
+    "mom/design/module-api-catalog/M16-operator-execution.json"
+  ],
+  "templateId": "T-operator-execution-shopfloor",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M16-operator-execution.current-task",
+      "screenName": "Current task",
+      "type": "operator-execution",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.instruction-panel",
+      "screenName": "Instruction panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.scan-input-area",
+      "screenName": "Scan/input area",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.large-action-bar",
+      "screenName": "Large action bar",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.exception-drawer",
+      "screenName": "Exception drawer",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.completion-summary",
+      "screenName": "Completion summary",
+      "type": "supporting-screen",
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M16-operator-execution.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M16-operator-execution.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M16-operator-execution.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M16-operator-execution.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    }
+  ],
+  "apiBindings": [
+    "m16.operator.execution.list",
+    "m16.operator.execution.detail",
+    "m16.operator.execution.lookup",
+    "m16.operator.execution.metrics",
+    "m16.operator.execution.update",
+    "m16.operator.execution.command.start",
+    "m16.operator.execution.command.pause",
+    "m16.operator.execution.command.hold",
+    "m16.operator.execution.command.resume",
+    "m16.operator.execution.command.record-count",
+    "m16.operator.execution.command.complete",
+    "m16.operator.execution.command.report-issue",
+    "m16.operator.execution.export"
+  ],
+  "workflow": {
+    "states": [
+      "ready",
+      "running",
+      "paused",
+      "hold",
+      "completed",
+      "exception"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "ready -> running"
+      },
+      {
+        "action": "pause",
+        "transition": "running -> paused"
+      },
+      {
+        "action": "hold",
+        "transition": "running|paused -> hold"
+      },
+      {
+        "action": "resume",
+        "transition": "paused|hold -> running"
+      },
+      {
+        "action": "complete",
+        "transition": "running -> completed"
+      },
+      {
+        "action": "reportIssue",
+        "transition": "running|paused|hold -> exception"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "operator.read",
+      "operator.execute",
+      "operator.hold",
+      "operator.complete",
+      "operator.reportIssue"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": false
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "PauseRequested",
+      "HoldRequested",
+      "ResumeRequested",
+      "RecordCountRequested",
+      "CompleteRequested",
+      "ReportIssueRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "shopfloor",
+    "supportedViewports": [
+      "desktop",
+      "tablet",
+      "kiosk"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": false
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "toolbar"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M16-operator-execution/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "operatorTask",
+      "operatorTask",
+      "executionStep",
+      "productionCount"
+    ]
+  },
+  "moduleArchetype": "operator-execution",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "instruction",
+    "main",
+    "action-bar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "shopfloor",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "limited_capture_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Guide point-of-use execution with current job, step instructions, scan/entry, hold/escalation and completion recording.",
+    "workflowNote": "This module is shopfloor-critical, scanner-first and must fail closed for unsafe or stale commands.",
+    "personas": [
+      "Operator",
+      "Line leader",
+      "Supervisor"
+    ],
+    "inputs": [
+      "Released dispatch/task",
+      "Traveler/BOM/routing",
+      "Work instructions",
+      "Tool/material verification",
+      "Barcode/serial scans"
+    ],
+    "outputs": [
+      "Execution events",
+      "Operation completion",
+      "Exceptions/holds",
+      "Production counts",
+      "Traceability records"
+    ],
+    "coreScreensNarrative": [
+      "Current task",
+      "Instruction panel",
+      "Scan/input area",
+      "Large action bar",
+      "Exception drawer",
+      "Completion summary"
+    ],
+    "policiesNarrative": "Freshness: machine-heartbeat Offline: limited_capture_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M16-operator-execution.current-task",
+      "title": "Current task",
+      "type": "operator-execution",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.instruction-panel",
+      "title": "Instruction panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.scan-input-area",
+      "title": "Scan/input area",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.large-action-bar",
+      "title": "Large action bar",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.exception-drawer",
+      "title": "Exception drawer",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    },
+    {
+      "screenId": "M16-operator-execution.completion-summary",
+      "title": "Completion summary",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "instruction",
+        "main",
+        "action-bar",
+        "footer"
+      ],
+      "blocks": [
+        "M16-operator-execution.header",
+        "M16-operator-execution.main",
+        "M16-operator-execution.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m16.operator.execution.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/operator/execution/{id}",
+      "permission": "operator.execute",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.start",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/start",
+      "permission": "operator.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "StartRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.pause",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/pause",
+      "permission": "operator.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "PauseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.hold",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/hold",
+      "permission": "operator.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "HoldRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.resume",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/resume",
+      "permission": "operator.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ResumeRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.record-count",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/record-count",
+      "permission": "operator.hold",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCountRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.complete",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/complete",
+      "permission": "operator.complete",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CompleteRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.command.report-issue",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/report-issue",
+      "permission": "operator.reportIssue",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ReportIssueRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m16.operator.execution.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/operator/execution/export",
+      "permission": "operator.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m16.operator.execution.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/operator/execution/query",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m16.operator.execution.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/operator/execution/{id}",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m16.operator.execution.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/operator/execution/lookup",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m16.operator.execution.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/operator/execution/metrics",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m16.operator.execution.list",
+      "method": "POST",
+      "path": "/mes/operator/execution/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "operatorTask summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.detail",
+      "method": "GET",
+      "path": "/mes/operator/execution/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "operatorTask detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.lookup",
+      "method": "POST",
+      "path": "/mes/operator/execution/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m16.operator.execution.metrics",
+      "method": "GET",
+      "path": "/mes/operator/execution/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.update",
+      "method": "PATCH",
+      "path": "/mes/operator/execution/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.execute",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.start",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/start",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.hold",
+      "auditEvent": "StartRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.pause",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/pause",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.hold",
+      "auditEvent": "PauseRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.hold",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/hold",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.hold",
+      "auditEvent": "HoldRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.resume",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/resume",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.hold",
+      "auditEvent": "ResumeRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.record-count",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/record-count",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.hold",
+      "auditEvent": "RecordCountRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.complete",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/complete",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.complete",
+      "auditEvent": "CompleteRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.command.report-issue",
+      "method": "POST",
+      "path": "/mes/operator/execution/{id}/actions/report-issue",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.reportIssue",
+      "auditEvent": "ReportIssueRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m16.operator.execution.export",
+      "method": "POST",
+      "path": "/mes/operator/execution/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "machine-heartbeat",
+      "permission": "operator.read",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

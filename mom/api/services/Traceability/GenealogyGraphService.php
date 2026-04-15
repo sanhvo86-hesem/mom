@@ -458,6 +458,7 @@ final class GenealogyGraphService
         if ($fieldPath === '') {
             throw new RuntimeException('genealogy_field_path_required');
         }
+        $requestedEffect = $this->genealogyRequestedEffect($fact);
         if (!method_exists($this->db, 'query')) {
             throw new RuntimeException('authoritative_genealogy_change_authority_store_required');
         }
@@ -488,11 +489,13 @@ final class GenealogyGraphService
                 ON from_ao.plm_change_order_id = co.plm_change_order_id
                AND lower(from_ao.object_type) = :from_type
                AND from_ao.object_id = :from_id
+               AND from_ao.requested_effect = :requested_effect
                AND from_ao.disposition = 'accepted'
              INNER JOIN plm_change_affected_objects to_ao
                 ON to_ao.plm_change_order_id = co.plm_change_order_id
                AND lower(to_ao.object_type) = :to_type
                AND to_ao.object_id = :to_id
+               AND to_ao.requested_effect = :requested_effect
                AND to_ao.disposition = 'accepted'
              INNER JOIN plm_change_resulting_objects ro
                 ON ro.plm_change_order_id = co.plm_change_order_id
@@ -524,6 +527,7 @@ final class GenealogyGraphService
                 ':to_id' => $toId,
                 ':edge_fact_id' => $edgeFactId,
                 ':field_path' => $fieldPath,
+                ':requested_effect' => $requestedEffect,
                 ':effective_at' => $this->nullableText($fact['effective_at'] ?? null),
             ],
         );
@@ -535,6 +539,18 @@ final class GenealogyGraphService
         }
 
         throw new RuntimeException('genealogy_change_authority_not_verified');
+    }
+
+    /**
+     * @param array<string, mixed> $fact
+     */
+    private function genealogyRequestedEffect(array $fact): string
+    {
+        $effect = strtolower($this->text($fact['requested_effect'] ?? $fact['change_effect'] ?? 'metadata_update'));
+        if (!in_array($effect, ['create', 'revise', 'release', 'supersede', 'withdraw', 'obsolete', 'replace', 'amend', 'deviation', 'metadata_update', 'training_update', 'publication_update'], true)) {
+            throw new RuntimeException('invalid_genealogy_requested_effect');
+        }
+        return $effect;
     }
 
     /**

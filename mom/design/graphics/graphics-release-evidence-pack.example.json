@@ -1,0 +1,11 @@
+{
+  "releaseId": "graphics-2026-04-14-001",
+  "graphicsAuthorityRefs": [
+    "mom-design-graphics/template-registry-authority.json",
+    "mom-design-graphics/module-graphics-compliance-matrix.json"
+  ],
+  "impactAnalysisRef": "mom-design-graphics/graphics-impact-analysis.schema.json",
+  "complianceMatrixRef": "mom-design-graphics/module-graphics-compliance-matrix.json",
+  "driftReportRef": "mom-design-graphics/graphics-drift-report.example.json",
+  "rollbackPlanRef": "Define rollback plan in MOM release manifest before production rollout."
+}

@@ -1,0 +1,12 @@
+{
+  "moduleId": "M29-document-control",
+  "route": "/eqms/document-control",
+  "templateId": "T-evidence-workspace-document-control",
+  "environment": "staging",
+  "sharedTokenCoverage": "partial",
+  "sharedComponentCoverage": "partial",
+  "privateCssDebt": "likely",
+  "zoneWhitelistEnforced": false,
+  "themeMappingResolved": false,
+  "timestamp": "2026-04-14T00:00:00Z"
+}

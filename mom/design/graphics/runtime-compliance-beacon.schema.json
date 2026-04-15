@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Runtime Compliance Beacon",
+  "type": "object",
+  "required": [
+    "moduleId",
+    "route",
+    "templateId",
+    "environment",
+    "sharedTokenCoverage",
+    "sharedComponentCoverage",
+    "zoneWhitelistEnforced",
+    "themeMappingResolved"
+  ],
+  "properties": {
+    "moduleId": {
+      "type": "string"
+    },
+    "route": {
+      "type": "string"
+    },
+    "templateId": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string"
+    },
+    "sharedTokenCoverage": {
+      "type": "string"
+    },
+    "sharedComponentCoverage": {
+      "type": "string"
+    },
+    "privateCssDebt": {
+      "type": "string"
+    },
+    "zoneWhitelistEnforced": {
+      "type": "boolean"
+    },
+    "themeMappingResolved": {
+      "type": "boolean"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

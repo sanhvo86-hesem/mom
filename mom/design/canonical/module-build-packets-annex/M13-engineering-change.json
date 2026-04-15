@@ -1,0 +1,657 @@
+{
+  "moduleProfile": {
+    "purpose": "Initiate, assess, approve and deploy engineering changes with full affected-object and effective-date control.",
+    "workflowNote": "Engineering changes require controlled review, signatures and traceability to affected objects.",
+    "personas": [
+      "Change originator",
+      "Engineering reviewer",
+      "Quality reviewer",
+      "Approver"
+    ],
+    "inputs": [
+      "Change request",
+      "Affected items/BOM/docs",
+      "Risk/impact assessment",
+      "Approval matrix",
+      "Implementation plan"
+    ],
+    "outputs": [
+      "Released ECO/ECN",
+      "Affected item effectivity",
+      "Task list",
+      "Audit-ready approval package"
+    ],
+    "coreScreensNarrative": [
+      "ECO queue",
+      "Change workspace",
+      "Impact matrix",
+      "Approval/signature panel",
+      "Implementation tasks",
+      "Audit package"
+    ],
+    "policiesNarrative": "Freshness: eqms-controlled-record Offline: forbidden Regulated: true"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M13-engineering-change.eco-queue",
+      "title": "ECO queue",
+      "type": "evidence-workspace",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.change-workspace",
+      "title": "Change workspace",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.impact-matrix",
+      "title": "Impact matrix",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.approval-signature-panel",
+      "title": "Approval/signature panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.implementation-tasks",
+      "title": "Implementation tasks",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    },
+    {
+      "screenId": "M13-engineering-change.audit-package",
+      "title": "Audit package",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M13-engineering-change.header",
+        "M13-engineering-change.main",
+        "M13-engineering-change.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m13.engineering.change.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/eqms/engineering-change",
+      "permission": "eco.create",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/eqms/engineering-change/{id}",
+      "permission": "eco.read",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.command.submit-assessment",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/submit-assessment",
+      "permission": "eco.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "SubmitAssessmentRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/approve",
+      "permission": "eco.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.command.implement",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/implement",
+      "permission": "eco.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ImplementRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.command.close",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/close",
+      "permission": "eco.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CloseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/cancel",
+      "permission": "eco.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m13.engineering.change.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/eqms/engineering-change/export",
+      "permission": "eco.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m13.engineering.change.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/eqms/engineering-change/query",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m13.engineering.change.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/engineering-change/{id}",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m13.engineering.change.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/eqms/engineering-change/lookup",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m13.engineering.change.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/eqms/engineering-change/metrics",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m13.engineering.change.list",
+      "method": "POST",
+      "path": "/eqms/engineering-change/query",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "engineeringChange summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.detail",
+      "method": "GET",
+      "path": "/eqms/engineering-change/{id}",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "engineeringChange detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.lookup",
+      "method": "POST",
+      "path": "/eqms/engineering-change/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m13.engineering.change.metrics",
+      "method": "GET",
+      "path": "/eqms/engineering-change/metrics",
+      "interactionType": "query",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.create",
+      "method": "POST",
+      "path": "/eqms/engineering-change",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "engineeringChange draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.update",
+      "method": "PATCH",
+      "path": "/eqms/engineering-change/{id}",
+      "interactionType": "command",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.command.submit-assessment",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/submit-assessment",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.approve",
+      "auditEvent": "SubmitAssessmentRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.command.approve",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.command.implement",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/implement",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.approve",
+      "auditEvent": "ImplementRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.command.close",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/close",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.approve",
+      "auditEvent": "CloseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.command.cancel",
+      "method": "POST",
+      "path": "/eqms/engineering-change/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.approve",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m13.engineering.change.export",
+      "method": "POST",
+      "path": "/eqms/engineering-change/export",
+      "interactionType": "export",
+      "ownerSystem": "eQMS",
+      "systemOfRecord": "eQMS",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "eqms-controlled-record",
+      "permission": "eco.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

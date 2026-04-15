@@ -34,6 +34,8 @@
     "GraphicsEnvironmentPolicyPack": { "$ref": "#/$defs/GraphicsEnvironmentPolicyPack" },
     "GraphicsEvidencePlan": { "$ref": "#/$defs/GraphicsEvidencePlan" },
     "GraphicsReleaseDashboard": { "$ref": "#/$defs/GraphicsReleaseDashboard" },
+    "GraphicsReleaseEvidencePack": { "$ref": "#/$defs/GraphicsReleaseEvidencePack" },
+    "graphicsReleaseEvidencePack": { "$ref": "#/$defs/GraphicsReleaseEvidencePack" },
     "multiSitePlantBrandingGovernance": {
       "type": "object",
       "additionalProperties": true
@@ -568,6 +570,45 @@
         "postApplyVerification": { "type": "object", "additionalProperties": true },
         "trendDashboard": { "type": "object", "additionalProperties": true },
         "emergencyOverridePath": { "type": "object", "additionalProperties": true },
+        "generatedAt": { "type": "string" }
+      }
+    },
+    "GraphicsReleaseEvidencePack": {
+      "type": "object",
+      "required": [
+        "evidencePackId",
+        "authority",
+        "status",
+        "changeSetRef",
+        "impactReportRef",
+        "complianceMatrixSnapshotRef",
+        "driftReportRef",
+        "runtimeLinkageProofRef",
+        "rolloutDecisionRef",
+        "rollbackPackageRef",
+        "waiverRefs",
+        "releaseBlockersStatus",
+        "requiredArtifacts",
+        "generatedAt"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "evidencePackId": { "type": "string" },
+        "authority": { "type": "string" },
+        "status": { "enum": ["draft", "ready", "blocked", "superseded", "waived"] },
+        "changeSetRef": { "type": "string" },
+        "impactReportRef": { "type": "string" },
+        "complianceMatrixSnapshotRef": { "type": "string" },
+        "driftReportRef": { "type": "string" },
+        "runtimeLinkageProofRef": { "type": "string" },
+        "debtObservatoryRef": { "type": "string" },
+        "environmentPolicyPacksRef": { "type": "string" },
+        "rolloutDecisionRef": { "type": "string" },
+        "rollbackPackageRef": { "type": "string" },
+        "waiverRefs": { "type": "array", "items": { "type": "string" } },
+        "releaseBlockersStatus": { "enum": ["clear", "blocked", "waived"] },
+        "releaseBlockers": { "type": "array", "items": { "$ref": "#/$defs/GraphicsReleaseBlocker" } },
+        "requiredArtifacts": { "type": "array", "items": { "type": "string" } },
         "generatedAt": { "type": "string" }
       }
     },

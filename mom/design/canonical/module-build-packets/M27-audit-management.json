@@ -1,0 +1,260 @@
+{
+  "moduleId": "M27-audit-management",
+  "moduleName": "Quản lý đánh giá",
+  "route": "/eqms/audits",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "Audit Program Manager",
+  "primaryEntity": "auditProgram",
+  "contractRefs": [
+    "mom/contracts/objects/auditProgram/contract.json",
+    "mom/design/module-api-catalog/M27-audit-management.json"
+  ],
+  "templateId": "T-approval-queue-audit",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M27-audit-management.audit-calendar",
+      "screenName": "Audit calendar",
+      "type": "approval-queue",
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.audit-execution",
+      "screenName": "Audit execution",
+      "type": "supporting-screen",
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.finding-register",
+      "screenName": "Finding register",
+      "type": "supporting-screen",
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.report-review",
+      "screenName": "Report review",
+      "type": "supporting-screen",
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    },
+    {
+      "screenId": "M27-audit-management.closure-dashboard",
+      "screenName": "Closure dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M27-audit-management.header",
+        "M27-audit-management.main",
+        "M27-audit-management.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M27-audit-management.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M27-audit-management.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M27-audit-management.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M27-audit-management.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M27-audit-management.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m27.audit.management.list",
+    "m27.audit.management.detail",
+    "m27.audit.management.lookup",
+    "m27.audit.management.metrics",
+    "m27.audit.management.update",
+    "m27.audit.management.command.schedule",
+    "m27.audit.management.command.start",
+    "m27.audit.management.command.record-finding",
+    "m27.audit.management.command.issue-report",
+    "m27.audit.management.command.close-finding",
+    "m27.audit.management.command.close-audit",
+    "m27.audit.management.export"
+  ],
+  "workflow": {
+    "states": [
+      "planned",
+      "in_execution",
+      "report_pending",
+      "issued",
+      "followup_open",
+      "closed"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "planned -> in_execution"
+      },
+      {
+        "action": "issueReport",
+        "transition": "in_execution -> issued"
+      },
+      {
+        "action": "followup",
+        "transition": "issued -> followup_open"
+      },
+      {
+        "action": "closeAudit",
+        "transition": "followup_open -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "audit.read",
+      "audit.schedule",
+      "audit.execute",
+      "audit.issue",
+      "audit.close",
+      "audit.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "ScheduleRequested",
+      "StartRequested",
+      "RecordFindingRequested",
+      "IssueReportRequested",
+      "CloseFindingRequested",
+      "CloseAuditRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M27-audit-management/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "auditProgram",
+      "auditProgram",
+      "auditExecution",
+      "auditFinding"
+    ]
+  },
+  "moduleArchetype": "approval-queue",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

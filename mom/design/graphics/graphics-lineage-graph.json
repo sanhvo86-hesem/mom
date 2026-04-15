@@ -1,0 +1,4468 @@
+{
+  "version": "2026.04.14-current-mom-worldclass",
+  "graphPurpose": "Trace graphics/runtime authority from templates to modules and bound endpoint aliases.",
+  "nodes": [
+    {
+      "id": "M01-customer-master",
+      "type": "module",
+      "label": "Khách hàng"
+    },
+    {
+      "id": "T-object-page-commercial-master",
+      "type": "template",
+      "label": "T-object-page-commercial-master"
+    },
+    {
+      "id": "m01.customer.master.list",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.list"
+    },
+    {
+      "id": "m01.customer.master.detail",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.detail"
+    },
+    {
+      "id": "m01.customer.master.lookup",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.lookup"
+    },
+    {
+      "id": "m01.customer.master.metrics",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.metrics"
+    },
+    {
+      "id": "m01.customer.master.create",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.create"
+    },
+    {
+      "id": "m01.customer.master.update",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.update"
+    },
+    {
+      "id": "m01.customer.master.command.update",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.command.update"
+    },
+    {
+      "id": "m01.customer.master.command.activate",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.command.activate"
+    },
+    {
+      "id": "m01.customer.master.command.hold",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.command.hold"
+    },
+    {
+      "id": "m01.customer.master.command.deactivate",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.command.deactivate"
+    },
+    {
+      "id": "m01.customer.master.command.link-approved-part",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.command.link-approved-part"
+    },
+    {
+      "id": "m01.customer.master.export",
+      "type": "endpointAlias",
+      "label": "m01.customer.master.export"
+    },
+    {
+      "id": "M02-sales-quotations",
+      "type": "module",
+      "label": "Báo giá bán hàng"
+    },
+    {
+      "id": "T-transactional-form-commercial-quote",
+      "type": "template",
+      "label": "T-transactional-form-commercial-quote"
+    },
+    {
+      "id": "m02.sales.quotations.list",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.list"
+    },
+    {
+      "id": "m02.sales.quotations.detail",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.detail"
+    },
+    {
+      "id": "m02.sales.quotations.lookup",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.lookup"
+    },
+    {
+      "id": "m02.sales.quotations.metrics",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.metrics"
+    },
+    {
+      "id": "m02.sales.quotations.create",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.create"
+    },
+    {
+      "id": "m02.sales.quotations.update",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.update"
+    },
+    {
+      "id": "m02.sales.quotations.command.price",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.price"
+    },
+    {
+      "id": "m02.sales.quotations.command.submit-approval",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.submit-approval"
+    },
+    {
+      "id": "m02.sales.quotations.command.approve",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.approve"
+    },
+    {
+      "id": "m02.sales.quotations.command.release",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.release"
+    },
+    {
+      "id": "m02.sales.quotations.command.expire",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.expire"
+    },
+    {
+      "id": "m02.sales.quotations.command.cancel",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.cancel"
+    },
+    {
+      "id": "m02.sales.quotations.command.convert-to-order",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.command.convert-to-order"
+    },
+    {
+      "id": "m02.sales.quotations.export",
+      "type": "endpointAlias",
+      "label": "m02.sales.quotations.export"
+    },
+    {
+      "id": "M03-sales-orders",
+      "type": "module",
+      "label": "Đơn bán hàng"
+    },
+    {
+      "id": "T-object-page-commercial-order",
+      "type": "template",
+      "label": "T-object-page-commercial-order"
+    },
+    {
+      "id": "m03.sales.orders.list",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.list"
+    },
+    {
+      "id": "m03.sales.orders.detail",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.detail"
+    },
+    {
+      "id": "m03.sales.orders.lookup",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.lookup"
+    },
+    {
+      "id": "m03.sales.orders.metrics",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.metrics"
+    },
+    {
+      "id": "m03.sales.orders.create",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.create"
+    },
+    {
+      "id": "m03.sales.orders.update",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.update"
+    },
+    {
+      "id": "m03.sales.orders.command.validate",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.validate"
+    },
+    {
+      "id": "m03.sales.orders.command.release",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.release"
+    },
+    {
+      "id": "m03.sales.orders.command.hold",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.hold"
+    },
+    {
+      "id": "m03.sales.orders.command.change-request",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.change-request"
+    },
+    {
+      "id": "m03.sales.orders.command.cancel",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.cancel"
+    },
+    {
+      "id": "m03.sales.orders.command.allocate",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.allocate"
+    },
+    {
+      "id": "m03.sales.orders.command.acknowledge",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.command.acknowledge"
+    },
+    {
+      "id": "m03.sales.orders.export",
+      "type": "endpointAlias",
+      "label": "m03.sales.orders.export"
+    },
+    {
+      "id": "M04-customer-complaints",
+      "type": "module",
+      "label": "Khiếu nại khách hàng"
+    },
+    {
+      "id": "T-exception-hub-complaint",
+      "type": "template",
+      "label": "T-exception-hub-complaint"
+    },
+    {
+      "id": "m04.customer.complaints.list",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.list"
+    },
+    {
+      "id": "m04.customer.complaints.detail",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.detail"
+    },
+    {
+      "id": "m04.customer.complaints.lookup",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.lookup"
+    },
+    {
+      "id": "m04.customer.complaints.metrics",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.metrics"
+    },
+    {
+      "id": "m04.customer.complaints.create",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.create"
+    },
+    {
+      "id": "m04.customer.complaints.update",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.update"
+    },
+    {
+      "id": "m04.customer.complaints.command.intake",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.intake"
+    },
+    {
+      "id": "m04.customer.complaints.command.triage",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.triage"
+    },
+    {
+      "id": "m04.customer.complaints.command.assign",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.assign"
+    },
+    {
+      "id": "m04.customer.complaints.command.record-containment",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.record-containment"
+    },
+    {
+      "id": "m04.customer.complaints.command.link-capa",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.link-capa"
+    },
+    {
+      "id": "m04.customer.complaints.command.issue-response",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.issue-response"
+    },
+    {
+      "id": "m04.customer.complaints.command.close",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.close"
+    },
+    {
+      "id": "m04.customer.complaints.command.void",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.command.void"
+    },
+    {
+      "id": "m04.customer.complaints.export",
+      "type": "endpointAlias",
+      "label": "m04.customer.complaints.export"
+    },
+    {
+      "id": "M05-supplier-master",
+      "type": "module",
+      "label": "Nhà cung cấp"
+    },
+    {
+      "id": "T-object-page-supplier-master",
+      "type": "template",
+      "label": "T-object-page-supplier-master"
+    },
+    {
+      "id": "m05.supplier.master.list",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.list"
+    },
+    {
+      "id": "m05.supplier.master.detail",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.detail"
+    },
+    {
+      "id": "m05.supplier.master.lookup",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.lookup"
+    },
+    {
+      "id": "m05.supplier.master.metrics",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.metrics"
+    },
+    {
+      "id": "m05.supplier.master.create",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.create"
+    },
+    {
+      "id": "m05.supplier.master.update",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.update"
+    },
+    {
+      "id": "m05.supplier.master.command.qualify",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.command.qualify"
+    },
+    {
+      "id": "m05.supplier.master.command.approve",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.command.approve"
+    },
+    {
+      "id": "m05.supplier.master.command.hold",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.command.hold"
+    },
+    {
+      "id": "m05.supplier.master.command.deactivate",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.command.deactivate"
+    },
+    {
+      "id": "m05.supplier.master.command.link-commodity",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.command.link-commodity"
+    },
+    {
+      "id": "m05.supplier.master.export",
+      "type": "endpointAlias",
+      "label": "m05.supplier.master.export"
+    },
+    {
+      "id": "M06-purchase-requisitions",
+      "type": "module",
+      "label": "Yêu cầu mua hàng"
+    },
+    {
+      "id": "T-transactional-form-procurement-pr",
+      "type": "template",
+      "label": "T-transactional-form-procurement-pr"
+    },
+    {
+      "id": "m06.purchase.requisitions.list",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.list"
+    },
+    {
+      "id": "m06.purchase.requisitions.detail",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.detail"
+    },
+    {
+      "id": "m06.purchase.requisitions.lookup",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.lookup"
+    },
+    {
+      "id": "m06.purchase.requisitions.metrics",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.metrics"
+    },
+    {
+      "id": "m06.purchase.requisitions.create",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.create"
+    },
+    {
+      "id": "m06.purchase.requisitions.update",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.update"
+    },
+    {
+      "id": "m06.purchase.requisitions.command.submit",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.command.submit"
+    },
+    {
+      "id": "m06.purchase.requisitions.command.approve",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.command.approve"
+    },
+    {
+      "id": "m06.purchase.requisitions.command.reject",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.command.reject"
+    },
+    {
+      "id": "m06.purchase.requisitions.command.cancel",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.command.cancel"
+    },
+    {
+      "id": "m06.purchase.requisitions.command.convert-to-po",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.command.convert-to-po"
+    },
+    {
+      "id": "m06.purchase.requisitions.export",
+      "type": "endpointAlias",
+      "label": "m06.purchase.requisitions.export"
+    },
+    {
+      "id": "M07-purchase-orders",
+      "type": "module",
+      "label": "Đơn mua hàng"
+    },
+    {
+      "id": "T-object-page-procurement-po",
+      "type": "template",
+      "label": "T-object-page-procurement-po"
+    },
+    {
+      "id": "m07.purchase.orders.list",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.list"
+    },
+    {
+      "id": "m07.purchase.orders.detail",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.detail"
+    },
+    {
+      "id": "m07.purchase.orders.lookup",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.lookup"
+    },
+    {
+      "id": "m07.purchase.orders.metrics",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.metrics"
+    },
+    {
+      "id": "m07.purchase.orders.create",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.create"
+    },
+    {
+      "id": "m07.purchase.orders.update",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.update"
+    },
+    {
+      "id": "m07.purchase.orders.command.submit-approval",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.submit-approval"
+    },
+    {
+      "id": "m07.purchase.orders.command.approve",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.approve"
+    },
+    {
+      "id": "m07.purchase.orders.command.release",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.release"
+    },
+    {
+      "id": "m07.purchase.orders.command.record-ack",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.record-ack"
+    },
+    {
+      "id": "m07.purchase.orders.command.revise",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.revise"
+    },
+    {
+      "id": "m07.purchase.orders.command.cancel",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.cancel"
+    },
+    {
+      "id": "m07.purchase.orders.command.close",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.command.close"
+    },
+    {
+      "id": "m07.purchase.orders.export",
+      "type": "endpointAlias",
+      "label": "m07.purchase.orders.export"
+    },
+    {
+      "id": "M08-receiving-putaway",
+      "type": "module",
+      "label": "Nhận hàng và cất kho"
+    },
+    {
+      "id": "T-operator-execution-receiving",
+      "type": "template",
+      "label": "T-operator-execution-receiving"
+    },
+    {
+      "id": "m08.receiving.putaway.list",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.list"
+    },
+    {
+      "id": "m08.receiving.putaway.detail",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.detail"
+    },
+    {
+      "id": "m08.receiving.putaway.lookup",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.lookup"
+    },
+    {
+      "id": "m08.receiving.putaway.metrics",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.metrics"
+    },
+    {
+      "id": "m08.receiving.putaway.update",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.update"
+    },
+    {
+      "id": "m08.receiving.putaway.command.start",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.start"
+    },
+    {
+      "id": "m08.receiving.putaway.command.scan",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.scan"
+    },
+    {
+      "id": "m08.receiving.putaway.command.match",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.match"
+    },
+    {
+      "id": "m08.receiving.putaway.command.record-discrepancy",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.record-discrepancy"
+    },
+    {
+      "id": "m08.receiving.putaway.command.route-to-iqc",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.route-to-iqc"
+    },
+    {
+      "id": "m08.receiving.putaway.command.confirm-putaway",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.confirm-putaway"
+    },
+    {
+      "id": "m08.receiving.putaway.command.complete",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.command.complete"
+    },
+    {
+      "id": "m08.receiving.putaway.export",
+      "type": "endpointAlias",
+      "label": "m08.receiving.putaway.export"
+    },
+    {
+      "id": "M09-inventory-control",
+      "type": "module",
+      "label": "Tồn kho"
+    },
+    {
+      "id": "T-analytical-list-inventory",
+      "type": "template",
+      "label": "T-analytical-list-inventory"
+    },
+    {
+      "id": "m09.inventory.control.list",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.list"
+    },
+    {
+      "id": "m09.inventory.control.detail",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.detail"
+    },
+    {
+      "id": "m09.inventory.control.lookup",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.lookup"
+    },
+    {
+      "id": "m09.inventory.control.metrics",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.metrics"
+    },
+    {
+      "id": "m09.inventory.control.update",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.update"
+    },
+    {
+      "id": "m09.inventory.control.command.adjust",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.command.adjust"
+    },
+    {
+      "id": "m09.inventory.control.command.reserve",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.command.reserve"
+    },
+    {
+      "id": "m09.inventory.control.command.release-reservation",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.command.release-reservation"
+    },
+    {
+      "id": "m09.inventory.control.export",
+      "type": "endpointAlias",
+      "label": "m09.inventory.control.export"
+    },
+    {
+      "id": "M10-shipping-fulfillment",
+      "type": "module",
+      "label": "Soạn hàng đóng gói giao hàng"
+    },
+    {
+      "id": "T-operator-execution-shipping",
+      "type": "template",
+      "label": "T-operator-execution-shipping"
+    },
+    {
+      "id": "m10.shipping.fulfillment.list",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.list"
+    },
+    {
+      "id": "m10.shipping.fulfillment.detail",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.detail"
+    },
+    {
+      "id": "m10.shipping.fulfillment.lookup",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.lookup"
+    },
+    {
+      "id": "m10.shipping.fulfillment.metrics",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.metrics"
+    },
+    {
+      "id": "m10.shipping.fulfillment.update",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.update"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.start-pick",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.start-pick"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.scan-pick",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.scan-pick"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.pack",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.pack"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.print-docs",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.print-docs"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.confirm-ship",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.confirm-ship"
+    },
+    {
+      "id": "m10.shipping.fulfillment.command.record-exception",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.command.record-exception"
+    },
+    {
+      "id": "m10.shipping.fulfillment.export",
+      "type": "endpointAlias",
+      "label": "m10.shipping.fulfillment.export"
+    },
+    {
+      "id": "M11-item-part-master",
+      "type": "module",
+      "label": "Mã vật tư và chi tiết"
+    },
+    {
+      "id": "T-object-page-item-master",
+      "type": "template",
+      "label": "T-object-page-item-master"
+    },
+    {
+      "id": "m11.item.part.master.list",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.list"
+    },
+    {
+      "id": "m11.item.part.master.detail",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.detail"
+    },
+    {
+      "id": "m11.item.part.master.lookup",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.lookup"
+    },
+    {
+      "id": "m11.item.part.master.metrics",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.metrics"
+    },
+    {
+      "id": "m11.item.part.master.create",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.create"
+    },
+    {
+      "id": "m11.item.part.master.update",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.update"
+    },
+    {
+      "id": "m11.item.part.master.command.approve",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.command.approve"
+    },
+    {
+      "id": "m11.item.part.master.command.effectivity",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.command.effectivity"
+    },
+    {
+      "id": "m11.item.part.master.command.obsolete",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.command.obsolete"
+    },
+    {
+      "id": "m11.item.part.master.export",
+      "type": "endpointAlias",
+      "label": "m11.item.part.master.export"
+    },
+    {
+      "id": "M12-bom-routing",
+      "type": "module",
+      "label": "Cấu trúc sản phẩm và quy trình"
+    },
+    {
+      "id": "T-object-page-engineering-structure",
+      "type": "template",
+      "label": "T-object-page-engineering-structure"
+    },
+    {
+      "id": "m12.bom.routing.list",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.list"
+    },
+    {
+      "id": "m12.bom.routing.detail",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.detail"
+    },
+    {
+      "id": "m12.bom.routing.lookup",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.lookup"
+    },
+    {
+      "id": "m12.bom.routing.metrics",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.metrics"
+    },
+    {
+      "id": "m12.bom.routing.create",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.create"
+    },
+    {
+      "id": "m12.bom.routing.update",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.update"
+    },
+    {
+      "id": "m12.bom.routing.command.submit-review",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.command.submit-review"
+    },
+    {
+      "id": "m12.bom.routing.command.release",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.command.release"
+    },
+    {
+      "id": "m12.bom.routing.command.supersede",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.command.supersede"
+    },
+    {
+      "id": "m12.bom.routing.command.obsolete",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.command.obsolete"
+    },
+    {
+      "id": "m12.bom.routing.export",
+      "type": "endpointAlias",
+      "label": "m12.bom.routing.export"
+    },
+    {
+      "id": "M13-engineering-change",
+      "type": "module",
+      "label": "Thay đổi kỹ thuật"
+    },
+    {
+      "id": "T-evidence-workspace-eco",
+      "type": "template",
+      "label": "T-evidence-workspace-eco"
+    },
+    {
+      "id": "m13.engineering.change.list",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.list"
+    },
+    {
+      "id": "m13.engineering.change.detail",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.detail"
+    },
+    {
+      "id": "m13.engineering.change.lookup",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.lookup"
+    },
+    {
+      "id": "m13.engineering.change.metrics",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.metrics"
+    },
+    {
+      "id": "m13.engineering.change.create",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.create"
+    },
+    {
+      "id": "m13.engineering.change.update",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.update"
+    },
+    {
+      "id": "m13.engineering.change.command.submit-assessment",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.command.submit-assessment"
+    },
+    {
+      "id": "m13.engineering.change.command.approve",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.command.approve"
+    },
+    {
+      "id": "m13.engineering.change.command.implement",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.command.implement"
+    },
+    {
+      "id": "m13.engineering.change.command.close",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.command.close"
+    },
+    {
+      "id": "m13.engineering.change.command.cancel",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.command.cancel"
+    },
+    {
+      "id": "m13.engineering.change.export",
+      "type": "endpointAlias",
+      "label": "m13.engineering.change.export"
+    },
+    {
+      "id": "M14-work-order-management",
+      "type": "module",
+      "label": "Lệnh sản xuất"
+    },
+    {
+      "id": "T-object-page-work-order",
+      "type": "template",
+      "label": "T-object-page-work-order"
+    },
+    {
+      "id": "m14.work.order.management.list",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.list"
+    },
+    {
+      "id": "m14.work.order.management.detail",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.detail"
+    },
+    {
+      "id": "m14.work.order.management.lookup",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.lookup"
+    },
+    {
+      "id": "m14.work.order.management.metrics",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.metrics"
+    },
+    {
+      "id": "m14.work.order.management.create",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.create"
+    },
+    {
+      "id": "m14.work.order.management.update",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.update"
+    },
+    {
+      "id": "m14.work.order.management.command.release",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.release"
+    },
+    {
+      "id": "m14.work.order.management.command.hold",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.hold"
+    },
+    {
+      "id": "m14.work.order.management.command.resume",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.resume"
+    },
+    {
+      "id": "m14.work.order.management.command.complete",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.complete"
+    },
+    {
+      "id": "m14.work.order.management.command.close",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.close"
+    },
+    {
+      "id": "m14.work.order.management.command.cancel",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.command.cancel"
+    },
+    {
+      "id": "m14.work.order.management.export",
+      "type": "endpointAlias",
+      "label": "m14.work.order.management.export"
+    },
+    {
+      "id": "M15-finite-scheduling-dispatch",
+      "type": "module",
+      "label": "Lập lịch hữu hạn và điều độ"
+    },
+    {
+      "id": "T-planning-board-dispatch",
+      "type": "template",
+      "label": "T-planning-board-dispatch"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.list",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.list"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.detail",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.detail"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.lookup",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.lookup"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.metrics",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.metrics"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.update",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.update"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.command.generate",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.command.generate"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.command.simulate",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.command.simulate"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.command.resolve-conflict",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.command.resolve-conflict"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.command.publish",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.command.publish"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.command.supersede",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.command.supersede"
+    },
+    {
+      "id": "m15.finite.scheduling.dispatch.export",
+      "type": "endpointAlias",
+      "label": "m15.finite.scheduling.dispatch.export"
+    },
+    {
+      "id": "M16-operator-execution",
+      "type": "module",
+      "label": "Thực thi công việc tại trạm"
+    },
+    {
+      "id": "T-operator-execution-shopfloor",
+      "type": "template",
+      "label": "T-operator-execution-shopfloor"
+    },
+    {
+      "id": "m16.operator.execution.list",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.list"
+    },
+    {
+      "id": "m16.operator.execution.detail",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.detail"
+    },
+    {
+      "id": "m16.operator.execution.lookup",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.lookup"
+    },
+    {
+      "id": "m16.operator.execution.metrics",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.metrics"
+    },
+    {
+      "id": "m16.operator.execution.update",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.update"
+    },
+    {
+      "id": "m16.operator.execution.command.start",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.start"
+    },
+    {
+      "id": "m16.operator.execution.command.pause",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.pause"
+    },
+    {
+      "id": "m16.operator.execution.command.hold",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.hold"
+    },
+    {
+      "id": "m16.operator.execution.command.resume",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.resume"
+    },
+    {
+      "id": "m16.operator.execution.command.record-count",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.record-count"
+    },
+    {
+      "id": "m16.operator.execution.command.complete",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.complete"
+    },
+    {
+      "id": "m16.operator.execution.command.report-issue",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.command.report-issue"
+    },
+    {
+      "id": "m16.operator.execution.export",
+      "type": "endpointAlias",
+      "label": "m16.operator.execution.export"
+    },
+    {
+      "id": "M17-machine-monitoring-andon",
+      "type": "module",
+      "label": "Giám sát máy và Andon"
+    },
+    {
+      "id": "T-shopfloor-board-machine-status",
+      "type": "template",
+      "label": "T-shopfloor-board-machine-status"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.list",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.list"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.detail",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.detail"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.lookup",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.lookup"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.metrics",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.metrics"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.update",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.update"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.command.acknowledge-alarm",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.command.acknowledge-alarm"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.command.shelve-alarm",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.command.shelve-alarm"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.command.assign-response",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.command.assign-response"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.command.open-detail",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.command.open-detail"
+    },
+    {
+      "id": "m17.machine.monitoring.andon.export",
+      "type": "endpointAlias",
+      "label": "m17.machine.monitoring.andon.export"
+    },
+    {
+      "id": "M18-oee-downtime",
+      "type": "module",
+      "label": "OEE và dừng máy"
+    },
+    {
+      "id": "T-analytical-list-oee",
+      "type": "template",
+      "label": "T-analytical-list-oee"
+    },
+    {
+      "id": "m18.oee.downtime.list",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.list"
+    },
+    {
+      "id": "m18.oee.downtime.detail",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.detail"
+    },
+    {
+      "id": "m18.oee.downtime.lookup",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.lookup"
+    },
+    {
+      "id": "m18.oee.downtime.metrics",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.metrics"
+    },
+    {
+      "id": "m18.oee.downtime.update",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.update"
+    },
+    {
+      "id": "m18.oee.downtime.command.reclassify-downtime",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.command.reclassify-downtime"
+    },
+    {
+      "id": "m18.oee.downtime.command.approve-adjustment",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.command.approve-adjustment"
+    },
+    {
+      "id": "m18.oee.downtime.export",
+      "type": "endpointAlias",
+      "label": "m18.oee.downtime.export"
+    },
+    {
+      "id": "M19-tool-management",
+      "type": "module",
+      "label": "Quản lý dao cụ"
+    },
+    {
+      "id": "T-object-page-tooling",
+      "type": "template",
+      "label": "T-object-page-tooling"
+    },
+    {
+      "id": "m19.tool.management.list",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.list"
+    },
+    {
+      "id": "m19.tool.management.detail",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.detail"
+    },
+    {
+      "id": "m19.tool.management.lookup",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.lookup"
+    },
+    {
+      "id": "m19.tool.management.metrics",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.metrics"
+    },
+    {
+      "id": "m19.tool.management.update",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.update"
+    },
+    {
+      "id": "m19.tool.management.command.issue",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.issue"
+    },
+    {
+      "id": "m19.tool.management.command.return",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.return"
+    },
+    {
+      "id": "m19.tool.management.command.record-usage",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.record-usage"
+    },
+    {
+      "id": "m19.tool.management.command.replace",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.replace"
+    },
+    {
+      "id": "m19.tool.management.command.quarantine",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.quarantine"
+    },
+    {
+      "id": "m19.tool.management.command.retire",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.command.retire"
+    },
+    {
+      "id": "m19.tool.management.export",
+      "type": "endpointAlias",
+      "label": "m19.tool.management.export"
+    },
+    {
+      "id": "M20-preventive-maintenance",
+      "type": "module",
+      "label": "Bảo trì phòng ngừa"
+    },
+    {
+      "id": "T-approval-queue-maintenance",
+      "type": "template",
+      "label": "T-approval-queue-maintenance"
+    },
+    {
+      "id": "m20.preventive.maintenance.list",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.list"
+    },
+    {
+      "id": "m20.preventive.maintenance.detail",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.detail"
+    },
+    {
+      "id": "m20.preventive.maintenance.lookup",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.lookup"
+    },
+    {
+      "id": "m20.preventive.maintenance.metrics",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.metrics"
+    },
+    {
+      "id": "m20.preventive.maintenance.update",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.update"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.generate-wo",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.generate-wo"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.release",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.release"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.start",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.start"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.record-checklist",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.record-checklist"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.close",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.close"
+    },
+    {
+      "id": "m20.preventive.maintenance.command.defer",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.command.defer"
+    },
+    {
+      "id": "m20.preventive.maintenance.export",
+      "type": "endpointAlias",
+      "label": "m20.preventive.maintenance.export"
+    },
+    {
+      "id": "M21-calibration-management",
+      "type": "module",
+      "label": "Hiệu chuẩn"
+    },
+    {
+      "id": "T-evidence-workspace-calibration",
+      "type": "template",
+      "label": "T-evidence-workspace-calibration"
+    },
+    {
+      "id": "m21.calibration.management.list",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.list"
+    },
+    {
+      "id": "m21.calibration.management.detail",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.detail"
+    },
+    {
+      "id": "m21.calibration.management.lookup",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.lookup"
+    },
+    {
+      "id": "m21.calibration.management.metrics",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.metrics"
+    },
+    {
+      "id": "m21.calibration.management.update",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.update"
+    },
+    {
+      "id": "m21.calibration.management.command.start",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.start"
+    },
+    {
+      "id": "m21.calibration.management.command.record-result",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.record-result"
+    },
+    {
+      "id": "m21.calibration.management.command.submit-review",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.submit-review"
+    },
+    {
+      "id": "m21.calibration.management.command.approve",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.approve"
+    },
+    {
+      "id": "m21.calibration.management.command.declare-oot",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.declare-oot"
+    },
+    {
+      "id": "m21.calibration.management.command.close",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.command.close"
+    },
+    {
+      "id": "m21.calibration.management.export",
+      "type": "endpointAlias",
+      "label": "m21.calibration.management.export"
+    },
+    {
+      "id": "M22-receiving-iqc",
+      "type": "module",
+      "label": "Kiểm tra đầu vào"
+    },
+    {
+      "id": "T-transactional-form-iqc",
+      "type": "template",
+      "label": "T-transactional-form-iqc"
+    },
+    {
+      "id": "m22.receiving.iqc.list",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.list"
+    },
+    {
+      "id": "m22.receiving.iqc.detail",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.detail"
+    },
+    {
+      "id": "m22.receiving.iqc.lookup",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.lookup"
+    },
+    {
+      "id": "m22.receiving.iqc.metrics",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.metrics"
+    },
+    {
+      "id": "m22.receiving.iqc.update",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.update"
+    },
+    {
+      "id": "m22.receiving.iqc.command.start",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.start"
+    },
+    {
+      "id": "m22.receiving.iqc.command.record-result",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.record-result"
+    },
+    {
+      "id": "m22.receiving.iqc.command.submit-review",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.submit-review"
+    },
+    {
+      "id": "m22.receiving.iqc.command.accept",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.accept"
+    },
+    {
+      "id": "m22.receiving.iqc.command.reject",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.reject"
+    },
+    {
+      "id": "m22.receiving.iqc.command.hold",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.hold"
+    },
+    {
+      "id": "m22.receiving.iqc.command.void",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.command.void"
+    },
+    {
+      "id": "m22.receiving.iqc.export",
+      "type": "endpointAlias",
+      "label": "m22.receiving.iqc.export"
+    },
+    {
+      "id": "M23-inprocess-inspection",
+      "type": "module",
+      "label": "Kiểm tra trong quá trình"
+    },
+    {
+      "id": "T-operator-execution-inprocess-quality",
+      "type": "template",
+      "label": "T-operator-execution-inprocess-quality"
+    },
+    {
+      "id": "m23.inprocess.inspection.list",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.list"
+    },
+    {
+      "id": "m23.inprocess.inspection.detail",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.detail"
+    },
+    {
+      "id": "m23.inprocess.inspection.lookup",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.lookup"
+    },
+    {
+      "id": "m23.inprocess.inspection.metrics",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.metrics"
+    },
+    {
+      "id": "m23.inprocess.inspection.update",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.update"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.start",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.start"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.record-value",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.record-value"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.flag-nonconformance",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.flag-nonconformance"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.submit-review",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.submit-review"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.accept",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.accept"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.reject",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.reject"
+    },
+    {
+      "id": "m23.inprocess.inspection.command.hold",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.command.hold"
+    },
+    {
+      "id": "m23.inprocess.inspection.export",
+      "type": "endpointAlias",
+      "label": "m23.inprocess.inspection.export"
+    },
+    {
+      "id": "M24-spc-quality-analytics",
+      "type": "module",
+      "label": "SPC và phân tích chất lượng"
+    },
+    {
+      "id": "T-analytical-list-spc",
+      "type": "template",
+      "label": "T-analytical-list-spc"
+    },
+    {
+      "id": "m24.spc.quality.analytics.list",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.list"
+    },
+    {
+      "id": "m24.spc.quality.analytics.detail",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.detail"
+    },
+    {
+      "id": "m24.spc.quality.analytics.lookup",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.lookup"
+    },
+    {
+      "id": "m24.spc.quality.analytics.metrics",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.metrics"
+    },
+    {
+      "id": "m24.spc.quality.analytics.update",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.update"
+    },
+    {
+      "id": "m24.spc.quality.analytics.command.recalculate-limits",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.command.recalculate-limits"
+    },
+    {
+      "id": "m24.spc.quality.analytics.command.acknowledge-violation",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.command.acknowledge-violation"
+    },
+    {
+      "id": "m24.spc.quality.analytics.export",
+      "type": "endpointAlias",
+      "label": "m24.spc.quality.analytics.export"
+    },
+    {
+      "id": "M25-ncr-mrb",
+      "type": "module",
+      "label": "NCR và xử lý bất phù hợp"
+    },
+    {
+      "id": "T-exception-hub-ncr",
+      "type": "template",
+      "label": "T-exception-hub-ncr"
+    },
+    {
+      "id": "m25.ncr.mrb.list",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.list"
+    },
+    {
+      "id": "m25.ncr.mrb.detail",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.detail"
+    },
+    {
+      "id": "m25.ncr.mrb.lookup",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.lookup"
+    },
+    {
+      "id": "m25.ncr.mrb.metrics",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.metrics"
+    },
+    {
+      "id": "m25.ncr.mrb.create",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.create"
+    },
+    {
+      "id": "m25.ncr.mrb.update",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.update"
+    },
+    {
+      "id": "m25.ncr.mrb.command.contain",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.contain"
+    },
+    {
+      "id": "m25.ncr.mrb.command.investigate",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.investigate"
+    },
+    {
+      "id": "m25.ncr.mrb.command.submit-mrb",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.submit-mrb"
+    },
+    {
+      "id": "m25.ncr.mrb.command.record-disposition",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.record-disposition"
+    },
+    {
+      "id": "m25.ncr.mrb.command.close",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.close"
+    },
+    {
+      "id": "m25.ncr.mrb.command.void",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.command.void"
+    },
+    {
+      "id": "m25.ncr.mrb.export",
+      "type": "endpointAlias",
+      "label": "m25.ncr.mrb.export"
+    },
+    {
+      "id": "M26-capa",
+      "type": "module",
+      "label": "Hành động khắc phục phòng ngừa"
+    },
+    {
+      "id": "T-evidence-workspace-capa",
+      "type": "template",
+      "label": "T-evidence-workspace-capa"
+    },
+    {
+      "id": "m26.capa.list",
+      "type": "endpointAlias",
+      "label": "m26.capa.list"
+    },
+    {
+      "id": "m26.capa.detail",
+      "type": "endpointAlias",
+      "label": "m26.capa.detail"
+    },
+    {
+      "id": "m26.capa.lookup",
+      "type": "endpointAlias",
+      "label": "m26.capa.lookup"
+    },
+    {
+      "id": "m26.capa.metrics",
+      "type": "endpointAlias",
+      "label": "m26.capa.metrics"
+    },
+    {
+      "id": "m26.capa.create",
+      "type": "endpointAlias",
+      "label": "m26.capa.create"
+    },
+    {
+      "id": "m26.capa.update",
+      "type": "endpointAlias",
+      "label": "m26.capa.update"
+    },
+    {
+      "id": "m26.capa.command.start-analysis",
+      "type": "endpointAlias",
+      "label": "m26.capa.command.start-analysis"
+    },
+    {
+      "id": "m26.capa.command.assign-action",
+      "type": "endpointAlias",
+      "label": "m26.capa.command.assign-action"
+    },
+    {
+      "id": "m26.capa.command.submit-verification",
+      "type": "endpointAlias",
+      "label": "m26.capa.command.submit-verification"
+    },
+    {
+      "id": "m26.capa.command.close",
+      "type": "endpointAlias",
+      "label": "m26.capa.command.close"
+    },
+    {
+      "id": "m26.capa.command.cancel",
+      "type": "endpointAlias",
+      "label": "m26.capa.command.cancel"
+    },
+    {
+      "id": "m26.capa.export",
+      "type": "endpointAlias",
+      "label": "m26.capa.export"
+    },
+    {
+      "id": "M27-audit-management",
+      "type": "module",
+      "label": "Quản lý đánh giá"
+    },
+    {
+      "id": "T-approval-queue-audit",
+      "type": "template",
+      "label": "T-approval-queue-audit"
+    },
+    {
+      "id": "m27.audit.management.list",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.list"
+    },
+    {
+      "id": "m27.audit.management.detail",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.detail"
+    },
+    {
+      "id": "m27.audit.management.lookup",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.lookup"
+    },
+    {
+      "id": "m27.audit.management.metrics",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.metrics"
+    },
+    {
+      "id": "m27.audit.management.update",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.update"
+    },
+    {
+      "id": "m27.audit.management.command.schedule",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.schedule"
+    },
+    {
+      "id": "m27.audit.management.command.start",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.start"
+    },
+    {
+      "id": "m27.audit.management.command.record-finding",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.record-finding"
+    },
+    {
+      "id": "m27.audit.management.command.issue-report",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.issue-report"
+    },
+    {
+      "id": "m27.audit.management.command.close-finding",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.close-finding"
+    },
+    {
+      "id": "m27.audit.management.command.close-audit",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.command.close-audit"
+    },
+    {
+      "id": "m27.audit.management.export",
+      "type": "endpointAlias",
+      "label": "m27.audit.management.export"
+    },
+    {
+      "id": "M28-training-competency",
+      "type": "module",
+      "label": "Đào tạo và năng lực"
+    },
+    {
+      "id": "T-approval-queue-training",
+      "type": "template",
+      "label": "T-approval-queue-training"
+    },
+    {
+      "id": "m28.training.competency.list",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.list"
+    },
+    {
+      "id": "m28.training.competency.detail",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.detail"
+    },
+    {
+      "id": "m28.training.competency.lookup",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.lookup"
+    },
+    {
+      "id": "m28.training.competency.metrics",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.metrics"
+    },
+    {
+      "id": "m28.training.competency.update",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.update"
+    },
+    {
+      "id": "m28.training.competency.command.assign",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.assign"
+    },
+    {
+      "id": "m28.training.competency.command.record-completion",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.record-completion"
+    },
+    {
+      "id": "m28.training.competency.command.record-assessment",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.record-assessment"
+    },
+    {
+      "id": "m28.training.competency.command.verify-effectiveness",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.verify-effectiveness"
+    },
+    {
+      "id": "m28.training.competency.command.expire",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.expire"
+    },
+    {
+      "id": "m28.training.competency.command.waive",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.command.waive"
+    },
+    {
+      "id": "m28.training.competency.export",
+      "type": "endpointAlias",
+      "label": "m28.training.competency.export"
+    },
+    {
+      "id": "M29-document-control",
+      "type": "module",
+      "label": "Kiểm soát tài liệu"
+    },
+    {
+      "id": "T-evidence-workspace-document-control",
+      "type": "template",
+      "label": "T-evidence-workspace-document-control"
+    },
+    {
+      "id": "m29.document.control.list",
+      "type": "endpointAlias",
+      "label": "m29.document.control.list"
+    },
+    {
+      "id": "m29.document.control.detail",
+      "type": "endpointAlias",
+      "label": "m29.document.control.detail"
+    },
+    {
+      "id": "m29.document.control.lookup",
+      "type": "endpointAlias",
+      "label": "m29.document.control.lookup"
+    },
+    {
+      "id": "m29.document.control.metrics",
+      "type": "endpointAlias",
+      "label": "m29.document.control.metrics"
+    },
+    {
+      "id": "m29.document.control.create",
+      "type": "endpointAlias",
+      "label": "m29.document.control.create"
+    },
+    {
+      "id": "m29.document.control.update",
+      "type": "endpointAlias",
+      "label": "m29.document.control.update"
+    },
+    {
+      "id": "m29.document.control.command.submit-review",
+      "type": "endpointAlias",
+      "label": "m29.document.control.command.submit-review"
+    },
+    {
+      "id": "m29.document.control.command.approve",
+      "type": "endpointAlias",
+      "label": "m29.document.control.command.approve"
+    },
+    {
+      "id": "m29.document.control.command.release",
+      "type": "endpointAlias",
+      "label": "m29.document.control.command.release"
+    },
+    {
+      "id": "m29.document.control.command.supersede",
+      "type": "endpointAlias",
+      "label": "m29.document.control.command.supersede"
+    },
+    {
+      "id": "m29.document.control.command.obsolete",
+      "type": "endpointAlias",
+      "label": "m29.document.control.command.obsolete"
+    },
+    {
+      "id": "m29.document.control.export",
+      "type": "endpointAlias",
+      "label": "m29.document.control.export"
+    },
+    {
+      "id": "M30-lot-genealogy-traceability",
+      "type": "module",
+      "label": "Phả hệ lô và truy xuất"
+    },
+    {
+      "id": "T-exception-hub-genealogy",
+      "type": "template",
+      "label": "T-exception-hub-genealogy"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.list",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.list"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.detail",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.detail"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.lookup",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.lookup"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.metrics",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.metrics"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.update",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.update"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.command.expand-upstream",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.command.expand-upstream"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.command.expand-downstream",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.command.expand-downstream"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.command.freeze-trace-report",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.command.freeze-trace-report"
+    },
+    {
+      "id": "m30.lot.genealogy.traceability.export",
+      "type": "endpointAlias",
+      "label": "m30.lot.genealogy.traceability.export"
+    },
+    {
+      "id": "M31-accounts-payable",
+      "type": "module",
+      "label": "Công nợ phải trả và đối chiếu 3 bên"
+    },
+    {
+      "id": "T-approval-queue-finance-ap",
+      "type": "template",
+      "label": "T-approval-queue-finance-ap"
+    },
+    {
+      "id": "m31.accounts.payable.list",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.list"
+    },
+    {
+      "id": "m31.accounts.payable.detail",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.detail"
+    },
+    {
+      "id": "m31.accounts.payable.lookup",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.lookup"
+    },
+    {
+      "id": "m31.accounts.payable.metrics",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.metrics"
+    },
+    {
+      "id": "m31.accounts.payable.update",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.update"
+    },
+    {
+      "id": "m31.accounts.payable.command.ingest",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.ingest"
+    },
+    {
+      "id": "m31.accounts.payable.command.match",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.match"
+    },
+    {
+      "id": "m31.accounts.payable.command.resolve-exception",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.resolve-exception"
+    },
+    {
+      "id": "m31.accounts.payable.command.approve",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.approve"
+    },
+    {
+      "id": "m31.accounts.payable.command.post",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.post"
+    },
+    {
+      "id": "m31.accounts.payable.command.void",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.command.void"
+    },
+    {
+      "id": "m31.accounts.payable.export",
+      "type": "endpointAlias",
+      "label": "m31.accounts.payable.export"
+    },
+    {
+      "id": "M32-accounts-receivable",
+      "type": "module",
+      "label": "Công nợ phải thu và lập hóa đơn"
+    },
+    {
+      "id": "T-approval-queue-finance-ar",
+      "type": "template",
+      "label": "T-approval-queue-finance-ar"
+    },
+    {
+      "id": "m32.accounts.receivable.list",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.list"
+    },
+    {
+      "id": "m32.accounts.receivable.detail",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.detail"
+    },
+    {
+      "id": "m32.accounts.receivable.lookup",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.lookup"
+    },
+    {
+      "id": "m32.accounts.receivable.metrics",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.metrics"
+    },
+    {
+      "id": "m32.accounts.receivable.update",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.update"
+    },
+    {
+      "id": "m32.accounts.receivable.command.generate",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.generate"
+    },
+    {
+      "id": "m32.accounts.receivable.command.validate",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.validate"
+    },
+    {
+      "id": "m32.accounts.receivable.command.resolve-exception",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.resolve-exception"
+    },
+    {
+      "id": "m32.accounts.receivable.command.approve",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.approve"
+    },
+    {
+      "id": "m32.accounts.receivable.command.post",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.post"
+    },
+    {
+      "id": "m32.accounts.receivable.command.void",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.command.void"
+    },
+    {
+      "id": "m32.accounts.receivable.export",
+      "type": "endpointAlias",
+      "label": "m32.accounts.receivable.export"
+    },
+    {
+      "id": "M33-costing-valuation",
+      "type": "module",
+      "label": "Giá thành và định giá tồn kho"
+    },
+    {
+      "id": "T-analytical-list-costing",
+      "type": "template",
+      "label": "T-analytical-list-costing"
+    },
+    {
+      "id": "m33.costing.valuation.list",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.list"
+    },
+    {
+      "id": "m33.costing.valuation.detail",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.detail"
+    },
+    {
+      "id": "m33.costing.valuation.lookup",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.lookup"
+    },
+    {
+      "id": "m33.costing.valuation.metrics",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.metrics"
+    },
+    {
+      "id": "m33.costing.valuation.update",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.update"
+    },
+    {
+      "id": "m33.costing.valuation.command.recalculate-standard",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.command.recalculate-standard"
+    },
+    {
+      "id": "m33.costing.valuation.command.approve-adjustment",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.command.approve-adjustment"
+    },
+    {
+      "id": "m33.costing.valuation.export",
+      "type": "endpointAlias",
+      "label": "m33.costing.valuation.export"
+    },
+    {
+      "id": "M34-executive-control-tower",
+      "type": "module",
+      "label": "Trung tâm điều hành"
+    },
+    {
+      "id": "T-control-tower-executive",
+      "type": "template",
+      "label": "T-control-tower-executive"
+    },
+    {
+      "id": "m34.executive.control.tower.list",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.list"
+    },
+    {
+      "id": "m34.executive.control.tower.detail",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.detail"
+    },
+    {
+      "id": "m34.executive.control.tower.lookup",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.lookup"
+    },
+    {
+      "id": "m34.executive.control.tower.metrics",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.metrics"
+    },
+    {
+      "id": "m34.executive.control.tower.update",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.update"
+    },
+    {
+      "id": "m34.executive.control.tower.command.acknowledge-exception",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.command.acknowledge-exception"
+    },
+    {
+      "id": "m34.executive.control.tower.command.export-pack",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.command.export-pack"
+    },
+    {
+      "id": "m34.executive.control.tower.export",
+      "type": "endpointAlias",
+      "label": "m34.executive.control.tower.export"
+    }
+  ],
+  "edges": [
+    {
+      "from": "T-object-page-commercial-master",
+      "to": "M01-customer-master",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.command.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.command.activate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.command.deactivate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.command.link-approved-part",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M01-customer-master",
+      "to": "m01.customer.master.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-transactional-form-commercial-quote",
+      "to": "M02-sales-quotations",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.price",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.submit-approval",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.expire",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.command.convert-to-order",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M02-sales-quotations",
+      "to": "m02.sales.quotations.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-commercial-order",
+      "to": "M03-sales-orders",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.validate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.change-request",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.allocate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.command.acknowledge",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M03-sales-orders",
+      "to": "m03.sales.orders.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-exception-hub-complaint",
+      "to": "M04-customer-complaints",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.intake",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.triage",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.assign",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.record-containment",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.link-capa",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.issue-response",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.command.void",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M04-customer-complaints",
+      "to": "m04.customer.complaints.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-supplier-master",
+      "to": "M05-supplier-master",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.command.qualify",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.command.deactivate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.command.link-commodity",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M05-supplier-master",
+      "to": "m05.supplier.master.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-transactional-form-procurement-pr",
+      "to": "M06-purchase-requisitions",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.command.submit",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.command.reject",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.command.convert-to-po",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M06-purchase-requisitions",
+      "to": "m06.purchase.requisitions.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-procurement-po",
+      "to": "M07-purchase-orders",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.submit-approval",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.record-ack",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.revise",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M07-purchase-orders",
+      "to": "m07.purchase.orders.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-operator-execution-receiving",
+      "to": "M08-receiving-putaway",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.scan",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.match",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.record-discrepancy",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.route-to-iqc",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.confirm-putaway",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.command.complete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M08-receiving-putaway",
+      "to": "m08.receiving.putaway.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-analytical-list-inventory",
+      "to": "M09-inventory-control",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.command.adjust",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.command.reserve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.command.release-reservation",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M09-inventory-control",
+      "to": "m09.inventory.control.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-operator-execution-shipping",
+      "to": "M10-shipping-fulfillment",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.start-pick",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.scan-pick",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.pack",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.print-docs",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.confirm-ship",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.command.record-exception",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M10-shipping-fulfillment",
+      "to": "m10.shipping.fulfillment.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-item-master",
+      "to": "M11-item-part-master",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.command.effectivity",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.command.obsolete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M11-item-part-master",
+      "to": "m11.item.part.master.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-engineering-structure",
+      "to": "M12-bom-routing",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.command.submit-review",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.command.supersede",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.command.obsolete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M12-bom-routing",
+      "to": "m12.bom.routing.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-evidence-workspace-eco",
+      "to": "M13-engineering-change",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.command.submit-assessment",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.command.implement",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M13-engineering-change",
+      "to": "m13.engineering.change.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-work-order",
+      "to": "M14-work-order-management",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.resume",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.complete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M14-work-order-management",
+      "to": "m14.work.order.management.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-planning-board-dispatch",
+      "to": "M15-finite-scheduling-dispatch",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.command.generate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.command.simulate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.command.resolve-conflict",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.command.publish",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.command.supersede",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M15-finite-scheduling-dispatch",
+      "to": "m15.finite.scheduling.dispatch.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-operator-execution-shopfloor",
+      "to": "M16-operator-execution",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.pause",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.resume",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.record-count",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.complete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.command.report-issue",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M16-operator-execution",
+      "to": "m16.operator.execution.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-shopfloor-board-machine-status",
+      "to": "M17-machine-monitoring-andon",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.command.acknowledge-alarm",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.command.shelve-alarm",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.command.assign-response",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.command.open-detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M17-machine-monitoring-andon",
+      "to": "m17.machine.monitoring.andon.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-analytical-list-oee",
+      "to": "M18-oee-downtime",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.command.reclassify-downtime",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.command.approve-adjustment",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M18-oee-downtime",
+      "to": "m18.oee.downtime.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-object-page-tooling",
+      "to": "M19-tool-management",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.issue",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.return",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.record-usage",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.replace",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.quarantine",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.command.retire",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M19-tool-management",
+      "to": "m19.tool.management.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-approval-queue-maintenance",
+      "to": "M20-preventive-maintenance",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.generate-wo",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.record-checklist",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.command.defer",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M20-preventive-maintenance",
+      "to": "m20.preventive.maintenance.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-evidence-workspace-calibration",
+      "to": "M21-calibration-management",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.record-result",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.submit-review",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.declare-oot",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M21-calibration-management",
+      "to": "m21.calibration.management.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-transactional-form-iqc",
+      "to": "M22-receiving-iqc",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.record-result",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.submit-review",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.accept",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.reject",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.command.void",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M22-receiving-iqc",
+      "to": "m22.receiving.iqc.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-operator-execution-inprocess-quality",
+      "to": "M23-inprocess-inspection",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.record-value",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.flag-nonconformance",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.submit-review",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.accept",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.reject",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.command.hold",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M23-inprocess-inspection",
+      "to": "m23.inprocess.inspection.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-analytical-list-spc",
+      "to": "M24-spc-quality-analytics",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.command.recalculate-limits",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.command.acknowledge-violation",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M24-spc-quality-analytics",
+      "to": "m24.spc.quality.analytics.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-exception-hub-ncr",
+      "to": "M25-ncr-mrb",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.contain",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.investigate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.submit-mrb",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.record-disposition",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.command.void",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M25-ncr-mrb",
+      "to": "m25.ncr.mrb.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-evidence-workspace-capa",
+      "to": "M26-capa",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.command.start-analysis",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.command.assign-action",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.command.submit-verification",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.command.close",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.command.cancel",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M26-capa",
+      "to": "m26.capa.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-approval-queue-audit",
+      "to": "M27-audit-management",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.schedule",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.start",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.record-finding",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.issue-report",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.close-finding",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.command.close-audit",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M27-audit-management",
+      "to": "m27.audit.management.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-approval-queue-training",
+      "to": "M28-training-competency",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.assign",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.record-completion",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.record-assessment",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.verify-effectiveness",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.expire",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.command.waive",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M28-training-competency",
+      "to": "m28.training.competency.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-evidence-workspace-document-control",
+      "to": "M29-document-control",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.create",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.command.submit-review",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.command.release",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.command.supersede",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.command.obsolete",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M29-document-control",
+      "to": "m29.document.control.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-exception-hub-genealogy",
+      "to": "M30-lot-genealogy-traceability",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.command.expand-upstream",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.command.expand-downstream",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.command.freeze-trace-report",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M30-lot-genealogy-traceability",
+      "to": "m30.lot.genealogy.traceability.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-approval-queue-finance-ap",
+      "to": "M31-accounts-payable",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.ingest",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.match",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.resolve-exception",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.post",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.command.void",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M31-accounts-payable",
+      "to": "m31.accounts.payable.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-approval-queue-finance-ar",
+      "to": "M32-accounts-receivable",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.generate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.validate",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.resolve-exception",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.approve",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.post",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.command.void",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M32-accounts-receivable",
+      "to": "m32.accounts.receivable.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-analytical-list-costing",
+      "to": "M33-costing-valuation",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.command.recalculate-standard",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.command.approve-adjustment",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M33-costing-valuation",
+      "to": "m33.costing.valuation.export",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "T-control-tower-executive",
+      "to": "M34-executive-control-tower",
+      "type": "template-governs-module"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.list",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.detail",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.lookup",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.metrics",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.update",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.command.acknowledge-exception",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.command.export-pack",
+      "type": "module-binds-endpoint"
+    },
+    {
+      "from": "M34-executive-control-tower",
+      "to": "m34.executive.control.tower.export",
+      "type": "module-binds-endpoint"
+    }
+  ]
+}

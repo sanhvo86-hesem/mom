@@ -1,0 +1,253 @@
+{
+  "moduleId": "M12-bom-routing",
+  "moduleName": "Cấu trúc sản phẩm và quy trình",
+  "route": "/erp/engineering/bom-routing",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "Engineering Data Management",
+  "processOwner": "Manufacturing Engineering Manager",
+  "primaryEntity": "bomRevision",
+  "contractRefs": [
+    "mom/contracts/objects/bomRevision/contract.json",
+    "mom/design/module-api-catalog/M12-bom-routing.json"
+  ],
+  "templateId": "T-object-page-engineering-structure",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M12-bom-routing.bom-list",
+      "screenName": "BOM list",
+      "type": "object-page",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.bom-detail",
+      "screenName": "BOM detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.routing-tab",
+      "screenName": "Routing tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.where-used",
+      "screenName": "Where-used",
+      "type": "supporting-screen",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.revision-compare",
+      "screenName": "Revision compare",
+      "type": "supporting-screen",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    },
+    {
+      "screenId": "M12-bom-routing.approval-history",
+      "screenName": "Approval history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M12-bom-routing.header",
+        "M12-bom-routing.main",
+        "M12-bom-routing.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M12-bom-routing.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M12-bom-routing.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M12-bom-routing.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M12-bom-routing.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m12.bom.routing.list",
+    "m12.bom.routing.detail",
+    "m12.bom.routing.lookup",
+    "m12.bom.routing.metrics",
+    "m12.bom.routing.create",
+    "m12.bom.routing.update",
+    "m12.bom.routing.command.submit-review",
+    "m12.bom.routing.command.release",
+    "m12.bom.routing.command.supersede",
+    "m12.bom.routing.command.obsolete",
+    "m12.bom.routing.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "pending_review",
+      "released",
+      "superseded",
+      "obsolete"
+    ],
+    "transitions": [
+      {
+        "action": "submitReview",
+        "transition": "draft -> pending_review"
+      },
+      {
+        "action": "release",
+        "transition": "pending_review -> released"
+      },
+      {
+        "action": "supersede",
+        "transition": "released -> superseded"
+      },
+      {
+        "action": "obsolete",
+        "transition": "superseded -> obsolete"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "bom.read",
+      "bom.create",
+      "bom.release",
+      "bom.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitReviewRequested",
+      "ReleaseRequested",
+      "SupersedeRequested",
+      "ObsoleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M12-bom-routing/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "bomRevision",
+      "bomRevision",
+      "bomLine",
+      "routingOperation"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

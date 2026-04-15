@@ -1,0 +1,274 @@
+{
+  "moduleId": "M29-document-control",
+  "moduleName": "Kiểm soát tài liệu",
+  "route": "/eqms/documents",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "Document Control Manager",
+  "primaryEntity": "controlledDocument",
+  "contractRefs": [
+    "mom/contracts/objects/controlledDocument/contract.json",
+    "mom/design/module-api-catalog/M29-document-control.json"
+  ],
+  "templateId": "T-evidence-workspace-document-control",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M29-document-control.document-register",
+      "screenName": "Document register",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.document-workspace",
+      "screenName": "Document workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.review-approval-panel",
+      "screenName": "Review/approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.effective-copy-preview",
+      "screenName": "Effective copy preview",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.acknowledgment-dashboard",
+      "screenName": "Acknowledgment dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    },
+    {
+      "screenId": "M29-document-control.audit-history",
+      "screenName": "Audit history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M29-document-control.header",
+        "M29-document-control.main",
+        "M29-document-control.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M29-document-control.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M29-document-control.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M29-document-control.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M29-document-control.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M29-document-control.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m29.document.control.list",
+    "m29.document.control.detail",
+    "m29.document.control.lookup",
+    "m29.document.control.metrics",
+    "m29.document.control.create",
+    "m29.document.control.update",
+    "m29.document.control.command.submit-review",
+    "m29.document.control.command.approve",
+    "m29.document.control.command.release",
+    "m29.document.control.command.supersede",
+    "m29.document.control.command.obsolete",
+    "m29.document.control.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "in_review",
+      "approved",
+      "effective",
+      "superseded",
+      "obsolete"
+    ],
+    "transitions": [
+      {
+        "action": "submitReview",
+        "transition": "draft -> in_review"
+      },
+      {
+        "action": "approve",
+        "transition": "in_review -> approved"
+      },
+      {
+        "action": "release",
+        "transition": "approved -> effective"
+      },
+      {
+        "action": "supersede",
+        "transition": "effective -> superseded"
+      },
+      {
+        "action": "obsolete",
+        "transition": "superseded -> obsolete"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "document.read",
+      "document.create",
+      "document.review",
+      "document.approve",
+      "document.release",
+      "document.sign",
+      "document.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "SubmitReviewRequested",
+      "ApproveRequested",
+      "ReleaseRequested",
+      "SupersedeRequested",
+      "ObsoleteRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M29-document-control/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "controlledDocument",
+      "controlledDocument",
+      "documentRevision",
+      "acknowledgmentRecord"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

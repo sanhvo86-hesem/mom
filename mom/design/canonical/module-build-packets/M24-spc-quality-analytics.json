@@ -1,0 +1,230 @@
+{
+  "moduleId": "M24-spc-quality-analytics",
+  "moduleName": "SPC và phân tích chất lượng",
+  "route": "/mes/quality/spc",
+  "domain": "MES",
+  "criticality": "high",
+  "ownerTeam": "Quality Analytics",
+  "processOwner": "Quality Systems Manager",
+  "primaryEntity": "spcStudy",
+  "contractRefs": [
+    "mom/contracts/objects/spcStudy/contract.json",
+    "mom/design/module-api-catalog/M24-spc-quality-analytics.json"
+  ],
+  "templateId": "T-analytical-list-spc",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M24-spc-quality-analytics.spc-overview",
+      "screenName": "SPC overview",
+      "type": "analytical-list",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.chart-workspace",
+      "screenName": "Chart workspace",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.violation-queue",
+      "screenName": "Violation queue",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.capability-tab",
+      "screenName": "Capability tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    },
+    {
+      "screenId": "M24-spc-quality-analytics.raw-data-table",
+      "screenName": "Raw data table",
+      "type": "supporting-screen",
+      "blocks": [
+        "M24-spc-quality-analytics.header",
+        "M24-spc-quality-analytics.main",
+        "M24-spc-quality-analytics.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M24-spc-quality-analytics.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M24-spc-quality-analytics.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m24.spc.quality.analytics.list",
+    "m24.spc.quality.analytics.detail",
+    "m24.spc.quality.analytics.lookup",
+    "m24.spc.quality.analytics.metrics",
+    "m24.spc.quality.analytics.update",
+    "m24.spc.quality.analytics.command.recalculate-limits",
+    "m24.spc.quality.analytics.command.acknowledge-violation",
+    "m24.spc.quality.analytics.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "acknowledgeViolation",
+        "transition": "current -> current"
+      },
+      {
+        "action": "recalculateLimits",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "spc.read",
+      "spc.recalculate",
+      "spc.acknowledge",
+      "spc.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "RecalculateLimitsRequested",
+      "AcknowledgeViolationRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": 3000
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M24-spc-quality-analytics/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "spcStudy",
+      "spcStudy",
+      "spcSample",
+      "spcViolation"
+    ]
+  },
+  "moduleArchetype": "analytical-list",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "chart-area",
+    "main",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

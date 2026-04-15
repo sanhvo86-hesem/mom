@@ -431,6 +431,7 @@ Canonical evidence package reads and finalization:
 - WO creation and update contracts preserve optional CNC/digital-thread fields: `routing_operation_id`, `job_operation_id`, `cnc_program_version_id`, `setup_sheet_id`, `setup_sheet_revision`, `org_plant_id`, and `org_site_id`.
 - EQMS complaint/MRB/deviation/concession generic updates cannot mutate lifecycle fields such as `status`, `status_history`, closure, approval, or rejection metadata. Those changes must use transition or change-control paths.
 - Genealogy DB constraint migration `121_genealogy_runtime_ontology_constraints.sql` aligns `genealogy_nodes` and `as_manufactured_snapshots` with the runtime graph ontology; it does not make AI or analytics execution authority.
+- Production reports that invoke the canonical 5M genealogy gate must carry `org_plant_id` or `org_site_id`. The shopfloor service passes that partition scope as trusted top-level genealogy request scope and fails closed with `traceability_5m_partition_scope_required` when scope is absent.
 
 ## Backward compatibility
 

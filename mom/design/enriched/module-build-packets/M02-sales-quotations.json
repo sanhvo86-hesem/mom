@@ -1,0 +1,1014 @@
+{
+  "moduleId": "M02-sales-quotations",
+  "moduleName": "Báo giá bán hàng",
+  "route": "/erp/sales/quotations",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Commercial",
+  "processOwner": "Sales Manager",
+  "primaryEntity": "salesQuotation",
+  "contractRefs": [
+    "mom/contracts/objects/salesQuotation/contract.json",
+    "mom/design/module-api-catalog/M02-sales-quotations.json"
+  ],
+  "templateId": "T-transactional-form-commercial-quote",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M02-sales-quotations.quotation-inbox",
+      "screenName": "Quotation inbox",
+      "type": "transactional-form",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.quotation-form",
+      "screenName": "Quotation form",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.pricing-breakdown",
+      "screenName": "Pricing breakdown",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.approval-panel",
+      "screenName": "Approval panel",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.revision-compare",
+      "screenName": "Revision compare",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.export-preview",
+      "screenName": "Export preview",
+      "type": "supporting-screen",
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M02-sales-quotations.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M02-sales-quotations.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M02-sales-quotations.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M02-sales-quotations.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m02.sales.quotations.list",
+    "m02.sales.quotations.detail",
+    "m02.sales.quotations.lookup",
+    "m02.sales.quotations.metrics",
+    "m02.sales.quotations.create",
+    "m02.sales.quotations.update",
+    "m02.sales.quotations.command.price",
+    "m02.sales.quotations.command.submit-approval",
+    "m02.sales.quotations.command.approve",
+    "m02.sales.quotations.command.release",
+    "m02.sales.quotations.command.expire",
+    "m02.sales.quotations.command.cancel",
+    "m02.sales.quotations.command.convert-to-order",
+    "m02.sales.quotations.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "priced",
+      "pending_approval",
+      "released",
+      "expired",
+      "cancelled"
+    ],
+    "transitions": [
+      {
+        "action": "price",
+        "transition": "draft -> priced"
+      },
+      {
+        "action": "submitApproval",
+        "transition": "priced -> pending_approval"
+      },
+      {
+        "action": "approve",
+        "transition": "pending_approval -> released"
+      },
+      {
+        "action": "expire",
+        "transition": "released -> expired"
+      },
+      {
+        "action": "cancel",
+        "transition": "draft|priced|pending_approval -> cancelled"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "quotation.read",
+      "quotation.create",
+      "quotation.update",
+      "quotation.price",
+      "quotation.approve",
+      "quotation.release",
+      "quotation.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "PriceRequested",
+      "SubmitApprovalRequested",
+      "ApproveRequested",
+      "ReleaseRequested",
+      "ExpireRequested",
+      "CancelRequested",
+      "ConvertToOrderRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M02-sales-quotations/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "salesQuotation",
+      "salesQuotation",
+      "salesQuotationLine",
+      "quoteRevision"
+    ]
+  },
+  "moduleArchetype": "transactional-form",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "workflow",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "draft_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "limited",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13",
+  "moduleProfile": {
+    "purpose": "Create, price, review and release customer quotations with commercial and technical assumptions.",
+    "workflowNote": "Pricing assumptions, lead times and exceptions must be versioned. Released quotes become read-only except via revision workflow.",
+    "personas": [
+      "Sales engineer",
+      "Sales manager",
+      "Costing analyst"
+    ],
+    "inputs": [
+      "RFQ/customer inquiry",
+      "Customer master",
+      "Item master",
+      "Cost estimate",
+      "Lead time estimate",
+      "Commercial terms",
+      "Approval rules"
+    ],
+    "outputs": [
+      "Released quotation",
+      "Revision history",
+      "Margin snapshot",
+      "Customer-facing PDF",
+      "Quote-to-order conversion record"
+    ],
+    "coreScreensNarrative": [
+      "Quotation inbox",
+      "Quotation form",
+      "Pricing breakdown",
+      "Approval panel",
+      "Revision compare",
+      "Export preview"
+    ],
+    "policiesNarrative": "Freshness: erp-transactional Offline: draft_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M02-sales-quotations.quotation-inbox",
+      "title": "Quotation inbox",
+      "type": "transactional-form",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.quotation-form",
+      "title": "Quotation form",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.pricing-breakdown",
+      "title": "Pricing breakdown",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.approval-panel",
+      "title": "Approval panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.revision-compare",
+      "title": "Revision compare",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    },
+    {
+      "screenId": "M02-sales-quotations.export-preview",
+      "title": "Export preview",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "workflow",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M02-sales-quotations.header",
+        "M02-sales-quotations.main",
+        "M02-sales-quotations.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m02.sales.quotations.create",
+      "interactionType": "command",
+      "method": "POST",
+      "path": "/erp/sales/quotations",
+      "permission": "quotation.create",
+      "requiresOnline": false,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordCreated",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/erp/sales/quotations/{id}",
+      "permission": "quotation.update",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.price",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/price",
+      "permission": "quotation.price",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "PriceRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.submit-approval",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/submit-approval",
+      "permission": "quotation.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "SubmitApprovalRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.approve",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/approve",
+      "permission": "quotation.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ApproveRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.release",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/release",
+      "permission": "quotation.release",
+      "requiresOnline": true,
+      "offlinePolicy": "forbidden",
+      "auditEvent": "ReleaseRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.expire",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/expire",
+      "permission": "quotation.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ExpireRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.cancel",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/cancel",
+      "permission": "quotation.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "CancelRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.command.convert-to-order",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/convert-to-order",
+      "permission": "quotation.approve",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ConvertToOrderRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m02.sales.quotations.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/erp/sales/quotations/export",
+      "permission": "quotation.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m02.sales.quotations.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/erp/sales/quotations/query",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m02.sales.quotations.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/sales/quotations/{id}",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m02.sales.quotations.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/erp/sales/quotations/lookup",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m02.sales.quotations.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/erp/sales/quotations/metrics",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m02.sales.quotations.list",
+      "method": "POST",
+      "path": "/erp/sales/quotations/query",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "salesQuotation summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.detail",
+      "method": "GET",
+      "path": "/erp/sales/quotations/{id}",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "salesQuotation detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.lookup",
+      "method": "POST",
+      "path": "/erp/sales/quotations/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.metrics",
+      "method": "GET",
+      "path": "/erp/sales/quotations/metrics",
+      "interactionType": "query",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.create",
+      "method": "POST",
+      "path": "/erp/sales/quotations",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.create",
+      "auditEvent": "RecordCreated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "record": "salesQuotation draft payload",
+        "traceability": "source references",
+        "attachments": "optional temp refs"
+      },
+      "response": {
+        "id": "new record id",
+        "status": "workflow start state",
+        "etag": "version token"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.update",
+      "method": "PATCH",
+      "path": "/erp/sales/quotations/{id}",
+      "interactionType": "command",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.update",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.price",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/price",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.price",
+      "auditEvent": "PriceRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.submit-approval",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/submit-approval",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.approve",
+      "auditEvent": "SubmitApprovalRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.approve",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/approve",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.approve",
+      "auditEvent": "ApproveRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.release",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/release",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.release",
+      "auditEvent": "ReleaseRequested",
+      "offlinePolicy": "forbidden",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.expire",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/expire",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.approve",
+      "auditEvent": "ExpireRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.cancel",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/cancel",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.approve",
+      "auditEvent": "CancelRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.command.convert-to-order",
+      "method": "POST",
+      "path": "/erp/sales/quotations/{id}/actions/convert-to-order",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.approve",
+      "auditEvent": "ConvertToOrderRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m02.sales.quotations.export",
+      "method": "POST",
+      "path": "/erp/sales/quotations/export",
+      "interactionType": "export",
+      "ownerSystem": "ERP",
+      "systemOfRecord": "ERP",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "erp-transactional",
+      "permission": "quotation.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

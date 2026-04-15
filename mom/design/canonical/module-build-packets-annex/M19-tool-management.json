@@ -1,0 +1,670 @@
+{
+  "moduleProfile": {
+    "purpose": "Track tool identities, preset data, life usage, issue/return and replacement thresholds.",
+    "workflowNote": "Tool life status must be authoritative for execution guards when required by process.",
+    "personas": [
+      "Tool crib attendant",
+      "CNC programmer",
+      "Supervisor"
+    ],
+    "inputs": [
+      "Tool master",
+      "Preset records",
+      "Machine usage counts",
+      "Issue/return transactions",
+      "Tool life rules"
+    ],
+    "outputs": [
+      "Current tool life status",
+      "Issue history",
+      "Replacement alerts",
+      "Tool availability",
+      "Audit trail"
+    ],
+    "coreScreensNarrative": [
+      "Tool list",
+      "Tool detail",
+      "Life tracking",
+      "Issue/return panel",
+      "Preset history",
+      "Alerts"
+    ],
+    "policiesNarrative": "Freshness: shopfloor-transactional Offline: limited_capture_only Regulated: false"
+  },
+  "screenInventory": [
+    {
+      "screenId": "M19-tool-management.tool-list",
+      "title": "Tool list",
+      "type": "object-page",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    },
+    {
+      "screenId": "M19-tool-management.tool-detail",
+      "title": "Tool detail",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    },
+    {
+      "screenId": "M19-tool-management.life-tracking",
+      "title": "Life tracking",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    },
+    {
+      "screenId": "M19-tool-management.issue-return-panel",
+      "title": "Issue/return panel",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    },
+    {
+      "screenId": "M19-tool-management.preset-history",
+      "title": "Preset history",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    },
+    {
+      "screenId": "M19-tool-management.alerts",
+      "title": "Alerts",
+      "type": "supporting-screen",
+      "zones": [
+        "header",
+        "kpi-bar",
+        "tabs",
+        "main",
+        "sidebar",
+        "footer"
+      ],
+      "blocks": [
+        "M19-tool-management.header",
+        "M19-tool-management.main",
+        "M19-tool-management.actions"
+      ]
+    }
+  ],
+  "actionInventory": [
+    {
+      "actionId": "m19.tool.management.update",
+      "interactionType": "command",
+      "method": "PATCH",
+      "path": "/mes/tools/{id}",
+      "permission": "tool.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUpdated",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.issue",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/issue",
+      "permission": "tool.issue",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "IssueRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.return",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/return",
+      "permission": "tool.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ReturnRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.record-usage",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/record-usage",
+      "permission": "tool.recordUsage",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RecordUsageRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.replace",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/replace",
+      "permission": "tool.replace",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "ReplaceRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.quarantine",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/quarantine",
+      "permission": "tool.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "QuarantineRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.command.retire",
+      "interactionType": "workflow-transition",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/retire",
+      "permission": "tool.read",
+      "requiresOnline": true,
+      "offlinePolicy": "limited",
+      "auditEvent": "RetireRequested",
+      "transition": null
+    },
+    {
+      "actionId": "m19.tool.management.export",
+      "interactionType": "export",
+      "method": "POST",
+      "path": "/mes/tools/export",
+      "permission": "tool.export",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed",
+      "auditEvent": "ExportRequested",
+      "transition": null
+    }
+  ],
+  "queryInventory": [
+    {
+      "queryId": "m19.tool.management.list",
+      "interactionType": "query",
+      "method": "POST",
+      "path": "/mes/tools/query",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m19.tool.management.detail",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/tools/{id}",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m19.tool.management.lookup",
+      "interactionType": "lookup",
+      "method": "POST",
+      "path": "/mes/tools/lookup",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    },
+    {
+      "queryId": "m19.tool.management.metrics",
+      "interactionType": "query",
+      "method": "GET",
+      "path": "/mes/tools/metrics",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "requiresOnline": false,
+      "offlinePolicy": "allowed"
+    }
+  ],
+  "endpointInventory": [
+    {
+      "alias": "m19.tool.management.list",
+      "method": "POST",
+      "path": "/mes/tools/query",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "QueryExecuted",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "filters": [
+          "field/operator/value"
+        ],
+        "sort": [
+          "field,dir"
+        ],
+        "page": {
+          "number": "int",
+          "size": "int"
+        },
+        "viewId": "optional saved view"
+      },
+      "response": {
+        "rows": [
+          "toolInstance summary row"
+        ],
+        "total": "int",
+        "aggregates": "optional kpi totals"
+      }
+    },
+    {
+      "alias": "m19.tool.management.detail",
+      "method": "GET",
+      "path": "/mes/tools/{id}",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "DetailViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "include": [
+          "tabs or related datasets"
+        ]
+      },
+      "response": {
+        "record": "toolInstance detail",
+        "related": "context datasets",
+        "auditPreview": "last events"
+      }
+    },
+    {
+      "alias": "m19.tool.management.lookup",
+      "method": "POST",
+      "path": "/mes/tools/lookup",
+      "interactionType": "lookup",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "LookupUsed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "search": "string",
+        "limit": "int",
+        "filters": "optional lightweight filters"
+      },
+      "response": {
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "status": "string"
+          }
+        ]
+      }
+    },
+    {
+      "alias": "m19.tool.management.metrics",
+      "method": "GET",
+      "path": "/mes/tools/metrics",
+      "interactionType": "query",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "not-required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "MetricsViewed",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "timeWindow": "optional",
+        "groupBy": "optional"
+      },
+      "response": {
+        "kpis": "named KPI set",
+        "timestamp": "source timestamp"
+      }
+    },
+    {
+      "alias": "m19.tool.management.update",
+      "method": "PATCH",
+      "path": "/mes/tools/{id}",
+      "interactionType": "command",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "conditional",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "RecordUpdated",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "etag": "If-Match value",
+        "patch": "changed fields only",
+        "reasonCode": "required when controlled"
+      },
+      "response": {
+        "id": "record id",
+        "status": "current workflow state",
+        "etag": "new version token"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.issue",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/issue",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.issue",
+      "auditEvent": "IssueRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.return",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/return",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "ReturnRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.record-usage",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/record-usage",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.recordUsage",
+      "auditEvent": "RecordUsageRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.replace",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/replace",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.replace",
+      "auditEvent": "ReplaceRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.quarantine",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/quarantine",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "QuarantineRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.command.retire",
+      "method": "POST",
+      "path": "/mes/tools/{id}/actions/retire",
+      "interactionType": "workflow-transition",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": true,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.read",
+      "auditEvent": "RetireRequested",
+      "offlinePolicy": "limited",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "id": "string path param",
+        "reasonCode": "required for hold/reject/disposition/void where applicable",
+        "comment": "optional user note",
+        "payload": "command-specific fields"
+      },
+      "response": {
+        "id": "record id",
+        "status": "new workflow state",
+        "taskRefs": "downstream/generated tasks if any"
+      }
+    },
+    {
+      "alias": "m19.tool.management.export",
+      "method": "POST",
+      "path": "/mes/tools/export",
+      "interactionType": "export",
+      "ownerSystem": "MES",
+      "systemOfRecord": "MOM",
+      "requiresOnline": false,
+      "idempotency": "required",
+      "freshnessPolicy": "shopfloor-transactional",
+      "permission": "tool.export",
+      "auditEvent": "ExportRequested",
+      "offlinePolicy": "allowed",
+      "errorContract": [
+        "validation",
+        "permission-denied",
+        "conflict",
+        "timeout",
+        "stale-source"
+      ],
+      "request": {
+        "format": "pdf|xlsx|csv|zip",
+        "filters": "same as list scope",
+        "columns": "optional",
+        "includeAudit": "bool for regulated"
+      },
+      "response": {
+        "jobId": "export job id",
+        "downloadRef": "when synchronous or completed"
+      }
+    }
+  ]
+}

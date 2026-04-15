@@ -1,0 +1,246 @@
+{
+  "moduleId": "M09-inventory-control",
+  "moduleName": "Tồn kho",
+  "route": "/erp/inventory",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Supply Chain",
+  "processOwner": "Inventory Control Manager",
+  "primaryEntity": "inventoryBalance",
+  "contractRefs": [
+    "mom/contracts/objects/inventoryBalance/contract.json",
+    "mom/design/module-api-catalog/M09-inventory-control.json"
+  ],
+  "templateId": "T-analytical-list-inventory",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M09-inventory-control.inventory-list",
+      "screenName": "Inventory list",
+      "type": "analytical-list",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    },
+    {
+      "screenId": "M09-inventory-control.stock-by-location",
+      "screenName": "Stock by location",
+      "type": "supporting-screen",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    },
+    {
+      "screenId": "M09-inventory-control.lot-detail",
+      "screenName": "Lot detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    },
+    {
+      "screenId": "M09-inventory-control.reservations-tab",
+      "screenName": "Reservations tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    },
+    {
+      "screenId": "M09-inventory-control.aging-dashboard",
+      "screenName": "Aging dashboard",
+      "type": "supporting-screen",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    },
+    {
+      "screenId": "M09-inventory-control.adjustment-history",
+      "screenName": "Adjustment history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M09-inventory-control.header",
+        "M09-inventory-control.main",
+        "M09-inventory-control.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M09-inventory-control.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M09-inventory-control.main",
+      "blockType": "data-table",
+      "zone": "main"
+    },
+    {
+      "blockId": "M09-inventory-control.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M09-inventory-control.audit",
+      "blockType": "audit-trail",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M09-inventory-control.metrics",
+      "blockType": "chart-panel",
+      "zone": "chart-area"
+    }
+  ],
+  "apiBindings": [
+    "m09.inventory.control.list",
+    "m09.inventory.control.detail",
+    "m09.inventory.control.lookup",
+    "m09.inventory.control.metrics",
+    "m09.inventory.control.update",
+    "m09.inventory.control.command.adjust",
+    "m09.inventory.control.command.reserve",
+    "m09.inventory.control.command.release-reservation",
+    "m09.inventory.control.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "adjust",
+        "transition": "current -> current"
+      },
+      {
+        "action": "reserve",
+        "transition": "current -> current"
+      },
+      {
+        "action": "releaseReservation",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "inventory.read",
+      "inventory.adjust",
+      "inventory.reserve",
+      "inventory.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "AdjustRequested",
+      "ReserveRequested",
+      "ReleaseReservationRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": true,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": true,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": 500,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M09-inventory-control/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "inventoryBalance",
+      "inventoryBalance",
+      "inventoryReservation",
+      "inventoryStatus"
+    ]
+  },
+  "moduleArchetype": "analytical-list",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "chart-area",
+    "main",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

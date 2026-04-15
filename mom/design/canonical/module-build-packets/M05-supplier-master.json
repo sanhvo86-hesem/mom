@@ -1,0 +1,261 @@
+{
+  "moduleId": "M05-supplier-master",
+  "moduleName": "Nhà cung cấp",
+  "route": "/erp/suppliers",
+  "domain": "ERP",
+  "criticality": "high",
+  "ownerTeam": "ERP Procurement",
+  "processOwner": "Procurement Manager",
+  "primaryEntity": "supplier",
+  "contractRefs": [
+    "mom/contracts/objects/supplier/contract.json",
+    "mom/design/module-api-catalog/M05-supplier-master.json"
+  ],
+  "templateId": "T-object-page-supplier-master",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M05-supplier-master.supplier-list",
+      "screenName": "Supplier list",
+      "type": "object-page",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.supplier-detail",
+      "screenName": "Supplier detail",
+      "type": "supporting-screen",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.quality-tab",
+      "screenName": "Quality tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.commercial-tab",
+      "screenName": "Commercial tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.banking-tax-tab",
+      "screenName": "Banking/tax tab",
+      "type": "supporting-screen",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    },
+    {
+      "screenId": "M05-supplier-master.change-history",
+      "screenName": "Change history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M05-supplier-master.header",
+        "M05-supplier-master.main",
+        "M05-supplier-master.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M05-supplier-master.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M05-supplier-master.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M05-supplier-master.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M05-supplier-master.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m05.supplier.master.list",
+    "m05.supplier.master.detail",
+    "m05.supplier.master.lookup",
+    "m05.supplier.master.metrics",
+    "m05.supplier.master.create",
+    "m05.supplier.master.update",
+    "m05.supplier.master.command.qualify",
+    "m05.supplier.master.command.approve",
+    "m05.supplier.master.command.hold",
+    "m05.supplier.master.command.deactivate",
+    "m05.supplier.master.command.link-commodity",
+    "m05.supplier.master.export"
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "qualified",
+      "approved",
+      "active",
+      "on_hold",
+      "inactive"
+    ],
+    "transitions": [
+      {
+        "action": "qualify",
+        "transition": "draft -> qualified"
+      },
+      {
+        "action": "approve",
+        "transition": "qualified -> approved"
+      },
+      {
+        "action": "activate",
+        "transition": "approved -> active"
+      },
+      {
+        "action": "hold",
+        "transition": "active -> on_hold"
+      },
+      {
+        "action": "deactivate",
+        "transition": "active|on_hold -> inactive"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "supplier.read",
+      "supplier.create",
+      "supplier.update",
+      "supplier.approve",
+      "supplier.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": false,
+    "signatureRequired": false,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordCreated",
+      "RecordUpdated",
+      "QualifyRequested",
+      "ApproveRequested",
+      "HoldRequested",
+      "DeactivateRequested",
+      "LinkCommodityRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "tabs"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M05-supplier-master/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "supplier",
+      "supplier",
+      "supplierBank",
+      "supplierCommodity"
+    ]
+  },
+  "moduleArchetype": "object-page",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "tabs",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "non-part11-operational-record",
+    "electronicRecordReliedUpon": false,
+    "electronicSignatureRequired": false,
+    "requiredGates": []
+  },
+  "densityModes": [
+    "compact",
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

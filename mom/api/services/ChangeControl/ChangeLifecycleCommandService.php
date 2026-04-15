@@ -14,6 +14,8 @@ use RuntimeException;
  */
 final class ChangeLifecycleCommandService
 {
+    private const WIP_IMPACT_OBJECT_TYPES = ['work_order', 'job_order', 'lot', 'batch', 'serial', 'finished_good', 'sales_order', 'purchase_order'];
+
     private ?object $db;
 
     public function __construct(?object $db)
@@ -1256,26 +1258,95 @@ final class ChangeLifecycleCommandService
         }
 
         $missing = [];
-        $hasDisposition = $dispositionKeys !== [];
         foreach ($effectivities as $effectivity) {
             $impact = strtolower($this->text($effectivity['release_impact'] ?? ''));
             if (!in_array($impact, ['retroactive', 'wip_hold', 'wip_rework', 'ship_hold'], true)) {
                 continue;
             }
-            $type = strtolower($this->text($effectivity['object_type'] ?? ''));
-            $id = $this->text($effectivity['object_id'] ?? '');
-            if ($hasDisposition && !in_array($type, ['work_order', 'job_order', 'lot', 'batch', 'serial', 'finished_good', 'sales_order', 'purchase_order'], true)) {
+            $impactedObjects = $this->impactedWipObjectsForEffectivity($effectivity);
+            if ($impactedObjects === []) {
+                $missing[] = $effectivity + ['missing_reason' => 'wip_impact_scope_required'];
                 continue;
             }
-            if ($type === '' || $id === '') {
-                $missing[] = $effectivity + ['missing_reason' => 'effectivity_object_required_for_wip_impact_disposition'];
-                continue;
-            }
-            if (!isset($dispositionKeys[$type . '|' . $id])) {
-                $missing[] = $effectivity + ['missing_reason' => 'wip_impact_disposition_not_enumerated'];
+            foreach ($impactedObjects as $object) {
+                $type = strtolower($this->text($object['object_type'] ?? ''));
+                $id = $this->text($object['object_id'] ?? '');
+                if ($type === '' || $id === '') {
+                    $missing[] = $effectivity + ['missing_reason' => 'effectivity_object_required_for_wip_impact_disposition'];
+                    continue;
+                }
+                if (!isset($dispositionKeys[$type . '|' . $id])) {
+                    $missing[] = $effectivity + [
+                        'missing_reason' => 'wip_impact_disposition_not_enumerated',
+                        'missing_wip_object_type' => $type,
+                        'missing_wip_object_id' => $id,
+                    ];
+                }
             }
         }
         return $missing;
+    }
+
+    /**
+     * @param array<string, mixed> $effectivity
+     * @return list<array{object_type: string, object_id: string}>
+     */
+    private function impactedWipObjectsForEffectivity(array $effectivity): array
+    {
+        $objects = [];
+        $type = strtolower($this->text($effectivity['object_type'] ?? ''));
+        $id = $this->text($effectivity['object_id'] ?? '');
+        if (in_array($type, self::WIP_IMPACT_OBJECT_TYPES, true) && $id !== '') {
+            $objects[] = ['object_type' => $type, 'object_id' => $id];
+        }
+
+        foreach ($this->effectivityImpactContainers($effectivity) as $container) {
+            foreach (['impacted_wip_objects', 'wip_impacts', 'impacted_objects', 'impact_set', 'wip_objects'] as $key) {
+                $entries = $container[$key] ?? null;
+                if (!is_array($entries)) {
+                    continue;
+                }
+                foreach ($entries as $entry) {
+                    if (!is_array($entry)) {
+                        continue;
+                    }
+                    $entryType = strtolower($this->text($entry['wip_object_type'] ?? $entry['object_type'] ?? ''));
+                    $entryId = $this->text($entry['wip_object_id'] ?? $entry['object_id'] ?? '');
+                    if (in_array($entryType, self::WIP_IMPACT_OBJECT_TYPES, true) && $entryId !== '') {
+                        $objects[] = ['object_type' => $entryType, 'object_id' => $entryId];
+                    }
+                }
+            }
+        }
+
+        $unique = [];
+        foreach ($objects as $object) {
+            $unique[$object['object_type'] . '|' . $object['object_id']] = $object;
+        }
+        return array_values($unique);
+    }
+
+    /**
+     * @param array<string, mixed> $effectivity
+     * @return list<array<string, mixed>>
+     */
+    private function effectivityImpactContainers(array $effectivity): array
+    {
+        $containers = [$effectivity];
+        foreach (['effectivity_scope', 'metadata', 'impact_scope', 'release_impact_scope'] as $field) {
+            $value = $effectivity[$field] ?? null;
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) {
+                    $containers[] = $decoded;
+                }
+                continue;
+            }
+            if (is_array($value)) {
+                $containers[] = $value;
+            }
+        }
+        return $containers;
     }
 
     /**

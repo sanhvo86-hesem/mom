@@ -150,8 +150,142 @@ function main() {
   }
 
   validateGraphicsGovernance(graphicsGovernance, packets);
+  validateWorldclassPackArtifacts(graphicsGovernance);
 
   reportAndExit();
+}
+
+function resolvePackPath(packPath) {
+  return String(packPath || '')
+    .replace(/^mom-design-canonical\//, 'mom/design/canonical/')
+    .replace(/^mom-design-enriched\//, 'mom/design/enriched/')
+    .replace(/^mom-design-graphics\//, 'mom/design/graphics/')
+    .replace(/^mom-design-repo-alignment\//, 'mom/design/repo-alignment/');
+}
+
+function validateWorldclassPackArtifacts(graphicsGovernance) {
+  const manifest = readJson('mom/design/canonical/manifest.json');
+  if (!manifest) return;
+
+  const packets = Array.isArray(manifest.packets) ? manifest.packets : [];
+  if (!packets.length) {
+    errors.push('mom/design/canonical/manifest.json: packets must not be empty');
+    return;
+  }
+  if (Number(manifest.moduleCount || 0) !== packets.length) {
+    errors.push(`mom/design/canonical/manifest.json: moduleCount ${manifest.moduleCount} does not match packets length ${packets.length}`);
+  }
+
+  const canonicalIds = new Set();
+  for (const packetRef of packets) {
+    const moduleId = String(packetRef.moduleId || '').trim();
+    const templateId = String(packetRef.templateId || '').trim();
+    const canonicalPath = resolvePackPath(packetRef.canonicalPath);
+    const annexPath = resolvePackPath(packetRef.annexPath);
+    if (!moduleId) errors.push('mom/design/canonical/manifest.json: packet reference missing moduleId');
+    if (!templateId) errors.push(`mom/design/canonical/manifest.json: ${moduleId || '<unknown>'} missing templateId`);
+    if (canonicalIds.has(moduleId)) errors.push(`mom/design/canonical/manifest.json: duplicate moduleId ${moduleId}`);
+    canonicalIds.add(moduleId);
+    if (!fs.existsSync(rel(canonicalPath))) errors.push(`mom/design/canonical/manifest.json: canonical packet missing ${canonicalPath}`);
+    if (!fs.existsSync(rel(annexPath))) errors.push(`mom/design/canonical/manifest.json: annex packet missing ${annexPath}`);
+  }
+
+  const canonicalFiles = listJsonFiles('mom/design/canonical/module-build-packets');
+  const annexFiles = listJsonFiles('mom/design/canonical/module-build-packets-annex');
+  if (canonicalFiles.length !== packets.length) {
+    errors.push(`mom/design/canonical/module-build-packets: expected ${packets.length} files from manifest, found ${canonicalFiles.length}`);
+  }
+  if (annexFiles.length !== packets.length) {
+    errors.push(`mom/design/canonical/module-build-packets-annex: expected ${packets.length} files from manifest, found ${annexFiles.length}`);
+  }
+
+  const requiredPackFiles = [
+    'mom/design/canonical/schemas/module-build-packet.schema.json',
+    'mom/design/enriched/endpoint-catalog.json',
+    'mom/design/enriched/module-catalog-index.json',
+    'mom/design/enriched/schemas/enriched-module-build-packet.schema.json',
+    'mom/design/graphics/template-registry-authority.json',
+    'mom/design/graphics/theme-compatibility-matrix.json',
+    'mom/design/graphics/module-graphics-compliance-matrix.json',
+    'mom/design/graphics/graphics-lineage-graph.json',
+    'mom/design/graphics/visual-debt-observatory.json',
+    'mom/design/graphics/runtime-compliance-beacon.schema.json',
+    'mom/design/graphics/graphics-release-evidence-pack.schema.json',
+    'mom/design/repo-alignment/backend-graphics-authority-api-contract.json',
+    'mom/design/repo-alignment/graphics-governance-runtime-migration.md',
+  ];
+  for (const filePath of requiredPackFiles) {
+    if (!fs.existsSync(rel(filePath))) errors.push(`${filePath}: required worldclass pack artifact is missing`);
+  }
+
+  const templateAuthority = readJson('mom/design/graphics/template-registry-authority.json');
+  const complianceMatrix = readJson('mom/design/graphics/module-graphics-compliance-matrix.json');
+  const themeMatrix = readJson('mom/design/graphics/theme-compatibility-matrix.json');
+  const backendContract = readJson('mom/design/repo-alignment/backend-graphics-authority-api-contract.json');
+
+  if (templateAuthority) {
+    const templates = Array.isArray(templateAuthority.templates) ? templateAuthority.templates : [];
+    if (templates.length !== packets.length) {
+      errors.push(`mom/design/graphics/template-registry-authority.json: expected ${packets.length} templates from canonical manifest, found ${templates.length}`);
+    }
+    const templatesById = new Set(templates.map((template) => String(template.templateId || '')));
+    for (const packetRef of packets) {
+      if (!templatesById.has(String(packetRef.templateId || ''))) {
+        errors.push(`mom/design/graphics/template-registry-authority.json: missing template ${packetRef.templateId} for ${packetRef.moduleId}`);
+      }
+    }
+  }
+
+  if (complianceMatrix) {
+    const rows = Array.isArray(complianceMatrix.modules)
+      ? complianceMatrix.modules
+      : (Array.isArray(complianceMatrix.matrix) ? complianceMatrix.matrix : []);
+    if (rows.length !== packets.length) {
+      errors.push(`mom/design/graphics/module-graphics-compliance-matrix.json: expected ${packets.length} rows from canonical manifest, found ${rows.length}`);
+    }
+    const rowIds = new Set(rows.map((row) => String(row.moduleId || '')));
+    for (const packetRef of packets) {
+      if (!rowIds.has(String(packetRef.moduleId || ''))) {
+        errors.push(`mom/design/graphics/module-graphics-compliance-matrix.json: missing compliance row for ${packetRef.moduleId}`);
+      }
+    }
+  }
+
+  if (themeMatrix) {
+    const rows = Array.isArray(themeMatrix.matrix) ? themeMatrix.matrix : [];
+    if (!rows.length) errors.push('mom/design/graphics/theme-compatibility-matrix.json: matrix must not be empty');
+    for (const row of rows) {
+      const status = String(row.status || '').toLowerCase();
+      const hasRuntime = row.runtimePresetExists === true;
+      if (status === 'exact-match' && !hasRuntime) {
+        errors.push(`mom/design/graphics/theme-compatibility-matrix.json: ${row.adminThemeId || '<unknown>'} is exact-match without runtimePresetExists`);
+      }
+      if (!hasRuntime && !row.requiredAction) {
+        errors.push(`mom/design/graphics/theme-compatibility-matrix.json: ${row.adminThemeId || '<unknown>'} lacks requiredAction for non-runtime theme`);
+      }
+    }
+  }
+
+  if (backendContract) {
+    const serialized = JSON.stringify(backendContract);
+    for (const endpoint of [
+      'admin_template_registry_get',
+      'admin_graphics_impact_template',
+      'admin_graphics_compliance_get',
+      'admin_graphics_rollout_apply',
+      'admin_graphics_release_blockers_get',
+    ]) {
+      if (!serialized.includes(endpoint)) {
+        warnings.push(`mom/design/repo-alignment/backend-graphics-authority-api-contract.json: missing endpoint reference ${endpoint}`);
+      }
+    }
+  }
+
+  const releaseLink = graphicsGovernance.graphicsReleaseLink || {};
+  const authorityRefs = Array.isArray(releaseLink.graphicsAuthorityRefs) ? releaseLink.graphicsAuthorityRefs : [];
+  if (!authorityRefs.some((ref) => String(ref).includes('mom/design/graphics'))) {
+    warnings.push('graphics-governance: graphicsReleaseLink does not yet reference mom/design/graphics pack artifacts; current release remains compatibility projection');
+  }
 }
 
 function validateStatusManifest(statusManifest) {

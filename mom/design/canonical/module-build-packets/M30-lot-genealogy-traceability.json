@@ -1,0 +1,235 @@
+{
+  "moduleId": "M30-lot-genealogy-traceability",
+  "moduleName": "Phả hệ lô và truy xuất",
+  "route": "/mom/traceability/genealogy",
+  "domain": "MOM",
+  "criticality": "regulated",
+  "ownerTeam": "MOM Traceability",
+  "processOwner": "Traceability Lead",
+  "primaryEntity": "genealogyRecord",
+  "contractRefs": [
+    "mom/contracts/objects/genealogyRecord/contract.json",
+    "mom/design/module-api-catalog/M30-lot-genealogy-traceability.json"
+  ],
+  "templateId": "T-exception-hub-genealogy",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M30-lot-genealogy-traceability.genealogy-search",
+      "screenName": "Genealogy search",
+      "type": "exception-hub",
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.graph-view",
+      "screenName": "Graph view",
+      "type": "supporting-screen",
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.timeline-view",
+      "screenName": "Timeline view",
+      "type": "supporting-screen",
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.impacted-objects-list",
+      "screenName": "Impacted objects list",
+      "type": "supporting-screen",
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    },
+    {
+      "screenId": "M30-lot-genealogy-traceability.export-package",
+      "screenName": "Export package",
+      "type": "supporting-screen",
+      "blocks": [
+        "M30-lot-genealogy-traceability.header",
+        "M30-lot-genealogy-traceability.main",
+        "M30-lot-genealogy-traceability.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M30-lot-genealogy-traceability.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M30-lot-genealogy-traceability.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M30-lot-genealogy-traceability.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M30-lot-genealogy-traceability.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M30-lot-genealogy-traceability.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m30.lot.genealogy.traceability.list",
+    "m30.lot.genealogy.traceability.detail",
+    "m30.lot.genealogy.traceability.lookup",
+    "m30.lot.genealogy.traceability.metrics",
+    "m30.lot.genealogy.traceability.update",
+    "m30.lot.genealogy.traceability.command.expand-upstream",
+    "m30.lot.genealogy.traceability.command.expand-downstream",
+    "m30.lot.genealogy.traceability.command.freeze-trace-report",
+    "m30.lot.genealogy.traceability.export"
+  ],
+  "workflow": {
+    "states": [
+      "current"
+    ],
+    "transitions": [
+      {
+        "action": "freezeTraceReport",
+        "transition": "current -> current"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "genealogy.read",
+      "genealogy.export",
+      "genealogy.freeze"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "ExpandUpstreamRequested",
+      "ExpandDownstreamRequested",
+      "FreezeTraceReportRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "grid"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M30-lot-genealogy-traceability/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "genealogyRecord",
+      "genealogyRecord",
+      "traceLink",
+      "shipmentLink"
+    ]
+  },
+  "moduleArchetype": "exception-hub",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "kpi-bar",
+    "filter",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "read_only",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}

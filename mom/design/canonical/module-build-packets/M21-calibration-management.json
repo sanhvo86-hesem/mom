@@ -1,0 +1,262 @@
+{
+  "moduleId": "M21-calibration-management",
+  "moduleName": "Hiệu chuẩn",
+  "route": "/eqms/calibration",
+  "domain": "eQMS",
+  "criticality": "regulated",
+  "ownerTeam": "Quality Systems",
+  "processOwner": "Metrology Manager",
+  "primaryEntity": "calibrationRecord",
+  "contractRefs": [
+    "mom/contracts/objects/calibrationRecord/contract.json",
+    "mom/design/module-api-catalog/M21-calibration-management.json"
+  ],
+  "templateId": "T-evidence-workspace-calibration",
+  "templateVersion": "1.0.0",
+  "screens": [
+    {
+      "screenId": "M21-calibration-management.calibration-schedule",
+      "screenName": "Calibration schedule",
+      "type": "evidence-workspace",
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.calibration-execution",
+      "screenName": "Calibration execution",
+      "type": "supporting-screen",
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.result-review",
+      "screenName": "Result review",
+      "type": "supporting-screen",
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.certificate-preview",
+      "screenName": "Certificate preview",
+      "type": "supporting-screen",
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    },
+    {
+      "screenId": "M21-calibration-management.audit-history",
+      "screenName": "Audit/history",
+      "type": "supporting-screen",
+      "blocks": [
+        "M21-calibration-management.header",
+        "M21-calibration-management.main",
+        "M21-calibration-management.actions"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "blockId": "M21-calibration-management.header",
+      "blockType": "page-header",
+      "zone": "header"
+    },
+    {
+      "blockId": "M21-calibration-management.main",
+      "blockType": "form-section",
+      "zone": "main"
+    },
+    {
+      "blockId": "M21-calibration-management.actions",
+      "blockType": "action-bar",
+      "zone": "footer"
+    },
+    {
+      "blockId": "M21-calibration-management.audit",
+      "blockType": "audit-trail",
+      "zone": "sidebar"
+    },
+    {
+      "blockId": "M21-calibration-management.signatures",
+      "blockType": "signature-panel",
+      "zone": "sidebar"
+    }
+  ],
+  "apiBindings": [
+    "m21.calibration.management.list",
+    "m21.calibration.management.detail",
+    "m21.calibration.management.lookup",
+    "m21.calibration.management.metrics",
+    "m21.calibration.management.update",
+    "m21.calibration.management.command.start",
+    "m21.calibration.management.command.record-result",
+    "m21.calibration.management.command.submit-review",
+    "m21.calibration.management.command.approve",
+    "m21.calibration.management.command.declare-oot",
+    "m21.calibration.management.command.close",
+    "m21.calibration.management.export"
+  ],
+  "workflow": {
+    "states": [
+      "scheduled",
+      "in_progress",
+      "pending_review",
+      "approved",
+      "out_of_tolerance",
+      "closed"
+    ],
+    "transitions": [
+      {
+        "action": "start",
+        "transition": "scheduled -> in_progress"
+      },
+      {
+        "action": "submitReview",
+        "transition": "in_progress -> pending_review"
+      },
+      {
+        "action": "approve",
+        "transition": "pending_review -> approved"
+      },
+      {
+        "action": "declareOOT",
+        "transition": "pending_review -> out_of_tolerance"
+      },
+      {
+        "action": "close",
+        "transition": "approved|out_of_tolerance -> closed"
+      }
+    ]
+  },
+  "permissions": {
+    "permissions": [
+      "calibration.read",
+      "calibration.execute",
+      "calibration.approve",
+      "calibration.sign",
+      "calibration.export"
+    ],
+    "negativeTestsRequired": true,
+    "fieldMaskingRequired": true
+  },
+  "audit": {
+    "required": true,
+    "controlledRecord": true,
+    "signatureRequired": true,
+    "eventFamilies": [
+      "LookupUsed",
+      "RecordUpdated",
+      "StartRequested",
+      "RecordResultRequested",
+      "SubmitReviewRequested",
+      "ApproveRequested",
+      "DeclareOotRequested",
+      "CloseRequested",
+      "ExportRequested"
+    ]
+  },
+  "i18n": {
+    "primaryLocale": "vi-VN",
+    "lockedEnglishTerms": [
+      "OEE",
+      "SPC",
+      "CAPA",
+      "NCR",
+      "MRB",
+      "IQC",
+      "FAIR",
+      "ECO",
+      "ECN"
+    ]
+  },
+  "responsive": {
+    "deviceProfile": "office",
+    "supportedViewports": [
+      "desktop",
+      "tablet"
+    ],
+    "containerQueryRequired": false,
+    "printSupport": true
+  },
+  "accessibility": {
+    "wcagLevel": "2.2 AA",
+    "apgPatterns": [
+      "dialog"
+    ],
+    "screenReaderSummaryRequired": false,
+    "keyboardCritical": true
+  },
+  "performance": {
+    "firstMeaningfulRenderMs": 2500,
+    "gridInteractionP95Ms": 150,
+    "chartRenderP95Ms": null,
+    "realtimeLatencyMs": null
+  },
+  "qa": {
+    "requiredGates": [
+      "G01",
+      "G04",
+      "G05",
+      "G07",
+      "G08",
+      "G10",
+      "G16",
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ],
+    "evidenceBundleRef": "mom/_reports/releases/{releaseId}/M21-calibration-management/"
+  },
+  "traceability": {
+    "required": true,
+    "primaryLinks": [
+      "calibrationRecord",
+      "calibrationRecord",
+      "calibrationResult",
+      "referenceStandard"
+    ]
+  },
+  "moduleArchetype": "evidence-workspace",
+  "version": "1.0.0",
+  "zones": [
+    "header",
+    "main",
+    "sidebar",
+    "footer"
+  ],
+  "regulatoryScope": {
+    "recordClass": "part11-record",
+    "electronicRecordReliedUpon": true,
+    "electronicSignatureRequired": true,
+    "requiredGates": [
+      "G14",
+      "G15",
+      "G18",
+      "G19"
+    ]
+  },
+  "densityModes": [
+    "default",
+    "comfortable"
+  ],
+  "offlineSupport": {
+    "mode": "forbidden",
+    "policy": {
+      "readReference": "allowed",
+      "draftCapture": "forbidden",
+      "mutations": "forbidden"
+    }
+  },
+  "releaseDate": "2026-04-13"
+}
