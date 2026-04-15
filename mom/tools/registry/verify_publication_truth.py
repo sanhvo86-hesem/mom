@@ -663,6 +663,8 @@ def main() -> int:
                       f"rows={len(compliance_rows) if isinstance(compliance_rows, list) else 'n/a'} packets={pack_count}")
 
             theme_matrix_path = pack_artifacts["theme_compatibility_matrix"]
+            theme_rows = []
+            runtime_rows = []
             if theme_matrix_path.is_file():
                 theme_matrix = load(theme_matrix_path)
                 theme_rows = theme_matrix.get("matrix", [])
@@ -687,6 +689,28 @@ def main() -> int:
                 ]
                 check("graphics_pack_theme_matrix_blocks_unmapped_runtime_themes", not unsafe_rows,
                       f"unsafe_rows={unsafe_rows[:10]}")
+
+            visual_debt_path = pack_artifacts["visual_debt_observatory"]
+            if visual_debt_path.is_file():
+                visual_debt = load(visual_debt_path)
+                visual_summary = visual_debt.get("summary", {})
+                detected_browser_authority = [
+                    key for key in visual_summary.get("browserAuthorityKeysDetected", [])
+                    if key
+                ] if isinstance(visual_summary.get("browserAuthorityKeysDetected", []), list) else ["<invalid>"]
+                check("graphics_pack_visual_debt_marked_projection",
+                      visual_debt.get("artifactRole") == "visual-debt-projection"
+                      and visual_debt.get("productionAuthority") is False,
+                      f"artifactRole={visual_debt.get('artifactRole')} productionAuthority={visual_debt.get('productionAuthority')}")
+                check("graphics_pack_visual_debt_no_browser_authority_detected",
+                      not detected_browser_authority,
+                      f"browserAuthorityKeysDetected={detected_browser_authority}")
+                if theme_rows:
+                    check("graphics_pack_visual_debt_theme_counts_match_matrix",
+                          int(visual_summary.get("adminUiThemeCount") or 0) == len(theme_rows)
+                          and int(visual_summary.get("runtimeThemePresetCount") or 0) == len(runtime_rows)
+                          and int(visual_summary.get("exactThemeOverlap") or 0) == len(runtime_rows),
+                          f"summary={visual_summary} themeRows={len(theme_rows)} runtimeRows={len(runtime_rows)}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")

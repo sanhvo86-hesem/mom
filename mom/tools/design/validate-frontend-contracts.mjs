@@ -221,6 +221,7 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
   const templateAuthority = readJson('mom/design/graphics/template-registry-authority.json');
   const complianceMatrix = readJson('mom/design/graphics/module-graphics-compliance-matrix.json');
   const themeMatrix = readJson('mom/design/graphics/theme-compatibility-matrix.json');
+  const visualDebt = readJson('mom/design/graphics/visual-debt-observatory.json');
   const backendContract = readJson('mom/design/repo-alignment/backend-graphics-authority-api-contract.json');
 
   if (templateAuthority) {
@@ -275,6 +276,26 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
       }
       if (!hasRuntime && !row.requiredAction) {
         errors.push(`mom/design/graphics/theme-compatibility-matrix.json: ${row.adminThemeId || '<unknown>'} lacks requiredAction for non-runtime theme`);
+      }
+    }
+  }
+
+  if (visualDebt) {
+    if (visualDebt.artifactRole !== 'visual-debt-projection' || visualDebt.productionAuthority !== false) {
+      errors.push('mom/design/graphics/visual-debt-observatory.json: visual debt observatory must be explicitly marked as non-production projection');
+    }
+    const summary = visualDebt.summary || {};
+    const forbiddenDetected = Array.isArray(summary.browserAuthorityKeysDetected)
+      ? summary.browserAuthorityKeysDetected.filter(Boolean)
+      : [];
+    if (forbiddenDetected.length) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: forbidden browser authority keys are still reported as detected: ${forbiddenDetected.join(', ')}`);
+    }
+    if (themeMatrix) {
+      const rows = Array.isArray(themeMatrix.matrix) ? themeMatrix.matrix : [];
+      const runtimeRows = rows.filter((row) => row && row.runtimePresetExists === true);
+      if (Number(summary.adminUiThemeCount || 0) !== rows.length || Number(summary.runtimeThemePresetCount || 0) !== runtimeRows.length || Number(summary.exactThemeOverlap || 0) !== runtimeRows.length) {
+        errors.push(`mom/design/graphics/visual-debt-observatory.json: theme summary counts must match theme compatibility matrix rows/runtime overlap`);
       }
     }
   }
