@@ -1,0 +1,2761 @@
+{
+  "generated_at": "2026-04-15",
+  "repo": "sanhvo86-hesem/mom",
+  "inventory_count": 256,
+  "summary": {
+    "generated-authority-artifact": 175,
+    "narrative-agent-report": 60,
+    "narrative-control-artifact": 21
+  },
+  "items": [
+    {
+      "path": "mom/contracts/README.md",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/ai-authority-chain.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/authority-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/command-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/deprecation-ledger.json",
+      "topic": "cross-tranche:backlog-ledger",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/domain-map.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/event-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/glossary.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/migration-manifest.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/object-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/README.md",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/analytics--inventory-balance-snapshots/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/analytics--mes-oee-snapshots/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/analytics--plant-performance-snapshots/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/analytics--production-bom-snapshots/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/analytics--production-route-snapshots/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/commercial_customer--customer-care-cases/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/commercial_customer--customer-purchase-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/commercial_customer--quotations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/commercial_customer--quote-effectiveness-reviews/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/commercial_customer--sales-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--ap-invoices/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--ar-invoices/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--backdate-exceptions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--credit-memos/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--debit-memos/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--fixed-asset-capitalizations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--inventory-valuations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/finance--period-closes/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/integration_resilience--reconciliation-exceptions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--customer-returns/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--cycle-count-plans/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--freight-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--inventory-items/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--inventory-movements/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--shipments/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--stock-balances/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/inventory_logistics--warehouses/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--five-s-audits/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--incidents/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--maintenance-plans/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--maintenance-work-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--permits/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/maintenance_ehs--safety-observations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--assets/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--compliance-obligations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--customers/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--employees/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--equipment/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--measuring-devices/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--suppliers/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/master_data--tools/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/mes_execution--machine-alarms/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--dispatch-lists/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--ipqc-inspections/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--job-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--production-operations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--production-plans/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/planning_production--work-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--iqc-inspections/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--purchase-receipt-corrections/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--purchase-receipts/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--purchase-requisitions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--supplier-asns/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/procurement_supplier_quality--supplier-purchase-orders/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--audit-programs/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--concessions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--control-plans/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--corrective-actions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--deviations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--fqc-inspections/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--improvement-actions/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--msa-studies/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--nonconformances/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--oqc-inspections/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--override-controls/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/quality_improvement--spc-observations/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/objects/traceability_serialization--lot-genealogy/contract.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/package-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/registry-authority-standard.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/schemas/enterprise-registry-doctor-report.schema.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/schemas/registry-authority-standard.schema.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/state-model-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/contracts/table-registry.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/api-params.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/canonical-backend-standardization-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/command-runtime-bindings.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/computed-formulas.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/data-fields-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/data-fields-part1.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/data-fields-part2.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/data-fields.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/destructive-endpoint-quarantine.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/domain-architecture.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/domain-field-packs.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/endpoint-catalog-index.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/endpoint-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/endpoint-governance-classification.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/enterprise-event-contract-map.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/enterprise-frontend-simulation-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/enterprise-frontend-simulation-report.md",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/enterprise-registry-doctor-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/enterprise-registry-remediation-roadmap.md",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/field-types.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/foundation-governance-publication-summary.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/frontend-foundation-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/global-erp-mom-capability-audit.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/global-erp-mom-capability-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/graphics-governance-registry.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/graphics-template-registry.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/migration-gap-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/operational-blind-spot-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/operational-blind-spot-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/operational-stress-catalog.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/operational-stress-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/operational-stress-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/orphan-resolution.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/publication-entity-accounting.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/publication-truth-summary.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/registry-manifest.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/registry-quality-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/relation-map.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/runtime-access-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-authority-summary.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-library.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-command-center-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-diagnostics.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-enterprise-manifest.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-experience-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-operations-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-registry-contracts.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-release-log.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-round7-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/schema-studio-runtime-projections.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/status-options.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-diagnostics.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-manifest.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-registry-contracts.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections-segments.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/domains.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/endpoint-bindings.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/graphics-governance.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/graphics-release-link.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/relations.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/tables.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/system-contract-runtime-projections.segments/workflow-bindings.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/table-governance-overlay.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/table-registry.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/validation-rules.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave-gap-ledger.json",
+      "topic": "cross-tranche:backlog-ledger",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave0-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave0-governance-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave1-lifecycle-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave1-lifecycle-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave1-lifecycle-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave2-canonical-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave2-canonical-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave2-canonical-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave3-process-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave3-process-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave3-process-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave4-production-quality-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave4-production-quality-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave4-production-quality-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave5-maintenance-ehs-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave5-maintenance-ehs-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave5-maintenance-ehs-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave6-finance-projection-governance-policy.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave6-finance-projection-normalization.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/wave6-finance-projection-report.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/data/registry/workflow-library.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/database/schema-authority-summary.json",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/database/schema-authority-summary.md",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/database/schema.sql",
+      "topic": "cross-tranche:generated-authority",
+      "artifact_type": "generated-authority-artifact",
+      "claims_made": [
+        "Generated authority/proof artifact; must match authoritative generators and current repo state."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "generated from repo authority"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent1-repo-reality.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent2-standards-benchmark.md",
+      "topic": "tranche10:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references world-class positioning"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent3-vendor-benchmark.md",
+      "topic": "tranche10:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "Narrative tranche/control artifact; claims require re-verification before reuse."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent4-architecture-authority.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent5-reliability-security-compliance.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/agent6-defects-backlog.md",
+      "topic": "tranche10:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "records external blocker",
+        "records product-decision blocker",
+        "references world-class positioning"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent1-repo-reality.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent2-standards-benchmark.md",
+      "topic": "tranche10:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent3-vendor-benchmark.md",
+      "topic": "tranche10:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent4-architecture-authority.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent5-reliability-security-compliance.md",
+      "topic": "tranche10:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche10/pass2-agent6-defects-backlog.md",
+      "topic": "tranche10:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "records external blocker",
+        "records product-decision blocker"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent1-repo-reality.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent2-standards-benchmark.md",
+      "topic": "tranche13:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent3-vendor-benchmark.md",
+      "topic": "tranche13:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent4-architecture-authority.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "references world-class positioning"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent5-reliability-security-compliance.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/agent6-defects-backlog.md",
+      "topic": "tranche13:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records product-decision blocker",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent1-repo-reality.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent2-standards-benchmark.md",
+      "topic": "tranche13:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent3-vendor-benchmark.md",
+      "topic": "tranche13:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent4-architecture-authority.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent5-reliability-security-compliance.md",
+      "topic": "tranche13:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche13/pass2-agent6-defects-backlog.md",
+      "topic": "tranche13:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records product-decision blocker",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent1-repo-reality.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent2-standards-benchmark.md",
+      "topic": "tranche14:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent3-vendor-benchmark.md",
+      "topic": "tranche14:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent4-architecture-authority.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent5-reliability-security-compliance.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/agent6-defects-backlog.md",
+      "topic": "tranche14:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references world-class positioning",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent1-repo-reality.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references publishability/release gate",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent2-standards-benchmark.md",
+      "topic": "tranche14:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent3-vendor-benchmark.md",
+      "topic": "tranche14:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent4-architecture-authority.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references schema authority",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent5-reliability-security-compliance.md",
+      "topic": "tranche14:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche14/pass2-agent6-defects-backlog.md",
+      "topic": "tranche14:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references world-class positioning",
+        "references publishability/release gate"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent1-repo-reality.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent2-standards-benchmark.md",
+      "topic": "tranche15:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "records external blocker",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent3-vendor-benchmark.md",
+      "topic": "tranche15:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent4-architecture-authority.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent5-reliability-security-compliance.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/agent6-defects-backlog.md",
+      "topic": "tranche15:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records product-decision blocker",
+        "references world-class positioning",
+        "references publishability/release gate",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent1-repo-reality.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references publishability/release gate",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent2-standards-benchmark.md",
+      "topic": "tranche15:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references schema authority",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent3-vendor-benchmark.md",
+      "topic": "tranche15:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent4-architecture-authority.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent5-reliability-security-compliance.md",
+      "topic": "tranche15:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche15/pass2-agent6-defects-backlog.md",
+      "topic": "tranche15:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references publishability/release gate",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent1-repo-reality.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent2-standards-benchmark.md",
+      "topic": "tranche16:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent3-vendor-benchmark.md",
+      "topic": "tranche16:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent4-architecture-authority.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent5-reliability-security-vps.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/agent6-defects-backlog.md",
+      "topic": "tranche16:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "references publishability/release gate",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent1-repo-reality.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent2-standards-benchmark.md",
+      "topic": "tranche16:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent3-vendor-benchmark.md",
+      "topic": "tranche16:benchmark",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent4-architecture-authority.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "records product-decision blocker",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent5-reliability-security-vps.md",
+      "topic": "tranche16:agent-audit",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/agent-reports/tranche16/pass2-agent6-defects-backlog.md",
+      "topic": "tranche16:backlog-ledger",
+      "artifact_type": "narrative-agent-report",
+      "claims_made": [
+        "claims pass/green verification",
+        "records external blocker",
+        "records product-decision blocker",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/branch-strategy-tranche13.md",
+      "topic": "tranche13:branch-strategy",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/branch-strategy-tranche14.md",
+      "topic": "tranche14:branch-strategy",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/branch-strategy-tranche15.md",
+      "topic": "tranche15:branch-strategy",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/branch-strategy-tranche16.md",
+      "topic": "tranche16:branch-strategy",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
+      "topic": "cross-tranche:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "Narrative tranche/control artifact; claims require re-verification before reuse."
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/registry-artifact-segmentation-benchmark-2026-04-14.md",
+      "topic": "cross-tranche:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/unresolved-backlog-ledger-tranche10.md",
+      "topic": "tranche10:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/unresolved-backlog-ledger-tranche13.md",
+      "topic": "tranche13:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/unresolved-backlog-ledger-tranche14.md",
+      "topic": "tranche14:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references world-class positioning",
+        "references publishability/release gate"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/unresolved-backlog-ledger-tranche15.md",
+      "topic": "tranche15:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references world-class positioning",
+        "references publishability/release gate"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/unresolved-backlog-ledger-tranche16.md",
+      "topic": "tranche16:backlog-ledger",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "records external blocker",
+        "records product-decision blocker",
+        "references publishability/release gate",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-benchmark-dossier-tranche10.md",
+      "topic": "tranche10:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims closure of backlog or defects"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-benchmark-dossier-tranche13.md",
+      "topic": "tranche13:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-benchmark-dossier-tranche14.md",
+      "topic": "tranche14:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-benchmark-dossier-tranche15.md",
+      "topic": "tranche15:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references schema authority",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-benchmark-dossier-tranche16.md",
+      "topic": "tranche16:benchmark",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-class-swarm-closure-tranche10.md",
+      "topic": "tranche10:closure-signoff",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims verified complete capability",
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references schema authority"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-class-swarm-closure-tranche13.md",
+      "topic": "tranche13:closure-signoff",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-class-swarm-closure-tranche14.md",
+      "topic": "tranche14:closure-signoff",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-class-swarm-reaudit-closure-tranche15.md",
+      "topic": "tranche15:closure-signoff",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    },
+    {
+      "path": "mom/docs/system/world-class-swarm-reaudit-closure-tranche16.md",
+      "topic": "tranche16:closure-signoff",
+      "artifact_type": "narrative-control-artifact",
+      "claims_made": [
+        "claims pass/green verification",
+        "claims closure of backlog or defects",
+        "references world-class positioning",
+        "references schema authority",
+        "references publication truth",
+        "references branch/merge/cleanup strategy"
+      ],
+      "needs_reverification": true,
+      "source_of_truth_status": "narrative only; not source of truth"
+    }
+  ]
+}
