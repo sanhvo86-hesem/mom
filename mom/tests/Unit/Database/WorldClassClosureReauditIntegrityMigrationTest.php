@@ -57,7 +57,7 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $this->assertStringContainsString('VALIDATE CONSTRAINT chk_plm_change_orders_release_signature', $this->closureSql);
         $this->assertStringContainsString('plm_change_orders_release_signature_unvalidated_rows_block_constraint', $this->closureSql);
         $this->assertStringContainsString('ux_traceability_5m_obligations_scoped', $this->closureSql);
-        $this->assertStringContainsString('(COALESCE(org_plant_id, \'\'))', $this->closureSql);
+        $this->assertStringContainsString('(COALESCE(org_plant_id::text, \'\'))', $this->closureSql);
         $this->assertStringNotContainsString('NOT VALID', $this->closureSql);
     }
 

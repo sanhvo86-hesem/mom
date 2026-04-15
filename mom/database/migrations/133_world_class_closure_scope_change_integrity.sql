@@ -58,10 +58,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_traceability_5m_obligations_scoped
         operation_class,
         object_type,
         object_id,
-        (COALESCE(org_company_code, '')),
-        (COALESCE(org_legal_entity_code, '')),
-        (COALESCE(org_plant_id, '')),
-        (COALESCE(org_site_id, ''))
+        (COALESCE(org_company_code::text, '')),
+        (COALESCE(org_legal_entity_code::text, '')),
+        (COALESCE(org_plant_id::text, '')),
+        (COALESCE(org_site_id::text, ''))
     );
 
 -- 3) Released/terminal document and form-control records are immutable at the DB
