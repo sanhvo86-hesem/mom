@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T08:07:26.901732+00:00",
+    "generatedAt": "2026-04-15T10:51:39.440417+00:00",
     "simulationType": "contract_level_frontend_interaction",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",

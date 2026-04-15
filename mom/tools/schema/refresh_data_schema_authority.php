@@ -179,6 +179,20 @@ if (!is_array($schema)) {
 $schema = invoke_private($controller, 'normalizeEnterpriseSchema', [$schema, $actor]);
 $bundle = invoke_private($controller, 'buildCompilerBundle', [$schema, $designId, $actor]);
 $manifest = invoke_private($controller, 'updateEnterpriseRegistryArtifacts', [$bundle, null]);
+
+// The authority refresh defaults to the read-only system contract registry, but
+// schema-studio-* artifacts remain the editable workspace draft surface. Restore
+// that draft after compiling authority projections so Data Schema cannot confuse
+// runtime authority with a user-editable design layer.
+$workspaceManifest = null;
+if ($designId === 'system_contract_registry') {
+    $workspaceSchema = invoke_private($controller, 'loadDesignDocument', ['workspace']);
+    if (is_array($workspaceSchema)) {
+        $workspaceSchema = invoke_private($controller, 'normalizeEnterpriseSchema', [$workspaceSchema, $actor]);
+        $workspaceBundle = invoke_private($controller, 'buildCompilerBundle', [$workspaceSchema, 'workspace', $actor]);
+        $workspaceManifest = invoke_private($controller, 'updateEnterpriseRegistryArtifacts', [$workspaceBundle, null]);
+    }
+}
 run_refresh_command(['php', $portalRoot . '/tools/schema/refresh_schema_authority_summary.php'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_canonical_backend_standardization_catalog.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_data_fields_from_table_registry.py'], $projectRoot);
@@ -195,4 +209,6 @@ fwrite(STDOUT, json_encode([
     'manifestGeneratedAt' => $manifest['_meta']['generatedAt'] ?? '',
     'projectionCount' => $manifest['summary']['projectionCount'] ?? 0,
     'releaseReadinessScore' => $manifest['summary']['releaseReadinessScore'] ?? 0,
+    'workspaceManifestRestored' => is_array($workspaceManifest),
+    'workspaceProjectionCount' => is_array($workspaceManifest) ? (int)($workspaceManifest['summary']['projectionCount'] ?? 0) : null,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);

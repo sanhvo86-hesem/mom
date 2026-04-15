@@ -1072,6 +1072,7 @@ class SchemaStudioController extends BaseController
         $evidenceCount = 0;
         $lifecycleCount = 0;
         $uiHintCount = 0;
+        $workflowCandidateCount = 0;
         $workflowCount = 0;
         $policyCount = 0;
         $securityRoleCount = 0;
@@ -1094,6 +1095,7 @@ class SchemaStudioController extends BaseController
             $hasLifecycle = trim((string)($lifecycle['stage'] ?? '')) !== '' || trim((string)($lifecycle['effective_from'] ?? '')) !== '' || trim((string)($lifecycle['effective_until'] ?? '')) !== '';
             $hasUiHints = trim((string)($ui['default_widget'] ?? '')) !== '' || trim((string)($ui['icon'] ?? '')) !== '';
             $hasWorkflow = trim((string)($integration['workflow_id'] ?? '')) !== '' || count((array)($integration['workflow_bindings'] ?? [])) > 0;
+            $isWorkflowCandidate = $hasWorkflow || $this->tableWorkflowCandidate($table);
             $hasPolicy = !empty($table['rls_enabled']) || count((array)($table['policies'] ?? [])) > 0 || count((array)($security['policy_refs'] ?? [])) > 0;
             $hasSecurityRoles = count((array)($security['roles'] ?? [])) > 0;
 
@@ -1117,6 +1119,9 @@ class SchemaStudioController extends BaseController
             if ($hasUiHints) {
                 $uiHintCount++;
             }
+            if ($isWorkflowCandidate) {
+                $workflowCandidateCount++;
+            }
             if ($hasWorkflow) {
                 $workflowCount++;
             }
@@ -1139,7 +1144,7 @@ class SchemaStudioController extends BaseController
         $evidenceCoverage = $this->percentage($evidenceCount, $tableCount, 100);
         $lifecycleCoverage = $this->percentage($lifecycleCount, $tableCount, 100);
         $uiCoverage = $this->percentage($uiHintCount, $tableCount, 100);
-        $workflowCoverage = $this->percentage($workflowCount, $tableCount, 100);
+        $workflowCoverage = $this->percentage($workflowCount, max(1, $workflowCandidateCount), 100);
         $policyCoverage = $this->percentage($policyCount, $tableCount, 100);
         $securityRoleCoverage = $this->percentage($securityRoleCount, $tableCount, 100);
 
@@ -5116,6 +5121,8 @@ class SchemaStudioController extends BaseController
         $tableRegistry = $this->readRegistryDocumentWithFallback('table-registry', $registryPath);
         $relationMap = $this->readRegistryDocumentWithFallback('relation-map', $relationPath);
         $domainArch = $this->readRegistryDocumentWithFallback('domain-architecture', $domainPath);
+        $governanceOverlay = $this->readJsonFile($this->registryDirPath() . '/table-governance-overlay.json') ?? [];
+        $governanceByTable = is_array($governanceOverlay['tables'] ?? null) ? $governanceOverlay['tables'] : [];
         $registrySource = $this->registrySourceLabel($registryPath, 'mom/data/registry/table-registry.json');
         $registryUpdatedAt = $registryPath !== null && is_file($registryPath)
             ? gmdate('c', (int)(filemtime($registryPath) ?: time()))
@@ -5222,16 +5229,115 @@ class SchemaStudioController extends BaseController
                 $columnIndexMap[$colId] = ['table' => $tableIndex, 'column' => count($columns) - 1];
             }
 
+            $domain = (string)($domainMap[$tableName] ?? $tableDef['domain'] ?? 'default');
+            $governanceRow = is_array($governanceByTable[$tableName] ?? null) ? $governanceByTable[$tableName] : [];
+            $workflowRefs = array_values(array_filter(array_map('strval', is_array($governanceRow['workflowRefs'] ?? null) ? $governanceRow['workflowRefs'] : []), static fn(string $value): bool => trim($value) !== ''));
+            $workflowId = trim((string)($tableDef['workflowId'] ?? ''));
+            if ($workflowId === '') {
+                foreach ($workflowRefs as $workflowRef) {
+                    if (strpos($workflowRef, 'wf_') === 0) {
+                        $workflowId = $workflowRef;
+                        break;
+                    }
+                }
+            }
+            $workflowBindings = array_values(array_unique(array_filter(array_merge($workflowId !== '' ? [$workflowId] : [], $workflowRefs), static fn(string $value): bool => trim($value) !== '')));
+            $ownerRole = trim((string)($governanceRow['ownerRole'] ?? ''));
+            $stewardRole = trim((string)($governanceRow['stewardRole'] ?? ''));
+            $classification = trim((string)($governanceRow['dataClassification'] ?? ''));
+            $qualityProfile = is_array($governanceRow['qualityProfile'] ?? null) ? $governanceRow['qualityProfile'] : [];
+            $qualityChecks = array_values(array_filter(array_map('strval', is_array($qualityProfile['checks'] ?? null) ? $qualityProfile['checks'] : []), static fn(string $value): bool => trim($value) !== ''));
+            $policyRefs = array_values(array_unique(array_filter(array_merge(
+                $qualityChecks,
+                [
+                    trim((string)($governanceRow['authorityMode'] ?? '')) !== '' ? 'authority:' . trim((string)$governanceRow['authorityMode']) : '',
+                    trim((string)($governanceRow['deletionMode'] ?? '')) !== '' ? 'delete:' . trim((string)$governanceRow['deletionMode']) : '',
+                    trim((string)($qualityProfile['profile'] ?? '')) !== '' ? 'quality:' . trim((string)$qualityProfile['profile']) : '',
+                ]
+            ), static fn(string $value): bool => trim($value) !== '')));
+            $digitalThread = is_array($tableDef['digitalThread'] ?? null) ? $tableDef['digitalThread'] : [];
+            $digitalThreadLinks = array_values(array_unique(array_filter(array_merge(
+                is_array($digitalThread['upstream'] ?? null) ? array_map('strval', $digitalThread['upstream']) : [],
+                is_array($digitalThread['downstream'] ?? null) ? array_map('strval', $digitalThread['downstream']) : []
+            ), static fn(string $value): bool => trim($value) !== '')));
+            $label = $this->humanizeKey($tableName);
+            $semanticTokens = array_values(array_filter(array_unique(array_merge(
+                [$domain],
+                is_array($governanceRow['businessObjectRefs'] ?? null) ? array_map('strval', $governanceRow['businessObjectRefs']) : [],
+                $digitalThreadLinks
+            )), static fn(string $value): bool => trim($value) !== ''));
+
             $schema['tables'][] = [
                 'id' => $tableId,
                 'name' => $tableName,
                 'schema' => 'public',
                 'comment' => (string)($tableDef['description'] ?? $tableDef['comment'] ?? ''),
-                'domain' => (string)($domainMap[$tableName] ?? $tableDef['domain'] ?? 'default'),
+                'domain' => $domain,
                 'color' => null,
-                'tags' => ['registry_contract'],
+                'tags' => array_values(array_unique(array_filter(array_merge(
+                    ['registry_contract', $domain],
+                    $workflowBindings,
+                    $digitalThreadLinks
+                ), static fn(string $value): bool => trim($value) !== ''))),
                 'rls_enabled' => false,
                 'readOnly' => true,
+                'labels' => [
+                    'vi' => $label,
+                    'en' => $label,
+                ],
+                'business' => [
+                    'business_name_vi' => $label,
+                    'business_name_en' => $label,
+                    'manufacturing_semantics' => implode(' ', $semanticTokens),
+                ],
+                'canonical' => [
+                    'layer' => $this->inferLayerForTable($schema, ['name' => $tableName, 'domain' => $domain]),
+                    'layer_code' => $this->safeId($this->inferLayerForTable($schema, ['name' => $tableName, 'domain' => $domain]), 'foundation'),
+                    'object_key' => $this->safeId($tableName, 'table'),
+                    'capability' => $domain,
+                    'canonical_status' => 'published_registry_contract',
+                    'lineage_targets' => $digitalThreadLinks,
+                ],
+                'governance' => [
+                    'owner' => $ownerRole !== '' ? $ownerRole : 'platform_owner',
+                    'steward' => $stewardRole !== '' ? $stewardRole : 'platform_data_steward',
+                    'approver_role' => $ownerRole !== '' ? $ownerRole : 'platform_owner',
+                    'classification' => $classification !== '' ? $classification : 'internal_operational',
+                    'reason_codes' => [],
+                    'review_evidence' => array_values(array_filter([
+                        'table-governance-overlay',
+                        'table-registry',
+                        trim((string)($governanceRow['systemOfRecord'] ?? '')),
+                    ], static fn(string $value): bool => trim($value) !== '')),
+                ],
+                'lifecycle' => [
+                    'stage' => 'published_registry_contract',
+                    'effective_from' => (string)(($tableRegistry['_meta']['generatedAt'] ?? null) ?: $registryUpdatedAt),
+                    'effective_until' => '',
+                ],
+                'ui' => [
+                    'default_widget' => 'registry_table',
+                    'icon' => 'table',
+                    'surfaces' => is_array($governanceRow['uiSurfaces'] ?? null) ? array_values($governanceRow['uiSurfaces']) : ['system_contract_registry'],
+                ],
+                'integration' => [
+                    'workflow_id' => $workflowId,
+                    'workflow_bindings' => $workflowBindings,
+                    'event_topics' => is_array($governanceRow['eventContractRefs'] ?? null) ? array_values($governanceRow['eventContractRefs']) : [],
+                    'digital_thread_links' => $digitalThreadLinks,
+                    'api_contract_refs' => is_array($governanceRow['apiContractRefs'] ?? null) ? array_values($governanceRow['apiContractRefs']) : [],
+                ],
+                'security' => [
+                    'sensitivity' => $classification !== '' ? $classification : 'internal_operational',
+                    'masking' => [],
+                    'roles' => array_values(array_filter(array_unique([$ownerRole, $stewardRole]), static fn(string $value): bool => trim($value) !== '')),
+                    'policy_refs' => $policyRefs,
+                ],
+                'policies' => array_map(static fn(string $policyRef): array => ['key' => $policyRef, 'source' => 'table-governance-overlay'], $policyRefs),
+                'reporting' => [
+                    'subject_area' => $domain,
+                    'grain' => 'one_row_per_' . $this->safeId($tableName, 'table'),
+                ],
                 'canvas' => [
                     'x' => 80 + (($tableIndex % 5) * 300),
                     'y' => 80 + ((int)floor($tableIndex / 5) * 240),
