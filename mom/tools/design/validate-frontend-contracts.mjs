@@ -222,6 +222,7 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
   const complianceMatrix = readJson('mom/design/graphics/module-graphics-compliance-matrix.json');
   const themeMatrix = readJson('mom/design/graphics/theme-compatibility-matrix.json');
   const visualDebt = readJson('mom/design/graphics/visual-debt-observatory.json');
+  const enrichedEndpointCatalog = readJson('mom/design/enriched/endpoint-catalog.json');
   const backendContract = readJson('mom/design/repo-alignment/backend-graphics-authority-api-contract.json');
 
   if (templateAuthority) {
@@ -284,6 +285,19 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
     if (visualDebt.artifactRole !== 'visual-debt-projection' || visualDebt.productionAuthority !== false) {
       errors.push('mom/design/graphics/visual-debt-observatory.json: visual debt observatory must be explicitly marked as non-production projection');
     }
+    const projectionInputs = visualDebt.projectionInputs || {};
+    for (const [key, expectedFragment] of Object.entries({
+      canonicalManifestRef: 'mom/design/canonical/manifest.json',
+      themeCompatibilityMatrixRef: 'mom/design/graphics/theme-compatibility-matrix.json',
+      backendRegistryRef: 'mom/data/registry/graphics-governance-registry.json',
+      moduleComplianceRef: '#/moduleGraphicsCompliance',
+      runtimeBeaconRef: '#/runtimeGraphicsComplianceBeacon',
+      registryVisualDebtRef: '#/visualDebtObservatory'
+    })) {
+      if (!String(projectionInputs[key] || '').includes(expectedFragment)) {
+        errors.push(`mom/design/graphics/visual-debt-observatory.json: projectionInputs.${key} must reference ${expectedFragment}`);
+      }
+    }
     const summary = visualDebt.summary || {};
     const forbiddenDetected = Array.isArray(summary.browserAuthorityKeysDetected)
       ? summary.browserAuthorityKeysDetected.filter(Boolean)
@@ -297,6 +311,53 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
       if (Number(summary.adminUiThemeCount || 0) !== rows.length || Number(summary.runtimeThemePresetCount || 0) !== runtimeRows.length || Number(summary.exactThemeOverlap || 0) !== runtimeRows.length) {
         errors.push(`mom/design/graphics/visual-debt-observatory.json: theme summary counts must match theme compatibility matrix rows/runtime overlap`);
       }
+    }
+    const registryComplianceRows = Array.isArray(graphicsGovernance.moduleGraphicsCompliance?.matrix)
+      ? graphicsGovernance.moduleGraphicsCompliance.matrix
+      : [];
+    const registryBeaconRows = Array.isArray(graphicsGovernance.runtimeGraphicsComplianceBeacon?.beacons)
+      ? graphicsGovernance.runtimeGraphicsComplianceBeacon.beacons
+      : [];
+    const registryComplianceSummary = graphicsGovernance.moduleGraphicsCompliance?.summary || {};
+    const registryVisualDebt = graphicsGovernance.visualDebtObservatory || {};
+    const registrySignals = registryVisualDebt.globalSignals || {};
+    const expectedPending = Math.max(0, packets.length - registryComplianceRows.length);
+    if (Number(summary.canonicalPacketCount || 0) !== packets.length) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: canonicalPacketCount ${summary.canonicalPacketCount} must match canonical manifest packets ${packets.length}`);
+    }
+    const endpointAliases = enrichedEndpointCatalog && typeof enrichedEndpointCatalog.aliases === 'object'
+      ? Object.keys(enrichedEndpointCatalog.aliases || {})
+      : [];
+    if (Number(summary.endpointAliasCount || 0) !== endpointAliases.length) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: endpointAliasCount ${summary.endpointAliasCount} must match enriched endpoint aliases ${endpointAliases.length}`);
+    }
+    if (Number(summary.registryAuditedModuleCount || 0) !== registryComplianceRows.length) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: registryAuditedModuleCount ${summary.registryAuditedModuleCount} must match backend compliance rows ${registryComplianceRows.length}`);
+    }
+    if (Number(summary.runtimeBeaconReportedModules || 0) !== registryBeaconRows.length) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: runtimeBeaconReportedModules ${summary.runtimeBeaconReportedModules} must match runtime beacon rows ${registryBeaconRows.length}`);
+    }
+    if (Number(summary.modulesPendingGraphicsAudit || 0) !== expectedPending) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: modulesPendingGraphicsAudit ${summary.modulesPendingGraphicsAudit} must equal canonical packets minus backend-audited modules (${expectedPending})`);
+    }
+    if (Number(summary.fullAdminControlledModuleCount || 0) !== Number(registryComplianceSummary.fullAdminControlledCount || 0)) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: fullAdminControlledModuleCount ${summary.fullAdminControlledModuleCount} must match backend compliance summary ${registryComplianceSummary.fullAdminControlledCount}`);
+    }
+    if (Number(summary.releaseBlockingModules || 0) !== Number(graphicsGovernance.runtimeGraphicsComplianceBeacon?.summary?.releaseBlockingModules || registryComplianceSummary.blockedCount || 0)) {
+      errors.push('mom/design/graphics/visual-debt-observatory.json: releaseBlockingModules must match runtime beacon or backend compliance blocked count');
+    }
+    if (Number(summary.privateCssDebtScore || 0) !== Number(registrySignals.privateCssDebtScore || 0)) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: privateCssDebtScore ${summary.privateCssDebtScore} must match backend visual debt signal ${registrySignals.privateCssDebtScore}`);
+    }
+    if (Number(summary.tokenCoveragePercent || 0) !== Number(registrySignals.tokenCoveragePercent || 0)) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: tokenCoveragePercent ${summary.tokenCoveragePercent} must match backend visual debt signal ${registrySignals.tokenCoveragePercent}`);
+    }
+    if (Number(summary.bridgeAliasDebtCount || 0) !== Number(registrySignals.bridgeAliasDebtCount || 0)) {
+      errors.push(`mom/design/graphics/visual-debt-observatory.json: bridgeAliasDebtCount ${summary.bridgeAliasDebtCount} must match backend visual debt signal ${registrySignals.bridgeAliasDebtCount}`);
+    }
+    const scopeRule = String(visualDebt.scopeRule || '');
+    if (expectedPending > 0 && !scopeRule.includes('Claiming all canonical pack modules as full-admin-controlled is blocked')) {
+      errors.push('mom/design/graphics/visual-debt-observatory.json: scopeRule must block full-pack control claims while pending module audits remain');
     }
   }
 

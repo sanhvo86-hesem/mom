@@ -3,6 +3,14 @@
   "artifactRole": "visual-debt-projection",
   "productionAuthority": false,
   "consumerRule": "This artifact reports graphics debt detected by the imported pack alignment. Production release authority remains the backend graphics governance registry and publication truth gates.",
+  "projectionInputs": {
+    "canonicalManifestRef": "mom/design/canonical/manifest.json",
+    "themeCompatibilityMatrixRef": "mom/design/graphics/theme-compatibility-matrix.json",
+    "backendRegistryRef": "mom/data/registry/graphics-governance-registry.json",
+    "moduleComplianceRef": "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+    "runtimeBeaconRef": "mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+    "registryVisualDebtRef": "mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory"
+  },
   "summary": {
     "adminUiThemeCount": 23,
     "runtimeThemePresetCount": 23,
@@ -10,7 +18,14 @@
     "canonicalPacketCount": 34,
     "enrichedPacketCount": 34,
     "endpointAliasCount": 395,
-    "modulesPendingGraphicsAudit": 34,
+    "registryAuditedModuleCount": 2,
+    "runtimeBeaconReportedModules": 2,
+    "fullAdminControlledModuleCount": 2,
+    "releaseBlockingModules": 0,
+    "modulesPendingGraphicsAudit": 32,
+    "privateCssDebtScore": 14777,
+    "tokenCoveragePercent": 29,
+    "bridgeAliasDebtCount": 0,
     "browserAuthorityKeysDetected": [],
     "forbiddenBrowserAuthorityKeysGoverned": [
       "hesem_layout_templates",
@@ -18,10 +33,11 @@
     ],
     "zoneWhitelistRuntimeStatus": "spec-only-or-unverified"
   },
+  "scopeRule": "Current graphics release proof applies to the backend-audited runtime scope. Claiming all canonical pack modules as full-admin-controlled is blocked until modulesPendingGraphicsAudit is 0 and runtimeBeaconReportedModules equals canonicalPacketCount.",
   "priorityDebt": [
     "Keep browser-backed template authority demoted to preview/draft cache only.",
     "Maintain Admin UI theme vs runtime preset parity through validator gates.",
-    "Attach runtime compliance beacon to every governed module route.",
-    "Promote graphics governance into Builder/release blockers."
+    "Attach runtime compliance beacon to every remaining canonical pack module route before claiming full-pack promotion.",
+    "Keep Builder/release blockers tied to backend graphics compliance, release blockers, waivers, impact and visual-debt projection gates."
   ]
 }

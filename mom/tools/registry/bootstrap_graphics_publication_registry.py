@@ -253,6 +253,69 @@ def graphics_registry(run_id: str, generated_at: str, modules: list[dict[str, An
     }
 
 
+def graphics_visual_debt_projection(graphics: dict[str, Any], packets: list[dict[str, Any]]) -> dict[str, Any]:
+    theme_matrix = read_json(MOM / "design" / "graphics" / "theme-compatibility-matrix.json", {})
+    theme_rows = theme_matrix.get("matrix", []) if isinstance(theme_matrix.get("matrix"), list) else []
+    runtime_theme_rows = [
+        row for row in theme_rows
+        if isinstance(row, dict) and row.get("runtimePresetExists") is True
+    ]
+    compliance = graphics.get("moduleGraphicsCompliance", {}) if isinstance(graphics.get("moduleGraphicsCompliance"), dict) else {}
+    compliance_rows = compliance.get("matrix", []) if isinstance(compliance.get("matrix"), list) else []
+    compliance_summary = compliance.get("summary", {}) if isinstance(compliance.get("summary"), dict) else {}
+    runtime_beacon = graphics.get("runtimeGraphicsComplianceBeacon", {}) if isinstance(graphics.get("runtimeGraphicsComplianceBeacon"), dict) else {}
+    beacon_rows = runtime_beacon.get("beacons", []) if isinstance(runtime_beacon.get("beacons"), list) else []
+    visual_debt = graphics.get("visualDebtObservatory", {}) if isinstance(graphics.get("visualDebtObservatory"), dict) else {}
+    global_signals = visual_debt.get("globalSignals", {}) if isinstance(visual_debt.get("globalSignals"), dict) else {}
+    enriched_endpoint_catalog = read_json(MOM / "design" / "enriched" / "endpoint-catalog.json", {})
+    endpoint_aliases = enriched_endpoint_catalog.get("aliases", {}) if isinstance(enriched_endpoint_catalog.get("aliases"), dict) else {}
+    pending_count = max(0, len(packets) - len(compliance_rows))
+
+    return {
+        "version": "2026.04.14-current-mom-worldclass",
+        "artifactRole": "visual-debt-projection",
+        "productionAuthority": False,
+        "consumerRule": "This artifact reports graphics debt detected by the imported pack alignment. Production release authority remains the backend graphics governance registry and publication truth gates.",
+        "projectionInputs": {
+            "canonicalManifestRef": "mom/design/canonical/manifest.json",
+            "themeCompatibilityMatrixRef": "mom/design/graphics/theme-compatibility-matrix.json",
+            "backendRegistryRef": "mom/data/registry/graphics-governance-registry.json",
+            "moduleComplianceRef": "mom/data/registry/graphics-governance-registry.json#/moduleGraphicsCompliance",
+            "runtimeBeaconRef": "mom/data/registry/graphics-governance-registry.json#/runtimeGraphicsComplianceBeacon",
+            "registryVisualDebtRef": "mom/data/registry/graphics-governance-registry.json#/visualDebtObservatory",
+        },
+        "summary": {
+            "adminUiThemeCount": len(theme_rows),
+            "runtimeThemePresetCount": len(runtime_theme_rows),
+            "exactThemeOverlap": len(runtime_theme_rows),
+            "canonicalPacketCount": len(packets),
+            "enrichedPacketCount": len(packets),
+            "endpointAliasCount": len(endpoint_aliases),
+            "registryAuditedModuleCount": len(compliance_rows),
+            "runtimeBeaconReportedModules": len(beacon_rows),
+            "fullAdminControlledModuleCount": int(compliance_summary.get("fullAdminControlledCount") or 0),
+            "releaseBlockingModules": int(runtime_beacon.get("summary", {}).get("releaseBlockingModules") or compliance_summary.get("blockedCount") or 0),
+            "modulesPendingGraphicsAudit": pending_count,
+            "privateCssDebtScore": int(global_signals.get("privateCssDebtScore") or 0),
+            "tokenCoveragePercent": int(global_signals.get("tokenCoveragePercent") or 0),
+            "bridgeAliasDebtCount": int(global_signals.get("bridgeAliasDebtCount") or 0),
+            "browserAuthorityKeysDetected": [],
+            "forbiddenBrowserAuthorityKeysGoverned": [
+                "hesem_layout_templates",
+                "hesem_module_template_binding",
+            ],
+            "zoneWhitelistRuntimeStatus": "spec-only-or-unverified",
+        },
+        "scopeRule": "Current graphics release proof applies to the backend-audited runtime scope. Claiming all canonical pack modules as full-admin-controlled is blocked until modulesPendingGraphicsAudit is 0 and runtimeBeaconReportedModules equals canonicalPacketCount.",
+        "priorityDebt": [
+            "Keep browser-backed template authority demoted to preview/draft cache only.",
+            "Maintain Admin UI theme vs runtime preset parity through validator gates.",
+            "Attach runtime compliance beacon to every remaining canonical pack module route before claiming full-pack promotion.",
+            "Keep Builder/release blockers tied to backend graphics compliance, release blockers, waivers, impact and visual-debt projection gates.",
+        ],
+    }
+
+
 def report_doc(run_id: str, generated_at: str, name: str) -> dict[str, Any]:
     return {"_meta": meta(run_id, generated_at), "summary": {name: 0, "remaining_" + name: 0}}
 
@@ -285,6 +348,7 @@ def main() -> int:
 
     write_json(REG / "graphics-governance-registry.json", graphics_registry(run_id, generated_at, modules, packets))
     graphics = read_json(REG / "graphics-governance-registry.json", {})
+    write_json(MOM / "design" / "graphics" / "visual-debt-observatory.json", graphics_visual_debt_projection(graphics, packets))
     release_blocked = bool((graphics.get("graphicsReleaseLink") or {}).get("releaseBlocked") or (graphics.get("releaseBlockers") or {}).get("summary", {}).get("releaseBlocked"))
     release_state = "blocked-by-graphics-governance" if release_blocked else "ready"
     write_json(REG / "graphics-template-registry.json", {

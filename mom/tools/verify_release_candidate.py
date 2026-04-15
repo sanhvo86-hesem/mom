@@ -130,6 +130,25 @@ if graphics_registry_path.is_file():
     check("graphics evidence pack is machine-readable", isinstance(evidence_pack, dict) and bool(evidence_pack), f"graphicsReleaseEvidencePack={evidence_pack}")
     for key in ["moduleGraphicsCompliance", "moduleGraphicsLineageGraph", "runtimeGraphicsComplianceBeacon", "visualDebtObservatory"]:
         check(f"graphics registry has {key}", isinstance(graphics.get(key), dict), f"{key} missing")
+    visual_debt_projection = design / "graphics/visual-debt-observatory.json"
+    if canonical_manifest_path.is_file() and visual_debt_projection.is_file():
+        projection = json.loads(visual_debt_projection.read_text(encoding="utf-8"))
+        projection_summary = projection.get("summary", {})
+        compliance_rows = graphics.get("moduleGraphicsCompliance", {}).get("matrix", [])
+        beacon_rows = graphics.get("runtimeGraphicsComplianceBeacon", {}).get("beacons", [])
+        expected_pending = max(0, packet_count - (len(compliance_rows) if isinstance(compliance_rows, list) else 0))
+        check("graphics visual debt projection derives from backend registry",
+              projection.get("artifactRole") == "visual-debt-projection"
+              and projection.get("productionAuthority") is False
+              and int(projection_summary.get("canonicalPacketCount") or 0) == packet_count
+              and int(projection_summary.get("registryAuditedModuleCount") or 0) == (len(compliance_rows) if isinstance(compliance_rows, list) else 0)
+              and int(projection_summary.get("runtimeBeaconReportedModules") or 0) == (len(beacon_rows) if isinstance(beacon_rows, list) else 0)
+              and int(projection_summary.get("modulesPendingGraphicsAudit") or 0) == expected_pending,
+              f"summary={projection_summary} packetCount={packet_count} expectedPending={expected_pending}")
+        if expected_pending > 0:
+            check("graphics visual debt projection blocks full-pack overclaim",
+                  "Claiming all canonical pack modules as full-admin-controlled is blocked" in str(projection.get("scopeRule", "")),
+                  f"scopeRule={projection.get('scopeRule')}")
 
 # 5. OpenAPI
 print("\nOpenAPI:")

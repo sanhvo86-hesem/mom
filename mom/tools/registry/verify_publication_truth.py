@@ -377,6 +377,12 @@ def main() -> int:
         check("system_contract_not_workspace_draft",
               system_meta.get("designId") != "workspace" and system_meta.get("workspaceDraftUsed") is False,
               f"designId={system_meta.get('designId')} workspaceDraftUsed={system_meta.get('workspaceDraftUsed')}")
+        refresh_tool_path = PORTAL / "tools" / "schema" / "refresh_data_schema_authority.php"
+        refresh_tool_source = refresh_tool_path.read_text(encoding="utf-8") if refresh_tool_path.is_file() else ""
+        check("system_contract_refresh_tool_defaults_to_registry_authority",
+              "$designId = 'system_contract_registry';" in refresh_tool_source
+              and "$designId = 'workspace';" not in refresh_tool_source,
+              "refresh_data_schema_authority.php must not default to workspace draft authority")
         check("system_contract_table_count_matches_registry",
               manifest_summary.get("tableCount") == table_count and runtime_summary.get("tableCount") == table_count,
               f"manifest={manifest_summary.get('tableCount')} runtime={runtime_summary.get('tableCount')} registry={table_count}")
@@ -694,6 +700,12 @@ def main() -> int:
             if visual_debt_path.is_file():
                 visual_debt = load(visual_debt_path)
                 visual_summary = visual_debt.get("summary", {})
+                enriched_endpoint_catalog_path = DESIGN / "enriched" / "endpoint-catalog.json"
+                endpoint_aliases = {}
+                if enriched_endpoint_catalog_path.is_file():
+                    endpoint_aliases = load(enriched_endpoint_catalog_path).get("aliases", {})
+                    if not isinstance(endpoint_aliases, dict):
+                        endpoint_aliases = {}
                 detected_browser_authority = [
                     key for key in visual_summary.get("browserAuthorityKeysDetected", [])
                     if key
@@ -702,6 +714,22 @@ def main() -> int:
                       visual_debt.get("artifactRole") == "visual-debt-projection"
                       and visual_debt.get("productionAuthority") is False,
                       f"artifactRole={visual_debt.get('artifactRole')} productionAuthority={visual_debt.get('productionAuthority')}")
+                projection_inputs = visual_debt.get("projectionInputs", {})
+                expected_projection_inputs = {
+                    "canonicalManifestRef": "mom/design/canonical/manifest.json",
+                    "themeCompatibilityMatrixRef": "mom/design/graphics/theme-compatibility-matrix.json",
+                    "backendRegistryRef": "mom/data/registry/graphics-governance-registry.json",
+                    "moduleComplianceRef": "#/moduleGraphicsCompliance",
+                    "runtimeBeaconRef": "#/runtimeGraphicsComplianceBeacon",
+                    "registryVisualDebtRef": "#/visualDebtObservatory",
+                }
+                missing_projection_inputs = [
+                    key for key, expected in expected_projection_inputs.items()
+                    if expected not in str(projection_inputs.get(key, ""))
+                ] if isinstance(projection_inputs, dict) else list(expected_projection_inputs.keys())
+                check("graphics_pack_visual_debt_projection_inputs_resolve",
+                      not missing_projection_inputs,
+                      f"missing={missing_projection_inputs}")
                 check("graphics_pack_visual_debt_no_browser_authority_detected",
                       not detected_browser_authority,
                       f"browserAuthorityKeysDetected={detected_browser_authority}")
@@ -711,6 +739,29 @@ def main() -> int:
                           and int(visual_summary.get("runtimeThemePresetCount") or 0) == len(runtime_rows)
                           and int(visual_summary.get("exactThemeOverlap") or 0) == len(runtime_rows),
                           f"summary={visual_summary} themeRows={len(theme_rows)} runtimeRows={len(runtime_rows)}")
+                registry_rows = rows if isinstance(rows, list) else []
+                registry_beacons = beacons if isinstance(beacons, list) else []
+                registry_compliance_summary = graphics.get("moduleGraphicsCompliance", {}).get("summary", {})
+                registry_signals = graphics.get("visualDebtObservatory", {}).get("globalSignals", {})
+                expected_pending = max(0, pack_count - len(registry_rows))
+                check("graphics_pack_visual_debt_counts_match_backend_registry",
+                      int(visual_summary.get("canonicalPacketCount") or 0) == pack_count
+                      and int(visual_summary.get("endpointAliasCount") or 0) == len(endpoint_aliases)
+                      and int(visual_summary.get("registryAuditedModuleCount") or 0) == len(registry_rows)
+                      and int(visual_summary.get("runtimeBeaconReportedModules") or 0) == len(registry_beacons)
+                      and int(visual_summary.get("modulesPendingGraphicsAudit") or 0) == expected_pending,
+                      f"summary={visual_summary} packCount={pack_count} endpointAliases={len(endpoint_aliases)} registryRows={len(registry_rows)} beacons={len(registry_beacons)} pending={expected_pending}")
+                check("graphics_pack_visual_debt_signals_match_backend_registry",
+                      int(visual_summary.get("fullAdminControlledModuleCount") or 0) == int(registry_compliance_summary.get("fullAdminControlledCount") or 0)
+                      and int(visual_summary.get("releaseBlockingModules") or 0) == int(graphics.get("runtimeGraphicsComplianceBeacon", {}).get("summary", {}).get("releaseBlockingModules") or registry_compliance_summary.get("blockedCount") or 0)
+                      and int(visual_summary.get("privateCssDebtScore") or 0) == int(registry_signals.get("privateCssDebtScore") or 0)
+                      and int(visual_summary.get("tokenCoveragePercent") or 0) == int(registry_signals.get("tokenCoveragePercent") or 0)
+                      and int(visual_summary.get("bridgeAliasDebtCount") or 0) == int(registry_signals.get("bridgeAliasDebtCount") or 0),
+                      f"summary={visual_summary} compliance={registry_compliance_summary} signals={registry_signals}")
+                scope_rule = str(visual_debt.get("scopeRule", ""))
+                check("graphics_pack_visual_debt_blocks_full_pack_overclaim",
+                      expected_pending == 0 or "Claiming all canonical pack modules as full-admin-controlled is blocked" in scope_rule,
+                      f"pending={expected_pending} scopeRule={scope_rule}")
 
     # Gate K: Truth summary consistency
     print("\nGate K: Truth summary consistency")

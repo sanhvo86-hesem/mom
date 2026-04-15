@@ -5,6 +5,8 @@ declare(strict_types=1);
 use MOM\Api\Controllers\SchemaStudioController;
 use MOM\Database\DataLayer;
 
+ini_set('memory_limit', '1G');
+
 require dirname(__DIR__, 2) . '/database/DataLayer.php';
 require dirname(__DIR__, 2) . '/api/controllers/BaseController.php';
 require dirname(__DIR__, 2) . '/api/controllers/SchemaStudioController.php';
@@ -16,7 +18,7 @@ $dataDir = $portalRoot . '/data';
 $actor = 'schema_authority_refresh_cli';
 $args = array_slice($argv, 1);
 $skipPublication = false;
-$designId = 'workspace';
+$designId = 'system_contract_registry';
 
 foreach ($args as $arg) {
     if ($arg === '--skip-publication') {
