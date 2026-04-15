@@ -820,11 +820,11 @@
   function renderWizardStep0() {
     var d = state.wizardData;
     var html = '<div class="eqms-wizard-step-content">';
-    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Loai xac nhan & Thong tin co ban', en: 'Validation Type & Basic Information' }) + '</h3>';
-    html += ui.renderFormField({ key: 'validation_type', label: { vi: 'Loai xac nhan', en: 'Validation Type' }, type: 'select', options: VALIDATION_TYPES, value: d.validation_type, required: true });
-    html += ui.renderFormField({ key: 'title', label: { vi: 'Tieu de du an', en: 'Project Title' }, type: 'text', value: d.title, required: true, placeholder: { vi: 'Nhap tieu de...', en: 'Enter project title...' } });
-    html += ui.renderFormField({ key: 'description', label: { vi: 'Mo ta', en: 'Description' }, type: 'textarea', value: d.description, placeholder: { vi: 'Mo ta pham vi xac nhan...', en: 'Describe the validation scope...' } });
-    html += ui.renderFormField({ key: 'rationale', label: { vi: 'Ly do xac nhan', en: 'Validation Rationale' }, type: 'textarea', value: d.rationale, placeholder: { vi: 'Tai sao can xac nhan...', en: 'Why validation is needed...' } });
+    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Loại xác nhận & Thông tin cơ bản', en: 'Validation Type & Basic Information' }) + '</h3>';
+    html += ui.renderFormField({ key: 'validation_type', label: { vi: 'Loại xác nhận', en: 'Validation Type' }, type: 'select', options: VALIDATION_TYPES, value: d.validation_type, required: true });
+    html += ui.renderFormField({ key: 'title', label: { vi: 'Tiêu đề dự án', en: 'Project Title' }, type: 'text', value: d.title, required: true, placeholder: { vi: 'Nhập tiêu đề...', en: 'Enter project title...' } });
+    html += ui.renderFormField({ key: 'description', label: { vi: 'Mô tả', en: 'Description' }, type: 'textarea', value: d.description, placeholder: { vi: 'Mô tả phạm vi xác nhận...', en: 'Describe the validation scope...' } });
+    html += ui.renderFormField({ key: 'rationale', label: { vi: 'Lý do xác nhận', en: 'Validation Rationale' }, type: 'textarea', value: d.rationale, placeholder: { vi: 'Tại sao cần xác nhận...', en: 'Why validation is needed...' } });
     html += '</div>';
     return html;
   }
@@ -832,11 +832,11 @@
   function renderWizardStep1() {
     var d = state.wizardData;
     var html = '<div class="eqms-wizard-step-content">';
-    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Thiet bi va Nhom', en: 'Equipment & Team' }) + '</h3>';
-    html += ui.renderFormField({ key: 'equipment_system', label: { vi: 'Thiet bi / He thong', en: 'Equipment / System' }, type: 'text', value: d.equipment_system, required: true, placeholder: { vi: 'Ten thiet bi hoac he thong...', en: 'Equipment or system name...' } });
-    html += ui.renderFormField({ key: 'team_lead', label: { vi: 'Truong nhom', en: 'Team Lead' }, type: 'text', value: d.team_lead, required: true });
-    html += ui.renderFormField({ key: 'team_members', label: { vi: 'Thanh vien nhom', en: 'Team Members' }, type: 'textarea', value: d.team_members, placeholder: { vi: 'Cach nhau boi dau phay...', en: 'Comma-separated names...' } });
-    html += ui.renderFormField({ key: 'target_date', label: { vi: 'Ngay muc tieu hoan thanh', en: 'Target Completion Date' }, type: 'date', value: d.target_date, required: true });
+    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Thiết bị và Nhóm', en: 'Equipment & Team' }) + '</h3>';
+    html += ui.renderFormField({ key: 'equipment_system', label: { vi: 'Thiết bị / Hệ thống', en: 'Equipment / System' }, type: 'text', value: d.equipment_system, required: true, placeholder: { vi: 'Tên thiết bị hoặc hệ thống...', en: 'Equipment or system name...' } });
+    html += ui.renderFormField({ key: 'team_lead', label: { vi: 'Trưởng nhóm', en: 'Team Lead' }, type: 'text', value: d.team_lead, required: true });
+    html += ui.renderFormField({ key: 'team_members', label: { vi: 'Thành viên nhóm', en: 'Team Members' }, type: 'textarea', value: d.team_members, placeholder: { vi: 'Cách nhau bởi dấu phẩy...', en: 'Comma-separated names...' } });
+    html += ui.renderFormField({ key: 'target_date', label: { vi: 'Ngày mục tiêu hoàn thành', en: 'Target Completion Date' }, type: 'date', value: d.target_date, required: true });
     html += '</div>';
     return html;
   }
@@ -844,15 +844,15 @@
   function renderWizardStep2() {
     var d = state.wizardData;
     var html = '<div class="eqms-wizard-step-content">';
-    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Xem lai thong tin truoc khi gui', en: 'Review Before Submission' }) + '</h3>';
+    html += '<h3 style="margin:0 0 16px">' + T({ vi: 'Xem lại thông tin trước khi gửi', en: 'Review Before Submission' }) + '</h3>';
     html += ui.renderFieldGrid([
-      { label: { vi: 'Loai xac nhan',       en: 'Validation Type' },    value: d.validation_type,   badge: true },
-      { label: { vi: 'Tieu de',             en: 'Title' },              value: d.title },
-      { label: { vi: 'Thiet bi / He thong', en: 'Equipment / System' }, value: d.equipment_system },
-      { label: { vi: 'Truong nhom',         en: 'Team Lead' },          value: d.team_lead },
-      { label: { vi: 'Ngay muc tieu',       en: 'Target Date' },        value: fmtDate(d.target_date) },
-      { label: { vi: 'Mo ta',               en: 'Description' },        value: d.description },
-      { label: { vi: 'Ly do',               en: 'Rationale' },          value: d.rationale }
+      { label: { vi: 'Loại xác nhận',       en: 'Validation Type' },    value: d.validation_type,   badge: true },
+      { label: { vi: 'Tiêu đề',             en: 'Title' },              value: d.title },
+      { label: { vi: 'Thiết bị / Hệ thống', en: 'Equipment / System' }, value: d.equipment_system },
+      { label: { vi: 'Trưởng nhóm',         en: 'Team Lead' },          value: d.team_lead },
+      { label: { vi: 'Ngày mục tiêu',       en: 'Target Date' },        value: fmtDate(d.target_date) },
+      { label: { vi: 'Mô tả',               en: 'Description' },        value: d.description },
+      { label: { vi: 'Lý do',               en: 'Rationale' },          value: d.rationale }
     ]);
     html += '</div>';
     return html;
@@ -862,17 +862,17 @@
   // SCREEN: ANALYTICS
   // =========================================================================
   function renderAnalytics() {
-    if (state.loading) return ui.renderLoadingState({ vi: 'Dang tai phan tich...', en: 'Loading analytics...' });
+    if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
     if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
     var html = '';
 
     html += '<button class="eqms-btn ghost sm" data-action="go-inventory" style="margin-bottom:8px">';
-    html += '\u2190 ' + T({ vi: 'Quay lai danh sach', en: 'Back to inventory' });
+    html += '\u2190 ' + T({ vi: 'Quay lại danh sách', en: 'Back to inventory' });
     html += '</button>';
 
-    html += '<h2 style="margin:0 0 16px;font-size:18px;font-weight:600">' + T({ vi: 'Phan tich xac nhan', en: 'Validation Analytics' }) + '</h2>';
+    html += '<h2 style="margin:0 0 16px;font-size:18px;font-weight:600">' + T({ vi: 'Phân tích xác nhận', en: 'Validation Analytics' }) + '</h2>';
 
     // KPIs
     html += ui.renderKpiRow([

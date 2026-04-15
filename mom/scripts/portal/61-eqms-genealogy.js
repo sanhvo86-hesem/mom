@@ -42,28 +42,28 @@
   // CONSTANTS
   // =========================================================================
   var NODE_TYPES = [
-    { value: 'raw_material',   label: { vi: 'Nguyen lieu',       en: 'Raw Material' },    icon: '\uD83E\uDDEA', col: 0 },
-    { value: 'component',      label: { vi: 'Linh kien',         en: 'Component' },        icon: '\u2699\uFE0F', col: 0 },
-    { value: 'wip',            label: { vi: 'Ban thanh pham',    en: 'WIP' },              icon: '\uD83D\uDD27', col: 1 },
-    { value: 'sub_assembly',   label: { vi: 'Cum chi tiet',      en: 'Sub-Assembly' },     icon: '\uD83D\uDEE0\uFE0F', col: 1 },
-    { value: 'finished_good',  label: { vi: 'Thanh pham',        en: 'Finished Good' },    icon: '\uD83D\uDCE6', col: 2 },
-    { value: 'customer',       label: { vi: 'Khach hang',        en: 'Customer' },         icon: '\uD83C\uDFE2', col: 3 }
+    { value: 'raw_material',   label: { vi: 'Nguyên liệu',       en: 'Raw Material' },    icon: '\uD83E\uDDEA', col: 0 },
+    { value: 'component',      label: { vi: 'Linh kiện',         en: 'Component' },        icon: '\u2699\uFE0F', col: 0 },
+    { value: 'wip',            label: { vi: 'Bán thành phẩm',    en: 'WIP' },              icon: '\uD83D\uDD27', col: 1 },
+    { value: 'sub_assembly',   label: { vi: 'Cụm chi tiết',      en: 'Sub-Assembly' },     icon: '\uD83D\uDEE0\uFE0F', col: 1 },
+    { value: 'finished_good',  label: { vi: 'Thành phẩm',        en: 'Finished Good' },    icon: '\uD83D\uDCE6', col: 2 },
+    { value: 'customer',       label: { vi: 'Khách hàng',        en: 'Customer' },         icon: '\uD83C\uDFE2', col: 3 }
   ];
 
   var NODE_TYPE_MAP = {};
   NODE_TYPES.forEach(function(t) { NODE_TYPE_MAP[t.value] = t; });
 
   var QUALITY_STATUS_OPTIONS = [
-    { value: 'conforming',     label: { vi: 'Phu hop',           en: 'Conforming' } },
-    { value: 'non_conforming', label: { vi: 'Khong phu hop',     en: 'Non-Conforming' } },
-    { value: 'on_hold',        label: { vi: 'Tam giu',           en: 'On Hold' } },
-    { value: 'released',       label: { vi: 'Da giai phong',     en: 'Released' } },
-    { value: 'quarantined',    label: { vi: 'Cach ly',           en: 'Quarantined' } }
+    { value: 'conforming',     label: { vi: 'Phù hợp',           en: 'Conforming' } },
+    { value: 'non_conforming', label: { vi: 'Không phù hợp',     en: 'Non-Conforming' } },
+    { value: 'on_hold',        label: { vi: 'Tạm giữ',           en: 'On Hold' } },
+    { value: 'released',       label: { vi: 'Đã giải phóng',     en: 'Released' } },
+    { value: 'quarantined',    label: { vi: 'Cách ly',           en: 'Quarantined' } }
   ];
 
   var DIRECTION_OPTIONS = [
-    { value: 'upstream',   label: { vi: 'Nguoc dong',  en: 'Upstream' } },
-    { value: 'downstream', label: { vi: 'Xuoi dong',   en: 'Downstream' } }
+    { value: 'upstream',   label: { vi: 'Ngược dòng',  en: 'Upstream' } },
+    { value: 'downstream', label: { vi: 'Xuôi dòng',   en: 'Downstream' } }
   ];
 
   var SCREENS = { SEARCH: 'search', GRAPH: 'graph', ANALYTICS: 'analytics' };
@@ -181,12 +181,12 @@
         state.screen = SCREENS.GRAPH;
         if (state.selectedNodeId) loadNodeDetail(state.selectedNodeId);
       } else {
-        state.searchError = res.message || T({ vi: 'Khong tim thay ban ghi', en: 'No record found' });
+        state.searchError = res.message || T({ vi: 'Không tìm thấy bản ghi', en: 'No record found' });
       }
       paint();
     }).catch(function(err) {
       state.searchLoading = false;
-      state.searchError = err.message || 'Network error';
+      state.searchError = err.message || T({ vi: 'Lỗi mạng', en: 'Network error' });
       paint();
     });
   }
@@ -202,12 +202,12 @@
       if (res.success) {
         state.searchResults = res.data || [];
       } else {
-        state.searchError = res.message || T({ vi: 'Loi tim kiem', en: 'Search error' });
+        state.searchError = res.message || T({ vi: 'Lỗi tìm kiếm', en: 'Search error' });
       }
       paint();
     }).catch(function(err) {
       state.searchLoading = false;
-      state.searchError = err.message || 'Network error';
+      state.searchError = err.message || T({ vi: 'Lỗi mạng', en: 'Network error' });
       paint();
     });
   }
@@ -287,11 +287,11 @@
     apiCall('eqms_genealogy_metrics', {}).then(function(res) {
       state.loading = false;
       if (res.success) { state.metrics = res.data || {}; }
-      else { state.error = res.message || 'Failed to load metrics'; }
+      else { state.error = res.message || T({ vi: 'Không thể tải chỉ số', en: 'Failed to load metrics' }); }
       paint();
     }).catch(function(err) {
       state.loading = false;
-      state.error = err.message || 'Network error';
+      state.error = err.message || T({ vi: 'Lỗi mạng', en: 'Network error' });
       paint();
     });
   }
@@ -315,7 +315,7 @@
     html += '<div class="eqms-toolbar-left"></div>';
     html += '<div class="eqms-toolbar-right">';
     html += '<button class="eqms-btn ghost sm" data-action="go-analytics">';
-    html += T({ vi: 'Phan tich', en: 'Analytics' });
+    html += T({ vi: 'Phân tích', en: 'Analytics' });
     html += '</button>';
     html += '</div></div>';
 
@@ -323,10 +323,10 @@
     html += '<div class="eqms-scan-first">';
     html += '<div style="font-size:48px;margin-bottom:8px">\uD83C\uDF33</div>';
     html += '<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;text-align:center">';
-    html += T({ vi: 'Truy xuat nguon goc', en: 'Genealogy / Traceability' });
+    html += T({ vi: 'Truy xuất nguồn gốc', en: 'Genealogy / Traceability' });
     html += '</h2>';
     html += '<p style="margin:0 0 24px;color:var(--hm-text-secondary,#64748b);text-align:center;max-width:480px">';
-    html += T({ vi: 'Nhap ma lo, barcode hoac serial de truy xuat chuoi cung ung nguoc/xuoi dong', en: 'Enter a lot, barcode, or serial number to trace the supply chain upstream/downstream' });
+    html += T({ vi: 'Nhập mã lô, barcode hoặc serial để truy xuất chuỗi cung ứng ngược/xuôi dòng', en: 'Enter a lot, barcode, or serial number to trace the supply chain upstream/downstream' });
     html += '</p>';
 
     // Scan input
