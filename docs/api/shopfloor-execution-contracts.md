@@ -385,6 +385,7 @@ Rules:
 - The service validates generated SQL as SELECT/CTE only, rejects DDL/DML and dangerous functions, caps rows, runs in a PostgreSQL read-only transaction, and sets `statement_timeout` inside that transaction.
 - Hourly throttling is enforced through a shared per-user/hour ledger under the AI scheduling data directory rather than browser session state.
 - The NLQ prompt uses canonical AI prediction types: `defect_probability`, `tool_wear`, `spc_anomaly`, `process_drift`, and `equipment_failure`.
+- The NLQ prompt and relation allowlist are generated from a single schema/provenance registry. Each allowed relation must declare its domain, authority, projection role, and columns before AI can reference it.
 - NLQ is read-only advisory access. It cannot dispatch work, approve quality, alter schedules, create NCRs, or command machines.
 - Conversation history/detail reads require AI read roles. JSON fallback detail reads validate safe conversation IDs, resolve files under the conversation directory, and require owner metadata before returning content.
 

@@ -24,6 +24,34 @@ final class NaturalLanguageQueryServiceSecurityTest extends TestCase
         $this->assertStringNotContainsString("quality_predictions — AI quality predictions\n- prediction_id   UUID PRIMARY KEY\n- prediction_type VARCHAR(50) — 'defect_probability', 'tool_wear', 'spc_anomaly', 'process_drift', 'equipment_failure'\n- severity        VARCHAR(20) — 'critical', 'major', 'minor'", $prompt);
     }
 
+    public function testNlqRelationRegistryCarriesProvenanceAndDrivesValidation(): void
+    {
+        $reflection = new ReflectionClass(NaturalLanguageQueryService::class);
+        $constant = $reflection->getReflectionConstant('QUERY_RELATION_REGISTRY');
+        $this->assertNotFalse($constant);
+        $registry = $constant->getValue();
+        $this->assertIsArray($registry);
+
+        $service = new NaturalLanguageQueryService(sys_get_temp_dir());
+        $promptMethod = $reflection->getMethod('buildSystemPrompt');
+        $validateMethod = $reflection->getMethod('validateSql');
+        $prompt = (string)$promptMethod->invoke($service);
+
+        foreach ($registry as $relation => $metadata) {
+            $this->assertIsString($relation);
+            $this->assertNotSame('', trim((string)$metadata['domain']));
+            $this->assertNotSame('', trim((string)$metadata['authority']));
+            $this->assertNotSame('', trim((string)$metadata['projection_role']));
+            $this->assertNotEmpty($metadata['columns']);
+            $this->assertStringContainsString('### ' . $relation . ' - ', $prompt);
+            $this->assertStringContainsString('Authority: ' . $metadata['authority'], $prompt);
+            $this->assertStringContainsString('Projection role: ' . $metadata['projection_role'], $prompt);
+        }
+
+        $this->assertNull($validateMethod->invoke($service, 'SELECT prediction_id FROM quality_predictions LIMIT 10'));
+        $this->assertIsString($validateMethod->invoke($service, 'SELECT id FROM ai_conversations LIMIT 10'));
+    }
+
     public function testPostgresStatementTimeoutIsSetInsideReadOnlyTransaction(): void
     {
         $source = (string)file_get_contents(QMS_TEST_BASE_DIR . '/api/services/NaturalLanguageQueryService.php');

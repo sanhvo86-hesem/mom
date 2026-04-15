@@ -42,15 +42,120 @@ final class NaturalLanguageQueryService
         'SET\s+ROLE', 'SET\s+SESSION',
     ];
 
-    private const ALLOWED_QUERY_RELATIONS = [
-        'items',
-        'work_orders',
-        'job_orders',
-        'ncr_records',
-        'mes_oee_snapshots',
-        'quality_predictions',
-        'production_schedule_slots',
-        'machines',
+    private const QUERY_RELATION_REGISTRY = [
+        'items' => [
+            'title' => 'Master data: products, raw materials, sub-assemblies',
+            'domain' => 'ERP master data',
+            'authority' => 'item master table',
+            'projection_role' => 'canonical item reference for planning and execution context',
+            'columns' => [
+                'item_id         UUID PRIMARY KEY',
+                'item_number     VARCHAR(50) UNIQUE - e.g. "FG-001", "RM-0042"',
+                'description     TEXT',
+                "item_type       VARCHAR(30) - 'finished_good', 'raw_material', 'sub_assembly', 'consumable'",
+                "status          VARCHAR(20) - 'active', 'inactive', 'obsolete'",
+            ],
+        ],
+        'work_orders' => [
+            'title' => 'Production work orders (lenh san xuat)',
+            'domain' => 'ERP planning intent',
+            'authority' => 'work-order planning table',
+            'projection_role' => 'planning intent; not execution event truth',
+            'columns' => [
+                'wo_id           UUID PRIMARY KEY',
+                'wo_number       VARCHAR(50) UNIQUE - e.g. "WO-2024-001234"',
+                'item_id         UUID REFERENCES items(item_id)',
+                'quantity        NUMERIC - planned quantity',
+                "status          VARCHAR(30) - 'planned', 'released', 'in_progress', 'completed', 'closed', 'cancelled'",
+                'machine_id      VARCHAR(50) - assigned machine',
+                'start_date      DATE',
+                'due_date        DATE',
+            ],
+        ],
+        'job_orders' => [
+            'title' => 'Customer job orders (don hang khach hang)',
+            'domain' => 'ERP demand and planning',
+            'authority' => 'job-order planning table',
+            'projection_role' => 'customer demand context; not shopfloor execution authority',
+            'columns' => [
+                'jo_id           UUID PRIMARY KEY',
+                'jo_number       VARCHAR(50) UNIQUE',
+                'customer_id     UUID',
+                "status          VARCHAR(30) - 'draft', 'confirmed', 'in_production', 'shipped', 'closed'",
+                'priority        INT - 1 (highest) to 5 (lowest)',
+            ],
+        ],
+        'ncr_records' => [
+            'title' => 'Non-conformance records (ban ghi khong phu hop)',
+            'domain' => 'EQMS quality evidence',
+            'authority' => 'nonconformance record table',
+            'projection_role' => 'quality issue evidence and status for read-only analysis',
+            'columns' => [
+                'ncr_id          UUID PRIMARY KEY',
+                'ncr_number      VARCHAR(50) UNIQUE - e.g. "NCR-2024-0567"',
+                'defect_type     VARCHAR(100)',
+                "severity        VARCHAR(20) - 'critical', 'major', 'minor'",
+                "status          VARCHAR(30) - 'open', 'investigating', 'corrective_action', 'closed', 'rejected'",
+                'machine_id      VARCHAR(50)',
+                'part_number     VARCHAR(100)',
+            ],
+        ],
+        'mes_oee_snapshots' => [
+            'title' => 'OEE snapshots per machine per day',
+            'domain' => 'MES analytics read model',
+            'authority' => 'derived MES snapshot table',
+            'projection_role' => 'derived KPI snapshot; not append-only execution event truth',
+            'columns' => [
+                'snapshot_id     UUID PRIMARY KEY',
+                'machine_id      VARCHAR(50)',
+                'snapshot_date   DATE',
+                'availability_pct NUMERIC(5,2) - percentage 0-100',
+                'performance_pct  NUMERIC(5,2) - percentage 0-100',
+                'quality_pct      NUMERIC(5,2) - percentage 0-100',
+                'oee_pct          NUMERIC(5,2) - calculated: (availability * performance * quality) / 10000',
+            ],
+        ],
+        'quality_predictions' => [
+            'title' => 'AI quality predictions',
+            'domain' => 'AI advisory projection',
+            'authority' => 'AI prediction projection table',
+            'projection_role' => 'advisory-only quality signal; never execution or EQMS disposition authority',
+            'columns' => [
+                'prediction_id   UUID PRIMARY KEY',
+                "prediction_type VARCHAR(50) - 'defect_probability', 'tool_wear', 'spc_anomaly', 'process_drift', 'equipment_failure'",
+                "severity        VARCHAR(20) - 'info', 'watch', 'warning', 'critical'",
+                "status          VARCHAR(30) - 'active', 'acknowledged', 'resolved', 'false_positive'",
+                'machine_id      VARCHAR(50)',
+                'confidence      NUMERIC(5,2) - 0.00 to 1.00',
+                'created_at      TIMESTAMPTZ',
+            ],
+        ],
+        'production_schedule_slots' => [
+            'title' => 'Machine schedule time blocks',
+            'domain' => 'MOM scheduling read model',
+            'authority' => 'schedule slot planning table',
+            'projection_role' => 'planned machine time blocks; schedule mutation remains controller-governed',
+            'columns' => [
+                'slot_id         UUID PRIMARY KEY',
+                'machine_id      VARCHAR(50)',
+                'wo_number       VARCHAR(50)',
+                'start_time      TIMESTAMPTZ',
+                'end_time        TIMESTAMPTZ',
+                "status          VARCHAR(20) - 'scheduled', 'in_progress', 'completed', 'cancelled'",
+            ],
+        ],
+        'machines' => [
+            'title' => 'Machine master data (from items/master data)',
+            'domain' => 'Asset and machine master data',
+            'authority' => 'machine master table',
+            'projection_role' => 'machine identity/status context for planning, OEE, and quality queries',
+            'columns' => [
+                'machine_id      VARCHAR(50) PRIMARY KEY',
+                'machine_name    VARCHAR(200)',
+                "machine_type    VARCHAR(50) - 'CNC', 'injection_molding', 'assembly', 'packaging', etc.",
+                "status          VARCHAR(20) - 'running', 'idle', 'maintenance', 'offline'",
+            ],
+        ],
     ];
 
     // ── Maximum result rows / So dong ket qua toi da ──────────────────────
@@ -405,76 +510,15 @@ final class NaturalLanguageQueryService
      */
     private function buildSystemPrompt(): string
     {
-        return <<<'PROMPT'
+        $schemas = $this->buildRelationSchemaPrompt();
+
+        return <<<PROMPT
 You are a PostgreSQL query generator for the HESEM MOM (Manufacturing Operations Management) system.
 Ban la bo tao truy van PostgreSQL cho he thong HESEM MOM (Quan ly Van hanh San xuat).
 
 ## Available Table Schemas
 
-### items — Master data: products, raw materials, sub-assemblies
-- item_id         UUID PRIMARY KEY
-- item_number     VARCHAR(50) UNIQUE — e.g. "FG-001", "RM-0042"
-- description     TEXT
-- item_type       VARCHAR(30) — 'finished_good', 'raw_material', 'sub_assembly', 'consumable'
-- status          VARCHAR(20) — 'active', 'inactive', 'obsolete'
-
-### work_orders — Production work orders (lenh san xuat)
-- wo_id           UUID PRIMARY KEY
-- wo_number       VARCHAR(50) UNIQUE — e.g. "WO-2024-001234"
-- item_id         UUID REFERENCES items(item_id)
-- quantity         NUMERIC — planned quantity
-- status          VARCHAR(30) — 'planned', 'released', 'in_progress', 'completed', 'closed', 'cancelled'
-- machine_id      VARCHAR(50) — assigned machine
-- start_date      DATE
-- due_date        DATE
-
-### job_orders — Customer job orders (don hang khach hang)
-- jo_id           UUID PRIMARY KEY
-- jo_number       VARCHAR(50) UNIQUE
-- customer_id     UUID
-- status          VARCHAR(30) — 'draft', 'confirmed', 'in_production', 'shipped', 'closed'
-- priority        INT — 1 (highest) to 5 (lowest)
-
-### ncr_records — Non-conformance records (ban ghi khong phu hop)
-- ncr_id          UUID PRIMARY KEY
-- ncr_number      VARCHAR(50) UNIQUE — e.g. "NCR-2024-0567"
-- defect_type     VARCHAR(100)
-- severity        VARCHAR(20) — 'critical', 'major', 'minor'
-- status          VARCHAR(30) — 'open', 'investigating', 'corrective_action', 'closed', 'rejected'
-- machine_id      VARCHAR(50)
-- part_number     VARCHAR(100)
-
-### mes_oee_snapshots — OEE snapshots per machine per day
-- snapshot_id     UUID PRIMARY KEY
-- machine_id      VARCHAR(50)
-- snapshot_date   DATE
-- availability_pct NUMERIC(5,2) — percentage 0-100
-- performance_pct  NUMERIC(5,2) — percentage 0-100
-- quality_pct      NUMERIC(5,2) — percentage 0-100
-- oee_pct          NUMERIC(5,2) — calculated: (availability * performance * quality) / 10000
-
-### quality_predictions — AI quality predictions
-- prediction_id   UUID PRIMARY KEY
-- prediction_type VARCHAR(50) — 'defect_probability', 'tool_wear', 'spc_anomaly', 'process_drift', 'equipment_failure'
-- severity        VARCHAR(20) — 'info', 'watch', 'warning', 'critical'
-- status          VARCHAR(30) — 'active', 'acknowledged', 'resolved', 'false_positive'
-- machine_id      VARCHAR(50)
-- confidence      NUMERIC(5,2) — 0.00 to 1.00
-- created_at      TIMESTAMPTZ
-
-### production_schedule_slots — Machine schedule time blocks
-- slot_id         UUID PRIMARY KEY
-- machine_id      VARCHAR(50)
-- wo_number       VARCHAR(50)
-- start_time      TIMESTAMPTZ
-- end_time        TIMESTAMPTZ
-- status          VARCHAR(20) — 'scheduled', 'in_progress', 'completed', 'cancelled'
-
-### machines — Machine master data (from items/master data)
-- machine_id      VARCHAR(50) PRIMARY KEY
-- machine_name    VARCHAR(200)
-- machine_type    VARCHAR(50) — 'CNC', 'injection_molding', 'assembly', 'packaging', etc.
-- status          VARCHAR(20) — 'running', 'idle', 'maintenance', 'offline'
+{$schemas}
 
 ## KPI Formulas
 - OEE = (Availability% x Performance% x Quality%) / 10000
@@ -504,6 +548,25 @@ Do NOT use functions that modify data (e.g. nextval, setval, pg_advisory_lock).
 Do NOT reference system catalogs (pg_*, information_schema) unless specifically asked about table structure.
 AI prediction rows are advisory projections only; never imply that they dispatch, approve, complete, or control execution.
 PROMPT;
+    }
+
+    private function buildRelationSchemaPrompt(): string
+    {
+        $sections = [];
+        foreach (self::QUERY_RELATION_REGISTRY as $relation => $metadata) {
+            $columns = array_map(static fn(string $column): string => '- ' . $column, $metadata['columns']);
+            $sections[] = sprintf(
+                "### %s - %s\nDomain: %s\nAuthority: %s\nProjection role: %s\n%s",
+                $relation,
+                (string)$metadata['title'],
+                (string)$metadata['domain'],
+                (string)$metadata['authority'],
+                (string)$metadata['projection_role'],
+                implode("\n", $columns),
+            );
+        }
+
+        return implode("\n\n", $sections);
     }
 
     // ── Response Parsing ───────────────────────────────────────────────────
@@ -712,7 +775,7 @@ PROMPT;
     {
         $withoutStrings = preg_replace("/'([^']|'')*'/", "''", $sql) ?? $sql;
         $withoutComments = preg_replace('/--.*?$|\/\*.*?\*\//ms', ' ', $withoutStrings) ?? $withoutStrings;
-        $allowed = array_fill_keys(self::ALLOWED_QUERY_RELATIONS, true);
+        $allowed = array_fill_keys(array_keys(self::QUERY_RELATION_REGISTRY), true);
 
         if (preg_match_all('/(?:WITH|,)\s+([a-z_][a-z0-9_]*)\s+AS\s*\(/i', $withoutComments, $cteMatches)) {
             foreach ($cteMatches[1] as $cteName) {

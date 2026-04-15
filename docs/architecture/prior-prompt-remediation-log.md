@@ -1,6 +1,6 @@
 # Prior Prompt Remediation Log
 
-Audited branch: `codex/worldclass-closure-20260415-0913`
+Audited branch: `codex/deep-remediate-open-findings-20260415-094651`
 
 Date: 2026-04-15
 
@@ -24,6 +24,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | AI NLQ and RCA write-like surface control | Fixed now | `aiNlQuery()` is role-scoped, CSRF-protected, audited, and read-only; `aiRcaAnalyze()` now requires CSRF. |
 | AI NLQ PostgreSQL runtime safety | Fixed now | `NaturalLanguageQueryService::executeSafeQuery()` begins a read-only transaction before `SET LOCAL statement_timeout`. |
 | AI prediction schema grounding | Fixed now | NLQ prompt uses the same prediction types as `AiPredictionPipeline`; migration `110_ai_advisory_boundary_comments.sql` replaces legacy autonomous-action comments with advisory-boundary comments. |
+| AI NLQ schema/provenance grounding | Fixed now | `NaturalLanguageQueryService` now drives both the prompt schema and SQL relation allowlist from one `QUERY_RELATION_REGISTRY` containing domain, authority, projection role, and columns for every allowed read relation. Regression coverage proves the registry drives validation. |
 | Planning schedule compatibility aliases | Fixed now | Legacy `order_schedule_*`, `order_capacity_heatmap`, and `order_promise_suggest` action aliases now route to the existing `AiSchedulingController` schedule handlers instead of non-existent `OrderController` methods. |
 | Planner schedule slot validation | Fixed now | Schedule slot create/update now validate `YYYY-MM-DD` dates, `HH:MM` times, same-day time order, and controlled priority values before writing DB or JSON fallback stores. |
 | Order hold release governance | Fixed now | `OrderController::releaseHold()` now derives the held order type and requires the corresponding `so_write`, `jo_write`, or `wo_write` permission before mutating the hold. |
@@ -74,7 +75,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 | Full skill/certification matching on dispatch report submission | Staged | Mobile task start uses qualification gate, but dispatch report matching needs governed machine-operation-skill policy data. |
 | Full NCR/CAPA/SPC workflow enforcement | Staged | First-piece and inspection capture are now linked, but nonconformance disposition/CAPA/SPC enforcement needs EQMS workflow integration. |
 | Full genealogy edge emission from every report | Staged | Trace-ready fields exist, but serial/lot/traveler edge policy needs product/lot/operation governance before automatic edge creation. |
-| AI projection unification | Fixed for Phase 1 ETL and NLQ safety, staged for full copilot registry | AI predictions are DB-first with JSON fallback, recommendation records are explicitly advisory/pending, `AiDataEtlService` exposes `shopfloor_execution`, and NLQ is now CSRF/role guarded. A full semantic copilot registry remains a later analytics migration. |
+| AI projection unification | Fixed for Phase 1 ETL, NLQ safety, and NLQ schema provenance; staged for full copilot registry | AI predictions are DB-first with JSON fallback, recommendation records are explicitly advisory/pending, `AiDataEtlService` exposes `shopfloor_execution`, and NLQ is CSRF/role guarded with a schema/provenance registry for its allowed read surface. A full cross-domain semantic copilot registry remains a later analytics migration. |
 | MTConnect/OPC UA runtime ingestion | Staged | Phase 1 is human-input-first. This patch preserves machine/equipment/timestamp semantics but does not ingest or command machines. |
 
 ## Completed incorrectly or superficially before this pass
@@ -114,8 +115,7 @@ This log records prior deliverables from the Phase 1 CNC shopfloor execution pro
 - Full qualification enforcement is blocked by missing governed machine/operation/skill policy for dispatch reports.
 - Full genealogy automation is blocked by unresolved serial/lot/traveler edge semantics.
 - Full EQMS enforcement is blocked by the need to connect inspection results to NCR, disposition, CAPA, and SPC workflows.
-- Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed in this pass.
+- Full semantic AI/copilot grounding is blocked by fragmented execution, quality, CNC, and advisory stores and should follow source reconciliation. NLQ security/runtime/schema drift is fixed for the currently allowed read relations.
 - Full DB-backed CNC program/setup-sheet authority remains blocked by required JSON-to-DB reconciliation and compatibility testing.
 - Online mobile clock-in, clock-out, and completion replay are implemented for the existing compatibility store. Full labor correction/reopen governance remains staged because it needs supervisor disposition, payroll/timekeeping reconciliation, and audit-signature semantics.
-- Full NLQ schema grounding remains blocked by the absence of a canonical NLQ schema/provenance registry; current NLQ remains read-only, scoped, and advisory.
 - Full quality sidecar closure remains blocked by missing canonical command-service ownership for `QualityIntegrationService` and OQC JSONL/hold sidecar writes.
