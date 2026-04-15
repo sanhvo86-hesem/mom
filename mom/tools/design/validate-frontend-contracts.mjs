@@ -383,11 +383,27 @@ function validatePacket(packet, packetPath, templateLookup, blockContracts, endp
     }
     if (binding.moduleApi !== binding.registryEndpointId) {
       if (binding.type === 'legacy-adapter') {
-        warnings.push(`${bindingLabel}: legacy module API maps to registry endpoint "${binding.registryEndpointId}"`);
+        validateLegacyAdapterGovernance(packet, binding, bindingLabel);
       } else {
         errors.push(`${bindingLabel}: moduleApi differs from registryEndpointId without legacy-adapter type`);
       }
     }
+  }
+}
+
+function validateLegacyAdapterGovernance(packet, binding, bindingLabel) {
+  const governance = packet.legacyAdapterGovernance || {};
+  const governedApis = Array.isArray(governance.moduleApis) ? governance.moduleApis.map(String) : [];
+  const requiredFields = ['status', 'owner', 'reason', 'migrationTarget', 'reviewBy', 'releasePolicy'];
+  const missingFields = requiredFields.filter((field) => !String(governance[field] || '').trim());
+  if (governance.status !== 'controlled-compatibility') {
+    errors.push(`${bindingLabel}: legacy-adapter requires legacyAdapterGovernance.status="controlled-compatibility"`);
+  }
+  if (missingFields.length) {
+    errors.push(`${bindingLabel}: legacy-adapter governance missing ${missingFields.join(', ')}`);
+  }
+  if (governedApis.indexOf(String(binding.moduleApi || '')) < 0) {
+    errors.push(`${bindingLabel}: legacy-adapter is not listed in legacyAdapterGovernance.moduleApis`);
   }
 }
 

@@ -79,6 +79,30 @@
     { "moduleApi": "navigate-tab", "type": "local-action", "usedBy": ["blk-toolbar-create", "blk-toolbar-packing", "blk-detail-toolbar"] },
     { "moduleApi": "set-state", "type": "local-action", "usedBy": ["blk-detail-toolbar"] }
   ],
+  "legacyAdapterGovernance": {
+    "status": "controlled-compatibility",
+    "owner": "Sales Order Control / Frontend Architecture Council",
+    "reason": "Runtime screens still call legacy module API names, while registry authority is already mapped to canonical endpoint ids. Renaming these APIs without a module migration would break active UI bindings.",
+    "migrationTarget": "Replace legacy module API names with canonical registryEndpointId calls when the M2 runtime adapter layer is retired.",
+    "reviewBy": "2026-06-30",
+    "releasePolicy": "Allowed only as compatibility debt; new module build packets must not introduce legacy-adapter bindings without this governance block.",
+    "moduleApis": [
+      "order_dashboard_kpi",
+      "order_so_list",
+      "order_so_detail",
+      "order_so_create",
+      "order_transition",
+      "order_jo_list",
+      "order_jo_create",
+      "order_wo_create",
+      "order_hierarchy",
+      "order_contract_review",
+      "order_shipment_gate",
+      "packing_list",
+      "packing_create",
+      "order_timeline"
+    ]
+  },
   "workflows": [
     { "workflowId": "sales-order-lifecycle", "entity": "sales.sales_order", "stateField": "status", "transitionEndpoint": "sales.sales_order.transition" },
     { "workflowId": "job-order-release", "entity": "production.job_orders", "stateField": "status", "transitionEndpoint": "production.job_orders.transition" },

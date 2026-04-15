@@ -846,6 +846,39 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ], 'operator-1');
     }
 
+    public function testCanonicalDistributionReadAckRequiresAuthoritativeSignatureWhenClientOmitsFlag(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('document_read_ack_signature_required');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb(readAckSignatureRequired: true)))->acknowledgeRead([
+            'doc_revision_id' => '00000000-0000-0000-0000-000000000901',
+            'actor_ref' => 'operator-1',
+            'idempotency_key' => 'ack-canonical-requires-signature',
+        ], 'operator-1');
+    }
+
+    public function testDocumentReadAckSignatureMustBeChallengeBackedAndDocumentBound(): void
+    {
+        $db = new DocumentFormControlFakeDb(readAckSignatureRequired: true);
+        $ackHash = hash('sha256', 'read-ack-document-bound-proof');
+
+        $ack = (new DocumentRevisionCommandService($db))->acknowledgeRead([
+            'doc_revision_id' => '00000000-0000-0000-0000-000000000901',
+            'actor_ref' => 'operator-1',
+            'signature_event_id' => '00000000-0000-0000-0000-000000000904',
+            'acknowledgement_hash_sha256' => $ackHash,
+            'idempotency_key' => 'ack-with-authoritative-signature',
+        ], 'operator-1');
+
+        $this->assertSame('DOCACK-1', $ack['read_acknowledgement']['doc_read_acknowledgement_id']);
+        $signatureQuery = $db->queryOneCalls[1]['sql'];
+        $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $signatureQuery);
+        $this->assertStringContainsString("signature_meaning = 'document_read_acknowledgement'", $signatureQuery);
+        $this->assertStringContainsString("signature_action = 'document_read_acknowledgement'", $signatureQuery);
+        $this->assertSame($ackHash, $db->queryOneCalls[1]['params'][':acknowledgement_hash_sha256']);
+    }
+
     public function testFormIssuanceCommandServicePersistsIssuanceAndSubmissionAttemptWithoutLegacySchemas(): void
     {
         $db = new DocumentFormControlFakeDb();
@@ -1177,6 +1210,46 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $codes = array_column($result['blockers'], 'code');
         $this->assertContains('effectivity_conflict', $codes);
         $this->assertContains('training_gate_not_met', $codes);
+    }
+
+    public function testEffectivityGateRequiresObjectCompleteVerificationAndCountsSignedWaiver(): void
+    {
+        $releaseObjects = [
+            ['object_type' => 'doc_revision', 'object_id' => 'DOC-1'],
+            ['object_type' => 'doc_revision', 'object_id' => 'DOC-2'],
+        ];
+
+        $missing = (new EffectivityGateService())->evaluateChangeOrderRelease(
+            ['status' => 'approved'],
+            [$releaseObjects[0]],
+            [$releaseObjects[1]],
+            [['effectivity_type' => 'date']],
+            [],
+            [['verification_state' => 'passed', 'object_type' => 'doc_revision', 'object_id' => 'DOC-1']],
+            [],
+        );
+        $this->assertContains('verification_missing_for_object', array_column($missing['blockers'], 'code'));
+
+        $covered = (new EffectivityGateService())->evaluateChangeOrderRelease(
+            ['status' => 'approved'],
+            [$releaseObjects[0]],
+            [$releaseObjects[1]],
+            [['effectivity_type' => 'date']],
+            [],
+            [[
+                'verification_state' => 'passed',
+                'object_type' => 'doc_revision',
+                'object_id' => 'DOC-1',
+            ], [
+                'verification_state' => 'waived',
+                'object_type' => 'doc_revision',
+                'object_id' => 'DOC-2',
+                'waiver_signature_event_id' => '00000000-0000-0000-0000-000000000905',
+            ]],
+            [],
+        );
+        $this->assertNotContains('verification_missing_for_object', array_column($covered['blockers'], 'code'));
+        $this->assertContains('verification_waived', array_column($covered['warnings'], 'code'));
     }
 
     public function testPublicationStateRequiresReceiptForPublishedAndReleasedChangeForWithdrawal(): void
@@ -2178,6 +2251,69 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         }
     }
 
+    public function testWipImpactingNonWipEffectivityRequiresExplicitImpactedWipScope(): void
+    {
+        $db = new ChangeLifecycleFakeDb();
+        $service = new ChangeLifecycleCommandService($db);
+
+        $service->createChangeOrder([
+            'change_order_number' => 'CO-WIP-SCOPE',
+            'idempotency_key' => 'CO-WIP-SCOPE-create',
+            'title' => 'Route change with WIP hold',
+            'wip_dispositions' => [[
+                'wip_object_type' => 'work_order',
+                'wip_object_id' => 'WO-10',
+                'disposition' => 'hold',
+                'disposition_state' => 'approved',
+            ]],
+            'affected_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10',
+                'affected_fields' => ['operation.20.method'],
+                'requested_effect' => 'deviation',
+            ]],
+            'resulting_objects' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'result_role' => 'replacement',
+            ]],
+            'effectivities' => [[
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'effectivity_type' => 'date',
+                'effective_from' => '2026-04-14T00:00:00Z',
+                'release_impact' => 'wip_hold',
+            ]],
+            'verifications' => [[
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ], [
+                'verification_type' => 'implementation',
+                'verification_state' => 'passed',
+                'object_type' => 'process_route',
+                'object_id' => 'ROUTE-10-TEMP',
+                'verified_at' => '2026-04-14T00:00:00Z',
+            ]],
+            'effectiveness_reviews' => [[
+                'review_state' => 'scheduled',
+                'review_due_at' => '2026-04-21T00:00:00Z',
+            ]],
+        ], 'qa-1');
+
+        $readiness = $service->evaluateChangeOrderReleaseReadiness('CO-WIP-SCOPE');
+
+        $codes = array_column($readiness['blockers'], 'code');
+        $this->assertContains('wip_impact_disposition_required', $codes);
+        $wipBlocker = array_values(array_filter(
+            $readiness['blockers'],
+            static fn (array $blocker): bool => ($blocker['code'] ?? '') === 'wip_impact_disposition_required',
+        ))[0];
+        $this->assertSame('wip_impact_scope_required', $wipBlocker['data']['missing_reason']);
+    }
+
     public function testEmergencyChangeReleaseRequiresRollbackAndPostImplementationControls(): void
     {
         $db = new ChangeLifecycleFakeDb();
@@ -2413,6 +2549,8 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringContainsString("(COALESCE(org_plant_id, ''))", $sql);
         $this->assertStringContainsString('plm_change_resulting_objects ro', $sql);
         $this->assertStringContainsString(':edge_fact_id', $sql);
+        $this->assertStringContainsString('from_ao.requested_effect = :requested_effect', $sql);
+        $this->assertStringContainsString('to_ao.requested_effect = :requested_effect', $sql);
 
         $gate = $service->evaluateAndPersist5M([
             'operation_class' => 'cnc_milling',
@@ -3047,6 +3185,8 @@ final class DocumentFormControlFakeDb
         private readonly bool $formIssuanceConflict = false,
         private readonly bool $submissionAttemptConflict = false,
         private readonly bool $validationConflict = false,
+        private readonly bool $readAckSignatureRequired = false,
+        private readonly bool $readAckSignatureVerified = true,
     )
     {
     }
@@ -3140,10 +3280,16 @@ final class DocumentFormControlFakeDb
                 'canonicalization_rules' => '{}',
             ];
         }
+        if (str_contains($trimmed, 'FROM doc_distributions') && str_contains($trimmed, 'bool_or(read_ack_required)')) {
+            return ['read_ack_required' => $this->readAckSignatureRequired];
+        }
         if (str_contains($trimmed, 'INSERT INTO doc_families')) {
             return ['doc_family_id' => 'DOCFAM-1', 'doc_code' => (string)$params[':doc_code']];
         }
         if (str_contains($trimmed, 'FROM signature_events se')) {
+            if (!$this->readAckSignatureVerified && str_contains($trimmed, 'document_read_acknowledgement')) {
+                return [];
+            }
             return [
                 'signature_event_id' => (string)($params[':signature_event_id'] ?? '00000000-0000-0000-0000-000000000705'),
             ];

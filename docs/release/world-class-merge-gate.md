@@ -37,11 +37,11 @@ Pre-gate content HEAD: `1f151a46`
 | command | result |
 |---|---|
 | `./composer analyse -- --memory-limit=1G` | PASS, PHPStan 230/230 files, no errors. |
-| `./composer test` | PASS, 497 tests, 2845 assertions, 1 skipped. |
-| `./composer check` | PASS, PHPStan no errors plus PHPUnit 497 tests, 2845 assertions, 1 skipped. |
+| `./composer test` | PASS, 504 tests, 2876 assertions, 1 skipped. |
+| `./composer check` | PASS, PHPStan no errors plus PHPUnit 504 tests, 2876 assertions, 1 skipped. |
 | `vendor/bin/phpunit tests/Unit/Services/WorldClassControlPlaneExecutionTest.php` | PASS, 85 tests, 514 assertions. |
 | `vendor/bin/phpunit tests/Unit/Services/ShopfloorExecutionServiceTest.php` | PASS, 49 tests, 183 assertions. |
-| `node tools/design/validate-frontend-contracts.mjs` | PASS, 0 errors, 14 legacy API-binding warnings. |
+| `node tools/design/validate-frontend-contracts.mjs` | PASS, 0 errors, 0 warnings after legacy-adapter governance was made explicit. |
 | `python3 tools/verify_release_candidate.py` | PASS, 36/36 checks. |
 | `php -l api/services/ShopfloorExecutionService.php && php -l tests/Unit/Services/ShopfloorExecutionServiceTest.php` | PASS, no syntax errors. |
 

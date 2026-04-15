@@ -55,6 +55,13 @@ final class WorldClassClosureReauditIntegrityMigrationTest extends TestCase
         $this->assertStringContainsString('released_doc_revision_immutable', $this->closureSql);
         $this->assertStringContainsString('released_form_template_revision_immutable', $this->closureSql);
         $this->assertStringContainsString('released_form_schema_version_immutable', $this->closureSql);
+        $this->assertStringContainsString('released_doc_revision_delete_blocked', $this->closureSql);
+        $this->assertStringContainsString('BEFORE DELETE ON doc_revisions', $this->closureSql);
+        $this->assertStringContainsString('BEFORE DELETE ON frm_template_revisions', $this->closureSql);
+        $this->assertStringContainsString('BEFORE DELETE ON frm_schema_versions', $this->closureSql);
+        $this->assertStringContainsString('NEW.approved_by IS DISTINCT FROM OLD.approved_by', $this->closureSql);
+        $this->assertStringContainsString('NEW.released_at IS DISTINCT FROM OLD.released_at', $this->closureSql);
+        $this->assertStringContainsString('NEW.metadata IS DISTINCT FROM OLD.metadata', $this->closureSql);
         $this->assertStringContainsString('fk_periodic_evaluations_waiver_signature_event', $this->closureSql);
         $this->assertStringContainsString('audit.integrity_digest.daily', $this->closureSql);
     }

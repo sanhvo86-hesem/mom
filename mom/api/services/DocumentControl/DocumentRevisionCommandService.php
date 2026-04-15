@@ -238,7 +238,6 @@ final class DocumentRevisionCommandService
         $db = $this->requireDb();
         $revisionId = $this->requiredUuid($input, 'doc_revision_id');
         $sourceChangeOrderId = $this->requiredUuid($input, 'source_change_order_id');
-        $supersededBy = $this->nullableUuid($input['superseded_by_doc_revision_id'] ?? null);
         $this->assertReleasedDocumentChangeAuthority(
             $db,
             $sourceChangeOrderId,

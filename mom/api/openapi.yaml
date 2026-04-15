@@ -5433,15 +5433,13 @@ paths:
                 signature_action:
                   type: string
                   default: evidence_finalize
+                  enum: [evidence_finalize, document_release, document_read_acknowledgement, periodic_evaluation_waiver, change_order_release, verification_waiver]
                 signed_payload_hash_sha256:
                   type: string
                   pattern: '^[a-f0-9]{64}$'
                 displayed_record_hash_sha256:
                   type: string
                   pattern: '^[a-f0-9]{64}$'
-                expires_at:
-                  type: string
-                  format: date-time
       responses:
         '201':
           description: Signature challenge issued.
@@ -5878,7 +5876,7 @@ paths:
       operationId: eqmsEvaluate5MGate
       tags: [EQMS Control Plane]
       summary: Evaluate required 5M context before release or production acceptance
-      description: Returns blockers when material, machine, method, measurement, or man/personnel context is incomplete.
+      description: Returns blockers when material, machine, method, measurement, or man/personnel context is incomplete. Scope is derived from the authenticated portal session; caller-supplied org or scope fields are rejected.
       security:
         - sessionCookie: []
           csrfHeader: []
@@ -5897,6 +5895,26 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '403':
+          description: Caller supplied an unauthorized scope field or lacks a session scope.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [unauthorized_scope_field_in_request, scope_context_required]
+        '409':
+          description: 5M evaluation could not be persisted into the scoped genealogy partition.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum: [genealogy_partition_scope_required, traceability_5m_gate_not_met]
 
   /api/v1/eqms/genealogy/as-manufactured:
     get:
