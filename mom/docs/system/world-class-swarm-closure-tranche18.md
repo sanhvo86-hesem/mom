@@ -14,7 +14,7 @@ Date: 2026-04-15
 | Pass 2 | COMPLETE | Six pass-2 reports written; pass-2 defects and deep merge-gate defects fixed; focused regression/PHPStan/publication gates passed |
 | Merge to main | COMPLETE | Integration branch `codex/tranche18-zero-trust-signoff-20260415` was fast-forward merged into `main` after the merge gate |
 | Pass 3 on main | COMPLETE | Six post-merge pass-3 reports written under `mom/docs/system/agent-reports/tranche18/` |
-| Cleanup | READY_FOR_FINAL_COMMANDS | Pass 3 found only branch/worktree/scratch-branch cleanup blockers; no application code defect remains |
+| Cleanup | COMPLETE | Helper/integration/scratch branches and tranche18 helper worktrees were removed; `main` was clean after tranche18 cleanup |
 
 ## First-Pass Synthesis
 
@@ -57,9 +57,10 @@ Date: 2026-04-15
 - Agent 3: vendor benchmark positioning remains honest; no full-suite parity claim was introduced.
 - Agent 4: architecture boundaries remain coherent after merge; scratch release-evidence rename churn must not be promoted.
 - Agent 5: reliability/security/observability/compliance surfaces passed; external OTel and Part 11 validation proof remain outside repo scope.
-- Agent 6: inherited FIX_NOW ledger remains closed; final cleanup must delete helper/integration/scratch branches and worktrees.
+- Agent 6: inherited FIX_NOW ledger remains closed; final cleanup deleted helper/integration/scratch branches and tranche18 helper worktrees.
 
-## Merge Gate Requirements Still Required
+## Merge Gate Requirements Closed
 
-- Final branch/worktree cleanup must complete after the pass-3 evidence commit.
-- `main` should be pushed if remote publication is available.
+- Final branch/worktree cleanup completed after the pass-3 evidence commit.
+- Required tranche18 inventory and pass-3 reports are tracked on `main`.
+- Later graphics-governance reconciliation may add its own branch/worktree evidence, but it is separate from tranche18 cleanup.

@@ -40,6 +40,13 @@ After pass 3 and final verification:
 - Delete integration branch `codex/tranche18-zero-trust-signoff-20260415`.
 - Leave checkout on `main` with clean status.
 
+Final tranche18 cleanup result:
+
+- Required tranche18 inventory and pass-3 reports are retained on `main`.
+- Tranche18 helper/integration/scratch branches were removed.
+- Tranche18 helper worktrees were removed.
+- Any later non-tranche18 branch or worktree is outside this tranche18 cleanup record and must be judged by its own evidence.
+
 ## Final Clean-State Verification
 
 - `git branch --show-current` must return `main`.
