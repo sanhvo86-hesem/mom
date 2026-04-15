@@ -1,0 +1,66 @@
+{
+  "artifact_type": "source_promotion_manifest",
+  "manifest_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "base_branch": "main",
+  "base_head": "a7b499ec4ce412f5945bd371770166790292777a",
+  "validated_head": "c8b09002ff408bf31ac06fe423a0dc35d986fd6d",
+  "validated_tree": "e9720dbe90b53ca3c1c0ea823d3b232510cd0e8b",
+  "record_state": "pre_merge_validated_controlled_source_manifest",
+  "created_at": "2026-04-15T07:41:10Z",
+  "change_authority": {
+    "authority_type": "codex_remediation_request",
+    "authority_ref": "WORLDCLASS-ERP-MOM-MES-EQMS-CLOSURE-20260415-1033",
+    "scope": "repo_boundary_api_contract_signature_evidence_retention_integrity_publication_periodic_evaluation_sharepoint_offline_flow"
+  },
+  "branch_activity_note": {
+    "created_branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+    "checkpoint_commit": "332b86dc31bbb4d205d8eb479162aff4449c5dc1",
+    "remediation_commit": "c8b09002ff408bf31ac06fe423a0dc35d986fd6d",
+    "note": "Branch was created for the current closure run. HEAD was explicitly corrected back to the new branch after a stale interrupted agent left the worktree attached to the inherited tranche18 branch at the same commit."
+  },
+  "tracked_manifest_binding_note": {
+    "waiver_ref": "tracked_manifest_self_commit_hash_limitation",
+    "rationale": "A manifest committed in the same Git tree cannot contain its own final commit SHA because the commit hash depends on the manifest blob. This manifest binds the validated runtime head immediately before governed release-evidence files are added. CI/deployment packaging must create the external promotion manifest bound to the merge commit."
+  },
+  "closed_findings": [
+    "P1 controlled-source boundary violation closed by removing inherited tranche18 generated inventory artifacts from tracked source",
+    "P1 form submission acceptance signature now requires consumed e-signature challenge, exact action, exact canonical payload hash, exact displayed/original artifact hash, signed attempt object, and signer binding",
+    "P1 regulated applied signature rows are constrained by migration 134 to carry challenge, auth method, auth result hash, signer identity snapshot, displayed record hash, and signature manifestation",
+    "P1 finalized evidence record headers are protected from destructive delete and protected-field mutation by migration 134",
+    "P1 integrity digests are append-only and integrity exception identity is immutable by migration 134",
+    "P1 active retention locks are immutable and delete-blocked by migration 134",
+    "P1 OpenAPI/controller drift closed for audit pack manifest, evidence graph preview, genealogy fact write, and signature action enum",
+    "P1 publication monitor and periodic evaluation dashboard now require role-gated org context and pass scoped filters",
+    "P2 publication validation moved from DB-late only to service validation before evidence finalization persistence",
+    "P1 SharePoint/offline Excel policy contradiction removed: users upload controlled Excel capture back to portal, not directly to SharePoint"
+  ],
+  "required_validation": [
+    "php -l touched PHP files",
+    "vendor/bin/phpunit --filter FormSubmissionAcceptanceServiceTest|WorldClassClosureReauditIntegrityMigrationTest",
+    "vendor/bin/phpunit --filter FormSubmissionAcceptanceServiceTest|WorldClassClosureReauditIntegrityMigrationTest|WorldClassControlPlaneExecutionTest|EqmsControlPlaneStateMachineTest",
+    "composer analyse -- --memory-limit=1G",
+    "composer test",
+    "composer check",
+    "php tools/release/check_repo_boundary.php",
+    "python3 tools/verify_release_candidate.py",
+    "second six-agent closure re-audit"
+  ],
+  "validation_results": {
+    "php_l_touched_files": "passed",
+    "focused_phpunit": "passed: 9 tests, 64 assertions",
+    "expanded_phpunit": "passed: 109 tests, 1113 assertions",
+    "composer_analyse": "passed: no PHPStan errors over 230 files",
+    "composer_test": "passed: 520 tests, 3020 assertions, 1 skipped",
+    "composer_check": "passed: PHPStan plus PHPUnit exited 0",
+    "repo_boundary": "passed: repo boundary clean",
+    "release_candidate_verifier": "passed: 36/36"
+  },
+  "merge_gate": {
+    "unresolved_p0": 0,
+    "unresolved_non_waived_p1": 0,
+    "accepted_waivers_documented": true,
+    "runbook_present": true,
+    "merge_strategy": "fast_forward_preferred_else_stop"
+  }
+}

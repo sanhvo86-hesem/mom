@@ -1,0 +1,31 @@
+{
+  "artifact_type": "reverse_sync_intake",
+  "intake_id": "worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
+  "created_at": "2026-04-15T07:41:10Z",
+  "source_of_change": "codex_worldclass_closure_program",
+  "disposition_state": "accepted_controlled_source_update",
+  "external_runtime_drift_found": false,
+  "controlled_source_updates": [
+    "Removed tracked generated tranche18 inventory artifacts that blocked repo boundary",
+    "Hardened form submission acceptance signature proof",
+    "Added final record integrity migration 134",
+    "Aligned EQMS OpenAPI request contracts with runtime controller requirements",
+    "Scoped publication and periodic evaluation monitor reads",
+    "Corrected offline Excel/SharePoint operating instruction"
+  ],
+  "runtime_or_generated_artifacts_not_reimported": [
+    "mom/vendor",
+    "mom/data/sessions",
+    "mom/data/uploads",
+    "browser-test artifacts",
+    "scratch prompt dumps",
+    "local runtime logs"
+  ],
+  "post_merge_actions": [
+    "Generate external post-merge release manifest bound to the merge commit",
+    "Capture deployment promotion receipt only after actual deployment",
+    "Close or delete stale local agent worktrees after merge verification",
+    "Exit WORM provider waiver by implementing Azure Immutable Blob or S3 Object Lock adapter"
+  ]
+}
