@@ -73,6 +73,71 @@ final class QueueServiceFallbackTest extends TestCase
         $this->assertSame(5.0, $channel->confirmTimeout);
     }
 
+    public function testFilePublishFailureIsSurfacedInHealth(): void
+    {
+        $queue = new QueueService($this->tmpDir, ['host' => '127.0.0.1', 'port' => 1], 2);
+        $blockedPath = $this->tmpDir . '/blocked-file';
+        file_put_contents($blockedPath, 'not-a-directory');
+        $this->setPrivate($queue, 'fileDir', $blockedPath);
+
+        $this->assertFalse($queue->publish('workflow.transitioned', ['record_id' => 'REC-1']));
+        $health = $queue->getHealth();
+
+        $this->assertSame(1, $health['file_write_failure_count']);
+        $this->assertNotEmpty($health['file_last_write_failure_at']);
+        $this->assertTrue($health['degraded']);
+    }
+
+    public function testFilePublishEncodeFailureIsSurfacedInHealth(): void
+    {
+        $queue = new QueueService($this->tmpDir, ['host' => '127.0.0.1', 'port' => 1], 2);
+
+        $this->assertFalse($queue->publish('workflow.transitioned', ['bad_number' => NAN]));
+        $health = $queue->getHealth();
+
+        $this->assertSame(1, $health['file_write_failure_count']);
+        $this->assertNotEmpty($health['file_last_write_failure_at']);
+        $this->assertTrue($health['degraded']);
+    }
+
+    public function testDeadLetterWriteFailureIsSurfacedInHealth(): void
+    {
+        $queue = new QueueService($this->tmpDir, ['host' => '127.0.0.1', 'port' => 1], 2);
+        $blockedPath = $this->tmpDir . '/blocked-dead-letter';
+        file_put_contents($blockedPath, 'not-a-directory');
+        $this->setPrivate($queue, 'fileDir', $blockedPath);
+        $this->invokePrivate($queue, 'writeDeadLetter', [QueueService::QUEUE_EVENTS_AUDIT, ['record_id' => 'REC-1']]);
+
+        $health = $queue->getHealth();
+        $this->assertSame(1, $health['file_write_failure_count']);
+        $this->assertNotEmpty($health['file_last_write_failure_at']);
+        $this->assertTrue($health['degraded']);
+    }
+
+    public function testQueueRewriteFailureIsSurfacedInHealth(): void
+    {
+        $queue = new QueueService($this->tmpDir, ['host' => '127.0.0.1', 'port' => 1], 2);
+        $missingDirFile = $this->tmpDir . '/missing-dir/events.audit.jsonl';
+        $fp = fopen('php://temp', 'r+');
+        $this->assertIsResource($fp);
+
+        try {
+            $this->invokePrivate($queue, 'rewriteFileQueue', [
+                QueueService::QUEUE_EVENTS_AUDIT,
+                $missingDirFile,
+                $fp,
+                ['{"record_id":"REC-1"}'],
+            ]);
+        } finally {
+            fclose($fp);
+        }
+
+        $health = $queue->getHealth();
+        $this->assertSame(1, $health['file_write_failure_count']);
+        $this->assertNotEmpty($health['file_last_write_failure_at']);
+        $this->assertTrue($health['degraded']);
+    }
+
     private function newFakeChannel(): ConfirmingQueueTestChannel
     {
         $reflection = new ReflectionClass(ConfirmingQueueTestChannel::class);
@@ -91,14 +156,14 @@ final class QueueServiceFallbackTest extends TestCase
         $prop->setValue($target, $value);
     }
 
-    private function invokePrivate(object $target, string $method): void
+    private function invokePrivate(object $target, string $method, array $args = []): mixed
     {
         $reflection = new ReflectionClass($target);
         $refMethod = $reflection->getMethod($method);
         if (PHP_VERSION_ID < 80100) {
             $refMethod->setAccessible(true);
         }
-        $refMethod->invoke($target);
+        return $refMethod->invokeArgs($target, $args);
     }
 
     private function removeDir(string $dir): void

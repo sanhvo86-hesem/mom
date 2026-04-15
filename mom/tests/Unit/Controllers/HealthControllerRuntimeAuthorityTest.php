@@ -6,8 +6,10 @@ namespace MOM\Tests\Unit\Controllers;
 
 use MOM\Api\Controllers\ExitException;
 use MOM\Api\Controllers\HealthController;
+use MOM\Api\Middleware\AuditMiddleware;
 use MOM\Database\DataLayer;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 final class HealthControllerRuntimeAuthorityTest extends TestCase
 {
@@ -18,6 +20,7 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
         $this->tmpDir = sys_get_temp_dir() . '/mom_health_authority_test_' . bin2hex(random_bytes(4));
         mkdir($this->tmpDir, 0775, true);
         putenv('MOM_ENABLE_LEGACY_AUDIT_LOG');
+        AuditMiddleware::resetLegacySinkHealthForTests();
     }
 
     protected function tearDown(): void
@@ -138,6 +141,59 @@ final class HealthControllerRuntimeAuthorityTest extends TestCase
             $payload['ok'],
         );
         $this->assertNoErrorKeys($payload);
+    }
+
+    public function testSanitizedReadinessInfrastructureDoesNotExposeLogTransportInternals(): void
+    {
+        putenv('LOKI_URL=http://loki.internal:3100/loki/api/v1/push');
+        $controller = new HealthController(
+            new DataLayer($this->tmpDir, (string)QMS_TEST_ROOT_DIR, ['use_postgres' => false]),
+            (string)QMS_TEST_ROOT_DIR,
+            $this->tmpDir,
+        );
+        $reflection = new ReflectionClass($controller);
+        $method = $reflection->getMethod('collectInfrastructureHealthSanitized');
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
+
+        $infra = $method->invoke($controller, $this->tmpDir);
+        putenv('LOKI_URL');
+
+        $this->assertArrayNotHasKey('file_cache_dir', $infra['redis'] ?? [], 'Unauthenticated readiness leaked cache path.');
+        $this->assertArrayNotHasKey('file_queue_dir', $infra['rabbitmq'] ?? [], 'Unauthenticated readiness leaked queue path.');
+
+        $logging = $infra['logging'] ?? [];
+        $this->assertIsArray($logging);
+        foreach (['error', 'loki_url', 'loki_verified_at', 'fallback_dir', 'last_failure_message'] as $key) {
+            $this->assertArrayNotHasKey($key, $logging, 'Unauthenticated readiness logging health leaked ' . $key);
+        }
+        $this->assertArrayHasKey('loki_configured', $logging);
+        $this->assertArrayHasKey('fallback_active', $logging);
+    }
+
+    public function testStatusSurfacesLegacyAuditSinkWriteFailures(): void
+    {
+        $before = AuditMiddleware::legacySinkHealth();
+        (new AuditMiddleware($this->tmpDir, enabled: true))->writeEntry([
+            'action' => 'health-status-proof',
+            'uri' => '/api.php?action=health-status-proof',
+            'timestamp' => gmdate('c'),
+        ]);
+        $this->assertGreaterThan((int)$before['write_failure_count'], (int)AuditMiddleware::legacySinkHealth()['write_failure_count']);
+
+        $controller = $this->adminController();
+        try {
+            $controller->status();
+            $this->fail('Health status should throw structured API response.');
+        } catch (ExitException $e) {
+            $payload = $e->getPayload();
+        }
+
+        $sink = $payload['infrastructure']['legacy_audit_file_sink'] ?? [];
+        $this->assertGreaterThan(0, (int)($sink['write_failure_count'] ?? 0));
+        $this->assertNotEmpty($sink['last_write_failure_at'] ?? null);
+        $this->assertTrue($sink['degraded'] ?? false);
     }
 
     private function adminController(): HealthController

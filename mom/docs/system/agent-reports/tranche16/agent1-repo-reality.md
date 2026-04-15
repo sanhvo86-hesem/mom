@@ -10,8 +10,8 @@ Inspected current repo state for authority core, planning/execution, traceabilit
 
 | Area | Classification | Evidence |
 | --- | --- | --- |
-| Schema authority | VERIFIED_COMPLETE | `python3 mom/tools/verify_schema_authority.py` passes 9/9 with migration chain 001-132 and registry/authority parity 761/761. |
-| Publication truth | VERIFIED_COMPLETE | `python3 mom/tools/registry/verify_publication_truth.py` passes 256/256 after tranche16 changes. |
+| Schema authority | VERIFIED_COMPLETE | Tranche16 evidence passed 9/9 with migration chain 001-132 and registry/authority parity 761/761. Tranche18 re-verification passes 9/9 with migration chain 001-133 and parity 761/761. |
+| Publication truth | VERIFIED_COMPLETE | Tranche16 evidence passed 256/256 after tranche16 changes. Tranche18 re-verification passes 271/271. |
 | Runtime DB/front-end connection | PARTIAL | Admin schema surfaces now report complete registry/publication proof locally, but VPS proof still depends on deployed migrations and healthcheck. |
 | File Explorer as admin tab | VERIFIED_COMPLETE | Prior code now treats File Explorer as a normal admin tab route instead of a dead-end navigation surface. |
 | Change authority | VERIFIED_COMPLETE | `ChangeAuthorityServiceTest` and migration 132 prove scoped post-release field authority, consumed token lookup, and e-signature challenge binding. |
@@ -26,4 +26,3 @@ Inspected current repo state for authority core, planning/execution, traceabilit
 - Harden runtime rate-limit fallback so state-store failure does not silently fail open.
 - Harden cache fallback health visibility and postdeploy runtime directory gates.
 - Preserve queue date semantics without brittle string slicing.
-

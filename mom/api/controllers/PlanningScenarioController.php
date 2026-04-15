@@ -16,6 +16,8 @@ final class PlanningScenarioController extends BaseController
 
         try {
             $body = $this->jsonBody();
+            $this->rejectRequestScopeFields();
+            $this->applySessionOrgScope($body, true);
             $body['calculated_by'] = (string)($body['calculated_by'] ?? $user['username'] ?? $user['id'] ?? 'planner');
             $this->success(['planning_scenario' => $this->service()->calculateScenario($body)], 201);
         } catch (Throwable $e) {
@@ -30,9 +32,7 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            // SECURITY: Pass org_id from session to verify cross-org access
-            $orgId = $_SESSION['org_id'] ?? null;
-            $this->success(['planning_scenario_detail' => $this->service()->scenarioDetail($this->scenarioId(), $orgId)]);
+            $this->success(['planning_scenario_detail' => $this->service()->scenarioDetail($this->scenarioId(), $this->sessionOrgId(), $this->planningScope())]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_detail_failed', 500, $e->getMessage());
@@ -45,9 +45,7 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            // SECURITY: Pass org_id from session to verify cross-org access
-            $orgId = $_SESSION['org_id'] ?? null;
-            $this->success(['planning_feasibility' => $this->service()->feasibility($this->scenarioId(), $orgId)]);
+            $this->success(['planning_feasibility' => $this->service()->feasibility($this->scenarioId(), $this->sessionOrgId(), $this->planningScope())]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_feasibility_failed', 500, $e->getMessage());
@@ -60,9 +58,7 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            // SECURITY: Pass org_id from session to verify cross-org access
-            $orgId = $_SESSION['org_id'] ?? null;
-            $this->success(['planning_capacity_load' => $this->service()->capacityLoad($this->scenarioId(), $orgId)]);
+            $this->success(['planning_capacity_load' => $this->service()->capacityLoad($this->scenarioId(), $this->sessionOrgId(), $this->planningScope())]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_capacity_failed', 500, $e->getMessage());
@@ -76,11 +72,9 @@ final class PlanningScenarioController extends BaseController
         $this->requireCsrf();
 
         try {
-            // SECURITY: Pass org_id from session to verify cross-org access
-            $orgId = $_SESSION['org_id'] ?? null;
             $this->success(['planning_scenario' => $this->service()->approveScenario($this->scenarioId(), [
                 'approved_by' => (string)($user['username'] ?? $user['id'] ?? 'planner'),
-            ], $orgId)]);
+            ], $this->sessionOrgId(), $this->planningScope())]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_approve_failed', 500, $e->getMessage());
@@ -94,11 +88,9 @@ final class PlanningScenarioController extends BaseController
         $this->requireCsrf();
 
         try {
-            // SECURITY: Pass org_id from session to verify cross-org access
-            $orgId = $_SESSION['org_id'] ?? null;
             $this->success(['planning_scenario' => $this->service()->publishScenario($this->scenarioId(), [
                 'published_by' => (string)($user['username'] ?? $user['id'] ?? 'planner'),
-            ], $orgId)]);
+            ], $this->sessionOrgId(), $this->planningScope())]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_scenario_publish_failed', 500, $e->getMessage());
@@ -111,7 +103,8 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['dispatch_readiness' => $this->service()->dispatchReadiness($this->criteria())]);
+            $criteria = $this->criteria();
+            $this->success(['dispatch_readiness' => $this->service()->dispatchReadiness($criteria)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_dispatch_readiness_failed', 500, $e->getMessage());
@@ -126,6 +119,8 @@ final class PlanningScenarioController extends BaseController
 
         try {
             $body = $this->jsonBody();
+            $this->rejectRequestScopeFields();
+            $this->applySessionOrgScope($body, true);
             $body['created_by'] = (string)($body['created_by'] ?? $user['username'] ?? $user['id'] ?? 'planner');
             $this->success(['replanning_signal' => $this->service()->recordReplanningSignal($body)], 201);
         } catch (Throwable $e) {
@@ -140,7 +135,8 @@ final class PlanningScenarioController extends BaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         try {
-            $this->success(['replanning_signals' => $this->service()->replanningSignals($this->criteria())]);
+            $criteria = $this->criteria();
+            $this->success(['replanning_signals' => $this->service()->replanningSignals($criteria)]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('planning_replanning_signals_failed', 500, $e->getMessage());
@@ -174,6 +170,22 @@ final class PlanningScenarioController extends BaseController
         return $id;
     }
 
+    private function sessionOrgId(): ?string
+    {
+        $orgId = $_SESSION['org_id'] ?? null;
+        return is_scalar($orgId) && trim((string)$orgId) !== '' ? trim((string)$orgId) : null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function planningScope(): array
+    {
+        $scope = [];
+        $this->applySessionOrgScope($scope, true);
+        return $scope;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -191,6 +203,9 @@ final class PlanningScenarioController extends BaseController
                 $criteria[$field] = trim($value);
             }
         }
+        $this->rejectPayloadScopeFields($criteria);
+        $this->rejectRequestScopeFields();
+        $this->applySessionOrgScope($criteria, true);
         return $criteria;
     }
 

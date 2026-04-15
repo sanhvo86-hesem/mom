@@ -32,7 +32,7 @@ Date: 2026-04-15
 ## Current Verification Snapshot
 
 - `python3 mom/tools/verify_schema_authority.py`: PASS 9/9.
-- `python3 mom/tools/registry/verify_publication_truth.py`: PASS 256/256.
+- `python3 mom/tools/registry/verify_publication_truth.py`: tranche16 evidence was PASS 256/256; tranche18 re-verification is PASS 271/271.
 - `php mom/tests/data_schema_admin_smoke.php`: PASS.
 - `php mom/tests/vps_control_tower_smoke.php`: PASS.
 - `php mom/scripts/postdeploy_healthcheck.php`: PASS after local runtime dirs were created; deploy script also creates them on VPS.

@@ -11,7 +11,7 @@ PASS for current root branch after reconciling stale helper-worktree findings. T
 | Item | Classification | Evidence / Action |
 | --- | --- | --- |
 | `ChangeAuthorityService.php` parse failure in a helper worktree | STALE_HELPER_FINDING | The helper worktree was still at checkpoint `934d1338`; final root branch parses clean and tests pass. Cleanup helper worktrees after merge. |
-| Generated authority/publication drift | ALREADY_FIXED | Root branch publication truth passes 256/256; schema authority passes 9/9. |
+| Generated authority/publication drift | ALREADY_FIXED | Tranche16 root branch publication truth passed 256/256 and schema authority passed 9/9. Tranche18 re-verification passes publication truth 271/271 and schema authority 9/9. |
 | Traceability/genealogy scope hardening | ALREADY_FIXED | Final root branch tests reject broad enterprise-only scope. |
 | Repo hygiene debris | ALREADY_FIXED | No committed temp/runtime debris found in final root checks. |
 | Helper worktree/branch cleanup | FIX_AT_END | Must remove tranche16 helper worktrees and branches after final merge. |
@@ -21,4 +21,3 @@ PASS for current root branch after reconciling stale helper-worktree findings. T
 ## FIX_NOW
 
 No code-fixable backlog remains open in the final root branch. Cleanup remains mandatory after merge.
-

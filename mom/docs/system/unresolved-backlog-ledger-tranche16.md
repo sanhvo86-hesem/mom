@@ -4,7 +4,7 @@ Date: 2026-04-15
 
 | Source Prompt / Doc | Original Expected Outcome | Current Verified Status | Evidence | Why Still Open | Code-Fixable Now | Action In This Run |
 | --- | --- | --- | --- | --- | --- | --- |
-| User screenshots: Registry vs PostgreSQL | Runtime DB connects cleanly to frontend; no missing migration/publishability blockers. | CLOSED_LOCAL | Schema authority 9/9; publication truth 256/256; migration 132 present. | VPS proof remains pending until deploy. | Yes | Added/verified migration and proof gates. |
+| User screenshots: Registry vs PostgreSQL | Runtime DB connects cleanly to frontend; no missing migration/publishability blockers. | CLOSED_LOCAL | Tranche16 evidence: schema authority 9/9, publication truth 256/256, migration 132 present. Tranche18 re-verification: migration chain 001-133 and publication truth 271/271. | VPS proof remains pending until deploy. | Yes | Added/verified migration and proof gates; tranche18 refreshed stale evidence counts. |
 | User screenshots: release blocked by registry quality report | Publishability blockers reflect real code state and do not overstate readiness. | CLOSED_LOCAL | Publication truth gates J/K/W pass. | None locally. | Yes | Strengthened publication truth script and diagnostics. |
 | User report: File Explorer admin tab cannot return | File Explorer behaves like other admin tabs. | ALREADY_FIXED | Prior portal route/navigation changes retained; not regressed by tranche16. | None locally. | Already fixed | Preserved behavior. |
 | Tranche15/closure docs | E-signature records require challenge trust linkage. | CLOSED_LOCAL | Migration 132 FK and orphan precheck; migration unit test. | External Part 11 validation remains. | Yes | Implemented relational integrity proof. |
@@ -15,4 +15,3 @@ Date: 2026-04-15
 | Standards benchmark | OTel collector, live trace context, metrics/logs correlation. | BLOCKED_EXTERNAL | No collector/exporter deployment in repo. | Requires external telemetry backend and operational config. | No | Document blocker only. |
 | Standards benchmark | Full Part 11 compliance package and WORM retention. | BLOCKED_EXTERNAL | Code has scoped controls, not validation package. | Requires SOPs, validation, identity/retention/audit process. | No | Document blocker only. |
 | Vendor benchmark | Full APS/SPC/SCAR/connected training suite parity. | PRODUCT_DECISION_REQUIRED | Repo contains slices, not full vendor-suite feature scope. | Requires roadmap/product ownership. | Not as a closure bug | No broad rewrite. |
-

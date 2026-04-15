@@ -41,7 +41,7 @@
 | | ASL management | Yes (source list / quota arrangement) |
 | **F. Compliance** | Standards | AS9100, IATF 16949, ISO 13485, FDA 21 CFR Part 11, GxP, NADCAP (via config) |
 | | Audit trail | Field-level change documents |
-| | E-signature | 21 CFR Part 11 compliant (SAP signature framework) |
+| | E-signature | Part 11-capable signature controls when configured, validated, and scoped to predicate-rule records |
 | | Export control | ITAR/EAR via SAP GTS (Global Trade Services) |
 | **G. Integration** | API type | OData REST, SOAP, RFC/BAPI, IDoc |
 | | Pre-built connectors | 2,800+ via SAP Integration Suite |
@@ -220,7 +220,7 @@
 | | COPQ | Via analytics |
 | **F. Compliance** | Standards | FDA 21 CFR Part 11, ISO 13485, ISO 9001, EU MDR, GxP |
 | | Audit trail | Comprehensive, time-stamped, transmissible |
-| | E-signature | Yes -- 21 CFR Part 11 compliant (subparts A, B, C) |
+| | E-signature | Yes -- Part 11-capable controls when validated and scoped to intended regulated records |
 | **G. Integration** | API type | REST API |
 | | Pre-built connectors | Not published |
 | **H. UX** | Low-code/no-code | Yes -- no-code form and workflow designer |
@@ -510,7 +510,7 @@
 | | Closed-loop | Deviations -> Investigations -> Root Causes -> CAPAs -> Change Controls |
 | **F. Compliance** | Standards | FDA 21 CFR Part 11, EU Annex 11, GxP -- built from ground up |
 | | Audit trail | Permanent audit logs on all records (out-of-the-box) |
-| | E-signature | Yes -- 21 CFR Part 11 compliant (native) |
+| | E-signature | Yes -- Part 11-capable native controls when validated and scoped to intended regulated records |
 | | Access control | Role-based (out-of-the-box) |
 | **G. Integration** | API type | REST API; connectivity with ERP/LIMS/MES |
 | | Deployment | Multi-tenant SaaS only |
@@ -654,7 +654,7 @@ The following metrics are consistently unavailable across all platforms:
 
 4. **ETQ Reliance** leads dedicated QMS platforms with 40+ pre-built applications and full closed-loop quality (NCR->CAPA->recall with eMDR).
 
-5. **Veeva Vault Quality** is the gold standard for pharma/life sciences 21 CFR Part 11 compliance, built from the ground up for GxP.
+5. **Veeva Vault Quality** is positioned for pharma/life-sciences GxP quality workflows with Part 11-capable controls when implemented, validated, and scoped to regulated records.
 
 6. **IFS Cloud** is notable for API-first design (6,000+ projections) and embedded AS9100/ITAR in workflows.
 

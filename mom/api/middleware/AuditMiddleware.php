@@ -26,6 +26,9 @@ class AuditMiddleware
     /** @var list<string> Actions to skip logging (high-frequency, low-risk). */
     private array $skipActions;
 
+    private static int $writeFailureCount = 0;
+    private static ?string $lastWriteFailureAt = null;
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -167,6 +170,30 @@ class AuditMiddleware
         }
 
         $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        @file_put_contents($this->logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+        if ($line === false || @file_put_contents($this->logFile, $line . "\n", FILE_APPEND | LOCK_EX) === false) {
+            self::$writeFailureCount++;
+            self::$lastWriteFailureAt = gmdate('c');
+            @error_log('[AuditMiddleware] Legacy audit file sink write failed');
+        }
+    }
+
+    /**
+     * @return array{write_failure_count:int,last_write_failure_at:?string}
+     */
+    public static function legacySinkHealth(): array
+    {
+        return [
+            'write_failure_count' => self::$writeFailureCount,
+            'last_write_failure_at' => self::$lastWriteFailureAt,
+        ];
+    }
+
+    public static function resetLegacySinkHealthForTests(): void
+    {
+        if (!defined('API_THROW_RESPONSES') || !API_THROW_RESPONSES) {
+            return;
+        }
+        self::$writeFailureCount = 0;
+        self::$lastWriteFailureAt = null;
     }
 }

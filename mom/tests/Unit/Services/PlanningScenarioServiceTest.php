@@ -138,6 +138,19 @@ final class PlanningScenarioServiceTest extends TestCase
         $this->assertSame(0, $dispatch['blocked_count']);
     }
 
+    public function testPartitionScopeGuardsPlanningReadAndPublishPaths(): void
+    {
+        $scenario = $this->service->calculateScenario($this->baseScenario());
+        $scope = ['org_site_id' => 'SITE-A', 'org_plant_id' => 'PLANT-1'];
+        $wrongScope = ['org_site_id' => 'SITE-B', 'org_plant_id' => 'PLANT-1'];
+
+        $this->assertSame($scenario['scenario_id'], $this->service->scenarioDetail($scenario['scenario_id'], null, $scope)['scenario']['scenario_id']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('planning_scenario_access_denied');
+        $this->service->approveScenario($scenario['scenario_id'], ['approved_by' => 'planner-1'], null, $wrongScope);
+    }
+
     public function testPublishBlockedWhenConstraintsRemain(): void
     {
         $scenario = $this->service->calculateScenario($this->baseScenario([

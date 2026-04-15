@@ -386,6 +386,93 @@ abstract class BaseController
     }
 
     /**
+     * Return the authenticated user's canonical org scope from every supported
+     * session mirror used by legacy and controller paths.
+     *
+     * @return array<string, string>
+     */
+    protected function authenticatedOrgScope(): array
+    {
+        $scope = [];
+        foreach ([
+            is_array($_SESSION['org_scope'] ?? null) ? $_SESSION['org_scope'] : [],
+            is_array($_SESSION['user_scope'] ?? null) ? $_SESSION['user_scope'] : [],
+            $_SESSION,
+        ] as $source) {
+            foreach (['org_company_code', 'org_legal_entity_code', 'org_site_id', 'org_plant_id'] as $field) {
+                $value = $source[$field] ?? null;
+                if (is_scalar($value) && trim((string)$value) !== '' && !isset($scope[$field])) {
+                    $scope[$field] = trim((string)$value);
+                }
+            }
+        }
+
+        $plant = $_SESSION['plant_id'] ?? $scope['org_plant_id'] ?? null;
+        if (is_scalar($plant) && trim((string)$plant) !== '') {
+            $scope['plant_id'] = trim((string)$plant);
+            $scope['org_plant_id'] = $scope['org_plant_id'] ?? trim((string)$plant);
+        }
+
+        $site = $_SESSION['site_id'] ?? $scope['org_site_id'] ?? null;
+        if (is_scalar($site) && trim((string)$site) !== '') {
+            $scope['site_id'] = trim((string)$site);
+            $scope['org_site_id'] = $scope['org_site_id'] ?? trim((string)$site);
+        }
+
+        return $scope;
+    }
+
+    /**
+     * Reject client-provided authority scope fields so controllers can derive
+     * partition truth from the authenticated session instead of request input.
+     *
+     * @param list<string>|null $fields
+     */
+    protected function rejectRequestScopeFields(?array $fields = null): void
+    {
+        $this->rejectPayloadScopeFields($this->jsonBody(), $fields);
+        foreach ($fields ?? ['org_company_code', 'org_legal_entity_code', 'org_site_id', 'org_plant_id', 'site_id', 'plant_id'] as $field) {
+            $value = $this->input($field);
+            if ($value !== null && trim($value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be provided in request. Scope is derived from user session.');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param list<string>|null $fields
+     */
+    protected function rejectPayloadScopeFields(array $payload, ?array $fields = null): void
+    {
+        foreach ($fields ?? ['org_company_code', 'org_legal_entity_code', 'org_site_id', 'org_plant_id', 'site_id', 'plant_id'] as $field) {
+            $value = $payload[$field] ?? null;
+            if (is_scalar($value) && trim((string)$value) !== '') {
+                $this->error('unauthorized_scope_field_in_request', 403, 'Scope fields cannot be provided in request. Scope is derived from user session.');
+            }
+        }
+    }
+
+    /**
+     * Apply authenticated session scope to request criteria.
+     *
+     * @param array<string, mixed> $criteria
+     */
+    protected function applySessionOrgScope(array &$criteria, bool $requirePartition = false): void
+    {
+        $scope = $this->authenticatedOrgScope();
+        if ($requirePartition && ((string)($scope['org_site_id'] ?? '') === '' || (string)($scope['org_plant_id'] ?? '') === '')) {
+            $this->error('missing_session_partition_scope', 403, 'A site and plant session scope is required for this authority path.');
+        }
+
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_site_id', 'org_plant_id', 'site_id', 'plant_id'] as $field) {
+            if (isset($scope[$field]) && $scope[$field] !== '') {
+                $criteria[$field] = $scope[$field];
+            }
+        }
+    }
+
+    /**
      * Require the current user to be an admin. Terminates with 403 on failure.
      *
      * @param array $user Authenticated user record.

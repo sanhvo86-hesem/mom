@@ -27,6 +27,8 @@ final class QueueService
     private bool $publisherConfirmsEnabled = false;
     private string $fileDir;
     private int $fileMaxAttempts;
+    private int $fileWriteFailureCount = 0;
+    private ?string $fileLastWriteFailureAt = null;
 
     // Exchange names
     public const EXCHANGE_EVENTS        = 'mom.events';
@@ -367,13 +369,16 @@ final class QueueService
     {
         $fileStats = $this->fileQueueStats();
         return [
-            'amqp_available'   => $this->amqpAvailable,
-            'fallback_mode'    => !$this->amqpAvailable ? 'file' : 'none',
-            'file_queue_dir'   => $this->fileDir,
+            'amqp_available' => $this->amqpAvailable,
+            'fallback_mode' => !$this->amqpAvailable ? 'file' : 'none',
+            'file_queue_dir' => $this->fileDir,
             'file_backlog_count' => $fileStats['backlog_count'],
             'file_dead_letter_count' => $fileStats['dead_letter_count'],
             'file_reconciliation_required' => $fileStats['dead_letter_count'] > 0,
             'file_max_attempts' => $this->fileMaxAttempts,
+            'file_write_failure_count' => $this->fileWriteFailureCount,
+            'file_last_write_failure_at' => $this->fileLastWriteFailureAt,
+            'degraded' => $this->fileWriteFailureCount > 0,
         ];
     }
 
@@ -417,9 +422,18 @@ final class QueueService
         $message['file_attempts'] = 0;
         $message['file_status'] = 'pending';
 
-        $line = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        $encoded = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($encoded === false) {
+            $this->markFileWriteFailure('file_publish_encode_failed', $queueName);
+            return false;
+        }
+        $line = $encoded . "\n";
         $result = @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
-        return $result !== false;
+        if ($result === false) {
+            $this->markFileWriteFailure('file_publish_failed', $queueName);
+            return false;
+        }
+        return true;
     }
 
     private function routingKeyToQueue(string $routingKey, string $exchange): string
@@ -505,13 +519,7 @@ final class QueueService
 
             // WRK-010: Use atomic temp file swap for file queue atomicity
             // Only truncate and rewrite AFTER all processing is complete
-            if (!empty($remaining)) {
-                $tmpFile = $file . '.tmp.' . bin2hex(random_bytes(6));
-                file_put_contents($tmpFile, implode("\n", $remaining) . "\n", LOCK_EX);
-                rename($tmpFile, $file); // atomic
-            } else {
-                ftruncate($fp, 0);
-            }
+            $this->rewriteFileQueue($queue, $file, $fp, $remaining);
         } finally {
             flock($fp, LOCK_UN);
             fclose($fp);
@@ -563,7 +571,41 @@ final class QueueService
         if ($encoded === false) {
             $encoded = '{"file_status":"dead_letter","dead_letter_reason":"encode_failed"}';
         }
-        @file_put_contents($file, $encoded . "\n", FILE_APPEND | LOCK_EX);
+        if (@file_put_contents($file, $encoded . "\n", FILE_APPEND | LOCK_EX) === false) {
+            $this->markFileWriteFailure('dead_letter_write_failed', $queue);
+        }
+    }
+
+    /**
+     * @param resource $fp
+     * @param list<string> $remaining
+     */
+    private function rewriteFileQueue(string $queue, string $file, $fp, array $remaining): void
+    {
+        if ($remaining !== []) {
+            $tmpFile = $file . '.tmp.' . bin2hex(random_bytes(6));
+            $written = @file_put_contents($tmpFile, implode("\n", $remaining) . "\n", LOCK_EX);
+            if ($written === false) {
+                $this->markFileWriteFailure('queue_rewrite_failed', $queue);
+                return;
+            }
+            if (!@rename($tmpFile, $file)) {
+                @unlink($tmpFile);
+                $this->markFileWriteFailure('queue_rewrite_swap_failed', $queue);
+            }
+            return;
+        }
+
+        if (!@ftruncate($fp, 0)) {
+            $this->markFileWriteFailure('queue_truncate_failed', $queue);
+        }
+    }
+
+    private function markFileWriteFailure(string $reason, string $queue): void
+    {
+        $this->fileWriteFailureCount++;
+        $this->fileLastWriteFailureAt = gmdate('c');
+        @error_log('[QueueService] File fallback write failed: ' . $reason . ' queue=' . $queue);
     }
 
     /**

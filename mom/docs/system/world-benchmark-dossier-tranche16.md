@@ -32,7 +32,7 @@ World-class platforms do not rely on a dashboard saying "ready"; they bind runti
 
 | Gap | Closed In This Run | Evidence |
 | --- | --- | --- |
-| Runtime DB/schema proof drift visible in admin UI | Yes locally | Migration chain 001-132, schema authority 9/9, publication truth 256/256. This is repo-local source-of-truth evidence, not ISA-95 certification or vendor-suite parity. |
+| Runtime DB/schema proof drift visible in admin UI | Yes locally | Current tranche18 re-verification: migration chain 001-133, schema authority 9/9, publication truth 271/271. This is repo-local source-of-truth evidence, not ISA-95 certification or vendor-suite parity. |
 | E-signature records not relationally tied to challenges | Yes locally | Migration 132 FK with orphan precheck; migration test. |
 | Explicit field authority lookup lacked unconsumed proof index | Yes locally | Migration 132 index; change authority tests. |
 | Rate limiter could fail open on fallback state failure | Yes locally | Fail-closed 503 path and regression test. |

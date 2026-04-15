@@ -148,17 +148,19 @@ final class TrustedReleaseRecordController extends BaseController
         $body = $this->jsonBody();
         $criteria = is_array($body['criteria'] ?? null) ? $body['criteria'] : $body;
         foreach (TrustedReleaseRecordService::filterFields() as $field) {
-            $value = $this->input($field);
-            if ($value !== null && trim($value) !== '') {
-                $criteria[$field] = trim($value);
+                $value = $this->input($field);
+                if ($value !== null && trim($value) !== '') {
+                    $criteria[$field] = trim($value);
+                }
             }
-        }
         foreach (['correlation_id', 'request_id', 'traceparent', 'limit', 'require_qualification'] as $field) {
             $value = $this->input($field);
             if ($value !== null && trim($value) !== '') {
                 $criteria[$field] = trim($value);
             }
         }
+        $this->rejectPayloadScopeFields($criteria);
+        $this->rejectRequestScopeFields();
         return $criteria;
     }
 
@@ -202,7 +204,7 @@ final class TrustedReleaseRecordController extends BaseController
     }
 
     /**
-     * MES-002 FIX: Verify release record packet belongs to user's authorized plant.
+     * Verify release record packet belongs to the user's authorized site/plant partition.
      *
      * @param array<string, mixed> $packet
      * @param array<string, mixed> $user
@@ -211,28 +213,33 @@ final class TrustedReleaseRecordController extends BaseController
      */
     private function verifyPacketScope(array $packet, array $user): void
     {
-        $userPlantId = (string)($_SESSION['plant_id'] ?? '');
+        $scope = $this->authenticatedOrgScope();
+        $userPlantId = (string)($scope['org_plant_id'] ?? $scope['plant_id'] ?? '');
+        $userSiteId = (string)($scope['org_site_id'] ?? $scope['site_id'] ?? '');
 
-        // If user has a plant restriction, verify packet matches
-        if ($userPlantId !== '') {
-            $packetPlantId = (string)($packet['org_plant_id'] ?? $packet['plant_id'] ?? '');
-            if ($packetPlantId !== '' && $packetPlantId !== $userPlantId) {
-                throw new \RuntimeException('unauthorized_plant_scope');
-            }
+        if ($userSiteId === '' || $userPlantId === '') {
+            throw new \RuntimeException('missing_session_partition_scope');
+        }
+
+        $packetSiteId = (string)($packet['org_site_id'] ?? $packet['site_id'] ?? '');
+        if ($packetSiteId === '' || $packetSiteId !== $userSiteId) {
+            throw new \RuntimeException('unauthorized_site_scope');
+        }
+
+        $packetPlantId = (string)($packet['org_plant_id'] ?? $packet['plant_id'] ?? '');
+        if ($packetPlantId === '' || $packetPlantId !== $userPlantId) {
+            throw new \RuntimeException('unauthorized_plant_scope');
         }
     }
 
     /**
-     * MES-002 FIX: Add user's plant_id to release record criteria to restrict scope.
+     * Add the user's site and plant scope to release record criteria.
      *
      * @param array<string, mixed> &$criteria
      * @return void
      */
     private function addUserPlantToCriteria(array &$criteria): void
     {
-        $userPlantId = (string)($_SESSION['plant_id'] ?? '');
-        if ($userPlantId !== '' && empty($criteria['org_plant_id'])) {
-            $criteria['org_plant_id'] = $userPlantId;
-        }
+        $this->applySessionOrgScope($criteria, true);
     }
 }

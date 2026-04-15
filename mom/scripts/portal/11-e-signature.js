@@ -7,7 +7,7 @@
  *   - Canvas signature pad (mouse + touch)
  *   - Typed signature with cursive font options
  *   - SHA-256 hash verification
- *   - 21 CFR Part 11 compliant metadata
+ *   - Part 11-capable metadata when validated and scoped to regulated records
  *   - Bilingual UI (EN/VI)
  *   - Mobile responsive
  *   - AuditTrail integration

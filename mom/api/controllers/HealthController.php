@@ -8,6 +8,7 @@ use MOM\Api\Services\CacheService;
 use MOM\Api\Services\QueueService;
 use MOM\Api\Services\LogTransport;
 use MOM\Api\Services\RuntimeAuthorityService;
+use MOM\Api\Middleware\AuditMiddleware;
 use MOM\Services\EvidenceVaultService;
 
 /**
@@ -201,8 +202,7 @@ class HealthController extends BaseController
         try {
             $cache = new CacheService($dataDir);
             $health = $cache->getHealth();
-            // Remove error message
-            unset($health['error']);
+            $health = $this->sanitizeInfrastructureHealth($health, ['file_cache_dir']);
             $infra['redis'] = $health;
         } catch (\Throwable $e) {
             $infra['redis'] = ['available' => false];
@@ -212,8 +212,7 @@ class HealthController extends BaseController
             $queue = new QueueService($dataDir);
             $health = $queue->getHealth();
             $queue->close();
-            // Remove error message
-            unset($health['error']);
+            $health = $this->sanitizeInfrastructureHealth($health, ['file_queue_dir']);
             $infra['rabbitmq'] = $health;
         } catch (\Throwable $e) {
             $infra['rabbitmq'] = ['available' => false];
@@ -222,8 +221,12 @@ class HealthController extends BaseController
         try {
             $log = new LogTransport($dataDir);
             $health = $log->getHealth();
-            // Remove error message
-            unset($health['error']);
+            $health = $this->sanitizeInfrastructureHealth($health, [
+                'loki_url',
+                'loki_verified_at',
+                'fallback_dir',
+                'last_failure_message',
+            ]);
             $infra['logging'] = $health;
         } catch (\Throwable $e) {
             $infra['logging'] = ['available' => false];
@@ -315,11 +318,28 @@ class HealthController extends BaseController
     private function legacyAuditFileSinkHealth(): array
     {
         $enabled = in_array(strtolower((string)getenv('MOM_ENABLE_LEGACY_AUDIT_LOG')), ['1', 'true', 'yes'], true);
+        $writeFailureHealth = AuditMiddleware::legacySinkHealth();
 
         return [
             'enabled' => $enabled,
-            'degraded' => $enabled,
+            'degraded' => $enabled || ((int)($writeFailureHealth['write_failure_count'] ?? 0) > 0),
             'authority_mode' => $enabled ? 'diagnostic_legacy_file_sink' : 'canonical_audit_store',
+            'write_failure_count' => (int)($writeFailureHealth['write_failure_count'] ?? 0),
+            'last_write_failure_at' => $writeFailureHealth['last_write_failure_at'] ?? null,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $health
+     * @param list<string> $redactedKeys
+     * @return array<string, mixed>
+     */
+    private function sanitizeInfrastructureHealth(array $health, array $redactedKeys = []): array
+    {
+        unset($health['error']);
+        foreach ($redactedKeys as $key) {
+            unset($health[$key]);
+        }
+        return $health;
     }
 }
