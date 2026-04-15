@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-15T12:04:25+00:00",
+        "generated_at": "2026-04-15T13:52:38+00:00",
         "generator": "tools/scripts/ai-index/generate.php",
         "description": "High-level project topology. Read this first to orient."
     },
@@ -83,5 +83,21 @@
         "2_SHADOW_WRITE": "write to both JSON + PostgreSQL",
         "3_POSTGRES_PRIMARY": "read from PostgreSQL, fallback to JSON",
         "4_POSTGRES_ONLY": "PostgreSQL only (final state)"
+    },
+    "ai_workflow_files": {
+        "mandatory_workflow": ".ai/AI-WORKFLOW.md",
+        "file_conventions": ".ai/CONVENTIONS.md",
+        "claude_config": "CLAUDE.md",
+        "agents_config": "AGENTS.md",
+        "cursor_config": ".cursorrules",
+        "windsurf_config": ".windsurfrules",
+        "copilot_config": ".github/copilot-instructions.md",
+        "aider_config": ".aider.conf.yml"
+    },
+    "directory_layout": {
+        "docs/": "Reference documentation — architecture, audits, standards, benchmarks (not served by app)",
+        "mom/": "Application — PHP source, migrations, contracts, assets, QMS documents served by app",
+        "tools/": "Build and automation scripts — AI index generator, release tools, VPS setup",
+        "_reports/": "Generated CI/test/AI-audit artifacts — never committed as source truth"
     }
 }

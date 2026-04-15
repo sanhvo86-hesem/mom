@@ -505,23 +505,7 @@ foreach ($contractDirs as $cd) {
 }
 out("  Contracts: " . count($contracts) . " across " . count($contractsByDomain) . " domains");
 
-// ── Phase 5: Build table → service heuristic map ──────────────────────────────
-
-$tableToServices = [];
-foreach ($parsedByType['services'] as $svc) {
-    $cls = $svc['class'];
-    foreach (array_keys($tableIndex) as $tbl) {
-        $words = array_filter(explode('_', $tbl), fn($w) => strlen($w) > 3);
-        foreach ($words as $word) {
-            if (stripos($cls, $word) !== false) {
-                $tableToServices[$tbl][] = $cls;
-                break;
-            }
-        }
-    }
-}
-
-// ── Phase 6: Write output files ───────────────────────────────────────────────
+// ── Phase 5: Write output files ───────────────────────────────────────────────
 
 out(str_repeat('─', 60));
 out("Writing .ai/ index files...");
@@ -595,6 +579,22 @@ $repoMap = [
         '3_POSTGRES_PRIMARY'  => 'read from PostgreSQL, fallback to JSON',
         '4_POSTGRES_ONLY'     => 'PostgreSQL only (final state)',
     ],
+    'ai_workflow_files' => [
+        'mandatory_workflow' => '.ai/AI-WORKFLOW.md',
+        'file_conventions'   => '.ai/CONVENTIONS.md',
+        'claude_config'      => 'CLAUDE.md',
+        'agents_config'      => 'AGENTS.md',
+        'cursor_config'      => '.cursorrules',
+        'windsurf_config'    => '.windsurfrules',
+        'copilot_config'     => '.github/copilot-instructions.md',
+        'aider_config'       => '.aider.conf.yml',
+    ],
+    'directory_layout' => [
+        'docs/'      => 'Reference documentation — architecture, audits, standards, benchmarks (not served by app)',
+        'mom/'       => 'Application — PHP source, migrations, contracts, assets, QMS documents served by app',
+        'tools/'     => 'Build and automation scripts — AI index generator, release tools, VPS setup',
+        '_reports/'  => 'Generated CI/test/AI-audit artifacts — never committed as source truth',
+    ],
 ];
 
 file_put_contents($AI_DIR . '/repo-map.json', json_encode($repoMap, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
@@ -618,7 +618,7 @@ vout("route-map.json", $verbose);
 $dbMap = [
     '_meta' => [
         'generated_at'     => date(DATE_ATOM),
-        'description'      => 'Database tables: which migration defines them, primary key, foreign keys, related services/contracts.',
+        'description'      => 'Database tables: which migration defines them, primary key, foreign keys, and owning contract. For targeted loading use .ai/db-map/index.json → .ai/db-map/<domain-slug>.json.',
         'migrations_dir'   => 'mom/database/migrations/',
         'total_migrations' => count($parsedMigrations),
         'total_tables'     => count($tableIndex),
@@ -630,7 +630,7 @@ $dbMap = [
         'tables_created'  => array_column($m['tables'], 'name'),
         'tables_extended' => $m['alter_tables'],
     ], $parsedMigrations),
-    'tables' => (static function() use ($tableIndex, $tableToServices, $contracts): array {
+    'tables' => (static function() use ($tableIndex, $contracts): array {
         $out = [];
         foreach ($tableIndex as $tableName => $info) {
             $ownerContract = null;
@@ -675,11 +675,11 @@ foreach ($tableIndex as $tName => $tInfo) {
 }
 
 $tablesByDomain = [];
-$domainIndex = [];   // table_name => domain (lightweight index)
+$domainIndex = [];   // table_name => domain-slug (matches filename in .ai/db-map/)
 foreach ($dbMap['tables'] as $tName => $tData) {
     $d = $tableToDomain[$tName] ?? 'unclassified';
     $tablesByDomain[$d][$tName] = $tData;
-    $domainIndex[$tName] = $d;
+    $domainIndex[$tName] = str_replace('_', '-', $d);  // slug matches .ai/db-map/<slug>.json
 }
 
 foreach ($tablesByDomain as $domain => $tables) {
@@ -688,14 +688,16 @@ foreach ($tablesByDomain as $domain => $tables) {
         '_meta' => ['domain' => $domain, 'table_count' => count($tables), 'generated_at' => date(DATE_ATOM)],
         'tables' => $tables,
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    vout("db-map/$domain.json (" . count($tables) . " tables)", $verbose);
+    $slug = str_replace('_', '-', $domain);
+    vout("db-map/$slug.json (" . count($tables) . " tables)", $verbose);
 }
 
 // Write lightweight domain index
 file_put_contents($dbMapDomainDir . '/index.json', json_encode([
     '_meta' => [
-        'description' => 'Table → domain lookup. Use this to find which domain file to load.',
-        'usage' => 'Grep table name here, then read .ai/db-map/<domain>.json for full details.',
+        'description'  => 'Lightweight table → domain-slug lookup. Values are the exact filename slugs in .ai/db-map/.',
+        'usage'        => 'Grep table name here to get its slug, then read .ai/db-map/<slug>.json for full details.',
+        'example'      => '"orders_header" => "planning-production" → read .ai/db-map/planning-production.json',
         'generated_at' => date(DATE_ATOM),
     ],
     'table_domain_map' => $domainIndex,
