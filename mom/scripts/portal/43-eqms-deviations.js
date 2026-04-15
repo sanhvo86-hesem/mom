@@ -45,6 +45,12 @@
     { value: 'minor',    label: { vi: 'Nho',          en: 'Minor' } }
   ];
 
+  var IMPACT_LEVELS = [
+    { value: 'high',   label: { vi: 'Cao',        en: 'High' } },
+    { value: 'medium', label: { vi: 'Trung binh', en: 'Medium' } },
+    { value: 'low',    label: { vi: 'Thap',       en: 'Low' } }
+  ];
+
   // ─── State ──────────────────────────────────────────────────────────────
   var state = {
     screen:     'queue',   // queue | detail | create | analytics
@@ -257,6 +263,7 @@
   // =========================================================================
   var DETAIL_TABS = [
     { id: 'summary',        label: { vi: 'Tong quan',            en: 'Summary' } },
+    { id: 'classification', label: { vi: 'Phan loai',            en: 'Classification' } },
     { id: 'impact',         label: { vi: 'Danh gia tac dong',    en: 'Impact Assessment' } },
     { id: 'containment',    label: { vi: 'Kiem soat',            en: 'Containment' } },
     { id: 'investigation',  label: { vi: 'Dieu tra',             en: 'Investigation' } },
@@ -309,8 +316,9 @@
 
   function renderDetailTab(d) {
     switch (state.detailTab) {
-      case 'summary':       return renderTabSummary(d);
-      case 'impact':        return renderTabImpact(d);
+      case 'summary':        return renderTabSummary(d);
+      case 'classification': return renderTabClassification(d);
+      case 'impact':         return renderTabImpact(d);
       case 'containment':   return renderTabContainment(d);
       case 'investigation': return renderTabInvestigation(d);
       case 'closure':       return renderTabClosure(d);
@@ -330,6 +338,8 @@
         { label: { vi: 'Phan loai',        en: 'Classification' },     value: d.classification || d.deviation_type, badge: true },
         { label: { vi: 'Nguon',            en: 'Source' },              value: d.source },
         { label: { vi: 'Muc do',           en: 'Severity' },           value: d.severity, badge: true },
+        { label: { vi: 'Muc anh huong',   en: 'Impact Level' },       value: (d.classification_board || {}).impact_level || d.impact_level, badge: true },
+        { label: { vi: 'Nguoi phan loai', en: 'Classified By' },      value: (d.classification_board || {}).classified_by || d.classified_by },
         { label: { vi: 'Nguoi phat hien',  en: 'Detected By' },        value: d.detected_by },
         { label: { vi: 'Ngay phat hien',   en: 'Detected At' },        value: fmtDateTime(d.detected_at) },
         { label: { vi: 'Khu vuc',          en: 'Area' },               value: d.area || d.department },
@@ -342,6 +352,98 @@
     ) + ui.renderSection({ vi: 'Kiem soat tam thoi', en: 'Immediate Containment' },
       '<div class="eqms-text-block">' + esc(d.immediate_containment || d.containment_action || '') + '</div>'
     );
+  }
+
+  // Tab: Classification Board
+  function renderTabClassification(d) {
+    var html = '';
+    var cls = d.classification_board || {};
+    var currentStatus = d.status || d.state || 'draft';
+
+    // ── Current Classification Panel ──
+    html += ui.renderSection({ vi: 'Phan loai hien tai', en: 'Current Classification' },
+      ui.renderFieldGrid([
+        { label: { vi: 'Phan loai',       en: 'Classification' },     value: d.classification || cls.classification, badge: true },
+        { label: { vi: 'Muc do',          en: 'Severity' },           value: d.severity || cls.severity, badge: true },
+        { label: { vi: 'Muc anh huong',   en: 'Impact Level' },       value: cls.impact_level || d.impact_level, badge: true },
+        { label: { vi: 'Ly do',           en: 'Justification' },      value: cls.justification || d.classification_justification },
+        { label: { vi: 'Nguoi phan loai', en: 'Classified By' },      value: cls.classified_by || d.classified_by },
+        { label: { vi: 'Ngay phan loai',  en: 'Classified At' },      value: fmtDateTime(cls.classified_at || d.classified_at) }
+      ])
+    );
+
+    // ── Classification History ──
+    var history = cls.history || d.classification_history || [];
+    html += ui.renderSection({ vi: 'Lich su phan loai', en: 'Classification History' },
+      history.length > 0
+        ? ui.renderDataGrid([
+            { key: 'classification', label: { vi: 'Phan loai',       en: 'Classification' }, type: 'badge', sortable: false },
+            { key: 'severity',       label: { vi: 'Muc do',          en: 'Severity' },       type: 'badge', sortable: false },
+            { key: 'impact_level',   label: { vi: 'Muc anh huong',   en: 'Impact Level' },   type: 'badge', sortable: false },
+            { key: 'justification',  label: { vi: 'Ly do',           en: 'Justification' },  sortable: false },
+            { key: 'changed_by',     label: { vi: 'Nguoi thay doi',  en: 'Changed By' },     sortable: false },
+            { key: 'changed_at',     label: { vi: 'Ngay thay doi',   en: 'Changed At' },     type: 'datetime', sortable: false },
+            { key: 'reason',         label: { vi: 'Ly do thay doi',  en: 'Change Reason' },  sortable: false }
+          ], history, { selectable: false })
+        : '<div class="eqms-empty-state">' + T({ vi: 'Chua co lich su phan loai lai.', en: 'No reclassification history.' }) + '</div>'
+    );
+
+    // ── Classify / Reclassify Action Panel ──
+    if (currentStatus === 'draft' || currentStatus === 'classified') {
+      html += renderClassifyActionPanel(d, currentStatus);
+    }
+
+    return html;
+  }
+
+  // Classification action form (draft -> classify, classified -> reclassify)
+  function renderClassifyActionPanel(d, currentStatus) {
+    var isReclassify = currentStatus === 'classified';
+    var panelTitle = isReclassify
+      ? { vi: 'Phan loai lai', en: 'Reclassify Deviation' }
+      : { vi: 'Phan loai sai lech', en: 'Classify Deviation' };
+    var btnLabel = isReclassify
+      ? { vi: 'Phan loai lai', en: 'Reclassify' }
+      : { vi: 'Phan loai', en: 'Classify' };
+
+    var html = '<div class="eqms-form-grid">';
+    html += ui.renderFormField({
+      key: 'classify_classification',
+      label: { vi: 'Phan loai', en: 'Classification' },
+      type: 'select',
+      required: true,
+      value: d.classification || '',
+      options: CLASSIFICATIONS
+    });
+    html += ui.renderFormField({
+      key: 'classify_severity',
+      label: { vi: 'Muc do', en: 'Severity' },
+      type: 'select',
+      required: true,
+      value: d.severity || '',
+      options: SEVERITIES
+    });
+    html += ui.renderFormField({
+      key: 'classify_impact_level',
+      label: { vi: 'Muc anh huong', en: 'Impact Level' },
+      type: 'select',
+      required: true,
+      value: '',
+      options: IMPACT_LEVELS
+    });
+    html += ui.renderFormField({
+      key: 'classify_justification',
+      label: { vi: 'Ly do (bat buoc)', en: 'Justification (required)' },
+      type: 'textarea',
+      required: true,
+      value: ''
+    });
+    html += '</div>';
+    html += '<div class="eqms-action-bar" style="margin-top:12px;">';
+    html += '<button class="eqms-btn primary" data-action="classify-submit">' + T(btnLabel) + '</button>';
+    html += '</div>';
+
+    return ui.renderSection(panelTitle, html);
   }
 
   // Tab: Impact Assessment
@@ -825,6 +927,36 @@
             loadSignatures(state.detail.deviation_id);
           });
           break;
+        case 'classify-submit':
+          var clsFields = {};
+          var clsEl;
+          clsEl = container.querySelector('[data-field="classify_classification"]');
+          if (clsEl) clsFields.classification = clsEl.value;
+          clsEl = container.querySelector('[data-field="classify_severity"]');
+          if (clsEl) clsFields.severity = clsEl.value;
+          clsEl = container.querySelector('[data-field="classify_impact_level"]');
+          if (clsEl) clsFields.impact_level = clsEl.value;
+          clsEl = container.querySelector('[data-field="classify_justification"]');
+          if (clsEl) clsFields.justification = clsEl.value;
+
+          if (!clsFields.classification || !clsFields.severity || !clsFields.impact_level || !clsFields.justification) {
+            state.error = T({ vi: 'Vui long dien day du tat ca cac truong bat buoc.', en: 'Please fill in all required fields.' });
+            rerender();
+            break;
+          }
+
+          state.loading = true;
+          rerender();
+          api('eqms_deviations_action_classify', Object.assign({
+            deviation_id: state.detail.deviation_id
+          }, clsFields)).then(function(res) {
+            state.loading = false;
+            if (res.success === false) { state.error = res.message; }
+            else { state.detail = res.data || res; state.error = null; }
+            rerender();
+          }).catch(function(err) { state.loading = false; state.error = err.message; rerender(); });
+          break;
+
         default:
           // Workflow action buttons
           if (['classify', 'record-containment', 'start-investigation', 'link-batch',

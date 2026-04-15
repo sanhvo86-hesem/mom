@@ -1,0 +1,402 @@
+{
+  "manifestVersion": "1.0.0",
+  "suiteId": "eqms",
+  "suiteName": { "vi": "Hệ thống Quản lý Chất lượng Doanh nghiệp", "en": "Enterprise Quality Management System" },
+  "domain": "eQMS",
+  "authority": "Standard 36 — Frontend Module Layout Template Standard",
+  "effectiveDate": "2026-04-16",
+  "ownerTeam": "Platform",
+  "processOwner": "Quality Assurance Director",
+
+  "modules": [
+    {
+      "moduleId": "eqms-quality-tower",
+      "moduleName": { "vi": "Tháp chất lượng", "en": "Quality Control Tower" },
+      "route": "/mom/eqms/quality-tower",
+      "criticality": "regulated",
+      "templateId": "T-control-tower",
+      "archetype": "control-tower",
+      "screens": ["dashboard"],
+      "primaryEntity": "quality_tower_snapshot",
+      "apiBindings": [
+        { "endpointId": "eqms_quality_tower_summary", "method": "GET" },
+        { "endpointId": "eqms_quality_tower_trends", "method": "GET" },
+        { "endpointId": "eqms_quality_tower_events", "method": "GET" },
+        { "endpointId": "eqms_quality_tower_export", "method": "POST" }
+      ],
+      "workflow": null,
+      "permissions": ["eqms.tower.view", "eqms.tower.export"],
+      "audit": { "events": ["view", "export", "drill-in"], "eSignature": false },
+      "i18n": "vi+en",
+      "responsive": ["desktop", "tablet"],
+      "file": "41-eqms-quality-tower.js"
+    },
+    {
+      "moduleId": "eqms-complaints",
+      "moduleName": { "vi": "Khiếu nại khách hàng", "en": "Customer Complaints" },
+      "route": "/mom/eqms/complaints",
+      "criticality": "regulated",
+      "templateId": "T-exception-hub-object-page",
+      "archetype": "exception-hub",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_complaints",
+      "apiBindings": [
+        { "endpointId": "eqms_complaints_query", "method": "POST" },
+        { "endpointId": "eqms_complaints_detail", "method": "GET" },
+        { "endpointId": "eqms_complaints_create", "method": "POST" },
+        { "endpointId": "eqms_complaints_update", "method": "PATCH" },
+        { "endpointId": "eqms_complaints_metrics", "method": "GET" },
+        { "endpointId": "eqms_complaints_audit", "method": "GET" },
+        { "endpointId": "eqms_complaints_comments", "method": "GET" },
+        { "endpointId": "eqms_complaints_attachments", "method": "GET" },
+        { "endpointId": "eqms_complaints_relationships", "method": "GET" },
+        { "endpointId": "eqms_complaints_signatures", "method": "GET" },
+        { "endpointId": "eqms_complaints_export", "method": "POST" }
+      ],
+      "workflow": {
+        "states": ["draft", "open", "under_investigation", "response_issued", "closed"],
+        "actions": ["intake", "triage", "assign", "record-containment", "start-investigation", "link-capa", "initiate-field-action", "issue-response", "close", "reopen"],
+        "eSignatureRequired": ["close"]
+      },
+      "permissions": ["eqms.complaints.view", "eqms.complaints.create", "eqms.complaints.edit", "eqms.complaints.approve", "eqms.complaints.close"],
+      "audit": { "events": ["create", "update", "state_transition", "comment", "attach", "sign", "export"], "eSignature": true },
+      "i18n": "vi+en",
+      "responsive": ["desktop", "tablet", "mobile"],
+      "file": "42-eqms-complaints.js"
+    },
+    {
+      "moduleId": "eqms-deviations",
+      "moduleName": { "vi": "Sự kiện chất lượng", "en": "Deviations / Quality Events" },
+      "route": "/mom/eqms/deviations",
+      "criticality": "regulated",
+      "templateId": "T-exception-hub-evidence",
+      "archetype": "exception-hub",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_deviations",
+      "workflow": {
+        "states": ["draft", "classified", "under_investigation", "pending_closure", "closed", "voided"],
+        "actions": ["classify", "record-containment", "start-investigation", "link-batch", "link-change-control", "link-capa", "close", "void"],
+        "eSignatureRequired": ["close", "void"]
+      },
+      "permissions": ["eqms.deviations.view", "eqms.deviations.create", "eqms.deviations.edit", "eqms.deviations.close"],
+      "audit": { "events": ["create", "update", "state_transition", "classify", "comment", "attach", "sign", "export"], "eSignature": true },
+      "i18n": "vi+en",
+      "file": "43-eqms-deviations.js"
+    },
+    {
+      "moduleId": "eqms-ncr",
+      "moduleName": { "vi": "NCR / MRB", "en": "NCR / MRB" },
+      "route": "/mom/eqms/ncr",
+      "criticality": "regulated",
+      "templateId": "T-exception-hub-disposition",
+      "archetype": "exception-hub",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_ncr_records",
+      "workflow": {
+        "states": ["draft", "submitted", "under_review", "disposition_set", "containment_active", "close_requested", "closed"],
+        "actions": ["contain", "investigate", "submit-mrb", "record-disposition", "rework", "repair", "use-as-is", "return-to-vendor", "scrap", "close", "reopen"],
+        "eSignatureRequired": ["record-disposition", "close"]
+      },
+      "permissions": ["eqms.ncr.view", "eqms.ncr.create", "eqms.ncr.edit", "eqms.ncr.approve", "eqms.ncr.close"],
+      "audit": { "events": ["create", "update", "state_transition", "mrb_vote", "disposition", "comment", "attach", "sign", "export"], "eSignature": true },
+      "i18n": "vi+en",
+      "file": "44-eqms-ncr.js"
+    },
+    {
+      "moduleId": "eqms-capa",
+      "moduleName": { "vi": "CAPA", "en": "CAPA" },
+      "route": "/mom/eqms/capa",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace",
+      "archetype": "evidence-workspace",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_capa_records",
+      "workflow": {
+        "states": ["draft", "initiated", "root_cause_analysis", "action_planning", "plan_approval", "implementation", "effectiveness_review", "verification", "pending_closure", "closed"],
+        "actions": ["start-analysis", "record-root-cause", "add-action-plan", "assign-action", "submit-approval", "submit-verification", "record-effectiveness", "close", "cancel"],
+        "eSignatureRequired": ["submit-approval", "close"]
+      },
+      "permissions": ["eqms.capa.view", "eqms.capa.create", "eqms.capa.edit", "eqms.capa.approve", "eqms.capa.close"],
+      "audit": { "events": ["create", "update", "state_transition", "action_plan", "verification", "effectiveness", "comment", "attach", "sign", "export"], "eSignature": true },
+      "i18n": "vi+en",
+      "file": "45-eqms-capa.js"
+    },
+    {
+      "moduleId": "eqms-change-control",
+      "moduleName": { "vi": "Kiểm soát thay đổi", "en": "Change Control" },
+      "route": "/mom/eqms/change-control",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace-wizard",
+      "archetype": "evidence-workspace",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_change_controls",
+      "workflow": {
+        "states": ["draft", "impact_assessment", "routing", "under_review", "approved", "implementation", "verification", "closed", "cancelled"],
+        "actions": ["classify", "assess-impact", "route-approval", "approve", "launch-implementation", "verify-effectiveness", "close"],
+        "eSignatureRequired": ["approve", "close"]
+      },
+      "i18n": "vi+en",
+      "file": "46-eqms-change-control.js"
+    },
+    {
+      "moduleId": "eqms-engineering-change",
+      "moduleName": { "vi": "Thay đổi kỹ thuật", "en": "Engineering Change" },
+      "route": "/mom/eqms/engineering-change",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace",
+      "archetype": "evidence-workspace",
+      "screens": ["queue", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_engineering_changes",
+      "workflow": {
+        "states": ["draft", "submitted", "under_assessment", "approved", "implementation", "closed", "cancelled"],
+        "actions": ["submit-assessment", "approve", "implement", "close", "cancel"],
+        "eSignatureRequired": ["approve", "close"]
+      },
+      "i18n": "vi+en",
+      "file": "47-eqms-engineering-change.js"
+    },
+    {
+      "moduleId": "eqms-documents",
+      "moduleName": { "vi": "Kiểm soát tài liệu", "en": "Document Control" },
+      "route": "/mom/eqms/documents",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace-controlled",
+      "archetype": "evidence-workspace",
+      "screens": ["register", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_documents",
+      "workflow": {
+        "states": ["draft", "in_review", "approved", "effective", "superseded", "obsolete"],
+        "actions": ["check-out", "check-in", "submit-review", "approve", "release", "supersede", "obsolete", "request-acknowledgement", "record-acknowledgement"],
+        "eSignatureRequired": ["approve", "release"]
+      },
+      "i18n": "vi+en",
+      "file": "48-eqms-documents.js"
+    },
+    {
+      "moduleId": "eqms-training",
+      "moduleName": { "vi": "Đào tạo & Năng lực", "en": "Training & Competency" },
+      "route": "/mom/eqms/training",
+      "criticality": "regulated",
+      "templateId": "T-list-report-matrix",
+      "archetype": "list-report",
+      "screens": ["matrix", "queue", "detail", "curriculum", "analytics"],
+      "primaryEntity": "eqms_training_records",
+      "workflow": {
+        "states": ["assigned", "in_progress", "completed", "verified", "expired", "waived"],
+        "actions": ["assign", "launch-session", "record-completion", "record-assessment", "verify-effectiveness", "expire", "waive"],
+        "eSignatureRequired": ["verify-effectiveness"]
+      },
+      "i18n": "vi+en",
+      "file": "49-eqms-training.js"
+    },
+    {
+      "moduleId": "eqms-audits",
+      "moduleName": { "vi": "Quản lý đánh giá", "en": "Audit Management" },
+      "route": "/mom/eqms/audits",
+      "criticality": "regulated",
+      "templateId": "T-list-report-calendar",
+      "archetype": "list-report",
+      "screens": ["calendar", "worklist", "detail", "create", "analytics"],
+      "primaryEntity": "eqms_audits",
+      "workflow": {
+        "states": ["planned", "scheduled", "in_progress", "draft_report", "report_issued", "response_tracking", "closed"],
+        "actions": ["schedule", "start", "record-finding", "issue-report", "assign-response", "close-finding", "close-audit"],
+        "eSignatureRequired": ["issue-report", "close-audit"]
+      },
+      "i18n": "vi+en",
+      "file": "50-eqms-audits.js"
+    },
+    {
+      "moduleId": "eqms-suppliers",
+      "moduleName": { "vi": "Mạng lưới nhà cung cấp", "en": "Supplier Quality Network" },
+      "route": "/mom/eqms/suppliers",
+      "criticality": "high",
+      "templateId": "T-analytical-list-scorecard",
+      "archetype": "analytical-list",
+      "screens": ["list", "detail", "analytics"],
+      "primaryEntity": "eqms_supplier_profiles",
+      "workflow": null,
+      "i18n": "vi+en",
+      "file": "51-eqms-suppliers.js"
+    },
+    {
+      "moduleId": "eqms-supplier-audits",
+      "moduleName": { "vi": "Đánh giá NCC & SCAR", "en": "Supplier Audits & SCAR" },
+      "route": "/mom/eqms/supplier-audits",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace-dual",
+      "archetype": "evidence-workspace",
+      "screens": ["audit-queue", "audit-detail", "scar-queue", "scar-detail"],
+      "primaryEntity": "eqms_supplier_audits",
+      "workflow": {
+        "audit": { "states": ["planned", "scheduled", "in_progress", "report_drafted", "report_issued", "closed"] },
+        "scar": { "states": ["issued", "acknowledged", "root_cause_submitted", "corrective_action_submitted", "verification", "closed"] }
+      },
+      "i18n": "vi+en",
+      "file": "52-eqms-supplier-audits.js"
+    },
+    {
+      "moduleId": "eqms-risks",
+      "moduleName": { "vi": "Quản lý rủi ro & FMEA", "en": "Risk Management & FMEA" },
+      "route": "/mom/eqms/risks",
+      "criticality": "regulated",
+      "templateId": "T-analytical-list-matrix",
+      "archetype": "analytical-list",
+      "screens": ["risk-register", "risk-detail", "heatmap", "fmea-list", "fmea-detail", "analytics"],
+      "primaryEntity": "eqms_risk_register",
+      "i18n": "vi+en",
+      "file": "53-eqms-risks.js"
+    },
+    {
+      "moduleId": "eqms-calibration",
+      "moduleName": { "vi": "Hiệu chuẩn / MSA", "en": "Calibration / MSA" },
+      "route": "/mom/eqms/calibration",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace-schedule",
+      "archetype": "evidence-workspace",
+      "screens": ["schedule", "detail", "msa-studies", "analytics"],
+      "primaryEntity": "eqms_calibration_records",
+      "i18n": "vi+en",
+      "file": "54-eqms-calibration.js"
+    },
+    {
+      "moduleId": "eqms-lab-investigations",
+      "moduleName": { "vi": "OOS/OOT / Điều tra", "en": "Lab Investigations" },
+      "route": "/mom/eqms/lab-investigations",
+      "criticality": "regulated",
+      "templateId": "T-exception-hub-evidence",
+      "archetype": "exception-hub",
+      "screens": ["queue", "detail", "analytics"],
+      "primaryEntity": "eqms_lab_investigations",
+      "workflow": {
+        "states": ["intake", "phase1_investigation", "phase2_investigation", "conclusion", "closed", "voided"],
+        "actions": ["intake-oos", "intake-oot", "start-phase1", "start-phase2", "request-retest", "request-resample", "link-capa", "close"],
+        "eSignatureRequired": ["close"]
+      },
+      "i18n": "vi+en",
+      "file": "55-eqms-lab-investigations.js"
+    },
+    {
+      "moduleId": "eqms-inspection",
+      "moduleName": { "vi": "IQC / Kiểm tra", "en": "IQC / In-Process Inspection" },
+      "route": "/mom/eqms/inspection",
+      "criticality": "shopfloor-critical",
+      "templateId": "T-operator-execution-scan",
+      "archetype": "operator-execution",
+      "screens": ["scan-first", "iqc-execution", "iqc-review", "inprocess", "analytics"],
+      "primaryEntity": "eqms_iqc_lots",
+      "i18n": "vi+en",
+      "file": "56-eqms-inspection.js"
+    },
+    {
+      "moduleId": "eqms-spc",
+      "moduleName": { "vi": "SPC Analytics", "en": "SPC Analytics" },
+      "route": "/mom/eqms/spc",
+      "criticality": "high",
+      "templateId": "T-analytical-list-chart",
+      "archetype": "analytical-list",
+      "screens": ["dashboard", "chart-detail", "capability-summary", "analytics"],
+      "primaryEntity": "eqms_spc_observations",
+      "i18n": "vi+en",
+      "file": "57-eqms-spc.js"
+    },
+    {
+      "moduleId": "eqms-batch-release",
+      "moduleName": { "vi": "Giải phóng lô", "en": "Batch Release" },
+      "route": "/mom/eqms/batch-release",
+      "criticality": "regulated",
+      "templateId": "T-approval-queue-evidence",
+      "archetype": "approval-queue",
+      "screens": ["register", "workspace", "analytics"],
+      "primaryEntity": "eqms_batch_release_records",
+      "workflow": {
+        "states": ["lot_created", "data_aggregation", "exception_review", "pending_release", "approved", "on_hold", "market_shipped"],
+        "actions": ["aggregate-data", "review-exceptions", "approve-release", "hold-release", "market-ship"],
+        "eSignatureRequired": ["approve-release", "market-ship"]
+      },
+      "i18n": "vi+en",
+      "file": "58-eqms-batch-release.js"
+    },
+    {
+      "moduleId": "eqms-validation",
+      "moduleName": { "vi": "Quản lý xác nhận", "en": "Validation Management" },
+      "route": "/mom/eqms/validation",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace-trace",
+      "archetype": "evidence-workspace",
+      "screens": ["inventory", "workspace", "analytics"],
+      "primaryEntity": "eqms_validation_projects",
+      "workflow": {
+        "states": ["planning", "requirements", "protocol_authoring", "protocol_approved", "execution", "summary_generated", "qualified", "failed"],
+        "actions": ["define-requirements", "author-protocol", "approve-protocol", "start-execution", "record-result", "log-deviation", "generate-summary"],
+        "eSignatureRequired": ["approve-protocol", "generate-summary"]
+      },
+      "i18n": "vi+en",
+      "file": "59-eqms-validation.js"
+    },
+    {
+      "moduleId": "eqms-field-actions",
+      "moduleName": { "vi": "Hành động thực địa", "en": "Field Actions / Recall" },
+      "route": "/mom/eqms/field-actions",
+      "criticality": "regulated",
+      "templateId": "T-exception-hub-command",
+      "archetype": "exception-hub",
+      "screens": ["queue", "workspace", "analytics"],
+      "primaryEntity": "eqms_field_actions",
+      "workflow": {
+        "states": ["intake", "evaluation", "planning", "execution", "monitoring", "closed"],
+        "actions": ["evaluate", "plan", "launch", "notify-customers", "record-effectiveness", "close"],
+        "eSignatureRequired": ["close"]
+      },
+      "i18n": "vi+en",
+      "file": "60-eqms-field-actions.js"
+    },
+    {
+      "moduleId": "eqms-genealogy",
+      "moduleName": { "vi": "Truy xuất nguồn gốc", "en": "Genealogy / Traceability" },
+      "route": "/mom/eqms/genealogy",
+      "criticality": "high",
+      "templateId": "T-object-page-graph",
+      "archetype": "object-page",
+      "screens": ["search", "graph", "analytics"],
+      "primaryEntity": "eqms_genealogy_trace_reports",
+      "i18n": "vi+en",
+      "file": "61-eqms-genealogy.js"
+    },
+    {
+      "moduleId": "eqms-quality-agreements",
+      "moduleName": { "vi": "Thoả thuận chất lượng", "en": "Quality Agreements" },
+      "route": "/mom/eqms/quality-agreements",
+      "criticality": "regulated",
+      "templateId": "T-evidence-workspace",
+      "archetype": "evidence-workspace",
+      "screens": ["register", "workspace"],
+      "primaryEntity": "eqms_quality_agreements",
+      "workflow": {
+        "states": ["draft", "under_review", "active", "renewal_pending", "expired", "terminated"],
+        "actions": ["submit-review", "activate", "request-renewal", "acknowledge", "expire", "terminate"],
+        "eSignatureRequired": ["activate"]
+      },
+      "i18n": "vi+en",
+      "file": "62-eqms-quality-agreements.js"
+    }
+  ],
+
+  "sharedComponents": {
+    "shell": "40-eqms-shell.js",
+    "css": "eqms-suite.css",
+    "components": [
+      "renderIdentityHeader", "renderStateTimeline", "renderAuditTrail",
+      "renderSignaturePanel", "renderCommentsThread", "renderAttachmentsGrid",
+      "renderRelationshipsPanel", "renderFilterBar", "renderDataGrid",
+      "renderKpiRow", "renderExportMenu", "renderEmptyState",
+      "renderLoadingState", "renderErrorState", "renderWizardShell",
+      "renderTabs", "renderChartWithTableFallback", "renderPagination",
+      "renderSection", "renderFieldGrid", "renderFormField"
+    ]
+  },
+
+  "qa": {
+    "requiredGates": ["schema", "token-lint", "api-contract", "a11y-wcag22aa", "keyboard", "responsive", "theme", "density", "visual-regression", "permission", "audit-trail", "vietnamese-diacritics"]
+  }
+}
