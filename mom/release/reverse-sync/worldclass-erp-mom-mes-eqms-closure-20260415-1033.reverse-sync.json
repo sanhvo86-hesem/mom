@@ -12,7 +12,11 @@
     "Added final record integrity migration 134",
     "Aligned EQMS OpenAPI request contracts with runtime controller requirements",
     "Scoped publication and periodic evaluation monitor reads",
-    "Corrected offline Excel/SharePoint operating instruction"
+    "Corrected offline Excel/SharePoint operating instruction",
+    "Added migration 135 for org-scoped immutable periodic evaluation closure and MES raw/derived event spine",
+    "Added MachineEventSpineService and MTConnect runtime integration for RecordMachineEvent/DeriveProductionEvent",
+    "Added shopfloor genealogy auto-emission with change-authority enforcement",
+    "Regenerated schema authority and registry artifacts for 764 mapped tables"
   ],
   "runtime_or_generated_artifacts_not_reimported": [
     "mom/vendor",
@@ -27,5 +31,10 @@
     "Capture deployment promotion receipt only after actual deployment",
     "Close or delete stale local agent worktrees after merge verification",
     "Exit WORM provider waiver by implementing Azure Immutable Blob or S3 Object Lock adapter"
+  ],
+  "closure_loop_evidence": [
+    "Second re-audit P1 for MES event spine closed by b908f82de6e745339478d3497d80eefd5d8a8208",
+    "Second re-audit P1 for periodic evaluation immutability/scope closed by b908f82de6e745339478d3497d80eefd5d8a8208",
+    "Validation after closure loop: composer analyse, composer test, composer check, repo boundary, release candidate verifier, schema publication orchestrator"
   ]
 }

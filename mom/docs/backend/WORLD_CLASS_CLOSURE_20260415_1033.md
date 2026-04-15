@@ -2,7 +2,9 @@
 
 Branch: `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033`
 
-Validated remediation head before release-evidence commit: `c8b09002ff408bf31ac06fe423a0dc35d986fd6d`
+Validated remediation head before first release-evidence commit: `c8b09002ff408bf31ac06fe423a0dc35d986fd6d`
+
+Closure-loop remediation head: `b908f82de6e745339478d3497d80eefd5d8a8208`
 
 ## Residual Debt Register
 
@@ -16,6 +18,10 @@ Validated remediation head before release-evidence commit: `c8b09002ff408bf31ac0
 | Active retention lock tamper protection | CLOSED_IN_THIS_RUN | Migration 134 blocks active lock update/delete. |
 | OpenAPI/runtime contract drift | CLOSED_IN_THIS_RUN | Updated `mom/api/openapi.yaml` for audit pack scope, evidence graph preview, genealogy fact write, and signature action enum. |
 | SharePoint direct upload contradiction | CLOSED_IN_THIS_RUN | ANNEX-136 now requires Excel capture upload back to portal; SharePoint remains server publication/read-only/discovery. |
+| MES event spine runtime gap | CLOSED_IN_THIS_RUN | Migration 135 adds append-only `machine_raw_events` and `production_derived_events`; `MachineEventSpineService` implements `RecordMachineEvent`/`DeriveProductionEvent`; `MtconnectPollingService` writes raw and derived records in authoritative DB mode. |
+| Automatic genealogy edge emission gap | CLOSED_IN_THIS_RUN | `ShopfloorExecutionService` now attempts production genealogy edge emission from execution truth when released change authority is supplied; missing authority returns explicit `blocked_change_authority_required` instead of bypassing change control. |
+| Periodic evaluation post-close mutability | CLOSED_IN_THIS_RUN | Migration 135 adds terminal-state DB triggers preventing update/delete after `passed`, `failed`, or `waived`. |
+| Periodic evaluation payload-only org scope | CLOSED_IN_THIS_RUN | Migration 135 adds first-class `org_id`; controller injects server org context; dashboard/schedule/close use schema scope rather than `result_payload` filtering. |
 | WORM/Object Lock provider | ACCEPTED_WAIVER | Owner: IT/System Admin + QA/QMS. Review: 2026-05-31. Exit: implement Azure Immutable Blob or S3 Object Lock adapter with provider receipt and legal-hold verification tests. |
 | Full persisted Unified Evidence Graph explorer | DEFERRED_P2_ROADMAP | Owner: Platform Architect. Review: 2026-06-30. Exit: graph projection tables/worker/query APIs plus ACL/scoping tests. |
 | Change Impact Explorer / Effectivity Manager product surface | DEFERRED_P2_ROADMAP | Owner: PLM Change-Control Architect. Review: 2026-06-30. Exit: affected/resulting browser, what-if effectivity simulation, WIP/on-order/finished impact APIs. |
@@ -53,23 +59,37 @@ Reference sources:
 | `php -l` on touched PHP files | Passed |
 | `./composer test -- --filter 'FormSubmissionAcceptanceServiceTest|WorldClassClosureReauditIntegrityMigrationTest'` | 9 tests, 64 assertions, passed |
 | `./composer test -- --filter 'FormSubmissionAcceptanceServiceTest|WorldClassClosureReauditIntegrityMigrationTest|WorldClassControlPlaneExecutionTest|EqmsControlPlaneStateMachineTest'` | 109 tests, 1113 assertions, passed |
-| `./composer analyse -- --memory-limit=1G` | Passed, no PHPStan errors |
-| `./composer test` | 520 tests, 3020 assertions, 1 skipped, passed |
+| `./composer test -- --filter 'PeriodicEvaluation|MachineEventSpine|ProductionReportAutoEmitsGenealogy|WorldClassClosureReauditIntegrityMigrationTest|ShopfloorExecutionServiceTest|EqmsControlPlaneStateMachineTest'` | 69 tests, 787 assertions, passed |
+| `./composer analyse -- --memory-limit=1G` | Passed, no PHPStan errors across 231 files |
+| `./composer test` | 523 tests, 3064 assertions, 1 skipped, passed |
 | `./composer check` | Passed |
 | `php tools/release/check_repo_boundary.php` | `repo boundary clean` |
 | `python3 tools/verify_release_candidate.py` | 36/36 passed |
+| `python3 mom/tools/registry/canonical_publication_orchestrator.py` | Overall PASS; publication proof artifact PASS |
+| `php mom/tools/schema/refresh_data_schema_authority.php --skip-publication` | Passed; registryTableCount=764; criticalGapCount=0 |
+| JSON registry/contract load check | 168 JSON files loaded successfully |
+
+## Second 6-Agent Re-Audit Closure
+
+| Agent lane | Second audit finding | Closure action |
+|---|---|---|
+| Platform governance | No P0; lifecycle proof still pre-merge until push/PR/merge/deletion. | Kept as merge-stage evidence, not product P1. No deploy/promotion claimed. |
+| Document/form/evidence | No P0/P1; WORM provider remains waiver; derived graph/product surfaces remain P2. | Waiver/P2 register retained. |
+| Change authority/configuration | No P0/P1; impact/effectivity browser remains product P2. | P2 roadmap retained. |
+| MES/MOM/genealogy | P1 raw machine event spine missing; P1 auto genealogy edge emission missing. | Closed by migration 135, `MachineEventSpineService`, MTConnect integration, and shopfloor genealogy auto-emission with released change authority. |
+| Regulated e-records/data integrity | P1 closed periodic evaluations mutable; P1 periodic scope payload-only. | Closed by migration 135 terminal immutability triggers, `periodic_evaluation_closure_events`, `org_id`, controller-injected org scope, and tests. |
+| Product benchmark | No non-waived P1; product cockpit surfaces remain P2/waiver. | P2 roadmap/waiver register retained. |
 
 ## Merge Gate
 
 | Gate | Status |
 |---|---|
 | Unresolved P0 | 0 |
-| Unresolved non-waived P1 | 0 after current remediation, pending second agent re-audit confirmation |
-| Migrations present | Yes: migration 134 |
+| Unresolved non-waived P1 | 0 after closure-loop remediation |
+| Migrations present | Yes: migrations 134 and 135 |
 | Backend changes present | Yes |
 | API contract updated | Yes |
 | Tests green | Yes |
 | Runbooks/evidence present | Yes |
 | Waivers documented | Yes |
 | Promotion claimed | No; pre-merge validation only |
-

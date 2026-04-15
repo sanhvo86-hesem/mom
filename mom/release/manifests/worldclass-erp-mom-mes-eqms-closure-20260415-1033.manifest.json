@@ -4,8 +4,8 @@
   "branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
   "base_branch": "main",
   "base_head": "a7b499ec4ce412f5945bd371770166790292777a",
-  "validated_head": "c8b09002ff408bf31ac06fe423a0dc35d986fd6d",
-  "validated_tree": "e9720dbe90b53ca3c1c0ea823d3b232510cd0e8b",
+  "validated_head": "b908f82de6e745339478d3497d80eefd5d8a8208",
+  "validated_tree": "d3063274c7d63c70591d888046b7087f41f77ea6",
   "record_state": "pre_merge_validated_controlled_source_manifest",
   "created_at": "2026-04-15T07:41:10Z",
   "change_authority": {
@@ -17,6 +17,7 @@
     "created_branch": "codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033",
     "checkpoint_commit": "332b86dc31bbb4d205d8eb479162aff4449c5dc1",
     "remediation_commit": "c8b09002ff408bf31ac06fe423a0dc35d986fd6d",
+    "closure_loop_commit": "b908f82de6e745339478d3497d80eefd5d8a8208",
     "note": "Branch was created for the current closure run. HEAD was explicitly corrected back to the new branch after a stale interrupted agent left the worktree attached to the inherited tranche18 branch at the same commit."
   },
   "tracked_manifest_binding_note": {
@@ -33,7 +34,11 @@
     "P1 OpenAPI/controller drift closed for audit pack manifest, evidence graph preview, genealogy fact write, and signature action enum",
     "P1 publication monitor and periodic evaluation dashboard now require role-gated org context and pass scoped filters",
     "P2 publication validation moved from DB-late only to service validation before evidence finalization persistence",
-    "P1 SharePoint/offline Excel policy contradiction removed: users upload controlled Excel capture back to portal, not directly to SharePoint"
+    "P1 SharePoint/offline Excel policy contradiction removed: users upload controlled Excel capture back to portal, not directly to SharePoint",
+    "P1 MES machine event spine implemented with append-only machine_raw_events and idempotent production_derived_events runtime service",
+    "P1 MTConnect polling now writes raw machine events and deterministic derived production events when authoritative DB mode is available",
+    "P1 shopfloor execution now auto-emits genealogy edge facts when released change authority is supplied and blocks with explicit authority-required state otherwise",
+    "P1 periodic evaluations now have first-class org_id partitioning, terminal-row immutability, and append-only closure events"
   ],
   "required_validation": [
     "php -l touched PHP files",
@@ -44,17 +49,23 @@
     "composer check",
     "php tools/release/check_repo_boundary.php",
     "python3 tools/verify_release_candidate.py",
-    "second six-agent closure re-audit"
+    "second six-agent closure re-audit",
+    "canonical publication orchestrator",
+    "schema authority refresh --skip-publication",
+    "JSON registry validity check"
   ],
   "validation_results": {
     "php_l_touched_files": "passed",
-    "focused_phpunit": "passed: 9 tests, 64 assertions",
-    "expanded_phpunit": "passed: 109 tests, 1113 assertions",
-    "composer_analyse": "passed: no PHPStan errors over 230 files",
-    "composer_test": "passed: 520 tests, 3020 assertions, 1 skipped",
+    "focused_phpunit": "passed: 69 tests, 787 assertions for periodic evaluation, MES event spine, shopfloor genealogy, and closure migration coverage",
+    "expanded_phpunit": "passed: 69 tests, 787 assertions; prior expanded EQMS suite also passed",
+    "composer_analyse": "passed: no PHPStan errors over 231 files",
+    "composer_test": "passed: 523 tests, 3064 assertions, 1 skipped",
     "composer_check": "passed: PHPStan plus PHPUnit exited 0",
     "repo_boundary": "passed: repo boundary clean",
-    "release_candidate_verifier": "passed: 36/36"
+    "release_candidate_verifier": "passed: 36/36",
+    "canonical_publication_orchestrator": "passed: overall PASS, publication proof artifact PASS",
+    "schema_authority_refresh_skip_publication": "passed: registryTableCount=764, criticalGapCount=0",
+    "json_registry_validation": "passed: 168 JSON registry/contract files loaded successfully"
   },
   "merge_gate": {
     "unresolved_p0": 0,

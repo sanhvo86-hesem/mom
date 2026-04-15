@@ -1,6 +1,6 @@
 # eQMS/MOM Control Plane Closure Register
 
-Updated: 2026-04-14
+Updated: 2026-04-15
 
 ## Closure Criteria
 
@@ -11,6 +11,16 @@ This register is the backend closure ledger for the current world-class audit wa
 | P0 | Must be remediated in this wave. No waiver accepted. | Closed by fail-closed controls, canonical writers/readers, and CI gate evidence below. |
 | P1 | Must be remediated or explicitly waived with owner, review date, and exit condition. | Non-waived P1 count is 0; WORM provider is dependency-waived. |
 | P2 | May remain in the roadmap if non-blocking and documented. | Tracked as deferred roadmap. |
+
+## 2026-04-15 Closure Loop Addendum
+
+| Second re-audit lane | Residual issue | Closure evidence |
+|---|---|---|
+| MES/MOM/genealogy | `RecordMachineEvent` / `DeriveProductionEvent` were documented but not runtime-complete. | Migration `135_world_class_mes_event_spine_periodic_closure.sql` adds append-only `machine_raw_events` and `production_derived_events`; `MachineEventSpineService` implements idempotent raw/derived writes; `MtconnectPollingService` writes those records in authoritative DB mode. |
+| MES/MOM/genealogy | Production execution did not auto-emit genealogy edge facts. | `ShopfloorExecutionService` now derives consume/produce genealogy edge facts from production reports and writes them through `GenealogyGraphService` when released change authority is supplied; missing authority produces explicit `blocked_change_authority_required` state instead of bypassing change control. |
+| Regulated e-records / data integrity | Closed periodic evaluation rows remained mutable. | Migration 135 adds `prevent_closed_periodic_evaluation_mutation` and update/delete triggers for terminal periodic evaluations. |
+| Regulated e-records / data integrity | Periodic evaluation dashboard scope depended on JSON payload discipline. | Migration 135 adds first-class `org_id`; controller schedule/close inject server org context; `PeriodicEvaluationService` dashboard/schedule/close use schema-level org partitioning. |
+| Proof | Registry/schema authority needed to include new tables. | `generate-table-architecture.mjs` maps migration 135 and `periodic_evaluation_closure_events`; canonical publication orchestrator PASS; schema refresh `--skip-publication` PASS; JSON registry load check PASS. |
 
 ## Closed P0 Evidence
 
