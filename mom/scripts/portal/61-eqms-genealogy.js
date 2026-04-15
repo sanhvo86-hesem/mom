@@ -332,20 +332,20 @@
     // Scan input
     html += '<div class="eqms-scan-input" style="display:flex;gap:8px;max-width:520px;margin:0 auto;width:100%">';
     html += '<input type="text" class="eqms-form-input" data-field="scan-value" value="' + esc(state.scanValue) + '" ';
-    html += 'placeholder="' + T({ vi: 'Ma lo / barcode / serial...', en: 'Lot ID / barcode / serial...' }) + '" ';
+    html += 'placeholder="' + T({ vi: 'Mã lô / barcode / serial...', en: 'Lot ID / barcode / serial...' }) + '" ';
     html += 'style="font-size:18px;padding:12px 16px;flex:1;font-family:var(--hm-font-mono,monospace)" autofocus>';
     html += '<button class="eqms-btn primary" data-action="scan-lookup" style="padding:12px 24px;font-size:16px">';
-    html += '\uD83D\uDD0D ' + T({ vi: 'Tra cuu', en: 'Lookup' });
+    html += '\uD83D\uDD0D ' + T({ vi: 'Tra cứu', en: 'Lookup' });
     html += '</button></div>';
 
     html += '<span class="eqms-scan-hint">';
-    html += T({ vi: 'Quet ma vach hoac nhap thu cong', en: 'Scan barcode or type manually' });
+    html += T({ vi: 'Quét mã vạch hoặc nhập thủ công', en: 'Scan barcode or type manually' });
     html += '</span>';
     html += '</div>';
 
     // Loading / error
     if (state.searchLoading) {
-      html += ui.renderLoadingState({ vi: 'Dang tim kiem...', en: 'Searching...' });
+      html += ui.renderLoadingState({ vi: 'Đang tìm kiếm...', en: 'Searching...' });
     } else if (state.searchError) {
       html += ui.renderErrorState(state.searchError, 'retry-search');
     }
@@ -353,14 +353,14 @@
     // Search results as cards
     if (state.searchResults.length > 0) {
       html += '<div style="margin-top:24px">';
-      html += ui.renderSection({ vi: 'Ket qua tim kiem', en: 'Search Results' }, renderSearchResultCards());
+      html += ui.renderSection({ vi: 'Kết quả tìm kiếm', en: 'Search Results' }, renderSearchResultCards());
       html += '</div>';
     }
 
     // Recent lookups
     if (state.recentLookups.length > 0 && !state.searchResults.length) {
       html += '<div style="margin-top:32px;max-width:520px;margin-left:auto;margin-right:auto">';
-      html += ui.renderSection({ vi: 'Tra cuu gan day', en: 'Recent Lookups' }, renderRecentLookups());
+      html += ui.renderSection({ vi: 'Tra cứu gần đây', en: 'Recent Lookups' }, renderRecentLookups());
       html += '</div>';
     }
 
@@ -409,7 +409,7 @@
     html += '<div class="eqms-toolbar">';
     html += '<div class="eqms-toolbar-left">';
     html += '<button class="eqms-btn ghost sm" data-action="go-search">';
-    html += '\u2190 ' + T({ vi: 'Tim kiem moi', en: 'New Search' });
+    html += '\u2190 ' + T({ vi: 'Tìm kiếm mới', en: 'New Search' });
     html += '</button>';
     html += '</div>';
     html += '<div class="eqms-toolbar-right">';
@@ -417,15 +417,15 @@
     // Graph / Table toggle
     html += '<div class="eqms-chart-toggle">';
     html += '<button class="eqms-chart-toggle-btn ' + (state.graphViewMode === 'graph' ? 'active' : '') + '" data-action="view-mode" data-mode="graph">';
-    html += '\uD83C\uDF33 ' + T({ vi: 'Do thi', en: 'Graph' });
+    html += '\uD83C\uDF33 ' + T({ vi: 'Đồ thị', en: 'Graph' });
     html += '</button>';
     html += '<button class="eqms-chart-toggle-btn ' + (state.graphViewMode === 'table' ? 'active' : '') + '" data-action="view-mode" data-mode="table">';
-    html += '\uD83D\uDCCB ' + T({ vi: 'Bang', en: 'Table' });
+    html += '\uD83D\uDCCB ' + T({ vi: 'Bảng', en: 'Table' });
     html += '</button></div>';
 
     // Freeze report + Export
     html += '<button class="eqms-btn secondary sm" data-action="freeze-trace-report">';
-    html += '\uD83D\uDCCB ' + T({ vi: 'Dong bang bao cao', en: 'Freeze Trace Report' });
+    html += '\uD83D\uDCCB ' + T({ vi: 'Đóng băng báo cáo', en: 'Freeze Trace Report' });
     html += '</button>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel', 'csv'] });
     html += '</div></div>';
@@ -433,7 +433,7 @@
     // Expand loading indicator
     if (state.expandLoading) {
       html += '<div style="padding:8px 0;text-align:center;font-size:13px;color:var(--hm-text-secondary)">';
-      html += T({ vi: 'Dang mo rong do thi...', en: 'Expanding graph...' });
+      html += T({ vi: 'Đang mở rộng đồ thị...', en: 'Expanding graph...' });
       html += '</div>';
     }
 

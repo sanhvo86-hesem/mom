@@ -876,22 +876,22 @@
 
     // KPIs
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong du an',              en: 'Total Projects' },          value: fmt(m.total_projects || 0) },
-      { label: { vi: 'Ti le hoan thanh dung han', en: 'On-time Completion Rate' }, value: (m.ontime_rate || 0) + '%', accent: (m.ontime_rate || 0) >= 80 ? 'success' : 'warning' },
-      { label: { vi: 'Ti le sai lech',          en: 'Deviation Rate' },           value: (m.deviation_rate || 0) + '%', accent: (m.deviation_rate || 0) > 10 ? 'danger' : '' },
-      { label: { vi: 'Do bao phu yeu cau TB',   en: 'Avg Req Coverage' },        value: (m.avg_req_coverage || 0) + '%' }
+      { label: { vi: 'Tổng dự án',              en: 'Total Projects' },          value: fmt(m.total_projects || 0) },
+      { label: { vi: 'Tỉ lệ hoàn thành đúng hạn', en: 'On-time Completion Rate' }, value: (m.ontime_rate || 0) + '%', accent: (m.ontime_rate || 0) >= 80 ? 'success' : 'warning' },
+      { label: { vi: 'Tỉ lệ sai lệch',          en: 'Deviation Rate' },           value: (m.deviation_rate || 0) + '%', accent: (m.deviation_rate || 0) > 10 ? 'danger' : '' },
+      { label: { vi: 'Độ bao phủ yêu cầu TB',   en: 'Avg Req Coverage' },        value: (m.avg_req_coverage || 0) + '%' }
     ]);
 
     // Project status pie chart / table
     var statusData = m.by_status || [];
     var statusColumns = [
-      { key: 'status',  label: { vi: 'Trang thai',  en: 'Status' },  type: 'badge' },
-      { key: 'count',   label: { vi: 'So luong',    en: 'Count' },   type: 'number' },
-      { key: 'percent', label: { vi: 'Ti le',       en: 'Percent' }, render: function(v) { return esc((v || 0) + '%'); } }
+      { key: 'status',  label: { vi: 'Trạng thái',  en: 'Status' },  type: 'badge' },
+      { key: 'count',   label: { vi: 'Số lượng',    en: 'Count' },   type: 'number' },
+      { key: 'percent', label: { vi: 'Tỉ lệ',       en: 'Percent' }, render: function(v) { return esc((v || 0) + '%'); } }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'Du an theo trang thai', en: 'Projects by Status' },
+    html += ui.renderSection({ vi: 'Dự án theo trạng thái', en: 'Projects by Status' },
       ui.renderChartWithTableFallback('val-status-chart', null, statusColumns, statusData, { defaultMode: 'table' })
     );
     html += '</div>';
