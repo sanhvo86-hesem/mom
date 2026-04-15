@@ -2,7 +2,7 @@
 
 Date: 2026-04-15
 
-Scope: current code, tests, generated artifacts, and `mom/docs/system/inherited-tranche-inventory-tranche18.json`.
+Scope: current code, tests, generated artifacts, and the tranche18 inherited inventory audit input. The inventory file itself is excluded from controlled source because repo-boundary policy classifies it as generated report output.
 
 ## Verdicts
 

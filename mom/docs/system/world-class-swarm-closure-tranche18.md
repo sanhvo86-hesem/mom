@@ -7,13 +7,13 @@ Date: 2026-04-15
 | Phase | Status | Evidence |
 | --- | --- | --- |
 | GIT-0 branch and helper worktrees | COMPLETE | Integration branch `codex/tranche18-zero-trust-signoff-20260415`; six helper branches/worktrees |
-| Inherited inventory | COMPLETE | `inherited-tranche-inventory-tranche18.md/json`, 256 artifacts |
+| Inherited inventory | COMPLETE_AS_AUDIT_INPUT | Inventory was used during the audit, then excluded from controlled source because repo-boundary policy classifies it as generated report output |
 | Pass 1 six-agent audit | COMPLETE | Six reports in `mom/docs/system/agent-reports/tranche18/` |
 | Coordinator synthesis | COMPLETE | This closure doc, benchmark dossier, backlog ledger, branch strategy |
 | Implementation | COMPLETE_ON_INTEGRATION | Planning/release scope authority, readiness redaction, fallback write-failure health, MES event spine, periodic-evaluation closure proof, generated artifact refresh |
 | Pass 2 | COMPLETE | Six pass-2 reports written; pass-2 defects and deep merge-gate defects fixed; focused regression/PHPStan/publication gates passed |
 | Merge to main | COMPLETE | Integration branch `codex/tranche18-zero-trust-signoff-20260415` was fast-forward merged into `main` after the merge gate |
-| Pass 3 on main | COMPLETE | Six post-merge pass-3 reports written under `mom/docs/system/agent-reports/tranche18/` |
+| Pass 3 on main | COMPLETE | Post-merge pass-3 findings are summarized in this governed closure record; generated per-agent scratch reports are excluded from controlled source |
 | Cleanup | COMPLETE | Helper/integration/scratch branches and tranche18 helper worktrees were removed; `main` was clean after tranche18 cleanup |
 
 ## First-Pass Synthesis
@@ -62,5 +62,5 @@ Date: 2026-04-15
 ## Merge Gate Requirements Closed
 
 - Final branch/worktree cleanup completed after the pass-3 evidence commit.
-- Required tranche18 inventory and pass-3 reports are tracked on `main`.
+- Tranche18 inventory and pass-3 scratch reports are excluded from controlled source.
 - Later graphics-governance reconciliation may add its own branch/worktree evidence, but it is separate from tranche18 cleanup.

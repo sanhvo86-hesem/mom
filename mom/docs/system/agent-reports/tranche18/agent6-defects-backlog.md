@@ -2,7 +2,7 @@
 
 Date: 2026-04-15
 
-Scope: `mom/docs/system/inherited-tranche-inventory-tranche18.json` with 256 inventoried artifacts, current code/tests/generated artifacts, and helper worktrees.
+Scope: tranche18 inherited inventory audit input with 256 inventoried artifacts, current code/tests/generated artifacts, and helper worktrees. The inventory file itself is excluded from controlled source because repo-boundary policy classifies it as generated report output.
 
 ## Verdict
 
@@ -31,7 +31,7 @@ No remaining code-fixable inherited backlog surfaced from tranche16/tranche17/tr
 | OTel collector/live correlation proof | BLOCKED_EXTERNAL | No deployed collector/exporter proof in repo | Requires external telemetry backend and config |
 | Full Part 11 validation package and WORM retention proof | BLOCKED_EXTERNAL | Code has scoped controls, not validation package evidence | Requires SOP/validation/retention/identity process |
 | SAP/Siemens/ETQ/MasterControl suite parity | PRODUCT_DECISION_REQUIRED | Repo contains targeted slices, not full vendor suites | Roadmap/product scope |
-| Helper worktree/branch cleanup | STILL_OPEN_AND_UNACCEPTABLE until final phase | Six helper worktrees exist during audit | Must remove after merge/pass3 |
+| Helper worktree/branch cleanup | CLOSED_BY_FINAL_CLEANUP | Helper worktrees and temporary branches were removed after merge/pass3 | No local code defect remains |
 
 ## Action Summary
 

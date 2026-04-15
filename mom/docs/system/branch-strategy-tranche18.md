@@ -24,7 +24,7 @@ Date: 2026-04-15
 - Pass 1: all six agents complete before coding.
 - Implementation: coordinator applies scoped fixes on the integration branch only.
 - Temporary helper branch `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033` is treated as coordinator implementation scratch only; its reviewed changes are merged back into `codex/tranche18-zero-trust-signoff-20260415` before final merge, and it is deleted during cleanup.
-- Temporary cleanup branch `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516` is treated as scratch-only. It deleted required tranche18 inventory in an unmerged commit, so it is not promoted to `main`; final pass-3 evidence is committed directly on `main` instead.
+- Temporary cleanup branch `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516` closed the repo-boundary failure left by the interrupted scratch branch, was fast-forward merged through PR #12, and was deleted locally/remotely after merge verification.
 - Pass 2: same six-agent lanes re-audit integration branch changes before merge.
 - Merge gate: run focused and broad validation on integration branch.
 - Final merge: switch to `main`, update from remote when available, then merge `codex/tranche18-zero-trust-signoff-20260415` into `main`.
@@ -42,7 +42,7 @@ After pass 3 and final verification:
 
 Final tranche18 cleanup result:
 
-- Required tranche18 inventory and pass-3 reports are retained on `main`.
+- Tranche18 inventory and pass-3 per-agent scratch reports are not retained on `main`; repo-boundary policy classifies them as generated report output.
 - Tranche18 helper/integration/scratch branches were removed.
 - Tranche18 helper worktrees were removed.
 - Any later non-tranche18 branch or worktree is outside this tranche18 cleanup record and must be judged by its own evidence.
