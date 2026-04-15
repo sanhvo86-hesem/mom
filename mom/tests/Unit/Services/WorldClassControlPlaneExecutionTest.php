@@ -718,6 +718,20 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertStringContainsString("distribution_state = 'superseded'", $sql);
     }
 
+    public function testTrainingGateDocumentReadAcknowledgementRequiresSignatureEvent(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('document_read_ack_signature_required');
+
+        (new DocumentRevisionCommandService(new DocumentFormControlFakeDb()))->acknowledgeRead([
+            'doc_revision_id' => '00000000-0000-0000-0000-000000000901',
+            'actor_ref' => 'operator-1',
+            'read_ack_required' => true,
+            'metadata' => ['training_gate' => true],
+            'idempotency_key' => 'ack-requires-signature',
+        ], 'operator-1');
+    }
+
     public function testFormIssuanceCommandServicePersistsIssuanceAndSubmissionAttemptWithoutLegacySchemas(): void
     {
         $db = new DocumentFormControlFakeDb();
@@ -1696,6 +1710,34 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
                 'canonical_payload' => ['result' => 'amended'],
                 'readable_snapshot_html' => '<html><body>amended</body></html>',
                 'publication_state' => ['publication_state' => 'pending'],
+                'signature_events' => [$this->evidenceSignatureEvent()],
+            ]);
+        } finally {
+            $this->removeTree($dir);
+        }
+    }
+
+    public function testEvidenceFinalizationWithSourceVersionAlwaysVerifiesReleasedChangeAuthority(): void
+    {
+        $dir = sys_get_temp_dir() . '/mom-finalize-amendment-authority-' . bin2hex(random_bytes(4));
+        mkdir($dir, 0775, true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('evidence_finalization_change_authority_not_verified');
+
+            (new EvidenceFinalizationService($dir, new EvidenceFinalizationFakeDb(changeAuthorityVerified: false)))->finalize([
+                'evidence_key' => 'EV-AMENDMENT',
+                'subject_type' => 'evidence_record',
+                'subject_id' => 'EV-1',
+                'actor_id' => 'qa-1',
+                'original_bytes' => 'raw original amended',
+                'canonical_payload' => ['result' => 'amended'],
+                'readable_snapshot_html' => '<html><body>amended</body></html>',
+                'publication_state' => ['publication_state' => 'pending'],
+                'source_version_id' => '00000000-0000-0000-0000-000000000601',
+                'source_change_order_id' => '00000000-0000-0000-0000-000000000602',
+                'field_paths' => ['canonical_payload'],
                 'signature_events' => [$this->evidenceSignatureEvent()],
             ]);
         } finally {
@@ -3075,7 +3117,7 @@ final class DocumentFormControlFakeDb
     {
         return implode("\n", array_map(
             static fn(array $call): string => $call['sql'],
-            array_merge($this->queryOneCalls, $this->queryCalls),
+            $this->queryOneCalls,
         ));
     }
 }
@@ -3106,7 +3148,7 @@ final class GenealogyGraphFakeDb
     {
         return implode("\n", array_map(
             static fn(array $call): string => $call['sql'],
-            $this->queryOneCalls,
+            array_merge($this->queryOneCalls, $this->queryCalls),
         ));
     }
 
