@@ -128,8 +128,17 @@ final class PeriodicEvaluationService
                  audit_pack_export_id = COALESCE(CAST(:audit_pack_export_id AS uuid), audit_pack_export_id),
                  waiver_signature_event_id = COALESCE(CAST(:waiver_signature_event_id AS uuid), waiver_signature_event_id),
                  updated_at = now()
-             WHERE (:periodic_evaluation_id IS NOT NULL AND periodic_evaluation_id::text = :periodic_evaluation_id)
-                OR (:evaluation_scope IS NOT NULL AND :scope_ref IS NOT NULL AND evaluation_scope = :evaluation_scope AND scope_ref = :scope_ref)
+             WHERE (
+                   :periodic_evaluation_id IS NOT NULL
+                   AND periodic_evaluation_id::text = :periodic_evaluation_id
+               )
+                OR (
+                   :periodic_evaluation_id IS NULL
+                   AND :evaluation_scope IS NOT NULL
+                   AND :scope_ref IS NOT NULL
+                   AND evaluation_scope = :evaluation_scope
+                   AND scope_ref = :scope_ref
+               )
              RETURNING *",
             [
                 ':evaluation_state' => $target,
@@ -238,8 +247,17 @@ final class PeriodicEvaluationService
         $row = $this->db->queryOne(
             "SELECT periodic_evaluation_id, evaluation_scope, scope_ref, evaluation_state, result_payload
              FROM periodic_evaluations
-             WHERE (:periodic_evaluation_id IS NOT NULL AND periodic_evaluation_id::text = :periodic_evaluation_id)
-                OR (:evaluation_scope IS NOT NULL AND :scope_ref IS NOT NULL AND evaluation_scope = :evaluation_scope AND scope_ref = :scope_ref)
+             WHERE (
+                   :periodic_evaluation_id IS NOT NULL
+                   AND periodic_evaluation_id::text = :periodic_evaluation_id
+               )
+                OR (
+                   :periodic_evaluation_id IS NULL
+                   AND :evaluation_scope IS NOT NULL
+                   AND :scope_ref IS NOT NULL
+                   AND evaluation_scope = :evaluation_scope
+                   AND scope_ref = :scope_ref
+               )
              LIMIT 1",
             [
                 ':periodic_evaluation_id' => $id,

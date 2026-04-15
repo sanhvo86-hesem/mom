@@ -212,7 +212,6 @@ final class DocumentRevisionCommandService
                AND read_ack_required = true
                AND (
                    (audience_type = 'user' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
-                   OR (audience_type = 'individual' AND (audience_ref = :actor_ref OR audience_ref = :audience_user_id))
                )
              RETURNING *",
             [

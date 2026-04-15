@@ -520,9 +520,11 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         ]);
 
         $this->assertSame('waived', $row['evaluation_state']);
+        $this->assertStringContainsString(':periodic_evaluation_id IS NULL', $db->queryOneCalls[0]['sql']);
         $this->assertStringContainsString('INNER JOIN e_signature_auth_challenges', $db->queryOneCalls[1]['sql']);
         $this->assertStringContainsString("signature_action = 'periodic_evaluation_waiver'", $db->queryOneCalls[1]['sql']);
         $this->assertStringContainsString('UPDATE periodic_evaluations', $db->queryOneCalls[2]['sql']);
+        $this->assertStringContainsString(':periodic_evaluation_id IS NULL', $db->queryOneCalls[2]['sql']);
     }
 
     public function testPeriodicEvaluationWaiverRejectsCallerSuppliedHashMismatch(): void
@@ -608,6 +610,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $this->assertSame('valid', $result['digest_state']);
         $this->assertStringContainsString('INSERT INTO integrity_exceptions', $db->queryOneCalls[1]['sql']);
         $this->assertSame('integrity_digest_mismatch', $db->queryOneCalls[1]['params'][':reason_code']);
+        $this->assertSame('global', $db->queryOneCalls[1]['params'][':object_id']);
     }
 
     public function testElectronicSignatureChallengeRejectsCallerControlledIdExpiryAndUnknownAction(): void
@@ -828,6 +831,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
         $sql = $db->combinedSql();
         $this->assertStringContainsString('doc_read_acknowledgements', $sql);
         $this->assertStringContainsString("distribution_state = 'complete'", $sql);
+        $this->assertStringNotContainsString("audience_type = 'individual'", $sql);
         $this->assertStringContainsString("lifecycle_state = 'superseded'", $sql);
         $this->assertStringContainsString("distribution_state = 'superseded'", $sql);
     }

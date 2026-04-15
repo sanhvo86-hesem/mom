@@ -206,7 +206,13 @@ final class IntegrityDigestService
      */
     private function digestObjectId(array $scope): string
     {
-        return $scope === [] ? 'global' : hash('sha256', $this->json($scope));
+        $partition = [];
+        foreach (['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'] as $field) {
+            if (($scope[$field] ?? '') !== '') {
+                $partition[$field] = $scope[$field];
+            }
+        }
+        return $partition === [] ? 'global' : hash('sha256', $this->json($partition));
     }
 
     private function requiredText(mixed $value, string $field): string
