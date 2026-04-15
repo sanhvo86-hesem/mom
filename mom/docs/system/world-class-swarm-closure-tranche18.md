@@ -12,9 +12,9 @@ Date: 2026-04-15
 | Coordinator synthesis | COMPLETE | This closure doc, benchmark dossier, backlog ledger, branch strategy |
 | Implementation | COMPLETE_ON_INTEGRATION | Planning/release scope authority, readiness redaction, fallback write-failure health, MES event spine, periodic-evaluation closure proof, generated artifact refresh |
 | Pass 2 | COMPLETE | Six pass-2 reports written; pass-2 defects and deep merge-gate defects fixed; focused regression/PHPStan/publication gates passed |
-| Merge to main | PENDING_AT_THIS_DOC_VERSION | Must run only after pass 2 and merge gate |
-| Pass 3 on main | PENDING_AT_THIS_DOC_VERSION | Must run after merge |
-| Cleanup | PENDING_AT_THIS_DOC_VERSION | Helper/integration branches remain until final cleanup |
+| Merge to main | COMPLETE | Integration branch `codex/tranche18-zero-trust-signoff-20260415` was fast-forward merged into `main` after the merge gate |
+| Pass 3 on main | COMPLETE | Six post-merge pass-3 reports written under `mom/docs/system/agent-reports/tranche18/` |
+| Cleanup | READY_FOR_FINAL_COMMANDS | Pass 3 found only branch/worktree/scratch-branch cleanup blockers; no application code defect remains |
 
 ## First-Pass Synthesis
 
@@ -50,8 +50,16 @@ Date: 2026-04-15
 - Deep merge-gate smoke found `machine_raw_events` missing direct governance metadata; migration 135 and `MachineEventSpineService` now include `payload_schema_version` and `row_version`.
 - Deep merge-gate smoke found generated-artifact drift after migration 135; `canonical_publication_orchestrator.py`, schema authority, and publication-truth verification now pass with 764 registry/schema authority tables and 4214 implementation-linked endpoints.
 
+## Pass-3 Findings
+
+- Agent 1: repo reality on `main` matches the tranche 18 implementation; cleanup blockers remained until final branch/worktree deletion.
+- Agent 2: found one doc false-confidence phrase in `mom/docs/world-class-platform-benchmark-2025-2026.md`; fixed by changing Part 11/GxP wording to validation-bound scope-ready language.
+- Agent 3: vendor benchmark positioning remains honest; no full-suite parity claim was introduced.
+- Agent 4: architecture boundaries remain coherent after merge; scratch release-evidence rename churn must not be promoted.
+- Agent 5: reliability/security/observability/compliance surfaces passed; external OTel and Part 11 validation proof remain outside repo scope.
+- Agent 6: inherited FIX_NOW ledger remains closed; final cleanup must delete helper/integration/scratch branches and worktrees.
+
 ## Merge Gate Requirements Still Required
 
-- Integration branch validation must run clean or be documented with hard evidence.
-- Merge to `main` must happen only after no code-fixable defect remains.
-- Pass 3 must run on `main` after merge and any pass-3 code-fixable defect must be fixed.
+- Final branch/worktree cleanup must complete after the pass-3 evidence commit.
+- `main` should be pushed if remote publication is available.

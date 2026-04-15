@@ -5,7 +5,7 @@ Date: 2026-04-15
 ## Integration Branch
 
 - Integration branch: `codex/tranche18-zero-trust-signoff-20260415`
-- Base: local `main` aligned with `origin/main` at `a7b499ec` before branch creation
+- Base: local `main` aligned with `origin/main` at `a7b499ec` before branch creation; before final merge the integration branch was rebased onto local `main` after `8f4b7030`
 - Policy: no tranche18 edits on `main` before final merge phase
 
 ## Helper Branches / Worktrees
@@ -24,6 +24,7 @@ Date: 2026-04-15
 - Pass 1: all six agents complete before coding.
 - Implementation: coordinator applies scoped fixes on the integration branch only.
 - Temporary helper branch `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1033` is treated as coordinator implementation scratch only; its reviewed changes are merged back into `codex/tranche18-zero-trust-signoff-20260415` before final merge, and it is deleted during cleanup.
+- Temporary cleanup branch `codex/worldclass-erp-mom-mes-eqms-closure-20260415-1516` is treated as scratch-only. It deleted required tranche18 inventory in an unmerged commit, so it is not promoted to `main`; final pass-3 evidence is committed directly on `main` instead.
 - Pass 2: same six-agent lanes re-audit integration branch changes before merge.
 - Merge gate: run focused and broad validation on integration branch.
 - Final merge: switch to `main`, update from remote when available, then merge `codex/tranche18-zero-trust-signoff-20260415` into `main`.

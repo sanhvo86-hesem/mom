@@ -508,7 +508,7 @@
 | **C. Quality** | NCR/CAPA | CAPA via "Continuous Improvement" object; deviations, internal/external audits, complaints, lab investigations, change controls |
 | | Root cause | Investigation workflows built-in |
 | | Closed-loop | Deviations -> Investigations -> Root Causes -> CAPAs -> Change Controls |
-| **F. Compliance** | Standards | FDA 21 CFR Part 11, EU Annex 11, GxP -- built from ground up |
+| **F. Compliance** | Standards | FDA 21 CFR Part 11, EU Annex 11, and GxP scope-ready controls when implemented, validated, and governed for regulated records |
 | | Audit trail | Permanent audit logs on all records (out-of-the-box) |
 | | E-signature | Yes -- Part 11-capable native controls when validated and scoped to intended regulated records |
 | | Access control | Role-based (out-of-the-box) |
