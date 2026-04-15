@@ -1,9 +1,16 @@
 # HESEM MOM ERP — Claude Code Guide
 
-## File Placement Rules
+## MANDATORY: Read Before Doing Anything
 
-**Before creating any file, read `.ai/CONVENTIONS.md`.**
-It defines exactly where every type of file belongs. NEVER place files at the repo root.
+**Follow the 4-phase workflow in `.ai/AI-WORKFLOW.md` — no exceptions.**
+
+Quick mandatory sequence every session:
+1. Read `.ai/CONVENTIONS.md` — WHERE to put files
+2. Read `.ai/repo-map.json` — project topology
+3. Read `AGENTS.md` — governance rules
+4. THEN locate → plan → execute → verify
+
+**NEVER create files at repo root. NEVER place reports inside `mom/docs/`.**
 
 ## AI Context Loading Protocol
 

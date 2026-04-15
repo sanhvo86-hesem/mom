@@ -1,8 +1,13 @@
 # GitHub Copilot Instructions — HESEM MOM ERP
 
-## File Placement
-Read `.ai/CONVENTIONS.md` before creating any file.
-NEVER place files at the repo root directory.
+## Mandatory Workflow
+Follow `.ai/AI-WORKFLOW.md` before every task:
+1. ORIENT: read `CONVENTIONS.md`, `repo-map.json`, `AGENTS.md`
+2. LOCATE: Grep index files to find classes/tables/routes
+3. PLAN: state exact file paths before creating anything
+4. VERIFY: run PHPStan + PHPUnit after changes
+
+NEVER place files at repo root. NEVER place reports or dev docs in `mom/docs/`.
 
 ## Project Orientation
 1. Read `.ai/repo-map.json` first — project topology, 54 controllers, 122 services, 137 migrations

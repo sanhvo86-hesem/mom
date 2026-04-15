@@ -64,12 +64,22 @@ Run the maximum safe subset for every change:
 - CNC/digital-thread work: item revision, operation, setup sheet, CNC program, inspection plan, genealogy, MTConnect/OPC UA readiness.
 - AI/security/reliability work: AI advisory boundaries, projections, copilot grounding, OT/IT controls, audit, CSRF, replay safety, DevEx.
 
+## Mandatory Workflow
+
+**Read `.ai/AI-WORKFLOW.md` before starting any task.** It defines the 4-phase process:
+- Phase 0: ORIENT — read CONVENTIONS.md, repo-map.json, AGENTS.md
+- Phase 1: LOCATE — use index files, never scan directories blindly
+- Phase 2: PLAN — state domain, tables, exact file paths, regression surface
+- Phase 3: EXECUTE — write code/files at exactly the stated locations
+- Phase 4: VERIFY — PHPStan + PHPUnit + index regeneration
+
 ## File Placement
 
-- **Read `.ai/CONVENTIONS.md` before creating any file.** It defines exactly where every type of file belongs.
-- NEVER place documentation, scripts, data files, or reports at the repo root.
-- Root directory is reserved for: `CLAUDE.md`, `AGENTS.md`, web entry files (`index.html`, `index.php`, `robots.txt`, `favicon.ico`), and dotfiles (`.editorconfig`, `.htaccess`, `.gitignore`).
-- When in doubt, check the directory map in `.ai/CONVENTIONS.md`.
+- **Every new file must be verified against `.ai/CONVENTIONS.md` before creation.**
+- NEVER place files at repo root (except CLAUDE.md, AGENTS.md, web files, dotfiles).
+- NEVER place reports, AI artifacts, or development notes inside `mom/docs/` root.
+- `mom/docs/` contains ONLY 5 subdirs served by the app: `forms/`, `training/`, `system/`, `operations/`, `glossary/`
+- AI-generated reports belong in `_reports/<category>/` or `mom/data/registry/` or `mom/release/`.
 
 ## AI Index Usage
 

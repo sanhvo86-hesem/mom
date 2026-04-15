@@ -33,7 +33,6 @@ Each AI tool reads a different config file. All of them point here.
 │   └── route-map.json            # API route index
 ├── .claude/                      # Claude Code config
 ├── .github/workflows/            # CI/CD pipelines
-├── assets/                       # Static frontend assets (served by app)
 ├── docs/                         # Reference documentation (NOT served by app)
 │   ├── api/                      # API specifications
 │   ├── architecture/             # Architecture decisions and specs
@@ -41,10 +40,10 @@ Each AI tool reads a different config file. All of them point here.
 │   ├── backend/                  # Backend specifications
 │   ├── benchmark/                # Gap analysis, scorecards
 │   ├── operations/               # Operational governance (M365, SharePoint)
-│   └── release/                  # Release notes and merge gates
-├── standards/                    # QMS standards (numbered governance docs)
-│   ├── templates/                # Master templates (referenced by code)
-│   └── reference/                # Reference materials (referenced by code)
+│   ├── release/                  # Release notes and merge gates
+│   └── standards/                # QMS standards (numbered governance docs)
+│       ├── templates/            # Master templates (referenced by code)
+│       └── reference/            # Reference materials (referenced by code)
 ├── tools/                        # Build, automation, and utility scripts
 │   ├── scripts/                  # Categorized scripts
 │   │   ├── ai-index/             # AI index generator
@@ -72,6 +71,7 @@ Each AI tool reads a different config file. All of them point here.
 │   ├── data/                     # Runtime data and config
 │   │   ├── registry/             # Generated registry reports
 │   │   └── config/               # Runtime configuration
+│   ├── assets/                   # Static assets (style.css, app.js, logos — served by app)
 │   ├── design/                   # Frontend design system
 │   ├── docs/                     # App-served documents (DO NOT MOVE)
 │   │   ├── ai-prompts/           # AI context and prompt docs
@@ -106,8 +106,8 @@ Each AI tool reads a different config file. All of them point here.
 | Security or compliance audit | `docs/audits/` | `agent7-network-security.md` |
 | Benchmark or gap analysis | `docs/benchmark/` | `oee-benchmark-q2-2026.md` |
 | Release gate or notes | `docs/release/` | `v2.2-release-gate.md` |
-| QMS standard (numbered) | `standards/` | `37-new-standard.md` |
-| Standard template | `standards/templates/` | `frm-template.xlsx` |
+| QMS standard (numbered) | `docs/standards/` | `37-new-standard.md` |
+| Standard template | `docs/standards/templates/` | `frm-template.xlsx` |
 | Build or automation script | `tools/scripts/<category>/` | `tools/scripts/encoding/fix-utf8.py` |
 | Reference data for scripts | `tools/data/` | `word-list.txt` |
 | Generated CI/test report | `_reports/<category>/` | `_reports/security/scan-report.json` |
@@ -151,6 +151,6 @@ These directories are hardcoded in PHP controllers and services:
 - `mom/docs/training/` — FileController, document portal scanning
 - `mom/docs/system/` — FileController, protected system folder
 - `mom/docs/operations/` — FileController, protected operations folder
-- `assets/` — DocumentController, static asset serving
-- `standards/templates/` — Test validation references
-- `standards/reference/` — GraphicsGovernanceRepository patterns
+- `mom/assets/` — DocumentController, static asset serving (style.css, app.js, logos)
+- `docs/standards/templates/` — Test validation references
+- `docs/standards/reference/` — GraphicsGovernanceRepository patterns

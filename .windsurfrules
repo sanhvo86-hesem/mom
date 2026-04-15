@@ -1,8 +1,13 @@
 # Windsurf Rules — HESEM MOM ERP
 
-## File Placement (MANDATORY)
-Read `.ai/CONVENTIONS.md` before creating any file.
-NEVER place documentation, scripts, data files, or reports at the repo root.
+## MANDATORY WORKFLOW — Every Session
+Read `.ai/AI-WORKFLOW.md` before starting. 4 phases:
+1. ORIENT: `.ai/CONVENTIONS.md` + `.ai/repo-map.json` + `AGENTS.md`
+2. LOCATE: Grep index files, never scan directories blindly
+3. PLAN: state domain, tables, exact paths before any file creation
+4. VERIFY: PHPStan + PHPUnit after every change
+
+NEVER place files at repo root. NEVER put reports or dev notes inside `mom/docs/`.
 
 ## Context Loading — Always do this first
 1. `.ai/repo-map.json` — project topology
@@ -28,7 +33,7 @@ PHP 8.2+, PostgreSQL 16, Redis 7, RabbitMQ — custom MVC, no framework.
 | AI prompts | `mom/docs/ai-prompts/` |
 | Specs/architecture | `docs/architecture/` or `docs/backend/` |
 | Audits | `docs/audits/` |
-| Standards | `standards/` |
+| Standards | `docs/standards/` |
 | Scripts | `tools/scripts/<category>/` |
 | CI reports | `_reports/<category>/` |
 | PHP source | `mom/api/controllers/` or `mom/api/services/` |

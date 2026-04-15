@@ -1152,9 +1152,9 @@ class DocumentController extends BaseController
         $depth = ($folderTrim === '') ? 0 : count(array_filter(explode('/', $folderTrim)));
         $rootBase  = str_repeat('../', $depth);
         $rootHref  = $rootBase . 'mom/portal.html';
-        $assetsCss = $rootBase . 'assets/style.css';
-        $assetsJs  = $rootBase . 'assets/app.js';
-        $logoHref  = $rootBase . 'assets/hesem-logo.svg';
+        $assetsCss = $rootBase . 'mom/assets/style.css';
+        $assetsJs  = $rootBase . 'mom/assets/app.js';
+        $logoHref  = $rootBase . 'mom/assets/hesem-logo.svg';
         $ownerHtml = $this->buildHeaderActorClusterHtml($rootBase, $owner !== '' ? $owner : 'QA/QMS', true);
         $approverHtml = $this->buildHeaderActorClusterHtml($rootBase, 'CEO', false);
 

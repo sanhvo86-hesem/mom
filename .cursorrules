@@ -1,8 +1,14 @@
 # Cursor Rules — HESEM MOM ERP
 
-## CRITICAL: File Placement
-Before creating any file, read `.ai/CONVENTIONS.md`.
-NEVER place files at the repo root (exceptions: CLAUDE.md, AGENTS.md, index.html, index.php, robots.txt, favicon.ico, dotfiles).
+## MANDATORY WORKFLOW — Read First
+Follow `.ai/AI-WORKFLOW.md` every session:
+1. ORIENT: read `.ai/CONVENTIONS.md`, `.ai/repo-map.json`, `AGENTS.md`
+2. LOCATE: use index files (Grep, not directory scan)
+3. PLAN: state domain, tables, exact file paths before writing
+4. EXECUTE: create files at stated paths only
+5. VERIFY: PHPStan + PHPUnit after changes
+
+NEVER place files at repo root. NEVER put reports in `mom/docs/`.
 
 ## Project Navigation
 - Read `.ai/repo-map.json` first for project orientation
@@ -28,7 +34,7 @@ NEVER place files at the repo root (exceptions: CLAUDE.md, AGENTS.md, index.html
 - AI prompt docs → `mom/docs/ai-prompts/`
 - Architecture specs → `docs/architecture/`
 - Security audits → `docs/audits/`
-- QMS standards → `standards/`
+- QMS standards → `docs/standards/`
 - Build scripts → `tools/scripts/<category>/`
 - Generated reports → `_reports/<category>/`
 - PHP controllers → `mom/api/controllers/`

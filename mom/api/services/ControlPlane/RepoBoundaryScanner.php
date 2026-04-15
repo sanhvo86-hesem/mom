@@ -33,7 +33,7 @@ final class RepoBoundaryScanner
         ['pattern' => '#(^|/)mom/docs/system/agent-reports($|/)#', 'type' => 'generated_report', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/docs/system/[^/]*tranche[^/]*\.md$#i', 'type' => 'generated_report', 'severity' => 'P1'],
         ['pattern' => '#(^|/)prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
-        ['pattern' => '#(^|/)standards/prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
+        ['pattern' => '#(^|/)docs/standards/prompts($|/)#', 'type' => 'prompt_file', 'severity' => 'P2'],
         ['pattern' => '#^[^/]+\.(docx|pptx|xlsx)$#i', 'type' => 'runtime_artifact', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/docs/forms/.+/(?:\.backups|[^/]+\.bak$)#i', 'type' => 'generated_form_backup', 'severity' => 'P1'],
         ['pattern' => '#(^|/)mom/docs/tmp($|/)#', 'type' => 'runtime_artifact', 'severity' => 'P2'],
@@ -54,8 +54,8 @@ final class RepoBoundaryScanner
      * @var list<string>
      */
     private const ALLOWED_CONTROLLED_BINARY_PATTERNS = [
-        '#^standards/templates/[^/]+\.(xlsx|docx|pptx)$#i',
-        '#^standards/reference/[^/]+\.(xlsx|docx|pptx)$#i',
+        '#^docs/standards/templates/[^/]+\.(xlsx|docx|pptx)$#i',
+        '#^docs/standards/reference/[^/]+\.(xlsx|docx|pptx)$#i',
     ];
 
     /**
