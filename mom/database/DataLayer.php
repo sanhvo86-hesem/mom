@@ -111,6 +111,57 @@ class DataLayer
     }
 
     /**
+     * Execute a PostgreSQL SELECT query through the governed connection.
+     *
+     * @param array<string|int, mixed> $params
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function query(string $sql, array $params = []): ?array
+    {
+        return $this->requireSqlConnection()->query($sql, $params);
+    }
+
+    /**
+     * Execute a PostgreSQL SELECT query and return the first row.
+     *
+     * @param array<string|int, mixed> $params
+     * @return array<string, mixed>|null
+     */
+    public function row(string $sql, array $params = []): ?array
+    {
+        return $this->requireSqlConnection()->queryOne($sql, $params);
+    }
+
+    /**
+     * Execute a PostgreSQL scalar query.
+     *
+     * @param array<string|int, mixed> $params
+     */
+    public function scalar(string $sql, array $params = []): mixed
+    {
+        return $this->requireSqlConnection()->queryScalar($sql, $params);
+    }
+
+    /**
+     * Execute a PostgreSQL mutation statement.
+     *
+     * @param array<string|int, mixed> $params
+     */
+    public function execute(string $sql, array $params = []): int
+    {
+        return $this->requireSqlConnection()->execute($sql, $params);
+    }
+
+    private function requireSqlConnection(): Connection
+    {
+        $connection = $this->getConnection();
+        if ($connection === null) {
+            throw new RuntimeException('PostgreSQL connection is not available for SQL-backed EQMS operations');
+        }
+        return $connection;
+    }
+
+    /**
      * Return the resolved database configuration for server-side observability
      * and read-only probes.
      *

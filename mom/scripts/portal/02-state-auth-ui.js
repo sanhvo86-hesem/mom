@@ -2185,6 +2185,11 @@ function renderSidebar(){
     if(canUserAccessModule('ai-scheduling')) qualityButtons.push(portalNavButtonHtml('ai-scheduling', '🤖', lang==='en'?'AI Quality':'AI Chất lượng', {active: currentPage==='ai-scheduling'}));
     html += portalNavSectionHtml(lang==='en'?'QUALITY':'CHẤT LƯỢNG', qualityButtons);
 
+    /* EQMS Suite — World-Class Quality Management */
+    const eqmsButtons = [];
+    eqmsButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
+    html += portalNavSectionHtml(lang==='en'?'EQMS':'EQMS', eqmsButtons);
+
     const recordButtons = [];
     if(canUserAccessModule('forms')) recordButtons.push(portalNavButtonHtml('forms', '📋', lang==='en'?'Evidence Control':'Kiểm soát chứng cứ', {active: currentPage==='forms'}));
     /* 'evidence' nav removed — merged into forms module Evidence tab */
@@ -2490,6 +2495,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
   if(page==='module-builder'){ renderModuleBuilderPage(); }
   if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
+  if(page==='eqms' && typeof window._renderEqmsSuite==='function'){ var eqp=document.getElementById('page-eqms'); if(eqp) window._renderEqmsSuite(eqp); }
   if(page==='admin'){ if(!canUserAccessModule('admin')){navigateTo(firstAccessiblePortalModule());return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');

@@ -1,4 +1,17 @@
 openapi: "3.1.2"
+# ──────────────────────────────────────────────────────────────────────────────
+# EQMS World-Class Surface supplement:
+#   mom/api/openapi-eqms-worldclass.yaml  (OpenAPI 3.1.0, ~280 endpoints)
+#
+# To generate a merged spec:
+#   php tools/scripts/merge-openapi.php mom/api/openapi.yaml \
+#       mom/api/openapi-eqms-worldclass.yaml > mom/api/openapi-merged.yaml
+#
+# Supplement covers: customer-complaints, deviations, ncr, capa, change-control,
+#   engineering-changes, documents, training, audits, supplier-quality, risks/fmea,
+#   calibration/msa, lab-investigations, batch-release, validation, field-actions,
+#   genealogy, inspection/iqc, spc, quality-tower  (tags: eqms-*)
+# ──────────────────────────────────────────────────────────────────────────────
 info:
   title: HESEM QMS Portal API
   description: |

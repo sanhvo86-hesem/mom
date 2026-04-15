@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 681,
-        "generated_at": "2026-04-15T13:52:38+00:00"
+        "table_count": 717,
+        "generated_at": "2026-04-15T14:38:13+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -2287,6 +2287,53 @@
             ],
             "contract": null
         },
+        "eqms_attachments": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "attachment_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_audit_findings": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "finding_id",
+            "foreign_keys": [
+                {
+                    "col": "audit_id",
+                    "ref": "eqms_audits(audit_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_audits": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "audit_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_batch_release": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "batch_release_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_calibration_records": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "calibration_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_capa_records": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "capa_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_change_affected_object": {
             "defined_in": "104_eqms_change_authority_field_governance.sql",
             "extended_in": [],
@@ -2297,6 +2344,13 @@
                     "ref": "plm_change_orders(plm_change_order_id)"
                 }
             ],
+            "contract": null
+        },
+        "eqms_change_controls": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "change_control_id",
+            "foreign_keys": [],
             "contract": null
         },
         "eqms_change_resulting_object": {
@@ -2327,11 +2381,56 @@
             ],
             "contract": null
         },
+        "eqms_comments": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "comment_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_complaints": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "complaint_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_controlled_copies": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "copy_id",
+            "foreign_keys": [
+                {
+                    "col": "doc_id",
+                    "ref": "eqms_documents(doc_id)"
+                }
+            ],
+            "contract": null
+        },
         "eqms_controlled_revision_rollout": {
             "defined_in": "105_connected_governance_revision_training_execution.sql",
             "extended_in": [],
             "primary_key": "rollout_id",
             "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_deviations": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "deviation_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_document_acknowledgements": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "ack_id",
+            "foreign_keys": [
+                {
+                    "col": "doc_id",
+                    "ref": "eqms_documents(doc_id)"
+                }
+            ],
             "contract": null
         },
         "eqms_document_distribution": {
@@ -2410,6 +2509,13 @@
             ],
             "contract": null
         },
+        "eqms_documents": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "doc_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_electronic_signature_event": {
             "defined_in": "101_eqms_control_plane_foundation.sql",
             "extended_in": [],
@@ -2420,6 +2526,13 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "eqms_engineering_changes": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "ec_id",
+            "foreign_keys": [],
             "contract": null
         },
         "eqms_evidence_artifact": {
@@ -2485,6 +2598,20 @@
             "defined_in": "105_connected_governance_revision_training_execution.sql",
             "extended_in": [],
             "primary_key": "decision_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_export_jobs": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "job_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_field_actions": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "field_action_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -2653,6 +2780,27 @@
             ],
             "contract": null
         },
+        "eqms_lab_investigations": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "investigation_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_msa_records": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "msa_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_ncr_records": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "ncr_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_publication_event": {
             "defined_in": "103_eqms_evidence_package_publication.sql",
             "extended_in": [],
@@ -2692,6 +2840,20 @@
             "foreign_keys": [],
             "contract": null
         },
+        "eqms_quality_agreements": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "agreement_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_record_links": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "link_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_retention_lock": {
             "defined_in": "103_eqms_evidence_package_publication.sql",
             "extended_in": [],
@@ -2704,6 +2866,96 @@
             ],
             "contract": null
         },
+        "eqms_risk_register": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "risk_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_risks_controls": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "control_id",
+            "foreign_keys": [
+                {
+                    "col": "risk_id",
+                    "ref": "eqms_risk_register(risk_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_scars": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "scar_id",
+            "foreign_keys": [
+                {
+                    "col": "supplier_audit_id",
+                    "ref": "eqms_supplier_audits(supplier_audit_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_signatures": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "signature_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_spc_violation_acks": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "ack_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_supplier_audits": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "supplier_audit_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_supplier_profiles": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "supplier_profile_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_supplier_qualification_events": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "event_id",
+            "foreign_keys": [
+                {
+                    "col": "supplier_profile_id",
+                    "ref": "eqms_supplier_profiles(supplier_profile_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_training_curricula": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "curriculum_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_training_matrix": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "matrix_id",
+            "foreign_keys": [
+                {
+                    "col": "curriculum_id",
+                    "ref": "eqms_training_curricula(curriculum_id)"
+                }
+            ],
+            "contract": null
+        },
         "eqms_training_obligation": {
             "defined_in": "105_connected_governance_revision_training_execution.sql",
             "extended_in": [],
@@ -2712,6 +2964,65 @@
                 {
                     "col": "rollout_id",
                     "ref": "eqms_controlled_revision_rollout(rollout_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_training_records": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "training_id",
+            "foreign_keys": [
+                {
+                    "col": "curriculum_id",
+                    "ref": "eqms_training_curricula(curriculum_id)"
+                },
+                {
+                    "col": "document_id",
+                    "ref": "eqms_documents(doc_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_validation_executions": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "execution_id",
+            "foreign_keys": [
+                {
+                    "col": "protocol_id",
+                    "ref": "eqms_validation_protocols(protocol_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_validation_projects": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "project_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_validation_protocols": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "protocol_id",
+            "foreign_keys": [
+                {
+                    "col": "project_id",
+                    "ref": "eqms_validation_projects(project_id)"
+                }
+            ],
+            "contract": null
+        },
+        "eqms_validation_requirements": {
+            "defined_in": "136_eqms_worldclass_surface.sql",
+            "extended_in": [],
+            "primary_key": "requirement_id",
+            "foreign_keys": [
+                {
+                    "col": "project_id",
+                    "ref": "eqms_validation_projects(project_id)"
                 }
             ],
             "contract": null

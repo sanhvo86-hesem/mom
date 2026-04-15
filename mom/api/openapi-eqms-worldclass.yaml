@@ -1,0 +1,1286 @@
+openapi: "3.1.0"
+info:
+  title: HESEM MOM — EQMS World-Class Surface
+  description: |
+    OpenAPI supplement for the world-class EQMS expansion in HESEM MOM v4.0.
+
+    This file describes all **new and upgraded** EQMS endpoints.
+    It supplements (not replaces) the base `openapi.yaml`.
+
+    ## Module inventory
+
+    | Module | Prefix | Status |
+    |--------|--------|--------|
+    | Customer Complaints | `/api/v1/eqms/customer-complaints` | Upgraded |
+    | Deviations / Quality Events | `/api/v1/eqms/deviations` | New |
+    | NCR / MRB | `/api/v1/eqms/ncr` | Upgraded |
+    | CAPA | `/api/v1/eqms/capa` | Upgraded |
+    | Formal Change Control | `/api/v1/eqms/change-controls` | New |
+    | Engineering Change | `/api/v1/eqms/engineering-change` | Upgraded |
+    | Document Control | `/api/v1/eqms/documents` | Upgraded (QualityDocs-grade) |
+    | Training & Competency | `/api/v1/eqms/training` | Upgraded |
+    | Audit Management | `/api/v1/eqms/audits` | Upgraded |
+    | Supplier Quality Network | `/api/v1/eqms/suppliers` | New |
+    | Supplier Audits + SCAR | `/api/v1/eqms/supplier-audits`, `/api/v1/eqms/scars` | New |
+    | Quality Risk + FMEA | `/api/v1/eqms/risks`, `/api/v1/eqms/fmea` | New |
+    | Calibration + MSA | `/api/v1/eqms/calibration`, `/api/v1/eqms/msa` | Upgraded |
+    | IQC | `/api/v1/mes/quality/iqc` | Hardened |
+    | In-Process Inspection | `/api/v1/mes/quality/inprocess` | Hardened |
+    | SPC / Control Charts | `/api/v1/mes/quality/spc` | Hardened + create-deviation |
+    | OOS / OOT / Lab Investigation | `/api/v1/eqms/lab-investigations` | New |
+    | Batch Release | `/api/v1/eqms/batch-release` | New |
+    | Validation Management | `/api/v1/eqms/validation` | New |
+    | Field Actions / Recall | `/api/v1/eqms/field-actions` | New |
+    | Genealogy / Traceability | `/api/v1/mom/traceability/genealogy` | Hardened |
+
+    ## Cross-cutting contract (all regulated modules)
+
+    Every regulated module exposes the following sub-resources on `/{id}`:
+    - `GET /audit` — immutable audit trail (append-only)
+    - `GET|POST /comments` — record comments
+    - `GET|POST /attachments` — managed attachments
+    - `GET /relationships`, `POST /relationships/link`, `POST /relationships/unlink`
+    - `GET /available-actions` — allowed transitions from current state
+    - `GET|POST /signatures` — electronic signatures (21 CFR Part 11)
+    - `POST /export` — queue export job (returns 202 + job_id)
+
+    ## Regulated workflow contract
+
+    - All state transitions are **explicit** — no `status=done` shortcuts.
+    - `PATCH` on regulated records requires `If-Match: "{version}"` header.
+    - Electronic signature (`esig` object in body) is required for:
+      `close`, `approve`, `release`, `supersede`, `obsolete`, `void`,
+      `use-as-is` (NCR), `accept-residual-risk` (high risk only),
+      `approve-release` and `market-ship` (batch release always),
+      `launch` (field actions), `freeze-trace-report` (genealogy).
+    - Export jobs are asynchronous — `POST /export` returns `202 Accepted` with `job_id`.
+
+    ## Authentication & CSRF
+    Same as base `openapi.yaml`: PHP session cookie + `X-CSRF-Token` header.
+
+  version: 4.0.0
+
+servers:
+  - url: https://qms.hesem.com.vn/01-QMS-Portal/api
+    description: Production
+  - url: http://localhost:8080/01-QMS-Portal/api
+    description: Local development
+
+tags:
+  - name: EQMS-Complaints
+    description: Customer complaints — full 8D + CAPA linkage + field action initiation
+  - name: EQMS-Deviations
+    description: Deviations and quality events — batch-linked, change-control-linked
+  - name: EQMS-NCR
+    description: Nonconformance reports + MRB disposition (AS9100D, IATF 16949)
+  - name: EQMS-CAPA
+    description: Corrective and Preventive Actions with effectiveness verification
+  - name: EQMS-ChangeControl
+    description: Formal change control — impact assessment, multi-level approval, training impact
+  - name: EQMS-EngineeringChange
+    description: Engineering change orders aligned with formal change control
+  - name: EQMS-Documents
+    description: QualityDocs-grade document control — checkout/checkin, controlled copies, acknowledgements
+  - name: EQMS-Training
+    description: Training records, curricula, competency matrix, effectiveness verification
+  - name: EQMS-Audits
+    description: Audit programs, findings management, response tracking
+  - name: EQMS-Suppliers
+    description: Supplier quality network — qualifications, scorecards, quality agreements
+  - name: EQMS-SupplierAudits
+    description: Supplier on-site/remote audits
+  - name: EQMS-SCAR
+    description: Supplier Corrective Action Requests (8D-based)
+  - name: EQMS-Risks
+    description: Quality risk register — likelihood × severity heatmap, control verification
+  - name: EQMS-FMEA
+    description: FMEA (DFMEA/PFMEA/System) with RPN tracking — AIAG/VDA 2019
+  - name: EQMS-Calibration
+    description: Instrument calibration records + OOT declaration
+  - name: EQMS-MSA
+    description: Measurement System Analysis — gauge R&R, linearity, bias, stability
+  - name: EQMS-IQC
+    description: Incoming quality inspection (hardened surface)
+  - name: EQMS-InProcess
+    description: In-process quality inspection (hardened surface)
+  - name: EQMS-SPC
+    description: SPC control charts — rule violation workflows, create-deviation action
+  - name: EQMS-LabInvestigations
+    description: OOS / OOT / lab investigation — 2-phase FDA-compliant workflow
+  - name: EQMS-BatchRelease
+    description: Batch release workspace — aggregated evidence, electronic approval, market-ship
+  - name: EQMS-Validation
+    description: Validation management — CSV/CQV/process/equipment, IQ/OQ/PQ, trace matrix
+  - name: EQMS-FieldActions
+    description: Field actions / recall / product surveillance (FDA, EU MDR patterns)
+  - name: EQMS-Genealogy
+    description: Lot genealogy and traceability — upstream/downstream expansion, frozen trace reports
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Reusable Components
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+  schemas:
+
+    # ── Standard response envelope ──────────────────────────────────────────
+    SuccessEnvelope:
+      type: object
+      required: [ok, server_time]
+      properties:
+        ok:          { type: boolean, example: true }
+        server_time: { type: string, format: date-time }
+
+    ErrorEnvelope:
+      type: object
+      required: [ok, error, server_time]
+      properties:
+        ok:          { type: boolean, example: false }
+        error:       { type: string, example: "invalid_transition" }
+        detail:      { type: string }
+        server_time: { type: string, format: date-time }
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:    { type: integer }
+        offset:   { type: integer }
+        limit:    { type: integer }
+        has_more: { type: boolean }
+
+    # ── Electronic signature object ─────────────────────────────────────────
+    EsigObject:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          description: "Meaning of the signature (e.g. 'Approved', 'Released', 'Reviewed and accepted')"
+          example: "Approved — quality review complete"
+        password:
+          type: string
+          format: password
+          description: "User's current password for re-authentication (alternative to sig_token)"
+        sig_token:
+          type: string
+          description: "Pre-issued signature challenge token from /eqms/signature-challenges"
+
+    # ── Concurrency control ─────────────────────────────────────────────────
+    # PATCH requests must include If-Match: "{version}" header.
+    # Actions that mutate state must include version in the body OR If-Match header.
+
+    # ── Cross-cutting sub-resources ─────────────────────────────────────────
+    AuditEvent:
+      type: object
+      properties:
+        event_type:      { type: string }
+        actor_id:        { type: string }
+        occurred_at:     { type: string, format: date-time }
+        payload:         { type: object }
+        esig_reason:     { type: string, nullable: true }
+        prev_hash:       { type: string, nullable: true }
+        event_hash:      { type: string, nullable: true }
+        correlation_id:  { type: string, nullable: true }
+
+    Comment:
+      type: object
+      properties:
+        comment_id:  { type: string, format: uuid }
+        text:        { type: string }
+        author:      { type: string }
+        is_internal: { type: boolean }
+        created_at:  { type: string, format: date-time }
+
+    Attachment:
+      type: object
+      required: [filename, storage_ref]
+      properties:
+        attachment_id: { type: string, format: uuid }
+        filename:      { type: string }
+        storage_ref:   { type: string }
+        mime_type:     { type: string }
+        size_bytes:    { type: integer }
+        uploaded_by:   { type: string }
+        uploaded_at:   { type: string, format: date-time }
+
+    RecordLink:
+      type: object
+      properties:
+        link_id:           { type: string, format: uuid }
+        target_type:       { type: string }
+        target_id:         { type: string, format: uuid }
+        relationship_type: { type: string }
+        linked_by:         { type: string }
+        linked_at:         { type: string, format: date-time }
+
+    Signature:
+      type: object
+      properties:
+        signature_id: { type: string, format: uuid }
+        signer:       { type: string }
+        signing_role: { type: string }
+        reason:       { type: string }
+        signed_at:    { type: string, format: date-time }
+
+    ExportJob:
+      type: object
+      properties:
+        job_id:  { type: string, format: uuid }
+        status:  { type: string, enum: [queued, processing, completed, failed] }
+        format:  { type: string, enum: [pdf, xlsx, csv, json] }
+
+    AvailableActionsResponse:
+      type: object
+      properties:
+        current_state:    { type: string }
+        available_actions: { type: array, items: { type: string } }
+
+    # ── Query request body ──────────────────────────────────────────────────
+    QueryRequest:
+      type: object
+      properties:
+        filters:  { type: object }
+        search:   { type: string }
+        sort_by:  { type: string }
+        sort_dir: { type: string, enum: [ASC, DESC] }
+        offset:   { type: integer, minimum: 0 }
+        limit:    { type: integer, minimum: 1, maximum: 500 }
+
+    # ── Complaint schemas ───────────────────────────────────────────────────
+    Complaint:
+      type: object
+      properties:
+        complaint_id:     { type: string, format: uuid }
+        complaint_number: { type: string, example: "COMP-20260415-0001" }
+        customer_id:      { type: string, format: uuid, nullable: true }
+        customer_name:    { type: string }
+        source:           { type: string, enum: [customer, field, distributor, internal] }
+        severity:         { type: string, enum: [minor, major, critical] }
+        category:         { type: string }
+        subject:          { type: string }
+        description:      { type: string }
+        status:           { type: string, enum: [draft, open, under_investigation, response_issued, closed, reopened] }
+        version:          { type: integer }
+        created_at:       { type: string, format: date-time }
+
+    CreateComplaintRequest:
+      type: object
+      required: [subject, description, severity, received_date]
+      properties:
+        customer_id:       { type: string, format: uuid }
+        customer_name:     { type: string }
+        source:            { type: string, enum: [customer, field, distributor, internal] }
+        severity:          { type: string, enum: [minor, major, critical] }
+        category:          { type: string }
+        subject:           { type: string }
+        description:       { type: string }
+        affected_product_id: { type: string, format: uuid }
+        affected_lot_number: { type: string }
+        received_date:     { type: string, format: date }
+        priority:          { type: string, enum: [low, medium, high, critical] }
+        due_date:          { type: string, format: date }
+
+    # ── Deviation schemas ───────────────────────────────────────────────────
+    Deviation:
+      type: object
+      properties:
+        deviation_id:     { type: string, format: uuid }
+        deviation_number: { type: string, example: "DEV-20260415-0001" }
+        title:            { type: string }
+        description:      { type: string }
+        severity:         { type: string, enum: [minor, major, critical] }
+        deviation_type:   { type: string, enum: [planned, unplanned, emergency] }
+        department:       { type: string }
+        affected_process: { type: string }
+        batch_id:         { type: string, format: uuid, nullable: true }
+        status:           { type: string, enum: [draft, classified, under_investigation, pending_closure, closed, voided] }
+        version:          { type: integer }
+        created_at:       { type: string, format: date-time }
+
+    # ── NCR schemas ─────────────────────────────────────────────────────────
+    NcrRecord:
+      type: object
+      properties:
+        ncr_id:        { type: string, format: uuid }
+        ncr_number:    { type: string, example: "NCR-20260415-0001" }
+        title:         { type: string }
+        severity:      { type: string, enum: [minor, major, critical] }
+        source:        { type: string, enum: [production, receiving, customer, audit, process] }
+        item_id:       { type: string, format: uuid, nullable: true }
+        lot_number:    { type: string }
+        qty_affected:  { type: number }
+        disposition:   { type: string, enum: [rework, repair, use_as_is, return_to_vendor, scrap], nullable: true }
+        status:        { type: string, enum: [draft, submitted, under_review, mrb_review, disposition_set, rework_in_progress, closed] }
+        version:       { type: integer }
+
+    # ── CAPA schemas ────────────────────────────────────────────────────────
+    CapaRecord:
+      type: object
+      properties:
+        capa_id:          { type: string, format: uuid }
+        capa_number:      { type: string, example: "CAPA-20260415-0001" }
+        title:            { type: string }
+        source_type:      { type: string, enum: [ncr, complaint, audit, deviation, spc, other] }
+        severity:         { type: string, enum: [minor, major, critical] }
+        root_cause_method: { type: string, enum: [5why, fishbone, fault_tree, other] }
+        root_cause_description: { type: string }
+        action_plan:      { type: array, items: { type: object } }
+        status:           { type: string, enum: [draft, initiated, analysis, action_planning, pending_approval, approved, implementation, effectiveness_review, closed, cancelled] }
+        version:          { type: integer }
+
+    # ── Change Control schemas ───────────────────────────────────────────────
+    ChangeControl:
+      type: object
+      properties:
+        change_control_id:     { type: string, format: uuid }
+        change_control_number: { type: string }
+        title:                 { type: string }
+        change_type:           { type: string, enum: [quality, regulatory, process, product, system, facility] }
+        change_category:       { type: string, enum: [major, minor, administrative] }
+        risk_level:            { type: string, enum: [high, medium, low], nullable: true }
+        status:                { type: string, enum: [draft, classified, impact_assessed, pending_approval, approved, implementation, effectiveness_review, closed] }
+        version:               { type: integer }
+
+    # ── Document schemas ────────────────────────────────────────────────────
+    EqmsDocument:
+      type: object
+      properties:
+        doc_id:           { type: string, format: uuid }
+        doc_number:       { type: string }
+        title:            { type: string }
+        document_type:    { type: string, enum: [SOP, WI, form, policy, spec, record] }
+        revision_code:    { type: string }
+        effective_date:   { type: string, format: date, nullable: true }
+        checked_out_by:   { type: string, nullable: true }
+        acknowledgement_required: { type: boolean }
+        status:           { type: string, enum: [draft, checked_out, review, pending_approval, approved, released, superseded, obsolete] }
+        version:          { type: integer }
+
+    # ── Risk Register schemas ────────────────────────────────────────────────
+    RiskRecord:
+      type: object
+      properties:
+        risk_id:           { type: string, format: uuid }
+        risk_number:       { type: string }
+        risk_title:        { type: string }
+        risk_category:     { type: string, enum: [product, process, supplier, regulatory, system] }
+        likelihood:        { type: integer, minimum: 1, maximum: 5 }
+        severity:          { type: integer, minimum: 1, maximum: 5 }
+        risk_score:        { type: integer, description: "Computed: likelihood × severity" }
+        residual_risk_score: { type: integer, nullable: true }
+        status:            { type: string, enum: [identified, assessed, controlled, verification, accepted, closed] }
+        version:           { type: integer }
+
+    # ── Batch Release schemas ────────────────────────────────────────────────
+    BatchRelease:
+      type: object
+      properties:
+        batch_release_id:     { type: string, format: uuid }
+        batch_release_number: { type: string }
+        lot_id:               { type: string, format: uuid, nullable: true }
+        batch_number:         { type: string }
+        release_type:         { type: string, enum: [standard, expedited, conditional] }
+        release_package:      { type: object, description: "Aggregated evidence snapshot" }
+        exceptions:           { type: array, items: { type: object } }
+        approved_by:          { type: string, nullable: true }
+        approved_at:          { type: string, format: date-time, nullable: true }
+        status:               { type: string, enum: [initiated, data_aggregated, exceptions_reviewed, hold, approved, shipped] }
+        version:              { type: integer }
+
+    # ── Lab Investigation schemas ────────────────────────────────────────────
+    LabInvestigation:
+      type: object
+      properties:
+        investigation_id:     { type: string, format: uuid }
+        investigation_number: { type: string }
+        investigation_type:   { type: string, enum: [OOS, OOT] }
+        lot_number:           { type: string }
+        test_name:            { type: string }
+        specification:        { type: string }
+        actual_result:        { type: string }
+        phase1_conclusion:    { type: string, nullable: true }
+        phase2_required:      { type: boolean }
+        capa_id:              { type: string, format: uuid, nullable: true }
+        status:               { type: string, enum: [draft, phase1, phase1_complete, phase2, closed] }
+        version:              { type: integer }
+
+    # ── Field Action schemas ────────────────────────────────────────────────
+    FieldAction:
+      type: object
+      properties:
+        field_action_id:     { type: string, format: uuid }
+        field_action_number: { type: string }
+        action_type:         { type: string, enum: [recall, field_safety_notice, advisory, investigation] }
+        classification:      { type: string, enum: [voluntary, mandatory] }
+        affected_products:   { type: array, items: { type: object } }
+        launch_date:         { type: string, format: date-time, nullable: true }
+        status:              { type: string, enum: [draft, under_evaluation, planned, launched, notifications_sent, effectiveness_review, closed] }
+        version:             { type: integer }
+
+  # ── Security ───────────────────────────────────────────────────────────────
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+    csrfHeader:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+
+  # ── Common responses ────────────────────────────────────────────────────────
+  responses:
+    401Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    403Forbidden:
+      description: Insufficient permissions or missing role
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    404NotFound:
+      description: Record not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    409Conflict:
+      description: Invalid workflow transition or business rule violation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    412PreconditionFailed:
+      description: Version conflict (optimistic locking failure)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    428VersionRequired:
+      description: If-Match version header required for this regulated operation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  # ── Common parameters ────────────────────────────────────────────────────────
+  parameters:
+    RecordId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IfMatchVersion:
+      name: If-Match
+      in: header
+      required: true
+      description: "Optimistic lock version. Format: \"{N}\" where N is the integer version."
+      schema: { type: string, example: '"3"' }
+    ExportFormat:
+      name: format
+      in: query
+      schema: { type: string, enum: [pdf, xlsx, csv, json], default: pdf }
+
+security:
+  - sessionCookie: []
+    csrfHeader: []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+paths:
+
+  # ── Customer Complaints ───────────────────────────────────────────────────
+  /v1/eqms/customer-complaints/query:
+    post:
+      tags: [EQMS-Complaints]
+      summary: Query customer complaints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated complaint list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      complaints:
+                        type: array
+                        items: { $ref: '#/components/schemas/Complaint' }
+        '401': { $ref: '#/components/responses/401Unauthorized' }
+
+  /v1/eqms/customer-complaints:
+    post:
+      tags: [EQMS-Complaints]
+      summary: Create a customer complaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateComplaintRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      complaint: { $ref: '#/components/schemas/Complaint' }
+
+  /v1/eqms/customer-complaints/{id}:
+    get:
+      tags: [EQMS-Complaints]
+      summary: Get complaint detail
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      responses:
+        '200':
+          description: Complaint record
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      complaint: { $ref: '#/components/schemas/Complaint' }
+        '404': { $ref: '#/components/responses/404NotFound' }
+    patch:
+      tags: [EQMS-Complaints]
+      summary: Update complaint (requires If-Match version)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      responses:
+        '200': { description: Updated }
+        '412': { $ref: '#/components/responses/412PreconditionFailed' }
+
+  /v1/eqms/customer-complaints/{id}/actions/close:
+    post:
+      tags: [EQMS-Complaints]
+      summary: Close a complaint (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig, closure_summary]
+              properties:
+                closure_summary: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+                version: { type: integer }
+      responses:
+        '200': { description: Complaint closed }
+        '400': { description: Electronic signature required or missing closure_summary }
+        '409': { $ref: '#/components/responses/409Conflict' }
+
+  /v1/eqms/customer-complaints/{id}/audit:
+    get:
+      tags: [EQMS-Complaints]
+      summary: Immutable audit trail for a complaint
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      responses:
+        '200':
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      audit_events:
+                        type: array
+                        items: { $ref: '#/components/schemas/AuditEvent' }
+
+  # ── Deviations ─────────────────────────────────────────────────────────────
+  /v1/eqms/deviations/query:
+    post:
+      tags: [EQMS-Deviations]
+      summary: Query deviations / quality events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated deviation list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      deviations:
+                        type: array
+                        items: { $ref: '#/components/schemas/Deviation' }
+
+  /v1/eqms/deviations/{id}/actions/close:
+    post:
+      tags: [EQMS-Deviations]
+      summary: Close deviation (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig, final_conclusion]
+              properties:
+                final_conclusion: { type: string }
+                root_cause:       { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Deviation closed }
+        '409': { $ref: '#/components/responses/409Conflict' }
+
+  /v1/eqms/deviations/{id}/actions/void:
+    post:
+      tags: [EQMS-Deviations]
+      summary: Void deviation (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig, void_reason]
+              properties:
+                void_reason: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Deviation voided }
+
+  # ── NCR ────────────────────────────────────────────────────────────────────
+  /v1/eqms/ncr/query:
+    post:
+      tags: [EQMS-NCR]
+      summary: Query NCR records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated NCR list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      ncrs: { type: array, items: { $ref: '#/components/schemas/NcrRecord' } }
+
+  /v1/eqms/ncr/{id}/actions/use-as-is:
+    post:
+      tags: [EQMS-NCR]
+      summary: "Disposition: use as-is (AS9100D §8.7.2 — requires engineering justification + signature)"
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [engineering_justification, esig]
+              properties:
+                engineering_justification: { type: string, minLength: 20 }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Disposition recorded }
+        '400': { description: Engineering justification required }
+
+  /v1/eqms/ncr/{id}/actions/close:
+    post:
+      tags: [EQMS-NCR]
+      summary: Close NCR (requires disposition + electronic signature)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                closure_notes: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: NCR closed }
+        '409': { description: Cannot close without disposition }
+
+  # ── CAPA ───────────────────────────────────────────────────────────────────
+  /v1/eqms/capa/query:
+    post:
+      tags: [EQMS-CAPA]
+      summary: Query CAPA records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated CAPA list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      capas: { type: array, items: { $ref: '#/components/schemas/CapaRecord' } }
+
+  /v1/eqms/capa/{id}/actions/submit-approval:
+    post:
+      tags: [EQMS-CAPA]
+      summary: Submit CAPA for approval (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approver, esig]
+              properties:
+                approver: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Submitted for approval }
+
+  /v1/eqms/capa/{id}/actions/close:
+    post:
+      tags: [EQMS-CAPA]
+      summary: Close CAPA (effectiveness review must be completed + electronic signature)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                closure_notes: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: CAPA closed }
+        '409': { description: Cannot close without completed effectiveness review }
+
+  # ── Change Control ─────────────────────────────────────────────────────────
+  /v1/eqms/change-controls/query:
+    post:
+      tags: [EQMS-ChangeControl]
+      summary: Query formal change controls
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated change control list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      change_controls: { type: array, items: { $ref: '#/components/schemas/ChangeControl' } }
+
+  /v1/eqms/change-controls/{id}/actions/approve:
+    post:
+      tags: [EQMS-ChangeControl]
+      summary: Approve change control (electronic signature required; approver must be in approval route)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                approval_comment: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Approved }
+        '403': { description: Approver not in approval route }
+
+  /v1/eqms/change-controls/{id}/training-impact/query:
+    post:
+      tags: [EQMS-ChangeControl]
+      summary: Query training records impacted by this change control
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Impacted training records
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      training_records: { type: array, items: { type: object } }
+
+  # ── Document Control ────────────────────────────────────────────────────────
+  /v1/eqms/documents/query:
+    post:
+      tags: [EQMS-Documents]
+      summary: Query controlled documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated document list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      documents: { type: array, items: { $ref: '#/components/schemas/EqmsDocument' } }
+
+  /v1/eqms/documents/{id}/actions/approve:
+    post:
+      tags: [EQMS-Documents]
+      summary: Approve document (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                approval_comment: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Document approved }
+
+  /v1/eqms/documents/{id}/actions/release:
+    post:
+      tags: [EQMS-Documents]
+      summary: Release document (electronic signature required; sets effective_date)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [effective_date, esig]
+              properties:
+                effective_date: { type: string, format: date }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Document released }
+
+  /v1/eqms/documents/{id}/controlled-copies:
+    get:
+      tags: [EQMS-Documents]
+      summary: List controlled copies issued for this document
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      responses:
+        '200':
+          description: Controlled copies
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      controlled_copies: { type: array, items: { type: object } }
+    post:
+      tags: [EQMS-Documents]
+      summary: Issue a new controlled copy
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [issued_to, issued_location]
+              properties:
+                issued_to:       { type: string }
+                issued_location: { type: string }
+      responses:
+        '201': { description: Controlled copy issued }
+
+  # ── Batch Release ────────────────────────────────────────────────────────────
+  /v1/eqms/batch-release/query:
+    post:
+      tags: [EQMS-BatchRelease]
+      summary: Query batch release records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated batch release list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      batch_releases: { type: array, items: { $ref: '#/components/schemas/BatchRelease' } }
+
+  /v1/eqms/batch-release/{id}/release-package:
+    get:
+      tags: [EQMS-BatchRelease]
+      summary: Get assembled release evidence package
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      responses:
+        '200':
+          description: Release package with all linked evidence
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      release_package: { type: object }
+                      iqc_results:     { type: array, items: { type: object } }
+                      inspection_results: { type: array, items: { type: object } }
+                      deviations:      { type: array, items: { type: object } }
+                      lab_investigations: { type: array, items: { type: object } }
+                      calibration_certs: { type: array, items: { type: object } }
+                      capa_links:      { type: array, items: { type: object } }
+                      exceptions:      { type: array, items: { type: object } }
+
+  /v1/eqms/batch-release/{id}/actions/approve-release:
+    post:
+      tags: [EQMS-BatchRelease]
+      summary: Approve batch release (ALWAYS requires electronic signature — fully regulated)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approval_statement, esig]
+              properties:
+                approval_statement: { type: string, minLength: 10 }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Batch release approved }
+        '400': { description: Electronic signature always required for batch release }
+
+  /v1/eqms/batch-release/{id}/actions/market-ship:
+    post:
+      tags: [EQMS-BatchRelease]
+      summary: Authorize market shipment (requires signature + prior approval)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [market_ship_authorization, esig]
+              properties:
+                market_ship_authorization: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Market shipment authorized }
+        '409': { description: Cannot ship without approved release }
+
+  # ── Lab Investigations ────────────────────────────────────────────────────
+  /v1/eqms/lab-investigations/query:
+    post:
+      tags: [EQMS-LabInvestigations]
+      summary: Query OOS / OOT lab investigations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated lab investigation list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      investigations: { type: array, items: { $ref: '#/components/schemas/LabInvestigation' } }
+
+  /v1/eqms/lab-investigations/{id}/actions/close:
+    post:
+      tags: [EQMS-LabInvestigations]
+      summary: Close lab investigation (electronic signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [root_cause, lab_error_identified, final_conclusion, esig]
+              properties:
+                root_cause:           { type: string }
+                lab_error_identified: { type: boolean }
+                final_conclusion:     { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Investigation closed }
+
+  # ── Field Actions ─────────────────────────────────────────────────────────
+  /v1/eqms/field-actions/query:
+    post:
+      tags: [EQMS-FieldActions]
+      summary: Query field actions / recall records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QueryRequest' }
+      responses:
+        '200':
+          description: Paginated field action list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - $ref: '#/components/schemas/PaginationMeta'
+                  - type: object
+                    properties:
+                      field_actions: { type: array, items: { $ref: '#/components/schemas/FieldAction' } }
+
+  /v1/eqms/field-actions/{id}/actions/launch:
+    post:
+      tags: [EQMS-FieldActions]
+      summary: "Launch field action (electronic signature required — triggers official recall/FSN)"
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                launch_notes: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200': { description: Field action launched }
+        '400': { description: Electronic signature required for launch }
+
+  # ── Risk Register ─────────────────────────────────────────────────────────
+  /v1/eqms/risks/heatmap:
+    get:
+      tags: [EQMS-Risks]
+      summary: Risk heatmap aggregation (likelihood × severity by category)
+      responses:
+        '200':
+          description: Heatmap data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      heatmap:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            likelihood:  { type: integer }
+                            severity:    { type: integer }
+                            risk_score:  { type: integer }
+                            count:       { type: integer }
+                            categories:  { type: array, items: { type: string } }
+
+  /v1/eqms/risks/{id}/actions/accept-residual-risk:
+    post:
+      tags: [EQMS-Risks]
+      summary: Accept residual risk (signature required if risk_score ≥ 12)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/IfMatchVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [acceptance_rationale, residual_risk_score]
+              properties:
+                acceptance_rationale: { type: string }
+                residual_risk_score:  { type: integer, minimum: 1, maximum: 25 }
+                esig:
+                  $ref: '#/components/schemas/EsigObject'
+                  description: "Required when residual_risk_score ≥ 12 (high risk acceptance)"
+      responses:
+        '200': { description: Residual risk accepted }
+        '400': { description: Electronic signature required for high-risk acceptance }
+
+  # ── Genealogy ─────────────────────────────────────────────────────────────
+  /v1/mom/traceability/genealogy/{id}/actions/freeze-trace-report:
+    post:
+      tags: [EQMS-Genealogy]
+      summary: Freeze genealogy as immutable evidence package (quality_manager + signature required)
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [esig]
+              properties:
+                freeze_reason: { type: string }
+                esig: { $ref: '#/components/schemas/EsigObject' }
+      responses:
+        '200':
+          description: Genealogy frozen
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      frozen: { type: boolean }
+                      frozen_at: { type: string, format: date-time }
+                      frozen_by: { type: string }
+
+  # ── SPC create-deviation ──────────────────────────────────────────────────
+  /v1/mes/quality/spc/{id}/actions/create-deviation:
+    post:
+      tags: [EQMS-SPC]
+      summary: Create deviation from SPC rule violation
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deviation_title]
+              properties:
+                deviation_title:       { type: string }
+                deviation_description: { type: string }
+                severity:              { type: string, enum: [minor, major, critical] }
+      responses:
+        '201':
+          description: Deviation created and linked
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      deviation_id:     { type: string, format: uuid }
+                      deviation_number: { type: string }
+
+  # ── Validation Trace Matrix ───────────────────────────────────────────────
+  /v1/eqms/validation/{id}/trace-matrix:
+    get:
+      tags: [EQMS-Validation]
+      summary: Requirement → Protocol → Execution coverage trace matrix
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      responses:
+        '200':
+          description: Trace matrix
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      trace_matrix:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            requirement_id:    { type: string, format: uuid }
+                            req_number:        { type: string }
+                            description:       { type: string }
+                            acceptance_criteria: { type: string }
+                            protocol_coverage: { type: array, items: { type: object } }
+                            execution_results: { type: array, items: { type: object } }
+                            coverage_status:   { type: string, enum: [covered, partial, not_covered] }
